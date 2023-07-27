@@ -1,6 +1,6 @@
-import * as React from "react";
-import ImageList from "@mui/material/ImageList";
-import ImageListItem from "@mui/material/ImageListItem";
+
+import {ImageList, ImageListItem, ImageListItemBar} from "@mui/material";
+
 
 interface ItemData {
   img: string;
@@ -12,43 +12,53 @@ interface ItemData {
 
 const itemData = [
   {
-    img: "https://images.unsplash.com/photo-1551963831-b3b1ca40c98e",
-    title: "Breakfast",
+    img: `${require("../images/photography/six-shooter-sunset.jpg")}`,
+    title: "Six Shooter Sunset",
+    rows: 1,
+    cols: 1,
+  },
+  {
+    img: `${require("../images/photography/alki-beach.jpg")}`,
+    title: "Alki Beach",
+    rows: 1,
+    cols: 1,
+  },
+  {
+    img: `${require("../images/photography/iccle-creek.jpg")}`,
+    title:  "Iccle Creek",
+    rows: 1,
+    cols: 1,
+  },
+  {
+    img: `${require("../images/photography/ancestrial-pueblo.jpg")}`,
+    title: "Ancestral Pueblo View",
+    rows: 1,
+    cols: 1,
+  },
+
+  {
+    img: `${require("../images/photography/crow.jpg")}`,
+    title: "Migration",
+    rows: 1,
+    cols: 1,
+  },
+  {
+    img: `${require("../images/photography/rim-rock.jpg")}`,
+    title: "Rim Rock Lake",
+    rows: 1,
+    cols: 1,
+  },
+  {
+    img: `${require("../images/photography/tieton-south-fork-1.jpg")}`,
+    title:  "South Fork Tieton River",
     rows: 2,
     cols: 2,
   },
   {
-    img: "https://images.unsplash.com/photo-1551782450-a2132b4ba21d",
-    title: "Burger",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1522770179533-24471fcdba45",
-    title: "Camera",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1444418776041-9c7e33cc5a9c",
-    title: "Coffee",
-    cols: 2,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1533827432537-70133748f5c8",
-    title: "Hats",
-    cols: 2,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1558642452-9d2a7deb7f62",
-    title: "Honey",
-    author: "@arwinneil",
-    rows: 2,
-    cols: 2,
-  },
-  {
-    img: "https://images.unsplash.com/photo-1516802273409-68526ee1bdd6",
-    title: "Basketball",
-  },
-  {
-    img: "https://images.unsplash.com/photo-1518756131217-31eb79b20e8f",
-    title: "Fern",
+    img: `${require("../images/photography/tieton-south-fork-2.jpg")}`,
+    title: "Ancestral Pueblo View",
+    rows: 1,
+    cols: 1,
   },
 ];
 
@@ -64,7 +74,7 @@ function srcset(image: string, size: number, rows = 1, cols = 1) {
 
 
 
-export default function QuiltedImageList() {
+export function QuiltedImageList() {
   return (
     <ImageList >
       {itemData.map((item) => (
@@ -84,3 +94,24 @@ export default function QuiltedImageList() {
   );
 }
 
+
+export function TitledImageList() {
+  return (
+  <ImageList variant="masonry" >
+    {itemData.map((item) => (
+      <ImageListItem key={item.img}>
+        <img
+          src={`${item.img}`}
+          srcSet={`${item.img}`}
+          alt={item.title}
+          loading="lazy"
+        />
+        <ImageListItemBar position="below" title={item.title} />
+      </ImageListItem>
+    ))}
+  </ImageList>
+  );
+}
+
+    
+    
