@@ -12,9 +12,12 @@ export default function Home() {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}>
-          </Grid>
-          <Grid item component={Container}>
-              <Typography variant="h1" marginTop={3}>I'm a Developer, a Photographer, and a Climber.</Typography>
+            <Box sx={{ my: 8, mx: 4 }}>
+             <Paper>
+                <Typography variant="h2" marginTop={3}>I'm a Developer, a Photographer, and a Climber.</Typography>
+              </Paper>
+            </Box>
+
           </Grid>
       </Grid>
   );
