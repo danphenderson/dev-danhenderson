@@ -12,13 +12,13 @@ export default function Climbing() {
           sm={12}
           md={12}
           sx={{
-            backgroundImage: `url(${require("../images/home.jpg")})`,
+            backgroundImage: `url(${require("../images/city-photo-2.jpg")})`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}>
             <Box sx={{ my: 8, mx: 4 }}>
-              <Typography variant="h1" marginTop={3}>I'm a Developer, a Photographer, and a Climber.</Typography>
+              <Typography variant="h1" marginTop={3}>Climbing</Typography>
             </Box>
           </Grid>
       </Grid>
