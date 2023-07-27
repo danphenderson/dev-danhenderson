@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Grid, Paper, Box, Card, Container } from '@mui/material';
 import { Typography } from '@mui/material';
 
-export default function Home() {
+export default function CV() {
   return (
       <Grid container direction="row" component="main" sx={{ height: '100vh' }} >
         <Grid
