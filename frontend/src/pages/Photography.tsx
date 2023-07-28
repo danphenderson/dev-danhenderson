@@ -25,11 +25,6 @@ export default function Photography() {
   return (
     <Grid container component="main">
         <Box sx={{ flexGrow: 1 }}>
-          <Grid item component={Container}>
-            <Typography component="h1" variant="h2" color="text.primary" justifyContent="center">
-              Albums
-            </Typography>
-          </Grid>
           <Grid item component={Container} sx={{ py: 8 }} maxWidth="md">
             {/* End hero unit */}
             <Grid container spacing={4}>
