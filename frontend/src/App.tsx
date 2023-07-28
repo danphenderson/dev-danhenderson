@@ -18,7 +18,6 @@ export default function App() {
         <Route path="/climbing" element={<Climbing />} />
         <Route path="/contact" element={<Contact />} />
       </Routes>
-      <Footer />
     </BrowserRouter>
   );
 }
