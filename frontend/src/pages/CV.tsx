@@ -1,4 +1,4 @@
-import { Typography,Grid, Paper, Box,  Avatar, Button, Divider, } from '@mui/material';
+import { Typography,Grid, Paper, Box,  Avatar, Button, Divider, ListItem, ListItemText, List } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
@@ -192,7 +192,6 @@ export default function CV() {
         {/* Right Section */}
         <Grid item xs={12} md={8}>
           <Paper elevation={3} sx={{ padding: 2 }}>
-        
             {/* About Me */}
             <Box sx={{ padding: 2 }}>
               <Typography variant="h4" gutterBottom>
@@ -252,6 +251,21 @@ export default function CV() {
               <Typography variant="h4" gutterBottom>
                 Stack and Tools
               </Typography>
+
+              {stackAndTools.map((section) => (
+                <Box key={section.title}>
+                  <Typography variant="h5" gutterBottom>
+                    {section.title}
+                  </Typography>
+                  <List dense>
+                    {section.items.map((item) => (
+                      <ListItem key={item}>
+                        <ListItemText primary={item} />
+                      </ListItem>
+                    ))}
+                  </List>
+                </Box>
+              ))}
             </Box>
           </Paper>
           </Grid> 

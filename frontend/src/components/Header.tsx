@@ -11,7 +11,6 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { Paper } from '@mui/material';
 
-
 const pages = ["CV", "Photography", "Climbing", "Contact"];
 
 export default function Header() {
@@ -29,7 +28,7 @@ export default function Header() {
     <Paper elevation={10}>
     <AppBar position="static">
       <Container maxWidth="xl">
-        <Toolbar disableGutters>
+        <Toolbar>
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
               size="large"
@@ -60,7 +59,7 @@ export default function Header() {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu} href={page}>
+                <MenuItem key={page} onClick={handleCloseNavMenu} href={page.toLowerCase()}>
                   <Typography textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
