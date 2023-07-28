@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography, Grid, Container, Paper } from "@mui/material";
-import {ImageList, ImageListItem, ImageListItemBar, Link} from "@mui/material";
+import { QuiltedImageList } from "../components/PhotoAlbum";
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
@@ -17,34 +17,51 @@ const albums = [
       {
         img: `${require("../images/photography/six-shooter-sunset.jpg")}`,
         title: "Six Shooter Sunset",
+        rows: 1,
+        cols: 1,
       },
       {
         img: `${require("../images/photography/alki-beach.jpg")}`,
         title: "Alki Beach",
+        rows: 1,
+        cols: 1,
       },
       {
         img: `${require("../images/photography/iccle-creek.jpg")}`,
         title:  "Iccle Creek",
+        rows: 1,
+        cols: 1,
       },
       {
         img: `${require("../images/photography/ancestrial-pueblo.jpg")}`,
         title: "Ancestral Pueblo View",
+        rows: 1,
+        cols: 1,
       },
+    
       {
         img: `${require("../images/photography/crow.jpg")}`,
         title: "Migration",
+        rows: 1,
+        cols: 1,
       },
       {
         img: `${require("../images/photography/rim-rock.jpg")}`,
         title: "Rim Rock Lake",
+        rows: 1,
+        cols: 1,
       },
       {
         img: `${require("../images/photography/tieton-south-fork-1.jpg")}`,
         title:  "South Fork Tieton River",
+        rows: 2,
+        cols: 2,
       },
       {
         img: `${require("../images/photography/tieton-south-fork-2.jpg")}`,
         title: "Ancestral Pueblo View",
+        rows: 1,
+        cols: 1,
       },
     ]
   },
@@ -56,34 +73,51 @@ const albums = [
       {
         img: `${require("../images/photography/six-shooter-sunset.jpg")}`,
         title: "Six Shooter Sunset",
+        rows: 1,
+        cols: 1,
       },
       {
         img: `${require("../images/photography/alki-beach.jpg")}`,
         title: "Alki Beach",
+        rows: 1,
+        cols: 1,
       },
       {
         img: `${require("../images/photography/iccle-creek.jpg")}`,
         title:  "Iccle Creek",
+        rows: 1,
+        cols: 1,
       },
       {
         img: `${require("../images/photography/ancestrial-pueblo.jpg")}`,
         title: "Ancestral Pueblo View",
+        rows: 1,
+        cols: 1,
       },
+    
       {
         img: `${require("../images/photography/crow.jpg")}`,
         title: "Migration",
+        rows: 1,
+        cols: 1,
       },
       {
         img: `${require("../images/photography/rim-rock.jpg")}`,
-        title: "Rim Rock Lake",
+        title: "Rim Rock Lake",                     
+        rows: 1,
+        cols: 1,
       },
       {
         img: `${require("../images/photography/tieton-south-fork-1.jpg")}`,
         title:  "South Fork Tieton River",
+        rows: 2,
+        cols: 2,
       },
       {
         img: `${require("../images/photography/tieton-south-fork-2.jpg")}`,
         title: "Ancestral Pueblo View",
+        rows: 1,
+        cols: 1,
       },
     ]  
   }
@@ -101,7 +135,6 @@ export default function Photography() {
     <Grid container component="main">
         <Box sx={{ flexGrow: 1 }}>
           <Grid item component={Container} sx={{ py: 8 }} maxWidth="md">
-            {/* End hero unit */}
             <Grid container spacing={4}>
               {albums.map((card) => (
                 <Grid item key={card.name} xs={12} sm={6} md={4}>
@@ -130,3 +163,5 @@ export default function Photography() {
     </Grid>
   );
 }
+
+
