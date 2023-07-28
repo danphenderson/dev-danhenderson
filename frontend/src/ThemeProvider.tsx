@@ -17,7 +17,7 @@ const theme = createTheme({
     },
     divider: grey[300],
   },
-  spacing: 8,
+  spacing: 4,
   typography: {
     fontFamily: [
       'Roboto',
