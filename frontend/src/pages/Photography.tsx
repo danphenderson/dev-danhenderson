@@ -13,113 +13,11 @@ const albums = [
     name: "landscapes",
     description: "Landscape photo collection",
     src: `${require("../images/photography/six-shooter-sunset.jpg")}`,
-    images:  [
-      {
-        img: `${require("../images/photography/six-shooter-sunset.jpg")}`,
-        title: "Six Shooter Sunset",
-        rows: 1,
-        cols: 1,
-      },
-      {
-        img: `${require("../images/photography/alki-beach.jpg")}`,
-        title: "Alki Beach",
-        rows: 1,
-        cols: 1,
-      },
-      {
-        img: `${require("../images/photography/iccle-creek.jpg")}`,
-        title:  "Iccle Creek",
-        rows: 1,
-        cols: 1,
-      },
-      {
-        img: `${require("../images/photography/ancestrial-pueblo.jpg")}`,
-        title: "Ancestral Pueblo View",
-        rows: 1,
-        cols: 1,
-      },
-    
-      {
-        img: `${require("../images/photography/crow.jpg")}`,
-        title: "Migration",
-        rows: 1,
-        cols: 1,
-      },
-      {
-        img: `${require("../images/photography/rim-rock.jpg")}`,
-        title: "Rim Rock Lake",
-        rows: 1,
-        cols: 1,
-      },
-      {
-        img: `${require("../images/photography/tieton-south-fork-1.jpg")}`,
-        title:  "South Fork Tieton River",
-        rows: 2,
-        cols: 2,
-      },
-      {
-        img: `${require("../images/photography/tieton-south-fork-2.jpg")}`,
-        title: "Ancestral Pueblo View",
-        rows: 1,
-        cols: 1,
-      },
-    ]
   },
   {
     name: "action",
     description: "Action photo collection",
-    src: `${require("../images/photography/city-photo-1.jpg")}`,
-    images:  [
-      {
-        img: `${require("../images/photography/six-shooter-sunset.jpg")}`,
-        title: "Six Shooter Sunset",
-        rows: 1,
-        cols: 1,
-      },
-      {
-        img: `${require("../images/photography/alki-beach.jpg")}`,
-        title: "Alki Beach",
-        rows: 1,
-        cols: 1,
-      },
-      {
-        img: `${require("../images/photography/iccle-creek.jpg")}`,
-        title:  "Iccle Creek",
-        rows: 1,
-        cols: 1,
-      },
-      {
-        img: `${require("../images/photography/ancestrial-pueblo.jpg")}`,
-        title: "Ancestral Pueblo View",
-        rows: 1,
-        cols: 1,
-      },
-    
-      {
-        img: `${require("../images/photography/crow.jpg")}`,
-        title: "Migration",
-        rows: 1,
-        cols: 1,
-      },
-      {
-        img: `${require("../images/photography/rim-rock.jpg")}`,
-        title: "Rim Rock Lake",                     
-        rows: 1,
-        cols: 1,
-      },
-      {
-        img: `${require("../images/photography/tieton-south-fork-1.jpg")}`,
-        title:  "South Fork Tieton River",
-        rows: 2,
-        cols: 2,
-      },
-      {
-        img: `${require("../images/photography/tieton-south-fork-2.jpg")}`,
-        title: "Ancestral Pueblo View",
-        rows: 1,
-        cols: 1,
-      },
-    ]  
+    src: `${require("../images/photography/city-photo-1.jpg")}`, 
   }
 ];
 

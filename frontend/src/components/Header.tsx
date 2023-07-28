@@ -11,6 +11,7 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { Paper } from '@mui/material';
 
+
 const pages = ["CV", "Photography", "Climbing", "Contact"];
 
 export default function Header() {
