@@ -11,12 +11,12 @@ export default function Home() {
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
-          }}>
+          }}> 
             <Box sx={{ my: 8, mx: 4 }}>
-             <Paper>
-                <Typography variant="h2" marginTop={3}>I'm a Developer, a Photographer, and a Climber.</Typography>
+             <Paper elevation={10}>
+                <Typography variant="h2" marginTop={3}>Hi, I'm a Developer, Photographer, and Climber.</Typography>
               </Paper>
-            </Box>
+            </Box> 
 
           </Grid>
       </Grid>

@@ -1,4 +1,4 @@
-import { blue, pink, grey } from '@mui/material/colors'
+import { red, purple, lime, deepOrange, teal, cyan, blue, pink, grey } from '@mui/material/colors'
 import CssBaseline from '@mui/material/CssBaseline'
 import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
 import { ReactNode } from 'react';
@@ -6,7 +6,7 @@ import { ReactNode } from 'react';
 const theme = createTheme({
   palette: {
     primary: blue,
-    secondary: pink,
+    secondary: deepOrange,
     text: {
       primary: grey[900],
       secondary: grey[700],
@@ -20,14 +20,7 @@ const theme = createTheme({
   spacing: 8,
   typography: {
     fontFamily: [
-      '"Hiragino Sans"',
-      '-apple-system',
-      'BlinkMacSystemFont',
-      '"Segoe UI"',
       'Roboto',
-      'Helvetica',
-      'Arial',
-      'sans-serif',
     ].join(','),
   },
   components: {

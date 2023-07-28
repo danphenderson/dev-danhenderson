@@ -18,7 +18,7 @@ export default function Contact() {
             backgroundPosition: 'center',
           }}>
             <Box sx={{ my: 8, mx: 4 }}>
-              <Typography variant="h2" marginTop={3}>Lets do business, please connect via email at me@danhenderson.dev.</Typography>
+              <Typography variant="h2" marginTop={3}>Let's do business, please connect via email at me@danhenderson.dev.</Typography>
             </Box>
           </Grid>
       </Grid>

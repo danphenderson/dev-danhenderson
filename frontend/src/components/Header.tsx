@@ -11,6 +11,7 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import { Paper } from '@mui/material';
 
 const pages = ["cv", "Photography", "Climbing", "Contact"];
 
@@ -34,6 +35,7 @@ export default function Header() {
   };
 
   return (
+    <Paper elevation={10}>
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
@@ -88,5 +90,6 @@ export default function Header() {
         </Toolbar>
       </Container>
     </AppBar>
+    </Paper>
   );
 }
