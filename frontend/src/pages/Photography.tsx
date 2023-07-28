@@ -152,7 +152,7 @@ export default function Photography() {
                       </Typography>
                     </CardContent>
                     <CardActions>
-                      <Button variant="outlined" onClick={handleAlbumView}>View</Button>
+                      <Button href={"photography/" + card.name} variant="outlined" onClick={handleAlbumView}>View</Button>
                     </CardActions>
                   </Card>
                 </Grid>
