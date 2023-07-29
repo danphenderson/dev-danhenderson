@@ -6,23 +6,12 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
+import data from "../assets/photography/data.json";
 
-
-const albums = [
-  {
-    name: "landscapes",
-    description: "Landscape photo collection",
-    src: `${require("../images/photography/six-shooter-sunset.jpg")}`,
-  },
-  {
-    name: "action",
-    description: "Action photo collection",
-    src: `${require("../images/photography/city-photo-1.jpg")}`, 
-  }
-];
 
 
 export default function Photography() {
+
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
 
   const handleAlbumView = (event: React.MouseEvent<HTMLElement>) => {
@@ -34,7 +23,7 @@ export default function Photography() {
         <Box sx={{ flexGrow: 1 }}>
           <Grid item component={Container} sx={{ py: 8 }} maxWidth="md">
             <Grid container spacing={4}>
-              {albums.map((card) => (
+              {data.map((card) => (
                 <Grid item key={card.name} xs={12} sm={6} md={4}>
                   <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                     <CardMedia component="div"
@@ -50,7 +39,7 @@ export default function Photography() {
                       </Typography>
                     </CardContent>
                     <CardActions>
-                      <Button href={"photography/" + card.name} variant="outlined" onClick={handleAlbumView}>View</Button>
+                      <Button href={"photography/" + card.name.toLowerCase()} variant="outlined" onClick={handleAlbumView}>View</Button>
                     </CardActions>
                   </Card>
                 </Grid>
@@ -61,5 +50,3 @@ export default function Photography() {
     </Grid>
   );
 }
-
-
