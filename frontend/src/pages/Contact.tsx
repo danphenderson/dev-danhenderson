@@ -12,7 +12,7 @@ export default function Contact() {
           sm={12}
           md={12}
           sx={{
-            backgroundImage: `url(${require("../images/business.jpg")})`,
+            backgroundImage: `url(${require("../images/home.jpg")})`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',

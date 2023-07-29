@@ -10,14 +10,24 @@ import CardMedia from '@mui/material/CardMedia';
 
 const albums = [
   {
-    name: "landscapes",
+    name: "Landscape",
     description: "Landscape photo collection",
-    src: `${require("../images/photography/six-shooter-sunset.jpg")}`,
+    src: `${require("../images/photography/landscape/landscape-tumwater-canyon.jpg")}`,
   },
   {
-    name: "action",
+    name: "Action",
     description: "Action photo collection",
-    src: `${require("../images/photography/city-photo-1.jpg")}`, 
+    src: `${require("../images/photography/action/action-dan-clipping-cam.jpg")}`, 
+  },
+  {
+    name: "Portrait",
+    description: "Landscape photo collection",
+    src: `${require("../images/photography/portrait/portrait-sydney-tumwater.jpg")}`,
+  },
+  {
+    name: "Astronomy",
+    description: "Action photo collection",
+    src: `${require("../images/photography/astronomy/astronomy-arora-2.jpg")}`, 
   }
 ];
 
@@ -50,7 +60,7 @@ export default function Photography() {
                       </Typography>
                     </CardContent>
                     <CardActions>
-                      <Button href={"photography/" + card.name} variant="outlined" onClick={handleAlbumView}>View</Button>
+                      <Button href={"photography/" + card.name.toLowerCase()} variant="outlined" onClick={handleAlbumView}>View</Button>
                     </CardActions>
                   </Card>
                 </Grid>
