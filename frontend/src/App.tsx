@@ -8,7 +8,7 @@ import CV from "./pages/CV";
 import Contact from "./pages/Contact";
 import { QuiltedImageList } from "./components/PhotoAlbum";
 
-import data from './assets/photography/data.json';
+import data from './photography.json';
 
 export default function App() {
   return (

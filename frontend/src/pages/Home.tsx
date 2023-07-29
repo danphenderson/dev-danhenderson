@@ -7,7 +7,7 @@ export default function Home() {
       <Grid container direction="row" component="main" sx={{ height: '100vh' }} >
         <Grid item component="div" xs={12} sm={12} md={12}
           sx={{
-            backgroundImage: `url(${require("../assets/home.jpg")})`,
+            backgroundImage: `url(${"./assets/home.jpg"})`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
@@ -16,7 +16,7 @@ export default function Home() {
              <Paper elevation={10}>
                 <Typography variant="h2" marginTop={3}>Hi, I'm a Developer, Photographer, and Climber.</Typography>
               </Paper>
-            </Box> 
+            </Box>
 
           </Grid>
       </Grid>

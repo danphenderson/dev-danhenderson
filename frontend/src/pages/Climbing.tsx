@@ -1,8 +1,8 @@
 import * as React from 'react';
-import {Grid, Paper, Box, Card, Container, CardActionArea, CardContent, CardMedia } from '@mui/material';
+import {Grid, Paper, Box, Card, Container, CardActionArea, CardContent, CardMedia, CardActions, Button } from '@mui/material';
 import { Typography } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import data from "../assets/climbing/data.json";
+import data from "../ticks.json";
 
 const columns = [
   { field: 'Date', headerName: 'Date', flex: 1 },
@@ -24,7 +24,7 @@ export default function Climbing() {
           sm={12}
           md={12}
           sx={{
-            backgroundImage: `url(${require("../assets/photography/action/action-city-photo-2.jpg")})`,
+            backgroundImage: `${"./assets/photography/action/action-city-photo-2.jpg"}`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
@@ -35,7 +35,33 @@ export default function Climbing() {
             {/* Left Section (Profile Section)*/}
             <Grid item xs={12} md={4}>
               <Paper elevation={3} sx={{ padding: 2, textAlign: "center" }}>
-  
+
+                {/* Places I've Climbed */}
+                <Box sx={{padding: 2}}> 
+                <Card sx={{ maxWidth: 345 }}>
+                  <CardMedia
+                    component="img"
+                    alt="green iguana"
+                    height="140"
+                    image={`${"./assets/photography/action/action-city-photo-2.jpg"}`}
+                    loading='lazy'
+                  />
+                  <CardContent>
+                    <Typography gutterBottom variant="h5" component="div">
+                      Lizard
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Lizards are a widespread group of squamate reptiles, with over 6,000
+                      species, ranging across all continents except Antarctica
+                    </Typography>
+                  </CardContent>
+                  <CardActions>
+                    <Button size="small">Share</Button>
+                    <Button size="small">Learn More</Button>
+                  </CardActions>
+                </Card>
+                </Box>
+
                 <Box sx={{padding: 2}}> 
                   <Typography variant="h4" gutterBottom> 
                     Recent Ticks
@@ -45,6 +71,8 @@ export default function Climbing() {
 
               </Paper>
             </Grid>
+
+            
 
             {/* Right Section */}
             <Grid item xs={12} md={8}>
@@ -91,7 +119,7 @@ export default function Climbing() {
                       <CardMedia
                         component="img"
                         sx={{ width: 160, display: { xs: 'none', sm: 'block' } }}
-                        image={require("../assets/photography/action/action-city-photo-2.jpg").default}
+                        image={`${"./assets/photography/action/action-city-photo-2.jpg"}`}
                         alt={'Image of trip report'}
                       />
                     </Card>

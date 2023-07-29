@@ -12,10 +12,11 @@ export default function Contact() {
           sm={12}
           md={12}
           sx={{
-            backgroundImage: `url(${require("../assets/home.jpg")})`,
+            backgroundImage: `${"./assets/home.jpg"}`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
+            loading: 'lazy',
           }}>
             <Box sx={{ my: 8, mx: 4 }}>
               <Typography variant="h2" marginTop={3}>Let's do business, please connect via email at me@danhenderson.dev.</Typography>
