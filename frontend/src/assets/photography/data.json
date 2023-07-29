@@ -163,10 +163,83 @@
       }
     ]
   },
+  {
+    "name": "Portrait",
+    "description": "Aperture priority photo collection",
+    "src": "./assets/photography/astronomy/astronomy-arora-2.jpg",
+    "album":  [
+      {
+        "img": "./assets/photography/astronomy/astronomy-arora-1.jpg",
+        "title": "Arora",
+        "rows": 2,
+        "cols": 2
+      },
+      {
+        "img": "./assets/photography/astronomy/astronomy-arora-2.jpg",
+        "title": "Arora",
+        "rows": 2,
+        "cols": 2
+      },
+      {
+        "img": "./assets/photography/astronomy/astronomy-arora-3.jpg",
+        "title": "Arora",
+        "rows": 2,
+        "cols": 2
+      },
+      {
+        "img": "./assets/photography/astronomy/astronomy-galaxy-1.jpg",
+        "title": "",
+        "rows": 2,
+        "cols": 2
+      },
+      {
+        "img": "./assets/photography/astronomy/astronomy-galaxy-2.jpg",
+        "title": "",
+        "rows": 2,
+        "cols": 2
+      },
+      {
+        "img": "./assets/photography/astronomy/astronomy-joshua-tree-1.jpg",
+        "title": "",
+        "rows": 2,
+        "cols": 2
+      },
+      {
+        "img": "./assets/photography/astronomy/astronomy-joshua-tree-2.jpg",
+        "title": "",
+        "rows": 2,
+        "cols": 2
+      },
+      {
+        "img": "./assets/photography/astronomy/astronomy-joshua-tree-3.jpg",
+        "title": "",
+        "rows": 2,
+        "cols": 2
+      },
+      {
+        "img": "./assets/photography/astronomy/astronomy-arora-4.jpg",
+        "title": "",
+        "rows": 2,
+        "cols": 2
+      },
+      {
+        "img": "./assets/photography/astronomy/astronomy-kolab-canyon-1.jpg",
+        "title": "",
+        "rows": 2,
+        "cols": 2
+      },
+      {
+        "img": "./assets/photography/astronomy/astronomy-kolab-canyon-2.jpg",
+        "title": "",
+        "rows": 2,
+        "cols": 2
+      }
+    ]
+  },
 
   {
     "name": "Astronomy",
-    "description": "Action photo collection",
+    "description": "Astronomy photo collection",
     "src": "./assets/photography/astronomy/astronomy-arora-2.jpg",
     "album":  [
       {
