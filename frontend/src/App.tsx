@@ -6,6 +6,7 @@ import Climbing from "./pages/Climbing";
 import Photography from './pages/Photography';
 import CV from "./pages/CV";
 import Contact from "./pages/Contact";
+import NotFound from "./pages/NotFound";
 import { QuiltedImageList } from "./components/PhotoAlbum";
 
 import data from './photography.json';
@@ -23,6 +24,7 @@ export default function App() {
         ))}
         <Route path="/climbing" element={<Climbing />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="*" element={<NotFound/>} />
       </Routes>
     </BrowserRouter>
   );
