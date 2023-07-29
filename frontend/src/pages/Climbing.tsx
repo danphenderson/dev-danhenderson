@@ -24,7 +24,7 @@ export default function Climbing() {
           sm={12}
           md={12}
           sx={{
-            backgroundImage: `${"./assets/photography/action/action-city-photo-2.jpg"}`,
+            backgroundImage: `url('assets/photography/action/action-city-photo-2.jpg')`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',

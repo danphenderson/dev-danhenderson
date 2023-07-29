@@ -159,7 +159,7 @@ export default function CV() {
     <Grid container direction="row" component="main" sx={{ height: '100vh' }} >
       <Grid item component="div" xs={12} sm={12} md={12}
           sx={{
-            backgroundImage: `${"./assets/photography/landscape/landscape-tieton-south-fork-1.jpg"}`,
+            backgroundImage: `url("assets/photography/landscape/landscape-tieton-south-fork-1.jpg")`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
           }}>
