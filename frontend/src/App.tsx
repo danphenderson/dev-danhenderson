@@ -16,27 +16,27 @@ import { Box } from "@mui/material";
 import { useMemo } from "react";
 
 export default function App() {
-  const routes = useMemo(() => data.map((card) => (
-    <Route path={"/photography" + card.name.toLowerCase()} element={<QuiltedImageList ImageData={card.album}/> }/>
+  const memoizedData = useMemo(() => data.map(card => (
+    <Route path={"/photography/" + card.name.toLowerCase()} element={<QuiltedImageList ImageData={card.album}/> } key={card.name}/>
   )), [data]);
 
   return (
-    <Box>
-      <Header/>
-      <BrowserRouter>
+    <BrowserRouter>
+      <Box>
+        <Header />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cv" element={<CV />} />
           <Route path="/photography" element={<Photography />} />
-          {routes}
+          {memoizedData}
           <Route path="/climbing" element={<Climbing />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<SignIn />} />
           <Route path="/register" element={<SignUp />} />
           <Route path="*" element={<NotFound/>} />
         </Routes>
-      </BrowserRouter>
-      <Footer/>
-    </Box>
+        <Footer/>
+      </Box>
+    </BrowserRouter>
   );
 }

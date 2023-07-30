@@ -6,16 +6,39 @@ import Avatar from '@mui/material/Avatar';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import {GitHub, LinkedIn, Mail} from '@mui/icons-material';
+import { GitHub, LinkedIn, Mail } from '@mui/icons-material';
 import { Box, Button, Stack } from '@mui/material';
+import { Link } from 'react-router-dom';
 
-const pages = ["Photography", "CV", "Climbing", "Contact"];
+const pages = [
+  { name: "Photography", path: "/photography" },
+  { name: "CV", path: "/cv" },
+  { name: "Climbing", path: "/climbing" },
+  { name: "Contact", path: "/contact" },
+];
 const avatar = "./assets/home.jpg";
 
-
+const menuItems = [
+  {
+    icon: <Mail fontSize="small" />,
+    text: "Gmail",
+    href: "mailto:me@danhenderson.dev",
+  },
+  {
+    icon: <LinkedIn fontSize="small" />,
+    text: "LinkedIn",
+    href: "https://www.linkedin.com/in/daniel-henderson-6a9485bb/",
+    newTab: true,
+  },
+  {
+    icon: <GitHub fontSize="small" />,
+    text: "GitHub",
+    href: "https://github.com/danphenderson",
+    newTab: true,
+  },
+];
 
 export default function Header() {
-
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -40,39 +63,36 @@ export default function Header() {
               elevation: 0
             }}
           >
-            <MenuItem onClick={handleClose}>
-              <ListItemIcon>
-                <Mail fontSize="small" />
-              </ListItemIcon>
-              <a href="mailto:me@danhenderson.dev">Gmail</a>
-            </MenuItem>
-            <MenuItem onClick={handleClose}>
-              <ListItemIcon>
-                <LinkedIn fontSize="small" />
-              </ListItemIcon>
-              <a href="https://www.linkedin.com/in/daniel-henderson-6a9485bb/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            </MenuItem>
-            <MenuItem onClick={handleClose}>
-              <ListItemIcon>
-                <GitHub fontSize="small" />
-              </ListItemIcon>
-              <a href="https://github.com/danphenderson" target="_blank" rel="noopener noreferrer">GitHub</a>
-            </MenuItem>
+            {menuItems.map(({ icon, text, href, newTab }, index) => (
+              <MenuItem key={index} onClick={handleClose}>
+                <ListItemIcon>{icon}</ListItemIcon>
+                <a href={href} target={newTab ? "_blank" : "_self"} rel={newTab ? "noopener noreferrer" : ""}>
+                  {text}
+                </a>
+              </MenuItem>
+            ))}
           </Menu>
-          <IconButton edge="start"  aria-label="avatar" onClick={handleMenu}>
+          <IconButton
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            aria-describedby="Menu for profile links"
+            onClick={handleMenu}
+          >
             <Avatar src={avatar} sx={{ width: 60, height: 60, margin: "0 auto 20px" }} />
           </IconButton>
           <Stack direction="row" spacing={4}>
             {
-              pages.map((page) => (
+              pages.map(({ name, path }) => (
                 <Button
-                  key={page}
+                  key={name}
                   size="large"
                   sx={{color: 'white', display: 'block' }}
-                  href={page.toLowerCase()}
-                  aria-label={'Go to ' + page}
+                  component={Link}
+                  to={path}
+                  aria-label={'Go to ' + name}
                 >
-                  {page}
+                  {name}
                 </Button>
              ))
             }
