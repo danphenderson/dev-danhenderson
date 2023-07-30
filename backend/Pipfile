@@ -27,6 +27,7 @@ toml = "*"
 sqlalchemy = "*"
 baldin = {path = "."}
 danhenderson-api = {path = "."}
+pydantic-settings = "*"
 
 [dev-packages]
 ipython = "*"
