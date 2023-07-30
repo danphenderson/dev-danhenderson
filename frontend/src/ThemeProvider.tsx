@@ -1,7 +1,8 @@
-import { red, purple, lime, deepOrange, teal, cyan, blue, pink, grey } from '@mui/material/colors'
+import { deepOrange, blue, grey } from '@mui/material/colors'
 import CssBaseline from '@mui/material/CssBaseline'
 import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles'
 import { ReactNode } from 'react';
+
 
 const theme = createTheme({
   palette: {

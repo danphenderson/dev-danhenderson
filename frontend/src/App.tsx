@@ -8,13 +8,15 @@ import CV from "./pages/CV";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import { QuiltedImageList } from "./components/PhotoAlbum";
+import SignIn from "./components/Login";
+import SignUp from "./components/Register";
 
 import data from './photography.json';
 import { Box } from "@mui/material";
 
 export default function App() {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box>
     <Header/>
       <BrowserRouter>
         <Routes>
@@ -26,6 +28,8 @@ export default function App() {
           ))}
           <Route path="/climbing" element={<Climbing />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/login" element={<SignIn />} />
+          <Route path="/register" element={<SignUp />} />
           <Route path="*" element={<NotFound/>} />
         </Routes>
       </BrowserRouter>
