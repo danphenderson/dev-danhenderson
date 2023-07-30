@@ -1,28 +1,24 @@
-# app/config.py
+# app/conf.py
+
 from pathlib import Path
 from typing import Literal, Union
+from pydantic_settings import BaseSettings
 from toml import load as toml_load
-from pydantic import AnyHttpUrl, AnyUrl, BaseSettings, EmailStr, validator
-from selenium.webdriver.chrome.options import Options as ChromeOptions
+from pydantic import AnyHttpUrl, AnyUrl, EmailStr, validator
 
 PROJECT_DIR = Path(__file__).parent.parent.parent
 PYPROJECT_CONTENT = toml_load(f"{PROJECT_DIR}/pyproject.toml")["project"]
 
-class _Config:
-    case_sensitive = False
-    env_file = PROJECT_DIR / ".env"
-    env_file_encoding = "utf-8"
 
 
-class _BaseSettings(BaseSettings):
+class Settings(BaseSettings):
 
-    class Config(_Config):
-        pass
+    class Config:
+        case_sensitive = False
+        env_file = PROJECT_DIR / ".env"
+        env_file_encoding = "utf-8"
+        
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-class Settings(_BaseSettings):
     # CORE SETTINGS
     SECRET_KEY: str
     ENVIRONMENT: Literal["DEV", "PYTEST", "STAGE", "PRODUCTION"]
@@ -41,17 +37,9 @@ class Settings(_BaseSettings):
     DEFAULT_DATABASE_HOSTNAME: str
     DEFAULT_DATABASE_USER: str
     DEFAULT_DATABASE_PASSWORD: str
-    DEFAULT_DATABASE_PORT: str
+    DEFAULT_DATABASE_PORT: int
     DEFAULT_DATABASE_DB: str
     DEFAULT_SQLALCHEMY_DATABASE_URI: str = ""
-
-    # POSTGRESQL TEST DATABASE
-    TEST_DATABASE_HOSTNAME: str
-    TEST_DATABASE_USER: str
-    TEST_DATABASE_PASSWORD: str
-    TEST_DATABASE_PORT: str
-    TEST_DATABASE_DB: str
-    TEST_SQLALCHEMY_DATABASE_URI: str = ""
 
     # FIRST SUPERUSER
     FIRST_SUPERUSER_EMAIL: EmailStr
@@ -68,26 +56,15 @@ class Settings(_BaseSettings):
     def _assemble_default_db_connection(cls, v: str, values: dict[str, str]) -> str:
         return AnyUrl.build(
             scheme="postgresql+asyncpg",
-            user=values["DEFAULT_DATABASE_USER"],
+            username=values["DEFAULT_DATABASE_USER"],
             password=values["DEFAULT_DATABASE_PASSWORD"],
             host=values["DEFAULT_DATABASE_HOSTNAME"],
-            port=values["DEFAULT_DATABASE_PORT"],
+            port=values["DEFAULT_DATABASE_PORT"], # type: ignore
             path=f"/{values['DEFAULT_DATABASE_DB']}",
-        )
+        ) 
 
-    @validator("TEST_SQLALCHEMY_DATABASE_URI")
-    def _assemble_test_db_connection(cls, v: str, values: dict[str, str]) -> str:
-        return AnyUrl.build(
-            scheme="postgresql+asyncpg",
-            user=values["TEST_DATABASE_USER"],
-            password=values["TEST_DATABASE_PASSWORD"],
-            host=values["TEST_DATABASE_HOSTNAME"],
-            port=values["TEST_DATABASE_PORT"],
-            path=f"/{values['TEST_DATABASE_DB']}",
-        )
-
-    class Config:
-        env_file = f"{PROJECT_DIR}/.env"
-        case_sensitive = True
+def get_settings(**kwargs) -> Settings:
+    settings = Settings(**kwargs)
+    return settings
 
 settings = get_settings()
