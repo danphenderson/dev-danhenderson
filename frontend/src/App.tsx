@@ -13,19 +13,22 @@ import SignUp from "./components/Register";
 
 import data from './photography.json';
 import { Box } from "@mui/material";
+import { useMemo } from "react";
 
 export default function App() {
+  const routes = useMemo(() => data.map((card) => (
+    <Route path={"/photography" + card.name.toLowerCase()} element={<QuiltedImageList ImageData={card.album}/> }/>
+  )), [data]);
+
   return (
     <Box>
-    <Header/>
+      <Header/>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cv" element={<CV />} />
           <Route path="/photography" element={<Photography />} />
-          {data.map((card) => (
-            <Route path={"/photography/" + card.name.toLowerCase()} element={<QuiltedImageList ImageData={card.album}/> }/>
-          ))}
+          {routes}
           <Route path="/climbing" element={<Climbing />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<SignIn />} />
