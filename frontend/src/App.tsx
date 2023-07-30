@@ -35,8 +35,9 @@ export default function App() {
           <Route path="/register" element={<SignUp />} />
           <Route path="*" element={<NotFound/>} />
         </Routes>
-        <Footer/>
       </Box>
+      {/* Bug displaying CopyRight Footer */}
+      {/* <Box sx={{ height: '100px' }} > <Footer /> </Box> */}
     </BrowserRouter>
   );
 }

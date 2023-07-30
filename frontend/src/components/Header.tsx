@@ -6,13 +6,13 @@ import Avatar from '@mui/material/Avatar';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import { GitHub, LinkedIn, Mail } from '@mui/icons-material';
+import { ConnectWithoutContactOutlined, GitHub, LinkedIn, Mail } from '@mui/icons-material';
 import { Box, Button, Stack } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 const pages = [
-  { name: "Photography", path: "/photography" },
   { name: "CV", path: "/cv" },
+  { name: "Photography", path: "/photography" },
   { name: "Climbing", path: "/climbing" },
   { name: "Contact", path: "/contact" },
 ];
@@ -38,6 +38,7 @@ const menuItems = [
   },
 ];
 
+
 export default function Header() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -53,7 +54,37 @@ export default function Header() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
-        <Toolbar>
+        <Toolbar sx={{ justifyContent: "space-between", padding: "0 20px" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              aria-describedby="Menu for profile links"
+              onClick={handleMenu}
+              sx={{justifyContent: "center"}}
+            >
+            <Avatar src={avatar} sx={{ p: 2, width: 80, height: 80 }} />
+            </IconButton>
+          </Box>
+          <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+            <Stack direction="row" spacing={4}>
+              {
+                pages.map(({ name, path }) => (
+                  <Button
+                    key={name}
+                    size="large"
+                    sx={{color: 'white', fontSize: "1.2rem" }}
+                    component={Link}
+                    to={path}
+                    aria-label={'Go to ' + name}
+                  >
+                    {name}
+                  </Button>
+               ))
+              }
+            </Stack>
+          </Box>
           <Menu
             anchorEl={anchorEl}
             open={open}
@@ -66,39 +97,14 @@ export default function Header() {
             {menuItems.map(({ icon, text, href, newTab }, index) => (
               <MenuItem key={index} onClick={handleClose}>
                 <ListItemIcon>{icon}</ListItemIcon>
-                <a href={href} target={newTab ? "_blank" : "_self"} rel={newTab ? "noopener noreferrer" : ""}>
+                <a href={href} target={newTab ? "_blank" : "_self"} rel={newTab ? "noopener noreferrer" : ""} style={{ color: '#333' }}>
                   {text}
                 </a>
               </MenuItem>
             ))}
-          </Menu>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            aria-describedby="Menu for profile links"
-            onClick={handleMenu}
-          >
-            <Avatar src={avatar} sx={{ width: 60, height: 60, margin: "0 auto 20px" }} />
-          </IconButton>
-          <Stack direction="row" spacing={4}>
-            {
-              pages.map(({ name, path }) => (
-                <Button
-                  key={name}
-                  size="large"
-                  sx={{color: 'white', display: 'block' }}
-                  component={Link}
-                  to={path}
-                  aria-label={'Go to ' + name}
-                >
-                  {name}
-                </Button>
-             ))
-            }
-          </Stack>       
+          </Menu>       
         </Toolbar>
       </AppBar>
     </Box>
   );
-}
+};
