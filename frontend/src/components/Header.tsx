@@ -1,85 +1,84 @@
 import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
-import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
+import Avatar from '@mui/material/Avatar';
 import MenuItem from '@mui/material/MenuItem';
-import { Paper } from '@mui/material';
+import Menu from '@mui/material/Menu';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import {GitHub, LinkedIn, Mail} from '@mui/icons-material';
+import { Box, Button, Stack } from '@mui/material';
 
-const pages = ["CV", "Photography", "Climbing", "Contact"];
+const pages = ["Photography", "CV", "Climbing", "Contact"];
+const avatar = "./assets/home.jpg";
+
+
 
 export default function Header() {
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
 
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+
+  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
   };
 
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (
-    <Paper elevation={10}>
-    <AppBar position="static">
-      <Container maxWidth="xl">
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
         <Toolbar>
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
-              sx={{
-                display: { xs: 'block', md: 'none' },
-              }}
-            >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu} href={page.toLowerCase()}>
-                  <Typography textAlign="center">{page}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
-          </Box>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-                href={page.toLowerCase()}
-              >
-                {page}
-              </Button>
-            ))}
-          </Box>
+          <Menu
+            anchorEl={anchorEl}
+            open={open}
+            onClose={handleClose}
+            onClick={handleClose}
+            PaperProps={{
+              elevation: 0
+            }}
+          >
+            <MenuItem onClick={handleClose}>
+              <ListItemIcon>
+                <Mail fontSize="small" />
+              </ListItemIcon>
+              <a href="mailto:me@danhenderson.dev">Gmail</a>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <ListItemIcon>
+                <LinkedIn fontSize="small" />
+              </ListItemIcon>
+              <a href="https://www.linkedin.com/in/daniel-henderson-6a9485bb/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            </MenuItem>
+            <MenuItem onClick={handleClose}>
+              <ListItemIcon>
+                <GitHub fontSize="small" />
+              </ListItemIcon>
+              <a href="https://github.com/danphenderson" target="_blank" rel="noopener noreferrer">GitHub</a>
+            </MenuItem>
+          </Menu>
+          <IconButton edge="start"  aria-label="avatar" onClick={handleMenu}>
+            <Avatar src={avatar} sx={{ width: 60, height: 60, margin: "0 auto 20px" }} />
+          </IconButton>
+          <Stack direction="row" spacing={4}>
+            {
+              pages.map((page) => (
+                <Button
+                  key={page}
+                  size="large"
+                  sx={{color: 'white', display: 'block' }}
+                  href={page.toLowerCase()}
+                  aria-label={'Go to ' + page}
+                >
+                  {page}
+                </Button>
+             ))
+            }
+          </Stack>       
         </Toolbar>
-      </Container>
-    </AppBar>
-    </Paper>
+      </AppBar>
+    </Box>
   );
 }
