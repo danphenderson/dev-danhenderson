@@ -11,7 +11,7 @@ import Button from '@mui/material/Button';
 import MenuItem from '@mui/material/MenuItem';
 import { Paper } from '@mui/material';
 
-const pages = ["CV", "Photography", "Climbing", "Contact"];
+const pages = ["Photography", "CV", "Climbing", "Contact"];
 
 export default function Header() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -25,11 +25,9 @@ export default function Header() {
   };
 
   return (
-    <Paper elevation={10}>
-    <AppBar position="static">
-      <Container maxWidth="xl">
-        <Toolbar>
-          <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+    <Box sx={{ flexGrow: 1 }}>
+      <AppBar position="static">
+          <Toolbar>
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -60,26 +58,24 @@ export default function Header() {
             >
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu} href={page.toLowerCase()}>
-                  <Typography textAlign="center">{page}</Typography>
+                  <Typography noWrap component="div" textAlign="center">{page}</Typography>
                 </MenuItem>
               ))}
             </Menu>
-          </Box>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
                 key={page}
+                size="large"
                 onClick={handleCloseNavMenu}
-                sx={{ my: 2, color: 'white', display: 'block' }}
+                sx={{color: 'white', display: 'block' }}
                 href={page.toLowerCase()}
+                aria-label={'Go to ' + page}
               >
                 {page}
               </Button>
             ))}
-          </Box>
-        </Toolbar>
-      </Container>
-    </AppBar>
-    </Paper>
+          </Toolbar>
+      </AppBar>
+    </Box>
   );
 }
