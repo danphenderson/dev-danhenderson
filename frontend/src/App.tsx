@@ -10,22 +10,26 @@ import NotFound from "./pages/NotFound";
 import { QuiltedImageList } from "./components/PhotoAlbum";
 
 import data from './photography.json';
+import { Box } from "@mui/material";
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/cv" element={<CV />} />
-        <Route path="/photography" element={<Photography />} />
-        {data.map((card) => (
-          <Route path={"/photography/" + card.name.toLowerCase()} element={<QuiltedImageList ImageData={card.album}/> }/>
-        ))}
-        <Route path="/climbing" element={<Climbing />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="*" element={<NotFound/>} />
-      </Routes>
-    </BrowserRouter>
+    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Header/>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/cv" element={<CV />} />
+          <Route path="/photography" element={<Photography />} />
+          {data.map((card) => (
+            <Route path={"/photography/" + card.name.toLowerCase()} element={<QuiltedImageList ImageData={card.album}/> }/>
+          ))}
+          <Route path="/climbing" element={<Climbing />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<NotFound/>} />
+        </Routes>
+      </BrowserRouter>
+      <Footer/>
+    </Box>
   );
 }
