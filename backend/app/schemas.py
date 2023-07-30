@@ -27,3 +27,42 @@ class UserCreate(schemas.BaseUserCreate):
 class UserUpdate(schemas.BaseUserUpdate):
     pass
 
+
+class BasePhotoGallery(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    src: str | None = None
+
+class PhotoGalleryRead(BasePhotoGallery, BaseRead):
+    pass
+
+class PhotoGalleryImagesRead(PhotoGalleryRead):
+    images: list["ImageRead"]
+
+class PhotoGalleryCreate(BasePhotoGallery):
+    title: str
+    src: str
+
+class PhotoGalleryUpdate(BasePhotoGallery):
+    id: UUID4
+
+
+class BaseImage(BaseModel):
+    title: str | None = None
+    description: str | None = None
+    src: str | None = None
+    photo_gallery: list["PhotoGalleryRead"] | None = None
+
+class ImageRead(BaseImage, BaseRead):
+    pass
+
+class ImagePhotoGalleryRead(ImageRead):
+    photo_gallery: list["PhotoGalleryRead"]
+
+class ImageCreate(BaseImage):
+    title: str
+    src: str
+
+class ImageUpdate(BaseImage):
+    id: UUID4
+
