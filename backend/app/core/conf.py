@@ -60,7 +60,7 @@ class Settings(BaseSettings):
             password=values["DEFAULT_DATABASE_PASSWORD"],
             host=values["DEFAULT_DATABASE_HOSTNAME"],
             port=values["DEFAULT_DATABASE_PORT"], # type: ignore
-            path=f"/{values['DEFAULT_DATABASE_DB']}",
+            path=f"{values['DEFAULT_DATABASE_DB']}",
         ) 
 
 def get_settings(**kwargs) -> Settings:
