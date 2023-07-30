@@ -16,7 +16,7 @@ import { Box } from "@mui/material";
 
 export default function App() {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+    <Box>
     <Header/>
       <BrowserRouter>
         <Routes>
