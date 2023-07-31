@@ -13,27 +13,31 @@ import SignUp from "./components/Register";
 
 import data from './photography.json';
 import { Box } from "@mui/material";
+import { useMemo } from "react";
 
 export default function App() {
+  const memoizedData = useMemo(() => data.map(card => (
+    <Route path={"/photography/" + card.name.toLowerCase()} element={<QuiltedImageList ImageData={card.album}/> } key={card.name}/>
+  )), [data]);
+
   return (
-    <Box>
-    <Header/>
-      <BrowserRouter>
+    <BrowserRouter>
+      <Box>
+        <Header />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cv" element={<CV />} />
           <Route path="/photography" element={<Photography />} />
-          {data.map((card) => (
-            <Route path={"/photography/" + card.name.toLowerCase()} element={<QuiltedImageList ImageData={card.album}/> }/>
-          ))}
+          {memoizedData}
           <Route path="/climbing" element={<Climbing />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/login" element={<SignIn />} />
           <Route path="/register" element={<SignUp />} />
           <Route path="*" element={<NotFound/>} />
         </Routes>
-      </BrowserRouter>
-      <Footer/>
-    </Box>
+      </Box>
+      {/* Bug displaying CopyRight Footer */}
+      {/* <Box sx={{ height: '100px' }} > <Footer /> </Box> */}
+    </BrowserRouter>
   );
 }

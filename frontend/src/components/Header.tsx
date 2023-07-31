@@ -6,16 +6,40 @@ import Avatar from '@mui/material/Avatar';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import {GitHub, LinkedIn, Mail} from '@mui/icons-material';
+import { ConnectWithoutContactOutlined, GitHub, LinkedIn, Mail } from '@mui/icons-material';
 import { Box, Button, Stack } from '@mui/material';
+import { Link } from 'react-router-dom';
 
-const pages = ["Photography", "CV", "Climbing", "Contact"];
+const pages = [
+  { name: "CV", path: "/cv" },
+  { name: "Photography", path: "/photography" },
+  { name: "Climbing", path: "/climbing" },
+  { name: "Contact", path: "/contact" },
+];
 const avatar = "./assets/home.jpg";
 
+const menuItems = [
+  {
+    icon: <Mail fontSize="small" />,
+    text: "Gmail",
+    href: "mailto:me@danhenderson.dev",
+  },
+  {
+    icon: <LinkedIn fontSize="small" />,
+    text: "LinkedIn",
+    href: "https://www.linkedin.com/in/daniel-henderson-6a9485bb/",
+    newTab: true,
+  },
+  {
+    icon: <GitHub fontSize="small" />,
+    text: "GitHub",
+    href: "https://github.com/danphenderson",
+    newTab: true,
+  },
+];
 
 
 export default function Header() {
-
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 
@@ -30,7 +54,37 @@ export default function Header() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
-        <Toolbar>
+        <Toolbar sx={{ justifyContent: "space-between", padding: "0 20px" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              aria-describedby="Menu for profile links"
+              onClick={handleMenu}
+              sx={{justifyContent: "center"}}
+            >
+            <Avatar src={avatar} sx={{ p: 2, width: 80, height: 80 }} />
+            </IconButton>
+          </Box>
+          <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
+            <Stack direction="row" spacing={4}>
+              {
+                pages.map(({ name, path }) => (
+                  <Button
+                    key={name}
+                    size="large"
+                    sx={{color: 'white', fontSize: "1.2rem" }}
+                    component={Link}
+                    to={path}
+                    aria-label={'Go to ' + name}
+                  >
+                    {name}
+                  </Button>
+               ))
+              }
+            </Stack>
+          </Box>
           <Menu
             anchorEl={anchorEl}
             open={open}
@@ -40,45 +94,17 @@ export default function Header() {
               elevation: 0
             }}
           >
-            <MenuItem onClick={handleClose}>
-              <ListItemIcon>
-                <Mail fontSize="small" />
-              </ListItemIcon>
-              <a href="mailto:me@danhenderson.dev">Gmail</a>
-            </MenuItem>
-            <MenuItem onClick={handleClose}>
-              <ListItemIcon>
-                <LinkedIn fontSize="small" />
-              </ListItemIcon>
-              <a href="https://www.linkedin.com/in/daniel-henderson-6a9485bb/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-            </MenuItem>
-            <MenuItem onClick={handleClose}>
-              <ListItemIcon>
-                <GitHub fontSize="small" />
-              </ListItemIcon>
-              <a href="https://github.com/danphenderson" target="_blank" rel="noopener noreferrer">GitHub</a>
-            </MenuItem>
-          </Menu>
-          <IconButton edge="start"  aria-label="avatar" onClick={handleMenu}>
-            <Avatar src={avatar} sx={{ width: 60, height: 60, margin: "0 auto 20px" }} />
-          </IconButton>
-          <Stack direction="row" spacing={4}>
-            {
-              pages.map((page) => (
-                <Button
-                  key={page}
-                  size="large"
-                  sx={{color: 'white', display: 'block' }}
-                  href={page.toLowerCase()}
-                  aria-label={'Go to ' + page}
-                >
-                  {page}
-                </Button>
-             ))
-            }
-          </Stack>       
+            {menuItems.map(({ icon, text, href, newTab }, index) => (
+              <MenuItem key={index} onClick={handleClose}>
+                <ListItemIcon>{icon}</ListItemIcon>
+                <a href={href} target={newTab ? "_blank" : "_self"} rel={newTab ? "noopener noreferrer" : ""} style={{ color: '#333' }}>
+                  {text}
+                </a>
+              </MenuItem>
+            ))}
+          </Menu>       
         </Toolbar>
       </AppBar>
     </Box>
   );
-}
+};
