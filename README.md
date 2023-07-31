@@ -23,6 +23,7 @@ https://levelup.gitconnected.com/building-a-website-starter-with-fastapi-92d0770
 https://testdriven.io/courses/tdd-fastapi/
 https://fastapi-users.github.io/fastapi-users/10.4/
 https://www.gormanalysis.com/blog/many-to-many-relationships-in-fastapi/
+https://testdriven.io/blog/docker-best-practices/#use-a-dockerignore-file
 
 2×× Success codes HTTP status codes
 200 OK
