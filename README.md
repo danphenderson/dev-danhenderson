@@ -9,6 +9,8 @@ A React+FastAPI web application powering danhenderson.dev.
 └── frontend
     ├── src
     ├── ...
+└── infrastructure
+    ├── src
 ```
 
 ### `cd backend/`

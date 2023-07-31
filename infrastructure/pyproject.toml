@@ -3,15 +3,15 @@ requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-package-dir = {"app" = ""}
+package-dir = {"infrastructure" = ""}
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.md"], content-type = "text/markdown"}
 
 [project]
-name = "danhenderson-api"
+name = "danhenderson-infrastructure"
 version = "0.1.0-alpha"
-description = "API serving danhenderson.dev"
+description = "Infrastructure stack defining danhenderson.dev"
 requires-python = ">=3.9"
 authors = [
     {name = "Daniel Henderson", email = "me@danhenderson.dev"},
@@ -55,10 +55,6 @@ norecursedirs = [
     "dist",
     "build",
 ]
-testpaths = [
-    "app/tests"
-]
-
 [tool.isort]
 profile = "black"
 
