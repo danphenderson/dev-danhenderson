@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - 3000:80
+      
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    ports:
+      - "5431:5432"
+    environment:
+      - POSTGRES_DB=danhenderson
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=password
+    volumes:
+      - ./backend/public/db:/var/lib/postgresql/data
+
+  # web:
+  #   build: ./backend
+  #   volumes:
+  #     - ./backend:/app
+  #   ports:
+  #     - "8004:8004"
+  #   environment:
+  #     - DATABASE_URL=postgres://admin:password@db:5431/danhenderson
+  #   depends_on:
+  #     - db

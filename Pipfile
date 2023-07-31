@@ -22,9 +22,10 @@ toml = "*"
 sqlalchemy = "*"
 pydantic-settings = "*"
 
-
 [dev-packages]
 ipython = "*"
+danhenderson-infrastructure = {editable = true, path = "./infrastructure"}
+danhenderson-api = {editable = true, path = "./backend"}
 
 [scripts]
 psql = "docker-compose exec db psql -U postgres"
