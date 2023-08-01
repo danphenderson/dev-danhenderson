@@ -15,7 +15,7 @@ class BaseRead(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-
+# User schemas
 class UserRead(schemas.BaseUser[uuid.UUID]):
     # TODO: FastAPI-Users should implement a UUID4 type
     # reference documentation for details.
@@ -28,6 +28,20 @@ class UserUpdate(schemas.BaseUserUpdate):
     pass
 
 
+# Contact form schemas
+class BaseContactForm(BaseModel):
+    name: str | None = None
+    email: str | None = None
+    message: str | None = None
+
+
+class ContactFormCreate(BaseContactForm):
+    name: str
+    email: str
+    message: str
+
+
+# Photo gallery schemas
 class BasePhotoGallery(BaseModel):
     title: str | None = None
     description: str | None = None
@@ -47,6 +61,7 @@ class PhotoGalleryUpdate(BasePhotoGallery):
     id: UUID4
 
 
+# Image schemas
 class BaseImage(BaseModel):
     title: str | None = None
     description: str | None = None
