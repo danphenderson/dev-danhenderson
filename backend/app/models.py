@@ -59,5 +59,7 @@ class PhotoGalleryXImage(Base):
     Represents a model for a photo gallery to image relationship.
     """
     __tablename__ = "photo_gallery_x_image"
-    photo_gallery_id = Column(UUID, ForeignKey("photo_gallery.id"))
-    image_id = Column(UUID, ForeignKey("image.id"))
+    photo_gallery_id = Column("photo_gallery_id", UUID, ForeignKey("photo_gallery.id"))
+    image_id = Column("image_id", UUID, ForeignKey("image.id"))
+
+

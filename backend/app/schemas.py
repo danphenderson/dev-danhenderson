@@ -7,8 +7,6 @@ from fastapi_users import schemas
 
 class BaseModel(_BaseModel):
     class Config:
-        orm_mode = True
-        extra='allow'
         from_attributes = True
 
 class BaseRead(BaseModel):
