@@ -9,6 +9,7 @@ class BaseModel(_BaseModel):
     class Config:
         orm_mode = True
         extra='allow'
+        from_attributes = True
 
 class BaseRead(BaseModel):
     id: UUID4 | str
@@ -34,6 +35,8 @@ class BaseContactForm(BaseModel):
     email: str | None = None
     message: str | None = None
 
+class ContactFormRead(BaseContactForm, BaseRead):
+    pass
 
 class ContactFormCreate(BaseContactForm):
     name: str
