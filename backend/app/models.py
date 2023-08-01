@@ -18,6 +18,16 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     pass
 
 
+class ContactForm(Base):
+    """
+    Represents a model for a contact form.
+    """
+    __tablename__ = "contact_form"
+    name = Column(String, index=True)
+    email = Column(String, index=True)
+    message = Column(String)
+    
+    
 class PhotoGallery(Base):
     """
     Represents a model for a photo gallery.

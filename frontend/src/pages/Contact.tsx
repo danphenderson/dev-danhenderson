@@ -5,23 +5,28 @@ import { useState } from 'react';
 
 
 export default function Contact() {
-  const [values, setValues] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setValues({
-      ...values,
-      [event.target.name]: event.target.value,
-    });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    // Handle the form submission here
-    console.log(values);
+  const handleSubmit = async () => {
+    try {
+      const response = await fetch('contact/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      if (response.ok) {
+        alert('Message sent successfully!');
+      } else {
+        alert('Failed to send message.');
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
   
   return (
@@ -40,63 +45,39 @@ export default function Contact() {
             loading: 'lazy',
           }}>
             <Paper sx={{ p: 2, my: 8, mx: 4 }}>
-              <Typography component="h1" variant="h5">
-                Contact Me
-            </Typography>
-            <Box
-              component="form"
-              onSubmit={handleSubmit}
-              sx={{
-                width: "100%", 
-                mt: 3,
-              }}
-            >
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="name"
-                label="Name"
-                name="name"
-                autoFocus
-                value={values.name}
-                onChange={handleChange}
-              />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
-                value={values.email}
-                onChange={handleChange}
-              />
-              <TextField
-                variant="outlined"
-                margin="normal"
-                required
-                fullWidth
-                name="message"
-                label="Message"
-                type="text"
-                id="message"
-                value={values.message}
-                onChange={handleChange}
-              />
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                color="primary"
-                sx={{ mt: 3, mb: 2 }}
-              >
-                Send Message
-              </Button>
-            </Box>
+            <Typography variant="h4" gutterBottom>Contact Me</Typography>
+            <TextField
+              fullWidth
+              label="Name"
+              variant="outlined"
+              margin="normal"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+            />
+            <TextField
+              fullWidth
+              label="Email"
+              variant="outlined"
+              margin="normal"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+            />
+            <TextField
+              fullWidth
+              label="Message"
+              variant="outlined"
+              margin="normal"
+              name="message"
+              multiline
+              rows={4}
+              value={formData.message}
+              onChange={handleChange}
+            />
+            <Button variant="contained" color="primary" onClick={handleSubmit}>
+              Submit
+            </Button>
           </Paper>
         </Grid>
     </Grid>

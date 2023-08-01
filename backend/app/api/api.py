@@ -14,7 +14,7 @@ from fastapi import APIRouter
 from app.api.deps import fastapi_users
 from app.core import security
 from app.schemas import UserCreate, UserRead, UserUpdate
-from app.api.routes import photo_gallary, images
+from app.api.routes import photo_gallary, images, contact
 
 api_router : APIRouter = APIRouter()
 
@@ -52,4 +52,9 @@ api_router.include_router(
     images.router,
     prefix="/images",
     tags=["images"],
+)
+api_router.include_router(
+    contact.router,
+    prefix="/contact",
+    tags=["contact"],
 )
