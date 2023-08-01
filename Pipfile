@@ -25,6 +25,6 @@ ipython = "*"
 danhenderson-api = {editable = true, path = "./backend"}
 
 [scripts]
-psql = "docker-compose exec db psql -U postgres"
+psql = "docker-compose exec db psql -U admin -d danhenderson"
 ipython = "docker-compose exec web ipython"
 shell = "docker-compose exec web bash"
