@@ -19,6 +19,7 @@ python-dotenv = "*"
 toml = "*"
 sqlalchemy = "*"
 pydantic-settings = "*"
+aioyagmail = "*"
 
 [dev-packages]
 ipython = "*"

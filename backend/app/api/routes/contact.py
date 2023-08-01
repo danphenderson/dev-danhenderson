@@ -7,7 +7,10 @@ from pydantic import UUID4
 from sqlalchemy import select
 from app.logging import console_log
 
+
 router : APIRouter = APIRouter(tags=["contact"])
+
+
 
 
 @router.post("/", response_model=schemas.ContactFormRead, status_code=201)
