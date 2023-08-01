@@ -1,32 +1,17 @@
 version: "3.8"
 
 services:
-
-  frontend:
-    build:
-      context: ./frontend
-    ports:
-      - 3000:80
-      
   db:
     image: postgres:15
-    restart: unless-stopped
     ports:
       - "5431:5432"
+    restart: unless-stopped
     environment:
-      - POSTGRES_DB=danhenderson
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=password
+      POSTGRES_USER: ${DEFAULT_DATABASE_USER}
+      POSTGRES_PASSWORD: ${DEFAULT_DATABASE_PASSWORD}
+      POSTGRES_DB: ${DEFAULT_DATABASE_DB}
+    env_file:
+      - .env
     volumes:
       - ./backend/public/db:/var/lib/postgresql/data
-
-  # web:
-  #   build: ./backend
-  #   volumes:
-  #     - ./backend:/app
-  #   ports:
-  #     - "8004:8004"
-  #   environment:
-  #     - DATABASE_URL=postgres://admin:password@db:5431/danhenderson
-  #   depends_on:
-  #     - db
+      
