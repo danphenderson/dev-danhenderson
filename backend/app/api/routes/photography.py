@@ -1,4 +1,5 @@
 # app/api/photo_gallery.py
+
 from fastapi import APIRouter, HTTPException, Depends
 from app.logging import console_log
 from app.core.db import get_async_session
@@ -15,10 +16,15 @@ async def create_photo_gallery(
     db = Depends(get_async_session)
 ):
     photo_gallery = models.PhotoGallery(**payload.model_dump())
-    db.add(photo_gallery)
-    await db.commit()
-    await db.refresh(photo_gallery)
-    return photo_gallery.id
+
+    try:
+        db.add(photo_gallery)
+        await db.commit()
+        await db.refresh(photo_gallery)
+        return schemas.ContactFormRead.from_orm(photo_gallery)
+
+    except Exception as _:
+        console_log.exception("Error creating photo gallery")
 
 @router.get("/collection", response_model=list[schemas.PhotoGalleryRead])
 async def read_photo_galleries(
