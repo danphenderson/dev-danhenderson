@@ -1,11 +1,11 @@
 ## TODO:
 
-1. Define developer image for backend.
+1. Define developer image for backend. - DONE
   - docker-compose.yml uses environment variables from one file?
   - Dockerfile uses `backend/requirements.txt`, declaring python API deps.
   - Add `ping` route, test ping. 10min
 
-2. Define developer image for frontend.
+2. Define developer image for frontend. - DONE
 
 3. Define AWS CDK stack.
   - Use the stack image generator tool.

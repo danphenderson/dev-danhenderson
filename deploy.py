@@ -3,12 +3,10 @@ import os
 
 import aws_cdk as cdk
 
-from infrastructure.stack import 
+from infrastructure import stack
 
 
 app = cdk.App()
-DataStack(app, "DataStack")
-FrontendStack(app, "FrontendStack")
-BackendStack(app, "BackendStack")
+
 
 app.synth()
