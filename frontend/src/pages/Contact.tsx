@@ -33,73 +33,73 @@ export default function Contact() {
           sm={12}
           md={12}
           sx={{
-            backgroundImage: `url('assets/home.jpg')`,
+            backgroundImage: `url('assets/photography/landscape/landscape-tumwater-canyon.jpg')`,
             backgroundRepeat: 'no-repeat',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             loading: 'lazy',
           }}>
-            <Box sx={{ my: 8, mx: 4 }}>
-            <Typography component="h1" variant="h5">
-        Contact Us
-      </Typography>
-      <Box
-        component="form"
-        onSubmit={handleSubmit}
-        sx={{
-          width: "100%", 
-          mt: 3,
-        }}
-      >
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          id="name"
-          label="Name"
-          name="name"
-          autoFocus
-          value={values.name}
-          onChange={handleChange}
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          id="email"
-          label="Email Address"
-          name="email"
-          autoComplete="email"
-          value={values.email}
-          onChange={handleChange}
-        />
-        <TextField
-          variant="outlined"
-          margin="normal"
-          required
-          fullWidth
-          name="message"
-          label="Message"
-          type="text"
-          id="message"
-          value={values.message}
-          onChange={handleChange}
-        />
-        <Button
-          type="submit"
-          fullWidth
-          variant="contained"
-          color="primary"
-          sx={{ mt: 3, mb: 2 }}
-        >
-          Send Message
-        </Button>
-      </Box>
+            <Paper sx={{ p: 2, my: 8, mx: 4 }}>
+              <Typography component="h1" variant="h5">
+                Contact Me
+            </Typography>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              sx={{
+                width: "100%", 
+                mt: 3,
+              }}
+            >
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="name"
+                label="Name"
+                name="name"
+                autoFocus
+                value={values.name}
+                onChange={handleChange}
+              />
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                value={values.email}
+                onChange={handleChange}
+              />
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                name="message"
+                label="Message"
+                type="text"
+                id="message"
+                value={values.message}
+                onChange={handleChange}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Send Message
+              </Button>
             </Box>
-          </Grid>
-      </Grid>
+          </Paper>
+        </Grid>
+    </Grid>
   );
   
 }

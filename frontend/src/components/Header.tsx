@@ -9,6 +9,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import { ConnectWithoutContactOutlined, GitHub, LinkedIn, Mail } from '@mui/icons-material';
 import { Box, Button, Stack } from '@mui/material';
 import { Link } from 'react-router-dom';
+import ThemeToggleButton from './Admin';
+
 
 const pages = [
   { name: "CV", path: "/cv" },
@@ -52,7 +54,6 @@ export default function Header() {
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static">
         <Toolbar sx={{ justifyContent: "space-between", padding: "0 20px" }}>
           <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -66,6 +67,7 @@ export default function Header() {
             >
             <Avatar src={avatar} sx={{ p: 2, width: 80, height: 80 }} />
             </IconButton>
+            <ThemeToggleButton/>
           </Box>
           <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center" }}>
             <Stack direction="row" spacing={4}>
@@ -105,6 +107,5 @@ export default function Header() {
           </Menu>       
         </Toolbar>
       </AppBar>
-    </Box>
   );
 };
