@@ -18,11 +18,7 @@ async def create_contact(
     payload: schemas.ContactFormCreate,
     db = Depends(get_async_session),
 ) -> schemas.ContactFormRead:
-    new_contact = models.ContactForm(**payload.dict())
-
-    console_log.critical("Creating new contact form entry")
-    console_log.critical(new_contact)
-
+    new_contact = models.ContactForm(**payload.model_dump())
     db.add(new_contact)
     await db.commit()
     await db.refresh(new_contact)
