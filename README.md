@@ -23,9 +23,10 @@ Enjoy!
 └── frontend
     ├── src
     ├── ...
-└── infrastructure
-    ├── src
 ```
+
+dc up --build
+ 
 
 ### `cd backend/`
 
@@ -38,6 +39,7 @@ https://testdriven.io/courses/tdd-fastapi/
 https://fastapi-users.github.io/fastapi-users/10.4/
 https://www.gormanalysis.com/blog/many-to-many-relationships-in-fastapi/
 https://testdriven.io/blog/docker-best-practices/#use-a-dockerignore-file
+https://aws.amazon.com/blogs/containers/deploy-applications-on-amazon-ecs-using-docker-compose/
 
 
 ### `cd frontend/`
