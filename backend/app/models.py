@@ -63,26 +63,3 @@ class PhotoGalleryXImage(Base):
     image_id = Column("image_id", UUID, ForeignKey("image.id"))
 
 
-
-
-class ClimbingTick(Base):
-    """
-    Represents a model for a climbing route.
-    """
-    __tablename__ = "climbing_route"
-    
-    date = Column(DateTime) # 'YYYY-MM-DD' format (FA Date)
-    route_name = Column(String, index=True)
-    rating = Column(String) 
-    notes = Column(String)  
-    url = Column(String)  
-    pitches = Column(Integer) 
-    location = Column(String) 
-    avg_stars = Column(Float)
-    your_stars = Column(Integer) 
-    style = Column(String) 
-    lead_style = Column(String) 
-    route_type = Column(String)  
-    your_rating = Column(String) 
-    length = Column(Integer)  
-    rating_code = Column(Integer)

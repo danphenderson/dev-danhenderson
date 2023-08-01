@@ -82,4 +82,3 @@ class ImagePhotoGalleryRead(ImageRead):
 
 class ImageUpdate(BaseImage):
     id: UUID4
-

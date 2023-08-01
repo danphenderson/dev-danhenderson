@@ -9,3 +9,10 @@ from app.logging import console_log
 
 
 router : APIRouter = APIRouter(tags=["climbing"])
+
+
+@router.get("/climbing/ticks", response_model=list[dict])
+async def get_ticks():
+    """
+    Returns a list of ticks.
+    """
