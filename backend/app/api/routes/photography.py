@@ -9,6 +9,17 @@ from sqlalchemy import select
 
 router : APIRouter = APIRouter(tags=["photography"])
 
+
+async def get_image(id: UUID4, db = Depends(get_async_session)) -> models.Image:
+    image = await db.get(models.Image, id)
+    if not image:
+        console_log.info(f"image with id {id} not found")
+        raise HTTPException(status_code=404, detail=f"image with {id} not found")
+    return image
+
+
+
+
 @router.post("/collection", status_code=201, response_model=schemas.PhotoGalleryRead)
 async def create_photo_gallery(
     payload: schemas.PhotoGalleryCreate,
@@ -39,10 +50,11 @@ async def read_photo_gallery(
     id: UUID4,
     db = Depends(get_async_session)
 ):
-    query = select(models.PhotoGallery).where(models.PhotoGallery.id == id)
-    res = await db.execute(query)
-    return schemas.PhotoGalleryImagesRead.from_orm(res.scalar())
-
+    photo_gallery = await db.get(models.PhotoGallery, id)
+    if not photo_gallery:
+        console_log.info(f"photo gallery with id {id} not found")
+        raise HTTPException(status_code=404, detail=f"photo gallery with {id} not found")
+    return schemas.PhotoGalleryImagesRead.from_orm(photo_gallery)
 
 @router.post("/image", status_code=201, response_model=schemas.ImageRead)
 async def create_image(
@@ -56,6 +68,17 @@ async def create_image(
         await db.commit()
         await db.refresh(image)
         return schemas.ImageRead.from_orm(image)
-
     except Exception as _:
         console_log.exception("Error creating image")
+
+
+@router.get("/image/{id}", response_model=list[schemas.ImageRead])
+async def read_image(
+    id: UUID4,
+    db = Depends(get_async_session)
+):
+    image = await db.get(models.Image, id)
+    if not image:
+        console_log.info(f"image with id {id} not found")
+        raise HTTPException(status_code=404, detail=f"image with {id} not found")
+    return schemas.ImageRead.from_orm(image)
