@@ -1,5 +1,5 @@
 {
-  "app": "python3 app.py",
+  "app": "python3 deploy.py",
   "watch": {
     "include": [
       "**"

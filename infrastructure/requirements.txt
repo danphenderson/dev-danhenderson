@@ -1,6 +1,0 @@
--i https://pypi.org/simple
-aws-cdk-lib==2.89.0
-aws-cdk.asset-awscli-v1==2.2.200 ; python_version ~= '3.7'
-aws-cdk.asset-kubectl-v20==2.1.2 ; python_version ~= '3.7'
-aws-cdk.asset-node-proxy-agent-v5==2.0.166 ; python_version ~= '3.7'
-constructs==10.2.69

@@ -24,7 +24,6 @@ pydantic-settings = "*"
 
 [dev-packages]
 ipython = "*"
-danhenderson-infrastructure = {editable = true, path = "./infrastructure"}
 danhenderson-api = {editable = true, path = "./backend"}
 
 [scripts]
