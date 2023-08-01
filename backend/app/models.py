@@ -65,13 +65,13 @@ class PhotoGalleryXImage(Base):
 
 
 
-class ClimbingRoute(Base):
+class ClimbingTick(Base):
     """
     Represents a model for a climbing route.
     """
     __tablename__ = "climbing_route"
     
-    date = Column(DateTime) 
+    date = Column(DateTime) # 'YYYY-MM-DD' format (FA Date)
     route_name = Column(String, index=True)
     rating = Column(String) 
     notes = Column(String)  
