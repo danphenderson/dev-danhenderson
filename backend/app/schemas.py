@@ -52,7 +52,7 @@ class PhotoGalleryRead(BasePhotoGallery, BaseRead):
     pass
 
 class PhotoGalleryImagesRead(PhotoGalleryRead):
-    images: list["ImageRead"]
+    images: list
 
 class PhotoGalleryCreate(BasePhotoGallery):
     title: str
@@ -67,17 +67,18 @@ class BaseImage(BaseModel):
     title: str | None = None
     description: str | None = None
     src: str | None = None
-    photo_gallery: list["PhotoGalleryRead"] | None = None
 
 class ImageRead(BaseImage, BaseRead):
     pass
 
-class ImagePhotoGalleryRead(ImageRead):
-    photo_gallery: list["PhotoGalleryRead"]
-
 class ImageCreate(BaseImage):
     title: str
     src: str
+
+class ImagePhotoGalleryRead(ImageRead):
+    photo_gallery: list
+
+
 
 class ImageUpdate(BaseImage):
     id: UUID4
