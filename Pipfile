@@ -20,6 +20,8 @@ toml = "*"
 sqlalchemy = "*"
 pydantic-settings = "*"
 aioyagmail = "*"
+feedparser = "*"
+gunicorn = "*"
 
 [dev-packages]
 ipython = "*"

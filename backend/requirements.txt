@@ -42,3 +42,5 @@ typeguard==2.13.3 ; python_full_version >= '3.5.3'
 typing-extensions==4.7.1 ; python_version >= '3.7'
 uvicorn==0.23.2
 aioyagmail==0.0.4
+feedparser==6.0.10
+ipython==8.14.0
