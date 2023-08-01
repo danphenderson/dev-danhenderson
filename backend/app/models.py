@@ -3,7 +3,7 @@ SQL Alchemy models declaration.
 """
 from uuid import uuid4
 from datetime import datetime
-from sqlalchemy import Column, DateTime,  String, UUID, ForeignKey
+from sqlalchemy import Column, DateTime, Float, Integer,  String, UUID, ForeignKey
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID
 from sqlalchemy.orm import DeclarativeBase, relationship
 
@@ -63,3 +63,26 @@ class PhotoGalleryXImage(Base):
     image_id = Column("image_id", UUID, ForeignKey("image.id"))
 
 
+
+
+class ClimbingRoute(Base):
+    """
+    Represents a model for a climbing route.
+    """
+    __tablename__ = "climbing_route"
+    
+    date = Column(DateTime) 
+    route_name = Column(String, index=True)
+    rating = Column(String) 
+    notes = Column(String)  
+    url = Column(String)  
+    pitches = Column(Integer) 
+    location = Column(String) 
+    avg_stars = Column(Float)
+    your_stars = Column(Integer) 
+    style = Column(String) 
+    lead_style = Column(String) 
+    route_type = Column(String)  
+    your_rating = Column(String) 
+    length = Column(Integer)  
+    rating_code = Column(Integer)
