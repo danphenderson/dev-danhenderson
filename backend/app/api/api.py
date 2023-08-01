@@ -14,7 +14,7 @@ from fastapi import APIRouter
 from app.api.deps import fastapi_users
 from app.core import security
 from app.schemas import UserCreate, UserRead, UserUpdate
-from app.api.routes import photography, contact
+from app.api.routes import photography, contact, climbing
 
 api_router : APIRouter = APIRouter()
 
@@ -52,4 +52,9 @@ api_router.include_router(
     contact.router,
     prefix="/contact",
     tags=["contact"],
+)
+api_router.include_router(
+    climbing.router,
+    prefix="/climbing",
+    tags=["climbing"],
 )

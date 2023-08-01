@@ -1,12 +1,15 @@
 # app/api/contact.py
 from fastapi import APIRouter, HTTPException
 from app.logging import console_log
-
+import httpx
+import feedparser
+from typing import  Any
+from app import schemas, models
 
 router : APIRouter = APIRouter(tags=["climbing"])
 
 
-@router.get("/climbing/ticks", response_model=list[dict])
+@router.get("/ticks", response_model=list[dict[str, Any]], status_code=200)
 async def get_ticks():
     """
     Fetches all ticks from mountain projects rss XML feed.
