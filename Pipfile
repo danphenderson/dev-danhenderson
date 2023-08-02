@@ -22,6 +22,8 @@ pydantic-settings = "*"
 aioyagmail = "*"
 feedparser = "*"
 gunicorn = "*"
+selenium = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 ipython = "*"
