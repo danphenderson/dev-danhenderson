@@ -1,4 +1,4 @@
-# app/api/photo_gallery.py
+# app/api/photography.py
 
 from fastapi import APIRouter, HTTPException, Depends
 from app.logging import console_log

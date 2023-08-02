@@ -10,9 +10,6 @@ from app.logging import console_log
 
 router : APIRouter = APIRouter(tags=["contact"])
 
-
-
-
 @router.post("/", response_model=schemas.ContactFormRead, status_code=201)
 async def create_contact(
     payload: schemas.ContactFormCreate,

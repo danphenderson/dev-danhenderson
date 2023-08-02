@@ -41,6 +41,9 @@ class Settings(BaseSettings):
     DEFAULT_DATABASE_DB: str
     DEFAULT_SQLALCHEMY_DATABASE_URI: str = ""
 
+    # THIRD PARTY API KEYS
+    OPEN_WEATHER_API_KEY : str = ""
+    
     # FIRST SUPERUSER
     FIRST_SUPERUSER_EMAIL: EmailStr
     FIRST_SUPERUSER_PASSWORD: str

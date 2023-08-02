@@ -82,3 +82,14 @@ class ImagePhotoGalleryRead(ImageRead):
 
 class ImageUpdate(BaseImage):
     id: UUID4
+
+
+
+class OpenWeatherRead(BaseModel):
+    temperature: float
+    humidity: int
+    pressure: int
+    weather_description: str
+    wind_speed: float
+    city: str
+    state: str
