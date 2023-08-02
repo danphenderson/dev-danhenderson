@@ -2,6 +2,7 @@ import { Typography,Grid, Paper, Box,  Avatar, Button, Divider, ListItem, ListIt
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import {Work as WorkIcon, School as SchoolIcon } from '@mui/icons-material';
+import BackgroundPaper from '../components/BackgroundPaper';
 const avatar = "./assets/home.jpg";
 
 const aboutMe = {
@@ -155,92 +156,82 @@ const stackAndTools = [
 
 export default function CV() {
   return (
-    <Grid container direction="row" component="main" sx={{ height: '100vh' }}>
-      <Grid item component="div" xs={12} sm={12} md={12}
-        sx={{
-          backgroundImage: `url("assets/photography/landscape/landscape-tieton-south-fork-1.jpg")`,
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover',
-        }}>
-        <Grid container spacing={4} sx={{ padding: 2, maxWidth: 1200, margin: "0 auto" }}>
-
+    <BackgroundPaper image='assets/photography/landscape/landscape-tieton-south-fork-3.jpg'>
           {/* Left Section (Profile Section) */}
-          <Grid item xs={12} md={4}>
-            <Paper elevation={3} sx={{ padding: 2, textAlign: "center", marginY: 4 }}>
-              {/* Name and Title */}
-              <Typography variant="h4">{aboutMe.name}</Typography>
-              <Typography variant="subtitle1" color="textSecondary">{aboutMe.title}</Typography>
-              <Box>
-                <Box sx={{ my: 2 }}>
-                  <Button variant="contained" color="primary" href={githubProfileUrl} target="_blank" startIcon={<GitHubIcon />}>
-                    GitHub Profile
-                  </Button>
-                </Box>
-                <Box sx={{ my: 2 }}>
-                  <Button variant="contained" color="primary" href={linkedinProfileUrl} target="_blank" startIcon={<LinkedInIcon />}>
-                    LinkedIn Profile
-                  </Button>
-                </Box>
+      <Grid item xs={12} md={4}>
+        <Paper elevation={3} sx={{ padding: 2, textAlign: "center", marginY: 4 }}>
+          {/* Name and Title */}
+          <Typography variant="h4">{aboutMe.name}</Typography>
+          <Typography variant="subtitle1" color="textSecondary">{aboutMe.title}</Typography>
+          <Box>
+            <Box sx={{ my: 2 }}>
+              <Button variant="contained" color="primary" href={githubProfileUrl} target="_blank" startIcon={<GitHubIcon />}>
+                GitHub Profile
+              </Button>
+            </Box>
+            <Box sx={{ my: 2 }}>
+              <Button variant="contained" color="primary" href={linkedinProfileUrl} target="_blank" startIcon={<LinkedInIcon />}>
+                LinkedIn Profile
+              </Button>
+            </Box>
+          </Box>
+         {/* Stack and Tools */}
+          {/* <Box sx={{ padding: 2 }}>
+            <Typography variant="h4" gutterBottom>
+              Stack and Tools
+            </Typography>
+
+            {stackAndTools.map((section) => (
+                <Box key={section.title}>
+                  <Typography variant="h5" gutterBottom>{section.title}</Typography>
+                <List dense>
+                  {section.items.map((item) => (
+                    <ListItem key={item}>
+                      <ListItemText primary={item} />
+                    </ListItem>
+                  ))}
+                </List>
               </Box>
-             {/* Stack and Tools */}
-              {/* <Box sx={{ padding: 2 }}>
-                <Typography variant="h4" gutterBottom>
-                  Stack and Tools
-                </Typography>
+            ))}
+          </Box> */}
+        </Paper>
+      </Grid>
 
-                {stackAndTools.map((section) => (
-                    <Box key={section.title}>
-                      <Typography variant="h5" gutterBottom>{section.title}</Typography>
-                    <List dense>
-                      {section.items.map((item) => (
-                        <ListItem key={item}>
-                          <ListItemText primary={item} />
-                        </ListItem>
-                      ))}
-                    </List>
-                  </Box>
-                ))}
-              </Box> */}
-            </Paper>
-          </Grid>
+      {/* Right Section */}
+      <Grid item xs={12} md={8}>
+        <Paper elevation={3} sx={{ padding: 2, marginY: 4 }}>
 
-          {/* Right Section */}
-          <Grid item xs={12} md={8}>
-            <Paper elevation={3} sx={{ padding: 2, marginY: 4 }}>
+          {/* About Me */}
+          <Box sx={{ padding: 2, marginBottom: 4 }}>
+            <Typography variant="h4" gutterBottom>About Me</Typography>
+            <Typography variant="body1">{aboutMe.about}</Typography>
+          </Box>
 
-              {/* About Me */}
-              <Box sx={{ padding: 2, marginBottom: 4 }}>
-                <Typography variant="h4" gutterBottom>About Me</Typography>
-                <Typography variant="body1">{aboutMe.about}</Typography>
-              </Box>
-
-              {/* Experience */}
-              <Box sx={{ padding: 2, marginBottom: 4 }}>
-                <Typography variant="h4" gutterBottom > Professional Experience</Typography>
-                {experiences.map((experience, index) => (
-                  <Box key={index}>
-                    <Typography variant="h5">{experience.title} @ {experience.company}</Typography>
-                    <Typography variant="subtitle1" color="textSecondary">{experience.startDate} - {experience.endDate}</Typography>
-                    <Typography variant="body1">{experience.description}</Typography>
-                    <Divider sx={{ margin: "10px 0" }} />
-                  </Box>
-                ))}
-              </Box>
-
-              {/* Education */}
-              <Box sx={{ padding: 2, marginBottom: 4 }}>
-                <Typography variant="h4" gutterBottom> Education</Typography>
-                <Typography variant="h5">{educationInfo.university}</Typography>
-                <Typography variant="body1">{educationInfo.degree} | {educationInfo.date}</Typography>
-                <Typography variant="body1">{educationInfo.grades}</Typography>
-                <Typography variant="body1">{educationInfo.activities}</Typography>
-                <Typography variant="body1">{educationInfo.achievements}</Typography>
+          {/* Experience */}
+          <Box sx={{ padding: 2, marginBottom: 4 }}>
+            <Typography variant="h4" gutterBottom > Professional Experience</Typography>
+            {experiences.map((experience, index) => (
+              <Box key={index}>
+                <Typography variant="h5">{experience.title} @ {experience.company}</Typography>
+                <Typography variant="subtitle1" color="textSecondary">{experience.startDate} - {experience.endDate}</Typography>
+                <Typography variant="body1">{experience.description}</Typography>
                 <Divider sx={{ margin: "10px 0" }} />
               </Box>
-          </Paper>
-          </Grid> 
-        </Grid>
-      </Grid>
-    </Grid>
+            ))}
+          </Box>
+
+          {/* Education */}
+          <Box sx={{ padding: 2, marginBottom: 4 }}>
+            <Typography variant="h4" gutterBottom> Education</Typography>
+            <Typography variant="h5">{educationInfo.university}</Typography>
+            <Typography variant="body1">{educationInfo.degree} | {educationInfo.date}</Typography>
+            <Typography variant="body1">{educationInfo.grades}</Typography>
+            <Typography variant="body1">{educationInfo.activities}</Typography>
+            <Typography variant="body1">{educationInfo.achievements}</Typography>
+            <Divider sx={{ margin: "10px 0" }} />
+          </Box>
+      </Paper>
+      </Grid> 
+    </BackgroundPaper>
   );
 }
