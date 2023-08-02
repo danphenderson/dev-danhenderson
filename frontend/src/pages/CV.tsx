@@ -157,7 +157,7 @@ const stackAndTools = [
 export default function CV() {
   return (
     <BackgroundPaper image='assets/photography/landscape/landscape-tieton-south-fork-3.jpg'>
-          {/* Left Section (Profile Section) */}
+      {/* Left Section (Profile Section) */}
       <Grid item xs={12} md={4}>
         <Paper elevation={3} sx={{ padding: 2, textAlign: "center", marginY: 4 }}>
           {/* Name and Title */}
