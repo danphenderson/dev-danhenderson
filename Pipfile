@@ -24,6 +24,7 @@ feedparser = "*"
 gunicorn = "*"
 selenium = "*"
 beautifulsoup4 = "*"
+boto3 = "*"
 
 [dev-packages]
 ipython = "*"
