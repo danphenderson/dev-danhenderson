@@ -1,9 +1,50 @@
-# dev-danhenderson
-A React+FastAPI web application powering danhenderson.dev.
+# [danhenderson.dev](https://www.danhenderson.dev)
 
-To add additional dependencies, for example other CDK libraries, just add
-them to your `setup.py` file and rerun the `pip install -r requirements.txt`
-command.
+## `src`
+
+The web application source code structure: 
+```
+.
+├── Pipfile
+├── Pipfile.lock
+├── README.md
+├── backend
+│   ├── Dockerfile
+│   ├── Dockerfile.prod
+│   ├── app
+│   ├── oauth2_google.json
+│   ├── public
+│   ├── pyproject.toml
+│   └── requirements.txt
+├── cloudformation
+│   ├── cdk.json
+│   ├── deploy.py
+│   ├── requirements.txt
+│   └── stacks/
+├── docker-compose.yml
+└── frontend
+    ├── Dockerfile
+    ├── node_modules
+    ├── package-lock.json
+    ├── package.json
+    ├── public
+    ├── src
+    └── tsconfig.json
+```
+
+*backend*: 
+http://localhost:8004
+
+OpenAPI (re)docs: http://localhost:8004/docs | http://localhost:8004/redocs
+
+*frontend*:
+
+http://localhost:3000
+
+*cloudformation:
+
+
+
 
 ## Useful commands
 
@@ -13,25 +54,18 @@ command.
  * `cdk diff`        compare deployed stack with current state
  * `cdk docs`        open CDK documentation
 
-Enjoy!
+E
+stacks
+njoy!
 
 ## Development
-```
-├── backend
-    ├── app
-    ├── ...
-└── frontend
-    ├── src
-    ├── ...
-```
+
 
 dc up --build
  
 
 ### `cd backend/`
 
-API: http://localhost1:8004
-OpenAPI (re)docs: http://localhost:8004/docs | http://localhost:8004/redocs
 
 #### Ref:
 https://levelup.gitconnected.com/building-a-website-starter-with-fastapi-92d077092864#e696
