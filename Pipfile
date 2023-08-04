@@ -25,8 +25,7 @@ gunicorn = "*"
 selenium = "*"
 beautifulsoup4 = "*"
 boto3 = "*"
-aws-cdk-lib = "==2.89.0"
-constructs = "*"
+
 
 [dev-packages]
 ipython = "*"
