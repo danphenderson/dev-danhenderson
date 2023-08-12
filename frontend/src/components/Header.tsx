@@ -87,24 +87,7 @@ export default function Header() {
               }
             </Stack>
           </Box>
-          <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            onClick={handleClose}
-            PaperProps={{
-              elevation: 0
-            }}
-          >
-            {menuItems.map(({ icon, text, href, newTab }, index) => (
-              <MenuItem key={index} onClick={handleClose}>
-                <ListItemIcon>{icon}</ListItemIcon>
-                <a href={href} target={newTab ? "_blank" : "_self"} rel={newTab ? "noopener noreferrer" : ""} style={{ color: '#333' }}>
-                  {text}
-                </a>
-              </MenuItem>
-            ))}
-          </Menu>       
+     
         </Toolbar>
       </AppBar>
   );
