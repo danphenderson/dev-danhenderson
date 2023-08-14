@@ -1,8 +1,0 @@
-{
-    "python.analysis.autoImportCompletions": true,
-    "python.analysis.downloadStubs": true,
-    "python.analysis.inlayHints.callArgumentNames": false,
-    "python.analysis.inlayHints.functionReturnTypes": false,
-    "python.analysis.inlayHints.pytestParameters": true,
-    "python.analysis.inlayHints.variableTypes": false
-}
