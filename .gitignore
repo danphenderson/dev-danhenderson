@@ -164,15 +164,15 @@ backend/public
 *oauth2_google.json
 
 # dependencies
-frontend/node_modules
-frontend/.pnp
+node_modules
+.pnp
 .pnp.js
 
 # testing
-frontend/coverage
+coverage
 
 # production
-frontend/build
+build
 
 # misc
 .DS_Store
