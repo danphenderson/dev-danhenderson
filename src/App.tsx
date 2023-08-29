@@ -8,8 +8,6 @@ import CV from "./pages/CV";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
 import { QuiltedImageList } from "./components/PhotoAlbum";
-import SignIn from "./components/Login";
-import SignUp from "./components/Register";
 
 import data from './photography.json';
 import { Box } from "@mui/material";
@@ -31,8 +29,6 @@ export default function App() {
           {memoizedData}
           <Route path="/climbing" element={<Climbing />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/login" element={<SignIn />} />
-          <Route path="/register" element={<SignUp />} />
           <Route path="*" element={<NotFound/>} />
         </Routes>
       </Box>
