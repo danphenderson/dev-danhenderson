@@ -1,0 +1,29 @@
+# Use the official Node.js image as the base image
+FROM node:20 AS build
+
+# Set the working directory inside the container
+WORKDIR /usr/src/app
+
+# Copy the package.json and package-lock.json files
+COPY package*.json ./
+
+# Install npm dependencies
+RUN npm install
+
+# Copy the frontend source code into the container
+COPY . .
+
+# Build the React application; this creates a 'build' folder with all the static assets
+RUN npm run build
+
+# Use a smaller, production-ready base image to reduce image size
+FROM nginx:stable-alpine
+
+# Copy the React build from the previous stage
+COPY --from=build /usr/src/app/build /usr/share/nginx/html
+
+# Expose port 80 (default port for NGINX)
+EXPOSE 80
+
+# Start NGINX to serve our static files
+CMD ["nginx", "-g", "daemon off;"]
