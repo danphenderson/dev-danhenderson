@@ -2,7 +2,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Footer from './components/Footer';
 import Header from './components/Header';
 import Home from './pages/Home';
-import Climbing from "./pages/Climbing";
 import Photography from './pages/Photography';
 import CV from "./pages/CV";
 import NotFound from "./pages/NotFound";
@@ -27,9 +26,8 @@ export default function App() {
           <Route path="/photography" element={<Photography />} /> {memoizedData}
           <Route path="*" element={<NotFound/>} />
         </Routes>
+        <Footer/>
       </Box>
-      {/* Bug displaying CopyRight Footer */}
-      {/* <Box sx={{ height: '100px' }} > <Footer /> </Box> */}
     </BrowserRouter>
   );
 }
