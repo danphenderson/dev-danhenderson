@@ -9,7 +9,6 @@ const pages = [
   { name: "Home", path: "/" },
   { name: "CV", path: "/cv" },
   { name: "Photography", path: "/photography" },
-  { name: "Climbing", path: "/climbing" },
 ];
 
 const avatar = "./assets/home.jpg";

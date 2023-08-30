@@ -20,12 +20,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <Box>
-        <Header />
+        <Header/>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cv" element={<CV />} />
           <Route path="/photography" element={<Photography />} /> {memoizedData}
-          <Route path="/climbing" element={<Climbing />} />
           <Route path="*" element={<NotFound/>} />
         </Routes>
       </Box>
