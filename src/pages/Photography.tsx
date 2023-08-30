@@ -1,6 +1,5 @@
 import React from "react";
-import { Box, Typography, Grid, Container, Paper } from "@mui/material";
-import { QuiltedImageList } from "../components/PhotoAlbum";
+import { Typography, Grid } from "@mui/material";
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';

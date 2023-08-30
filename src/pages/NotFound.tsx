@@ -1,4 +1,3 @@
-import {Grid, Paper, Box } from '@mui/material';
 import { Typography } from '@mui/material';
 import BackgroundPaper from '../components/BackgroundPaper';
 

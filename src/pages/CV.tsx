@@ -1,8 +1,9 @@
-import { Typography,Grid, Paper, Box,  Avatar, Button, Divider, ListItem, ListItemText, List } from '@mui/material';
+import { Typography,Grid, Paper, Box, Button, Divider } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
-import {Work as WorkIcon, School as SchoolIcon } from '@mui/icons-material';
 import BackgroundPaper from '../components/BackgroundPaper';
+
+
 const avatar = "./assets/home.jpg";
 
 const aboutMe = {
