@@ -19,7 +19,7 @@ const experiences = [
   {
     company: 'Lucerna Health',
     industry: 'HealthTech',
-    title: 'Data Pipeline Engineer',
+    title: 'Data Pipeline Engineer | Full Time',
     startDate: 'April 2022',
     endDate: 'December 2023',
     description: "Led software development and research of cloud warehousing and ingestion solutions for Lucerna's big-data cloud platform. Responsibilities included architectural design, releases, and deployments of the platform's data-engine software assets, ensuring the security and integrity of our clients' analytics data layer.",
@@ -33,7 +33,7 @@ const experiences = [
   {
     company: 'Lucerna Health',
     industry: 'HealthTech',
-    title: 'Data Scientist',
+    title: 'Data Scientist | Contract',
     startDate: 'November 2021',
     endDate: 'April 2022',
     description: "Responsible for ML feature development and operations and aided three restricted-offshore developers by rapidly resolving blockers, including infrastructure deployments, code reviews, ETL services, and quality assurance testing to accelerate their productivity.",
@@ -46,7 +46,7 @@ const experiences = [
   {
     company: 'Michigan Technological University',
     industry: 'Higher Education',
-    title: 'Researcher',
+    title: 'Researcher | Internship',
     startDate: 'November 2021',
     endDate: 'April 2022',
     description: "Responsibilities included co-authoring and performing the numerical experiment for submission to SIAM’s 2022 conference on Parallel Processing for Scientific Computing of publication: 2022, Azzam J, Henderson D, Ong BW and Struthers AA, Quasi-Newton Optimization with Hessian Samples.",
@@ -100,20 +100,16 @@ const stackAndTools = [
       'C/C++',
       'SQL',
       'Zsh',
-      'Jinja2',
       'LaTeX',
-      'MATLAB',
-      'Mathematica',
       'HTML',
-      'XML',
-      'YML',
+      'TypeScript',
     ],
   },
   {
     title: 'CLI Tools',
     items: [
       'Amazon CDK & SDK',
-      'docker-compose',
+      'docker/docker-compose',
       'pre-commit',
       'cookiecutter',
       'git submodule',
@@ -127,7 +123,7 @@ const stackAndTools = [
   },
   {
     title: 'Databases',
-    items: ['Amazon Redshift', 'PostgreSQL', 'MySQL', 'SQLite'],
+    items: ['Redshift', 'PostgreSQL', 'Amazon Neptune'],
   },
   {
     title: 'Services',
@@ -143,7 +139,6 @@ const stackAndTools = [
       'Jira',
       'Confluence',
       'Lucid',
-      'Figma',
       'OpenAPI/Swagger',
       'Docker',
       'Jupyter',
@@ -177,10 +172,6 @@ export default function CV() {
           </Box>
          {/* Stack and Tools */}
           {/* <Box sx={{ padding: 2 }}>
-            <Typography variant="h4" gutterBottom>
-              Stack and Tools
-            </Typography>
-
             {stackAndTools.map((section) => (
                 <Box key={section.title}>
                   <Typography variant="h5" gutterBottom>{section.title}</Typography>
