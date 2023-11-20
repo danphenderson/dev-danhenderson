@@ -16,6 +16,31 @@ const aboutMe = {
     "As a Cloud Data Platform Engineer with 1.5 years of experience, I am passionate about leading big-data solutions and driving analytics and insights for growth-oriented organizations prioritizing developer experience using CI/CD automation and cloud infrastructure defined as code. In my previous role, I built and optimized high-performance data engines, increasing Lucerna Health's ingestion pipeline throughput by over 50% and generating significant savings for our customers' compute-expense. I have also co-authored a publication exploring a novel scheme incorporating curvature information generated using SIMD-parallel forward-mode Automatic Differentiation into unconstrained Quasi-Newton minimization of a smooth objective function. Skilled in AWS, Python, Julia, Spark, DBT, FastAPI/Django, gRPC, Docker, and ML/NLP, I offer cross-disciplinary expertise in mathematics, computer science, finance, and economics. I seek opportunities that leverage my skills and experience to drive organizational growth and innovation, focusing on backend web application roles in data pipelines, ML/AI, and DevOps/Automation engineering. In my free time, I enjoy being inspired by the mountains, skiing, biking, and climbing the granite slopes.",
 };
 
+
+const codingExamples = [
+  {
+    title: 'Personal Portfolio',
+    description: 'My personal portfolio website built using React, TypeScript, and Material UI 5. It is deployed on AWS using S3, CloudFront, and Route53.',
+    links: ['www.danhenderson.dev',],
+  },
+  {
+    title: 'BlockOpt.jl',
+    description: 'An optim-style interface built on top of ForwardDiff.jl and TRS.jl Julia packages exploring a novel scheme for an unconstrained Quasi-Newton minimization of a smooth objective function.',
+    links: ['https://github.com/danphenderson/BlockOpt.jl'],
+  },
+  {
+    title: 'UncNLPrograms.jl',
+    description: 'A library containing a subset of high-dimensional, nonlinear, and unconstrained optimization problems from the CUTEst set implemented in native Julia to test solvers using Automatic/Algorithmic Differentiation.',
+    links: ['https://github.com/danphenderson/UncNLPrograms.jl']
+  },
+  {
+    title: 'MasterPlan',
+    description: 'A java application that allows users to create and manage a DAG structure of tasks and corresponding subtasks. It was built using Maven, Java11, and JavaFX.',
+    links: ['https://github.com/danphenderson/masterplan-app']
+  }
+]
+
+
 const experiences = [
   {
     company: 'Lucerna Health',
@@ -226,6 +251,22 @@ export default function CV() {
             <Typography key={index} variant="body1">{acheivement}</Typography>
           ))}
           <Divider sx={{ margin: "10px 0" }} />
+        </Box>
+
+        {/* Coding Examples */}
+        <Box sx={{ padding: 2, marginBottom: 4 }}>
+          <Typography variant="h4" gutterBottom> Coding Examples</Typography>
+          {codingExamples.map((example, index) => (
+            <Box key={index} sx={{ marginBottom: 2 }}>
+              <Typography variant="h5">{example.title}</Typography>
+              <Typography variant="body1">{example.description}</Typography>
+              {example.links.map((link, linkIndex) => (
+                <Typography key={linkIndex} variant="body2">
+                  <a href={link} target="_blank" rel="noopener noreferrer">{link}</a>
+                </Typography>
+              ))}
+            </Box>
+          ))}
         </Box>
 
       </Paper>
