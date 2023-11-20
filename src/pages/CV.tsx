@@ -66,15 +66,14 @@ const linkedinProfileUrl = 'https://www.linkedin.com/in/daniel-henderson-6a9485b
 const educationInfo = {
   university: "Michigan Technological University",
   degree: "B.S. Cum Laude, Mathematics, Applied/Computational & Minor in Computer Science",
-  date: "Jun 2015 - 2021",
   grades: "Cumulative: 3.56 | Departmental: 3.71",
   activities:
-    "President & V.P., Finance Club\n" +
-    "Representative, Undergraduate Student Government\n" +
-    "Member, Ways and Means Committee, allocating $700K to 200+ student organizations\n" +
-    "Liaison, Michigan Tech's Parent Fund Committee, budgeted and voted on the disbursement of $70K\n" +
-    "Student Advisor to the Dean of the School of Business and Economics\n" +
-    "Junior Partner, Applied Portfolio Management Program",
+    "• President & V.P., Finance Club\n" +
+    "• Representative, Undergraduate Student Government\n" +
+    "• Member, Ways and Means Committee, allocating $700K to 200+ student organizations\n" +
+    "• Liaison, Michigan Tech's Parent Fund Committee, budgeted and voted on the disbursement of $70K\n" +
+    "• Student Advisor to the Dean of the School of Business and Economics\n" +
+    "• Junior Partner, Applied Portfolio Management Program",
   achievements:
     "Achievements:\n" +
     "Recipient of Dean's List award for six semesters (Spring 2015, Summer 2015, Fall 2019, Spring 2020, Fall 2020, & Spring 2021)\n" +
@@ -212,16 +211,23 @@ export default function CV() {
             ))}
           </Box>
 
-          {/* Education */}
-          <Box sx={{ padding: 2, marginBottom: 4 }}>
-            <Typography variant="h4" gutterBottom> Education</Typography>
-            <Typography variant="h5">{educationInfo.university}</Typography>
-            <Typography variant="body1">{educationInfo.degree} | {educationInfo.date}</Typography>
-            <Typography variant="body1">{educationInfo.grades}</Typography>
-            <Typography variant="body1">{educationInfo.activities}</Typography>
-            <Typography variant="body1">{educationInfo.achievements}</Typography>
-            <Divider sx={{ margin: "10px 0" }} />
-          </Box>
+        {/* Education */}
+        <Box sx={{ padding: 2, marginBottom: 4 }}>
+          <Typography variant="h4" gutterBottom> Education</Typography>
+          <Typography variant="h5">{educationInfo.university}</Typography>
+          <Typography variant="body1">{educationInfo.degree} | {educationInfo.grades} </Typography>
+
+          {/* Activities */}
+          {educationInfo.activities.split("\n").map((activity, index) => (
+            <Typography key={index} variant="body1">{activity}</Typography>
+          ))}
+          {/* Achievements */}
+          {educationInfo.achievements.split("\n").map((acheivement, index) => (
+            <Typography key={index} variant="body1">{acheivement}</Typography>
+          ))}
+          <Divider sx={{ margin: "10px 0" }} />
+        </Box>
+
       </Paper>
       </Grid> 
     </BackgroundPaper>
