@@ -235,5 +235,54 @@
         "cols": 2
       }
     ]
+  },
+  {
+    "name": "New Mexico",
+    "description": "New Mexico during the end of November.",
+    "src": "/assets/photography/new-mexico/hdr-river-jemez-mountains.jpg",
+    "album":  [
+      {
+        "img": "/assets/photography/new-mexico/enchanted-tower.jpg",
+        "title": "",
+        "rows": 1, 
+        "cols": 1
+      },
+      {
+        "img": "/assets/photography/new-mexico/james-2.jpg",
+        "title": "",
+        "rows": 1, 
+        "cols": 1
+      },
+      {
+        "img": "/assets/photography/new-mexico/jemez-mountains-mist-1.jpg",
+        "title": "",
+        "rows": 2, 
+        "cols": 2
+      },
+      {
+        "img": "/assets/photography/new-mexico/capulin-canyon.jpg",
+        "title": "",
+        "rows": 2, 
+        "cols": 2
+      },
+      {
+        "img": "/assets/photography/new-mexico/hdr-jemez-mountains-bridge.jpg",
+        "title": "",
+        "rows": 1, 
+        "cols": 1
+      },
+      {
+        "img": "/assets/photography/new-mexico/hdr-river-jemez-mountains.jpg",
+        "title": "",
+        "rows": 1, 
+        "cols": 1
+      },
+      {
+        "img": "/assets/photography/new-mexico/capulin-canyon-sunset-1.jpg",
+        "title": "",
+        "rows": 2, 
+        "cols": 2
+      }
+    ]
   }
 ]
