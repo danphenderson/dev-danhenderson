@@ -21,7 +21,7 @@ const codingExamples = [
   {
     title: 'Personal Portfolio',
     description: 'My personal portfolio website built using React, TypeScript, and Material UI 5. It is deployed on AWS using S3, CloudFront, and Route53.',
-    links: ['www.danhenderson.dev',],
+    links: ['https://danhenderson.dev',],
   },
   {
     title: 'BlockOpt.jl',
