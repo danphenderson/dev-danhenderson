@@ -12,15 +12,18 @@ const aboutMe = {
   email: 'me@danhenderson.dev',
   phone: '906-281-7641',
   location: 'Seattle, WA',
-  about:
-    "As a Cloud Data Platform Engineer with 1.5 years of experience, I am passionate about leading big-data solutions and driving analytics and insights for growth-oriented organizations prioritizing developer experience using CI/CD automation and cloud infrastructure defined as code. In my previous role, I built and optimized high-performance data engines, increasing Lucerna Health's ingestion pipeline throughput by over 50% and generating significant savings for our customers' compute-expense. I have also co-authored a publication exploring a novel scheme incorporating curvature information generated using SIMD-parallel forward-mode Automatic Differentiation into unconstrained Quasi-Newton minimization of a smooth objective function. Skilled in AWS, Python, Julia, Spark, DBT, FastAPI/Django, gRPC, Docker, and ML/NLP, I offer cross-disciplinary expertise in mathematics, computer science, finance, and economics. I seek opportunities that leverage my skills and experience to drive organizational growth and innovation, focusing on backend web application roles in data pipelines, ML/AI, and DevOps/Automation engineering. In my free time, I enjoy being inspired by the mountains, skiing, biking, and climbing the granite slopes.",
 };
 
 
 const codingExamples = [
   {
-    title: 'Personal Portfolio',
-    description: 'My personal portfolio website built using React, TypeScript, and Material UI 5. It is deployed on AWS using S3, CloudFront, and Route53.',
+    title: 'chromex',
+    description: "An asynchronous interface for chrome browser automation's and scrapping that is built on bs4 and selenium.",
+    links: ['https://github.com/danphenderson/python-chromex'],
+  },
+  {
+    title: 'Portfolio',
+    description: 'My personal portfolio website built with React-TypeScript, using Material UI 5. It is deployed on AWS using S3, CloudFront, and Route53.',
     links: ['https://danhenderson.dev',],
   },
   {
@@ -37,9 +40,26 @@ const codingExamples = [
     title: 'MasterPlan',
     description: 'A java application that allows users to create and manage a DAG structure of tasks and corresponding subtasks. It was built using Maven, Java11, and JavaFX.',
     links: ['https://github.com/danphenderson/masterplan-app']
-  }
+  },
+  {
+    title: 'LeetCode Solutions',
+    description: "A collection of my solutions to LeetCode problems.",
+    links: ['https://github.com/danphenderson/leetcode-solutions']
+  },
 ]
 
+const certificates = [
+  {
+    title: "AWS Certified Solutions Architect – Associate",
+    issuer: "Amazon Web Services",
+    date: "Feburary 5th, 2024",
+  },
+  {
+    title: "AWS Cloud Practitioner",
+    issuer: "Amazon Web Services",
+    date: "January 19th, 2024",
+  }
+]
 
 const experiences = [
   {
@@ -62,7 +82,7 @@ const experiences = [
     title: 'Data Scientist | Contract',
     startDate: 'November 2021',
     endDate: 'April 2022',
-    description: "Responsible for ML feature development and operations and aided three restricted-offshore developers by rapidly resolving blockers, including infrastructure deployments, code reviews, ETL services, and quality assurance testing to accelerate their productivity.",
+    description: "ML feature development, operations, and assisted three restricted-offshore developers by rapidly resolving blockers, e.g. infrastructure deployments, code reviews, ETL services, and QA testing to accelerate their productivity.",
     projects: [
       "Built analytics pipeline and dashboard to meet data governance auditory requirements for the HiTrust certification of the organization's multi-tenant cloud architecture.",
       "Introduced standard version control safeguards for our data-science department production assets and automated their deployment using AWS CDK and Bitbucket pipelines.",
@@ -81,6 +101,16 @@ const experiences = [
       "Built UncNLPrograms.jl, a library containing a subset of high-dimensional, nonlinear, and unconstrained optimization problems from the CUTEst set implemented in native Julia to test solvers using Automatic/Algorithmic Differentiation.", 
     ],
   },
+  {
+    company: 'Michigan Technological University',
+    industry: 'Higher Education',
+    title: 'Mathematics Tutor | Part Time',
+    startDate: 'November 2021',
+    endDate: 'April 2022',
+    description: "Provided weekly tutoring services to NCAA student-athletes in multivariable, integral and differential calculus, ordinary differential equations, and linear algebra.",
+    projects: [
+    ],
+  },
   // Add more experiences as needed
 ];
 
@@ -93,14 +123,13 @@ const educationInfo = {
   degree: "B.S. Cum Laude, Mathematics, Applied/Computational & Minor in Computer Science",
   grades: "Cumulative: 3.56 | Departmental: 3.71",
   activities:
-    "• President & V.P., Finance Club\n" +
-    "• Representative, Undergraduate Student Government\n" +
-    "• Member, Ways and Means Committee, allocating $700K to 200+ student organizations\n" +
-    "• Liaison, Michigan Tech's Parent Fund Committee, budgeted and voted on the disbursement of $70K\n" +
-    "• Student Advisor to the Dean of the School of Business and Economics\n" +
-    "• Junior Partner, Applied Portfolio Management Program",
+    "- President & V.P., Finance Club\n" +
+    "- Representative, Undergraduate Student Government\n" +
+    "- Member, Ways and Means Committee, allocating $700K to 200+ student organizations\n" +
+    "- Liaison, Michigan Tech's Parent Fund Committee, budgeted and voted on the disbursement of $70K\n" +
+    "- Student Advisor to the Dean of the School of Business and Economics\n" +
+    "- Junior Partner, Applied Portfolio Management Program",
   achievements:
-    "Achievements:\n" +
     "Recipient of Dean's List award for six semesters (Spring 2015, Summer 2015, Fall 2019, Spring 2020, Fall 2020, & Spring 2021)\n" +
     "Certificate of Merit for Outstanding Academic Achievement in Calculus II with Technology, Mathematical Sciences Department",
 };
@@ -217,15 +246,10 @@ export default function CV() {
       <Grid item xs={12} md={8}>
         <Paper elevation={3} sx={{ padding: 2, marginY: 4 }}>
 
-          {/* About Me */}
-          <Box sx={{ padding: 2, marginBottom: 4 }}>
-            <Typography variant="h4" gutterBottom>About Me</Typography>
-            <Typography variant="body1">{aboutMe.about}</Typography>
-          </Box>
 
           {/* Experience */}
           <Box sx={{ padding: 2, marginBottom: 4 }}>
-            <Typography variant="h4" gutterBottom > Professional Experience</Typography>
+            <Typography variant="h3" gutterBottom > Experiences</Typography>
             {experiences.map((experience, index) => (
               <Box key={index}>
                 <Typography variant="h5">{experience.title} @ {experience.company}</Typography>
@@ -236,11 +260,26 @@ export default function CV() {
             ))}
           </Box>
 
+
+          {/* Certificates */}
+          <Box sx={{ padding: 2, marginBottom: 4 }}>
+            <Typography variant="h3" gutterBottom > Certificates</Typography>
+            {certificates.map((certificate, index) => (
+              <Box key={index}>
+                <Typography variant="h5">{certificate.title} </Typography>
+                <Typography variant="subtitle1" color="textSecondary">{certificate.issuer} issued on {certificate.date}</Typography>
+                <Divider sx={{ margin: "10px 0" }} />
+              </Box>
+            ))}
+          </Box>
+
+
         {/* Education */}
         <Box sx={{ padding: 2, marginBottom: 4 }}>
-          <Typography variant="h4" gutterBottom> Education</Typography>
+          <Typography variant="h3" gutterBottom> Education</Typography>
           <Typography variant="h5">{educationInfo.university}</Typography>
-          <Typography variant="body1">{educationInfo.degree} | {educationInfo.grades} </Typography>
+          <Typography variant="subtitle1">{educationInfo.degree}</Typography>
+          <Typography variant="subtitle1">{educationInfo.grades}</Typography>
 
           {/* Activities */}
           {educationInfo.activities.split("\n").map((activity, index) => (
@@ -253,9 +292,10 @@ export default function CV() {
           <Divider sx={{ margin: "10px 0" }} />
         </Box>
 
+
         {/* Coding Examples */}
         <Box sx={{ padding: 2, marginBottom: 4 }}>
-          <Typography variant="h4" gutterBottom> Coding Examples</Typography>
+          <Typography variant="h3" gutterBottom> Coding Examples</Typography>
           {codingExamples.map((example, index) => (
             <Box key={index} sx={{ marginBottom: 2 }}>
               <Typography variant="h5">{example.title}</Typography>
@@ -268,7 +308,6 @@ export default function CV() {
             </Box>
           ))}
         </Box>
-
       </Paper>
       </Grid> 
     </BackgroundPaper>
