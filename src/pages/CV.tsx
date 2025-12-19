@@ -639,7 +639,7 @@ export default function CV() {
                       )}
                     </Box>
                     <Box>
-                      <Typography variant="subtitle2" sx={{ color: '#0f172a', mb: 0.5 }}>
+                      <Typography variant="overline" sx={{ color: accentColor, letterSpacing: 2, fontWeight: 700 }}>
                         Open source contributions
                       </Typography>
                       {githubLoading ? (
@@ -693,7 +693,7 @@ export default function CV() {
                       )}
                     </Box>
                     <Box>
-                      <Typography variant="subtitle2" sx={{ color: '#0f172a', mb: 0.5 }}>
+                      <Typography variant="overline" sx={{ color: accentColor, letterSpacing: 2, fontWeight: 700 }}>
                         Open source projects
                       </Typography>
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>

@@ -46,7 +46,7 @@ export default function Climbing() {
         <Typography variant="h2">
           Recorded Ascents
         </Typography>
-        <DataGrid rows={ticks} columns={columns} />
+        <DataGrid rows={ticks} columns={columns} autoHeight/>
       </Paper>
     </BackgroundPaper>
   );

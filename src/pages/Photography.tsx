@@ -7,16 +7,9 @@ import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import data from "../photography.json";
 import BackgroundPaper from "../components/BackgroundPaper";
-
+import { Link } from "react-router-dom"
 
 export default function Photography() {
-
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-
-  const handleAlbumView = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
-
   return (
     <BackgroundPaper image='assets/photography/landscape/landscape-lime-kiln.jpg'>
       <Grid container spacing={4}>
@@ -36,7 +29,13 @@ export default function Photography() {
                 </Typography>
               </CardContent>
               <CardActions>
-                <Button href={"photography/" + card.name.toLowerCase()} variant="outlined" onClick={handleAlbumView}>View</Button>
+                <Button
+                  component={Link}
+                  to={`/photography/${card.name.toLowerCase()}`}
+                  variant="outlined"
+                >
+                  View
+                </Button>
               </CardActions>
             </Card>
           </Grid>
