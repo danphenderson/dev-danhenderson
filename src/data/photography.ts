@@ -1,0 +1,293 @@
+import type { PhotoCategory } from '../types/data';
+import { assetBasePath } from './cv';
+
+const withBase = (path: string) => `${assetBasePath}${path}`;
+
+export const photographyCategories: PhotoCategory[] = [
+  {
+    name: "Landscape",
+    description: "Landscape photo collection",
+    src: withBase('/assets/photography/landscape/landscape-tieton-south-fork-1.jpg'),
+    album: [
+      {
+        img: withBase('/assets/photography/landscape/landscape-tieton-south-fork-1.jpg'),
+        title: "Missing",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-tieton-south-fork-2.jpg'),
+        title: "Missing",
+        rows: 1,
+        cols: 1,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-tieton-south-fork-3.jpg'),
+        title: "Missing",
+        rows: 1,
+        cols: 1,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-alki-beach.jpg'),
+        title: "Missing",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-six-shooter-sunset.jpg'),
+        title: "Missing",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-beef-basin-sunset.jpg'),
+        title: "Missing",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-cotton-candy-rocks.jpg'),
+        title: "Missing",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-hidden-valley-sunset.jpg'),
+        title: "Missing",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-lime-kiln.jpg'),
+        title: "Missing",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-sand-dunes.jpg'),
+        title: "Missing",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-space-station.jpg'),
+        title: "Missing",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-tumwater-canyon.jpg'),
+        title: "Missing",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-rim-rock.jpg'),
+        title: "Six Shooter Sunset",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-indian-creek-1.jpg'),
+        title: "Six Shooter Sunset",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/landscape/landscape-beef-basin-fin.jpg'),
+        title: "Six Shooter Sunset",
+        rows: 2,
+        cols: 2,
+      },
+    ],
+  },
+  {
+    name: "Action",
+    description: "Action photo collection",
+    src: withBase('/assets/photography/action/action-dan-clipping-cam.jpg'),
+    album: [
+      {
+        img: withBase('/assets/photography/action/action-bighorns.jpg'),
+        title: "Missing",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/action/action-bouldering-pinheads.jpg'),
+        title: "Pinhead boulder, Joshua Tree",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/action/action-city-photo-1.jpg'),
+        title: "12a Sport Climbing, City Rock",
+        rows: 1,
+        cols: 1,
+      },
+      {
+        img: withBase('/assets/photography/action/action-city-photo-2.jpg'),
+        title: "12a Sport Climbing, City Rock",
+        rows: 1,
+        cols: 1,
+      },
+      {
+        img: withBase('/assets/photography/action/action-eric-on.jpg'),
+        title: "Eric Laabs, 5.11 Indian Creek Fingers; on!",
+        rows: 1,
+        cols: 1,
+      },
+      {
+        img: withBase('/assets/photography/action/action-eric-off.jpg'),
+        title: "Eric Laabs, 5.11 Indian Creek Fingers; off!",
+        rows: 1,
+        cols: 1,
+      },
+      {
+        img: withBase('/assets/photography/action/action-flying-crow.jpg'),
+        title: "En Route to Las Vegas",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/action/action-lucia-scarface.jpg'),
+        title: "Lucia Li, Indian Creek Scarface Silhouette",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/action/action-lime-kiln.jpg'),
+        title: "Ocean of Limestone, Lime Kiln",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/action/action-relaxing.jpg'),
+        title: "Action Relaxing",
+        rows: 2,
+        cols: 2,
+      },
+    ],
+  },
+  {
+    name: "Astronomy",
+    description: "Astronomy photo collection",
+    src: withBase('/assets/photography/astronomy/astronomy-arora-2.jpg'),
+    album: [
+      {
+        img: withBase('/assets/photography/astronomy/astronomy-arora-1.jpg'),
+        title: "Arora",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/astronomy/astronomy-arora-2.jpg'),
+        title: "Arora",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/astronomy/astronomy-arora-3.jpg'),
+        title: "Arora",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/astronomy/astronomy-galaxy-1.jpg'),
+        title: "",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/astronomy/astronomy-galaxy-2.jpg'),
+        title: "",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/astronomy/astronomy-joshua-tree-1.jpg'),
+        title: "",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/astronomy/astronomy-joshua-tree-2.jpg'),
+        title: "",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/astronomy/astronomy-joshua-tree-3.jpg'),
+        title: "",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/astronomy/astronomy-arora-4.jpg'),
+        title: "",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/astronomy/astronomy-kolab-canyon-1.jpg'),
+        title: "",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/astronomy/astronomy-kolab-canyon-2.jpg'),
+        title: "",
+        rows: 2,
+        cols: 2,
+      },
+    ],
+  },
+  {
+    name: "New Mexico",
+    description: "New Mexico in November.",
+    src: withBase('/assets/photography/new-mexico/hdr-river-jemez-mountains.jpg'),
+    album: [
+      {
+        img: withBase('/assets/photography/new-mexico/enchanted-tower.jpg'),
+        title: "",
+        rows: 1,
+        cols: 1,
+      },
+      {
+        img: withBase('/assets/photography/new-mexico/james-2.jpg'),
+        title: "",
+        rows: 1,
+        cols: 1,
+      },
+      {
+        img: withBase('/assets/photography/new-mexico/jemez-mountains-mist-1.jpg'),
+        title: "",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/new-mexico/capulin-canyon.jpg'),
+        title: "",
+        rows: 2,
+        cols: 2,
+      },
+      {
+        img: withBase('/assets/photography/new-mexico/hdr-jemez-mountains-bridge.jpg'),
+        title: "",
+        rows: 1,
+        cols: 1,
+      },
+      {
+        img: withBase('/assets/photography/new-mexico/hdr-river-jemez-mountains.jpg'),
+        title: "",
+        rows: 1,
+        cols: 1,
+      },
+      {
+        img: withBase('/assets/photography/new-mexico/capulin-canyon-sunset-1.jpg'),
+        title: "",
+        rows: 2,
+        cols: 2,
+      },
+    ],
+  },
+];

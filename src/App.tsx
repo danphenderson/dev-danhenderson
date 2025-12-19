@@ -8,14 +8,24 @@ import Climbing from "./pages/Climbing";
 import NotFound from "./pages/NotFound";
 import { QuiltedImageList } from "./components/PhotoAlbum";
 
-import data from './photography.json';
 import { Box } from "@mui/material";
 import { useMemo } from "react";
+import { usePhotographyData } from "./hooks/usePhotographyData";
 
 export default function App() {
-  const memoizedData = useMemo(() => data.map(card => (
-    <Route path={"/photography/" + card.name.toLowerCase()} element={<QuiltedImageList ImageData={card.album}/> } key={card.name}/>
-  )), [data]);
+  const { categories } = usePhotographyData();
+
+  const photoRoutes = useMemo(
+    () =>
+      categories.map((card) => (
+        <Route
+          path={`/photography/${card.slug}`}
+          element={<QuiltedImageList ImageData={card.album} />}
+          key={card.name}
+        />
+      )),
+    [categories],
+  );
 
   return (
     <BrowserRouter>
@@ -25,7 +35,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/cv" element={<CV />} />
           <Route path="/climbing" element={<Climbing />} />
-          <Route path="/photography" element={<Photography />} /> {memoizedData}
+          <Route path="/photography" element={<Photography />} /> {photoRoutes}
           <Route path="*" element={<NotFound/>} />
         </Routes>
         <Footer/>
