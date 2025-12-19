@@ -1,11 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Typography, Grid, Paper, Box, Button, Divider, Avatar, Chip, Stack } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import LaunchIcon from '@mui/icons-material/Launch';
+import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import BackgroundPaper from '../components/BackgroundPaper';
 
 
-const avatar = "./assets/home.jpg";
+const assetBasePath = process.env.PUBLIC_URL || '';
+const avatar = `${assetBasePath}/assets/home.jpg`;
+const cvBackgroundImage = `${assetBasePath}/assets/photography/landscape/landscape-tieton-south-fork-3.jpg`;
 
 const aboutMe = {
   name: 'Daniel Henderson',
@@ -13,11 +17,13 @@ const aboutMe = {
   email: 'me@danhenderson.dev',
   phone: '906-281-7641',
   location: 'Seattle, WA',
-  bio: `Applied/Computational Mathematics PhD student at Michigan Technological University (expected M.S. Spring 2026), building performance-critical scientific software and data systems.
+  bio: `Applied/Computational Math PhD student (M.S. expected Spring 2026) focused on performance-critical scientific software and data systems.
 
-Previously, I was a data scientist and pipeline engineer at Lucerna Health, where I designed cloud-native ingestion and analytics infrastructure that increased throughput by 50%+ and reduced downstream compute costs. That industry experience informs my research and engineering style: correctness first, then performance, then maintainability and reproducibility.
+Ex–Lucerna Health data scientist/pipeline engineer: built cloud-native ingestion + analytics infrastructure that boosted throughput 50%+ and reduced compute costs.
 
-Current research focuses on numerical methods for differential equations in hemodynamics, with additional work in smooth optimization and performance benchmarking across Julia, Python, and C. I'm pursuing applied research and engineering roles at the intersection of math, systems, and production software (scientific computing, data platforms, ML/AI engineering).`,
+Research: numerical methods for differential equations in hemodynamics; additional work in smooth optimization and benchmarking across Julia, Python, and C.
+
+Interested in applied roles at the intersection of math, systems, and production software (scientific computing, data platforms, ML/AI engineering). Full profile on LinkedIn.`,
 };
 
 const accentColor = '#0ea5e9';
@@ -27,12 +33,23 @@ const glassPanelSx = {
   boxShadow: '0 20px 80px rgba(15,23,42,0.18)',
   backdropFilter: 'blur(12px)',
 };
+const contentCardSx = {
+  borderRadius: 2,
+  border: '1px solid rgba(14,165,233,0.18)',
+  backgroundColor: 'rgba(255,255,255,0.78)',
+  boxShadow: '0 10px 40px rgba(15,23,42,0.08)',
+  p: { xs: 2, md: 2.5 },
+};
+const linkStyle = { color: 'inherit', textDecoration: 'none' as const };
 
 const githubUsername = 'danphenderson';
-const fallbackGitHubActivity = [
-  'Maintaining BlockOpt.jl (trust-region quasi-Newton optimizer in Julia).',
-  'Experimenting with data/ML pipelines on AWS Glue, EMR, and CDK.',
-  'Shipping personal portfolio + CV site (React, TypeScript, AWS).',
+type GitHubActivityItem = { label: string; href?: string };
+type GitHubContribution = { name: string; url: string; stars?: number };
+
+const fallbackGitHubActivity: GitHubActivityItem[] = [
+  { label: 'Maintaining BlockOpt.jl (trust-region quasi-Newton optimizer in Julia).', href: 'https://github.com/danphenderson/BlockOpt.jl' },
+  { label: 'Experimenting with data/ML pipelines on AWS Glue, EMR, and CDK.', href: 'https://github.com/danphenderson' },
+  { label: 'Shipping personal portfolio + CV site (React, TypeScript, AWS).', href: 'https://github.com/danphenderson/dev-danhenderson' },
 ];
 const fallbackGitHubProjects = [
   { name: 'BlockOpt.jl', url: 'https://github.com/danphenderson/BlockOpt.jl' },
@@ -40,6 +57,7 @@ const fallbackGitHubProjects = [
   { name: 'python-chromex', url: 'https://github.com/danphenderson/python-chromex' },
   { name: 'masterplan-app', url: 'https://github.com/danphenderson/masterplan-app' },
 ];
+const MAX_VISIBLE_CONTRIBUTIONS = 20;
 
 type GitHubEvent = {
   id: string;
@@ -50,45 +68,72 @@ type GitHubEvent = {
     action?: string;
     ref_type?: string;
     ref?: string;
-    commits?: { message?: string }[];
-    pull_request?: { number?: number };
-    issue?: { number?: number };
+    commits?: { message?: string; sha?: string }[];
+    pull_request?: { number?: number; html_url?: string };
+    issue?: { number?: number; html_url?: string };
   };
 };
 
 type GitHubRepo = {
   id: number;
   name: string;
+  full_name?: string;
   html_url: string;
   stargazers_count: number;
   fork: boolean;
   archived: boolean;
 };
 
-const formatGitHubEvent = (event: GitHubEvent) => {
+const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
+  const repoName = event.repo?.name;
+  const repoUrl = repoName ? `https://github.com/${repoName}` : undefined;
+
   switch (event.type) {
     case 'PushEvent': {
       const commits = event.payload?.commits?.length ?? 0;
-      return `Pushed ${commits || 'new'} commit${commits === 1 ? '' : 's'} to ${event.repo.name}`;
+      return {
+        label: `Pushed ${commits || 'new'} commit${commits === 1 ? '' : 's'} to ${repoName}`,
+        href: repoUrl,
+      };
     }
     case 'PullRequestEvent': {
       const action = event.payload?.action ?? 'updated';
       const prNumber = event.payload?.pull_request?.number;
-      return `${action.charAt(0).toUpperCase()}${action.slice(1)} PR${prNumber ? ` #${prNumber}` : ''} on ${event.repo.name}`;
+      return {
+        label: `${action.charAt(0).toUpperCase()}${action.slice(1)} PR${prNumber ? ` #${prNumber}` : ''} on ${repoName}`,
+        href: prNumber ? `${repoUrl}/pull/${prNumber}` : repoUrl,
+      };
     }
     case 'IssuesEvent': {
       const action = event.payload?.action ?? 'updated';
       const issueNumber = event.payload?.issue?.number;
-      return `${action.charAt(0).toUpperCase()}${action.slice(1)} issue${issueNumber ? ` #${issueNumber}` : ''} on ${event.repo.name}`;
+      return {
+        label: `${action.charAt(0).toUpperCase()}${action.slice(1)} issue${issueNumber ? ` #${issueNumber}` : ''} on ${repoName}`,
+        href: issueNumber ? `${repoUrl}/issues/${issueNumber}` : repoUrl,
+      };
     }
     case 'PullRequestReviewEvent':
-      return `Reviewed a PR on ${event.repo.name}`;
+      return {
+        label: `Reviewed a PR on ${repoName}`,
+        href: repoUrl,
+      };
     case 'CreateEvent':
-      return `Created ${event.payload?.ref_type ?? 'a resource'}${event.payload?.ref ? ` ${event.payload.ref}` : ''} in ${event.repo.name}`;
+      return {
+        label: `Created ${event.payload?.ref_type ?? 'a resource'}${event.payload?.ref ? ` ${event.payload.ref}` : ''} in ${repoName}`,
+        href: repoUrl,
+      };
     case 'ReleaseEvent':
-      return `Published a release on ${event.repo.name}`;
+      return {
+        label: `Published a release on ${repoName}`,
+        href: repoUrl,
+      };
     default:
-      return `${event.type.replace(/Event$/, '')} on ${event.repo.name}`;
+      return repoName
+        ? {
+            label: `${event.type.replace(/Event$/, '')} on ${repoName}`,
+            href: repoUrl,
+          }
+        : null;
   }
 };
 
@@ -144,6 +189,7 @@ const certificates = [
 const experiences = [
   {
     company: 'Lucerna Health',
+    companyUrl: 'https://getlucerna.com',
     industry: 'HealthTech',
     title: 'Data Pipeline Engineer | Full Time',
     startDate: 'Apr 2022',
@@ -159,6 +205,7 @@ const experiences = [
   },
   {
     company: 'Lucerna Health',
+    companyUrl: 'https://getlucerna.com',
     industry: 'HealthTech',
     title: 'Data Scientist | Contract',
     startDate: 'Nov 2021',
@@ -203,8 +250,7 @@ const experiences = [
 ];
 
 const githubProfileUrl = 'https://github.com/danphenderson'; 
-
-const linkedinProfileUrl = 'https://www.linkedin.com/in/daniel-henderson-6a9485bb/'; 
+const linkedinProfileUrl = 'https://www.linkedin.com/in/daniel-henderson-6a9485bb/';
 
 const educationInfo = {
   university: "Michigan Technological University",
@@ -292,10 +338,14 @@ const stackAndTools = [
 
 
 export default function CV() {
-  const [githubActivity, setGithubActivity] = useState<string[]>(fallbackGitHubActivity);
+  const [githubActivity, setGithubActivity] = useState<GitHubActivityItem[]>(fallbackGitHubActivity);
   const [githubProjects, setGithubProjects] = useState<{ name: string; url: string }[]>(fallbackGitHubProjects);
   const [githubLoading, setGithubLoading] = useState<boolean>(false);
   const [githubError, setGithubError] = useState<string | null>(null);
+  const [githubContribs, setGithubContribs] = useState<GitHubContribution[]>([]);
+  const lastGithubActivity = useRef<GitHubActivityItem[]>(fallbackGitHubActivity);
+  const lastGithubProjects = useRef<{ name: string; url: string }[]>(fallbackGitHubProjects);
+  const lastGithubContribs = useRef<GitHubContribution[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -304,16 +354,25 @@ export default function CV() {
       setGithubLoading(true);
       setGithubError(null);
       try {
-        const [eventsRes, reposRes] = await Promise.all([
+        const headers: HeadersInit = { Accept: 'application/vnd.github+json' };
+
+        const [eventsRes, reposRes, contribRes] = await Promise.all([
           fetch(`https://api.github.com/users/${githubUsername}/events/public?per_page=20`, {
-            headers: { Accept: 'application/vnd.github+json' },
+            headers,
           }),
           fetch(`https://api.github.com/users/${githubUsername}/repos?per_page=100&sort=updated`, {
-            headers: { Accept: 'application/vnd.github+json' },
+            headers,
+          }),
+          fetch(`https://api.github.com/search/issues?q=author:${githubUsername}+is:public+is:pr+-user:${githubUsername}&sort=updated&order=desc&per_page=30`, {
+            headers,
           }),
         ]);
 
         let encounteredError = false;
+        const externalReposSet = new Set<string>();
+        let activityList = fallbackGitHubActivity;
+        let projectList = fallbackGitHubProjects;
+        let contributionsList: GitHubContribution[] = [];
 
         if (eventsRes.ok) {
           const eventsData: GitHubEvent[] = await eventsRes.json();
@@ -322,43 +381,101 @@ export default function CV() {
               ['PushEvent', 'PullRequestEvent', 'IssuesEvent', 'PullRequestReviewEvent', 'CreateEvent', 'ReleaseEvent'].includes(event.type)
             )
             .map(formatGitHubEvent)
-            .filter(Boolean)
+            .filter((item): item is GitHubActivityItem => Boolean(item))
             .slice(0, 6);
-          if (!cancelled) {
-            setGithubActivity(formattedEvents.length ? formattedEvents : fallbackGitHubActivity);
-          }
+          eventsData
+            .map((event) => event.repo?.name)
+            .filter(
+              (repoName): repoName is string =>
+                Boolean(repoName) && !repoName.toLowerCase().startsWith(`${githubUsername.toLowerCase()}/`)
+            )
+            .forEach((name) => externalReposSet.add(name));
+          activityList = formattedEvents.length ? formattedEvents : fallbackGitHubActivity;
         } else {
           encounteredError = true;
-          if (!cancelled) {
-            setGithubActivity(fallbackGitHubActivity);
-          }
         }
 
         if (reposRes.ok) {
           const reposData: GitHubRepo[] = await reposRes.json();
-          const repos = reposData
+          projectList = reposData
             .filter((repo) => !repo.fork && !repo.archived)
             .sort((a, b) => b.stargazers_count - a.stargazers_count)
             .slice(0, 8)
             .map((repo) => ({ name: repo.name, url: repo.html_url }));
-          if (!cancelled) {
-            setGithubProjects(repos.length ? repos : fallbackGitHubProjects);
-          }
         } else {
           encounteredError = true;
-          if (!cancelled) {
-            setGithubProjects(fallbackGitHubProjects);
-          }
         }
 
-        if (encounteredError && !cancelled) {
-          setGithubError('Unable to load GitHub activity right now. Showing recent highlights instead.');
+        if (contribRes.ok) {
+          type GitHubSearchIssues = { items: { repository_url: string }[] };
+          const contribData: GitHubSearchIssues = await contribRes.json();
+          const searchRepos = contribData.items
+            .map((item) => item.repository_url?.split('repos/')[1])
+            .filter(
+              (name): name is string =>
+                Boolean(name) && !name.toLowerCase().startsWith(`${githubUsername.toLowerCase()}/`)
+            );
+          searchRepos.forEach((name) => externalReposSet.add(name));
+        } else {
+          encounteredError = true;
+        }
+
+        const contributions = Array.from(externalReposSet).slice(0, MAX_VISIBLE_CONTRIBUTIONS);
+        contributionsList = contributions.map((name) => ({
+          name,
+          url: `https://github.com/${name}`,
+          stars: 0,
+        }));
+
+        if (contributionsList.length) {
+          const enriched = await Promise.all(
+            contributionsList.map(async (repo) => {
+              try {
+                const res = await fetch(`https://api.github.com/repos/${repo.name}`, { headers });
+                if (!res.ok) {
+                  encounteredError = true;
+                  return repo;
+                }
+                const data: GitHubRepo = await res.json();
+                return {
+                  name: data.full_name || repo.name,
+                  url: data.html_url || repo.url,
+                  stars: data.stargazers_count || 0,
+                };
+              } catch {
+                encounteredError = true;
+                return repo;
+              }
+            })
+          );
+
+          contributionsList = enriched
+            .sort((a, b) => (b.stars || 0) - (a.stars || 0))
+            .map(({ name, url, stars }) => ({ name, url, stars }));
+        }
+
+        const effectiveActivity = activityList.length ? activityList : lastGithubActivity.current;
+        const effectiveProjects = projectList.length ? projectList : lastGithubProjects.current;
+        const effectiveContribs = contributionsList.length ? contributionsList : lastGithubContribs.current;
+
+        if (!cancelled) {
+          lastGithubActivity.current = effectiveActivity;
+          lastGithubProjects.current = effectiveProjects;
+          lastGithubContribs.current = effectiveContribs;
+
+          setGithubActivity(effectiveActivity);
+          setGithubProjects(effectiveProjects);
+          setGithubContribs(effectiveContribs);
+          if (encounteredError) {
+            setGithubError('Unable to load all GitHub data right now. Showing recent highlights instead.');
+          }
         }
       } catch (error) {
         if (!cancelled) {
           setGithubError('Unable to load GitHub activity right now. Showing recent highlights instead.');
-          setGithubActivity(fallbackGitHubActivity);
-          setGithubProjects(fallbackGitHubProjects);
+          setGithubActivity(lastGithubActivity.current.length ? lastGithubActivity.current : fallbackGitHubActivity);
+          setGithubProjects(lastGithubProjects.current.length ? lastGithubProjects.current : fallbackGitHubProjects);
+          setGithubContribs(lastGithubContribs.current);
         }
       } finally {
         if (!cancelled) {
@@ -374,7 +491,7 @@ export default function CV() {
   }, []);
 
   return (
-    <BackgroundPaper image='assets/photography/landscape/landscape-tieton-south-fork-3.jpg'>
+    <BackgroundPaper image={cvBackgroundImage}>
       <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 1.5, md: 3 }, py: { xs: 2, md: 3 } }}>
         <Grid container spacing={3} alignItems="stretch">
           <Grid item xs={12} md={4}>
@@ -445,26 +562,133 @@ export default function CV() {
                     >
                       View profile
                     </Button>
-                    <Box>
-                      <Typography variant="subtitle2" sx={{ color: '#0f172a', mb: 0.5 }}>
-                        Recent activity
-                      </Typography>
+                    <Button
+                      variant="text"
+                      color="primary"
+                      href={linkedinProfileUrl}
+                      target="_blank"
+                      startIcon={<LinkedInIcon />}
+                      sx={{ textTransform: 'none', alignSelf: 'flex-start', paddingX: 0 }}
+                    >
+                      View LinkedIn
+                    </Button>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ color: '#0f172a', mb: 0.5 }}>
+                    Recent activity
+                  </Typography>
                       {githubLoading ? (
                         <Typography variant="body2" color="text.secondary">
                           Loading activity...
                         </Typography>
                       ) : (
-                        <Box component="ul" sx={{ paddingLeft: 2.5, margin: 0 }}>
+                        <Box
+                          component="ul"
+                          sx={{
+                            listStyle: 'none',
+                            padding: 0,
+                            margin: 0,
+                            display: 'grid',
+                            gap: 0.75,
+                          }}
+                        >
                           {githubActivity.map((item, idx) => (
-                            <Typography key={idx} component="li" variant="body2" sx={{ color: 'text.secondary' }}>
-                              {item}
-                            </Typography>
+                            <Box
+                              key={idx}
+                              component="li"
+                              sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                padding: 0.75,
+                                borderRadius: 1.5,
+                                border: '1px solid rgba(15,23,42,0.08)',
+                                backgroundColor: 'rgba(255,255,255,0.9)',
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: '50%',
+                                  backgroundColor: accentColor,
+                                  flexShrink: 0,
+                                }}
+                              />
+                              <Typography variant="body2" sx={{ color: '#0f172a' }}>
+                                {item.href ? (
+                                  <a
+                                    href={item.href}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ ...linkStyle, textDecoration: 'underline' }}
+                                  >
+                                    {item.label}
+                                  </a>
+                                ) : (
+                                  item.label
+                                )}
+                              </Typography>
+                            </Box>
                           ))}
                         </Box>
                       )}
                       {githubError && (
                         <Typography variant="caption" color="textSecondary">
                           {githubError}
+                        </Typography>
+                      )}
+                    </Box>
+                    <Box>
+                      <Typography variant="subtitle2" sx={{ color: '#0f172a', mb: 0.5 }}>
+                        Open source contributions
+                      </Typography>
+                      {githubLoading ? (
+                        <Typography variant="body2" color="text.secondary">
+                          Loading contributions...
+                        </Typography>
+                      ) : githubContribs.length > 0 ? (
+                        <Stack spacing={1.25}>
+                          {githubContribs.map((project) => (
+                            <Box
+                              key={project.name}
+                              component="a"
+                              href={project.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              sx={{
+                                ...contentCardSx,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                textDecoration: 'none',
+                                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                                p: 1.5,
+                                '&:hover': {
+                                  transform: 'translateY(-2px)',
+                                  boxShadow: '0 12px 30px rgba(15,23,42,0.15)',
+                                },
+                              }}
+                            >
+                              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Typography variant="subtitle2" sx={{ color: '#0f172a', fontWeight: 700 }}>
+                                  {project.name}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                  View on GitHub
+                                </Typography>
+                              </Box>
+                              <Stack direction="row" spacing={0.5} alignItems="center">
+                                <StarRoundedIcon sx={{ fontSize: 18, color: '#fbbf24' }} />
+                                <Typography variant="body2" sx={{ fontWeight: 600, color: '#0f172a' }}>
+                                  {project.stars ?? 0}
+                                </Typography>
+                              </Stack>
+                            </Box>
+                          ))}
+                        </Stack>
+                      ) : (
+                        <Typography variant="body2" color="text.secondary">
+                          No recent community contributions found. Showing personal projects below.
                         </Typography>
                       )}
                     </Box>
@@ -559,36 +783,52 @@ export default function CV() {
                     {experiences.map((experience, index) => (
                       <Box
                         key={index}
-                        sx={{
-                          borderRadius: 2,
-                          border: '1px solid rgba(14,165,233,0.18)',
-                          backgroundColor: 'rgba(255,255,255,0.78)',
-                          boxShadow: '0 10px 40px rgba(15,23,42,0.08)',
-                          p: { xs: 2, md: 2.5 },
-                        }}
+                        sx={contentCardSx}
                       >
-                        <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1}>
-                          <Box>
-                            <Typography variant="h6" fontWeight={700}>
-                              {experience.title} @ {experience.company}
-                            </Typography>
-                            <Typography variant="subtitle2" color="textSecondary">
-                              {experience.startDate} - {experience.endDate}
-                            </Typography>
-                          </Box>
-                          {experience.industry && (
-                            <Chip
-                              size="small"
-                              label={experience.industry}
-                              variant="outlined"
-                              sx={{
-                                borderColor: accentColor,
-                                color: '#0f172a',
-                                backgroundColor: 'rgba(14,165,233,0.12)',
-                                fontWeight: 600,
-                              }}
-                            />
-                          )}
+                        <Stack spacing={1.25}>
+                          <Stack direction="row" justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1.5} flexWrap="wrap">
+                            <Box>
+                              <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center', color: '#0f172a' }}>
+                                <span>{experience.title}</span>
+                                <span>@</span>
+                                <span>{experience.company}</span>
+                              </Typography>
+                              <Stack direction="row" spacing={1} alignItems="center">
+                                <Typography variant="subtitle2" color="textSecondary">
+                                  {experience.startDate} - {experience.endDate}
+                                </Typography>
+                                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                                  {experience.companyUrl && (
+                                    <Button
+                                      size="small"
+                                      variant="outlined"
+                                      color="primary"
+                                      startIcon={<LaunchIcon />}
+                                      href={experience.companyUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      sx={{ textTransform: 'none', borderColor: 'rgba(14,165,233,0.4)', color: '#0f172a', backgroundColor: 'rgba(14,165,233,0.08)' }}
+                                    >
+                                      Company site
+                                    </Button>
+                                  )}
+                                  {experience.industry && (
+                                    <Chip
+                                      size="small"
+                                      label={experience.industry}
+                                      variant="outlined"
+                                      sx={{
+                                        borderColor: accentColor,
+                                        color: '#0f172a',
+                                        backgroundColor: 'rgba(14,165,233,0.12)',
+                                        fontWeight: 600,
+                                      }}
+                                    />
+                                  )}
+                                </Stack>
+                              </Stack>
+                            </Box>
+                          </Stack>
                         </Stack>
                         {experience.description && (
                           <Typography variant="body2" sx={{ mt: 1 }}>
@@ -633,16 +873,14 @@ export default function CV() {
                   <Typography variant="overline" sx={{ color: accentColor, letterSpacing: 2, fontWeight: 700 }}>
                     Certificates
                   </Typography>
+                  <Typography variant="h4" sx={{ mb: 2, color: '#0f172a' }}>
+                    Credentials
+                  </Typography>
                   <Stack spacing={1.5}>
                     {certificates.map((certificate, index) => (
                       <Box
                         key={index}
-                        sx={{
-                          borderRadius: 2,
-                          border: '1px solid rgba(15,23,42,0.08)',
-                          padding: 2,
-                          backgroundColor: 'rgba(255,255,255,0.8)',
-                        }}
+                        sx={contentCardSx}
                       >
                         <Typography variant="h6">{certificate.title}</Typography>
                         <Typography variant="subtitle2" color="textSecondary">
@@ -700,9 +938,12 @@ export default function CV() {
                   <Typography variant="overline" sx={{ color: accentColor, letterSpacing: 2, fontWeight: 700 }}>
                     Coding Examples
                   </Typography>
+                  <Typography variant="h4" sx={{ mb: 2, color: '#0f172a' }}>
+                    Selected Work
+                  </Typography>
                   <Stack spacing={1.5}>
                     {codingExamples.map((example, index) => (
-                      <Box key={index} sx={{ borderRadius: 2, padding: 1.5, backgroundColor: 'rgba(255,255,255,0.78)' }}>
+                      <Box key={index} sx={contentCardSx}>
                         <Typography variant="h6">{example.title}</Typography>
                         <Typography variant="body2">{example.description}</Typography>
                         <Stack spacing={0.25} sx={{ mt: 0.5 }}>
