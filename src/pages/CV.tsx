@@ -51,7 +51,7 @@ export default function CV() {
             >
               <ProfileCard about={aboutMe} avatarSrc={avatar} />
 
-              <Divider sx={{ borderColor: 'rgba(15,23,42,0.08)' }} />
+              <Divider sx={{ borderColor: 'divider' }} />
 
               <Stack spacing={2}>
                 <SectionHeading overline="GitHub" sx={{ mb: 0.5 }} />
@@ -66,7 +66,7 @@ export default function CV() {
                 <GitHubProjects projects={projects} />
               </Stack>
 
-              <Divider sx={{ borderColor: 'rgba(15,23,42,0.08)' }} />
+              <Divider sx={{ borderColor: 'divider' }} />
 
               <SectionHeading overline="Stack & Tools" sx={{ mt: 0.5 }} />
               <StackSection sections={stackAndTools} />
@@ -88,21 +88,21 @@ export default function CV() {
                   <ExperienceList experiences={experiences} />
                 </Box>
 
-                <Divider sx={{ borderColor: 'rgba(15,23,42,0.08)' }} />
+                <Divider sx={{ borderColor: 'divider' }} />
 
                 <Box>
                   <SectionHeading overline="Certificates" title="Credentials" />
                   <CertificatesList certificates={certificates} />
                 </Box>
 
-                <Divider sx={{ borderColor: 'rgba(15,23,42,0.08)' }} />
+                <Divider sx={{ borderColor: 'divider' }} />
 
                 <Box>
                   <SectionHeading overline="Education" />
                   <EducationSection education={educationInfo} />
                 </Box>
 
-                <Divider sx={{ borderColor: 'rgba(15,23,42,0.08)' }} />
+                <Divider sx={{ borderColor: 'divider' }} />
 
                 <Box>
                   <SectionHeading overline="Coding Examples" title="Selected Work" />

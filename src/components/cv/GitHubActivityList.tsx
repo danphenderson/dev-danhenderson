@@ -9,11 +9,11 @@ type GitHubActivityListProps = {
 };
 
 export const GitHubActivityList = ({ activity, loading, error }: GitHubActivityListProps) => {
-  const { accentColor, linkStyle } = useCvStyles();
+  const { accentColor, linkStyle, subtleBorder, subtleSurface } = useCvStyles();
 
   return (
     <Box>
-      <Typography variant="subtitle2" sx={{ color: '#0f172a', mb: 0.5 }}>
+      <Typography variant="subtitle2" sx={{ color: 'text.primary', mb: 0.5 }}>
         Recent activity
       </Typography>
       {loading ? (
@@ -41,8 +41,8 @@ export const GitHubActivityList = ({ activity, loading, error }: GitHubActivityL
                 gap: 1,
                 padding: 0.75,
                 borderRadius: 1.5,
-                border: '1px solid rgba(15,23,42,0.08)',
-                backgroundColor: 'rgba(255,255,255,0.9)',
+                border: subtleBorder,
+                backgroundColor: subtleSurface,
               }}
             >
               <Box
@@ -54,7 +54,7 @@ export const GitHubActivityList = ({ activity, loading, error }: GitHubActivityL
                   flexShrink: 0,
                 }}
               />
-              <Typography variant="body2" sx={{ color: '#0f172a' }}>
+              <Typography variant="body2" sx={{ color: 'text.primary' }}>
                 {item.href ? (
                   <a
                     href={item.href}
@@ -73,7 +73,7 @@ export const GitHubActivityList = ({ activity, loading, error }: GitHubActivityL
         </Box>
       )}
       {error && (
-        <Typography variant="caption" color="textSecondary">
+        <Typography variant="caption" color="text.secondary">
           {error}
         </Typography>
       )}

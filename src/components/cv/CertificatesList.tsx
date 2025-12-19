@@ -11,7 +11,7 @@ export const CertificatesList = ({ certificates }: CertificatesListProps) => (
     {certificates.map((certificate, index) => (
       <ContentCard key={`${certificate.title}-${index}`}>
         <Typography variant="h6">{certificate.title}</Typography>
-        <Typography variant="subtitle2" color="textSecondary">
+        <Typography variant="subtitle2" color="text.secondary">
           {certificate.issuer} issued on {certificate.date}
         </Typography>
         {certificate.link && (

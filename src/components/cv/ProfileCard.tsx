@@ -1,4 +1,5 @@
 import { Avatar, Chip, Stack, Typography } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import type { AboutMe } from '../../data/cv';
 import { useCvStyles } from '../../ThemeProvider';
 
@@ -8,7 +9,8 @@ type ProfileCardProps = {
 };
 
 export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
-  const { accentColor } = useCvStyles();
+  const { accentColor, accentTint } = useCvStyles();
+  const theme = useTheme();
 
   return (
     <Stack spacing={2} alignItems="center">
@@ -18,7 +20,7 @@ export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
         sx={{
           width: 96,
           height: 96,
-          boxShadow: '0 10px 30px rgba(15,23,42,0.3)',
+          boxShadow: theme.shadows[6],
           border: '2px solid rgba(255,255,255,0.9)',
         }}
       />
@@ -26,7 +28,7 @@ export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
         <Typography variant="h5" fontWeight={700}>
           {about.name}
         </Typography>
-        <Typography variant="subtitle1" color="textSecondary">
+        <Typography variant="subtitle1" color="text.secondary">
           {about.title}
         </Typography>
       </Stack>
@@ -35,13 +37,13 @@ export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
         variant="outlined"
         sx={{
           borderColor: accentColor,
-          color: '#0f172a',
-          backgroundColor: 'rgba(14,165,233,0.12)',
+          color: 'text.primary',
+          backgroundColor: accentTint,
           fontWeight: 600,
         }}
       />
       {about.bio && (
-        <Typography variant="body1" sx={{ whiteSpace: 'pre-line', color: '#0f172a' }}>
+        <Typography variant="body1" sx={{ whiteSpace: 'pre-line', color: 'text.primary' }}>
           {about.bio}
         </Typography>
       )}

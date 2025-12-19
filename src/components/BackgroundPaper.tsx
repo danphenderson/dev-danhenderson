@@ -1,4 +1,5 @@
 import { Box, Grid, Paper } from '@mui/material';
+import { alpha, useTheme } from '@mui/material/styles';
 
 interface BackgroundPaperProps {
   image: string;
@@ -19,6 +20,10 @@ const resolveBackgroundImage = (src: string) => {
 
 const BackgroundPaper: React.FC<BackgroundPaperProps> = ({ image, children }) => {
   const resolvedImage = resolveBackgroundImage(image);
+  const theme = useTheme();
+  const overlayColor = alpha(theme.palette.common.black, theme.palette.mode === 'light' ? 0.4 : 0.6);
+  const shellBackground = alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.72 : 0.6);
+  const shellBorder = `1px solid ${alpha(theme.palette.divider, 0.5)}`;
 
   return (
     <Grid container component="main" sx={{ minHeight: '100vh' }}>
@@ -41,7 +46,7 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({ image, children }) =>
             right: 0,
             bottom: 0,
             left: 0,
-            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            backgroundColor: overlayColor,
           },
         }}
       >
@@ -56,7 +61,16 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({ image, children }) =>
             padding: '50px 0',
           }}
         >
-          <Paper elevation={10} sx={{ backgroundColor: 'rgba(255, 255, 255, 0.6)', padding: 2, borderRadius: 2 }}>
+          <Paper
+            elevation={10}
+            sx={{
+              backgroundColor: shellBackground,
+              padding: 2,
+              borderRadius: 2,
+              border: shellBorder,
+              boxShadow: theme.shadows[6],
+            }}
+          >
             {children}
           </Paper>
         </Box>

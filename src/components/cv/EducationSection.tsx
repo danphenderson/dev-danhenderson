@@ -8,11 +8,11 @@ type EducationSectionProps = {
 
 export const EducationSection = ({ education }: EducationSectionProps) => (
   <ContentCard>
-    <Typography variant="h4" sx={{ mb: 2, color: '#0f172a' }}>
+    <Typography variant="h4" sx={{ mb: 2, color: 'text.primary' }}>
       {education.university}
     </Typography>
     <Typography variant="subtitle1">{education.degree}</Typography>
-    <Typography variant="subtitle2" color="textSecondary" sx={{ mb: 1.5 }}>
+    <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1.5 }}>
       {education.grades}
     </Typography>
     <Stack spacing={0.5} sx={{ mb: 1.5 }}>

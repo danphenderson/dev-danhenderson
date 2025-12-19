@@ -1,5 +1,4 @@
-import { Box, Button, Chip, Stack, Typography } from '@mui/material';
-import LaunchIcon from '@mui/icons-material/Launch';
+import { Box, Chip, Link, Stack, Typography } from '@mui/material';
 import type { Experience, ExperienceProject } from '../../data/cv';
 import { ContentCard } from '../ContentCard';
 import { useCvStyles } from '../../ThemeProvider';
@@ -43,7 +42,7 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
 };
 
 export const ExperienceList = ({ experiences }: ExperienceListProps) => {
-  const { accentColor } = useCvStyles();
+  const { accentColor, accentTint } = useCvStyles();
 
   return (
     <Stack spacing={2.25}>
@@ -52,30 +51,22 @@ export const ExperienceList = ({ experiences }: ExperienceListProps) => {
           <Stack spacing={1.25}>
             <Stack direction="row" justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1.5} flexWrap="wrap">
               <Box>
-                <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center', color: '#0f172a' }}>
+                <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center', color: 'text.primary' }}>
                   <span>{experience.title}</span>
                   <span>@</span>
-                  <span>{experience.company}</span>
+                  {experience.companyUrl ? (
+                    <Link href={experience.companyUrl} target="_blank" rel="noopener noreferrer" color="inherit" underline="hover">
+                      {experience.company}
+                    </Link>
+                  ) : (
+                    <span>{experience.company}</span>
+                  )}
                 </Typography>
                 <Stack direction="row" spacing={1} alignItems="center">
-                  <Typography variant="subtitle2" color="textSecondary">
+                  <Typography variant="subtitle2" color="text.secondary">
                     {experience.startDate} - {experience.endDate}
                   </Typography>
                   <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                    {experience.companyUrl && (
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        color="primary"
-                        startIcon={<LaunchIcon />}
-                        href={experience.companyUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        sx={{ textTransform: 'none', borderColor: 'rgba(14,165,233,0.4)', color: '#0f172a', backgroundColor: 'rgba(14,165,233,0.08)' }}
-                      >
-                        Company site
-                      </Button>
-                    )}
                     {experience.industry && (
                       <Chip
                         size="small"
@@ -83,8 +74,8 @@ export const ExperienceList = ({ experiences }: ExperienceListProps) => {
                         variant="outlined"
                         sx={{
                           borderColor: accentColor,
-                          color: '#0f172a',
-                          backgroundColor: 'rgba(14,165,233,0.12)',
+                          color: 'text.primary',
+                          backgroundColor: accentTint,
                           fontWeight: 600,
                         }}
                       />
