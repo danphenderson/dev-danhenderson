@@ -1,7 +1,7 @@
 import { ElementType } from 'react';
 import { Box, BoxProps } from '@mui/material';
 import { SxProps, Theme } from '@mui/material/styles';
-import { useCvStyles } from '../../ThemeProvider';
+import { useCvStyles } from '../ThemeProvider';
 
 type ContentCardProps<RootComponent extends ElementType = 'div'> = BoxProps<RootComponent> & {
   sx?: SxProps<Theme>;

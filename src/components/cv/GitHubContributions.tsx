@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from '@mui/material';
 import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import type { GitHubContribution } from '../../data/cv';
-import { ContentCard } from './ContentCard';
+import { ContentCard } from '../ContentCard';
 
 type GitHubContributionsProps = {
   contributions: GitHubContribution[];

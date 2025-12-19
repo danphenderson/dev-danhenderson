@@ -1,7 +1,7 @@
 import { Box, Button, Chip, Stack, Typography } from '@mui/material';
 import LaunchIcon from '@mui/icons-material/Launch';
 import type { Experience, ExperienceProject } from '../../data/cv';
-import { ContentCard } from './ContentCard';
+import { ContentCard } from '../ContentCard';
 import { useCvStyles } from '../../ThemeProvider';
 
 type ExperienceListProps = {

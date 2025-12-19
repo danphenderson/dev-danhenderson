@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 
 const pages = [
   { name: "CV", path: "/cv" },
+  { name: "Climbing", path: "/climbing" },
   { name: "Photography", path: "/photography" },
 ];
 

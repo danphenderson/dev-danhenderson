@@ -4,6 +4,7 @@ import Header from './components/Header';
 import Home from './pages/Home';
 import Photography from './pages/Photography';
 import CV from "./pages/CV";
+import Climbing from "./pages/Climbing";
 import NotFound from "./pages/NotFound";
 import { QuiltedImageList } from "./components/PhotoAlbum";
 
@@ -23,6 +24,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cv" element={<CV />} />
+          <Route path="/climbing" element={<Climbing />} />
           <Route path="/photography" element={<Photography />} /> {memoizedData}
           <Route path="*" element={<NotFound/>} />
         </Routes>

@@ -1,6 +1,6 @@
 import { Button, Stack, Typography } from '@mui/material';
 import type { Certificate } from '../../data/cv';
-import { ContentCard } from './ContentCard';
+import { ContentCard } from '../ContentCard';
 
 type CertificatesListProps = {
   certificates: Certificate[];

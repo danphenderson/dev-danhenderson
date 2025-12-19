@@ -1,6 +1,6 @@
 import { Stack, Typography } from '@mui/material';
 import type { CodingExample } from '../../data/cv';
-import { ContentCard } from './ContentCard';
+import { ContentCard } from '../ContentCard';
 
 type CodingExamplesSectionProps = {
   examples: CodingExample[];
