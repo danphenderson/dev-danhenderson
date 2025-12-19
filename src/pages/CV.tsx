@@ -6,6 +6,7 @@ import { ContactButtons } from '../components/cv/ContactButtons';
 import { EducationSection } from '../components/cv/EducationSection';
 import { ExperienceList } from '../components/cv/ExperienceList';
 import { GitHubActivityList } from '../components/cv/GitHubActivityList';
+import { GitHubContributionCalendar } from '../components/cv/GitHubContributionCalendar';
 import { GitHubContributions } from '../components/cv/GitHubContributions';
 import { GitHubProjects } from '../components/cv/GitHubProjects';
 import { ProfileCard } from '../components/cv/ProfileCard';
@@ -19,6 +20,7 @@ import {
   cvBackgroundImage,
   educationInfo,
   experiences,
+  githubUsername,
   githubProfileUrl,
   linkedinProfileUrl,
   stackAndTools,
@@ -54,6 +56,7 @@ export default function CV() {
               <Stack spacing={2}>
                 <SectionHeading overline="GitHub" sx={{ mb: 0.5 }} />
                 <ContactButtons githubUrl={githubProfileUrl} linkedinUrl={linkedinProfileUrl} />
+                <GitHubContributionCalendar username={githubUsername} />
                 <GitHubActivityList activity={activity} loading={loading} error={error} />
 
                 <SectionHeading overline="Open source contributions" sx={{ mt: 1 }} />

@@ -11,8 +11,6 @@ const pages = [
   { name: "Photography", path: "/photography" },
 ];
 
-const avatar = "./assets/home.jpg";
-
 export default function Header() {
 
   return (
