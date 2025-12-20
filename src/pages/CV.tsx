@@ -12,6 +12,7 @@ import { GitHubProjects } from '../components/cv/GitHubProjects';
 import { ProfileCard } from '../components/cv/ProfileCard';
 import { SectionHeading } from '../components/cv/SectionHeading';
 import { StackSection } from '../components/cv/StackSection';
+import { CommonToolsAccordion } from '../components/cv/CommonToolsAccordion';
 import {
   aboutMe,
   certificates,
@@ -88,7 +89,6 @@ export default function CV() {
                 </Box>
 
                 <Divider sx={{ borderColor: 'divider' }} />
-
                 <Box>
                   <SectionHeading overline="Certificates" title="Credentials" />
                   <CertificatesList certificates={certificates} />
