@@ -40,14 +40,19 @@ export type Experience = {
   endDate: string;
   description?: string;
   projects?: ExperienceProject[];
+  tools?: string[];
 };
 
 export type EducationInfo = {
+  entries: EducationEntry[];
+};
+
+export type EducationEntry = {
   university: string;
-  degree: string;
-  grades: string;
-  activities: string;
-  achievements: string;
+  program: string;
+  status?: string;
+  dateRange?: string;
+  highlights?: string[];
 };
 
 export type StackSection = {
@@ -124,19 +129,78 @@ export const certificates: Certificate[] = [
 
 export const experiences: Experience[] = [
   {
+    company: 'Michigan Technological University',
+    industry: 'Higher Education',
+    title: 'Graduate Research Assistant | Hemodynamics',
+    startDate: 'May 2025',
+    endDate: 'Current',
+    description:
+      'Advisor: Jiang Sun (Department of Mathematical Sciences). Hemodynamics modeling and numerical methods for macrocirculatory blood flow.',
+    projects: [
+      'Developed a hemodynamics modeling and methods report for macrocirculatory blood flow, formalizing the continuum mechanics framework (Eulerian/Lagrangian descriptions, material derivative, and Reynolds transport theorem) used to derive conservation laws for vascular flow.',
+      'Derived and analyzed incompressible Navier–Stokes formulations for blood (including Newtonian and generalized-Newtonian viscosity models), documenting the kinematic roles of Reynolds/Womersley numbers and related nondimensional parameters relevant to large-vessel regimes.',
+      'Scoped numerical pathways from dimension-reduced 0D/1D vessel models (e.g., Windkessel-style lumped parameter assumptions and 1D averaging ideas) through modern computational directions including PINNs/DeepONets and fluid–structure interaction for compliant vessels.',
+    ],
+  },
+  {
+    company: 'Michigan Technological University',
+    industry: 'Higher Education',
+    title: 'Instructor | Calculus I with Technology',
+    startDate: 'Jan 2025',
+    endDate: 'May 2025 (5 mos)',
+    description: 'Department of Mathematical Sciences. Instructor of record for Calculus I with Technology.',
+    projects: [
+      'Served as instructor of record for Calculus I with Technology, managing full course delivery: lectures, assessments, grading policy, and end-to-end course administration.',
+      'Designed and iterated technology-integrated lessons and assignments to improve conceptual understanding and problem-solving fluency.',
+      'Earned a strong student evaluation score of 4.8/5.0 with 58% response rate.',
+    ],
+  },
+  {
+    company: 'Michigan Technological University',
+    industry: 'Higher Education',
+    title: 'Graduate Teaching Assistant | Calculus I with Technology',
+    startDate: 'Aug 2024',
+    endDate: 'Dec 2024 (5 mos)',
+    description:
+      'Department of Mathematical Sciences. Coordinated grading/logistics and supported students with technology-based workflows.',
+    projects: [
+      'Coordinated instructional logistics and grading with the instructor; maintained consistent rubrics and timely turnaround to support student progress.',
+      'Provided individualized feedback on assignments/exams and supported students with technology-based workflows (Mathematica).',
+    ],
+    tools: ['Mathematica', 'Gradescope', 'Canvas', 'Panapto'],
+  },
+  {
     company: 'Lucerna Health',
     companyUrl: 'https://getlucerna.com',
     industry: 'HealthTech',
     title: 'Data Pipeline Engineer | Full Time',
     startDate: 'Apr 2022',
     endDate: 'Dec 2022 (9 mos)',
-    description: 'Cloud-native data platform engineering for ingestion, entity resolution, and batch ETL across AWS.',
+    description:
+      'Lead developer of Lucerna’s entity linking, ingestion, and recoding pipelines powering data platform’s ana.',
     projects: [
-      'Developed and operated cloud-native ingestion + entity-resolution pipelines powering large-scale analytics; improved end-to-end data-volume throughput by 50%+ and reduced compute cost.',
-      'Automated integrity checks and admin workflows across PostgreSQL, Glue Catalog, S3, and Redshift, reducing manual operational load.',
-      'Modernized batch ETL with Glue 3.0 and EMR transient clusters (instance fleets), lowering compute spend and improving reliability.',
-      'Designed and built a reusable AWS CDK infrastructure library adopted by all tenant applications, enforcing standardized patterns in a multi-tenant AWS environment.',
-      'Migrated shared ETL/infrastructure from Bitbucket to GitHub Enterprise and standardized CI/CD workflows.',
+      "Lead development of company’s Entity Linking, Ingestion, and Recoding pipelines driving the cloud platform’s analytics layer.",
+      "Owned architectural design, releases, and deployments of data-engineering assets, including data governance, security, and integrity of the platform's analytics data layer.",
+      "Built an admin service to automate integrity/state workflows across PostgreSQL, AWS Glue Data Catalog, and S3, reducing time to resolve platform service tickets.",
+      'Delivered cost savings by upgrading ETL runtime to AWS Glue 3.0 and migrating batch processing to AWS EMR (Spark).',
+      'Cut compute costs with transient EMR workloads using EC2 instance fleets; abstracted autoscaling, bootstrapping, provisioning, security, and networking into a reusable library.',
+      'Migrated shared ETL/infrastructure assets from Bitbucket to GitHub Enterprise and standardized CI/CD with GitHub Actions workflows, hooks, and templates.',
+      'Centralized cloud-infrastructure deployments through a major refactor that removed technical debt and git submodules while introducing semantic versioning practices.',
+      'Stepped up during team turnover by representing the data team in engineering design discussions and assisted in hiring/interviews and onboarding for directors and interns.',
+    ],
+    tools: [
+      'AWS',
+      'AWS CDK (Python)',
+      'AWS Glue 3.0',
+      'AWS Glue Data Catalog',
+      'S3',
+      'Redshift',
+      'PostgreSQL',
+      'EMR (Spark)',
+      'EC2 Instance Fleets',
+      'Bitbucket',
+      'GitHub Enterprise',
+      'GitHub Actions',
     ],
   },
   {
@@ -146,18 +210,22 @@ export const experiences: Experience[] = [
     title: 'Data Scientist | Contract',
     startDate: 'Nov 2021',
     endDate: 'Apr 2022 (6 mos)',
-    description: 'Built and operated production ML workflows on AWS with versioned releases and automated deployments via CDK and CI/CD.',
+    description:
+      'Production ML and analytics engineering on AWS for a multi-tenant health data platform, focused on deployment automation, anomaly detection, and governance.',
     projects: [
-      'Built and operated production ML workflows on AWS with versioned releases and automated deployments via CDK + CI/CD.',
-      'Implemented a scalable PySpark isolation-forest anomaly detection service over a multi-tenant S3 data lake.',
-      'Designed shared ML abstractions encapsulating security + infrastructure concerns to make model workflows portable and production-ready.',
-      'Delivered governed analytics services aligned with HiTrust requirements and internal compliance controls.',
+      'Implemented version-control safeguards for production ML assets and automated deployments using AWS CDK and Bitbucket Pipelines.',
+      'Built an anomaly-detection pipeline using PySpark isolation forest to flag anomalous records in a multi-tenant S3 data lake.',
+      'Designed a facade-pattern shared ML library to abstract security and cloud infrastructure concerns, enabling portable ML workflows.',
+      'Developed a cost-effective, scalable PySpark analytics service to meet data governance requirements supporting HiTrust certification.',
+      'Collaborated on a deduplication ML hook in the ingestion pipeline, enabling human-in-the-loop training and parameter evaluation.',
+      'Unblocked restricted-offshore developers via infrastructure deployments, code reviews, ETL support, and QA testing to accelerate delivery.',
     ],
+    tools: ['AWS', 'AWS CDK', 'Bitbucket Pipelines', 'S3', 'Python', 'PySpark', 'Isolation Forest'],
   },
   {
     company: 'Michigan Technological University',
     industry: 'Higher Education',
-    title: 'Researcher | Internship',
+    title: 'Research Assistant | Full Time',
     startDate: 'May 2021',
     endDate: 'Nov 2021 (6 mos)',
     description: 'Co-authored and implemented numerical experiments for Quasi-Newton Optimization with Hessian Samples.',
@@ -171,6 +239,7 @@ export const experiences: Experience[] = [
       { text: 'Repository (BlockOpt.jl):', link: 'https://github.com/danphenderson/BlockOpt.jl' },
       { text: 'Repository (UncNLPrograms.jl):', link: 'https://github.com/danphenderson/UncNLPrograms.jl' },
     ],
+    tools: ['Julia', 'ForwardDiff.jl', 'CUTEst', 'LaTeX', 'TRS.jl', 'Mathematica', 'Overleaf'],
   },
   {
     company: 'Michigan Technological University',
@@ -184,19 +253,35 @@ export const experiences: Experience[] = [
 ];
 
 export const educationInfo: EducationInfo = {
-  university: 'Michigan Technological University',
-  degree: 'B.S. Cum Laude, Mathematics, Applied/Computational & Minor in Computer Science',
-  grades: 'Cumulative: 3.56 | Departmental: 3.71',
-  activities:
-    "- President & V.P., Finance Club\n" +
-    "- Representative, Undergraduate Student Government\n" +
-    "- Member, Ways and Means Committee, allocating $700K to 200+ student organizations\n" +
-    "- Liaison, Michigan Tech's Parent Fund Committee, budgeted and voted on the disbursement of $70K\n" +
-    "- Student Advisor to the Dean of the School of Business and Economics\n" +
-    "- Junior Partner, Applied Portfolio Management Program",
-  achievements:
-    "Recipient of Dean's List award for six semesters (Spring 2015, Summer 2015, Fall 2019, Spring 2020, Fall 2020, & Spring 2021)\n" +
-    "Certificate of Merit for Outstanding Academic Achievement in Calculus II with Technology, Mathematical Sciences Department",
+  entries: [
+    {
+      university: 'Michigan Technological University',
+      program: 'Ph.D. Program in Applied and Computational Mathematics',
+      status: 'M.S. expected Spring 2026',
+      dateRange: 'Fall 2024 – Present',
+      highlights: [
+        'Graduate coursework in numerical and functional analysis, differential equations, optimization, and scientific computing',
+        'Pedagogical coursework: Teaching College Mathematics, emphasizing curriculum design, assessment, and evidence-based instructional practice',
+        'Research focuses on computational hemodynamics.',
+        'Developing reproducible and performance-critical scientific software in Julia and Python.',
+      ],
+    },
+    {
+      university: 'Michigan Technological University',
+      program: 'B.S. Cum Laude, Mathematics, Applied/Computational & Minor in Computer Science',
+      status: 'Cumulative: 3.56 | Departmental: 3.71',
+      highlights: [
+        'President & V.P., Finance Club',
+        'Representative, Undergraduate Student Government',
+        'Member, Ways and Means Committee, allocating $700K to 200+ student organizations',
+        "Liaison, Michigan Tech's Parent Fund Committee, budgeted and voted on the disbursement of $70K",
+        'Student Advisor to the Dean of the School of Business and Economics',
+        'Junior Partner, Applied Portfolio Management Program',
+        "Recipient of Dean's List award for six semesters (Spring 2015, Summer 2015, Fall 2019, Spring 2020, Fall 2020, & Spring 2021)",
+        'Certificate of Merit for Outstanding Academic Achievement in Calculus II with Technology, Mathematical Sciences Department',
+      ],
+    },
+  ],
 };
 
 export const stackAndTools: StackSection[] = [
@@ -264,6 +349,17 @@ export const stackAndTools: StackSection[] = [
       'Spark UI',
     ],
   },
+];
+
+export const commonTools: string[] = [
+  'AWS Glue 3.0 + EMR (Spark)',
+  'Amazon Redshift & PostgreSQL',
+  'Python (pandas, PySpark)',
+  'Docker & docker-compose',
+  'GitHub Actions (CI/CD)',
+  'AWS CDK (IaC)',
+  'pre-commit & linting automation',
+  'Jupyter notebooks for exploration',
 ];
 
 export const fallbackGitHubActivity: GitHubActivityItem[] = [

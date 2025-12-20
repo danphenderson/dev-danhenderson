@@ -1,9 +1,8 @@
 import React from 'react';
-import { Alert, Box, Link as MuiLink, Paper, Stack } from '@mui/material';
+import { Alert, Box, Link as MuiLink, Stack } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { SectionHeading } from '../components/cv/SectionHeading';
-import { useCvStyles } from '../ThemeProvider';
 import { ContentCard } from '../components/ContentCard';
 import { useClimbingData, TickRow, TodoRow } from '../hooks/useClimbingData';
 
@@ -52,19 +51,11 @@ const todoColumns: GridColDef<TodoRow>[] = [
 
 export default function Climbing() {
   const { ticks, todos, loading, todosLoading, error, todosError } = useClimbingData();
-  const { glassPanelSx } = useCvStyles();
 
   return (
-    <BackgroundPaper image="assets/climbing/climbing-locations.png">
+    <BackgroundPaper image="assets/climbing/climbing-locations.png" showShell={false}>
       <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 1.5, md: 3 }, py: { xs: 2, md: 3 } }}>
-        <Paper
-          elevation={0}
-          sx={{
-            ...glassPanelSx,
-            p: { xs: 2.5, md: 3.5 },
-            borderRadius: 3,
-          }}
-        >
+        <ContentCard sx={{ p: { xs: 2.5, md: 3.5 } }}>
           <Stack spacing={2}>
             <SectionHeading overline="Climbing" title="Recorded Ascents" />
             {error && (
@@ -72,48 +63,44 @@ export default function Climbing() {
                 {error}
               </Alert>
             )}
-            <ContentCard>
-              <Box sx={{ width: '100%' }}>
-                <DataGrid
-                  rows={ticks}
-                  columns={columns}
-                  autoHeight
-                  disableRowSelectionOnClick
-                  pageSizeOptions={[5, 10, 25, 50]}
-                  initialState={{
-                    pagination: {
-                      paginationModel: { pageSize: 10, page: 0 },
-                    },
-                  }}
-                  loading={loading}
-                />
-              </Box>
-            </ContentCard>
+            <Box sx={{ width: '100%' }}>
+              <DataGrid
+                rows={ticks}
+                columns={columns}
+                autoHeight
+                disableRowSelectionOnClick
+                pageSizeOptions={[5, 10, 25, 50]}
+                initialState={{
+                  pagination: {
+                    paginationModel: { pageSize: 10, page: 0 },
+                  },
+                }}
+                loading={loading}
+              />
+            </Box>
             <SectionHeading overline="Climbing" title="To-Do Routes" sx={{ mt: 2 }} />
             {todosError && (
               <Alert severity="error" sx={{ mb: 1 }}>
                 {todosError}
               </Alert>
             )}
-            <ContentCard>
-              <Box sx={{ width: '100%' }}>
-                <DataGrid
-                  rows={todos}
-                  columns={todoColumns}
-                  autoHeight
-                  disableRowSelectionOnClick
-                  pageSizeOptions={[5, 10, 25, 50]}
-                  initialState={{
-                    pagination: {
-                      paginationModel: { pageSize: 10, page: 0 },
-                    },
-                  }}
-                  loading={todosLoading}
-                />
-              </Box>
-            </ContentCard>
+            <Box sx={{ width: '100%' }}>
+              <DataGrid
+                rows={todos}
+                columns={todoColumns}
+                autoHeight
+                disableRowSelectionOnClick
+                pageSizeOptions={[5, 10, 25, 50]}
+                initialState={{
+                  pagination: {
+                    paginationModel: { pageSize: 10, page: 0 },
+                  },
+                }}
+                loading={todosLoading}
+              />
+            </Box>
           </Stack>
-        </Paper>
+        </ContentCard>
       </Box>
     </BackgroundPaper>
   );

@@ -1,4 +1,5 @@
 import { Box, Chip } from '@mui/material';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import { useCvStyles } from '../../ThemeProvider';
 import type { GitHubProject } from '../../data/cv';
 
@@ -14,6 +15,7 @@ export const GitHubProjects = ({ projects }: GitHubProjectsProps) => {
       {projects.map((project) => (
         <Chip
           key={project.name}
+          icon={<GitHubIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
           label={project.name}
           component="a"
           href={project.url}

@@ -46,9 +46,41 @@ const createAppTheme = (mode: PaletteMode) =>
       fontFamily: ['Inter', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'].join(','),
     },
     components: {
+      MuiCssBaseline: {
+        styleOverrides: (theme) => ({
+          html: {
+            height: '100%',
+            width: '100%',
+            textRendering: 'optimizeLegibility',
+            WebkitFontSmoothing: 'antialiased',
+            MozOsxFontSmoothing: 'grayscale',
+            scrollBehavior: 'smooth',
+          },
+          body: {
+            height: '100%',
+            width: '100%',
+            margin: 0,
+          },
+          '#root': {
+            minHeight: '100%',
+          },
+          a: {
+            color: theme.palette.primary.main,
+            textDecoration: 'none',
+          },
+          'a:hover': {
+            textDecoration: 'underline',
+          },
+        }),
+      },
       MuiButton: {
         defaultProps: {
           disableElevation: true,
+        },
+      },
+      MuiLink: {
+        defaultProps: {
+          underline: 'hover',
         },
       },
       MuiTextField: {

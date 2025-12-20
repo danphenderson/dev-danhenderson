@@ -2,6 +2,7 @@ import { Box, Chip, Link, Stack, Typography } from '@mui/material';
 import type { Experience, ExperienceProject } from '../../data/cv';
 import { ContentCard } from '../ContentCard';
 import { useCvStyles } from '../../ThemeProvider';
+import { ToolsAccordion } from '../ToolsAccordion';
 
 type ExperienceListProps = {
   experiences: Experience[];
@@ -23,16 +24,16 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
           );
         }
 
+        const linkLabel = project.text.replace(/:\s*$/, '');
+
         return (
           <Typography component="li" variant="body2" key={projectIndex}>
-            {project.text}
-            {project.link && (
-              <>
-                {' '}
-                <a href={project.link} target="_blank" rel="noopener noreferrer">
-                  {project.link}
-                </a>
-              </>
+            {project.link ? (
+              <Link href={project.link} target="_blank" rel="noopener noreferrer" underline="hover">
+                {linkLabel}
+              </Link>
+            ) : (
+              project.text
             )}
           </Typography>
         );
@@ -51,36 +52,48 @@ export const ExperienceList = ({ experiences }: ExperienceListProps) => {
           <Stack spacing={1.25}>
             <Stack direction="row" justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1.5} flexWrap="wrap">
               <Box>
-                <Typography variant="h6" fontWeight={700} sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, alignItems: 'center', color: 'text.primary' }}>
-                  <span>{experience.title}</span>
-                  <span>@</span>
+                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                  <Typography variant="h6" fontWeight={700} sx={{ color: 'text.primary' }}>
+                    {experience.title}
+                  </Typography>
+                  {experience.industry && (
+                    <Chip
+                      size="small"
+                      label={experience.industry}
+                      variant="outlined"
+                      sx={{
+                        borderColor: accentColor,
+                        color: 'text.primary',
+                        backgroundColor: accentTint,
+                        fontWeight: 600,
+                      }}
+                    />
+                  )}
+                </Stack>
+                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                   {experience.companyUrl ? (
-                    <Link href={experience.companyUrl} target="_blank" rel="noopener noreferrer" color="inherit" underline="hover">
+                    <Link
+                      href={experience.companyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      color="inherit"
+                      underline="hover"
+                      variant="subtitle2"
+                      sx={{ color: 'text.secondary', fontWeight: 700 }}
+                    >
                       {experience.company}
                     </Link>
                   ) : (
-                    <span>{experience.company}</span>
+                    <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+                      {experience.company}
+                    </Typography>
                   )}
-                </Typography>
-                <Stack direction="row" spacing={1} alignItems="center">
+                  <Typography variant="subtitle2" color="text.secondary">
+                    •
+                  </Typography>
                   <Typography variant="subtitle2" color="text.secondary">
                     {experience.startDate} - {experience.endDate}
                   </Typography>
-                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                    {experience.industry && (
-                      <Chip
-                        size="small"
-                        label={experience.industry}
-                        variant="outlined"
-                        sx={{
-                          borderColor: accentColor,
-                          color: 'text.primary',
-                          backgroundColor: accentTint,
-                          fontWeight: 600,
-                        }}
-                      />
-                    )}
-                  </Stack>
                 </Stack>
               </Box>
             </Stack>
@@ -91,6 +104,18 @@ export const ExperienceList = ({ experiences }: ExperienceListProps) => {
             </Typography>
           )}
           <ExperienceProjects projects={experience.projects} />
+          {experience.tools?.filter((tool) => tool.trim().length > 0).length ? (
+            <Box sx={{ mt: 1.5 }}>
+              <ToolsAccordion
+                id={`experience-tools-${index}`}
+                title="Tools used"
+                subtitle=""
+                tools={experience.tools}
+                dense
+                defaultExpanded={false}
+              />
+            </Box>
+          ) : null}
         </ContentCard>
       ))}
     </Stack>

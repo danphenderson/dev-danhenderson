@@ -4,6 +4,7 @@ import { alpha, useTheme } from '@mui/material/styles';
 interface BackgroundPaperProps {
   image: string;
   children: React.ReactNode;
+  showShell?: boolean;
 }
 
 const resolveBackgroundImage = (src: string) => {
@@ -18,7 +19,7 @@ const resolveBackgroundImage = (src: string) => {
   return `${base}${normalized}`;
 };
 
-const BackgroundPaper: React.FC<BackgroundPaperProps> = ({ image, children }) => {
+const BackgroundPaper: React.FC<BackgroundPaperProps> = ({ image, children, showShell = true }) => {
   const resolvedImage = resolveBackgroundImage(image);
   const theme = useTheme();
   const overlayColor = alpha(theme.palette.common.black, theme.palette.mode === 'light' ? 0.4 : 0.6);
@@ -61,18 +62,22 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({ image, children }) =>
             padding: '50px 0',
           }}
         >
-          <Paper
-            elevation={10}
-            sx={{
-              backgroundColor: shellBackground,
-              padding: 2,
-              borderRadius: 2,
-              border: shellBorder,
-              boxShadow: theme.shadows[6],
-            }}
-          >
-            {children}
-          </Paper>
+          {showShell ? (
+            <Paper
+              elevation={10}
+              sx={{
+                backgroundColor: shellBackground,
+                padding: 2,
+                borderRadius: 2,
+                border: shellBorder,
+                boxShadow: theme.shadows[6],
+              }}
+            >
+              {children}
+            </Paper>
+          ) : (
+            <Box sx={{ width: '100%' }}>{children}</Box>
+          )}
         </Box>
       </Grid>
     </Grid>

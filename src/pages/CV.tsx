@@ -1,8 +1,7 @@
-import { Box, Divider, Grid, Paper, Stack } from '@mui/material';
+import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { CodingExamplesSection } from '../components/cv/CodingExamplesSection';
 import { CertificatesList } from '../components/cv/CertificatesList';
-import { ContactButtons } from '../components/cv/ContactButtons';
 import { EducationSection } from '../components/cv/EducationSection';
 import { ExperienceList } from '../components/cv/ExperienceList';
 import { GitHubActivityList } from '../components/cv/GitHubActivityList';
@@ -11,8 +10,8 @@ import { GitHubContributions } from '../components/cv/GitHubContributions';
 import { GitHubProjects } from '../components/cv/GitHubProjects';
 import { ProfileCard } from '../components/cv/ProfileCard';
 import { SectionHeading } from '../components/cv/SectionHeading';
-import { StackSection } from '../components/cv/StackSection';
-import { CommonToolsAccordion } from '../components/cv/CommonToolsAccordion';
+import { ToolsAccordion } from '../components/ToolsAccordion';
+import { ContentCard } from '../components/ContentCard';
 import {
   aboutMe,
   certificates,
@@ -21,94 +20,117 @@ import {
   educationInfo,
   experiences,
   githubUsername,
-  githubProfileUrl,
   linkedinProfileUrl,
+  commonTools,
   stackAndTools,
 } from '../data/cv';
 import { useGithubProfile } from '../hooks/useGithubProfile';
-import { useCvStyles } from '../ThemeProvider';
 
 export default function CV() {
   const { activity, projects, contributions, loading, error } = useGithubProfile();
-  const { glassPanelSx } = useCvStyles();
 
   return (
-    <BackgroundPaper image={cvBackgroundImage}>
-      <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 1.5, md: 3 }, py: { xs: 2, md: 3 } }}>
+    <BackgroundPaper image={cvBackgroundImage} showShell={false}>
+      <Box sx={{ maxWidth: 1600, mx: 'auto', px: { xs: 1.5, md: 5 }, py: { xs: 2, md: 4 } }}>
         <Grid container spacing={3} alignItems="stretch">
-          <Grid item xs={12} md={4}>
-            <Paper
-              elevation={0}
+          <Grid item xs={12} md={5} lg={4} sx={{ order: { xs: 2, md: 1 } }}>
+            <Box
               sx={{
-                ...glassPanelSx,
                 height: '100%',
                 p: { xs: 2.5, md: 3 },
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2.5,
-                borderRadius: 3,
               }}
             >
-              <ProfileCard about={aboutMe} />
+              <Stack spacing={2.5}>
+                <ContentCard>
+                  <Stack spacing={2}>
+                    <SectionHeading overline="About" sx={{ mb: 0.5 }} />
+                    <ProfileCard about={aboutMe} linkedinUrl={linkedinProfileUrl} />
+                  </Stack>
+                </ContentCard>
 
-              <Divider sx={{ borderColor: 'divider' }} />
+                <ContentCard>
+                  <Stack spacing={2}>
+                    <SectionHeading overline="GitHub" sx={{ mb: 0.5 }} />
 
-              <Stack spacing={2}>
-                <SectionHeading overline="GitHub" sx={{ mb: 0.5 }} />
-                <ContactButtons githubUrl={githubProfileUrl} linkedinUrl={linkedinProfileUrl} />
-                <GitHubContributionCalendar username={githubUsername} />
-                <GitHubActivityList activity={activity} loading={loading} error={error} />
+                    <Typography variant="h4" sx={{ color: 'text.primary' }}>
+                      Recent Activity
+                    </Typography>
+                    <GitHubActivityList activity={activity} loading={loading} error={error} />
 
-                <SectionHeading overline="Open source contributions" sx={{ mt: 1 }} />
-                <GitHubContributions contributions={contributions} loading={loading} />
+                    <Divider sx={{ borderColor: 'divider' }} />
 
-                <SectionHeading overline="Open source projects" sx={{ mt: 1 }} />
-                <GitHubProjects projects={projects} />
+                    <Typography variant="h4" sx={{ color: 'text.primary' }}>
+                      Open Source Contributions
+                    </Typography>
+                    <GitHubContributions contributions={contributions} loading={loading} variant="list" />
+
+                    <Divider sx={{ borderColor: 'divider' }} />
+                    <GitHubContributionCalendar username={githubUsername} contained={false} />
+
+                    <Divider sx={{ borderColor: 'divider' }} />
+
+                    <Typography variant="h4" sx={{ color: 'text.primary' }}>
+                      Open Source Projects
+                    </Typography>
+                    <GitHubProjects projects={projects} />
+                  </Stack>
+                </ContentCard>
+
+                <ContentCard>
+                  <SectionHeading overline="Certificates" title="Credentials" />
+                  <CertificatesList certificates={certificates} />
+                </ContentCard>
+
+                <ContentCard>
+                  <Stack spacing={2}>
+                    <SectionHeading overline="Stack & Tools" sx={{ mb: 0.5 }} />
+                    <ToolsAccordion
+                      title="Common tools & platforms"
+                      subtitle="Core utilities used across engagements."
+                      tools={commonTools}
+                      dense
+                      defaultExpanded={false}
+                    />
+
+                    {stackAndTools.map((section) => (
+                      <ToolsAccordion
+                        key={section.title}
+                        title={section.title}
+                        subtitle=""
+                        tools={section.items}
+                        dense
+                        defaultExpanded={false}
+                      />
+                    ))}
+                  </Stack>
+                </ContentCard>
               </Stack>
-
-              <Divider sx={{ borderColor: 'divider' }} />
-
-              <SectionHeading overline="Stack & Tools" sx={{ mt: 0.5 }} />
-              <StackSection sections={stackAndTools} />
-            </Paper>
+            </Box>
           </Grid>
 
-          <Grid item xs={12} md={8}>
-            <Paper
-              elevation={0}
+          <Grid item xs={12} md={7} lg={8} sx={{ order: { xs: 1, md: 2 } }}>
+            <Box
               sx={{
-                ...glassPanelSx,
                 p: { xs: 2.5, md: 3.5 },
-                borderRadius: 3,
               }}
             >
               <Stack spacing={3.5}>
-                <Box>
+                <ContentCard>
                   <SectionHeading overline="Experience" title="Roles & Impact" />
                   <ExperienceList experiences={experiences} />
-                </Box>
+                </ContentCard>
 
-                <Divider sx={{ borderColor: 'divider' }} />
-                <Box>
-                  <SectionHeading overline="Certificates" title="Credentials" />
-                  <CertificatesList certificates={certificates} />
-                </Box>
-
-                <Divider sx={{ borderColor: 'divider' }} />
-
-                <Box>
+                <ContentCard>
                   <SectionHeading overline="Education" />
                   <EducationSection education={educationInfo} />
-                </Box>
+                </ContentCard>
 
-                <Divider sx={{ borderColor: 'divider' }} />
-
-                <Box>
+                <ContentCard>
                   <SectionHeading overline="Coding Examples" title="Selected Work" />
                   <CodingExamplesSection examples={codingExamples} />
-                </Box>
+                </ContentCard>
               </Stack>
-            </Paper>
+            </Box>
           </Grid>
         </Grid>
       </Box>

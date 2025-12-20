@@ -34,7 +34,7 @@ export default function Home() {
           align="center"
           sx={{ color: '#fff', fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' }, lineHeight: '1.5' }}
         >
-          Hi, I'm a Software Developer, Photographer, and Adventurer.
+          Hi, my passions are mathematics, computers, and adventures 
         </Typography>
       </Stack>
 

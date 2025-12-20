@@ -9,13 +9,10 @@ type GitHubActivityListProps = {
 };
 
 export const GitHubActivityList = ({ activity, loading, error }: GitHubActivityListProps) => {
-  const { accentColor, linkStyle, subtleBorder, subtleSurface } = useCvStyles();
+  const { subtleBorder, subtleSurface } = useCvStyles();
 
   return (
     <Box>
-      <Typography variant="subtitle2" sx={{ color: 'text.primary', mb: 0.5 }}>
-        Recent activity
-      </Typography>
       {loading ? (
         <Typography variant="body2" color="text.secondary">
           Loading activity...
@@ -36,38 +33,48 @@ export const GitHubActivityList = ({ activity, loading, error }: GitHubActivityL
               key={`${item.label}-${idx}`}
               component="li"
               sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 1,
-                padding: 0.75,
-                borderRadius: 1.5,
-                border: subtleBorder,
-                backgroundColor: subtleSurface,
+                listStyle: 'none',
               }}
             >
-              <Box
-                sx={{
-                  width: 8,
-                  height: 8,
-                  borderRadius: '50%',
-                  backgroundColor: accentColor,
-                  flexShrink: 0,
-                }}
-              />
-              <Typography variant="body2" sx={{ color: 'text.primary' }}>
-                {item.href ? (
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ ...linkStyle, textDecoration: 'underline' }}
-                  >
+              {item.href ? (
+                <Box
+                  component="a"
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    display: 'block',
+                    padding: 0.75,
+                    borderRadius: 1.5,
+                    border: subtleBorder,
+                    backgroundColor: subtleSurface,
+                    color: 'text.primary',
+                    textDecoration: 'none',
+                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                    '&:hover': {
+                      transform: 'translateY(-2px)',
+                      boxShadow: 3,
+                    },
+                  }}
+                >
+                  <Typography variant="body2" sx={{ color: 'text.primary' }}>
                     {item.label}
-                  </a>
-                ) : (
-                  item.label
-                )}
-              </Typography>
+                  </Typography>
+                </Box>
+              ) : (
+                <Box
+                  sx={{
+                    padding: 0.75,
+                    borderRadius: 1.5,
+                    border: subtleBorder,
+                    backgroundColor: subtleSurface,
+                  }}
+                >
+                  <Typography variant="body2" sx={{ color: 'text.primary' }}>
+                    {item.label}
+                  </Typography>
+                </Box>
+              )}
             </Box>
           ))}
         </Box>

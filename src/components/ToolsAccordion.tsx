@@ -1,4 +1,5 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useId } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -8,29 +9,36 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
-import { useCvStyles } from '../../ThemeProvider';
+import { useCvStyles } from '../ThemeProvider';
 
-type CommonToolsAccordionProps = {
+type ToolsAccordionProps = {
+  id?: string;
   title?: string;
   subtitle?: string;
-  tools: string[];
+  tools?: string[]; // allow undefined safely
   dense?: boolean;
   defaultExpanded?: boolean;
 };
 
-export const CommonToolsAccordion = ({
+export const ToolsAccordion = ({
+  id: idProp,
   title = 'Common tools',
   subtitle = 'Frequently used across roles and projects.',
-  tools,
+  tools = [],
   dense = false,
   defaultExpanded = true,
-}: CommonToolsAccordionProps) => {
+}: ToolsAccordionProps) => {
   const { subtleBorder, subtleSurface } = useCvStyles();
+  const fallbackId = useId();
+  const accordionId = idProp ?? fallbackId;
+  const summaryId = `${accordionId}-header`;
+  const detailsId = `${accordionId}-content`;
 
   return (
     <Accordion
       disableGutters
       elevation={0}
+      defaultExpanded={defaultExpanded}
       sx={{
         border: subtleBorder,
         backgroundColor: subtleSurface,
@@ -48,26 +56,26 @@ export const CommonToolsAccordion = ({
           pb: dense ? 1.25 : 1.5,
         },
       }}
-      defaultExpanded={defaultExpanded}
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon sx={{ color: 'text.secondary' }} />}
-        aria-controls="common-tools-content"
-        id="common-tools-header"
+        aria-controls={detailsId}
+        id={summaryId}
       >
         <Stack spacing={0.25} sx={{ width: '100%' }}>
           <Typography variant="subtitle2" fontWeight={700} sx={{ color: 'text.primary' }}>
             {title}
           </Typography>
-          {subtitle ? (
+
+          {!!subtitle && (
             <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               {subtitle}
             </Typography>
-          ) : null}
+          )}
         </Stack>
       </AccordionSummary>
 
-      <AccordionDetails>
+      <AccordionDetails id={detailsId} aria-labelledby={summaryId}>
         <Box
           sx={{
             display: 'flex',
@@ -75,20 +83,22 @@ export const CommonToolsAccordion = ({
             gap: 0.75,
           }}
         >
-          {tools.map((tool) => (
-            <Chip
-              key={tool}
-              label={tool}
-              size={dense ? 'small' : 'medium'}
-              variant="outlined"
-              sx={{
-                border: subtleBorder,
-                backgroundColor: subtleSurface,
-                fontWeight: 500,
-                color: 'text.primary',
-              }}
-            />
-          ))}
+          {tools
+            .filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
+            .map((tool, idx) => (
+              <Chip
+                key={`${tool}-${idx}`} // stable even if duplicates exist
+                label={tool}
+                size={dense ? 'small' : 'medium'}
+                variant="outlined"
+                sx={{
+                  border: subtleBorder,
+                  backgroundColor: subtleSurface,
+                  fontWeight: 500,
+                  color: 'text.primary',
+                }}
+              />
+            ))}
         </Box>
       </AccordionDetails>
     </Accordion>

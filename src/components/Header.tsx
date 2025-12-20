@@ -24,10 +24,11 @@ export default function Header() {
   const { isPlaying, pause, play, ready } = useWelcomeAudio();
   const path = location.pathname.toLowerCase();
   const showAvatar = path.startsWith('/cv') || path.startsWith('/climbing') || path.startsWith('/photography');
+  const headerIconSx = { fontSize: 30 };
 
   return (
     <AppBar position="static">
-      <Toolbar sx={{ padding: "0 20px", gap: 2 }}>
+      <Toolbar sx={{ padding: "0 25px", gap: 2.5, minHeight: 80 }}>
         <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
           {showAvatar && (
             <Tooltip title="Back to home">
@@ -36,24 +37,24 @@ export default function Header() {
                 to="/"
                 color="inherit"
                 aria-label="Go to home"
-                sx={{ p: 0.5 }}
+                sx={{ p: 0.625 }}
               >
                 <Avatar
                   src={avatarSrc}
                   alt="Daniel Henderson"
-                  sx={{ width: 40, height: 40, border: '2px solid rgba(255,255,255,0.8)' }}
+                  sx={{ width: 50, height: 50, border: '2.5px solid rgba(255,255,255,0.8)' }}
                 />
               </IconButton>
             </Tooltip>
           )}
         </Box>
         <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-start" }}>
-          <Stack direction="row" spacing={4}>
+          <Stack direction="row" spacing={5}>
             {pages.map(({ name, path }) => (
               <Button
                 key={name}
                 size="large"
-                sx={{ color: 'white', fontSize: "1.2rem" }}
+                sx={{ color: 'white', fontSize: "1.5rem" }}
                 component={Link}
                 to={path}
                 aria-label={'Go to ' + name}
@@ -64,11 +65,12 @@ export default function Header() {
           </Stack>
         </Box>
         <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          <Stack direction="row" spacing={1.5} alignItems="center">
+          <Stack direction="row" spacing={2} alignItems="center">
             <Tooltip title={isPlaying ? 'Pause welcome audio' : 'Play welcome audio'}>
               <span>
                 <IconButton
                   color="inherit"
+                  size="large"
                   onClick={async () => {
                     if (isPlaying) {
                       pause();
@@ -82,15 +84,15 @@ export default function Header() {
                   }}
                   aria-label={isPlaying ? 'Pause welcome audio' : 'Play welcome audio'}
                   disabled={!ready}
-                  sx={{ mr: 0.5 }}
+                  sx={{ mr: 0.625 }}
                 >
-                  {isPlaying ? <PauseCircleOutlineIcon /> : <PlayCircleOutlineIcon />}
+                  {isPlaying ? <PauseCircleOutlineIcon sx={headerIconSx} /> : <PlayCircleOutlineIcon sx={headerIconSx} />}
                 </IconButton>
               </span>
             </Tooltip>
             <Tooltip title={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}>
-              <IconButton color="inherit" onClick={toggleTheme} aria-label="Toggle color theme">
-                {mode === 'light' ? <DarkModeOutlinedIcon /> : <LightModeOutlinedIcon />}
+              <IconButton color="inherit" size="large" onClick={toggleTheme} aria-label="Toggle color theme">
+                {mode === 'light' ? <DarkModeOutlinedIcon sx={headerIconSx} /> : <LightModeOutlinedIcon sx={headerIconSx} />}
               </IconButton>
             </Tooltip>
           </Stack>

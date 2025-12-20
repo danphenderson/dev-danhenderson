@@ -38,36 +38,53 @@ const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
   switch (event.type) {
     case 'PushEvent': {
       const commits = event.payload?.commits?.length ?? 0;
+      const lastCommitSha =
+        event.payload?.commits && event.payload.commits.length
+          ? event.payload.commits[event.payload.commits.length - 1]?.sha
+          : undefined;
       return {
         label: `Pushed ${commits || 'new'} commit${commits === 1 ? '' : 's'} to ${repoName}`,
-        href: repoUrl,
+        href: lastCommitSha && repoUrl ? `${repoUrl}/commit/${lastCommitSha}` : repoUrl,
       };
     }
     case 'PullRequestEvent': {
       const action = event.payload?.action ?? 'updated';
       const prNumber = event.payload?.pull_request?.number;
+      const prUrl = event.payload?.pull_request?.html_url;
       return {
         label: `${action.charAt(0).toUpperCase()}${action.slice(1)} PR${prNumber ? ` #${prNumber}` : ''} on ${repoName}`,
-        href: prNumber ? `${repoUrl}/pull/${prNumber}` : repoUrl,
+        href: prUrl || (prNumber && repoUrl ? `${repoUrl}/pull/${prNumber}` : repoUrl),
       };
     }
     case 'IssuesEvent': {
       const action = event.payload?.action ?? 'updated';
       const issueNumber = event.payload?.issue?.number;
+      const issueUrl = event.payload?.issue?.html_url;
       return {
         label: `${action.charAt(0).toUpperCase()}${action.slice(1)} issue${issueNumber ? ` #${issueNumber}` : ''} on ${repoName}`,
-        href: issueNumber ? `${repoUrl}/issues/${issueNumber}` : repoUrl,
+        href: issueUrl || (issueNumber && repoUrl ? `${repoUrl}/issues/${issueNumber}` : repoUrl),
       };
     }
-    case 'PullRequestReviewEvent':
-      return { label: `Reviewed a PR on ${repoName}`, href: repoUrl };
+    case 'PullRequestReviewEvent': {
+      const prNumber = event.payload?.pull_request?.number;
+      const prUrl = event.payload?.pull_request?.html_url;
+      return {
+        label: `Reviewed a PR${prNumber ? ` #${prNumber}` : ''} on ${repoName}`,
+        href: prUrl || (prNumber && repoUrl ? `${repoUrl}/pull/${prNumber}` : repoUrl),
+      };
+    }
     case 'CreateEvent':
       return {
         label: `Created ${event.payload?.ref_type ?? 'a resource'}${event.payload?.ref ? ` ${event.payload.ref}` : ''} in ${repoName}`,
-        href: repoUrl,
+        href:
+          repoUrl && event.payload?.ref_type === 'branch' && event.payload?.ref
+            ? `${repoUrl}/tree/${event.payload.ref}`
+            : repoUrl && event.payload?.ref_type === 'tag' && event.payload?.ref
+              ? `${repoUrl}/releases/tag/${event.payload.ref}`
+              : repoUrl,
       };
     case 'ReleaseEvent':
-      return { label: `Published a release on ${repoName}`, href: repoUrl };
+      return { label: `Published a release on ${repoName}`, href: repoUrl ? `${repoUrl}/releases` : repoUrl };
     default:
       return repoName
         ? { label: `${event.type.replace(/Event$/, '')} on ${repoName}`, href: repoUrl }
