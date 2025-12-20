@@ -5,7 +5,7 @@ import { useCvStyles } from '../../ThemeProvider';
 
 type ProfileCardProps = {
   about: AboutMe;
-  avatarSrc: string;
+  avatarSrc?: string;
 };
 
 export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
@@ -14,16 +14,18 @@ export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
 
   return (
     <Stack spacing={2} alignItems="center">
-      <Avatar
-        src={avatarSrc}
-        alt={about.name}
-        sx={{
-          width: 96,
-          height: 96,
-          boxShadow: theme.shadows[6],
-          border: '2px solid rgba(255,255,255,0.9)',
-        }}
-      />
+      {avatarSrc && (
+        <Avatar
+          src={avatarSrc}
+          alt={about.name}
+          sx={{
+            width: 96,
+            height: 96,
+            boxShadow: theme.shadows[6],
+            border: '2px solid rgba(255,255,255,0.9)',
+          }}
+        />
+      )}
       <Stack spacing={0.5} textAlign="center">
         <Typography variant="h5" fontWeight={700}>
           {about.name}

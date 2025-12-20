@@ -14,7 +14,6 @@ import { SectionHeading } from '../components/cv/SectionHeading';
 import { StackSection } from '../components/cv/StackSection';
 import {
   aboutMe,
-  avatar,
   certificates,
   codingExamples,
   cvBackgroundImage,
@@ -49,7 +48,7 @@ export default function CV() {
                 borderRadius: 3,
               }}
             >
-              <ProfileCard about={aboutMe} avatarSrc={avatar} />
+              <ProfileCard about={aboutMe} />
 
               <Divider sx={{ borderColor: 'divider' }} />
 
