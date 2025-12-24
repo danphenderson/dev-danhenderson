@@ -3,7 +3,7 @@ import { Link as RouterLink, useParams } from 'react-router-dom';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BackgroundPaper from '../components/BackgroundPaper';
-import { ContentCard } from '../components/ContentCard';
+import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import { SectionHeading } from '../components/cv/SectionHeading';
 import { QuiltedImageList } from '../components/PhotoAlbum';
 import { usePhotographyData } from '../hooks/usePhotographyData';
@@ -25,7 +25,7 @@ export default function PhotographyCategory() {
     <BackgroundPaper image={backgroundImage} showShell={false}>
       <Box sx={{ maxWidth: 1400, mx: 'auto', px: { xs: 1.5, md: 3 }, py: { xs: 2, md: 3 } }}>
         <Stack spacing={2.5}>
-          <ContentCard>
+          <AnimatedContentCard delayMs={0}>
             <Stack spacing={1.5}>
               <Button
                 component={RouterLink}
@@ -52,12 +52,12 @@ export default function PhotographyCategory() {
                 </Typography>
               )}
             </Stack>
-          </ContentCard>
+          </AnimatedContentCard>
 
           {category && (
-            <ContentCard sx={{ p: { xs: 1.5, md: 2 } }}>
+            <AnimatedContentCard delayMs={140} sx={{ p: { xs: 1.5, md: 2 } }}>
               <QuiltedImageList ImageData={category.album} albumLabel={category.name} />
-            </ContentCard>
+            </AnimatedContentCard>
           )}
         </Stack>
       </Box>

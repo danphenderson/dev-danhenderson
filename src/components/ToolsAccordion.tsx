@@ -1,5 +1,5 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useEffect, useId, useState } from 'react';
+import { ReactNode, useEffect, useId, useState } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -19,6 +19,7 @@ type ToolsAccordionProps = {
   tools?: string[]; // allow undefined safely
   dense?: boolean;
   defaultExpanded?: boolean;
+  children?: ReactNode;
 };
 
 export const ToolsAccordion = ({
@@ -28,6 +29,7 @@ export const ToolsAccordion = ({
   tools = [],
   dense = false,
   defaultExpanded = true,
+  children,
 }: ToolsAccordionProps) => {
   const { subtleBorder, subtleSurface } = useCvStyles();
   const fallbackId = useId();
@@ -90,35 +92,39 @@ export const ToolsAccordion = ({
       </AccordionSummary>
 
       <AccordionDetails id={detailsId} aria-labelledby={summaryId}>
-        <Box
-          sx={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 0.75,
-          }}
-        >
-          {tools
-            .filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
-            .map((tool, idx) => (
-              <Zoom
-                key={`${tool}-${idx}`} // stable even if duplicates exist
-                in={showTools}
-                style={{ transitionDelay: showTools ? `${idx * 30}ms` : '0ms' }}
-              >
-                <Chip
-                  label={tool}
-                  size={dense ? 'small' : 'medium'}
-                  variant="outlined"
-                  sx={{
-                    border: subtleBorder,
-                    backgroundColor: subtleSurface,
-                    fontWeight: 500,
-                    color: 'text.primary',
-                  }}
-                />
-              </Zoom>
-            ))}
-        </Box>
+        {children ? (
+          <Box sx={{ width: '100%' }}>{children}</Box>
+        ) : (
+          <Box
+            sx={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 0.75,
+            }}
+          >
+            {tools
+              .filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
+              .map((tool, idx) => (
+                <Zoom
+                  key={`${tool}-${idx}`} // stable even if duplicates exist
+                  in={showTools}
+                  style={{ transitionDelay: showTools ? `${idx * 30}ms` : '0ms' }}
+                >
+                  <Chip
+                    label={tool}
+                    size={dense ? 'small' : 'medium'}
+                    variant="outlined"
+                    sx={{
+                      border: subtleBorder,
+                      backgroundColor: subtleSurface,
+                      fontWeight: 500,
+                      color: 'text.primary',
+                    }}
+                  />
+                </Zoom>
+              ))}
+          </Box>
+        )}
       </AccordionDetails>
     </Accordion>
   );

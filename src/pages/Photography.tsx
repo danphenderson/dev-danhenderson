@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Box, Button, Grid, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import BackgroundPaper from '../components/BackgroundPaper';
-import { ContentCard } from '../components/ContentCard';
+import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import { SectionHeading } from '../components/cv/SectionHeading';
 import { LoadingBars } from '../components/LoadingBars';
 import { usePhotographyData } from '../hooks/usePhotographyData';
@@ -14,6 +14,8 @@ export default function Photography() {
   const loadedImagesRef = useRef<Set<string>>(new Set());
   const [loadedImages, setLoadedImages] = useState(0);
   const totalImages = categories.length;
+  const baseDelay = 120;
+  const staggerDelay = 90;
 
   useEffect(() => {
     loadedImagesRef.current.clear();
@@ -32,7 +34,7 @@ export default function Photography() {
     <BackgroundPaper image={fallbackBackgroundImage} showShell={false}>
       <Box sx={{ maxWidth: 1400, mx: 'auto', px: { xs: 1.5, md: 3 }, py: { xs: 2, md: 3 } }}>
         <Stack spacing={2.5}>
-          <ContentCard>
+          <AnimatedContentCard delayMs={0}>
             <Stack spacing={1}>
               <SectionHeading
                 overline="Photography"
@@ -49,12 +51,15 @@ export default function Photography() {
                 </Box>
               )}
             </Stack>
-          </ContentCard>
+          </AnimatedContentCard>
 
           <Grid container spacing={2.5}>
-            {categories.map((card) => (
+            {categories.map((card, index) => (
               <Grid item key={card.name} xs={12} sm={6} md={4}>
-                <ContentCard sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                <AnimatedContentCard
+                  delayMs={baseDelay + index * staggerDelay}
+                  sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 1.5 }}
+                >
                   <Box
                     sx={{
                       position: 'relative',
@@ -100,7 +105,7 @@ export default function Photography() {
                   >
                     View album
                   </Button>
-                </ContentCard>
+                </AnimatedContentCard>
               </Grid>
             ))}
           </Grid>

@@ -3,7 +3,7 @@ import { Alert, Box, Link as MuiLink, Stack } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { SectionHeading } from '../components/cv/SectionHeading';
-import { ContentCard } from '../components/ContentCard';
+import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import { LoadingBars } from '../components/LoadingBars';
 import { useClimbingData, TickRow, TodoRow } from '../hooks/useClimbingData';
 
@@ -62,7 +62,7 @@ export default function Climbing() {
   return (
     <BackgroundPaper image="assets/climbing/climbing-locations.png" showShell={false}>
       <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 1.5, md: 3 }, py: { xs: 2, md: 3 } }}>
-        <ContentCard sx={{ p: { xs: 2.5, md: 3.5 } }}>
+        <AnimatedContentCard sx={{ p: { xs: 2.5, md: 3.5 } }}>
           <Stack spacing={2}>
             <SectionHeading overline="Climbing" title="Recorded Ascents" />
             {error && (
@@ -109,7 +109,7 @@ export default function Climbing() {
               />
             </Box>
           </Stack>
-        </ContentCard>
+        </AnimatedContentCard>
       </Box>
     </BackgroundPaper>
   );

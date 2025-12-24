@@ -1,6 +1,6 @@
 import { Button, Stack, Typography } from '@mui/material';
 import type { Certificate } from '../../data/cv';
-import { ContentCard } from '../ContentCard';
+import { AnimatedContentCard } from '../AnimatedContentCard';
 
 type CertificatesListProps = {
   certificates: Certificate[];
@@ -9,7 +9,7 @@ type CertificatesListProps = {
 export const CertificatesList = ({ certificates }: CertificatesListProps) => (
   <Stack spacing={1.5}>
     {certificates.map((certificate, index) => (
-      <ContentCard key={`${certificate.title}-${index}`}>
+      <AnimatedContentCard key={`${certificate.title}-${index}`} delayMs={index * 90}>
         <Typography variant="h6">{certificate.title}</Typography>
         <Typography variant="subtitle2" color="text.secondary">
           {certificate.issuer} issued on {certificate.date}
@@ -26,7 +26,7 @@ export const CertificatesList = ({ certificates }: CertificatesListProps) => (
             View Certificate
           </Button>
         )}
-      </ContentCard>
+      </AnimatedContentCard>
     ))}
   </Stack>
 );

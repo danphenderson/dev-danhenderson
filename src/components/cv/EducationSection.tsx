@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material';
 import type { EducationInfo } from '../../data/cv';
-import { ContentCard } from '../ContentCard';
+import { AnimatedContentCard } from '../AnimatedContentCard';
 import { ToolsAccordion } from '../ToolsAccordion';
 
 type EducationSectionProps = {
@@ -15,7 +15,7 @@ export const EducationSection = ({ education }: EducationSectionProps) => {
   return (
     <Stack spacing={2.25}>
       {education.entries.map((entry, index) => (
-        <ContentCard key={`${entry.university}-${entry.program}-${index}`}>
+        <AnimatedContentCard key={`${entry.university}-${entry.program}-${index}`} delayMs={index * 90}>
           <Typography variant="h6" fontWeight={700} sx={{ color: 'text.primary' }}>
             {entry.university}
           </Typography>
@@ -63,7 +63,7 @@ export const EducationSection = ({ education }: EducationSectionProps) => {
               />
             </Box>
           ) : null}
-        </ContentCard>
+        </AnimatedContentCard>
       ))}
     </Stack>
   );

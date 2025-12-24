@@ -1,11 +1,12 @@
 import { Box, Chip, Link, Stack, Typography } from '@mui/material';
 import type { Experience, ExperienceProject } from '../../data/cv';
-import { ContentCard } from '../ContentCard';
+import { AnimatedContentCard } from '../AnimatedContentCard';
 import { useCvStyles } from '../../ThemeProvider';
 import { ToolsAccordion } from '../ToolsAccordion';
 
 type ExperienceListProps = {
   experiences: Experience[];
+  startDelayMs?: number;
 };
 
 const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) => {
@@ -42,13 +43,18 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
   );
 };
 
-export const ExperienceList = ({ experiences }: ExperienceListProps) => {
+const experienceStaggerMs = 80;
+
+export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceListProps) => {
   const { accentColor, accentTint } = useCvStyles();
 
   return (
     <Stack spacing={2.25}>
       {experiences.map((experience, index) => (
-        <ContentCard key={`${experience.company}-${index}`}>
+        <AnimatedContentCard
+          key={`${experience.company}-${index}`}
+          delayMs={startDelayMs + index * experienceStaggerMs}
+        >
           <Stack spacing={1.25}>
             <Stack direction="row" justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1.5} flexWrap="wrap">
               <Box>
@@ -103,7 +109,19 @@ export const ExperienceList = ({ experiences }: ExperienceListProps) => {
               {experience.description}
             </Typography>
           )}
-          <ExperienceProjects projects={experience.projects} />
+          {experience.projects?.length ? (
+            <Box sx={{ mt: 1.5 }}>
+              <ToolsAccordion
+                id={`experience-projects-${index}`}
+                title="Details"
+                subtitle=""
+                dense
+                defaultExpanded={false}
+              >
+                <ExperienceProjects projects={experience.projects} />
+              </ToolsAccordion>
+            </Box>
+          ) : null}
           {experience.tools?.filter((tool) => tool.trim().length > 0).length ? (
             <Box sx={{ mt: 1.5 }}>
               <ToolsAccordion
@@ -116,7 +134,7 @@ export const ExperienceList = ({ experiences }: ExperienceListProps) => {
               />
             </Box>
           ) : null}
-        </ContentCard>
+        </AnimatedContentCard>
       ))}
     </Stack>
   );
