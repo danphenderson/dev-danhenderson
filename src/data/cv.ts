@@ -6,6 +6,7 @@ export const cvBackgroundImage = `${assetBasePath}/assets/photography/landscape/
 export const githubUsername = 'danphenderson';
 export const githubProfileUrl = 'https://github.com/danphenderson';
 export const linkedinProfileUrl = 'https://www.linkedin.com/in/daniel-henderson-6a9485bb/';
+const mtuMathGraduateUrl = 'https://www.mtu.edu/math/graduate/students/';
 
 export type AboutMe = {
   name: string;
@@ -14,6 +15,10 @@ export type AboutMe = {
   phone: string;
   location: string;
   bio: string;
+  bioLink?: {
+    text: string;
+    url: string;
+  };
 };
 
 export type CodingExample = {
@@ -53,6 +58,7 @@ export type EducationEntry = {
   status?: string;
   dateRange?: string;
   highlights?: string[];
+  tools?: string[];
 };
 
 export type StackSection = {
@@ -70,6 +76,10 @@ export const aboutMe: AboutMe = {
   email: 'me@danhenderson.dev',
   phone: '906-281-7641',
   location: 'Seattle, WA',
+  bioLink: {
+    text: 'Applied/Computational Math PhD student',
+    url: mtuMathGraduateUrl,
+  },
   bio: `Applied/Computational Math PhD student (M.S. expected Spring 2026) focused on performance-critical scientific software and data systems.
 
 Ex–Lucerna Health data scientist/pipeline engineer: built cloud-native ingestion + analytics infrastructure that boosted throughput 50%+ and reduced compute costs.
@@ -130,33 +140,38 @@ export const certificates: Certificate[] = [
 export const experiences: Experience[] = [
   {
     company: 'Michigan Technological University',
+    companyUrl: mtuMathGraduateUrl,
     industry: 'Higher Education',
     title: 'Graduate Research Assistant | Hemodynamics',
     startDate: 'May 2025',
     endDate: 'Current',
     description:
-      'Advisor: Jiang Sun (Department of Mathematical Sciences). Hemodynamics modeling and numerical methods for macrocirculatory blood flow.',
+      'Advisor: Jiguang Sun (Department of Mathematical Sciences). Hemodynamics modeling and numerical methods for macrocirculatory blood flow.',
     projects: [
-      'Developed a hemodynamics modeling and methods report for macrocirculatory blood flow, formalizing the continuum mechanics framework (Eulerian/Lagrangian descriptions, material derivative, and Reynolds transport theorem) used to derive conservation laws for vascular flow.',
+      'Report on hemodynamics modeling and methods report for macrocirculatory blood flow, formalizing the continuum mechanics framework (Eulerian/Lagrangian descriptions, material derivative, and Reynolds transport theorem) used to derive conservation laws for vascular flow.',
       'Derived and analyzed incompressible Navier–Stokes formulations for blood (including Newtonian and generalized-Newtonian viscosity models), documenting the kinematic roles of Reynolds/Womersley numbers and related nondimensional parameters relevant to large-vessel regimes.',
-      'Scoped numerical pathways from dimension-reduced 0D/1D vessel models (e.g., Windkessel-style lumped parameter assumptions and 1D averaging ideas) through modern computational directions including PINNs/DeepONets and fluid–structure interaction for compliant vessels.',
+      'Scoped numerical pathways from dimension-reduced 1D/2D flow simulations to study modern computational directions including PINNs/DeepONets and fluid–structure interaction for compliant vessels.',
     ],
+    tools: ['LaTeX', 'Julia', 'Python']
   },
   {
     company: 'Michigan Technological University',
+    companyUrl: mtuMathGraduateUrl,
     industry: 'Higher Education',
     title: 'Instructor | Calculus I with Technology',
     startDate: 'Jan 2025',
     endDate: 'May 2025 (5 mos)',
-    description: 'Department of Mathematical Sciences. Instructor of record for Calculus I with Technology.',
+    description: 'Department of Mathematical Sciences. Instructor of Calculus I with Technology.',
     projects: [
-      'Served as instructor of record for Calculus I with Technology, managing full course delivery: lectures, assessments, grading policy, and end-to-end course administration.',
-      'Designed and iterated technology-integrated lessons and assignments to improve conceptual understanding and problem-solving fluency.',
-      'Earned a strong student evaluation score of 4.8/5.0 with 58% response rate.',
+      'Calculus I with Technology, managing full course delivery: lectures, assessments, grading, and end-to-end course administration.',
+      'Integrated technology into lessons and assignments to improve conceptual understanding and promote computational thinking.',
+      'Earned a strong student evaluation score of 4.8/5.0 with an above average 58% response rate (Fall 2025 median response rate: 53.13).',
     ],
+    tools: ['Mathematica', 'Gradescope', 'Canvas', 'Panapto', 'Zoom'],
   },
   {
     company: 'Michigan Technological University',
+    companyUrl: mtuMathGraduateUrl,
     industry: 'Higher Education',
     title: 'Graduate Teaching Assistant | Calculus I with Technology',
     startDate: 'Aug 2024',
@@ -167,7 +182,7 @@ export const experiences: Experience[] = [
       'Coordinated instructional logistics and grading with the instructor; maintained consistent rubrics and timely turnaround to support student progress.',
       'Provided individualized feedback on assignments/exams and supported students with technology-based workflows (Mathematica).',
     ],
-    tools: ['Mathematica', 'Gradescope', 'Canvas', 'Panapto'],
+    tools: ['Gradescope', 'Canvas'],
   },
   {
     company: 'Lucerna Health',
@@ -179,20 +194,22 @@ export const experiences: Experience[] = [
     description:
       'Lead developer of Lucerna’s entity linking, ingestion, and recoding pipelines powering data platform’s ana.',
     projects: [
-      "Lead development of company’s Entity Linking, Ingestion, and Recoding pipelines driving the cloud platform’s analytics layer.",
-      "Owned architectural design, releases, and deployments of data-engineering assets, including data governance, security, and integrity of the platform's analytics data layer.",
-      "Built an admin service to automate integrity/state workflows across PostgreSQL, AWS Glue Data Catalog, and S3, reducing time to resolve platform service tickets.",
-      'Delivered cost savings by upgrading ETL runtime to AWS Glue 3.0 and migrating batch processing to AWS EMR (Spark).',
-      'Cut compute costs with transient EMR workloads using EC2 instance fleets; abstracted autoscaling, bootstrapping, provisioning, security, and networking into a reusable library.',
+      "Improved company’s Entity Linking, Ingestion, and Recoding pipelines driving the cloud platform’s analytics layer (data lakehouse).",
+      "Repartitioned approx 50TB of parquet data, accelerating nightly DBT builds of platform's analytics layer.",
+      "Assisted in architectural design, releases, and deployments of data-engineering assets, including data governance, security, and integrity of the platform's analytics data layer (data lakehouse).",
+      "Built an admin service to automate integrity/state of tenant's platform across PostgreSQL, AWS Glue Data Catalog, Redshift, and S3, reducing time to resolve service tickets.",
+      'Delivered cost savings by upgrading ETL runtime to AWS Glue 3.0 and migrating batch processing to transient AWS EMR workloads using EC2 instance fleets; abstracted autoscaling, bootstrapping, provisioning, security, and networking into a reusable library.',
       'Migrated shared ETL/infrastructure assets from Bitbucket to GitHub Enterprise and standardized CI/CD with GitHub Actions workflows, hooks, and templates.',
       'Centralized cloud-infrastructure deployments through a major refactor that removed technical debt and git submodules while introducing semantic versioning practices.',
-      'Stepped up during team turnover by representing the data team in engineering design discussions and assisted in hiring/interviews and onboarding for directors and interns.',
+      'Stepped up during team turnover by representing the data team in engineering design discussions and assisted in hiring/interviews and onboarding for directors, lead engineers, and interns.',
     ],
     tools: [
-      'AWS',
-      'AWS CDK (Python)',
-      'AWS Glue 3.0',
-      'AWS Glue Data Catalog',
+      'AWS CDK & SDK (Python)',
+      'SNS',
+      'SQS',
+      'Lambda',
+      'Glue 3.0',
+      'Glue Data Catalog',
       'S3',
       'Redshift',
       'PostgreSQL',
@@ -201,6 +218,12 @@ export const experiences: Experience[] = [
       'Bitbucket',
       'GitHub Enterprise',
       'GitHub Actions',
+      'Docker (docker-compose)',
+      'Sentry',
+      'Slack',
+      'SonarCloud',
+      'Django',
+      'Python',
     ],
   },
   {
@@ -211,19 +234,20 @@ export const experiences: Experience[] = [
     startDate: 'Nov 2021',
     endDate: 'Apr 2022 (6 mos)',
     description:
-      'Production ML and analytics engineering on AWS for a multi-tenant health data platform, focused on deployment automation, anomaly detection, and governance.',
+      'Production ML and analytics engineering on AWS for a multi-tenant health data platform.',
     projects: [
       'Implemented version-control safeguards for production ML assets and automated deployments using AWS CDK and Bitbucket Pipelines.',
-      'Built an anomaly-detection pipeline using PySpark isolation forest to flag anomalous records in a multi-tenant S3 data lake.',
-      'Designed a facade-pattern shared ML library to abstract security and cloud infrastructure concerns, enabling portable ML workflows.',
+      'Built an anomaly-detection pipeline using PySpark isolation forest to flag anomalous records in S3 data lake.',
+      'Designed and build shared ML library to abstract security and cloud infrastructure concerns, enabling portable ML workflows.',
       'Developed a cost-effective, scalable PySpark analytics service to meet data governance requirements supporting HiTrust certification.',
       'Collaborated on a deduplication ML hook in the ingestion pipeline, enabling human-in-the-loop training and parameter evaluation.',
       'Unblocked restricted-offshore developers via infrastructure deployments, code reviews, ETL support, and QA testing to accelerate delivery.',
     ],
-    tools: ['AWS', 'AWS CDK', 'Bitbucket Pipelines', 'S3', 'Python', 'PySpark', 'Isolation Forest'],
+    tools: ['AWS', 'AWS CDK', 'Bitbucket Pipelines', 'Python', 'Numpy', 'Pandas', 'PySpark'],
   },
   {
     company: 'Michigan Technological University',
+    companyUrl: mtuMathGraduateUrl,
     industry: 'Higher Education',
     title: 'Research Assistant | Full Time',
     startDate: 'May 2021',
@@ -243,12 +267,14 @@ export const experiences: Experience[] = [
   },
   {
     company: 'Michigan Technological University',
+    companyUrl: mtuMathGraduateUrl,
     industry: 'Higher Education',
     title: 'Mathematics Tutor | Part Time',
     startDate: 'September 2015',
     endDate: 'May 2018 (3 yrs 5 mos)',
     description: 'Provided weekly tutoring services to NCAA student-athletes in multivariable, integral and differential calculus, ordinary differential equations, and linear algebra.',
     projects: [],
+    tools: ['Mathematica']
   },
 ];
 
@@ -265,6 +291,7 @@ export const educationInfo: EducationInfo = {
         'Research focuses on computational hemodynamics.',
         'Developing reproducible and performance-critical scientific software in Julia and Python.',
       ],
+      tools: ['LaTeX', 'Julia', 'Python', 'Mathematica'],
     },
     {
       university: 'Michigan Technological University',
@@ -280,22 +307,39 @@ export const educationInfo: EducationInfo = {
         "Recipient of Dean's List award for six semesters (Spring 2015, Summer 2015, Fall 2019, Spring 2020, Fall 2020, & Spring 2021)",
         'Certificate of Merit for Outstanding Academic Achievement in Calculus II with Technology, Mathematical Sciences Department',
       ],
+      tools: ['Java', 'C', 'C++', 'Python', 'Matlab', 'Mathematica', 'SQL', 'Assembly (MIPS)'],
     },
   ],
 };
 
 export const stackAndTools: StackSection[] = [
   {
-    title: 'Stack',
+    title: 'Development Stack and Tools',
     items: [
-      'Building on macOS using Z-Shell',
+      'macOS',
       'Homebrew package manager',
-      'Vim editor',
-      'Visual Studio Code IDE',
+      'Vim & Visual Studio Code for Editor & IDE',
+      'Zsh (also Bash)',
+      'Python (general purpose goto language)',
+      'TypeScript',
+      'React',
+      'PostgreSQL',
+      'AWS',
+      'pre-commit',
+      'github CLI (`gh`)',
+      'Docker & docker-compose',
+      'GitHub Actions (CI/CD)',
+      'AWS CDK (IaC)',
+      'Jira',
+      'Notion',
+      'Sentry',
+      'Jupyter notebooks for exploration',
+      'REPLs',
+      'Mermaid',
     ],
   },
   {
-    title: 'Languages',
+    title: 'Programing Languages',
     items: [
       'Python',
       'Java',
@@ -306,27 +350,17 @@ export const stackAndTools: StackSection[] = [
       'Bash',
       'LaTeX',
       'HTML',
+      'JavaScript',
       'TypeScript',
     ],
   },
   {
-    title: 'Tools',
-    items: [
-      'docker/docker-compose',
-      'pre-commit',
-      'cookiecutter',
-      'git submodule',
-      'jq',
-      'gh',
-    ],
-  },
-  {
-    title: 'Frameworks',
-    items: ['DBT', 'Django', 'FastAPI', 'React', 'Apache Spark', 'Amazon CDK & SDK'],
+    title: 'App Frameworks',
+    items: ['Data Build Tool (DBT)', 'Django', 'FastAPI', 'React', 'Apache Spark (PySpark)', 'Amazon CDK & SDK'],
   },
   {
     title: 'Databases',
-    items: ['Redshift', 'PostgreSQL'],
+    items: ['Redshift', 'PostgreSQL', 'Neo4j'],
   },
   {
     title: 'Services',
@@ -349,17 +383,6 @@ export const stackAndTools: StackSection[] = [
       'Spark UI',
     ],
   },
-];
-
-export const commonTools: string[] = [
-  'AWS Glue 3.0 + EMR (Spark)',
-  'Amazon Redshift & PostgreSQL',
-  'Python (pandas, PySpark)',
-  'Docker & docker-compose',
-  'GitHub Actions (CI/CD)',
-  'AWS CDK (IaC)',
-  'pre-commit & linting automation',
-  'Jupyter notebooks for exploration',
 ];
 
 export const fallbackGitHubActivity: GitHubActivityItem[] = [

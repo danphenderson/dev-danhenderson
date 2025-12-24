@@ -21,7 +21,6 @@ import {
   experiences,
   githubUsername,
   linkedinProfileUrl,
-  commonTools,
   stackAndTools,
 } from '../data/cv';
 import { useGithubProfile } from '../hooks/useGithubProfile';
@@ -84,14 +83,6 @@ export default function CV() {
                 <ContentCard>
                   <Stack spacing={2}>
                     <SectionHeading overline="Stack & Tools" sx={{ mb: 0.5 }} />
-                    <ToolsAccordion
-                      title="Common tools & platforms"
-                      subtitle="Core utilities used across engagements."
-                      tools={commonTools}
-                      dense
-                      defaultExpanded={false}
-                    />
-
                     {stackAndTools.map((section) => (
                       <ToolsAccordion
                         key={section.title}

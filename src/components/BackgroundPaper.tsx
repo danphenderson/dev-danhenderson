@@ -1,10 +1,14 @@
 import { Box, Grid, Paper } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
+import type { SxProps, Theme } from '@mui/material/styles';
 
 interface BackgroundPaperProps {
   image: string;
   children: React.ReactNode;
   showShell?: boolean;
+  contentAlign?: 'flex-start' | 'center' | 'flex-end';
+  contentSx?: SxProps<Theme>;
+  shellSx?: SxProps<Theme>;
 }
 
 const resolveBackgroundImage = (src: string) => {
@@ -19,12 +23,21 @@ const resolveBackgroundImage = (src: string) => {
   return `${base}${normalized}`;
 };
 
-const BackgroundPaper: React.FC<BackgroundPaperProps> = ({ image, children, showShell = true }) => {
+const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
+  image,
+  children,
+  showShell = true,
+  contentAlign = 'flex-start',
+  contentSx,
+  shellSx,
+}) => {
   const resolvedImage = resolveBackgroundImage(image);
   const theme = useTheme();
   const overlayColor = alpha(theme.palette.common.black, theme.palette.mode === 'light' ? 0.4 : 0.6);
   const shellBackground = alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.72 : 0.6);
   const shellBorder = `1px solid ${alpha(theme.palette.divider, 0.5)}`;
+  const resolvedContentSx = Array.isArray(contentSx) ? contentSx : contentSx ? [contentSx] : [];
+  const resolvedShellSx = Array.isArray(shellSx) ? shellSx : shellSx ? [shellSx] : [];
 
   return (
     <Grid container component="main" sx={{ minHeight: '100vh' }}>
@@ -52,26 +65,32 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({ image, children, show
         }}
       >
         <Box
-          sx={{
-            position: 'relative',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            minHeight: '100vh',
-            width: '100%',
-            padding: '50px 0',
-          }}
+          sx={[
+            {
+              position: 'relative',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: contentAlign,
+              minHeight: '100vh',
+              width: '100%',
+              padding: '50px 0',
+            },
+            ...resolvedContentSx,
+          ]}
         >
           {showShell ? (
             <Paper
               elevation={10}
-              sx={{
-                backgroundColor: shellBackground,
-                padding: 2,
-                borderRadius: 2,
-                border: shellBorder,
-                boxShadow: theme.shadows[6],
-              }}
+              sx={[
+                {
+                  backgroundColor: shellBackground,
+                  padding: 2,
+                  borderRadius: 2,
+                  border: shellBorder,
+                  boxShadow: theme.shadows[6],
+                },
+                ...resolvedShellSx,
+              ]}
             >
               {children}
             </Paper>

@@ -1,5 +1,6 @@
-import { Avatar, IconButton, Stack, Typography } from '@mui/material';
+import { Avatar, IconButton, Link, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import type { ReactNode } from 'react';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import type { AboutMe } from '../../data/cv';
 import { useCvStyles } from '../../ThemeProvider';
@@ -13,6 +14,22 @@ type ProfileCardProps = {
 export const ProfileCard = ({ about, avatarSrc, linkedinUrl }: ProfileCardProps) => {
   const { accentColor } = useCvStyles();
   const theme = useTheme();
+  const bioLink = about.bioLink;
+  const bioText = about.bio;
+  const bioLinkIndex = bioLink ? bioText.indexOf(bioLink.text) : -1;
+  let bioContent: ReactNode = bioText;
+
+  if (bioLink && bioLinkIndex >= 0) {
+    bioContent = (
+      <>
+        {bioText.slice(0, bioLinkIndex)}
+        <Link href={bioLink.url} target="_blank" rel="noopener noreferrer" underline="hover">
+          {bioLink.text}
+        </Link>
+        {bioText.slice(bioLinkIndex + bioLink.text.length)}
+      </>
+    );
+  }
 
   return (
     <Stack spacing={1.5} alignItems="flex-start">
@@ -66,7 +83,7 @@ export const ProfileCard = ({ about, avatarSrc, linkedinUrl }: ProfileCardProps)
       </Stack>
       {about.bio && (
         <Typography variant="body2" sx={{ whiteSpace: 'pre-line', color: 'text.primary' }}>
-          {about.bio}
+          {bioContent}
         </Typography>
       )}
     </Stack>

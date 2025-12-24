@@ -4,21 +4,55 @@ import BackgroundPaper from '../components/BackgroundPaper';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 
 export default function Home() {
-  const { play, isPlaying, ready, error } = useWelcomeAudio();
+  const { play, isPlaying, ready, error, showPauseHint, setShowPauseHint, setShowDarkModeHint } = useWelcomeAudio();
   const [isPromptOpen, setIsPromptOpen] = useState(false);
+  const [hasHandledAudioPrompt, setHasHandledAudioPrompt] = useState(false);
+  const [hasShownDarkModePrompt, setHasShownDarkModePrompt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (ready && !isPlaying) {
+    if (ready && !isPlaying && !hasHandledAudioPrompt) {
       setIsPromptOpen(true);
     }
-  }, [ready, isPlaying]);
+  }, [ready, isPlaying, hasHandledAudioPrompt]);
+
+  useEffect(
+    () => () => {
+      setShowPauseHint(false);
+      setShowDarkModeHint(false);
+    },
+    [setShowPauseHint, setShowDarkModeHint],
+  );
+
+  useEffect(() => {
+    if (error && !isPromptOpen) {
+      setHasHandledAudioPrompt(true);
+    }
+  }, [error, isPromptOpen]);
+
+  useEffect(() => {
+    if (ready && isPlaying && !isPromptOpen) {
+      setHasHandledAudioPrompt(true);
+    }
+  }, [ready, isPlaying, isPromptOpen]);
+
+  useEffect(() => {
+    if (hasShownDarkModePrompt || !hasHandledAudioPrompt || showPauseHint || isPromptOpen) return;
+    setShowDarkModeHint(true);
+    setHasShownDarkModePrompt(true);
+  }, [hasHandledAudioPrompt, hasShownDarkModePrompt, showPauseHint, isPromptOpen, setShowDarkModeHint]);
+
+  const handleCloseAudioPrompt = () => {
+    setIsPromptOpen(false);
+    setHasHandledAudioPrompt(true);
+  };
 
   const handlePlay = async () => {
     try {
       setIsLoading(true);
       await play();
-      setIsPromptOpen(false);
+      handleCloseAudioPrompt();
+      setShowPauseHint(true);
     } catch (err) {
       console.error('Unable to play welcome audio', err);
     } finally {
@@ -27,7 +61,12 @@ export default function Home() {
   };
 
   return (
-    <BackgroundPaper image="assets/home.jpg">
+    <BackgroundPaper
+      image="assets/home.jpg"
+      contentAlign="flex-end"
+      contentSx={{ pb: '194px' }}
+      shellSx={{ p: 1.5, pb: 0.5 }}
+    >
       <Stack spacing={2} alignItems="center">
         <Typography
           variant="h1"
@@ -38,7 +77,7 @@ export default function Home() {
         </Typography>
       </Stack>
 
-      <Dialog open={isPromptOpen} onClose={() => setIsPromptOpen(false)} aria-labelledby="welcome-audio-title">
+      <Dialog open={isPromptOpen} onClose={handleCloseAudioPrompt} aria-labelledby="welcome-audio-title">
         <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
         <DialogContent>
           <Typography variant="body1">
@@ -51,12 +90,13 @@ export default function Home() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setIsPromptOpen(false)}>No thanks</Button>
+          <Button onClick={handleCloseAudioPrompt}>No thanks</Button>
           <Button onClick={handlePlay} variant="contained" disabled={isLoading} aria-label="Play welcome audio">
             {isLoading ? 'Loading…' : 'Play audio'}
           </Button>
         </DialogActions>
       </Dialog>
+
     </BackgroundPaper>
   );
 }

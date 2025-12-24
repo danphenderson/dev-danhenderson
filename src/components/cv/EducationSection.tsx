@@ -1,6 +1,7 @@
 import { Box, Stack, Typography } from '@mui/material';
 import type { EducationInfo } from '../../data/cv';
 import { ContentCard } from '../ContentCard';
+import { ToolsAccordion } from '../ToolsAccordion';
 
 type EducationSectionProps = {
   education: EducationInfo;
@@ -47,6 +48,19 @@ export const EducationSection = ({ education }: EducationSectionProps) => {
                     {highlight}
                   </Typography>
                 ))}
+            </Box>
+          ) : null}
+
+          {entry.tools?.filter((tool) => tool.trim().length > 0).length ? (
+            <Box sx={{ mt: 1.5 }}>
+              <ToolsAccordion
+                id={`education-tools-${index}`}
+                title="Tools used"
+                subtitle=""
+                tools={entry.tools}
+                dense
+                defaultExpanded={false}
+              />
             </Box>
           ) : null}
         </ContentCard>

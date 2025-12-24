@@ -15,6 +15,10 @@ type WelcomeAudioContextValue = {
   isPlaying: boolean;
   ready: boolean;
   error?: string;
+  showPauseHint: boolean;
+  setShowPauseHint: (show: boolean) => void;
+  showDarkModeHint: boolean;
+  setShowDarkModeHint: (show: boolean) => void;
 };
 
 const WelcomeAudioContext = createContext<WelcomeAudioContextValue>({
@@ -23,6 +27,10 @@ const WelcomeAudioContext = createContext<WelcomeAudioContextValue>({
   isPlaying: false,
   ready: false,
   error: undefined,
+  showPauseHint: false,
+  setShowPauseHint: () => {},
+  showDarkModeHint: false,
+  setShowDarkModeHint: () => {},
 });
 
 const WIDGET_SCRIPT_SRC = 'https://w.soundcloud.com/player/api.js';
@@ -35,6 +43,8 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | undefined>();
+  const [showPauseHint, setShowPauseHint] = useState(false);
+  const [showDarkModeHint, setShowDarkModeHint] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -123,7 +133,19 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
 
   return (
     <>
-      <WelcomeAudioContext.Provider value={{ play, pause, isPlaying, ready, error }}>
+      <WelcomeAudioContext.Provider
+        value={{
+          play,
+          pause,
+          isPlaying,
+          ready,
+          error,
+          showPauseHint,
+          setShowPauseHint,
+          showDarkModeHint,
+          setShowDarkModeHint,
+        }}
+      >
         {children}
       </WelcomeAudioContext.Provider>
       <iframe
