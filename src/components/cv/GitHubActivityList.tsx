@@ -1,5 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import type { GitHubActivityItem } from '../../data/cv';
+import { LoadingBars } from '../LoadingBars';
 import { useCvStyles } from '../../ThemeProvider';
 
 type GitHubActivityListProps = {
@@ -14,9 +15,7 @@ export const GitHubActivityList = ({ activity, loading, error }: GitHubActivityL
   return (
     <Box>
       {loading ? (
-        <Typography variant="body2" color="text.secondary">
-          Loading activity...
-        </Typography>
+        <LoadingBars label="Loading GitHub activity" compact />
       ) : (
         <Box
           component="ul"

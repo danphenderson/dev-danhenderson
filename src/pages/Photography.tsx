@@ -1,14 +1,32 @@
+import { useEffect, useRef, useState } from 'react';
 import { Box, Button, Grid, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { ContentCard } from '../components/ContentCard';
 import { SectionHeading } from '../components/cv/SectionHeading';
+import { LoadingBars } from '../components/LoadingBars';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 
 const fallbackBackgroundImage = 'assets/photography/landscape/landscape-lime-kiln.jpg';
 
 export default function Photography() {
   const { categories } = usePhotographyData();
+  const loadedImagesRef = useRef<Set<string>>(new Set());
+  const [loadedImages, setLoadedImages] = useState(0);
+  const totalImages = categories.length;
+
+  useEffect(() => {
+    loadedImagesRef.current.clear();
+    setLoadedImages(0);
+  }, [categories]);
+
+  const handleImageReady = (src: string) => {
+    if (loadedImagesRef.current.has(src)) return;
+    loadedImagesRef.current.add(src);
+    setLoadedImages((prev) => prev + 1);
+  };
+
+  const isLoading = totalImages > 0 && loadedImages < totalImages;
 
   return (
     <BackgroundPaper image={fallbackBackgroundImage} showShell={false}>
@@ -25,6 +43,11 @@ export default function Photography() {
               <Typography variant="body2" color="text.secondary">
                 {categories.length} albums
               </Typography>
+              {isLoading && (
+                <Box sx={{ mt: 1 }}>
+                  <LoadingBars label="Loading photography albums" compact />
+                </Box>
+              )}
             </Stack>
           </ContentCard>
 
@@ -47,6 +70,8 @@ export default function Photography() {
                       alt={card.name}
                       loading="lazy"
                       decoding="async"
+                      onLoad={() => handleImageReady(card.src)}
+                      onError={() => handleImageReady(card.src)}
                       sx={{
                         position: 'absolute',
                         inset: 0,

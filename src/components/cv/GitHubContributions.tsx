@@ -1,6 +1,7 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import type { GitHubContribution } from '../../data/cv';
+import { LoadingBars } from '../LoadingBars';
 import { ContentCard } from '../ContentCard';
 import { useCvStyles } from '../../ThemeProvider';
 
@@ -20,9 +21,7 @@ export const GitHubContributions = ({
 
   if (loading) {
     return (
-      <Typography variant="body2" color="text.secondary">
-        Loading contributions...
-      </Typography>
+      <LoadingBars label="Loading GitHub contributions" compact />
     );
   }
 

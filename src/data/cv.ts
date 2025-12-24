@@ -243,7 +243,7 @@ export const experiences: Experience[] = [
       'Collaborated on a deduplication ML hook in the ingestion pipeline, enabling human-in-the-loop training and parameter evaluation.',
       'Unblocked restricted-offshore developers via infrastructure deployments, code reviews, ETL support, and QA testing to accelerate delivery.',
     ],
-    tools: ['AWS', 'AWS CDK', 'Bitbucket Pipelines', 'Python', 'Numpy', 'Pandas', 'PySpark'],
+    tools: ['AWS CDK & SDK (Python)', 'Bitbucket Pipelines', 'Python', 'SciPy', 'Numpy', 'Pandas', 'PySpark'],
   },
   {
     company: 'Michigan Technological University',

@@ -4,6 +4,7 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { SectionHeading } from '../components/cv/SectionHeading';
 import { ContentCard } from '../components/ContentCard';
+import { LoadingBars } from '../components/LoadingBars';
 import { useClimbingData, TickRow, TodoRow } from '../hooks/useClimbingData';
 
 const columns: GridColDef<TickRow>[] = [
@@ -49,6 +50,12 @@ const todoColumns: GridColDef<TodoRow>[] = [
   { field: 'location', headerName: 'Location', flex: 1, minWidth: 150 },
 ];
 
+const LoadingOverlay = () => (
+  <Box sx={{ width: '100%', p: 2 }}>
+    <LoadingBars label="Loading climbing data" compact />
+  </Box>
+);
+
 export default function Climbing() {
   const { ticks, todos, loading, todosLoading, error, todosError } = useClimbingData();
 
@@ -70,6 +77,7 @@ export default function Climbing() {
                 autoHeight
                 disableRowSelectionOnClick
                 pageSizeOptions={[5, 10, 25, 50]}
+                slots={{ loadingOverlay: LoadingOverlay }}
                 initialState={{
                   pagination: {
                     paginationModel: { pageSize: 10, page: 0 },
@@ -91,6 +99,7 @@ export default function Climbing() {
                 autoHeight
                 disableRowSelectionOnClick
                 pageSizeOptions={[5, 10, 25, 50]}
+                slots={{ loadingOverlay: LoadingOverlay }}
                 initialState={{
                   pagination: {
                     paginationModel: { pageSize: 10, page: 0 },
