@@ -2,10 +2,12 @@ import * as React from 'react'
 import { keyframes } from '@emotion/react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import { Avatar, Box, Button, IconButton, Popover, Stack, Tooltip, Typography } from '@mui/material';
+import { Avatar, Box, Button, IconButton, Menu, MenuItem, Popover, Stack, Tooltip, Typography } from '@mui/material';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { alpha, useTheme as useMuiTheme } from '@mui/material/styles';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
+import MenuIcon from '@mui/icons-material/Menu';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { Link, useLocation } from 'react-router-dom';
@@ -42,7 +44,11 @@ export default function Header() {
     useWelcomeAudio();
   const path = location.pathname.toLowerCase();
   const showAvatar = path.startsWith('/cv') || path.startsWith('/climbing') || path.startsWith('/photography');
-  const headerIconSx = { fontSize: 30 };
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
+  const headerIconSx = { fontSize: { xs: 26, md: 30 } };
+  const iconButtonSize = isMobile ? 'medium' : 'large';
+  const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState<null | HTMLElement>(null);
+  const mobileMenuOpen = Boolean(mobileMenuAnchor);
   const pauseButtonRef = React.useRef<HTMLButtonElement | null>(null);
   const themeButtonRef = React.useRef<HTMLButtonElement | null>(null);
   const themeRingColor = alpha(muiTheme.palette.primary.light, 0.9);
@@ -93,11 +99,36 @@ export default function Header() {
         },
       }
     : {};
+  React.useEffect(() => {
+    if (!isMobile && mobileMenuOpen) {
+      setMobileMenuAnchor(null);
+    }
+  }, [isMobile, mobileMenuOpen]);
+  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setMobileMenuAnchor(event.currentTarget);
+  };
+  const handleMobileMenuClose = () => {
+    setMobileMenuAnchor(null);
+  };
 
   return (
     <AppBar position="static">
-      <Toolbar sx={{ padding: "0 25px", gap: 2.5, minHeight: 80 }}>
-        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-start' }}>
+      <Toolbar sx={{ px: { xs: 1.5, md: 2.5 }, gap: { xs: 1.5, md: 2.5 }, minHeight: { xs: 64, md: 80 } }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1 }, flexShrink: 0 }}>
+          {isMobile && (
+            <IconButton
+              id="mobile-nav-button"
+              color="inherit"
+              size={iconButtonSize}
+              onClick={handleMobileMenuOpen}
+              aria-label="Open navigation menu"
+              aria-controls={mobileMenuOpen ? 'mobile-nav-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={mobileMenuOpen ? 'true' : undefined}
+            >
+              <MenuIcon sx={headerIconSx} />
+            </IconButton>
+          )}
           {showAvatar && (
             <Tooltip title="Back to home">
               <IconButton
@@ -105,24 +136,29 @@ export default function Header() {
                 to="/"
                 color="inherit"
                 aria-label="Go to home"
-                sx={{ p: 0.625 }}
+                size={iconButtonSize}
+                sx={{ p: { xs: 0.5, md: 0.625 } }}
               >
                 <Avatar
                   src={avatarSrc}
                   alt="Daniel Henderson"
-                  sx={{ width: 50, height: 50, border: '2.5px solid rgba(255,255,255,0.8)' }}
+                  sx={{
+                    width: { xs: 40, md: 50 },
+                    height: { xs: 40, md: 50 },
+                    border: '2.5px solid rgba(255,255,255,0.8)',
+                  }}
                 />
               </IconButton>
             </Tooltip>
           )}
         </Box>
-        <Box sx={{ flex: 1, display: "flex", justifyContent: "flex-start" }}>
-          <Stack direction="row" spacing={5}>
+        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center', minWidth: 0 }}>
+          <Stack direction="row" spacing={{ md: 5 }}>
             {pages.map(({ name, path }) => (
               <Button
                 key={name}
                 size="large"
-                sx={{ color: 'white', fontSize: "1.5rem" }}
+                sx={{ color: 'white', fontSize: { md: '1.5rem' } }}
                 component={Link}
                 to={path}
                 aria-label={'Go to ' + name}
@@ -132,13 +168,13 @@ export default function Header() {
             ))}
           </Stack>
         </Box>
-        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'flex-end' }}>
-          <Stack direction="row" spacing={2} alignItems="center">
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexShrink: 0, ml: { xs: 'auto', md: 0 } }}>
+          <Stack direction="row" spacing={{ xs: 1, md: 2 }} alignItems="center">
             <Tooltip title={isPlaying ? 'Pause welcome audio' : 'Play welcome audio'}>
               <span>
                 <IconButton
                   color="inherit"
-                  size="large"
+                  size={iconButtonSize}
                   ref={pauseButtonRef}
                   onClick={async () => {
                     if (isPlaying) {
@@ -163,7 +199,7 @@ export default function Header() {
             <Tooltip title={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}>
               <IconButton
                 color="inherit"
-                size="large"
+                size={iconButtonSize}
                 ref={themeButtonRef}
                 onClick={() => {
                   if (showDarkModeHint) {
@@ -235,6 +271,21 @@ export default function Header() {
           </Button>
         </Popover>
       </Toolbar>
+      <Menu
+        id="mobile-nav-menu"
+        anchorEl={mobileMenuAnchor}
+        open={mobileMenuOpen}
+        onClose={handleMobileMenuClose}
+        MenuListProps={{ 'aria-labelledby': 'mobile-nav-button' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+      >
+        {pages.map(({ name, path }) => (
+          <MenuItem key={name} component={Link} to={path} onClick={handleMobileMenuClose}>
+            {name}
+          </MenuItem>
+        ))}
+      </Menu>
     </AppBar>
   );
 };
