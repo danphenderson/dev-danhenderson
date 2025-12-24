@@ -15,9 +15,12 @@ type GitHubEvent = {
     action?: string;
     ref_type?: string;
     ref?: string;
+    before?: string;
+    head?: string;
     commits?: { message?: string; sha?: string }[];
     pull_request?: { number?: number; html_url?: string };
     issue?: { number?: number; html_url?: string };
+    release?: { html_url?: string; tag_name?: string };
   };
 };
 
@@ -33,18 +36,20 @@ type GitHubRepo = {
 
 const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
   const repoName = event.repo?.name;
-  const repoUrl = repoName ? `https://github.com/${repoName}` : undefined;
+  if (!repoName) {
+    return null;
+  }
+  const repoUrl = `https://github.com/${repoName}`;
 
   switch (event.type) {
     case 'PushEvent': {
-      const commits = event.payload?.commits?.length ?? 0;
-      const lastCommitSha =
-        event.payload?.commits && event.payload.commits.length
-          ? event.payload.commits[event.payload.commits.length - 1]?.sha
-          : undefined;
+      const commits = event.payload?.commits ?? [];
+      const commitCount = commits.length;
+      const commitShas = commits.map((commit) => commit.sha).filter((sha): sha is string => Boolean(sha));
+      const headSha = event.payload?.head || commitShas[commitShas.length - 1];
       return {
-        label: `Pushed ${commits || 'new'} commit${commits === 1 ? '' : 's'} to ${repoName}`,
-        href: lastCommitSha && repoUrl ? `${repoUrl}/commit/${lastCommitSha}` : repoUrl,
+        label: `Pushed ${commitCount || 'new'} commit${commitCount === 1 ? '' : 's'} to ${repoName}`,
+        href: headSha ? `${repoUrl}/commit/${headSha}` : repoUrl,
       };
     }
     case 'PullRequestEvent': {
@@ -83,12 +88,16 @@ const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
               ? `${repoUrl}/releases/tag/${event.payload.ref}`
               : repoUrl,
       };
-    case 'ReleaseEvent':
-      return { label: `Published a release on ${repoName}`, href: repoUrl ? `${repoUrl}/releases` : repoUrl };
+    case 'ReleaseEvent': {
+      const releaseTag = event.payload?.release?.tag_name;
+      const releaseUrl = event.payload?.release?.html_url;
+      return {
+        label: `Published ${releaseTag ? `release ${releaseTag}` : 'a release'} on ${repoName}`,
+        href: releaseUrl || `${repoUrl}/releases`,
+      };
+    }
     default:
-      return repoName
-        ? { label: `${event.type.replace(/Event$/, '')} on ${repoName}`, href: repoUrl }
-        : null;
+      return { label: `${event.type.replace(/Event$/, '')} on ${repoName}`, href: repoUrl };
   }
 };
 
