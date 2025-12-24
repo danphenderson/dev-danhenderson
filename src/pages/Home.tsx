@@ -3,18 +3,27 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typog
 import BackgroundPaper from '../components/BackgroundPaper';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 
+const AUDIO_PROMPT_STORAGE_KEY = 'danhenderson-welcome-audio-prompt';
+
 export default function Home() {
   const { play, isPlaying, ready, error, showPauseHint, setShowPauseHint, setShowDarkModeHint } = useWelcomeAudio();
   const [isPromptOpen, setIsPromptOpen] = useState(false);
-  const [hasHandledAudioPrompt, setHasHandledAudioPrompt] = useState(false);
+  const [hasDismissedAudioPrompt, setHasDismissedAudioPrompt] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.localStorage.getItem(AUDIO_PROMPT_STORAGE_KEY) === 'dismissed';
+  });
+  const [hasHandledAudioPrompt, setHasHandledAudioPrompt] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.localStorage.getItem(AUDIO_PROMPT_STORAGE_KEY) === 'dismissed';
+  });
   const [hasShownDarkModePrompt, setHasShownDarkModePrompt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (ready && !isPlaying && !hasHandledAudioPrompt) {
+    if (ready && !isPlaying && !hasHandledAudioPrompt && !hasDismissedAudioPrompt) {
       setIsPromptOpen(true);
     }
-  }, [ready, isPlaying, hasHandledAudioPrompt]);
+  }, [ready, isPlaying, hasHandledAudioPrompt, hasDismissedAudioPrompt]);
 
   useEffect(
     () => () => {
@@ -45,6 +54,15 @@ export default function Home() {
   const handleCloseAudioPrompt = () => {
     setIsPromptOpen(false);
     setHasHandledAudioPrompt(true);
+  };
+
+  const handleDismissAudioPrompt = () => {
+    setHasDismissedAudioPrompt(true);
+    setHasHandledAudioPrompt(true);
+    setIsPromptOpen(false);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(AUDIO_PROMPT_STORAGE_KEY, 'dismissed');
+    }
   };
 
   const handlePlay = async () => {
@@ -81,7 +99,7 @@ export default function Home() {
         <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
         <DialogContent>
           <Typography variant="body1">
-            Would you like to hear a short verse while browsing the site? You can stop it any time from your browser controls.
+            Would you like to hear a short verse while browsing the site? Use the pause button in the header to stop it anytime.
           </Typography>
           {error && (
             <Typography variant="caption" color="error">
@@ -91,6 +109,7 @@ export default function Home() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseAudioPrompt}>No thanks</Button>
+          <Button onClick={handleDismissAudioPrompt}>Don't ask again</Button>
           <Button onClick={handlePlay} variant="contained" disabled={isLoading} aria-label="Play welcome audio">
             {isLoading ? 'Loading…' : 'Play audio'}
           </Button>

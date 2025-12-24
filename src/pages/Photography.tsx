@@ -45,6 +45,8 @@ export default function Photography() {
                       component="img"
                       src={card.src}
                       alt={card.name}
+                      loading="lazy"
+                      decoding="async"
                       sx={{
                         position: 'absolute',
                         inset: 0,
