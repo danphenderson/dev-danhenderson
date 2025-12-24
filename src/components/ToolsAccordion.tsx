@@ -1,5 +1,5 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useId } from 'react';
+import { useEffect, useId, useState } from 'react';
 import {
   Accordion,
   AccordionDetails,
@@ -8,6 +8,7 @@ import {
   Chip,
   Stack,
   Typography,
+  Zoom,
 } from '@mui/material';
 import { useCvStyles } from '../ThemeProvider';
 
@@ -30,15 +31,28 @@ export const ToolsAccordion = ({
 }: ToolsAccordionProps) => {
   const { subtleBorder, subtleSurface } = useCvStyles();
   const fallbackId = useId();
+  const [expanded, setExpanded] = useState(defaultExpanded);
+  const [showTools, setShowTools] = useState(defaultExpanded);
   const accordionId = idProp ?? fallbackId;
   const summaryId = `${accordionId}-header`;
   const detailsId = `${accordionId}-content`;
+
+  useEffect(() => {
+    setExpanded(defaultExpanded);
+    setShowTools(defaultExpanded);
+  }, [defaultExpanded]);
 
   return (
     <Accordion
       disableGutters
       elevation={0}
-      defaultExpanded={defaultExpanded}
+      expanded={expanded}
+      onChange={(_, nextExpanded) => setExpanded(nextExpanded)}
+      TransitionProps={{
+        onEntering: () => setShowTools(false),
+        onEntered: () => setShowTools(true),
+        onExit: () => setShowTools(false),
+      }}
       sx={{
         border: subtleBorder,
         backgroundColor: subtleSurface,
@@ -86,18 +100,23 @@ export const ToolsAccordion = ({
           {tools
             .filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
             .map((tool, idx) => (
-              <Chip
+              <Zoom
                 key={`${tool}-${idx}`} // stable even if duplicates exist
-                label={tool}
-                size={dense ? 'small' : 'medium'}
-                variant="outlined"
-                sx={{
-                  border: subtleBorder,
-                  backgroundColor: subtleSurface,
-                  fontWeight: 500,
-                  color: 'text.primary',
-                }}
-              />
+                in={showTools}
+                style={{ transitionDelay: showTools ? `${idx * 30}ms` : '0ms' }}
+              >
+                <Chip
+                  label={tool}
+                  size={dense ? 'small' : 'medium'}
+                  variant="outlined"
+                  sx={{
+                    border: subtleBorder,
+                    backgroundColor: subtleSurface,
+                    fontWeight: 500,
+                    color: 'text.primary',
+                  }}
+                />
+              </Zoom>
             ))}
         </Box>
       </AccordionDetails>

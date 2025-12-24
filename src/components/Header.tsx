@@ -53,6 +53,11 @@ export default function Header() {
   const themeButtonRef = React.useRef<HTMLButtonElement | null>(null);
   const themeRingColor = alpha(muiTheme.palette.primary.light, 0.9);
   const themeGlowColor = alpha(muiTheme.palette.primary.main, 0.35);
+  const themeHintTitle = mode === 'dark' ? 'Try light mode' : 'Try dark mode';
+  const themeHintBody =
+    mode === 'dark'
+      ? 'Tap this button to switch back to light mode.'
+      : 'Tap this button to switch to dark mode.';
   const pauseHighlightSx = showPauseHint
     ? {
         position: 'relative',
@@ -261,10 +266,10 @@ export default function Header() {
           }}
         >
           <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-            Try dark mode
+            {themeHintTitle}
           </Typography>
           <Typography variant="body2" sx={{ mt: 1, mb: 2 }}>
-            Tap this button to switch between light and dark themes.
+            {themeHintBody}
           </Typography>
           <Button onClick={() => setShowDarkModeHint(false)} variant="contained" size="small">
             Okay

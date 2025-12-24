@@ -51,12 +51,7 @@ export default function Home() {
     setHasShownDarkModePrompt(true);
   }, [hasHandledAudioPrompt, hasShownDarkModePrompt, showPauseHint, isPromptOpen, setShowDarkModeHint]);
 
-  const handleCloseAudioPrompt = () => {
-    setIsPromptOpen(false);
-    setHasHandledAudioPrompt(true);
-  };
-
-  const handleDismissAudioPrompt = () => {
+  const handleOptOut = () => {
     setHasDismissedAudioPrompt(true);
     setHasHandledAudioPrompt(true);
     setIsPromptOpen(false);
@@ -69,7 +64,8 @@ export default function Home() {
     try {
       setIsLoading(true);
       await play();
-      handleCloseAudioPrompt();
+      setIsPromptOpen(false);
+      setHasHandledAudioPrompt(true);
       setShowPauseHint(true);
     } catch (err) {
       console.error('Unable to play welcome audio', err);
@@ -95,7 +91,7 @@ export default function Home() {
         </Typography>
       </Stack>
 
-      <Dialog open={isPromptOpen} onClose={handleCloseAudioPrompt} aria-labelledby="welcome-audio-title">
+      <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
         <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
         <DialogContent>
           <Typography variant="body1">
@@ -108,14 +104,14 @@ export default function Home() {
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseAudioPrompt}>No thanks</Button>
-          <Button onClick={handleDismissAudioPrompt}>Don't ask again</Button>
+          <Button onClick={handleOptOut} autoFocus>
+            No thanks
+          </Button>
           <Button onClick={handlePlay} variant="contained" disabled={isLoading} aria-label="Play welcome audio">
             {isLoading ? 'Loading…' : 'Play audio'}
           </Button>
         </DialogActions>
       </Dialog>
-
     </BackgroundPaper>
   );
 }
