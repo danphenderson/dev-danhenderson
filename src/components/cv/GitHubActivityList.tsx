@@ -1,5 +1,7 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Chip, Stack, Typography } from '@mui/material';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import type { GitHubActivityItem } from '../../data/cv';
+import { AnimatedContentCard } from '../AnimatedContentCard';
 import { LoadingBars } from '../LoadingBars';
 import { useCvStyles } from '../../ThemeProvider';
 
@@ -7,76 +9,77 @@ type GitHubActivityListProps = {
   activity: GitHubActivityItem[];
   loading: boolean;
   error?: string | null;
+  startDelayMs?: number;
+  itemStaggerMs?: number;
 };
 
-export const GitHubActivityList = ({ activity, loading, error }: GitHubActivityListProps) => {
+const defaultStaggerMs = 80;
+
+export const GitHubActivityList = ({
+  activity,
+  loading,
+  error,
+  startDelayMs = 0,
+  itemStaggerMs = defaultStaggerMs,
+}: GitHubActivityListProps) => {
   const { subtleBorder, subtleSurface } = useCvStyles();
+  const chipSx = {
+    border: subtleBorder,
+    backgroundColor: subtleSurface,
+    fontWeight: 600,
+    color: 'text.primary',
+    width: '100%',
+    height: 'auto',
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    '& .MuiChip-label': {
+      whiteSpace: 'normal',
+      textOverflow: 'clip',
+      lineHeight: 1.4,
+      px: 1,
+      py: 0.25,
+    },
+  };
+  const chipWrapperSx = {
+    width: '100%',
+    p: { xs: 0, md: 0 },
+    border: 'none',
+    backgroundColor: 'transparent',
+    boxShadow: 'none',
+    borderRadius: 0,
+  };
 
   return (
     <Box>
       {loading ? (
         <LoadingBars label="Loading GitHub activity" compact />
       ) : (
-        <Box
-          component="ul"
-          sx={{
-            listStyle: 'none',
-            padding: 0,
-            margin: 0,
-            display: 'grid',
-            gap: 0.75,
-          }}
-        >
-          {activity.map((item, idx) => (
-            <Box
-              key={`${item.label}-${idx}`}
-              component="li"
-              sx={{
-                listStyle: 'none',
-              }}
-            >
-              {item.href ? (
-                <Box
-                  component="a"
+        <Stack spacing={0.5}>
+          {activity.map((item, idx) => {
+            const isLink = Boolean(item.href);
+
+            return (
+              <AnimatedContentCard
+                key={`${item.label}-${idx}`}
+                delayMs={startDelayMs + idx * itemStaggerMs}
+                sx={chipWrapperSx}
+              >
+                <Chip
+                  icon={<GitHubIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                  label={item.label}
+                  component={isLink ? 'a' : 'div'}
                   href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  sx={{
-                    display: 'block',
-                    padding: 0.75,
-                    borderRadius: 1.5,
-                    border: subtleBorder,
-                    backgroundColor: subtleSurface,
-                    color: 'text.primary',
-                    textDecoration: 'none',
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                    '&:hover': {
-                      transform: 'translateY(-2px)',
-                      boxShadow: 3,
-                    },
-                  }}
-                >
-                  <Typography variant="body2" sx={{ color: 'text.primary' }}>
-                    {item.label}
-                  </Typography>
-                </Box>
-              ) : (
-                <Box
-                  sx={{
-                    padding: 0.75,
-                    borderRadius: 1.5,
-                    border: subtleBorder,
-                    backgroundColor: subtleSurface,
-                  }}
-                >
-                  <Typography variant="body2" sx={{ color: 'text.primary' }}>
-                    {item.label}
-                  </Typography>
-                </Box>
-              )}
-            </Box>
-          ))}
-        </Box>
+                  target={isLink ? '_blank' : undefined}
+                  rel={isLink ? 'noopener noreferrer' : undefined}
+                  clickable={isLink}
+                  variant="outlined"
+                  size="small"
+                  sx={chipSx}
+                />
+              </AnimatedContentCard>
+            );
+          })}
+        </Stack>
       )}
       {error && (
         <Typography variant="caption" color="text.secondary">

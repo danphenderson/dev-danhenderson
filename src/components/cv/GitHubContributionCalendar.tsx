@@ -50,15 +50,15 @@ export const GitHubContributionCalendar = ({
         Yearly GitHub activity at a glance.
       </Typography>
 
-      <Box
-        sx={{
-          mt: 0.5,
-          borderRadius: 1.5,
-          border: subtleBorder,
-          backgroundColor: subtleSurface,
-          p: { xs: 1, sm: 1.5 },
-          minWidth: 0,
-          overflowX: 'auto',
+        <Box
+          sx={{
+            mt: 0.5,
+            borderRadius: 1.5,
+            border: subtleBorder,
+            backgroundColor: subtleSurface,
+            p: { xs: 1, md: 1.25 },
+            minWidth: 0,
+            overflowX: 'auto',
           '& .react-activity-calendar': {
             width: '100%',
             minWidth: 0,

@@ -98,7 +98,7 @@ export const codingExamples: CodingExample[] = [
   {
     title: 'Portfolio',
     description: 'My personal portfolio website built with React-TypeScript, using Material UI 5. It is deployed on AWS using S3, CloudFront, and Route53.',
-    links: ['https://danhenderson.dev'],
+    links: ['https://github.com/danphenderson/dev-danhenderson'],
   },
   {
     title: 'BlockOpt.jl',
@@ -192,7 +192,7 @@ export const experiences: Experience[] = [
     startDate: 'Apr 2022',
     endDate: 'Dec 2022 (9 mos)',
     description:
-      'Lead developer of Lucerna’s entity linking, ingestion, and recoding pipelines powering data platform’s ana.',
+      'Lead on Lucerna’s entity linking, ingestion, and recoding pipelines powering the data platform.',
     projects: [
       "Improved company’s Entity Linking, Ingestion, and Recoding pipelines driving the cloud platform’s analytics layer (data lakehouse).",
       "Repartitioned approx 50TB of parquet data, accelerating nightly DBT builds of platform's analytics layer.",

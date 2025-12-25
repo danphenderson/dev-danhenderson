@@ -8,20 +8,34 @@ type CodingExamplesSectionProps = {
 
 export const CodingExamplesSection = ({ examples }: CodingExamplesSectionProps) => (
   <Stack spacing={1.5}>
-    {examples.map((example, index) => (
-      <AnimatedContentCard key={`${example.title}-${index}`} delayMs={index * 80}>
-        <Typography variant="h6">{example.title}</Typography>
-        <Typography variant="body2">{example.description}</Typography>
-        <Stack spacing={0.25} sx={{ mt: 0.5 }}>
-          {example.links.map((link, linkIndex) => (
-            <Typography key={`${link}-${linkIndex}`} variant="body2">
-              <a href={link} target="_blank" rel="noopener noreferrer">
-                {link}
-              </a>
+    {examples.map((example, index) => {
+      const primaryLink = example.links[0];
+
+      return (
+        <AnimatedContentCard key={`${example.title}-${index}`} delayMs={index * 80}>
+          {primaryLink ? (
+            <Typography
+              variant="h6"
+              component="a"
+              href={primaryLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              sx={{
+                color: 'text.primary',
+                textDecoration: 'none',
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              {example.title}
             </Typography>
-          ))}
-        </Stack>
-      </AnimatedContentCard>
-    ))}
+          ) : (
+            <Typography variant="h6">{example.title}</Typography>
+          )}
+          <Typography variant="body2">{example.description}</Typography>
+        </AnimatedContentCard>
+      );
+    })}
   </Stack>
 );

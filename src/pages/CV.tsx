@@ -13,6 +13,7 @@ import { GitHubProjects } from '../components/cv/GitHubProjects';
 import { ProfileCard } from '../components/cv/ProfileCard';
 import { SectionHeading } from '../components/cv/SectionHeading';
 import { ToolsAccordion } from '../components/ToolsAccordion';
+import { useCvStyles } from '../ThemeProvider';
 import {
   AnimatedContentCard,
   ANIMATED_CARD_BASE_DELAY_MS,
@@ -35,6 +36,7 @@ import { useGithubProfile } from '../hooks/useGithubProfile';
 export default function CV() {
   const { activity, projects, contributions, loading, error } = useGithubProfile();
   const muiTheme = useMuiTheme();
+  const { subtleBorder, subtleSurface } = useCvStyles();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const nestedDelayOffsetMs = 160;
   const experienceItemsDelay = ANIMATED_CARD_DURATION_MS + nestedDelayOffsetMs;
@@ -45,10 +47,32 @@ export default function CV() {
     boxShadow: 'none',
     borderRadius: 0,
   };
+  const githubSectionTitleSx = {
+    color: 'text.primary',
+    fontWeight: 700,
+  };
+  const githubSectionDividerSx = {
+    borderColor: 'divider',
+  };
+  const githubSectionCardSx = {
+    p: { xs: 1, md: 1.00 },
+  };
+  const githubSectionPanelSx = {
+    borderRadius: 1.5,
+    border: subtleBorder,
+    backgroundColor: subtleSurface,
+    p: { xs: 1, md: 1.00 },
+  };
   const githubStaggerMs = 200;
   const githubNestedBaseDelayMs = ANIMATED_CARD_DURATION_MS + nestedDelayOffsetMs;
+  const githubItemDelayOffsetMs = ANIMATED_CARD_DURATION_MS + nestedDelayOffsetMs;
 
   if (isMobile) {
+    const githubActivityDelayMs = githubNestedBaseDelayMs;
+    const githubActivityItemsDelayMs = githubActivityDelayMs + githubItemDelayOffsetMs;
+    const githubContributionsDelayMs = githubNestedBaseDelayMs + githubStaggerMs;
+    const githubContributionsItemsDelayMs = githubContributionsDelayMs + githubItemDelayOffsetMs;
+
     return (
       <BackgroundPaper image={cvBackgroundImage} showShell={false}>
         <Box sx={{ maxWidth: 1600, mx: 'auto', px: { xs: 1.5, md: 5 }, py: { xs: 2, md: 4 } }}>
@@ -70,36 +94,60 @@ export default function CV() {
               <EducationSection education={educationInfo} />
             </AnimatedContentCard>
 
-            <AnimatedContentCard delayMs={0}>
+            <AnimatedContentCard delayMs={0} sx={githubSectionCardSx}>
               <Stack spacing={2}>
                 <SectionHeading overline="GitHub" sx={{ mb: 0.5 }} />
 
-                <AnimatedContentCard delayMs={githubNestedBaseDelayMs} sx={ghostCardSx}>
-                  <Typography variant="h4" sx={{ color: 'text.primary' }}>
-                    Recent Activity
-                  </Typography>
-                  <GitHubActivityList activity={activity} loading={loading} error={error} />
+                <AnimatedContentCard delayMs={githubActivityDelayMs} sx={ghostCardSx}>
+                  <Stack spacing={1}>
+                    <Typography variant="subtitle2" sx={githubSectionTitleSx}>
+                      Recent Activity
+                    </Typography>
+                    <Box sx={githubSectionPanelSx}>
+                      <GitHubActivityList
+                        activity={activity}
+                        loading={loading}
+                        error={error}
+                        startDelayMs={githubActivityItemsDelayMs}
+                      />
+                    </Box>
+                  </Stack>
                 </AnimatedContentCard>
 
-                <AnimatedContentCard delayMs={githubNestedBaseDelayMs + githubStaggerMs} sx={ghostCardSx}>
-                  <Divider sx={{ borderColor: 'divider' }} />
-                  <Typography variant="h4" sx={{ color: 'text.primary' }}>
-                    Contributions
-                  </Typography>
-                  <GitHubContributions contributions={contributions} loading={loading} variant="list" />
+                <AnimatedContentCard delayMs={githubContributionsDelayMs} sx={ghostCardSx}>
+                  <Stack spacing={1}>
+                    <Divider sx={githubSectionDividerSx} />
+                    <Typography variant="subtitle2" sx={githubSectionTitleSx}>
+                      Contributions
+                    </Typography>
+                    <Box sx={githubSectionPanelSx}>
+                      <GitHubContributions
+                        contributions={contributions}
+                        loading={loading}
+                        variant="list"
+                        startDelayMs={githubContributionsItemsDelayMs}
+                      />
+                    </Box>
+                  </Stack>
                 </AnimatedContentCard>
 
                 <AnimatedContentCard delayMs={githubNestedBaseDelayMs + githubStaggerMs * 2} sx={ghostCardSx}>
-                  <Divider sx={{ borderColor: 'divider' }} />
-                  <GitHubContributionCalendar username={githubUsername} contained={false} />
+                  <Stack spacing={1}>
+                    <Divider sx={githubSectionDividerSx} />
+                    <GitHubContributionCalendar username={githubUsername} contained={false} />
+                  </Stack>
                 </AnimatedContentCard>
 
                 <AnimatedContentCard delayMs={githubNestedBaseDelayMs + githubStaggerMs * 3} sx={ghostCardSx}>
-                  <Divider sx={{ borderColor: 'divider' }} />
-                  <Typography variant="h4" sx={{ color: 'text.primary' }}>
-                    Public Projects
-                  </Typography>
-                  <GitHubProjects projects={projects} />
+                  <Stack spacing={1}>
+                    <Divider sx={githubSectionDividerSx} />
+                    <Typography variant="subtitle2" sx={githubSectionTitleSx}>
+                      Public Projects
+                    </Typography>
+                    <Box sx={githubSectionPanelSx}>
+                      <GitHubProjects projects={projects} />
+                    </Box>
+                  </Stack>
                 </AnimatedContentCard>
               </Stack>
             </AnimatedContentCard>
@@ -154,36 +202,60 @@ export default function CV() {
                   </Stack>
                 </AnimatedContentCard>
 
-                <AnimatedContentCard delayMs={120}>
+                <AnimatedContentCard delayMs={120} sx={githubSectionCardSx}>
                   <Stack spacing={2}>
                     <SectionHeading overline="GitHub" sx={{ mb: 0.5 }} />
 
                     <AnimatedContentCard delayMs={githubNestedBaseDelayMs + 120} sx={ghostCardSx}>
-                      <Typography variant="h4" sx={{ color: 'text.primary' }}>
-                        Recent Activity
-                      </Typography>
-                      <GitHubActivityList activity={activity} loading={loading} error={error} />
+                      <Stack spacing={1}>
+                        <Typography variant="subtitle2" sx={githubSectionTitleSx}>
+                          Recent Activity
+                        </Typography>
+                        <Box sx={githubSectionPanelSx}>
+                          <GitHubActivityList
+                            activity={activity}
+                            loading={loading}
+                            error={error}
+                            startDelayMs={githubNestedBaseDelayMs + 120 + githubItemDelayOffsetMs}
+                          />
+                        </Box>
+                      </Stack>
                     </AnimatedContentCard>
 
                     <AnimatedContentCard delayMs={githubNestedBaseDelayMs + 120 + githubStaggerMs} sx={ghostCardSx}>
-                      <Divider sx={{ borderColor: 'divider' }} />
-                      <Typography variant="h4" sx={{ color: 'text.primary' }}>
-                        Contributions
-                      </Typography>
-                      <GitHubContributions contributions={contributions} loading={loading} variant="list" />
+                      <Stack spacing={1}>
+                        <Divider sx={githubSectionDividerSx} />
+                        <Typography variant="subtitle2" sx={githubSectionTitleSx}>
+                          Contributions
+                        </Typography>
+                        <Box sx={githubSectionPanelSx}>
+                          <GitHubContributions
+                            contributions={contributions}
+                            loading={loading}
+                            variant="list"
+                            startDelayMs={githubNestedBaseDelayMs + 120 + githubStaggerMs + githubItemDelayOffsetMs}
+                          />
+                        </Box>
+                      </Stack>
                     </AnimatedContentCard>
 
                     <AnimatedContentCard delayMs={githubNestedBaseDelayMs + 120 + githubStaggerMs * 2} sx={ghostCardSx}>
-                      <Divider sx={{ borderColor: 'divider' }} />
-                      <GitHubContributionCalendar username={githubUsername} contained={false} />
+                      <Stack spacing={1}>
+                        <Divider sx={githubSectionDividerSx} />
+                        <GitHubContributionCalendar username={githubUsername} contained={false} />
+                      </Stack>
                     </AnimatedContentCard>
 
                     <AnimatedContentCard delayMs={githubNestedBaseDelayMs + 120 + githubStaggerMs * 3} sx={ghostCardSx}>
-                      <Divider sx={{ borderColor: 'divider' }} />
-                      <Typography variant="h4" sx={{ color: 'text.primary' }}>
-                        Projects
-                      </Typography>
-                      <GitHubProjects projects={projects} />
+                      <Stack spacing={1}>
+                        <Divider sx={githubSectionDividerSx} />
+                        <Typography variant="subtitle2" sx={githubSectionTitleSx}>
+                          Projects
+                        </Typography>
+                        <Box sx={githubSectionPanelSx}>
+                          <GitHubProjects projects={projects} />
+                        </Box>
+                      </Stack>
                     </AnimatedContentCard>
                   </Stack>
                 </AnimatedContentCard>
