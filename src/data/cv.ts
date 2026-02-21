@@ -43,6 +43,8 @@ export type Experience = {
   title: string;
   startDate: string;
   endDate: string;
+  impactSummary?: string;
+  impactHighlights?: string[];
   description?: string;
   projects?: ExperienceProject[];
   tools?: string[];
@@ -74,19 +76,19 @@ export const aboutMe: AboutMe = {
   name: 'Daniel Henderson',
   title: 'Software Engineer',
   email: 'me@danhenderson.dev',
-  phone: '906-281-7641',
+  phone: '',
   location: 'Seattle, WA',
   bioLink: {
-    text: 'Applied/Computational Math PhD student',
+    text: 'Mathematics MS student (expected summer 2026)',
     url: mtuMathGraduateUrl,
   },
-  bio: `Applied/Computational Math PhD student (M.S. expected Spring 2026) focused on performance-critical scientific software and data systems.
+  bio: `Mathematics MS student (expected summer 2026).
 
 Ex–Lucerna Health data scientist/pipeline engineer: built cloud-native ingestion + analytics infrastructure that boosted throughput 50%+ and reduced compute costs.
 
 Research: numerical methods for differential equations in hemodynamics; additional work in smooth optimization and benchmarking across Julia, Python, and C.
 
-Interested in applied roles at the intersection of math, systems, and production software (scientific computing, data platforms, ML/AI engineering). Full profile on LinkedIn.`,
+Interested in applied roles at the intersection of math, systems, and production software (scientific computing, data platforms, ML/AI engineering).`,
 };
 
 export const codingExamples: CodingExample[] = [
@@ -145,6 +147,12 @@ export const experiences: Experience[] = [
     title: 'Graduate Research Assistant | Hemodynamics',
     startDate: 'May 2025',
     endDate: 'Current',
+    impactSummary: 'Computational hemodynamics research focused on modeling rigor and practical numerical pathways.',
+    impactHighlights: [
+      'Formalized continuum mechanics foundations used to derive vascular flow conservation laws.',
+      'Analyzed incompressible Navier-Stokes variants across Newtonian and generalized-Newtonian assumptions.',
+      'Scoped near-term simulation pathways from reduced-order models toward PINNs/DeepONets and FSI.',
+    ],
     description:
       'Advisor: Jiguang Sun (Department of Mathematical Sciences). Hemodynamics modeling and numerical methods for macrocirculatory blood flow.',
     projects: [
@@ -161,6 +169,12 @@ export const experiences: Experience[] = [
     title: 'Instructor | Calculus I with Technology',
     startDate: 'Jan 2025',
     endDate: 'May 2025 (5 mos)',
+    impactSummary: 'Owned full-course delivery with strong student feedback and high engagement.',
+    impactHighlights: [
+      'Managed lectures, assessments, grading, and logistics for Calculus I with Technology.',
+      'Integrated applied tooling to improve conceptual understanding and computational fluency.',
+      'Received 4.8/5.0 student evaluations with a 58% response rate.',
+    ],
     description: 'Department of Mathematical Sciences. Instructor of Calculus I with Technology.',
     projects: [
       'Calculus I with Technology, managing full course delivery: lectures, assessments, grading, and end-to-end course administration.',
@@ -176,6 +190,11 @@ export const experiences: Experience[] = [
     title: 'Graduate Teaching Assistant | Calculus I with Technology',
     startDate: 'Aug 2024',
     endDate: 'Dec 2024 (5 mos)',
+    impactSummary: 'Improved consistency and turnaround for course logistics while supporting student technology workflows.',
+    impactHighlights: [
+      'Coordinated grading operations and rubric quality with course instructor.',
+      'Provided individual feedback and troubleshooting for assignment/tooling workflows.',
+    ],
     description:
       'Department of Mathematical Sciences. Coordinated grading/logistics and supported students with technology-based workflows.',
     projects: [
@@ -191,6 +210,12 @@ export const experiences: Experience[] = [
     title: 'Data Pipeline Engineer | Full Time',
     startDate: 'Apr 2022',
     endDate: 'Dec 2022 (9 mos)',
+    impactSummary: 'Led critical ingestion and platform pipeline improvements that increased throughput and lowered compute costs.',
+    impactHighlights: [
+      'Repartitioned roughly 50TB of parquet data to accelerate nightly DBT builds.',
+      'Reduced infrastructure cost by upgrading to Glue 3.0 and shifting heavy jobs onto transient EMR fleets.',
+      'Built an admin service that cut support ticket triage time across PostgreSQL, Glue, Redshift, and S3.',
+    ],
     description:
       'Lead on Lucerna’s entity linking, ingestion, and recoding pipelines powering the data platform.',
     projects: [
@@ -233,6 +258,12 @@ export const experiences: Experience[] = [
     title: 'Data Scientist | Contract',
     startDate: 'Nov 2021',
     endDate: 'Apr 2022 (6 mos)',
+    impactSummary: 'Built production-ready analytics and ML workflows for a multi-tenant health data platform on AWS.',
+    impactHighlights: [
+      'Delivered anomaly detection workflows in PySpark isolation forest across S3 lake data.',
+      'Automated deployment/version safeguards for ML assets with AWS CDK and Bitbucket Pipelines.',
+      'Designed a shared ML library to standardize secure, reusable cloud workflows.',
+    ],
     description:
       'Production ML and analytics engineering on AWS for a multi-tenant health data platform.',
     projects: [
@@ -282,7 +313,7 @@ export const educationInfo: EducationInfo = {
   entries: [
     {
       university: 'Michigan Technological University',
-      program: 'Ph.D. Program in Applied and Computational Mathematics',
+      program: 'MS Program in Mathematics',
       status: 'M.S. expected Spring 2026',
       dateRange: 'Fall 2024 – Present',
       highlights: [
@@ -333,6 +364,7 @@ export const stackAndTools: StackSection[] = [
       'Jira',
       'Notion',
       'Sentry',
+      'Sonarqube',
       'Jupyter notebooks for exploration',
       'REPLs',
       'Mermaid',
