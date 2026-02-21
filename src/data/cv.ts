@@ -82,11 +82,9 @@ export const aboutMe: AboutMe = {
     text: 'Mathematics MS student (expected summer 2026)',
     url: mtuMathGraduateUrl,
   },
-  bio: `Mathematics MS student (expected summer 2026).
+  bio: `Ex–Lucerna Health data scientist/pipeline engineer: built cloud-native ingestion + analytics infrastructure that boosted throughput 50%+ and reduced compute costs.
 
-Ex–Lucerna Health data scientist/pipeline engineer: built cloud-native ingestion + analytics infrastructure that boosted throughput 50%+ and reduced compute costs.
-
-Research: numerical methods for differential equations in hemodynamics; additional work in smooth optimization and benchmarking across Julia, Python, and C.
+Current Math MS student (expected summer 2026). Research: numerical methods for differential equations in hemodynamics; additional work in smooth optimization and benchmarking across Julia, Python, and C.
 
 Interested in applied roles at the intersection of math, systems, and production software (scientific computing, data platforms, ML/AI engineering).`,
 };
@@ -314,7 +312,7 @@ export const educationInfo: EducationInfo = {
     {
       university: 'Michigan Technological University',
       program: 'MS Program in Mathematics',
-      status: 'M.S. expected Spring 2026',
+      status: 'M.S. expected Summer 2026',
       dateRange: 'Fall 2024 – Present',
       highlights: [
         'Graduate coursework in numerical and functional analysis, differential equations, optimization, and scientific computing',
