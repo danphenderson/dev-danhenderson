@@ -82,11 +82,12 @@ export const aboutMe: AboutMe = {
     text: 'Mathematics MS student (expected summer 2026)',
     url: mtuMathGraduateUrl,
   },
-  bio: `Ex–Lucerna Health data scientist/pipeline engineer: built cloud-native ingestion + analytics infrastructure that boosted throughput 50%+ and reduced compute costs.
+  bio: `Current Math MS student (expected summer 2026) researching numerical methods
+  for differential equations in hemodynamics; additional work in smooth optimization and benchmarking across Julia, Python, and C.
 
-Current Math MS student (expected summer 2026). Research: numerical methods for differential equations in hemodynamics; additional work in smooth optimization and benchmarking across Julia, Python, and C.
+Ex–Lucerna Health data scientist/pipeline engineer: built cloud-native ingestion + analytics infrastructure that boosted throughput 50%+ and reduced compute costs.
 
-Interested in applied roles at the intersection of math, systems, and production software (scientific computing, data platforms, ML/AI engineering).`,
+Seeking employment opportunities at the intersection of math, systems, and production software (scientific computing, data platforms, ML/AI engineering).`,
 };
 
 export const codingExamples: CodingExample[] = [
@@ -154,7 +155,7 @@ export const experiences: Experience[] = [
     description:
       'Advisor: Jiguang Sun (Department of Mathematical Sciences). Hemodynamics modeling and numerical methods for macrocirculatory blood flow.',
     projects: [
-      'Report on hemodynamics modeling and methods report for macrocirculatory blood flow, formalizing the continuum mechanics framework (Eulerian/Lagrangian descriptions, material derivative, and Reynolds transport theorem) used to derive conservation laws for vascular flow.',
+      'Report on hemodynamics modeling for macrocirculatory blood flow, formalizing the continuum mechanics framework (Eulerian/Lagrangian descriptions, material derivative, and Reynolds transport theorem) used to derive conservation laws for vascular flow.',
       'Derived and analyzed incompressible Navier–Stokes formulations for blood (including Newtonian and generalized-Newtonian viscosity models), documenting the kinematic roles of Reynolds/Womersley numbers and related nondimensional parameters relevant to large-vessel regimes.',
       'Scoped numerical pathways from dimension-reduced 1D/2D flow simulations to study modern computational directions including PINNs/DeepONets and fluid–structure interaction for compliant vessels.',
     ],
@@ -267,7 +268,7 @@ export const experiences: Experience[] = [
     projects: [
       'Implemented version-control safeguards for production ML assets and automated deployments using AWS CDK and Bitbucket Pipelines.',
       'Built an anomaly-detection pipeline using PySpark isolation forest to flag anomalous records in S3 data lake.',
-      'Designed and build shared ML library to abstract security and cloud infrastructure concerns, enabling portable ML workflows.',
+      'Designed and built shared ML library to abstract security and cloud infrastructure concerns, enabling portable ML workflows.',
       'Developed a cost-effective, scalable PySpark analytics service to meet data governance requirements supporting HiTrust certification.',
       'Collaborated on a deduplication ML hook in the ingestion pipeline, enabling human-in-the-loop training and parameter evaluation.',
       'Unblocked restricted-offshore developers via infrastructure deployments, code reviews, ETL support, and QA testing to accelerate delivery.',
@@ -351,25 +352,20 @@ export const stackAndTools: StackSection[] = [
       'Zsh (also Bash)',
       'Python (general purpose goto language)',
       'TypeScript',
-      'React',
-      'PostgreSQL',
       'AWS',
       'pre-commit',
       'github CLI (`gh`)',
       'Docker & docker-compose',
       'GitHub Actions (CI/CD)',
       'AWS CDK (IaC)',
-      'Jira',
-      'Notion',
-      'Sentry',
-      'Sonarqube',
-      'Jupyter Notebooks',
       'REPLs',
       'Mermaid',
       'jq',
-      'DBeaver',
-      'Lucid',
-      'OpenAPI/Swagger',
+      'juliaup',
+      'pipenv',
+      '.editorconfig',
+      'prettier',
+      'pre-commit',
     ],
   },
   {
