@@ -194,12 +194,12 @@ export const experiences: Experience[] = [
       'Provided individual feedback and troubleshooting for assignment/tooling workflows.',
     ],
     description:
-      'Department of Mathematical Sciences. Coordinated grading/logistics and supported students with technology-based workflows.',
+      'Department of Mathematical Sciences. Coordinated grading/logistics and held office hours for students.',
     projects: [
       'Coordinated instructional logistics and grading with the instructor; maintained consistent rubrics and timely turnaround to support student progress.',
-      'Provided individualized feedback on assignments/exams and supported students with technology-based workflows (Mathematica).',
+      'Provided individualized feedback on assignments/exams.',
     ],
-    tools: ['Gradescope', 'Canvas'],
+    tools: ['Gradescope', 'Canvas', 'Mathematica'],
   },
   {
     company: 'Lucerna Health',
