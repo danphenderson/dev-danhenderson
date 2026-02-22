@@ -50,13 +50,21 @@ export const GitHubContributions = ({
       width: '100%',
       height: 'auto',
       justifyContent: 'flex-start',
-      alignItems: 'flex-start',
+      alignItems: 'center',
+      '& .MuiChip-icon': {
+        alignSelf: 'center',
+        marginLeft: 0.5,
+        marginRight: 0.5,
+        fontSize: 18,
+        color: 'text.secondary',
+      },
       '& .MuiChip-label': {
         whiteSpace: 'normal',
         textOverflow: 'clip',
         lineHeight: 1.4,
         px: 1,
         py: 0.25,
+        overflowWrap: 'anywhere',
       },
     };
     const chipWrapperSx = {
@@ -77,7 +85,7 @@ export const GitHubContributions = ({
             sx={chipWrapperSx}
           >
             <Chip
-              icon={<GitHubIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+              icon={<GitHubIcon />}
               label={
                 <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}>
                   <Box component="span" sx={{ fontWeight: 600, color: 'text.primary', overflowWrap: 'anywhere' }}>

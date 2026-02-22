@@ -363,13 +363,17 @@ export const stackAndTools: StackSection[] = [
       'Notion',
       'Sentry',
       'Sonarqube',
-      'Jupyter notebooks for exploration',
+      'Jupyter Notebooks',
       'REPLs',
       'Mermaid',
+      'jq',
+      'DBeaver',
+      'Lucid',
+      'OpenAPI/Swagger',
     ],
   },
   {
-    title: 'Programing Languages',
+    title: 'Programing & Scripting Languages',
     items: [
       'Python',
       'Java',
@@ -385,8 +389,8 @@ export const stackAndTools: StackSection[] = [
     ],
   },
   {
-    title: 'App Frameworks',
-    items: ['Data Build Tool (DBT)', 'Django', 'FastAPI', 'React', 'Apache Spark (PySpark)', 'Amazon CDK & SDK'],
+    title: 'ETL & API Frameworks',
+    items: ['Data Build Tool (DBT)', 'Django', 'FastAPI', 'Apache Spark (PySpark)'],
   },
   {
     title: 'Databases',
@@ -403,6 +407,7 @@ export const stackAndTools: StackSection[] = [
       'Notion',
       'GitBook',
       'Bitbucket',
+      'Visual Studio Code',
       'Jira',
       'Confluence',
       'Lucid',

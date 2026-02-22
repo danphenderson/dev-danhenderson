@@ -31,13 +31,21 @@ export const GitHubActivityList = ({
     width: '100%',
     height: 'auto',
     justifyContent: 'flex-start',
-    alignItems: 'flex-start',
+    alignItems: 'center',
+    '& .MuiChip-icon': {
+      alignSelf: 'center',
+      marginLeft: 0.5,
+      marginRight: 0.5,
+      fontSize: 18,
+      color: 'text.secondary',
+    },
     '& .MuiChip-label': {
       whiteSpace: 'normal',
       textOverflow: 'clip',
       lineHeight: 1.4,
       px: 1,
       py: 0.25,
+      overflowWrap: 'anywhere',
     },
   };
   const chipWrapperSx = {
@@ -65,7 +73,7 @@ export const GitHubActivityList = ({
                 sx={chipWrapperSx}
               >
                 <Chip
-                  icon={<GitHubIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+                  icon={<GitHubIcon />}
                   label={item.label}
                   component={isLink ? 'a' : 'div'}
                   href={item.href}

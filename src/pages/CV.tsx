@@ -16,9 +16,7 @@ import { ToolsAccordion } from '../components/ToolsAccordion';
 import { useCvStyles } from '../ThemeProvider';
 import {
   AnimatedContentCard,
-  ANIMATED_CARD_BASE_DELAY_MS,
   ANIMATED_CARD_DURATION_MS,
-  ANIMATED_CARD_SPEED_MULTIPLIER,
 } from '../components/AnimatedContentCard';
 import {
   aboutMe,
@@ -54,8 +52,10 @@ export default function CV() {
   const githubSectionDividerSx = {
     borderColor: 'divider',
   };
-  const githubSectionCardSx = {
-    p: { xs: 1, md: 1.00 },
+  const githubOverlineSx = {
+    mb: 0.5,
+    ml: { xs: 1.5, md: 1.5 },
+    mt: { xs: 0.75, md: 0.75 },
   };
   const githubSectionPanelSx = {
     borderRadius: 1.5,
@@ -94,10 +94,9 @@ export default function CV() {
               <EducationSection education={educationInfo} />
             </AnimatedContentCard>
 
-            <AnimatedContentCard delayMs={0} sx={githubSectionCardSx}>
+            <AnimatedContentCard delayMs={0}>
               <Stack spacing={2}>
-                <SectionHeading overline="GitHub" sx={{ mb: 0.5 }} />
-
+                <SectionHeading overline="GitHub" sx={githubOverlineSx} />
                 <AnimatedContentCard delayMs={githubActivityDelayMs} sx={ghostCardSx}>
                   <Stack spacing={1}>
                     <Typography variant="subtitle2" sx={githubSectionTitleSx}>
@@ -202,9 +201,9 @@ export default function CV() {
                   </Stack>
                 </AnimatedContentCard>
 
-                <AnimatedContentCard delayMs={120} sx={githubSectionCardSx}>
+                <AnimatedContentCard delayMs={120}>
                   <Stack spacing={2}>
-                    <SectionHeading overline="GitHub" sx={{ mb: 0.5 }} />
+                    <SectionHeading overline="GitHub" sx={githubOverlineSx} />
 
                     <AnimatedContentCard delayMs={githubNestedBaseDelayMs + 120} sx={ghostCardSx}>
                       <Stack spacing={1}>

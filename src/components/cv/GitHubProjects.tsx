@@ -15,7 +15,7 @@ export const GitHubProjects = ({ projects }: GitHubProjectsProps) => {
       {projects.map((project) => (
         <Chip
           key={project.name}
-          icon={<GitHubIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
+          icon={<GitHubIcon />}
           label={project.name}
           component="a"
           href={project.url}
@@ -29,6 +29,24 @@ export const GitHubProjects = ({ projects }: GitHubProjectsProps) => {
             backgroundColor: subtleSurface,
             fontWeight: 600,
             color: 'text.primary',
+            height: 'auto',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+            '& .MuiChip-icon': {
+              alignSelf: 'center',
+              marginLeft: 0.5,
+              marginRight: 0.5,
+              fontSize: 18,
+              color: 'text.secondary',
+            },
+            '& .MuiChip-label': {
+              whiteSpace: 'normal',
+              textOverflow: 'clip',
+              lineHeight: 1.4,
+              px: 1,
+              py: 0.25,
+              overflowWrap: 'anywhere',
+            },
           }}
         />
       ))}
