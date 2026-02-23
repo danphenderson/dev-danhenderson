@@ -91,8 +91,13 @@ Seeking employment opportunities at the intersection of math, systems, and produ
 };
 
 export const codingExamples: CodingExample[] = [
+    {
+    title: 'Python typewriter',
+    description: 'Typewriter is a Python Typer CLI built on LibCST that normalizes None-related type annotations while preserving formatting and comments.',
+    links: ['https://github.com/danphenderson/python-typewriter'],
+  },
   {
-    title: 'chromex',
+    title: 'Python chromex',
     description: "An asynchronous interface for chrome browser automation's and scrapping that is built on bs4 and selenium.",
     links: ['https://github.com/danphenderson/python-chromex'],
   },
@@ -120,7 +125,7 @@ export const codingExamples: CodingExample[] = [
     title: 'LeetCode Solutions',
     description: 'A collection of my solutions to LeetCode problems.',
     links: ['https://github.com/danphenderson/leetcode-solutions'],
-  },
+  }
 ];
 
 export const certificates: Certificate[] = [
