@@ -43,7 +43,6 @@ export type Experience = {
   title: string;
   startDate: string;
   endDate: string;
-  impactSummary?: string;
   impactHighlights?: string[];
   description?: string;
   projects?: ExperienceProject[];
@@ -82,12 +81,11 @@ export const aboutMe: AboutMe = {
     text: 'Mathematics MS student (expected summer 2026)',
     url: mtuMathGraduateUrl,
   },
-  bio: `Current Math MS student (expected summer 2026) researching numerical methods
-  for differential equations in hemodynamics; additional work in smooth optimization and benchmarking across Julia, Python, and C.
+  bio: `Applied/Computational Mathematics MS student (expected summer 2026) researching hemodynamics; additional work in smooth optimization and benchmarking across Julia, Python, and C.
 
 Ex–Lucerna Health data scientist/pipeline engineer: built cloud-native ingestion + analytics infrastructure that boosted throughput 50%+ and reduced compute costs.
 
-Seeking employment opportunities at the intersection of math, systems, and production software (scientific computing, data platforms, ML/AI engineering).`,
+Seeking employment opportunities at the intersection of systems and production software (scientific computing, data platforms, ML/AI engineering).`,
 };
 
 export const codingExamples: CodingExample[] = [
@@ -151,7 +149,6 @@ export const experiences: Experience[] = [
     title: 'Graduate Research Assistant | Hemodynamics',
     startDate: 'May 2025',
     endDate: 'Current',
-    impactSummary: 'Computational hemodynamics research focused on modeling rigor and practical numerical pathways.',
     impactHighlights: [
       'Formalized continuum mechanics foundations used to derive vascular flow conservation laws.',
       'Analyzed incompressible Navier-Stokes variants across Newtonian and generalized-Newtonian assumptions.',
@@ -164,7 +161,7 @@ export const experiences: Experience[] = [
       'Derived and analyzed incompressible Navier–Stokes formulations for blood (including Newtonian and generalized-Newtonian viscosity models), documenting the kinematic roles of Reynolds/Womersley numbers and related nondimensional parameters relevant to large-vessel regimes.',
       'Scoped numerical pathways from dimension-reduced 1D/2D flow simulations to study modern computational directions including PINNs/DeepONets and fluid–structure interaction for compliant vessels.',
     ],
-    tools: ['LaTeX', 'Julia', 'Python']
+    tools: ['LaTeX', 'Julia', 'Python', 'Overleaf']
   },
   {
     company: 'Michigan Technological University',
@@ -173,13 +170,12 @@ export const experiences: Experience[] = [
     title: 'Instructor | Calculus I with Technology',
     startDate: 'Jan 2025',
     endDate: 'May 2025 (5 mos)',
-    impactSummary: 'Owned full-course delivery with strong student feedback and high engagement.',
     impactHighlights: [
       'Managed lectures, assessments, grading, and logistics for Calculus I with Technology.',
       'Integrated applied tooling to improve conceptual understanding and computational fluency.',
       'Received 4.8/5.0 student evaluations with a 58% response rate.',
     ],
-    description: 'Department of Mathematical Sciences. Instructor of Calculus I with Technology.',
+    description: 'Department of Mathematical Sciences Graduate Teaching Assistantship, instructor of record for Calculus I with Technology.',
     projects: [
       'Calculus I with Technology, managing full course delivery: lectures, assessments, grading, and end-to-end course administration.',
       'Integrated technology into lessons and assignments to improve conceptual understanding and promote computational thinking.',
@@ -194,16 +190,16 @@ export const experiences: Experience[] = [
     title: 'Graduate Teaching Assistant | Calculus I with Technology',
     startDate: 'Aug 2024',
     endDate: 'Dec 2024 (5 mos)',
-    impactSummary: 'Improved consistency and turnaround for course logistics while supporting student technology workflows.',
     impactHighlights: [
       'Coordinated grading operations and rubric quality with course instructor.',
       'Provided individual feedback and troubleshooting for assignment/tooling workflows.',
     ],
     description:
-      'Department of Mathematical Sciences. Coordinated grading/logistics and held office hours for students.',
+      'Department of Mathematical Sciences Graduate Teaching Assistantship.',
     projects: [
       'Coordinated instructional logistics and grading with the instructor; maintained consistent rubrics and timely turnaround to support student progress.',
       'Provided individualized feedback on assignments/exams.',
+      'Held regular office hours assisting students and provided ad-hoc support for student troubleshooting of technology workflows (Mathematica, Gradescope, Canvas).',
     ],
     tools: ['Gradescope', 'Canvas', 'Mathematica'],
   },
@@ -214,14 +210,13 @@ export const experiences: Experience[] = [
     title: 'Data Pipeline Engineer | Full Time',
     startDate: 'Apr 2022',
     endDate: 'Dec 2022 (9 mos)',
-    impactSummary: 'Led critical ingestion and platform pipeline improvements that increased throughput and lowered compute costs.',
     impactHighlights: [
       'Repartitioned roughly 50TB of parquet data to accelerate nightly DBT builds.',
       'Reduced infrastructure cost by upgrading to Glue 3.0 and shifting heavy jobs onto transient EMR fleets.',
       'Built an admin service that cut support ticket triage time across PostgreSQL, Glue, Redshift, and S3.',
     ],
     description:
-      'Lead on Lucerna’s entity linking, ingestion, and recoding pipelines powering the data platform.',
+      'Lead on Lucerna’s entity linking, ingestion, and recoding pipelines powering the AWS multi-tenant health data platform. Responsible for critical ingestion and platform pipeline improvements that increased throughput and reduced compute costs.',
     projects: [
       "Improved company’s Entity Linking, Ingestion, and Recoding pipelines driving the cloud platform’s analytics layer (data lakehouse).",
       "Repartitioned approx 50TB of parquet data, accelerating nightly DBT builds of platform's analytics layer.",
@@ -234,6 +229,7 @@ export const experiences: Experience[] = [
     ],
     tools: [
       'AWS CDK & SDK (Python)',
+      'DBT (Data Build Tool)',
       'SNS',
       'SQS',
       'Lambda',
@@ -246,13 +242,14 @@ export const experiences: Experience[] = [
       'EC2 Instance Fleets',
       'Bitbucket',
       'GitHub Enterprise',
-      'GitHub Actions',
       'Docker (docker-compose)',
       'Sentry',
       'Slack',
       'SonarCloud',
       'Django',
       'Python',
+      'PySpark',
+      'OpenAPI/Swagger',
     ],
   },
   {
@@ -262,7 +259,6 @@ export const experiences: Experience[] = [
     title: 'Data Scientist | Contract',
     startDate: 'Nov 2021',
     endDate: 'Apr 2022 (6 mos)',
-    impactSummary: 'Built production-ready analytics and ML workflows for a multi-tenant health data platform on AWS.',
     impactHighlights: [
       'Delivered anomaly detection workflows in PySpark isolation forest across S3 lake data.',
       'Automated deployment/version safeguards for ML assets with AWS CDK and Bitbucket Pipelines.',
@@ -278,7 +274,7 @@ export const experiences: Experience[] = [
       'Collaborated on a deduplication ML hook in the ingestion pipeline, enabling human-in-the-loop training and parameter evaluation.',
       'Unblocked restricted-offshore developers via infrastructure deployments, code reviews, ETL support, and QA testing to accelerate delivery.',
     ],
-    tools: ['AWS CDK & SDK (Python)', 'Bitbucket Pipelines', 'Python', 'SciPy', 'Numpy', 'Pandas', 'PySpark'],
+    tools: ['AWS CDK & SDK (Python)', 'DBT (Data Build Tool)', 'Python', 'SciPy', 'Numpy', 'Pandas', 'PySpark'],
   },
   {
     company: 'Michigan Technological University',
@@ -317,14 +313,12 @@ export const educationInfo: EducationInfo = {
   entries: [
     {
       university: 'Michigan Technological University',
-      program: 'MS Program in Mathematics',
+      program: 'MS Program in Mathematics, Applied/Computational',
       status: 'M.S. expected Summer 2026',
       dateRange: 'Fall 2024 – Present',
       highlights: [
         'Graduate coursework in numerical and functional analysis, differential equations, optimization, and scientific computing',
         'Pedagogical coursework: Teaching College Mathematics, emphasizing curriculum design, assessment, and evidence-based instructional practice',
-        'Research focuses on computational hemodynamics.',
-        'Developing reproducible and performance-critical scientific software in Julia and Python.',
       ],
       tools: ['LaTeX', 'Julia', 'Python', 'Mathematica'],
     },
