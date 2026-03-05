@@ -221,10 +221,10 @@ export const experiences: Experience[] = [
       'Built an admin service that cut support ticket triage time across PostgreSQL, Glue, Redshift, and S3.',
     ],
     description:
-      'Contributor to Lucerna’s entity linking, ingestion, and recoding pipelines powering the health data platform, implementing improvements that increased throughput and slashed compute costs.',
+      'Contributor to the entity linking, ingestion, and recoding pipelines powering the health data platform, implemented improvements that increased throughput and slashed compute costs.',
     projects: [
-      "Repartitioned terabytes of parquet data, accelerating nightly DBT builds of platform's analytics layer (data lakehouse).",
-      "Assisted in architectural design, releases, and deployments of data-engineering assets, including data governance, security, and integrity of the platform's analytics data layer (data lakehouse).",
+      "Repartitioned petabytes of parquet data, accelerating nightly DBT builds of platform's analytics layer (data lakehouse).",
+      "Assisted in architectural design, releases, and deployments of data-engineering assets, including data governance, security, and integrity of the platform's data lakehouse.",
       "Built an admin service to automate integrity/state of tenant's platform across PostgreSQL, AWS Glue Data Catalog, Redshift, and S3, reducing time to resolve service tickets.",
       'Delivered cost savings by upgrading ETL runtime to AWS Glue 3.0 and migrating batch processing to transient AWS EMR workloads using EC2 instance fleets; abstracted autoscaling, bootstrapping, provisioning, security, and networking into a reusable library.',
       'Migrated shared ETL/infrastructure assets from Bitbucket to GitHub Enterprise and standardized CI/CD with GitHub Actions workflows, hooks, and templates.',
