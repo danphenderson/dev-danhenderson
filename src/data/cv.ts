@@ -90,12 +90,12 @@ Seeking employment opportunities at the intersection of systems and production s
 
 export const codingExamples: CodingExample[] = [
     {
-    title: 'Python typewriter CLI',
+    title: 'typewriter CLI',
     description: 'Typewriter is a pip-installable CLI built on Typer and LibCST to normalize None-related type annotations while preserving formatting and comments.',
     links: ['https://github.com/danphenderson/python-typewriter'],
   },
   {
-    title: 'Python chromex',
+    title: 'chromex Python Library',
     description: "An asynchronous interface for headless browser automation's that is built on bs4 and selenium.",
     links: ['https://github.com/danphenderson/python-chromex'],
   },
@@ -105,28 +105,28 @@ export const codingExamples: CodingExample[] = [
     links: ['https://github.com/danphenderson/dev-danhenderson'],
   },
   {
-    title: 'BlockOpt.jl',
+    title: 'BlockOpt.jl Julia Package',
     description: 'An optim-style Julia package built with ForwardDiff.jl and TRS.jl that presents a novel scheme for an unconstrained Quasi-Newton minimization of a smooth objective function.',
     links: ['https://github.com/danphenderson/BlockOpt.jl'],
   },
   {
-    title: 'UncNLPrograms.jl',
+    title: 'UncNLPrograms.jl Julia Package',
     description: 'A subset of high-dimensional, nonlinear, and unconstrained optimization problems from CUTEst in native Julia to test solvers using Automatic/Algorithmic Differentiation.',
     links: ['https://github.com/danphenderson/UncNLPrograms.jl'],
   },
   {
-    title: 'MasterPlan',
+    title: 'MasterPlan Java Application',
     description: 'A java application that allows users to create and manage a structure (directed acyclic graph) of tasks and corresponding subtasks.',
     links: ['https://github.com/danphenderson/masterplan-app'],
   },
   {
-    title: 'LeetCode Solutions',
-    description: 'A collection of LeetCode problem solutions.',
+    title: 'LeetCode Python Solutions',
+    description: 'A collection of LeetCode problems with corresponding solutions and brief discussions on the approaches used.',
     links: ['https://github.com/danphenderson/leetcode-solutions'],
   },
   {
-    title: 'Runge Kutta Methods in Matlab',
-    description: 'Implementation of various Runge Kutta methods for solving ordinary differential equations in Matlab.',
+    title: 'Runge-Kutta Methods Matlab Library',
+    description: 'Implementation of various Runge-Kutta methods for solving ordinary differential equations.',
     links: ['https://github.com/danphenderson/runge-kutta-matlab'],
   },
 ];
