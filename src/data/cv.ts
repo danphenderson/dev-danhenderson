@@ -101,7 +101,7 @@ export const codingExamples: CodingExample[] = [
   },
   {
     title: 'Portfolio using React, TypeScript, and AWS',
-    description: 'Personal website built with Material UI 5 and deployed on AWS using S3, CloudFront, and Route53.',
+    description: 'An interactive CV, climbing log, and photography galleries built with React + TypeScript + MUI and deployed on AWS using S3, CloudFront, and Route53.',
     links: ['https://github.com/danphenderson/dev-danhenderson'],
   },
   {
@@ -116,7 +116,7 @@ export const codingExamples: CodingExample[] = [
   },
   {
     title: 'MasterPlan Java Application',
-    description: 'A java application that allows users to create and manage a structure (directed acyclic graph) of tasks and corresponding subtasks.',
+    description: 'A Java application that allows users to create and manage a structure (directed acyclic graph) of tasks and corresponding subtasks.',
     links: ['https://github.com/danphenderson/masterplan-app'],
   },
   {
