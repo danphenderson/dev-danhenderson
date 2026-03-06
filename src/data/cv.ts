@@ -2,6 +2,8 @@ export const assetBasePath = process.env.PUBLIC_URL || '';
 
 export const avatar = `${assetBasePath}/assets/home.jpg`;
 export const cvBackgroundImage = `${assetBasePath}/assets/photography/landscape/landscape-tieton-south-fork-3.jpg`;
+export const resumePdfUrl = `${assetBasePath}/assets/daniel-henderson-resume.pdf`;
+export const resumeDownloadFilename = 'Daniel-Henderson-Resume.pdf';
 
 export const githubUsername = 'danphenderson';
 export const githubProfileUrl = 'https://github.com/danphenderson';
@@ -310,7 +312,7 @@ export const experiences: Experience[] = [
     title: 'Mathematics Tutor | Part Time',
     startDate: 'September 2015',
     endDate: 'May 2018 (2 yrs 9 mos)',
-    description: 'Provided weekly tutoring services to NCAA student-athletes in multivariable, integral and differential calculus, ordinary differential equations, and linear algebra.',
+    description: 'Tutor to NCAA student-athletes in multivariable, integral and differential calculus, ordinary differential equations, and linear algebra.',
     projects: [],
     tools: ['Mathematica']
   },

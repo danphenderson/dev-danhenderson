@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, Stack, Typography } from '@mui/material';
+import { Box, Button, Divider, Grid, Stack, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme as useMuiTheme } from '@mui/material/styles';
 import BackgroundPaper from '../components/BackgroundPaper';
@@ -27,6 +27,8 @@ import {
   experiences,
   githubUsername,
   linkedinProfileUrl,
+  resumeDownloadFilename,
+  resumePdfUrl,
   stackAndTools,
 } from '../data/cv';
 import { useGithubProfile } from '../hooks/useGithubProfile';
@@ -66,6 +68,27 @@ export default function CV() {
   const githubStaggerMs = 200;
   const githubNestedBaseDelayMs = ANIMATED_CARD_DURATION_MS + nestedDelayOffsetMs;
   const githubItemDelayOffsetMs = ANIMATED_CARD_DURATION_MS + nestedDelayOffsetMs;
+  const resumeDownloadAction = (
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: { xs: 'stretch', sm: 'flex-end' },
+        mb: { xs: 1.5, md: 2 },
+      }}
+    >
+      <Button
+        component="a"
+        href={resumePdfUrl}
+        download={resumeDownloadFilename}
+        variant="outlined"
+        size="small"
+        aria-label="Download resume as PDF"
+        sx={{ width: { xs: '100%', sm: 'flex-end' } }}
+      >
+        Download Resume (PDF)
+      </Button>
+    </Box>
+  );
 
   if (isMobile) {
     const githubActivityDelayMs = githubNestedBaseDelayMs;
@@ -81,6 +104,7 @@ export default function CV() {
               <Stack spacing={2}>
                 <SectionHeading overline="About" sx={{ mb: 0.5 }} />
                 <ProfileCard about={aboutMe} linkedinUrl={linkedinProfileUrl} />
+                {resumeDownloadAction}
               </Stack>
             </AnimatedContentCard>
 
@@ -198,6 +222,7 @@ export default function CV() {
                   <Stack spacing={2}>
                     <SectionHeading overline="About" sx={{ mb: 0.5 }} />
                     <ProfileCard about={aboutMe} linkedinUrl={linkedinProfileUrl} />
+                    {resumeDownloadAction}
                   </Stack>
                 </AnimatedContentCard>
 

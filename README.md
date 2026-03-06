@@ -231,6 +231,13 @@ Edit `src/data/cv.ts`:
 - `codingExamples`
 - `stackAndTools`
 
+### Update downloadable resume PDF
+- Replace `public/assets/daniel-henderson-resume.pdf` with the latest document.
+- Download button metadata is configured in `src/data/cv.ts` via `resumePdfUrl` and `resumeDownloadFilename`.
+- This PDF is intentionally maintained as a separate artifact and may differ from live `/cv` content.
+- LaTeX source is available at `resume/daniel-henderson-resume.tex`.
+- Compile locally with `pdflatex -output-directory public/assets resume/daniel-henderson-resume.tex` and then verify the generated `public/assets/daniel-henderson-resume.pdf`.
+
 ### Update climbing logs
 Edit `src/data/climbs.ts`:
 - `ticks` entries for completed routes
