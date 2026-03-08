@@ -273,6 +273,20 @@ export const experiences: Experience[] = [
     projects: [],
     tools: ['Mathematica']
   },
+    {
+    company: 'Various Locations',
+    companyUrl: mtuMathGraduateUrl,
+    industry: 'Retail & Service',
+    title: 'Bike Mechanic & Service Technician',
+    startDate: '2012',
+    endDate: 'Aug 2024',
+    description: 'Worked full-time and part-time at bike and ski shops in Arizona, Michigan, Utah, & Washington.',
+    projects: ['Diagnosed and serviced mechanical issues across customer and rental bicycles with consistent turnaround and quality.',
+      'Managed end-to-end service and sale workflows in retail and rental environments, including intake, triage, repair prioritization, point-of-sale transactions, rental check-in/check-out, and insurance claim support.',
+      'Applied structured troubleshooting and clear customer communication to recommend repairs, explain technical issues, and improve rider safety, equipment reliability, and overall service experience.'
+    ],
+    tools: ['Mathematica']
+  },
 ];
 
 export const educationInfo: EducationInfo = {
