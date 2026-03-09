@@ -412,4 +412,12 @@ export const fallbackGitHubProjects: GitHubProject[] = [
   { name: 'masterplan-app', url: 'https://github.com/danphenderson/masterplan-app' },
 ];
 
+export const fallbackGitHubContributions: GitHubContribution[] = [
+  { name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright' },
+  { name: 'JuliaLang/julia', url: 'https://github.com/JuliaLang/julia' },
+  { name: 'dbt-labs/dbt-core', url: 'https://github.com/dbt-labs/dbt-core' },
+  { name: 'SciML/DifferentialEquations.jl', url: 'https://github.com/SciML/DifferentialEquations.jl' },
+];
+
 export const MAX_VISIBLE_CONTRIBUTIONS = 20;
+export const MAX_CONTRIBUTION_ENRICHMENTS = 8;
