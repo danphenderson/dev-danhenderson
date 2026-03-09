@@ -1,13 +1,13 @@
 ## Portfolio Correctness + Debt Cleanup + Component Refactor
 
 ### Summary- Deliver patches in 4 waves: critical correctness/privacy, GitHub reliability, cruft/performance cleanup, and component refactor.
-- Prioritize user-visible correctness first, then reliability, then maintainability and scalability.
+- Prioritize user-visible correctness first, then reliability, then maintainability and component abstraction.
 
 ### Key Changes
 - **Wave 1 (critical fixes)**
   - Replace timezone-sensitive date rendering in climbing with a UTC-safe formatter that preserves the source calendar date.
   - Normalize background image resolution so `PUBLIC_URL` is applied exactly once.
-  - Convert welcome audio flow to true opt-in: defer SoundCloud script+iframe creation until explicit user consent; persist consent choice.
+  - Defer SoundCloud script+iframe creation until explicit user consent; persist consent choice.
 - **Wave 2 (GitHub data quality/resilience)**
   - Restrict contribution repo extraction to contribution-like event types.
   - Add `fallbackGitHubContributions` in `src/data/cv.ts` and wire it into `useGithubProfile` initialization + error fallback.

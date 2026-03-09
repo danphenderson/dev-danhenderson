@@ -51,7 +51,7 @@ export default function Header() {
   const { mode, toggleTheme } = useAppTheme();
   const muiTheme = useMuiTheme();
   const location = useLocation();
-  const { isPlaying, pause, play, ready, showPauseHint, setShowPauseHint, showDarkModeHint, setShowDarkModeHint } =
+  const { isPlaying, pause, play, showPauseHint, setShowPauseHint, showDarkModeHint, setShowDarkModeHint } =
     useWelcomeAudio();
   const path = location.pathname.toLowerCase();
   const showAvatar = path.startsWith('/cv') || path.startsWith('/climbing') || path.startsWith('/photography');
@@ -207,7 +207,6 @@ export default function Header() {
                       }}
                       aria-label={isPlaying ? 'Pause welcome audio' : 'Play welcome audio'}
                       aria-describedby={showPauseHint ? 'pause-audio-popover' : undefined}
-                      disabled={!ready}
                       sx={{ mr: 0.625, ...pauseHighlightSx }}
                     >
                       {isPlaying ? <PauseCircleOutlineIcon sx={headerIconSx} /> : <PlayCircleOutlineIcon sx={headerIconSx} />}
