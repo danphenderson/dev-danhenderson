@@ -60,19 +60,19 @@ const createAppTheme = (mode: PaletteMode) =>
       },
       h4: {
         fontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'].join(','),
-        fontWeight: 650,
+        fontWeight: 600,
         fontSize: 'clamp(1.3rem, 2.1vw, 1.65rem)',
         lineHeight: 1.2,
       },
       h5: {
         fontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'].join(','),
-        fontWeight: 650,
+        fontWeight: 600,
         fontSize: '1.22rem',
         lineHeight: 1.25,
       },
       h6: {
         fontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'].join(','),
-        fontWeight: 650,
+        fontWeight: 600,
         fontSize: '1.06rem',
         lineHeight: 1.3,
       },

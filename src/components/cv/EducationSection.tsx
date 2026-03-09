@@ -9,7 +9,14 @@ type EducationSectionProps = {
 };
 
 export const EducationSection = ({ education }: EducationSectionProps) => {
-  const { detailBlockSx, getDetailListSx, sectionTitleSx } = useCvStyles();
+  const {
+    detailBlockSx,
+    educationMetaSx,
+    educationProgramSx,
+    getDetailListSx,
+    sectionTitleSx,
+    secondaryTextSx,
+  } = useCvStyles();
 
   if (!education.entries || education.entries.length === 0) {
     return null;
@@ -19,23 +26,23 @@ export const EducationSection = ({ education }: EducationSectionProps) => {
     <Stack spacing={2.25}>
       {education.entries.map((entry, index) => (
         <AnimatedContentCard key={`${entry.university}-${entry.program}-${index}`} delayMs={index * 90}>
-          <Typography variant="h6" fontWeight={700} sx={sectionTitleSx}>
+          <Typography variant="h6" sx={sectionTitleSx}>
             {entry.university}
           </Typography>
 
-          <Typography variant="subtitle1" sx={{ mt: 0.75 }}>
+          <Typography variant="subtitle1" sx={educationProgramSx}>
             {entry.program}
           </Typography>
 
           {(entry.status || entry.dateRange) && (
-            <Stack spacing={0.25} sx={{ mt: 0.5 }}>
+            <Stack spacing={0.25} sx={educationMetaSx}>
               {entry.status && (
-                <Typography variant="subtitle2" color="text.secondary">
+                <Typography variant="subtitle2" sx={secondaryTextSx}>
                   {entry.status}
                 </Typography>
               )}
               {entry.dateRange && (
-                <Typography variant="subtitle2" color="text.secondary">
+                <Typography variant="subtitle2" sx={secondaryTextSx}>
                   {entry.dateRange}
                 </Typography>
               )}

@@ -32,7 +32,7 @@ export const GitHubLinkChipList = ({
   stackSpacing = 0.5,
   wrapGap = 0.75,
 }: GitHubLinkChipListProps) => {
-  const { chipWrapperSx, getGitHubChipSx } = useCvStyles();
+  const { chipWrapperSx, getGitHubChipSx, getGitHubChipWrapSx } = useCvStyles();
   const customChipSx = Array.isArray(chipSx) ? chipSx : chipSx ? [chipSx] : [];
   const baseChipSx: SxProps<Theme> = getGitHubChipSx(layout);
 
@@ -58,7 +58,7 @@ export const GitHubLinkChipList = ({
 
   if (layout === 'wrap') {
     return (
-      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: wrapGap }}>
+      <Box sx={getGitHubChipWrapSx(wrapGap)}>
         {items.map(renderChip)}
       </Box>
     );

@@ -69,7 +69,7 @@ export default function Climbing() {
             A collection of routes I've remembered to tick on Mountain Project.
           </Typography>
           {error && (
-            <Alert severity="error" sx={{ mb: 1 }}>
+            <Alert severity="error" sx={appStyles.errorAlertSx}>
               {error}
             </Alert>
           )}
@@ -89,12 +89,12 @@ export default function Climbing() {
               loading={loading}
             />
           </Box>
-          <SectionHeading overline="Climbing" title="To-Do Routes" sx={{ mt: 2 }} />
+          <SectionHeading overline="Climbing" title="To-Do Routes" sx={appStyles.sectionHeadingOffsetSx} />
           <Typography variant="subtitle2" sx={appStyles.sectionLeadSx}>
             A collection of routes I'm interested in climbing
           </Typography>
           {todosError && (
-            <Alert severity="error" sx={{ mb: 1 }}>
+            <Alert severity="error" sx={appStyles.errorAlertSx}>
               {todosError}
             </Alert>
           )}

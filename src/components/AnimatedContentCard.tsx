@@ -1,5 +1,6 @@
 import { ElementType, useEffect, useRef, useState } from 'react';
 import { Box, Zoom } from '@mui/material';
+import { useAppStyles } from '../styles/appStyles';
 import { ContentCard, ContentCardProps } from './ContentCard';
 
 export const ANIMATED_CARD_BASE_DELAY_MS = 80;
@@ -38,6 +39,7 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
   rootMargin = DEFAULT_ROOT_MARGIN,
   ...props
 }: AnimatedContentCardProps<RootComponent>) => {
+  const appStyles = useAppStyles();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hasTriggered, setHasTriggered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -85,7 +87,7 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
 
   return (
     <Zoom in={isVisible} timeout={ANIMATED_CARD_DURATION_MS * ANIMATED_CARD_SPEED_MULTIPLIER}>
-      <Box ref={containerRef} sx={{ width: '100%' }}>
+      <Box ref={containerRef} sx={appStyles.animatedCardContainerSx}>
         <ContentCard {...props} />
       </Box>
     </Zoom>

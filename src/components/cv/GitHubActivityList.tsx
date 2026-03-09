@@ -1,6 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import type { GitHubActivityItem } from '../../data/cv';
 import { LoadingBars } from '../LoadingBars';
+import { useCvStyles } from '../../styles/cvStyles';
 import { GitHubLinkChipList } from './GitHubLinkChipList';
 
 type GitHubActivityListProps = {
@@ -20,6 +21,8 @@ export const GitHubActivityList = ({
   startDelayMs = 0,
   itemStaggerMs = defaultStaggerMs,
 }: GitHubActivityListProps) => {
+  const { secondaryTextSx } = useCvStyles();
+
   return (
     <Box>
       {loading ? (
@@ -38,7 +41,7 @@ export const GitHubActivityList = ({
         />
       )}
       {error && (
-        <Typography variant="caption" color="text.secondary">
+        <Typography variant="caption" sx={secondaryTextSx}>
           {error}
         </Typography>
       )}

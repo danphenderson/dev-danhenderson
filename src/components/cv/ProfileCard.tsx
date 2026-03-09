@@ -11,7 +11,15 @@ type ProfileCardProps = {
 };
 
 export const ProfileCard = ({ about, avatarSrc, linkedinUrl }: ProfileCardProps) => {
-  const { linkedinButtonSx, profileAvatarSx, secondaryStrongSx } = useCvStyles();
+  const {
+    linkedinButtonSx,
+    primaryTextSx,
+    profileAvatarSx,
+    profileBioSx,
+    profileNameRowSx,
+    secondaryStrongSx,
+    secondaryTextSx,
+  } = useCvStyles();
   const bioLink = about.bioLink;
   const bioText = about.bio;
   const bioLinkIndex = bioLink ? bioText.indexOf(bioLink.text) : -1;
@@ -39,8 +47,8 @@ export const ProfileCard = ({ about, avatarSrc, linkedinUrl }: ProfileCardProps)
         />
       )}
       <Stack spacing={0.75} width="100%">
-        <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" sx={{ rowGap: 0.5 }}>
-          <Typography variant="h4" sx={{ color: 'text.primary' }}>
+        <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" sx={profileNameRowSx}>
+          <Typography variant="h4" sx={primaryTextSx}>
             {about.name}
           </Typography>
           {linkedinUrl && (
@@ -64,10 +72,10 @@ export const ProfileCard = ({ about, avatarSrc, linkedinUrl }: ProfileCardProps)
           </Typography>
           {about.location && (
             <>
-              <Typography variant="subtitle2" color="text.secondary">
+              <Typography variant="subtitle2" sx={secondaryTextSx}>
                 •
               </Typography>
-              <Typography variant="subtitle2" color="text.secondary">
+              <Typography variant="subtitle2" sx={secondaryTextSx}>
                 {about.location}
               </Typography>
             </>
@@ -75,7 +83,7 @@ export const ProfileCard = ({ about, avatarSrc, linkedinUrl }: ProfileCardProps)
         </Stack>
       </Stack>
       {about.bio && (
-        <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+        <Typography variant="body2" sx={[primaryTextSx, profileBioSx]}>
           {bioContent}
         </Typography>
       )}

@@ -11,7 +11,13 @@ type VolunteeringListProps = {
 const volunteeringStaggerMs = 80;
 
 export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: VolunteeringListProps) => {
-  const { getDetailListSx, secondaryItalicSx, secondaryStrongSx, sectionTitleSx } = useCvStyles();
+  const {
+    getDetailListSx,
+    secondaryItalicSx,
+    secondaryStrongSx,
+    sectionTitleSx,
+    volunteeringMetaSx,
+  } = useCvStyles();
 
   if (volunteering.length === 0) {
     return null;
@@ -46,16 +52,16 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
                     {entry.organization}
                   </Link>
                 ) : (
-                  <Typography variant="h6" fontWeight={700} sx={sectionTitleSx}>
+                  <Typography variant="h6" sx={sectionTitleSx}>
                     {entry.organization}
                   </Typography>
                 )}
-                <Typography variant="subtitle1" sx={{ fontStyle: 'italic' }}>
+                <Typography variant="subtitle1" sx={secondaryItalicSx}>
                   {entry.role}
                 </Typography>
               </Box>
 
-              <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
+              <Box sx={volunteeringMetaSx}>
                 <Typography variant="subtitle2" sx={secondaryStrongSx}>
                   {entry.dateRange}
                 </Typography>

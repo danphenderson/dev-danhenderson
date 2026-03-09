@@ -24,10 +24,8 @@ export const PageFrame = ({
     <BackgroundPaper image={image} showShell={false}>
       <Box
         sx={[
-          {
-            ...appStyles.pageFrameContainerSx,
-            maxWidth,
-          },
+          appStyles.pageFrameContainerSx,
+          { maxWidth },
           ...sxArray,
         ]}
       >

@@ -21,7 +21,7 @@ export const SectionHeading = ({ overline, title, subtitle, sx, ...props }: Sect
         </Typography>
       )}
       {subtitle && (
-        <Typography variant="subtitle1" color="text.secondary" sx={sectionHeadingSubtitleSx}>
+        <Typography variant="subtitle1" sx={sectionHeadingSubtitleSx}>
           {subtitle}
         </Typography>
       )}

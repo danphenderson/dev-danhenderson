@@ -121,7 +121,7 @@ export default function CV() {
   return (
     <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
       <Grid container spacing={3} alignItems="stretch">
-        <Grid item xs={12} md={5} lg={4} sx={{ order: { xs: 2, md: 1 } }}>
+        <Grid item xs={12} md={5} lg={4} sx={appStyles.cvSidebarGridItemSx}>
           <Box sx={appStyles.cvSidebarPaneSx}>
             <CVSidebar
               sections={['about', 'github', 'certificates', 'tools']}
@@ -145,7 +145,7 @@ export default function CV() {
           </Box>
         </Grid>
 
-        <Grid item xs={12} md={7} lg={8} sx={{ order: { xs: 1, md: 2 } }}>
+        <Grid item xs={12} md={7} lg={8} sx={appStyles.cvMainGridItemSx}>
           <Box sx={appStyles.cvMainPaneSx}>
             <CVMainColumn
               sections={['experience', 'education', 'volunteering', 'coding']}

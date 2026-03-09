@@ -21,12 +21,15 @@ export const GitHubContributions = ({
   itemStaggerMs = 80,
 }: GitHubContributionsProps) => {
   const {
+    contributionCardBodySx,
     contributionCardMetaSx,
+    contributionCardMetaRowSx,
     contributionCardNameSx,
     contributionCardSx,
     contributionInlineLabelSx,
     contributionInlineMetaSx,
     contributionInlineNameSx,
+    secondaryTextSx,
   } = useCvStyles();
 
   if (loading) {
@@ -37,7 +40,7 @@ export const GitHubContributions = ({
 
   if (!contributions.length) {
     return (
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={secondaryTextSx}>
         No recent community contributions found. Showing personal projects below.
       </Typography>
     );
@@ -86,12 +89,12 @@ export const GitHubContributions = ({
           rel="noopener noreferrer"
           sx={contributionCardSx}
         >
-          <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Box sx={contributionCardBodySx}>
             <Typography variant="subtitle2" sx={contributionCardNameSx}>
               {project.name}
             </Typography>
           </Box>
-          <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexShrink: 0 }}>
+          <Stack direction="row" spacing={0.5} alignItems="center" sx={contributionCardMetaRowSx}>
             <Typography variant="body2" sx={contributionCardMetaSx}>
               ★ {project.stars ?? 0}
             </Typography>

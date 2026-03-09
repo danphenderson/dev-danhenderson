@@ -43,7 +43,7 @@ export default function Photography() {
               subtitle="A selection of field work, climbing days, and stargazing nights."
               sx={appStyles.compactSectionHeadingSx}
             />
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" sx={appStyles.secondaryTextSx}>
               {categories.length} albums
             </Typography>
             {isLoading && (
@@ -74,11 +74,11 @@ export default function Photography() {
                   />
                 </Box>
 
-                <Stack spacing={0.5} sx={{ flexGrow: 1 }}>
-                  <Typography variant="h6" sx={{ color: 'text.primary' }}>
+                <Stack spacing={0.5} sx={appStyles.photographyCardContentSx}>
+                  <Typography variant="h6" sx={appStyles.primaryTextSx}>
                     {card.name}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography variant="body2" sx={appStyles.secondaryTextSx}>
                     {card.description}
                   </Typography>
                 </Stack>

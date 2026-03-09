@@ -22,6 +22,10 @@ type ToolsAccordionProps = {
   children?: ReactNode;
 };
 
+const getToolsChipZoomStyle = (showTools: boolean, idx: number) => ({
+  transitionDelay: showTools ? `${idx * 30}ms` : '0ms',
+});
+
 export const ToolsAccordion = ({
   id: idProp,
   title = 'Common tools',
@@ -31,7 +35,8 @@ export const ToolsAccordion = ({
   defaultExpanded = true,
   children,
 }: ToolsAccordionProps) => {
-  const { getToolsAccordionSx, sectionTitleSx, toolsChipSx, toolsWrapSx } = useCvStyles();
+  const { fullWidthSx, getToolsAccordionSx, sectionTitleSx, secondaryTextSx, toolsChipSx, toolsWrapSx } =
+    useCvStyles();
   const fallbackId = useId();
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [showTools, setShowTools] = useState(defaultExpanded);
@@ -58,17 +63,17 @@ export const ToolsAccordion = ({
       sx={getToolsAccordionSx(dense)}
     >
       <AccordionSummary
-        expandIcon={<ExpandMoreIcon sx={{ color: 'text.secondary' }} />}
+        expandIcon={<ExpandMoreIcon sx={secondaryTextSx} />}
         aria-controls={detailsId}
         id={summaryId}
       >
-        <Stack spacing={0.25} sx={{ width: '100%' }}>
-          <Typography variant="subtitle2" fontWeight={700} sx={sectionTitleSx}>
+        <Stack spacing={0.25} sx={fullWidthSx}>
+          <Typography variant="subtitle2" sx={sectionTitleSx}>
             {title}
           </Typography>
 
           {!!subtitle && (
-            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+            <Typography variant="body2" sx={secondaryTextSx}>
               {subtitle}
             </Typography>
           )}
@@ -77,7 +82,7 @@ export const ToolsAccordion = ({
 
       <AccordionDetails id={detailsId} aria-labelledby={summaryId}>
         {children ? (
-          <Box sx={{ width: '100%' }}>{children}</Box>
+          <Box sx={fullWidthSx}>{children}</Box>
         ) : (
           <Box sx={toolsWrapSx}>
             {tools
@@ -86,7 +91,7 @@ export const ToolsAccordion = ({
                 <Zoom
                   key={`${tool}-${idx}`} // stable even if duplicates exist
                   in={showTools}
-                  style={{ transitionDelay: showTools ? `${idx * 30}ms` : '0ms' }}
+                  style={getToolsChipZoomStyle(showTools, idx)}
                 >
                   <Chip
                     label={tool}

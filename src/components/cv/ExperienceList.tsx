@@ -48,7 +48,14 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
 const experienceStaggerMs = 80;
 
 export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceListProps) => {
-  const { detailBlockSx, experienceIndustryChipSx, secondaryStrongSx, sectionTitleSx } = useCvStyles();
+  const {
+    detailBlockSx,
+    experienceDescriptionSx,
+    experienceIndustryChipSx,
+    secondaryStrongSx,
+    secondaryTextSx,
+    sectionTitleSx,
+  } = useCvStyles();
 
   return (
     <Stack spacing={2.25}>
@@ -67,7 +74,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
             >
               <Box>
                 <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                  <Typography variant="h6" fontWeight={700} sx={sectionTitleSx}>
+                  <Typography variant="h6" sx={sectionTitleSx}>
                     {experience.title}
                   </Typography>
                   {experience.industry && (
@@ -97,10 +104,10 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                       {experience.company}
                     </Typography>
                   )}
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" sx={secondaryTextSx}>
                     •
                   </Typography>
-                  <Typography variant="subtitle2" color="text.secondary">
+                  <Typography variant="subtitle2" sx={secondaryTextSx}>
                     {experience.startDate} - {experience.endDate}
                   </Typography>
                 </Stack>
@@ -108,7 +115,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
             </Stack>
           </Stack>
           {experience.description && (
-            <Typography variant="body2" sx={{ mt: 1 }}>
+            <Typography variant="body2" sx={experienceDescriptionSx}>
               {experience.description}
             </Typography>
           )}

@@ -51,11 +51,11 @@ export default function PhotographyCategory() {
               sx={appStyles.compactSectionHeadingSx}
             />
             {category ? (
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={appStyles.secondaryTextSx}>
                 {category.album.length} photos
               </Typography>
             ) : (
-              <Typography variant="body2" color="text.secondary">
+              <Typography variant="body2" sx={appStyles.secondaryTextSx}>
                 This album does not exist or has been moved.
               </Typography>
             )}

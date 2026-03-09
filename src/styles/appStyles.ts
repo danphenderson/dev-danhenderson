@@ -71,6 +71,30 @@ export const useAppStyles = () => {
       };
     };
 
+    const getLoadingBarSx = ({
+      height,
+      trackColor,
+      barColor,
+      animation,
+      animationDelay,
+    }: {
+      height: number;
+      trackColor: string;
+      barColor: string;
+      animation: string;
+      animationDelay: string;
+    }): SxProps<Theme> => ({
+      height,
+      borderRadius: 999,
+      backgroundColor: trackColor,
+      '& .MuiLinearProgress-bar': {
+        borderRadius: 999,
+        backgroundColor: barColor,
+        animation,
+        animationDelay,
+      },
+    });
+
     const pageFrameContainerSx: SxProps<Theme> = {
       mx: 'auto',
       px: { xs: 1.5, md: 3 },
@@ -91,6 +115,18 @@ export const useAppStyles = () => {
       display: 'flex',
       flexDirection: 'column',
       gap: 1.5,
+    };
+
+    const photographyCardContentSx: SxProps<Theme> = {
+      flexGrow: 1,
+    };
+
+    const primaryTextSx: SxProps<Theme> = {
+      color: 'text.primary',
+    };
+
+    const secondaryTextSx: SxProps<Theme> = {
+      color: 'text.secondary',
     };
 
     const quiltedImageItemSx: SxProps<Theme> = {
@@ -172,6 +208,12 @@ export const useAppStyles = () => {
       cvMainPaneSx: {
         p: { xs: 2.5, md: 3.5 },
       } satisfies SxProps<Theme>,
+      cvSidebarGridItemSx: {
+        order: { xs: 2, md: 1 },
+      } satisfies SxProps<Theme>,
+      cvMainGridItemSx: {
+        order: { xs: 1, md: 2 },
+      } satisfies SxProps<Theme>,
       homeHeroContentSx: { pb: 24.25 } satisfies SxProps<Theme>,
       homeHeroShellSx: { p: 1.5, pb: 0.5 } satisfies SxProps<Theme>,
       homeHeroTitleSx: {
@@ -225,8 +267,28 @@ export const useAppStyles = () => {
       getHeaderHighlightSx,
       inlineStartSx: { alignSelf: 'flex-start' } satisfies SxProps<Theme>,
       compactSectionHeadingSx: { mb: 0 } satisfies SxProps<Theme>,
+      sectionHeadingOffsetSx: { mt: 2 } satisfies SxProps<Theme>,
       sectionLoadingSx: { mt: 1 } satisfies SxProps<Theme>,
+      primaryTextSx,
+      secondaryTextSx,
+      footerTextSx: {
+        color: 'text.secondary',
+      } satisfies SxProps<Theme>,
+      hintPopoverPaperSx: {
+        p: 2,
+        maxWidth: 240,
+        borderRadius: 2,
+        boxShadow: 6,
+      } satisfies SxProps<Theme>,
+      hintPopoverTitleSx: {
+        fontWeight: 600,
+      } satisfies SxProps<Theme>,
+      hintPopoverBodySx: {
+        mt: 1,
+        mb: 2,
+      } satisfies SxProps<Theme>,
       photographyCardSx,
+      photographyCardContentSx,
       photographyMediaSx: {
         position: 'relative',
         borderRadius: 1.5,
@@ -247,8 +309,11 @@ export const useAppStyles = () => {
         color: 'text.secondary',
         fontWeight: 700,
       } satisfies SxProps<Theme>,
+      errorAlertSx: { mb: 1 } satisfies SxProps<Theme>,
       dataGridContainerSx: { width: '100%' } satisfies SxProps<Theme>,
       loadingOverlaySx: { width: '100%', p: 2 } satisfies SxProps<Theme>,
+      animatedCardContainerSx: { width: '100%' } satisfies SxProps<Theme>,
+      getLoadingBarSx,
       quiltedImageItemSx,
       photoDownloadButtonSx: {
         color: theme.palette.text.primary,

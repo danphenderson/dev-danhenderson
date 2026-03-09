@@ -39,6 +39,13 @@ The site is a React Router single-page app. Keep unknown-route rewrites, `PUBLIC
 - Create React App (`react-scripts`)
 - Node 20.x in CI
 
+## Component Hierarchy
+
+- `src/index.tsx` bootstraps the app and wraps it with `ThemeProvider` and `WelcomeAudioProvider`.
+- `src/App.tsx` owns `BrowserRouter`, the shared `Header` / `Footer`, and route registration.
+- Route pages compose shared layout primitives such as `BackgroundPaper`, `PageFrame`, and `SectionCard`.
+- `/cv` is split into reusable CV building blocks such as `CVSidebar`, `CVMainColumn`, `ProfileCard`, `ExperienceList`, and GitHub-backed sections.
+
 ## Local Development
 
 ### Prerequisites
@@ -121,13 +128,14 @@ GitHub Actions workflows live in `.github/workflows/`:
 └── README.md
 ```
 
-### Common maintenance tasks
+### Customization guide
 
-- Update CV copy, certificates, code examples, or GitHub fallback content in `src/data/cv.ts`.
-- Replace the downloadable resume PDF at `public/assets/daniel-henderson-resume.pdf` and keep related metadata aligned in `src/data/cv.ts`.
-- Update theme tokens and component overrides in `src/ThemeProvider.tsx`.
+- Update CV copy, certificates, code examples, and GitHub fallback content in `src/data/cv.ts`.
+- Replace the downloadable resume PDF at `public/assets/daniel-henderson-resume.pdf` and keep related metadata in `src/data/cv.ts` aligned with it.
+- Update app theme tokens and MUI component overrides in `src/ThemeProvider.tsx`.
+- Keep reusable page and CV styling centralized in `src/styles/appStyles.ts` and `src/styles/cvStyles.ts` rather than reintroducing component-local `sx` fragments.
 - Update welcome-audio behavior or track configuration in `src/WelcomeAudioProvider.tsx`.
-- When changing climbing or photography data, keep `useClimbingData` sorting assumptions and photography slug behavior intact.
+- When changing climbing or photography data, preserve `useClimbingData` sorting assumptions and photography slug stability.
 
 ## Deployment Notes
 

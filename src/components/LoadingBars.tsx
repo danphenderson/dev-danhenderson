@@ -1,6 +1,7 @@
 import { keyframes } from '@emotion/react';
 import { LinearProgress, Stack } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
+import { useAppStyles } from '../styles/appStyles';
 
 type LoadingBarsProps = {
   label?: string;
@@ -15,8 +16,10 @@ const pulse = keyframes`
 
 export const LoadingBars = ({ label = 'Loading', compact = false }: LoadingBarsProps) => {
   const theme = useTheme();
+  const appStyles = useAppStyles();
   const barHeight = compact ? 4 : 6;
   const barSpacing = compact ? 0.75 : 1;
+  const pulseAnimation = `${pulse} 1.6s ease-in-out infinite`;
   const bars = [
     { tone: 'primary', delay: 0 },
     { tone: 'secondary', delay: 200 },
@@ -35,17 +38,13 @@ export const LoadingBars = ({ label = 'Loading', compact = false }: LoadingBarsP
             variant="determinate"
             value={100}
             aria-hidden={true}
-            sx={{
+            sx={appStyles.getLoadingBarSx({
               height: barHeight,
-              borderRadius: 999,
-              backgroundColor: trackColor,
-              '& .MuiLinearProgress-bar': {
-                borderRadius: 999,
-                backgroundColor: palette.main,
-                animation: `${pulse} 1.6s ease-in-out infinite`,
-                animationDelay: `${bar.delay}ms`,
-              },
-            }}
+              trackColor,
+              barColor: palette.main,
+              animation: pulseAnimation,
+              animationDelay: `${bar.delay}ms`,
+            })}
           />
         );
       })}

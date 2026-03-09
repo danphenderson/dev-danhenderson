@@ -54,6 +54,12 @@ export const useCvStyles = () => {
       },
     });
 
+    const getGitHubChipWrapSx = (gap: number): SxProps<Theme> => ({
+      display: 'flex',
+      flexWrap: 'wrap',
+      gap,
+    });
+
     const getToolsAccordionSx = (dense: boolean): SxProps<Theme> => ({
       border: subtleBorder,
       backgroundColor: subtleSurface,
@@ -111,12 +117,16 @@ export const useCvStyles = () => {
         color: 'text.secondary',
         fontStyle: 'italic',
       } satisfies SxProps<Theme>,
+      secondaryTextSx: { color: 'text.secondary' } satisfies SxProps<Theme>,
       primaryTextSx: { color: 'text.primary' } satisfies SxProps<Theme>,
       sectionHeadingTitleSx: (subtitle?: string): SxProps<Theme> => ({
         mb: subtitle ? 1 : 2,
         color: 'text.primary',
       }),
-      sectionHeadingSubtitleSx: { mb: 2 } satisfies SxProps<Theme>,
+      sectionHeadingSubtitleSx: {
+        mb: 2,
+        color: 'text.secondary',
+      } satisfies SxProps<Theme>,
       sectionHeadingCompactSx: { mb: 0.5 } satisfies SxProps<Theme>,
       subtleBorder,
       subtleSurface,
@@ -137,7 +147,10 @@ export const useCvStyles = () => {
         width: '100%',
         ...cardResetSx,
       } satisfies SxProps<Theme>,
+      fullWidthSx: { width: '100%' } satisfies SxProps<Theme>,
       getGitHubChipSx,
+      getGitHubChipWrapSx,
+      profileNameRowSx: { rowGap: 0.5 } satisfies SxProps<Theme>,
       profileAvatarSx: {
         width: 96,
         height: 96,
@@ -145,14 +158,18 @@ export const useCvStyles = () => {
         border: `2px solid ${alpha(theme.palette.common.white, isLight ? 0.9 : 0.72)}`,
       } satisfies SxProps<Theme>,
       linkedinButtonSx: { color: accentColor } satisfies SxProps<Theme>,
+      profileBioSx: { whiteSpace: 'pre-line' } satisfies SxProps<Theme>,
       experienceIndustryChipSx: {
         borderColor: accentColor,
         color: 'text.primary',
         backgroundColor: accentTint,
         fontWeight: 600,
       } satisfies SxProps<Theme>,
+      experienceDescriptionSx: { mt: 1 } satisfies SxProps<Theme>,
       getDetailListSx,
       detailBlockSx: { mt: 1.5 } satisfies SxProps<Theme>,
+      educationProgramSx: { mt: 0.75 } satisfies SxProps<Theme>,
+      educationMetaSx: { mt: 0.5 } satisfies SxProps<Theme>,
       codingExampleLinkSx: {
         color: 'text.primary',
         textDecoration: 'none',
@@ -197,6 +214,13 @@ export const useCvStyles = () => {
         fontWeight: 600,
         color: 'text.secondary',
       } satisfies SxProps<Theme>,
+      contributionCardBodySx: {
+        flex: 1,
+        minWidth: 0,
+      } satisfies SxProps<Theme>,
+      contributionCardMetaRowSx: {
+        flexShrink: 0,
+      } satisfies SxProps<Theme>,
       contributionCardInsetSx: { p: { xs: 1.5, md: 2 } } satisfies SxProps<Theme>,
       githubCalendarContainerSx: {
         mt: 0.5,
@@ -234,6 +258,10 @@ export const useCvStyles = () => {
         gap: 0.75,
       } satisfies SxProps<Theme>,
       contentCardInsetSx: { p: { xs: 1.5, md: 2 } } satisfies SxProps<Theme>,
+      certificateActionSx: { mt: 1 } satisfies SxProps<Theme>,
+      volunteeringMetaSx: {
+        textAlign: { xs: 'left', sm: 'right' },
+      } satisfies SxProps<Theme>,
     };
   }, [theme]);
 };

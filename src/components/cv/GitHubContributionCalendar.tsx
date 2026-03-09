@@ -15,8 +15,14 @@ export const GitHubContributionCalendar = ({
   contained = true,
 }: GitHubContributionCalendarProps) => {
   const theme = useTheme();
-  const { accentColor, contentCardInsetSx, githubCalendarContainerSx, githubCalendarSizeSx, sectionTitleSx } =
-    useCvStyles();
+  const {
+    accentColor,
+    contentCardInsetSx,
+    githubCalendarContainerSx,
+    githubCalendarSizeSx,
+    sectionTitleSx,
+    secondaryTextSx,
+  } = useCvStyles();
 
   const calendarTheme = useMemo(
     () => {
@@ -47,7 +53,7 @@ export const GitHubContributionCalendar = ({
       <Typography variant="subtitle2" sx={sectionTitleSx}>
         Contribution calendar
       </Typography>
-      <Typography variant="body2" color="text.secondary">
+      <Typography variant="body2" sx={secondaryTextSx}>
         Yearly GitHub activity at a glance.
       </Typography>
       <Box sx={githubCalendarContainerSx}>

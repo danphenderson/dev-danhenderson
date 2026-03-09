@@ -42,7 +42,6 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
         >
           {showShell ? (
             <Paper
-              elevation={10}
               sx={[
                 appStyles.backgroundShellSx,
                 ...resolvedShellSx,
