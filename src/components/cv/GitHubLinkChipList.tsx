@@ -32,9 +32,10 @@ export const GitHubLinkChipList = ({
   stackSpacing = 0.5,
   wrapGap = 0.75,
 }: GitHubLinkChipListProps) => {
-  const { chipWrapperSx, getGitHubChipSx, getGitHubChipWrapSx } = useCvStyles();
+  const { cardResetSx, chipWrapperSx, getGitHubChipSx, getGitHubChipWrapSx } = useCvStyles();
   const customChipSx = Array.isArray(chipSx) ? chipSx : chipSx ? [chipSx] : [];
   const baseChipSx: SxProps<Theme> = getGitHubChipSx(layout);
+  const wrapperSx = layout === 'wrap' ? cardResetSx : chipWrapperSx;
 
   const renderChip = (item: GitHubLinkChipItem) => {
     const isLink = Boolean(item.href);
@@ -56,10 +57,21 @@ export const GitHubLinkChipList = ({
     );
   };
 
+  const renderAnimatedChip = (item: GitHubLinkChipItem, idx: number) => (
+    <AnimatedContentCard
+      key={item.key}
+      delayMs={startDelayMs + idx * itemStaggerMs}
+      sx={wrapperSx}
+      containerSx={layout === 'wrap' ? { width: 'auto' } : undefined}
+    >
+      {renderChip(item)}
+    </AnimatedContentCard>
+  );
+
   if (layout === 'wrap') {
     return (
       <Box sx={getGitHubChipWrapSx(wrapGap)}>
-        {items.map(renderChip)}
+        {items.map((item, idx) => (animateItems ? renderAnimatedChip(item, idx) : renderChip(item)))}
       </Box>
     );
   }
@@ -71,15 +83,7 @@ export const GitHubLinkChipList = ({
           return renderChip(item);
         }
 
-        return (
-          <AnimatedContentCard
-            key={item.key}
-            delayMs={startDelayMs + idx * itemStaggerMs}
-            sx={chipWrapperSx}
-          >
-            {renderChip(item)}
-          </AnimatedContentCard>
-        );
+        return renderAnimatedChip(item, idx);
       })}
     </Stack>
   );

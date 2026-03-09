@@ -1,6 +1,7 @@
 import { keyframes } from '@emotion/react';
 import { LinearProgress, Stack } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useAppStyles } from '../styles/appStyles';
 
 type LoadingBarsProps = {
@@ -16,10 +17,11 @@ const pulse = keyframes`
 
 export const LoadingBars = ({ label = 'Loading', compact = false }: LoadingBarsProps) => {
   const theme = useTheme();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const appStyles = useAppStyles();
   const barHeight = compact ? 4 : 6;
   const barSpacing = compact ? 0.75 : 1;
-  const pulseAnimation = `${pulse} 1.6s ease-in-out infinite`;
+  const pulseAnimation = prefersReducedMotion ? 'none' : `${pulse} 1.6s ease-in-out infinite`;
   const bars = [
     { tone: 'primary', delay: 0 },
     { tone: 'secondary', delay: 200 },
@@ -43,7 +45,7 @@ export const LoadingBars = ({ label = 'Loading', compact = false }: LoadingBarsP
               trackColor,
               barColor: palette.main,
               animation: pulseAnimation,
-              animationDelay: `${bar.delay}ms`,
+              animationDelay: prefersReducedMotion ? '0ms' : `${bar.delay}ms`,
             })}
           />
         );

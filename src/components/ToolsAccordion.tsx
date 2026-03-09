@@ -10,6 +10,7 @@ import {
   Typography,
   Zoom,
 } from '@mui/material';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useCvStyles } from '../styles/cvStyles';
 
 type ToolsAccordionProps = {
@@ -22,8 +23,8 @@ type ToolsAccordionProps = {
   children?: ReactNode;
 };
 
-const getToolsChipZoomStyle = (showTools: boolean, idx: number) => ({
-  transitionDelay: showTools ? `${idx * 30}ms` : '0ms',
+const getToolsChipZoomStyle = (expanded: boolean, idx: number) => ({
+  transitionDelay: expanded ? `${idx * 20}ms` : '0ms',
 });
 
 export const ToolsAccordion = ({
@@ -37,16 +38,15 @@ export const ToolsAccordion = ({
 }: ToolsAccordionProps) => {
   const { fullWidthSx, getToolsAccordionSx, sectionTitleSx, secondaryTextSx, toolsChipSx, toolsWrapSx } =
     useCvStyles();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const fallbackId = useId();
   const [expanded, setExpanded] = useState(defaultExpanded);
-  const [showTools, setShowTools] = useState(defaultExpanded);
   const accordionId = idProp ?? fallbackId;
   const summaryId = `${accordionId}-header`;
   const detailsId = `${accordionId}-content`;
 
   useEffect(() => {
     setExpanded(defaultExpanded);
-    setShowTools(defaultExpanded);
   }, [defaultExpanded]);
 
   return (
@@ -55,11 +55,6 @@ export const ToolsAccordion = ({
       elevation={0}
       expanded={expanded}
       onChange={(_, nextExpanded) => setExpanded(nextExpanded)}
-      TransitionProps={{
-        onEntering: () => setShowTools(false),
-        onEntered: () => setShowTools(true),
-        onExit: () => setShowTools(false),
-      }}
       sx={getToolsAccordionSx(dense)}
     >
       <AccordionSummary
@@ -87,20 +82,32 @@ export const ToolsAccordion = ({
           <Box sx={toolsWrapSx}>
             {tools
               .filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
-              .map((tool, idx) => (
-                <Zoom
-                  key={`${tool}-${idx}`} // stable even if duplicates exist
-                  in={showTools}
-                  style={getToolsChipZoomStyle(showTools, idx)}
-                >
+              .map((tool, idx) => {
+                const chip = (
                   <Chip
+                    key={`${tool}-${idx}`}
                     label={tool}
                     size={dense ? 'small' : 'medium'}
                     variant="outlined"
                     sx={toolsChipSx}
                   />
-                </Zoom>
-              ))}
+                );
+
+                if (prefersReducedMotion) {
+                  return chip;
+                }
+
+                return (
+                  <Zoom
+                    key={`${tool}-${idx}`}
+                    in={expanded}
+                    appear={false}
+                    style={getToolsChipZoomStyle(expanded, idx)}
+                  >
+                    {chip}
+                  </Zoom>
+                );
+              })}
           </Box>
         )}
       </AccordionDetails>

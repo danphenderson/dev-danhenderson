@@ -1,7 +1,6 @@
 import { Box, Button, Grid, Stack } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme as useMuiTheme } from '@mui/material/styles';
-import { ANIMATED_CARD_DURATION_MS } from '../components/AnimatedContentCard';
 import { CVMainColumn } from '../components/cv/CVMainColumn';
 import { CVSidebar } from '../components/cv/CVSidebar';
 import { PageFrame } from '../components/layout/PageFrame';
@@ -26,8 +25,8 @@ export default function CV() {
   const { activity, projects, contributions, loading, error } = useGithubProfile();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
-  const nestedDelayOffsetMs = 160;
-  const experienceItemsDelayMs = ANIMATED_CARD_DURATION_MS + nestedDelayOffsetMs;
+  const githubNestedDelayOffsetMs = 40;
+  const experienceItemsDelayMs = 120;
 
   const resumeDownloadAction = (
     <Box
@@ -88,6 +87,7 @@ export default function CV() {
             error={error}
             certificates={certificates}
             stackAndTools={stackAndTools}
+            githubNestedDelayOffsetMs={githubNestedDelayOffsetMs}
             githubProjectTitle="Public Projects"
           />
 
@@ -136,10 +136,10 @@ export default function CV() {
               certificates={certificates}
               stackAndTools={stackAndTools}
               aboutDelayMs={0}
-              githubDelayMs={120}
-              certificatesDelayMs={240}
-              toolsDelayMs={360}
-              githubNestedDelayOffsetMs={120}
+              githubDelayMs={80}
+              certificatesDelayMs={160}
+              toolsDelayMs={240}
+              githubNestedDelayOffsetMs={githubNestedDelayOffsetMs}
               githubProjectTitle="Projects"
             />
           </Box>
@@ -154,9 +154,9 @@ export default function CV() {
               volunteering={volunteering}
               codingExamples={codingExamples}
               experienceDelayMs={0}
-              educationDelayMs={120}
-              volunteeringDelayMs={240}
-              codingDelayMs={360}
+              educationDelayMs={80}
+              volunteeringDelayMs={160}
+              codingDelayMs={240}
               experienceItemsDelayMs={experienceItemsDelayMs}
               volunteeringItemsDelayMs={experienceItemsDelayMs}
               spacing={3.5}
