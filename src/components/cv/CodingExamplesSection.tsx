@@ -1,7 +1,7 @@
 import { Stack, Typography } from '@mui/material';
 import type { CodingExample } from '../../data/cv';
 import { AnimatedContentCard } from '../AnimatedContentCard';
-import { useCvStyles } from '../../ThemeProvider';
+import { useCvStyles } from '../../styles/cvTheme';
 
 type CodingExamplesSectionProps = {
   examples: CodingExample[];

@@ -1,7 +1,7 @@
 import { Box, Chip, Link, Stack, Typography } from '@mui/material';
 import type { Experience, ExperienceProject } from '../../data/cv';
 import { AnimatedContentCard } from '../AnimatedContentCard';
-import { useCvStyles } from '../../ThemeProvider';
+import { useCvStyles } from '../../styles/cvTheme';
 import { ToolsAccordion } from '../ToolsAccordion';
 
 type ExperienceListProps = {

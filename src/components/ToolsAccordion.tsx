@@ -10,7 +10,7 @@ import {
   Typography,
   Zoom,
 } from '@mui/material';
-import { useCvStyles } from '../ThemeProvider';
+import { useCvStyles } from '../styles/cvTheme';
 
 type ToolsAccordionProps = {
   id?: string;
