@@ -17,8 +17,8 @@ jest.mock('../AnimatedContentCard', () => ({
   ),
 }));
 
-jest.mock('../ToolsAccordion', () => ({
-  ToolsAccordion: ({ title }: { title: string }) => <div data-testid="tools-accordion">{title}</div>,
+jest.mock('../SkillsAccordion', () => ({
+  SkillsAccordion: ({ title }: { title: string }) => <div data-testid="skills-accordion">{title}</div>,
 }));
 
 describe('StackAndToolsSection', () => {
@@ -38,7 +38,7 @@ describe('StackAndToolsSection', () => {
     expect(screen.getByText('Stack & Tools')).toBeInTheDocument();
     expect(screen.getAllByTestId('animated-content-item')[0]).toHaveAttribute('data-delay', '120');
     expect(screen.getAllByTestId('animated-content-item')[1]).toHaveAttribute('data-delay', '200');
-    expect(screen.getAllByTestId('tools-accordion')).toHaveLength(2);
+    expect(screen.getAllByTestId('skills-accordion')).toHaveLength(2);
     expect(screen.getByText('Languages')).toBeInTheDocument();
     expect(screen.getByText('Cloud')).toBeInTheDocument();
   });

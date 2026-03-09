@@ -83,7 +83,7 @@ export const useCvStyles = () => {
       transitionDelay: `${delayMs}ms`,
     });
 
-    const getToolsAccordionSx = (dense: boolean): SxProps<Theme> => ({
+    const getSkillsAccordionSx = (dense: boolean): SxProps<Theme> => ({
       border: subtleBorder,
       backgroundColor: subtleSurface,
       borderRadius: 2,
@@ -273,14 +273,14 @@ export const useCvStyles = () => {
         },
       } satisfies SxProps<Theme>,
       githubCalendarSizeSx: { width: '100%', minHeight: 140 } satisfies SxProps<Theme>,
-      getToolsAccordionSx,
-      toolsChipSx: {
+      getSkillsAccordionSx,
+      skillsChipSx: {
         border: subtleBorder,
         backgroundColor: subtleSurface,
         fontWeight: 500,
         color: 'text.primary',
       } satisfies SxProps<Theme>,
-      toolsWrapSx: {
+      skillsWrapSx: {
         display: 'flex',
         flexWrap: 'wrap',
         gap: 0.75,

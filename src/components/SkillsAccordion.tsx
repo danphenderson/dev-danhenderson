@@ -12,26 +12,26 @@ import {
 import { AnimatedZoomList } from './AnimatedZoomList';
 import { useCvStyles } from '../styles/cvStyles';
 
-type ToolsAccordionProps = {
+type SkillsAccordionProps = {
   id?: string;
   title?: string;
   subtitle?: string;
-  tools?: string[]; // allow undefined safely
+  skills?: string[]; // allow undefined safely
   dense?: boolean;
   defaultExpanded?: boolean;
   children?: ReactNode;
 };
 
-export const ToolsAccordion = ({
+export const SkillsAccordion = ({
   id: idProp,
-  title = 'Common tools',
+  title = 'Common skills',
   subtitle = 'Frequently used across roles and projects.',
-  tools = [],
+  skills = [],
   dense = false,
   defaultExpanded = true,
   children,
-}: ToolsAccordionProps) => {
-  const { fullWidthSx, getToolsAccordionSx, sectionTitleSx, secondaryTextSx, toolsChipSx, toolsWrapSx } =
+}: SkillsAccordionProps) => {
+  const { fullWidthSx, getSkillsAccordionSx, sectionTitleSx, secondaryTextSx, skillsChipSx, skillsWrapSx } =
     useCvStyles();
   const fallbackId = useId();
   const [expanded, setExpanded] = useState(defaultExpanded);
@@ -49,7 +49,7 @@ export const ToolsAccordion = ({
       elevation={0}
       expanded={expanded}
       onChange={(_, nextExpanded) => setExpanded(nextExpanded)}
-      sx={getToolsAccordionSx(dense)}
+      sx={getSkillsAccordionSx(dense)}
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon sx={secondaryTextSx} />}
@@ -74,17 +74,17 @@ export const ToolsAccordion = ({
           <Box sx={fullWidthSx}>{children}</Box>
         ) : (
           <AnimatedZoomList
-            items={tools.filter((t): t is string => typeof t === 'string' && t.trim().length > 0)}
-            getItemKey={(tool, idx) => `${tool}-${idx}`}
+            items={skills.filter((s): s is string => typeof s === 'string' && s.trim().length > 0)}
+            getItemKey={(skill, idx) => `${skill}-${idx}`}
             in={expanded}
-            containerSx={toolsWrapSx}
-            renderItem={(tool, idx) => (
+            containerSx={skillsWrapSx}
+            renderItem={(skill, idx) => (
               <Chip
-                key={`${tool}-${idx}`}
-                label={tool}
+                key={`${skill}-${idx}`}
+                label={skill}
                 size={dense ? 'small' : 'medium'}
                 variant="outlined"
-                sx={toolsChipSx}
+                sx={skillsChipSx}
               />
             )}
           />

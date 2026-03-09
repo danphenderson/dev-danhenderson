@@ -2,7 +2,7 @@ import { Box, Chip, Link, Stack, Typography } from '@mui/material';
 import type { Experience, ExperienceProject } from '../../data/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { useCvStyles } from '../../styles/cvStyles';
-import { ToolsAccordion } from '../ToolsAccordion';
+import { SkillsAccordion } from '../SkillsAccordion';
 
 type ExperienceListProps = {
   experiences: Experience[];
@@ -120,7 +120,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
           )}
           {experience.projects?.length ? (
             <Box sx={detailBlockSx}>
-              <ToolsAccordion
+              <SkillsAccordion
                 id={`experience-projects-${index}`}
                 title="Details"
                 subtitle=""
@@ -128,16 +128,16 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                 defaultExpanded={false}
               >
                 <ExperienceProjects projects={experience.projects} />
-              </ToolsAccordion>
+              </SkillsAccordion>
             </Box>
           ) : null}
-          {experience.tools?.filter((tool) => tool.trim().length > 0).length ? (
+          {experience.skills?.filter((tool) => tool.trim().length > 0).length ? (
             <Box sx={detailBlockSx}>
-              <ToolsAccordion
+              <SkillsAccordion
                 id={`experience-tools-${index}`}
-                title="Tools used"
+                title="Skills"
                 subtitle=""
-                tools={experience.tools}
+                skills={experience.skills}
                 dense
                 defaultExpanded={false}
               />

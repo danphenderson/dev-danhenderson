@@ -48,7 +48,7 @@ export type Experience = {
   impactHighlights?: string[];
   description?: string;
   projects?: ExperienceProject[];
-  tools?: string[];
+  skills?: string[];
 };
 
 export type EducationInfo = {
@@ -61,7 +61,7 @@ export type EducationEntry = {
   status?: string;
   dateRange?: string;
   highlights?: string[];
-  tools?: string[];
+  skills?: string[];
 };
 
 export type VolunteeringEntry = {
@@ -99,7 +99,7 @@ Former data scientist and data pipeline engineer who built ingestion, analytics,
 
 Open-source contributions spanning Julia documentation, Microsoft Playwright, Data Build Tool community plugins, and scientific-computing libraries.
 
-Seeking employment opportunities at the intersection of systems and production software (scientific computing, data platforms, ML/AI engineering).`,
+Open to opportunities at the intersection of systems and production software (scientific computing, data platforms, ML/AI engineering).`,
 };
 
 export const codingExamples: CodingExample[] = [
@@ -169,14 +169,13 @@ export const experiences: Experience[] = [
     startDate: 'May 2025',
     endDate: 'Current',
     description:
-      `Advisor: Jiguang Sun (Department of Mathematical Sciences).
-      Researching macrocirculatory blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.`,
+      `Researching macrocirculatory blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches. Advisor: Jiguang Sun, Department of Mathematical Sciences.`,
     projects: [
       'Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).',
       'Derived and analyzed Navier–Stokes formulations for blood (including Newtonian and generalized-Newtonian viscosity models), documenting the kinematic roles of Reynolds/Womersley numbers and related nondimensional parameters.',
       'Scoped numerical pathways from dimension-reduced 1D/2D flow simulations incorporating fluid-structure interaction models toward PINNs/DeepONets.',
     ],
-    tools: ['LaTeX', 'Julia', 'Python', 'Overleaf', 'PyTorch', 'DeepXDE']
+    skills: ['Research', 'Computational Fluid Dynamics', 'Julia', 'Python', 'PyTorch', 'DeepXDE', 'SciML', 'SciPy', 'LaTeX', 'Overleaf + GitHub', 'Visual Studio Code', 'Shells, REPLs, and Notebooks'],
   },
   {
     company: 'Michigan Technological University',
@@ -187,12 +186,13 @@ export const experiences: Experience[] = [
     endDate: 'May 2025 (5 mos)',
     description: 'Department of Mathematical Sciences Graduate Teaching Assistantship',
     projects: [
-      'Taught a 4-credit undergraduate mathematics section, including recorded lectures, assessments, grading, office hours, and course administration.',
-      'Coordinated content, rubrics, and student support with supervising faculty and peer instructors to keep sections aligned.',
-      'Authored Mathematica walkthroughs that reinforced conceptual understanding and computational fluency.',
-      'Earned a 4.8/5.0 average student evaluation score at a 58% response rate.',
+      'Taught a 4-credit undergraduate mathematics section, delivering recorded lectures, proctoring exams, holding office hours, and managing grading and day-to-day course operations.',
+      'Delivered lecture material consistently and on schedule, maintaining alignment with the course coordinator’s instructional plan.',
+      'Coordinated content, rubrics, and student support across recitations with supervising faculty and peer instructors to maintain consistency across sections.',
+      'Developed Mathematica notebook walkthroughs that reinforced conceptual understanding and computational fluency.',
+      'Earned a 4.8/5.0 average student evaluation score with a 58% response rate, above the university average.',
     ],
-    tools: ['Mathematica', 'Gradescope', 'Canvas', 'Panapto', 'Zoom', 'HTML'],
+    skills: ['University Teaching', 'Canvas', 'Gradescope', 'Panapto', 'Zoom', 'Mathematica', 'HTML'],
   },
   {
     company: 'Michigan Technological University',
@@ -207,7 +207,7 @@ export const experiences: Experience[] = [
       'Managed grading and individualized feedback for an assigned section through Gradescope and office hours.',
       'Helped design rubrics so assessment remained consistent across sections.',
     ],
-    tools: ['Gradescope', 'Canvas', 'Mathematica'],
+    skills: ['University Teaching Training', 'Gradescope', 'Canvas'],
   },
   {
     company: 'Lucerna Health',
@@ -228,7 +228,7 @@ export const experiences: Experience[] = [
       "Processed AWS CloudTrail logs into Parquet and built a dashboard to support security analytics and HITRUST compliance.",
       "Supported hiring and onboarding during an organizational transition, including new engineering and data leadership and interns.",
     ],
-    tools: [
+    skills: [
       'AWS: EC2, S3, SNS, SQS, Cloudformation, Cloudtrail, Cloudwatch, Lambda, Glue (& Glue Data Catalog), EMR, Redshift, RDS, Athena, Quicksight', 'Python', 'PySpark', 'Jupyter', 'DBT (Data Build Tool)', 'GitHub Enterprise', 'Docker',
       'Sentry', 'Slack', 'SonarCloud', 'Django', 'OpenAPI/Swagger', 'Jupyter', 'DBeaver', 'Postman', 'Visual Studio Code',
     ],
@@ -239,7 +239,7 @@ export const experiences: Experience[] = [
     industry: 'HealthTech',
     title: 'Data Scientist | Contract',
     startDate: 'Nov 2021',
-    endDate: 'Apr 2022 (5 mos)',
+    endDate: 'Apr 2022 (6 mos)',
     description:
       'Contributor to production ML and analytics layers of a multi-tenant cloud health data platform.',
     projects: [
@@ -250,7 +250,7 @@ export const experiences: Experience[] = [
       'Supported restricted offshore data engineers with deployments, code review, ETL troubleshooting, and unit tests to accelerate delivery.',
       'Migrated patient electronic medical record data from a client system into the platform, supporting schema mapping, ingestion, and validation.'
     ],
-    tools: ['AWS', 'Python', 'Jupyter', 'DBT (Data Build Tool)', 'Bitbucket', 'SciPy', 'PySpark', 'Visual Studio Code', 'DBeaver', 'Slack', 'Sentry', 'Slack', 'Jira', 'Confluence', 'Lucidchart'],
+    skills: ['AWS', 'Python', 'Jupyter', 'DBT (Data Build Tool)', 'Bitbucket', 'SciPy', 'PySpark', 'Visual Studio Code', 'DBeaver', 'Slack', 'Sentry', 'Slack', 'Jira', 'Confluence', 'Lucidchart'],
   },
   {
     company: 'Michigan Technological University',
@@ -258,8 +258,8 @@ export const experiences: Experience[] = [
     industry: 'Higher Education',
     title: 'Research Assistant | Full Time',
     startDate: 'May 2021',
-    endDate: 'Nov 2021 (5 mos)',
-    description: 'Contributor to quasi-Newton optimization research (Azzam, Henderson, Ong, Struthers; 2022).',
+    endDate: 'Nov 2021 (7 mos)',
+    description: 'Contributor to quasi-Newton optimization research (Azzam, Henderson, Ong, Struthers; 2022), led numerical experiments.',
     projects: [
       '2022, Azzam J, Henderson D, Ong BW, and Struthers AA, Quasi-Newton Optimization with Hessian Samples',
       'Built BlockOpt.jl, an open-source Julia implementation of the paper’s trust-region quasi-Newton methods.',
@@ -270,7 +270,7 @@ export const experiences: Experience[] = [
       { text: 'Repository (BlockOpt.jl):', link: 'https://github.com/danphenderson/BlockOpt.jl' },
       { text: 'Repository (UncNLPrograms.jl):', link: 'https://github.com/danphenderson/UncNLPrograms.jl' },
     ],
-    tools: ['Julia', 'ForwardDiff.jl', 'CUTEst', 'LaTeX', 'TRS.jl', 'Mathematica', 'Overleaf'],
+    skills: ['Research', 'Julia', 'ForwardDiff.jl', 'CUTEst', 'LaTeX', 'TRS.jl', 'Mathematica', 'Overleaf'],
   },
   {
     company: 'Michigan Technological University',
@@ -281,21 +281,21 @@ export const experiences: Experience[] = [
     endDate: 'May 2018 (2 yrs 9 mos)',
     description: 'Tutor to NCAA student-athletes in calculus (I, II, & III), ordinary differential equations, and linear algebra.',
     projects: [],
-    tools: ['Mathematica']
+    skills: ['Teaching', 'Mathematica']
   },
     {
     company: 'Various Locations',
     companyUrl: mtuMathGraduateUrl,
     industry: 'Retail & Service',
     title: 'Bike Mechanic & Service Technician',
-    startDate: '2012',
+    startDate: 'Various Periods Starting 2012',
     endDate: 'Aug 2024',
     description: 'Worked full-time and part-time at bike and ski shops in Arizona, Michigan, Utah, & Washington.',
     projects: ['Diagnosed and serviced mechanical issues across customer and rental bicycles with consistent turnaround and quality.',
       'Managed end-to-end service and sale workflows in retail and rental environments, including intake, triage, repair prioritization, point-of-sale transactions, rental check-in/check-out, and insurance claim support.',
       'Applied structured troubleshooting and clear customer communication to recommend repairs, explain technical issues, and improve rider safety, equipment reliability, and overall service experience.'
     ],
-    tools: ['Mathematica']
+    skills: ['Lightspeed', 'Customer Service']
   },
 ];
 
@@ -311,7 +311,7 @@ export const educationInfo: EducationInfo = {
         'Submissions to Numerical Analysis: A Graduate Course errata, improving correctness and clarity in the text.',
         "Coursework: Linear Algebra, Numerical Optimization, Error-Correcting Codes, Theoretical Numerical Analysis, Ordinary Differential Equations, Partial Differential Equations, Numerical Methods for PDEs, Discontinuous Galerkin Methods, Teaching College Mathematics"
       ],
-      tools: ['LaTeX', 'Julia', 'Python', 'Mathematica', 'Overleaf', 'Visual Studio Code'],
+      skills: ['LaTeX', 'Julia', 'Python', 'Mathematica', 'Overleaf', 'Visual Studio Code'],
     },
     {
       university: 'Michigan Technological University',
@@ -328,7 +328,7 @@ export const educationInfo: EducationInfo = {
         'Certificate of Merit for Outstanding Academic Achievement in Calculus II with Technology, Mathematical Sciences Department',
         "Relevant Coursework: Scientific Computing, Programming at Software & Hardware interface, Data Structures, Formal Models of Computation, Artificial Intelligence, Concurrent Computing, Optimization & Graph Algorithms, Team Software Project, Real Analysis (I & II), Abstract Algebra, Complex Analysis, Linear Algebra, Numerical Linear Algebra, Ordinary Differential Equations, Partial Differential Equations (PDEs), Numerical Methods for PDEs, Nonlinear Dynamics and Chaos, Combinatorics, Probability, Statistics (I & II), Regression Analysis, History of Mathematics"
       ],
-      tools: ['Java', 'C', 'C++', 'Python', 'Matlab', 'Mathematica', 'SQL', 'Assembly (MIPS)'],
+      skills: ['Java', 'C', 'C++', 'Python', 'Matlab', 'Mathematica', 'SQL', 'Assembly (MIPS)'],
     },
   ],
 };

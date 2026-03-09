@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from '@mui/material';
 import type { EducationInfo } from '../../data/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
-import { ToolsAccordion } from '../ToolsAccordion';
+import { SkillsAccordion } from '../SkillsAccordion';
 import { useCvStyles } from '../../styles/cvStyles';
 
 type EducationSectionProps = {
@@ -66,13 +66,13 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
             </Box>
           ) : null}
 
-          {entry.tools?.filter((tool) => tool.trim().length > 0).length ? (
+          {entry.skills?.filter((tool) => tool.trim().length > 0).length ? (
             <Box sx={detailBlockSx}>
-              <ToolsAccordion
+              <SkillsAccordion
                 id={`education-tools-${index}`}
-                title="Tools used"
+                title="Skills"
                 subtitle=""
-                tools={entry.tools}
+                skills={entry.skills}
                 dense
                 defaultExpanded={false}
               />

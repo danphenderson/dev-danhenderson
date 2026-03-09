@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../ThemeProvider';
-import { ToolsAccordion } from './ToolsAccordion';
+import { SkillsAccordion } from './SkillsAccordion';
 
 jest.mock('@mui/material', () => {
   const actual = jest.requireActual('@mui/material');
@@ -39,7 +39,7 @@ const setReducedMotionPreference = (matches: boolean) => {
   }));
 };
 
-describe('ToolsAccordion', () => {
+describe('SkillsAccordion', () => {
   afterEach(() => {
     window.matchMedia = defaultMatchMedia;
     jest.clearAllMocks();
@@ -50,7 +50,7 @@ describe('ToolsAccordion', () => {
 
     render(
       <ThemeProvider>
-        <ToolsAccordion title="Toolkit" tools={['React', 'TypeScript']} defaultExpanded={false} />
+        <SkillsAccordion title="Toolkit" skills={['React', 'TypeScript']} defaultExpanded={false} />
       </ThemeProvider>
     );
 
@@ -67,7 +67,7 @@ describe('ToolsAccordion', () => {
 
     render(
       <ThemeProvider>
-        <ToolsAccordion title="Toolkit" tools={['React', 'TypeScript']} defaultExpanded={false} />
+        <SkillsAccordion title="Toolkit" skills={['React', 'TypeScript']} defaultExpanded={false} />
       </ThemeProvider>
     );
 

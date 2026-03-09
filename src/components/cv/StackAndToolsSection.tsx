@@ -2,7 +2,7 @@ import { Stack } from '@mui/material';
 import type { StackSection } from '../../data/cv';
 import { useCvStyles } from '../../styles/cvStyles';
 import { AnimatedContentList } from '../AnimatedContentList';
-import { ToolsAccordion } from '../ToolsAccordion';
+import { SkillsAccordion } from '../SkillsAccordion';
 import { SectionHeading } from './SectionHeading';
 
 type StackAndToolsSectionProps = {
@@ -26,10 +26,10 @@ export const StackAndToolsSection = ({
         startDelayMs={startDelayMs}
         stackSpacing={2}
         renderItem={(section) => (
-          <ToolsAccordion
+          <SkillsAccordion
             title={section.title}
             subtitle=""
-            tools={section.items}
+            skills={section.items}
             dense
             defaultExpanded={false}
           />
