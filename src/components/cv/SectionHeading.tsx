@@ -1,5 +1,5 @@
 import { Box, BoxProps, Typography } from '@mui/material';
-import { useCvStyles } from '../../ThemeProvider';
+import { useCvStyles } from '../../styles/cvTheme';
 
 type SectionHeadingProps = BoxProps & {
   overline: string;

@@ -2,6 +2,8 @@ export const assetBasePath = process.env.PUBLIC_URL || '';
 
 export const avatar = `${assetBasePath}/assets/home.jpg`;
 export const cvBackgroundImage = `${assetBasePath}/assets/photography/landscape/landscape-tieton-south-fork-3.jpg`;
+export const resumePdfUrl = `${assetBasePath}/assets/daniel-henderson-resume.pdf`;
+export const resumeDownloadFilename = 'Daniel-Henderson-Resume.pdf';
 
 export const githubUsername = 'danphenderson';
 export const githubProfileUrl = 'https://github.com/danphenderson';
@@ -43,6 +45,7 @@ export type Experience = {
   title: string;
   startDate: string;
   endDate: string;
+  impactHighlights?: string[];
   description?: string;
   projects?: ExperienceProject[];
   tools?: string[];
@@ -74,51 +77,62 @@ export const aboutMe: AboutMe = {
   name: 'Daniel Henderson',
   title: 'Software Engineer',
   email: 'me@danhenderson.dev',
-  phone: '906-281-7641',
+  phone: '',
   location: 'Seattle, WA',
   bioLink: {
-    text: 'Applied/Computational Math PhD student',
+    text: 'M.S. Mathematics student in the applied/computational track (expected Aug 2026)',
     url: mtuMathGraduateUrl,
   },
-  bio: `Applied/Computational Math PhD student (M.S. expected Spring 2026) focused on performance-critical scientific software and data systems.
+  bio:
+`M.S. Mathematics student in the applied/computational track (expected Aug 2026) researching macrocirculatory hemodynamics.
 
-Ex–Lucerna Health data scientist/pipeline engineer: built cloud-native ingestion + analytics infrastructure that boosted throughput 50%+ and reduced compute costs.
+Former data scientist and data pipeline engineer who built ingestion, analytics, and machine-learning solutions for a healthcare data platform.
 
-Research: numerical methods for differential equations in hemodynamics; additional work in smooth optimization and benchmarking across Julia, Python, and C.
+Open-source contributions spanning Julia documentation, Microsoft Playwright, Data Build Tool community plugins, and scientific-computing libraries.
 
-Interested in applied roles at the intersection of math, systems, and production software (scientific computing, data platforms, ML/AI engineering). Full profile on LinkedIn.`,
+Seeking employment opportunities at the intersection of systems and production software (scientific computing, data platforms, ML/AI engineering).`,
 };
 
 export const codingExamples: CodingExample[] = [
+    {
+    title: 'typewriter CLI',
+    description: 'Typewriter is a pip-installable CLI built on Typer and LibCST to normalize None-related type annotations while preserving formatting and comments.',
+    links: ['https://github.com/danphenderson/python-typewriter'],
+  },
   {
-    title: 'chromex',
-    description: "An asynchronous interface for chrome browser automation's and scrapping that is built on bs4 and selenium.",
+    title: 'chromex Python Library',
+    description: "An asynchronous interface for headless browser automation's that is built on bs4 and selenium.",
     links: ['https://github.com/danphenderson/python-chromex'],
   },
   {
-    title: 'Portfolio',
-    description: 'My personal portfolio website built with React-TypeScript, using Material UI 5. It is deployed on AWS using S3, CloudFront, and Route53.',
+    title: 'Portfolio using React, TypeScript, and AWS',
+    description: 'An interactive CV, climbing log, and photography galleries built with React + TypeScript + MUI and deployed on AWS using S3, CloudFront, and Route53.',
     links: ['https://github.com/danphenderson/dev-danhenderson'],
   },
   {
-    title: 'BlockOpt.jl',
-    description: 'An optim-style interface built on top of ForwardDiff.jl and TRS.jl Julia packages exploring a novel scheme for an unconstrained Quasi-Newton minimization of a smooth objective function.',
+    title: 'BlockOpt.jl Julia Package',
+    description: 'An optim-style Julia package built with ForwardDiff.jl and TRS.jl that presents a novel scheme for an unconstrained Quasi-Newton minimization of a smooth objective function.',
     links: ['https://github.com/danphenderson/BlockOpt.jl'],
   },
   {
-    title: 'UncNLPrograms.jl',
-    description: 'A library containing a subset of high-dimensional, nonlinear, and unconstrained optimization problems from the CUTEst set implemented in native Julia to test solvers using Automatic/Algorithmic Differentiation.',
+    title: 'UncNLPrograms.jl Julia Package',
+    description: 'A subset of high-dimensional, nonlinear, and unconstrained optimization problems from CUTEst in native Julia to test solvers using Automatic/Algorithmic Differentiation.',
     links: ['https://github.com/danphenderson/UncNLPrograms.jl'],
   },
   {
-    title: 'MasterPlan',
-    description: 'A java application that allows users to create and manage a DAG structure of tasks and corresponding subtasks. It was built using Maven, Java11, and JavaFX.',
+    title: 'MasterPlan Java Application',
+    description: 'A Java application that allows users to create and manage a structure (directed acyclic graph) of tasks and corresponding subtasks.',
     links: ['https://github.com/danphenderson/masterplan-app'],
   },
   {
-    title: 'LeetCode Solutions',
-    description: 'A collection of my solutions to LeetCode problems.',
+    title: 'LeetCode Python Solutions',
+    description: 'A collection of LeetCode problems with corresponding solutions and brief discussions on the approaches used.',
     links: ['https://github.com/danphenderson/leetcode-solutions'],
+  },
+  {
+    title: 'Runge-Kutta Methods Matlab Library',
+    description: 'Implementation of various Runge-Kutta methods for solving ordinary differential equations.',
+    links: ['https://github.com/danphenderson/runge-kutta-matlab'],
   },
 ];
 
@@ -146,13 +160,14 @@ export const experiences: Experience[] = [
     startDate: 'May 2025',
     endDate: 'Current',
     description:
-      'Advisor: Jiguang Sun (Department of Mathematical Sciences). Hemodynamics modeling and numerical methods for macrocirculatory blood flow.',
+      `Advisor: Jiguang Sun (Department of Mathematical Sciences).
+      Researching macrocirculatory blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.`,
     projects: [
-      'Report on hemodynamics modeling and methods report for macrocirculatory blood flow, formalizing the continuum mechanics framework (Eulerian/Lagrangian descriptions, material derivative, and Reynolds transport theorem) used to derive conservation laws for vascular flow.',
-      'Derived and analyzed incompressible Navier–Stokes formulations for blood (including Newtonian and generalized-Newtonian viscosity models), documenting the kinematic roles of Reynolds/Womersley numbers and related nondimensional parameters relevant to large-vessel regimes.',
-      'Scoped numerical pathways from dimension-reduced 1D/2D flow simulations to study modern computational directions including PINNs/DeepONets and fluid–structure interaction for compliant vessels.',
+      'Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).',
+      'Derived and analyzed Navier–Stokes formulations for blood (including Newtonian and generalized-Newtonian viscosity models), documenting the kinematic roles of Reynolds/Womersley numbers and related nondimensional parameters.',
+      'Scoped numerical pathways from dimension-reduced 1D/2D flow simulations incorporating fluid-structure interaction models toward PINNs/DeepONets.',
     ],
-    tools: ['LaTeX', 'Julia', 'Python']
+    tools: ['LaTeX', 'Julia', 'Python', 'Overleaf', 'PyTorch', 'DeepXDE']
   },
   {
     company: 'Michigan Technological University',
@@ -161,13 +176,14 @@ export const experiences: Experience[] = [
     title: 'Instructor | Calculus I with Technology',
     startDate: 'Jan 2025',
     endDate: 'May 2025 (5 mos)',
-    description: 'Department of Mathematical Sciences. Instructor of Calculus I with Technology.',
+    description: 'Department of Mathematical Sciences Graduate Teaching Assistantship',
     projects: [
-      'Calculus I with Technology, managing full course delivery: lectures, assessments, grading, and end-to-end course administration.',
-      'Integrated technology into lessons and assignments to improve conceptual understanding and promote computational thinking.',
-      'Earned a strong student evaluation score of 4.8/5.0 with an above average 58% response rate (Fall 2025 median response rate: 53.13).',
+      'Taught a 4-credit undergraduate mathematics section, including recorded lectures, assessments, grading, office hours, and course administration.',
+      'Coordinated content, rubrics, and student support with supervising faculty and peer instructors to keep sections aligned.',
+      'Authored Mathematica walkthroughs that reinforced conceptual understanding and computational fluency.',
+      'Earned a 4.8/5.0 average student evaluation score at a 58% response rate.',
     ],
-    tools: ['Mathematica', 'Gradescope', 'Canvas', 'Panapto', 'Zoom'],
+    tools: ['Mathematica', 'Gradescope', 'Canvas', 'Panapto', 'Zoom', 'HTML'],
   },
   {
     company: 'Michigan Technological University',
@@ -177,12 +193,12 @@ export const experiences: Experience[] = [
     startDate: 'Aug 2024',
     endDate: 'Dec 2024 (5 mos)',
     description:
-      'Department of Mathematical Sciences. Coordinated grading/logistics and supported students with technology-based workflows.',
+      'Department of Mathematical Sciences Graduate Teaching Assistantship',
     projects: [
-      'Coordinated instructional logistics and grading with the instructor; maintained consistent rubrics and timely turnaround to support student progress.',
-      'Provided individualized feedback on assignments/exams and supported students with technology-based workflows (Mathematica).',
+      'Managed grading and individualized feedback for an assigned section through Gradescope and office hours.',
+      'Helped design rubrics so assessment remained consistent across sections.',
     ],
-    tools: ['Gradescope', 'Canvas'],
+    tools: ['Gradescope', 'Canvas', 'Mathematica'],
   },
   {
     company: 'Lucerna Health',
@@ -192,38 +208,20 @@ export const experiences: Experience[] = [
     startDate: 'Apr 2022',
     endDate: 'Dec 2022 (9 mos)',
     description:
-      'Lead on Lucerna’s entity linking, ingestion, and recoding pipelines powering the data platform.',
+      'Contributor to entity-linking, recoding, and ingestion pipelines feeding a healthcare analytics lakehouse, implemented improvements that increased throughput and slashed cloud compute costs.',
     projects: [
-      "Improved company’s Entity Linking, Ingestion, and Recoding pipelines driving the cloud platform’s analytics layer (data lakehouse).",
-      "Repartitioned approx 50TB of parquet data, accelerating nightly DBT builds of platform's analytics layer.",
-      "Assisted in architectural design, releases, and deployments of data-engineering assets, including data governance, security, and integrity of the platform's analytics data layer (data lakehouse).",
-      "Built an admin service to automate integrity/state of tenant's platform across PostgreSQL, AWS Glue Data Catalog, Redshift, and S3, reducing time to resolve service tickets.",
-      'Delivered cost savings by upgrading ETL runtime to AWS Glue 3.0 and migrating batch processing to transient AWS EMR workloads using EC2 instance fleets; abstracted autoscaling, bootstrapping, provisioning, security, and networking into a reusable library.',
-      'Migrated shared ETL/infrastructure assets from Bitbucket to GitHub Enterprise and standardized CI/CD with GitHub Actions workflows, hooks, and templates.',
-      'Centralized cloud-infrastructure deployments through a major refactor that removed technical debt and git submodules while introducing semantic versioning practices.',
-      'Stepped up during team turnover by representing the data team in engineering design discussions and assisted in hiring/interviews and onboarding for directors, lead engineers, and interns.',
+      "Supported architectural design, releases, and deployments of data-engineering assets, including data governance, security, and integrity of the platform's data lakehouse.",
+      "Repartitioned 50TB datalake, yielding improved query performance to accelerate nightly DBT builds and support analytics and reporting.",
+      "Reduced AWS ETL cost by 50% from upgrading ETL jobs to Glue 3.0 and moving batch workloads to EMR on transient EC2 fleets, supported by an internal platform library for provisioning, networking, security, monitoring, and scaling EMR clusters.",
+      "Built a reconciliation service across PostgreSQL, AWS Glue Data Catalog, Redshift, and S3 to identify and resolve data inconsistencies, reducing tenant-state investigations from hours to minutes.",
+      "Centralized infrastructure delivery by building an internal CDK library through a major refactor that removed technical debt and git submodules, while introducing semantic versioning practices, enabling more reliable and efficient deployments.",
+      "Migrated data team’s software assets from Bitbucket to GitHub Enterprise, standardizing CI/CD into GitHub Actions and hooks.",
+      "Processed AWS CloudTrail logs into Parquet and built a dashboard to support security analytics and HITRUST compliance.",
+      "Supported hiring and onboarding during an organizational transition, including new engineering and data leadership and interns.",
     ],
     tools: [
-      'AWS CDK & SDK (Python)',
-      'SNS',
-      'SQS',
-      'Lambda',
-      'Glue 3.0',
-      'Glue Data Catalog',
-      'S3',
-      'Redshift',
-      'PostgreSQL',
-      'EMR (Spark)',
-      'EC2 Instance Fleets',
-      'Bitbucket',
-      'GitHub Enterprise',
-      'GitHub Actions',
-      'Docker (docker-compose)',
-      'Sentry',
-      'Slack',
-      'SonarCloud',
-      'Django',
-      'Python',
+      'AWS: EC2, S3, SNS, SQS, Cloudformation, Cloudtrail, Cloudwatch, Lambda, Glue (& Glue Data Catalog), EMR, Redshift, RDS, Athena, Quicksight', 'Python', 'PySpark', 'Jupyter', 'DBT (Data Build Tool)', 'GitHub Enterprise', 'Docker',
+      'Sentry', 'Slack', 'SonarCloud', 'Django', 'OpenAPI/Swagger', 'Jupyter', 'DBeaver', 'Postman', 'Visual Studio Code',
     ],
   },
   {
@@ -232,18 +230,18 @@ export const experiences: Experience[] = [
     industry: 'HealthTech',
     title: 'Data Scientist | Contract',
     startDate: 'Nov 2021',
-    endDate: 'Apr 2022 (6 mos)',
+    endDate: 'Apr 2022 (5 mos)',
     description:
-      'Production ML and analytics engineering on AWS for a multi-tenant health data platform.',
+      'Contributor to production ML and analytics layers of a multi-tenant cloud health data platform.',
     projects: [
-      'Implemented version-control safeguards for production ML assets and automated deployments using AWS CDK and Bitbucket Pipelines.',
-      'Built an anomaly-detection pipeline using PySpark isolation forest to flag anomalous records in S3 data lake.',
-      'Designed and build shared ML library to abstract security and cloud infrastructure concerns, enabling portable ML workflows.',
-      'Developed a cost-effective, scalable PySpark analytics service to meet data governance requirements supporting HiTrust certification.',
-      'Collaborated on a deduplication ML hook in the ingestion pipeline, enabling human-in-the-loop training and parameter evaluation.',
-      'Unblocked restricted-offshore developers via infrastructure deployments, code reviews, ETL support, and QA testing to accelerate delivery.',
+      'Introduced CI/CD for machine-learning code, infrastructure, and model artifacts with AWS CDK and Bitbucket Pipelines, safeguarding our workflows and streamlining deployment processes.',
+      'Developed a schema-agnostic anomaly-detection pipeline and presented the workflow for broader team adoption, using PySpark isolation forest models to identify outliers in the platform`s S3 data lake.',
+      'Built an internal ML library that standardized training, deployment, logging, and cloud configuration, enabling portable ML workflows.',
+      'Contributed to a deduplication model with a human-in-the-loop training loop driven by platform user feedback.',
+      'Supported restricted offshore data engineers with deployments, code review, ETL troubleshooting, and unit tests to accelerate delivery.',
+      'Migrated patient electronic medical record data from a client system into the platform, supporting schema mapping, ingestion, and validation.'
     ],
-    tools: ['AWS CDK & SDK (Python)', 'Bitbucket Pipelines', 'Python', 'SciPy', 'Numpy', 'Pandas', 'PySpark'],
+    tools: ['AWS', 'Python', 'Jupyter', 'DBT (Data Build Tool)', 'Bitbucket', 'SciPy', 'PySpark', 'Visual Studio Code', 'DBeaver', 'Slack', 'Sentry', 'Slack', 'Jira', 'Confluence', 'Lucidchart'],
   },
   {
     company: 'Michigan Technological University',
@@ -251,12 +249,12 @@ export const experiences: Experience[] = [
     industry: 'Higher Education',
     title: 'Research Assistant | Full Time',
     startDate: 'May 2021',
-    endDate: 'Nov 2021 (6 mos)',
-    description: 'Co-authored and implemented numerical experiments for Quasi-Newton Optimization with Hessian Samples.',
+    endDate: 'Nov 2021 (5 mos)',
+    description: 'Contributor to quasi-Newton optimization research (Azzam, Henderson, Ong, Struthers; 2022).',
     projects: [
       '2022, Azzam J, Henderson D, Ong BW, and Struthers AA, Quasi-Newton Optimization with Hessian Samples',
-      'Built BlockOpt.jl (trust-region quasi-Newton with forward-mode AD) and implemented solvers for quadratically constrained subproblems.',
-      'Created UncNLPrograms.jl to translate CUTEst problems for reproducible AD-based benchmarking.',
+      'Built BlockOpt.jl, an open-source Julia implementation of the paper’s trust-region quasi-Newton methods.',
+      'Built UncNLPrograms.jl to create an automatic-differentiation optimization benchmark suite to test paper’s methods.',
       { text: 'Article:', link: 'https://lnkd.in/gfP39wZX' },
       { text: 'Zenodo DOI:', link: 'https://zenodo.org/record/5826808#.Y_QyR-zMJzW' },
       { text: 'Documentation:', link: 'https://danphenderson.github.io/BlockOpt.jl/dev/' },
@@ -271,9 +269,23 @@ export const experiences: Experience[] = [
     industry: 'Higher Education',
     title: 'Mathematics Tutor | Part Time',
     startDate: 'September 2015',
-    endDate: 'May 2018 (3 yrs 5 mos)',
-    description: 'Provided weekly tutoring services to NCAA student-athletes in multivariable, integral and differential calculus, ordinary differential equations, and linear algebra.',
+    endDate: 'May 2018 (2 yrs 9 mos)',
+    description: 'Tutor to NCAA student-athletes in calculus (I, II, & III), ordinary differential equations, and linear algebra.',
     projects: [],
+    tools: ['Mathematica']
+  },
+    {
+    company: 'Various Locations',
+    companyUrl: mtuMathGraduateUrl,
+    industry: 'Retail & Service',
+    title: 'Bike Mechanic & Service Technician',
+    startDate: '2012',
+    endDate: 'Aug 2024',
+    description: 'Worked full-time and part-time at bike and ski shops in Arizona, Michigan, Utah, & Washington.',
+    projects: ['Diagnosed and serviced mechanical issues across customer and rental bicycles with consistent turnaround and quality.',
+      'Managed end-to-end service and sale workflows in retail and rental environments, including intake, triage, repair prioritization, point-of-sale transactions, rental check-in/check-out, and insurance claim support.',
+      'Applied structured troubleshooting and clear customer communication to recommend repairs, explain technical issues, and improve rider safety, equipment reliability, and overall service experience.'
+    ],
     tools: ['Mathematica']
   },
 ];
@@ -282,16 +294,15 @@ export const educationInfo: EducationInfo = {
   entries: [
     {
       university: 'Michigan Technological University',
-      program: 'Ph.D. Program in Applied and Computational Mathematics',
-      status: 'M.S. expected Spring 2026',
+      program: 'MS Mathematics, Applied/Computational',
+      status: 'Expected Summer 2026',
       dateRange: 'Fall 2024 – Present',
       highlights: [
-        'Graduate coursework in numerical and functional analysis, differential equations, optimization, and scientific computing',
-        'Pedagogical coursework: Teaching College Mathematics, emphasizing curriculum design, assessment, and evidence-based instructional practice',
-        'Research focuses on computational hemodynamics.',
-        'Developing reproducible and performance-critical scientific software in Julia and Python.',
+        'Pedagogical training in curriculum design, assessment, and evidence-based instruction.',
+        'Submissions to Numerical Analysis: A Graduate Course errata, improving correctness and clarity in the text.',
+        "Coursework: Linear Algebra, Numerical Optimization, Error-Correcting Codes, Theoretical Numerical Analysis, Ordinary Differential Equations, Partial Differential Equations, Numerical Methods for PDEs, Discontinuous Galerkin Methods, Teaching College Mathematics"
       ],
-      tools: ['LaTeX', 'Julia', 'Python', 'Mathematica'],
+      tools: ['LaTeX', 'Julia', 'Python', 'Mathematica', 'Overleaf', 'Visual Studio Code'],
     },
     {
       university: 'Michigan Technological University',
@@ -300,12 +311,13 @@ export const educationInfo: EducationInfo = {
       highlights: [
         'President & V.P., Finance Club',
         'Representative, Undergraduate Student Government',
-        'Member, Ways and Means Committee, allocating $700K to 200+ student organizations',
+        'Member, Ways and Means Committee, allocating $700K to 220 student organizations',
         "Liaison, Michigan Tech's Parent Fund Committee, budgeted and voted on the disbursement of $70K",
         'Student Advisor to the Dean of the School of Business and Economics',
-        'Junior Partner, Applied Portfolio Management Program',
+        'Junior Partner, Applied Portfolio Management Program ($1.8M AUM)',
         "Recipient of Dean's List award for six semesters (Spring 2015, Summer 2015, Fall 2019, Spring 2020, Fall 2020, & Spring 2021)",
         'Certificate of Merit for Outstanding Academic Achievement in Calculus II with Technology, Mathematical Sciences Department',
+        "Relevant Coursework: Scientific Computing, Programming at Software & Hardware interface, Data Structures, Formal Models of Computation, Artificial Intelligence, Concurrent Computing, Optimization & Graph Algorithms, Team Software Project, Real Analysis (I & II), Abstract Algebra, Complex Analysis, Linear Algebra, Numerical Linear Algebra, Ordinary Differential Equations, Partial Differential Equations (PDEs), Numerical Methods for PDEs, Nonlinear Dynamics and Chaos, Combinatorics, Probability, Statistics (I & II), Regression Analysis, History of Mathematics"
       ],
       tools: ['Java', 'C', 'C++', 'Python', 'Matlab', 'Mathematica', 'SQL', 'Assembly (MIPS)'],
     },
@@ -322,24 +334,24 @@ export const stackAndTools: StackSection[] = [
       'Zsh (also Bash)',
       'Python (general purpose goto language)',
       'TypeScript',
-      'React',
-      'PostgreSQL',
       'AWS',
       'pre-commit',
       'github CLI (`gh`)',
       'Docker & docker-compose',
       'GitHub Actions (CI/CD)',
       'AWS CDK (IaC)',
-      'Jira',
-      'Notion',
-      'Sentry',
-      'Jupyter notebooks for exploration',
       'REPLs',
       'Mermaid',
+      'jq',
+      'juliaup',
+      'pipenv',
+      '.editorconfig',
+      'prettier',
+      'pre-commit',
     ],
   },
   {
-    title: 'Programing Languages',
+    title: 'Programing & Scripting Languages',
     items: [
       'Python',
       'Java',
@@ -355,8 +367,8 @@ export const stackAndTools: StackSection[] = [
     ],
   },
   {
-    title: 'App Frameworks',
-    items: ['Data Build Tool (DBT)', 'Django', 'FastAPI', 'React', 'Apache Spark (PySpark)', 'Amazon CDK & SDK'],
+    title: 'ETL & API Frameworks',
+    items: ['Data Build Tool (DBT)', 'Django', 'FastAPI', 'Apache Spark (PySpark)'],
   },
   {
     title: 'Databases',
@@ -373,6 +385,7 @@ export const stackAndTools: StackSection[] = [
       'Notion',
       'GitBook',
       'Bitbucket',
+      'Visual Studio Code',
       'Jira',
       'Confluence',
       'Lucid',
@@ -398,4 +411,12 @@ export const fallbackGitHubProjects: GitHubProject[] = [
   { name: 'masterplan-app', url: 'https://github.com/danphenderson/masterplan-app' },
 ];
 
+export const fallbackGitHubContributions: GitHubContribution[] = [
+  { name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright' },
+  { name: 'JuliaLang/julia', url: 'https://github.com/JuliaLang/julia' },
+  { name: 'dbt-labs/dbt-core', url: 'https://github.com/dbt-labs/dbt-core' },
+  { name: 'SciML/DifferentialEquations.jl', url: 'https://github.com/SciML/DifferentialEquations.jl' },
+];
+
 export const MAX_VISIBLE_CONTRIBUTIONS = 20;
+export const MAX_CONTRIBUTION_ENRICHMENTS = 8;

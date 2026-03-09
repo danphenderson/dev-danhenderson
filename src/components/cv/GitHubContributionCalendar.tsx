@@ -3,7 +3,7 @@ import { Box, Stack, Typography } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { GitHubCalendar } from 'react-github-calendar';
 import { ContentCard } from '../ContentCard';
-import { useCvStyles } from '../../ThemeProvider';
+import { useCvStyles } from '../../styles/cvTheme';
 
 type GitHubContributionCalendarProps = {
   username: string;

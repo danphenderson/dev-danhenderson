@@ -1,6 +1,7 @@
 import { Box, Grid, Paper } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import type { SxProps, Theme } from '@mui/material/styles';
+import { resolvePublicAssetPath } from '../utils/assets';
 
 interface BackgroundPaperProps {
   image: string;
@@ -11,18 +12,6 @@ interface BackgroundPaperProps {
   shellSx?: SxProps<Theme>;
 }
 
-const resolveBackgroundImage = (src: string) => {
-  if (/^(https?:)?\/\//i.test(src) || src.startsWith('data:')) {
-    return src;
-  }
-
-  const base = (process.env.PUBLIC_URL || '').replace(/\/$/, '');
-  const sanitized = src.replace(/^\.\//, '');
-  const normalized = sanitized.startsWith('/') ? sanitized : `/${sanitized.replace(/^\/+/, '')}`;
-
-  return `${base}${normalized}`;
-};
-
 const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
   image,
   children,
@@ -31,7 +20,7 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
   contentSx,
   shellSx,
 }) => {
-  const resolvedImage = resolveBackgroundImage(image);
+  const resolvedImage = resolvePublicAssetPath(image);
   const theme = useTheme();
   const overlayColor = alpha(theme.palette.common.black, theme.palette.mode === 'light' ? 0.4 : 0.6);
   const shellBackground = alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.72 : 0.6);

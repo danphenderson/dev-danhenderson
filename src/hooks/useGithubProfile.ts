@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import {
+  MAX_CONTRIBUTION_ENRICHMENTS,
   MAX_VISIBLE_CONTRIBUTIONS,
   fallbackGitHubActivity,
+  fallbackGitHubContributions,
   fallbackGitHubProjects,
   githubUsername,
 } from '../data/cv';
@@ -33,6 +35,16 @@ type GitHubRepo = {
   fork: boolean;
   archived: boolean;
 };
+
+const CONTRIBUTION_EVENT_TYPES = new Set([
+  'PullRequestEvent',
+  'PullRequestReviewEvent',
+  'PullRequestReviewCommentEvent',
+  'IssuesEvent',
+  'IssueCommentEvent',
+]);
+
+const normalizeRepoName = (repoName: string) => repoName.trim().toLowerCase();
 
 const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
   const repoName = event.repo?.name;
@@ -104,13 +116,13 @@ const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
 export const useGithubProfile = () => {
   const [activity, setActivity] = useState<GitHubActivityItem[]>(fallbackGitHubActivity);
   const [projects, setProjects] = useState<GitHubProject[]>(fallbackGitHubProjects);
-  const [contributions, setContributions] = useState<GitHubContribution[]>([]);
+  const [contributions, setContributions] = useState<GitHubContribution[]>(fallbackGitHubContributions);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const lastActivity = useRef<GitHubActivityItem[]>(fallbackGitHubActivity);
   const lastProjects = useRef<GitHubProject[]>(fallbackGitHubProjects);
-  const lastContributions = useRef<GitHubContribution[]>([]);
+  const lastContributions = useRef<GitHubContribution[]>(fallbackGitHubContributions);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -138,6 +150,9 @@ export const useGithubProfile = () => {
         let activityList = fallbackGitHubActivity;
         let projectList = fallbackGitHubProjects;
         let contributionsList: GitHubContribution[] = [];
+        const lastContributionsByRepo = new Map<string, GitHubContribution>(
+          lastContributions.current.map((repo) => [normalizeRepoName(repo.name), repo] as const)
+        );
 
         if (eventsRes.ok) {
           const eventsData: GitHubEvent[] = await eventsRes.json();
@@ -150,6 +165,7 @@ export const useGithubProfile = () => {
             .slice(0, 6);
 
           eventsData
+            .filter((event) => CONTRIBUTION_EVENT_TYPES.has(event.type))
             .map((event) => event.repo?.name)
             .filter(
               (repoName): repoName is string =>
@@ -188,20 +204,24 @@ export const useGithubProfile = () => {
         }
 
         const contributions = Array.from(externalReposSet).slice(0, MAX_VISIBLE_CONTRIBUTIONS);
-        contributionsList = contributions.map((name) => ({
+        const contributionCandidates = contributions.map((name) => ({
           name,
           url: `https://github.com/${name}`,
           stars: 0,
         }));
 
-        if (contributionsList.length) {
-          const enriched = await Promise.all(
-            contributionsList.map(async (repo) => {
+        if (contributionCandidates.length) {
+          const enrichmentCandidates = contributionCandidates.slice(0, MAX_CONTRIBUTION_ENRICHMENTS);
+          const tailCandidates = contributionCandidates.slice(MAX_CONTRIBUTION_ENRICHMENTS);
+
+          const enrichedHead = await Promise.all(
+            enrichmentCandidates.map(async (repo) => {
+              const lastKnownContribution = lastContributionsByRepo.get(normalizeRepoName(repo.name));
               try {
                 const res = await fetch(`https://api.github.com/repos/${repo.name}`, { headers, signal: controller.signal });
                 if (!res.ok) {
                   encounteredError = true;
-                  return repo;
+                  return lastKnownContribution ?? repo;
                 }
                 const data: GitHubRepo = await res.json();
                 return {
@@ -211,15 +231,20 @@ export const useGithubProfile = () => {
                 };
               } catch (err) {
                 if ((err as Error).name === 'AbortError') {
-                  return repo;
+                  return lastKnownContribution ?? repo;
                 }
                 encounteredError = true;
-                return repo;
+                return lastKnownContribution ?? repo;
               }
             })
           );
 
-          contributionsList = enriched
+          const mergedTail = tailCandidates.map((repo) => {
+            const lastKnownContribution = lastContributionsByRepo.get(normalizeRepoName(repo.name));
+            return lastKnownContribution ?? repo;
+          });
+
+          contributionsList = [...enrichedHead, ...mergedTail]
             .sort((a, b) => (b.stars || 0) - (a.stars || 0))
             .map(({ name, url, stars }) => ({ name, url, stars }));
         }
@@ -248,7 +273,7 @@ export const useGithubProfile = () => {
           setError('Unable to load GitHub activity right now. Showing recent highlights instead.');
           setActivity(lastActivity.current.length ? lastActivity.current : fallbackGitHubActivity);
           setProjects(lastProjects.current.length ? lastProjects.current : fallbackGitHubProjects);
-          setContributions(lastContributions.current);
+          setContributions(lastContributions.current.length ? lastContributions.current : fallbackGitHubContributions);
         }
       } finally {
         if (!cancelled) {

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { ticks as tickData, todos as todoData } from '../data/climbs';
 import type { Tick, Todo } from '../types/data';
+import { formatIsoDateAsUtcCalendar, getIsoDateUtcTimestamp } from '../utils/date';
 
 export type TickRow = Tick & { id: string };
 export type TodoRow = Todo & { id: string };
@@ -10,14 +11,14 @@ export function useClimbingData() {
     return tickData
       .slice()
       .sort((a, b) => {
-        const aDate = a.date ? new Date(a.date).getTime() : 0;
-        const bDate = b.date ? new Date(b.date).getTime() : 0;
+        const aDate = getIsoDateUtcTimestamp(a.date);
+        const bDate = getIsoDateUtcTimestamp(b.date);
         return bDate - aDate;
       })
       .map((tick, idx) => ({
         ...tick,
         id: `${tick.date}-${tick.route}-${idx}`,
-        date: tick.date ? new Date(tick.date).toLocaleDateString() : '',
+        date: formatIsoDateAsUtcCalendar(tick.date),
       }));
   }, []);
 

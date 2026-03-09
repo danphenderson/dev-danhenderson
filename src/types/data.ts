@@ -21,6 +21,7 @@ export type PhotoItem = {
 };
 
 export type PhotoCategory = {
+  slug: string;
   name: string;
   description: string;
   src: string;
