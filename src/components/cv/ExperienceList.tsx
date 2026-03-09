@@ -1,6 +1,6 @@
 import { Box, Chip, Link, Stack, Typography } from '@mui/material';
 import type { Experience, ExperienceProject } from '../../data/cv';
-import { AnimatedContentCard } from '../AnimatedContentCard';
+import { AnimatedContentList } from '../AnimatedContentList';
 import { useCvStyles } from '../../styles/cvStyles';
 import { ToolsAccordion } from '../ToolsAccordion';
 
@@ -45,8 +45,6 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
   );
 };
 
-const experienceStaggerMs = 80;
-
 export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceListProps) => {
   const {
     detailBlockSx,
@@ -58,12 +56,13 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
   } = useCvStyles();
 
   return (
-    <Stack spacing={2.25}>
-      {experiences.map((experience, index) => (
-        <AnimatedContentCard
-          key={`${experience.company}-${index}`}
-          delayMs={startDelayMs + index * experienceStaggerMs}
-        >
+    <AnimatedContentList
+      items={experiences}
+      getItemKey={(experience, index) => `${experience.company}-${index}`}
+      startDelayMs={startDelayMs}
+      stackSpacing={2.25}
+      renderItem={(experience, index) => (
+        <>
           <Stack spacing={1.25}>
             <Stack
               direction="row"
@@ -144,8 +143,8 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
               />
             </Box>
           ) : null}
-        </AnimatedContentCard>
-      ))}
-    </Stack>
+        </>
+      )}
+    />
   );
 };

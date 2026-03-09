@@ -23,13 +23,10 @@ type CVGitHubSectionProps = {
   error?: string | null;
   sectionDelayMs?: number;
   nestedDelayOffsetMs?: number;
+  itemOffsetMs?: number;
   projectTitle?: string;
   overlineSx?: SxProps<Theme>;
 };
-
-const nestedDelayBaseMs = 80;
-const githubStaggerMs = 120;
-const githubItemDelayOffsetMs = 80;
 
 export const CVGitHubSection = ({
   activity,
@@ -39,18 +36,23 @@ export const CVGitHubSection = ({
   error,
   sectionDelayMs = 0,
   nestedDelayOffsetMs = 0,
+  itemOffsetMs,
   projectTitle = 'Public Projects',
   overlineSx,
 }: CVGitHubSectionProps) => {
-  const { cardResetSx, dividerSx, githubDefaultOverlineSx, sectionTitleSx } = useCvStyles();
-  const githubNestedBaseDelayMs = nestedDelayBaseMs + nestedDelayOffsetMs;
-  const githubActivityDelayMs = githubNestedBaseDelayMs;
-  const githubActivityItemsDelayMs = githubActivityDelayMs + githubItemDelayOffsetMs;
-  const githubContributionsDelayMs = githubNestedBaseDelayMs + githubStaggerMs;
-  const githubContributionsItemsDelayMs = githubContributionsDelayMs + githubItemDelayOffsetMs;
-  const githubCalendarDelayMs = githubNestedBaseDelayMs + githubStaggerMs * 2;
-  const githubProjectsDelayMs = githubNestedBaseDelayMs + githubStaggerMs * 3;
-  const githubProjectsItemsDelayMs = githubProjectsDelayMs + githubItemDelayOffsetMs;
+  const {
+    cardResetSx,
+    dividerSx,
+    getSectionDelayMs,
+    githubDefaultOverlineSx,
+    motionTokens,
+    sectionTitleSx,
+  } = useCvStyles();
+  const resolvedItemOffsetMs = itemOffsetMs ?? motionTokens.itemOffsetMs;
+  const githubActivityDelayMs = getSectionDelayMs(0, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
+  const githubContributionsDelayMs = getSectionDelayMs(1, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
+  const githubCalendarDelayMs = getSectionDelayMs(2, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
+  const githubProjectsDelayMs = getSectionDelayMs(3, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
   const resolvedOverlineSx = overlineSx ?? githubDefaultOverlineSx;
 
   return (
@@ -68,7 +70,7 @@ export const CVGitHubSection = ({
                 activity={activity}
                 loading={loading}
                 error={error}
-                startDelayMs={githubActivityItemsDelayMs}
+                startDelayMs={resolvedItemOffsetMs}
               />
             </SectionPanel>
           </Stack>
@@ -85,7 +87,7 @@ export const CVGitHubSection = ({
                 contributions={contributions}
                 loading={loading}
                 variant="list"
-                startDelayMs={githubContributionsItemsDelayMs}
+                startDelayMs={resolvedItemOffsetMs}
               />
             </SectionPanel>
           </Stack>
@@ -108,8 +110,7 @@ export const CVGitHubSection = ({
               <GitHubProjects
                 projects={projects}
                 animateItems
-                startDelayMs={githubProjectsItemsDelayMs}
-                itemStaggerMs={80}
+                startDelayMs={resolvedItemOffsetMs}
               />
             </SectionPanel>
           </Stack>

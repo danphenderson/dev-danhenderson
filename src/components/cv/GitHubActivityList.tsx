@@ -12,14 +12,12 @@ type GitHubActivityListProps = {
   itemStaggerMs?: number;
 };
 
-const defaultStaggerMs = 80;
-
 export const GitHubActivityList = ({
   activity,
   loading,
   error,
   startDelayMs = 0,
-  itemStaggerMs = defaultStaggerMs,
+  itemStaggerMs,
 }: GitHubActivityListProps) => {
   const { secondaryTextSx } = useCvStyles();
 

@@ -1,14 +1,12 @@
 import { Box, Link, Stack, Typography } from '@mui/material';
 import type { VolunteeringEntry } from '../../data/cv';
-import { AnimatedContentCard } from '../AnimatedContentCard';
+import { AnimatedContentList } from '../AnimatedContentList';
 import { useCvStyles } from '../../styles/cvStyles';
 
 type VolunteeringListProps = {
   volunteering: VolunteeringEntry[];
   startDelayMs?: number;
 };
-
-const volunteeringStaggerMs = 80;
 
 export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: VolunteeringListProps) => {
   const {
@@ -24,12 +22,13 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
   }
 
   return (
-    <Stack spacing={2.25}>
-      {volunteering.map((entry, index) => (
-        <AnimatedContentCard
-          key={`${entry.organization}-${entry.role}-${index}`}
-          delayMs={startDelayMs + index * volunteeringStaggerMs}
-        >
+    <AnimatedContentList
+      items={volunteering}
+      getItemKey={(entry, index) => `${entry.organization}-${entry.role}-${index}`}
+      startDelayMs={startDelayMs}
+      stackSpacing={2.25}
+      renderItem={(entry) => (
+        <>
           <Stack spacing={1}>
             <Stack
               direction="row"
@@ -81,8 +80,8 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
               ))}
             </Box>
           </Stack>
-        </AnimatedContentCard>
-      ))}
-    </Stack>
+        </>
+      )}
+    />
   );
 };

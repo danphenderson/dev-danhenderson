@@ -12,7 +12,7 @@ export const GitHubProjects = ({
   projects,
   animateItems = false,
   startDelayMs = 0,
-  itemStaggerMs = 80,
+  itemStaggerMs,
 }: GitHubProjectsProps) => {
   return (
     <GitHubLinkChipList

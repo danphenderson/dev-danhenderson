@@ -7,6 +7,13 @@ export const useCvStyles = () => {
   const theme = useMuiTheme();
 
   return useMemo(() => {
+    const motionTokens = {
+      itemOffsetMs: 120,
+      itemStaggerMs: 80,
+      sectionStaggerMs: 80,
+      githubSubsectionStaggerMs: 120,
+      accordionChipStaggerMs: 20,
+    } as const;
     const accentColor = theme.palette.primary.main;
     const isLight = theme.palette.mode === 'light';
     const cardGradientStart = alpha(
@@ -54,10 +61,26 @@ export const useCvStyles = () => {
       },
     });
 
-    const getGitHubChipWrapSx = (gap: number): SxProps<Theme> => ({
+    const getWrapListSx = (gap: number): SxProps<Theme> => ({
       display: 'flex',
       flexWrap: 'wrap',
       gap,
+    });
+
+    const getSectionDelayMs = (
+      index: number,
+      startDelayMs: number = 0,
+      staggerMs: number = motionTokens.sectionStaggerMs
+    ) => startDelayMs + index * staggerMs;
+
+    const getItemDelayMs = (
+      index: number,
+      startDelayMs: number = motionTokens.itemOffsetMs,
+      staggerMs: number = motionTokens.itemStaggerMs
+    ) => startDelayMs + index * staggerMs;
+
+    const getAnimatedZoomItemSx = (delayMs: number): SxProps<Theme> => ({
+      transitionDelay: `${delayMs}ms`,
     });
 
     const getToolsAccordionSx = (dense: boolean): SxProps<Theme> => ({
@@ -86,6 +109,7 @@ export const useCvStyles = () => {
     };
 
     return {
+      motionTokens,
       accentColor,
       accentTint,
       contentCardSx: {
@@ -147,9 +171,13 @@ export const useCvStyles = () => {
         width: '100%',
         ...cardResetSx,
       } satisfies SxProps<Theme>,
+      wrapItemContainerSx: { width: 'auto' } satisfies SxProps<Theme>,
       fullWidthSx: { width: '100%' } satisfies SxProps<Theme>,
+      getSectionDelayMs,
+      getItemDelayMs,
+      getAnimatedZoomItemSx,
       getGitHubChipSx,
-      getGitHubChipWrapSx,
+      getWrapListSx,
       profileNameRowSx: { rowGap: 0.5 } satisfies SxProps<Theme>,
       profileAvatarSx: {
         width: 96,

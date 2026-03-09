@@ -19,14 +19,16 @@ import {
 } from '../data/cv';
 import { useGithubProfile } from '../hooks/useGithubProfile';
 import { useAppStyles } from '../styles/appStyles';
+import { useCvStyles } from '../styles/cvStyles';
 
 export default function CV() {
   const appStyles = useAppStyles();
+  const { getSectionDelayMs, motionTokens } = useCvStyles();
   const { activity, projects, contributions, loading, error } = useGithubProfile();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
-  const githubNestedDelayOffsetMs = 40;
-  const experienceItemsDelayMs = 120;
+  const githubNestedDelayOffsetMs = motionTokens.sectionStaggerMs / 2;
+  const itemOffsetMs = motionTokens.itemOffsetMs;
 
   const resumeDownloadAction = (
     <Box
@@ -70,8 +72,7 @@ export default function CV() {
             education={educationInfo}
             volunteering={volunteering}
             codingExamples={codingExamples}
-            experienceItemsDelayMs={experienceItemsDelayMs}
-            volunteeringItemsDelayMs={experienceItemsDelayMs}
+            itemOffsetMs={itemOffsetMs}
             spacing={2.5}
           />
 
@@ -87,6 +88,7 @@ export default function CV() {
             error={error}
             certificates={certificates}
             stackAndTools={stackAndTools}
+            itemOffsetMs={itemOffsetMs}
             githubNestedDelayOffsetMs={githubNestedDelayOffsetMs}
             githubProjectTitle="Public Projects"
           />
@@ -103,6 +105,7 @@ export default function CV() {
             error={error}
             certificates={certificates}
             stackAndTools={stackAndTools}
+            itemOffsetMs={itemOffsetMs}
           />
 
           <CVMainColumn
@@ -111,6 +114,7 @@ export default function CV() {
             education={educationInfo}
             volunteering={volunteering}
             codingExamples={codingExamples}
+            itemOffsetMs={itemOffsetMs}
             spacing={2.5}
           />
         </Stack>
@@ -135,10 +139,11 @@ export default function CV() {
               error={error}
               certificates={certificates}
               stackAndTools={stackAndTools}
-              aboutDelayMs={0}
-              githubDelayMs={80}
-              certificatesDelayMs={160}
-              toolsDelayMs={240}
+              aboutDelayMs={getSectionDelayMs(0)}
+              githubDelayMs={getSectionDelayMs(1)}
+              certificatesDelayMs={getSectionDelayMs(2)}
+              toolsDelayMs={getSectionDelayMs(3)}
+              itemOffsetMs={itemOffsetMs}
               githubNestedDelayOffsetMs={githubNestedDelayOffsetMs}
               githubProjectTitle="Projects"
             />
@@ -153,12 +158,11 @@ export default function CV() {
               education={educationInfo}
               volunteering={volunteering}
               codingExamples={codingExamples}
-              experienceDelayMs={0}
-              educationDelayMs={80}
-              volunteeringDelayMs={160}
-              codingDelayMs={240}
-              experienceItemsDelayMs={experienceItemsDelayMs}
-              volunteeringItemsDelayMs={experienceItemsDelayMs}
+              experienceDelayMs={getSectionDelayMs(0)}
+              educationDelayMs={getSectionDelayMs(1)}
+              volunteeringDelayMs={getSectionDelayMs(2)}
+              codingDelayMs={getSectionDelayMs(3)}
+              itemOffsetMs={itemOffsetMs}
               spacing={3.5}
             />
           </Box>

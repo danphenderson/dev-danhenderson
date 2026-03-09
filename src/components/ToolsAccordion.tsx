@@ -8,9 +8,8 @@ import {
   Chip,
   Stack,
   Typography,
-  Zoom,
 } from '@mui/material';
-import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
+import { AnimatedZoomList } from './AnimatedZoomList';
 import { useCvStyles } from '../styles/cvStyles';
 
 type ToolsAccordionProps = {
@@ -23,10 +22,6 @@ type ToolsAccordionProps = {
   children?: ReactNode;
 };
 
-const getToolsChipZoomStyle = (expanded: boolean, idx: number) => ({
-  transitionDelay: expanded ? `${idx * 20}ms` : '0ms',
-});
-
 export const ToolsAccordion = ({
   id: idProp,
   title = 'Common tools',
@@ -38,7 +33,6 @@ export const ToolsAccordion = ({
 }: ToolsAccordionProps) => {
   const { fullWidthSx, getToolsAccordionSx, sectionTitleSx, secondaryTextSx, toolsChipSx, toolsWrapSx } =
     useCvStyles();
-  const prefersReducedMotion = usePrefersReducedMotion();
   const fallbackId = useId();
   const [expanded, setExpanded] = useState(defaultExpanded);
   const accordionId = idProp ?? fallbackId;
@@ -79,36 +73,21 @@ export const ToolsAccordion = ({
         {children ? (
           <Box sx={fullWidthSx}>{children}</Box>
         ) : (
-          <Box sx={toolsWrapSx}>
-            {tools
-              .filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
-              .map((tool, idx) => {
-                const chip = (
-                  <Chip
-                    key={`${tool}-${idx}`}
-                    label={tool}
-                    size={dense ? 'small' : 'medium'}
-                    variant="outlined"
-                    sx={toolsChipSx}
-                  />
-                );
-
-                if (prefersReducedMotion) {
-                  return chip;
-                }
-
-                return (
-                  <Zoom
-                    key={`${tool}-${idx}`}
-                    in={expanded}
-                    appear={false}
-                    style={getToolsChipZoomStyle(expanded, idx)}
-                  >
-                    {chip}
-                  </Zoom>
-                );
-              })}
-          </Box>
+          <AnimatedZoomList
+            items={tools.filter((t): t is string => typeof t === 'string' && t.trim().length > 0)}
+            getItemKey={(tool, idx) => `${tool}-${idx}`}
+            in={expanded}
+            containerSx={toolsWrapSx}
+            renderItem={(tool, idx) => (
+              <Chip
+                key={`${tool}-${idx}`}
+                label={tool}
+                size={dense ? 'small' : 'medium'}
+                variant="outlined"
+                sx={toolsChipSx}
+              />
+            )}
+          />
         )}
       </AccordionDetails>
     </Accordion>

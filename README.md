@@ -46,6 +46,44 @@ The site is a React Router single-page app. Keep unknown-route rewrites, `PUBLIC
 - Route pages compose shared layout primitives such as `BackgroundPaper`, `PageFrame`, and `SectionCard`.
 - `/cv` is split into reusable CV building blocks such as `CVSidebar`, `CVMainColumn`, `ProfileCard`, `ExperienceList`, and GitHub-backed sections.
 
+## Animation Behavior
+
+Animation behavior is intentionally centralized for the CV route instead of being hardcoded in individual feature components.
+
+- `src/components/AnimatedContentCard.tsx`
+  - shared wrapper for card-style entry animation
+  - uses `IntersectionObserver` to trigger near viewport entry
+  - applies a literal `delayMs` before a short `Zoom` transition
+  - skips observer setup, timers, and transition effects when `prefers-reduced-motion` is enabled
+- `src/components/AnimatedContentList.tsx`
+  - shared staggered list wrapper for repeatable CV content such as experience, education, volunteering, certificates, coding examples, and GitHub items
+  - supports both stacked and wrapped layouts while keeping delay math out of feature components
+- `src/components/AnimatedZoomList.tsx`
+  - shared staggered `Zoom` list for accordion chip reveals
+  - used by the CV tools accordion so chip timing is not defined inline
+- `src/styles/cvStyles.ts`
+  - source of truth for CV motion tokens and delay helpers
+  - current tokens are:
+    - `itemOffsetMs = 120`
+    - `itemStaggerMs = 80`
+    - `sectionStaggerMs = 80`
+    - `githubSubsectionStaggerMs = 120`
+    - `accordionChipStaggerMs = 20`
+  - exposes helpers such as `getSectionDelayMs(...)` and `getItemDelayMs(...)` so `/cv` composition code does not own raw timing constants
+
+Current `/cv` sequencing rules:
+
+- Section cards stagger from shared section timing.
+- Repeatable inner item groups wait for the same additional shared item offset before their own stagger starts.
+- GitHub activity, contributions, and project chips follow the same shared item-offset rule as experience and volunteering.
+- Reduced-motion users should receive the same content without stagger, delayed reveal, or decorative pulse behavior.
+
+When changing CV motion:
+
+- prefer updating `src/styles/cvStyles.ts` tokens/helpers first
+- reuse `AnimatedContentCard`, `AnimatedContentList`, and `AnimatedZoomList`
+- avoid reintroducing inline transition-delay styles or per-component timing constants unless there is a route-specific reason
+
 ## Data Model and Content Sources
 
 ### Local data modules

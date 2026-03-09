@@ -1,14 +1,15 @@
 import { Box, Stack, Typography } from '@mui/material';
 import type { EducationInfo } from '../../data/cv';
-import { AnimatedContentCard } from '../AnimatedContentCard';
+import { AnimatedContentList } from '../AnimatedContentList';
 import { ToolsAccordion } from '../ToolsAccordion';
 import { useCvStyles } from '../../styles/cvStyles';
 
 type EducationSectionProps = {
   education: EducationInfo;
+  startDelayMs?: number;
 };
 
-export const EducationSection = ({ education }: EducationSectionProps) => {
+export const EducationSection = ({ education, startDelayMs = 0 }: EducationSectionProps) => {
   const {
     detailBlockSx,
     educationMetaSx,
@@ -23,9 +24,13 @@ export const EducationSection = ({ education }: EducationSectionProps) => {
   }
 
   return (
-    <Stack spacing={2.25}>
-      {education.entries.map((entry, index) => (
-        <AnimatedContentCard key={`${entry.university}-${entry.program}-${index}`} delayMs={index * 90}>
+    <AnimatedContentList
+      items={education.entries}
+      getItemKey={(entry, index) => `${entry.university}-${entry.program}-${index}`}
+      startDelayMs={startDelayMs}
+      stackSpacing={2.25}
+      renderItem={(entry, index) => (
+        <>
           <Typography variant="h6" sx={sectionTitleSx}>
             {entry.university}
           </Typography>
@@ -73,8 +78,8 @@ export const EducationSection = ({ education }: EducationSectionProps) => {
               />
             </Box>
           ) : null}
-        </AnimatedContentCard>
-      ))}
-    </Stack>
+        </>
+      )}
+    />
   );
 };

@@ -18,7 +18,7 @@ export const GitHubContributions = ({
   loading,
   variant = 'cards',
   startDelayMs = 0,
-  itemStaggerMs = 80,
+  itemStaggerMs,
 }: GitHubContributionsProps) => {
   const {
     contributionCardBodySx,

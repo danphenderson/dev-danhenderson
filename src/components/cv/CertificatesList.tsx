@@ -1,19 +1,24 @@
 import { Button, Stack, Typography } from '@mui/material';
 import type { Certificate } from '../../data/cv';
-import { AnimatedContentCard } from '../AnimatedContentCard';
+import { AnimatedContentList } from '../AnimatedContentList';
 import { useCvStyles } from '../../styles/cvStyles';
 
 type CertificatesListProps = {
   certificates: Certificate[];
+  startDelayMs?: number;
 };
 
-export const CertificatesList = ({ certificates }: CertificatesListProps) => {
+export const CertificatesList = ({ certificates, startDelayMs = 0 }: CertificatesListProps) => {
   const { certificateActionSx, secondaryTextSx } = useCvStyles();
 
   return (
-    <Stack spacing={1.5}>
-      {certificates.map((certificate, index) => (
-        <AnimatedContentCard key={`${certificate.title}-${index}`} delayMs={index * 90}>
+    <AnimatedContentList
+      items={certificates}
+      getItemKey={(certificate, index) => `${certificate.title}-${index}`}
+      startDelayMs={startDelayMs}
+      stackSpacing={1.5}
+      renderItem={(certificate) => (
+        <>
           <Typography variant="h6">{certificate.title}</Typography>
           <Typography variant="subtitle2" sx={secondaryTextSx}>
             {certificate.issuer} issued on {certificate.date}
@@ -30,8 +35,8 @@ export const CertificatesList = ({ certificates }: CertificatesListProps) => {
               View Certificate
             </Button>
           )}
-        </AnimatedContentCard>
-      ))}
-    </Stack>
+        </>
+      )}
+    />
   );
 };

@@ -35,6 +35,7 @@ type CVSidebarProps = {
   certificatesDelayMs?: number;
   toolsDelayMs?: number;
   githubNestedDelayOffsetMs?: number;
+  itemOffsetMs?: number;
   githubProjectTitle?: string;
   spacing?: number;
 };
@@ -56,10 +57,12 @@ export const CVSidebar = ({
   certificatesDelayMs = 0,
   toolsDelayMs = 0,
   githubNestedDelayOffsetMs = 0,
+  itemOffsetMs,
   githubProjectTitle,
   spacing = 2.5,
 }: CVSidebarProps) => {
-  const { sectionHeadingCompactSx } = useCvStyles();
+  const { motionTokens, sectionHeadingCompactSx } = useCvStyles();
+  const resolvedItemOffsetMs = itemOffsetMs ?? motionTokens.itemOffsetMs;
 
   return (
     <Stack spacing={spacing}>
@@ -82,6 +85,7 @@ export const CVSidebar = ({
           error={error}
           sectionDelayMs={githubDelayMs}
           nestedDelayOffsetMs={githubNestedDelayOffsetMs}
+          itemOffsetMs={resolvedItemOffsetMs}
           projectTitle={githubProjectTitle}
         />
       )}
@@ -89,7 +93,7 @@ export const CVSidebar = ({
       {sections.includes('certificates') && (
         <SectionCard delayMs={certificatesDelayMs}>
           <SectionHeading overline="Certificates" title="Credentials" />
-          <CertificatesList certificates={certificates} />
+          <CertificatesList certificates={certificates} startDelayMs={resolvedItemOffsetMs} />
         </SectionCard>
       )}
 

@@ -11,12 +11,16 @@ jest.mock('../AnimatedContentCard', () => ({
   }: {
     children: ReactNode;
     delayMs: number;
-    containerSx?: { width?: string };
+    containerSx?: { width?: string } | Array<{ width?: string }>;
   }) => (
     <div
       data-testid="animated-chip"
       data-delay={String(delayMs)}
-      data-container-width={containerSx?.width ?? ''}
+      data-container-width={
+        Array.isArray(containerSx)
+          ? containerSx.find((entry) => entry?.width)?.width ?? ''
+          : containerSx?.width ?? ''
+      }
     >
       {children}
     </div>

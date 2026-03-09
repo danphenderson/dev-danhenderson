@@ -3,7 +3,7 @@ import { Box, Chip, Stack } from '@mui/material';
 import { SxProps, Theme } from '@mui/material/styles';
 import { ReactNode } from 'react';
 import { useCvStyles } from '../../styles/cvStyles';
-import { AnimatedContentCard } from '../AnimatedContentCard';
+import { AnimatedContentList } from '../AnimatedContentList';
 
 export type GitHubLinkChipItem = {
   key: string;
@@ -27,12 +27,12 @@ export const GitHubLinkChipList = ({
   layout = 'stack',
   animateItems = false,
   startDelayMs = 0,
-  itemStaggerMs = 80,
+  itemStaggerMs,
   chipSx,
   stackSpacing = 0.5,
   wrapGap = 0.75,
 }: GitHubLinkChipListProps) => {
-  const { cardResetSx, chipWrapperSx, getGitHubChipSx, getGitHubChipWrapSx } = useCvStyles();
+  const { cardResetSx, chipWrapperSx, getGitHubChipSx, getWrapListSx } = useCvStyles();
   const customChipSx = Array.isArray(chipSx) ? chipSx : chipSx ? [chipSx] : [];
   const baseChipSx: SxProps<Theme> = getGitHubChipSx(layout);
   const wrapperSx = layout === 'wrap' ? cardResetSx : chipWrapperSx;
@@ -57,34 +57,42 @@ export const GitHubLinkChipList = ({
     );
   };
 
-  const renderAnimatedChip = (item: GitHubLinkChipItem, idx: number) => (
-    <AnimatedContentCard
-      key={item.key}
-      delayMs={startDelayMs + idx * itemStaggerMs}
-      sx={wrapperSx}
-      containerSx={layout === 'wrap' ? { width: 'auto' } : undefined}
-    >
-      {renderChip(item)}
-    </AnimatedContentCard>
-  );
-
   if (layout === 'wrap') {
     return (
-      <Box sx={getGitHubChipWrapSx(wrapGap)}>
-        {items.map((item, idx) => (animateItems ? renderAnimatedChip(item, idx) : renderChip(item)))}
-      </Box>
+      animateItems ? (
+        <AnimatedContentList
+          items={items}
+          getItemKey={(item) => item.key}
+          layout="wrap"
+          startDelayMs={startDelayMs}
+          itemStaggerMs={itemStaggerMs}
+          wrapGap={wrapGap}
+          itemSx={wrapperSx}
+          renderItem={renderChip}
+        />
+      ) : (
+        <Box sx={getWrapListSx(wrapGap)}>
+          {items.map(renderChip)}
+        </Box>
+      )
     );
   }
 
   return (
-    <Stack spacing={stackSpacing}>
-      {items.map((item, idx) => {
-        if (!animateItems) {
-          return renderChip(item);
-        }
-
-        return renderAnimatedChip(item, idx);
-      })}
-    </Stack>
+    animateItems ? (
+      <AnimatedContentList
+        items={items}
+        getItemKey={(item) => item.key}
+        startDelayMs={startDelayMs}
+        itemStaggerMs={itemStaggerMs}
+        stackSpacing={stackSpacing}
+        itemSx={wrapperSx}
+        renderItem={renderChip}
+      />
+    ) : (
+      <Stack spacing={stackSpacing}>
+        {items.map(renderChip)}
+      </Stack>
+    )
   );
 };

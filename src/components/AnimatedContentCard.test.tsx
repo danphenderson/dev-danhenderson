@@ -17,6 +17,7 @@ jest.mock('@mui/material', () => {
 });
 
 const defaultMatchMedia = window.matchMedia;
+const defaultIntersectionObserver = window.IntersectionObserver;
 
 const setReducedMotionPreference = (matches: boolean) => {
   window.matchMedia = jest.fn().mockImplementation((query: string) => ({
@@ -34,6 +35,7 @@ const setReducedMotionPreference = (matches: boolean) => {
 describe('AnimatedContentCard', () => {
   afterEach(() => {
     window.matchMedia = defaultMatchMedia;
+    window.IntersectionObserver = defaultIntersectionObserver;
     jest.useRealTimers();
     jest.clearAllMocks();
   });
