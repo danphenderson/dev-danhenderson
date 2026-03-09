@@ -16,6 +16,7 @@ import {
   resumeDownloadFilename,
   resumePdfUrl,
   stackAndTools,
+  volunteering,
 } from '../data/cv';
 import { useGithubProfile } from '../hooks/useGithubProfile';
 
@@ -72,11 +73,13 @@ export default function CV() {
           />
 
           <CVMainColumn
-            sections={['experience', 'education']}
+            sections={['experience', 'education', 'volunteering']}
             experiences={experiences}
             education={educationInfo}
+            volunteering={volunteering}
             codingExamples={codingExamples}
             experienceItemsDelayMs={experienceItemsDelayMs}
+            volunteeringItemsDelayMs={experienceItemsDelayMs}
             spacing={2.5}
           />
 
@@ -113,6 +116,7 @@ export default function CV() {
             sections={['coding']}
             experiences={experiences}
             education={educationInfo}
+            volunteering={volunteering}
             codingExamples={codingExamples}
             spacing={2.5}
           />
@@ -160,14 +164,17 @@ export default function CV() {
             }}
           >
             <CVMainColumn
-              sections={['experience', 'education', 'coding']}
+              sections={['experience', 'education', 'volunteering', 'coding']}
               experiences={experiences}
               education={educationInfo}
+              volunteering={volunteering}
               codingExamples={codingExamples}
               experienceDelayMs={0}
               educationDelayMs={120}
-              codingDelayMs={240}
+              volunteeringDelayMs={240}
+              codingDelayMs={360}
               experienceItemsDelayMs={experienceItemsDelayMs}
+              volunteeringItemsDelayMs={experienceItemsDelayMs}
               spacing={3.5}
             />
           </Box>
