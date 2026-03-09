@@ -9,6 +9,7 @@ type AnimatedZoomListProps<Item> = {
   getItemKey: (item: Item, index: number) => string;
   renderItem: (item: Item, index: number) => ReactNode;
   in: boolean;
+  startDelayMs?: number;
   containerSx?: SxProps<Theme>;
   itemStaggerMs?: number;
 };
@@ -18,6 +19,7 @@ export const AnimatedZoomList = <Item,>({
   getItemKey,
   renderItem,
   in: inProp,
+  startDelayMs = 0,
   containerSx,
   itemStaggerMs,
 }: AnimatedZoomListProps<Item>) => {
@@ -49,7 +51,7 @@ export const AnimatedZoomList = <Item,>({
           in={inProp}
           appear={false}
         >
-          <Box sx={getAnimatedZoomItemSx(getSectionDelayMs(index, 0, resolvedItemStaggerMs))}>
+          <Box sx={getAnimatedZoomItemSx(getSectionDelayMs(index, startDelayMs, resolvedItemStaggerMs))}>
             {renderItem(item, index)}
           </Box>
         </Zoom>

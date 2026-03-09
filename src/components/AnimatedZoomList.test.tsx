@@ -66,14 +66,15 @@ describe('AnimatedZoomList', () => {
         items={['React', 'TypeScript']}
         getItemKey={(item) => item}
         in
+        startDelayMs={40}
         renderItem={(item) => <div>{item}</div>}
       />
     );
 
     expect(screen.getAllByTestId('zoom-item')).toHaveLength(2);
     expect(screen.getAllByTestId('zoom-item')[0]).toHaveAttribute('data-appear', 'false');
-    expect(mockGetAnimatedZoomItemSx).toHaveBeenNthCalledWith(1, 0);
-    expect(mockGetAnimatedZoomItemSx).toHaveBeenNthCalledWith(2, 20);
+    expect(mockGetAnimatedZoomItemSx).toHaveBeenNthCalledWith(1, 40);
+    expect(mockGetAnimatedZoomItemSx).toHaveBeenNthCalledWith(2, 60);
   });
 
   it('renders static items without zoom wrappers for reduced motion', () => {

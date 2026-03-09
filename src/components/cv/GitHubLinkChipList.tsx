@@ -3,7 +3,7 @@ import { Box, Chip, Stack } from '@mui/material';
 import { SxProps, Theme } from '@mui/material/styles';
 import { ReactNode } from 'react';
 import { useCvStyles } from '../../styles/cvStyles';
-import { AnimatedContentList } from '../AnimatedContentList';
+import { AnimatedZoomList } from '../AnimatedZoomList';
 
 export type GitHubLinkChipItem = {
   key: string;
@@ -32,10 +32,16 @@ export const GitHubLinkChipList = ({
   stackSpacing = 0.5,
   wrapGap = 0.75,
 }: GitHubLinkChipListProps) => {
-  const { cardResetSx, chipWrapperSx, getGitHubChipSx, getWrapListSx } = useCvStyles();
+  const { getGitHubChipSx, getWrapListSx } = useCvStyles();
   const customChipSx = Array.isArray(chipSx) ? chipSx : chipSx ? [chipSx] : [];
   const baseChipSx: SxProps<Theme> = getGitHubChipSx(layout);
-  const wrapperSx = layout === 'wrap' ? cardResetSx : chipWrapperSx;
+  const animatedContainerSx: SxProps<Theme> = layout === 'wrap'
+    ? getWrapListSx(wrapGap)
+    : {
+      display: 'flex',
+      flexDirection: 'column',
+      gap: stackSpacing,
+    };
 
   const renderChip = (item: GitHubLinkChipItem) => {
     const isLink = Boolean(item.href);
@@ -60,14 +66,13 @@ export const GitHubLinkChipList = ({
   if (layout === 'wrap') {
     return (
       animateItems ? (
-        <AnimatedContentList
+        <AnimatedZoomList
           items={items}
           getItemKey={(item) => item.key}
-          layout="wrap"
+          in
           startDelayMs={startDelayMs}
+          containerSx={animatedContainerSx}
           itemStaggerMs={itemStaggerMs}
-          wrapGap={wrapGap}
-          itemSx={wrapperSx}
           renderItem={renderChip}
         />
       ) : (
@@ -80,13 +85,13 @@ export const GitHubLinkChipList = ({
 
   return (
     animateItems ? (
-      <AnimatedContentList
+      <AnimatedZoomList
         items={items}
         getItemKey={(item) => item.key}
+        in
         startDelayMs={startDelayMs}
+        containerSx={animatedContainerSx}
         itemStaggerMs={itemStaggerMs}
-        stackSpacing={stackSpacing}
-        itemSx={wrapperSx}
         renderItem={renderChip}
       />
     ) : (

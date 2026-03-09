@@ -1,4 +1,4 @@
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import type { Certificate } from '../../data/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { useCvStyles } from '../../styles/cvStyles';
