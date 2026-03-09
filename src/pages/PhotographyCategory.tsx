@@ -1,5 +1,4 @@
-import { useMemo } from 'react';
-import { Link as RouterLink, useParams } from 'react-router-dom';
+import { Link as RouterLink, Navigate, useParams } from 'react-router-dom';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BackgroundPaper from '../components/BackgroundPaper';
@@ -9,15 +8,23 @@ import { QuiltedImageList } from '../components/PhotoAlbum';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 
 const fallbackBackgroundImage = 'assets/photography/landscape/landscape-lime-kiln.jpg';
+const legacySlugMap: Record<string, string> = {
+  'new mexico': 'new-mexico',
+  'new%20mexico': 'new-mexico',
+};
 
 export default function PhotographyCategory() {
   const { slug } = useParams<{ slug?: string }>();
   const { categories } = usePhotographyData();
+  const slugKey = slug?.toLowerCase();
+  const canonicalSlug = slugKey ? legacySlugMap[slugKey] ?? slugKey : undefined;
+  const shouldRedirect = Boolean(slugKey && legacySlugMap[slugKey]);
 
-  const category = useMemo(
-    () => categories.find((item) => item.slug === slug),
-    [categories, slug]
-  );
+  if (shouldRedirect && canonicalSlug) {
+    return <Navigate to={`/photography/${canonicalSlug}`} replace />;
+  }
+
+  const category = categories.find((item) => item.slug === canonicalSlug);
 
   const backgroundImage = category?.src ?? fallbackBackgroundImage;
 

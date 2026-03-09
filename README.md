@@ -250,7 +250,7 @@ Edit `src/data/photography.ts`:
 - Add or remove categories
 - Add/remove items in each category’s `album`
 
-Album route slugs are generated in `usePhotographyData` from lowercase category names.
+Album route slugs are explicitly defined as `slug` values in `src/data/photography.ts` and consumed by `usePhotographyData`.
 
 ### Update colors and typography
 Edit `src/ThemeProvider.tsx`:

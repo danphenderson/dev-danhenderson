@@ -5,32 +5,20 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@fontsource/roboto": "^5.0.5",
     "@fontsource/source-sans-3": "^5.2.9",
     "@fontsource/space-grotesk": "^5.2.10",
     "@mui/icons-material": "^5.14.1",
     "@mui/material": "^5.14.2",
-    "@mui/styled-engine-sc": "^5.12.0",
     "@mui/x-data-grid": "^6.10.2",
-    "@stripe/react-stripe-js": "^2.1.2",
-    "@stripe/stripe-js": "^2.0.0",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "@types/jest": "^27.5.2",
     "@types/node": "^16.18.39",
     "@types/react": "^18.2.17",
     "@types/react-dom": "^18.2.7",
-    "markdown-to-jsx": "^7.2.1",
-    "path-browserify": "^1.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-github-calendar": "^5.0.3",
     "react-router-dom": "^6.14.2",
     "react-scripts": "5.0.1",
-    "styled-components": "^5.3.11",
-    "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "typescript": "^4.9.5"
   },
   "scripts": {
     "start": "PORT=${PORT:-3001} react-scripts start",
@@ -55,8 +43,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "eslint-plugin-react": "^7.32.2"
   }
 }

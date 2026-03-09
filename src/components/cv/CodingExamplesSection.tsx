@@ -11,7 +11,7 @@ const experienceStaggerMs = 80;
 
 
 export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExamplesSectionProps) => {
-  const { accentColor, accentTint } = useCvStyles();
+  const { accentColor } = useCvStyles();
 
   return (
     <Stack spacing={2.25}>

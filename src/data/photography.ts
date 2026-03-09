@@ -5,6 +5,7 @@ const withBase = (path: string) => `${assetBasePath}${path}`;
 
 export const photographyCategories: PhotoCategory[] = [
   {
+    slug: "landscape",
     name: "Landscape",
     description: "Landscape photo collection",
     src: withBase('/assets/photography/landscape/landscape-tieton-south-fork-1.jpg'),
@@ -102,6 +103,7 @@ export const photographyCategories: PhotoCategory[] = [
     ],
   },
   {
+    slug: "action",
     name: "Action",
     description: "Action photo collection",
     src: withBase('/assets/photography/action/action-dan-clipping-cam.jpg'),
@@ -169,6 +171,7 @@ export const photographyCategories: PhotoCategory[] = [
     ],
   },
   {
+    slug: "astronomy",
     name: "Astronomy",
     description: "Astronomy photo collection",
     src: withBase('/assets/photography/astronomy/astronomy-arora-2.jpg'),
@@ -242,6 +245,7 @@ export const photographyCategories: PhotoCategory[] = [
     ],
   },
   {
+    slug: "new-mexico",
     name: "New Mexico",
     description: "New Mexico in November.",
     src: withBase('/assets/photography/new-mexico/hdr-river-jemez-mountains.jpg'),
