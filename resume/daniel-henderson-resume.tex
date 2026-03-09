@@ -1,0 +1,182 @@
+\documentclass[10pt,letterpaper]{article}
+
+\usepackage[margin=0.50in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\setlength{\emergencystretch}{2em}
+\setlist[itemize]{leftmargin=1.25em, topsep=0pt, itemsep=0pt, parsep=0pt, partopsep=0pt}
+\titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
+\titlespacing*{\section}{0pt}{9pt}{4pt}
+
+\newcommand{\resumeItem}[1]{\item \small #1}
+\newcommand{\resumeLink}[2]{\href{#1}{#2}}
+\newcommand{\resumeSubheading}[4]{%
+  \textbf{#1} \hfill \small{\textit{#2}}\\
+  \small{\textit{#3}} \hfill \small{\textit{#4}}\par
+}
+\newenvironment{courselist}[1][Relevant Coursework]{%
+  \begin{minipage}[t]{\linewidth}%
+    \textbf{#1:} \ignorespaces
+}{%
+  \end{minipage}%
+}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE \textbf{Daniel Henderson}}\\[3pt]
+  \small Seattle, WA \enspace | \enspace \resumeLink{mailto:me@danhenderson.dev}{me@danhenderson.dev}
+  \enspace | \enspace \resumeLink{https://www.danhenderson.dev}{danhenderson.dev}
+  \enspace | \enspace \resumeLink{https://www.linkedin.com/in/daniel-henderson-6a9485bb/}{LinkedIn}
+\end{center}
+
+\section*{Summary}
+\begin{itemize}
+  \resumeItem{M.S. Mathematics student in the applied/computational track (expected Aug 2026) researching macrocirculatory hemodynamics.}
+  \resumeItem{Former data scientist and data pipeline engineer who built ingestion, analytics, and machine-learning solutions for a healthcare data platform.}
+  \resumeItem{Open-source contributions spanning Julia documentation, Microsoft Playwright, Data Build Tool community plugins, and scientific-computing libraries.}
+\end{itemize}
+
+\section*{Experience}
+\resumeSubheading{Graduate Research Assistant}{May 2025 -- Present}{Michigan Technological University}{Higher Education}
+\begin{itemize}
+  \resumeItem{Researching macrocirculatory blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.}
+\end{itemize}
+
+\resumeSubheading{Instructor, Calculus I}{Jan 2025 -- May 2025}{Michigan Technological University}{Higher Education}
+\begin{itemize}
+  \resumeItem{Taught a 4-credit undergraduate mathematics section, including recorded lectures, assessments, grading, office hours, and course administration.}
+  \resumeItem{Coordinated content, rubrics, and student support with supervising faculty and peer instructors to keep sections aligned.}
+  \resumeItem{Authored Mathematica walkthroughs that reinforced conceptual understanding and computational fluency.}
+  \resumeItem{Earned a 4.8/5.0 average student evaluation score at a 58\% response rate.}
+\end{itemize}
+
+\resumeSubheading{Graduate Teaching Assistant}{Aug 2024 -- Dec 2024}{Michigan Technological University}{Higher Education}
+\begin{itemize}
+  \resumeItem{Managed grading and individualized feedback for an assigned section through Gradescope and office hours.}
+  \resumeItem{Helped design rubrics so assessment remained consistent across sections.}
+\end{itemize}
+
+\resumeSubheading{Data Pipeline Engineer}{Apr 2022 -- Dec 2022}{Lucerna Health}{HealthTech}
+\begin{itemize}
+  \resumeItem{Contributed to entity-linking, recoding, and ingestion pipelines feeding a healthcare analytics lakehouse.}
+  \resumeItem{Reduced AWS ETL cost by 50\% by upgrading ETL jobs to Glue 3.0 and moving batch workloads to EMR on transient EC2 fleets, supported by an internal platform library for provisioning, networking, security, monitoring, and scaling EMR clusters.}
+  \resumeItem{Built a reconciliation service across PostgreSQL, AWS Glue Data Catalog, Redshift, and S3 to identify and resolve data inconsistencies,
+  reducing tenant-state investigations from hours to minutes.}
+  \resumeItem{Repartitioned production Parquet datalake, yielding improved query performance to support analytics and reporting.}
+  \resumeItem{Processed AWS CloudTrail logs into Parquet and built a dashboard to support security analytics and HITRUST compliance.}
+  \resumeItem{Centralized infrastructure delivery by building an internal CDK library through a major refactor that removed technical debt and git submodules, while introducing semantic versioning practices, enabling more reliable and efficient deployments.}
+  \resumeItem{Migrated data team's software assets from Bitbucket to GitHub Enterprise, standardizing CI/CD into GitHub Actions and hooks.}
+  \resumeItem{Supported hiring and onboarding during an organizational transition, including new engineering and data leadership and interns.}
+\end{itemize}
+
+\resumeSubheading{Data Scientist}{Nov 2021 -- Apr 2022}{Lucerna Health}{HealthTech}
+\begin{itemize}
+  \resumeItem{Introduced CI/CD for machine-learning code, infrastructure, and model artifacts with AWS CDK and Bitbucket Pipelines.}
+  \resumeItem{Built an internal ML library that standardized training, deployment, logging, and cloud configuration.}
+  \resumeItem{Developed a schema-agnostic anomaly-detection pipeline and presented the workflow for broader team adoption.}
+  \resumeItem{Contributed to a deduplication model with a human-in-the-loop training loop driven by platform user feedback.}
+  \resumeItem{Supported restricted offshore data engineers with deployments, code review, ETL troubleshooting, and unit tests.}
+  \resumeItem{Migrated patient electronic medical record data from a client system into the platform, supporting schema mapping, ingestion, and validation.}
+\end{itemize}
+
+\resumeSubheading{Research Assistant}{May 2021 -- Nov 2021}{Michigan Technological University}{Higher Education}
+\begin{itemize}
+  \resumeItem{Co-authored and led numerical experiements for \resumeLink{https://arxiv.org/abs/2201.02608}{``\emph{Quasi-Newton Optimization with Hessian Samples}''} (Azzam, Henderson, Ong, Struthers; 2022)}
+  \resumeItem{Built \resumeLink{https://github.com/danphenderson/BlockOpt.jl}{BlockOpt.jl}, an open-source Julia implementation of the paper's trust-region quasi-Newton methods.}
+  \resumeItem{Built \resumeLink{https://github.com/danphenderson/UncNLPrograms.jl}{UncNLPrograms.jl} to create an automatic-differentiation optimization benchmark suite to test paper's methods.}
+\end{itemize}
+
+\resumeSubheading{Mathematics Tutor}{Sep 2015 -- May 2018}{Michigan Technological University}{Higher Education}
+\begin{itemize}
+  \resumeItem{Tutored NCAA student-athletes in calculus, ordinary differential equations, and linear algebra.}
+\end{itemize}
+
+\resumeSubheading{Bike Mechanic \& Service Technician}{2012 -- 2024}{Various Bicycle Shops}{Arizona, Michigan, Utah, \& Washington}
+\begin{itemize}
+    \item Diagnosed and serviced mechanical issues across customer and rental bicycles with consistent turnaround and quality.
+    \item Managed end-to-end service and sale workflows in retail and rental environments, including intake, triage, repair prioritization, point-of-sale transactions, rental check-in/check-out, and insurance claim support.
+    \item Applied structured troubleshooting and clear customer communication to recommend repairs, explain technical issues, and improve rider safety, equipment reliability, and overall service experience.
+\end{itemize}
+
+\newpage
+\section*{Education}
+\resumeSubheading{M.S. Mathematics, Applied/Computational}{Aug 2024 -- Expected Aug 2026}{Michigan Technological University}{GPA: 3.44}
+\begin{itemize}
+  \resumeItem{Advisor: Jiguang Sun (Department of Mathematical Sciences).}
+  \resumeItem{Pedagogical training in curriculum design, assessment, and evidence-based instruction.}
+  \resumeItem{Contributed to \resumeLink{https://homepage.divms.uiowa.edu/~dstewart/978-3-031-08120-0_Cover_PrintPDF.pdf}{\emph{Numerical Analysis: A Graduate Course}} errata, improving correctness and clarity in the text.}
+  \resumeItem{
+  \begin{courselist}
+    Linear Algebra; Numerical Optimization; Error-Correcting Codes; Theoretical Numerical Analysis; Ordinary Differential Equations; Partial Differential Equations; Numerical Methods for PDEs; Discontinuous Galerkin Methods; Teaching College Mathematics
+  \end{courselist}}
+\end{itemize}
+
+\resumeSubheading{B.S. Mathematics, Applied/Computational, \& Computer Science Minor}{Aug 2015 -- May 2021 (Gap Year 2018/2019)}{Michigan Technological University}{GPA: 3.56; Departmental GPA: 3.71}
+\begin{itemize}
+  \resumeItem{Dean's List for six semesters and recipient of a Certificate of Merit for Outstanding Academic Achievement in Calculus II.}
+  \resumeItem{Leadership and service: President and Vice President of Finance Club; Student Advisor to the Dean of the School of Business and Economics.}
+  \resumeItem{Applied finance and governance: Junior Partner in the Applied Portfolio Management Program (\$1.8M AUM) and Undergraduate Student Government representative on the Ways and Means Committee allocating \$700K across 220 student organizations.}
+  \resumeItem{
+  \begin{courselist}
+    Scientific Computing; Programming at Software \& Hardware interface; Data Structures; Formal Models of Computation; Artificial Intelligence; Concurrent Computing;
+    Optimization \& Graph Algorithms; Team Software Project; Real Analysis (I \& II); Abstract Algebra; Complex Analysis; Linear Algebra; Numerical Linear Algebra;
+    Ordinary Differential Equations; Partial Differential Equations (PDEs); Numerical Methods for PDEs; Nonlinear Dynamics and Chaos; Combinatorics; Probability;
+    Statistics (I \& II); Regression Analysis; History of Mathematics
+  \end{courselist}}
+\end{itemize}
+
+\section*{Volunteering}
+\resumeSubheading{Little Brothers}{Feb 2026}{Friends of the Elderly}{Houghton, MI}
+\begin{itemize}
+  \resumeItem{Contributed 16 volunteer hours sorting, cleaning, and repairing donated medical equipment accumulated over 20 years for reuse in support of isolated seniors.}
+\end{itemize}
+
+\resumeSubheading{Access Fund}{May 2019 -- Present}{Conservation Team}{Scarface Trail (Indian Creek, UT), Silver Mountain, MI, and Index, WA.}
+\begin{itemize}
+  \resumeItem{Supported trail construction and maintenance projects with the Access Fund conservation team at major climbing areas.}
+\end{itemize}
+
+\resumeSubheading{MidWest Devo}{Feb 2013 -- Feb 2015}{Co-Founder \& Volunteer Leadership}{United States}
+\begin{itemize}
+  \resumeItem{Co-founded regional youth cycling development team.}
+  \resumeItem{Earned a \$1,500 Keweenaw Community Foundation grant to build a pump track and skills area.}
+  \resumeItem{Recruited athletes, secured grassroots sponsorships and supported five athletes to attend USA Cycling mountain bike nationals.}
+\end{itemize}
+
+\section*{Selected Projects}
+\begin{itemize}
+  \resumeItem{\textbf{\resumeLink{https://github.com/danphenderson/dev-danhenderson}{Portfolio}}: interactive CV, climbing log, and photography galleries deployed with S3, CloudFront, and Route53}
+  \resumeItem{\textbf{\resumeLink{https://github.com/danphenderson/BlockOpt.jl}{BlockOpt.jl}}: trust-region quasi-Newton optimization package using ForwardDiff.jl and TRS.jl}
+  \resumeItem{\textbf{\resumeLink{https://github.com/danphenderson/UncNLPrograms.jl}{UncNLPrograms.jl}}: subset of CUTEst problems for automatic-differentiation-based solver benchmarking in Julia}
+    \resumeItem{\textbf{\resumeLink{https://github.com/danphenderson/python-typewriter}{typewriter CLI}}: pip-installable Typer and LibCST tools for normalizing \texttt{None}-related type annotations in Python codebases}
+  \resumeItem{\textbf{\resumeLink{https://github.com/danphenderson/python-chromex}{chromex}}: asynchronous Python library for headless browser reads of reactive web pages, built on Beautiful Soup and Selenium}
+  \resumeItem{\textbf{\resumeLink{https://github.com/danphenderson/masterplan-app}{MasterPlan Java Application}}: DAG-based task and subtask management application}
+  \resumeItem{\textbf{\resumeLink{https://github.com/danphenderson/leetcode-solutions}{LeetCode Python Solutions}}: collection of solutions with approach notes and complexity analyses}
+  \resumeItem{\textbf{\resumeLink{https://github.com/danphenderson/runge-kutta-matlab}{Runge-Kutta Methods Matlab Library}}: Runge-Kutta ODE solvers}
+\end{itemize}
+
+\section*{Certifications}
+\begin{itemize}
+  \resumeItem{\textbf{AWS Certified Solutions Architect -- Associate}, Amazon Web Services (February 5, 2024).}
+  \resumeItem{\textbf{AWS Cloud Practitioner}, Amazon Web Services (January 19, 2024).}
+\end{itemize}
+
+\section*{Technical Skills}
+\small
+  \begin{itemize}
+    \resumeItem{\textbf{Languages:} Python, Julia, C/C++, SQL, TypeScript, JavaScript, Java, Bash, Zsh, MATLAB}
+    \resumeItem{\textbf{DevOps:} Coveralls, Codecov, Git Submodules and Hooks, GitHub Actions, Bitbucket Pipelines, SonarCloud, Sentry}
+    \resumeItem{\textbf{Data \& Databases:} PySpark, Data Build Tool, PostgreSQL, MySQL, Redshift}
+    \resumeItem{\textbf{Testing \& APIs:} pytest, unittest, JUnit, Playwright, Selenium, OpenAPI/Swagger, Postman, FastAPI, Django, .env}
+    \resumeItem{\textbf{Developer Tools:} Copilot, Codex, Vim, Visual Studio Code, DBeaver, GitHub CLI, Squarespace, Notion, Confluence, Jira, Slack, Mermaid, Lucidchart, brew, pre-commit, .editorconfig}
+    \resumeItem{\textbf{Cloud:} AWS, Squarespace, Google Workspace}
+  \end{itemize}
+  \end{document}
