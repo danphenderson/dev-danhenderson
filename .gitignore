@@ -188,5 +188,3 @@ yarn-error.log*
 
 deploy.sh
 build.tar.gz
-
-AGENTS.md
