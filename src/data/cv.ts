@@ -164,9 +164,10 @@ export const experiences: Experience[] = [
       Researching macrocirculatory blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.`,
     projects: [
       'Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).',
-      'Scoped near-term simulation pathways from reduced-order models toward PINNs/DeepONets and fluid-structure interaction models.',
+      'Derived and analyzed Navier–Stokes formulations for blood (including Newtonian and generalized-Newtonian viscosity models), documenting the kinematic roles of Reynolds/Womersley numbers and related nondimensional parameters.',
+      'Scoped numerical pathways from dimension-reduced 1D/2D flow simulations incorporating fluid-structure interaction models toward PINNs/DeepONets.',
     ],
-    tools: ['LaTeX', 'Julia', 'Python', 'Overleaf']
+    tools: ['LaTeX', 'Julia', 'Python', 'Overleaf', 'PyTorch', 'DeepXDE']
   },
   {
     company: 'Michigan Technological University',
