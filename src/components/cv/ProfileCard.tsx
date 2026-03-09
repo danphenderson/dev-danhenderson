@@ -1,9 +1,8 @@
 import { Avatar, IconButton, Link, Stack, Typography } from '@mui/material';
-import { useTheme } from '@mui/material/styles';
 import type { ReactNode } from 'react';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import type { AboutMe } from '../../data/cv';
-import { useCvStyles } from '../../styles/cvTheme';
+import { useCvStyles } from '../../styles/cvStyles';
 
 type ProfileCardProps = {
   about: AboutMe;
@@ -12,8 +11,7 @@ type ProfileCardProps = {
 };
 
 export const ProfileCard = ({ about, avatarSrc, linkedinUrl }: ProfileCardProps) => {
-  const { accentColor } = useCvStyles();
-  const theme = useTheme();
+  const { linkedinButtonSx, profileAvatarSx, secondaryStrongSx } = useCvStyles();
   const bioLink = about.bioLink;
   const bioText = about.bio;
   const bioLinkIndex = bioLink ? bioText.indexOf(bioLink.text) : -1;
@@ -37,12 +35,7 @@ export const ProfileCard = ({ about, avatarSrc, linkedinUrl }: ProfileCardProps)
         <Avatar
           src={avatarSrc}
           alt={about.name}
-          sx={{
-            width: 96,
-            height: 96,
-            boxShadow: theme.shadows[6],
-            border: '2px solid rgba(255,255,255,0.9)',
-          }}
+          sx={profileAvatarSx}
         />
       )}
       <Stack spacing={0.75} width="100%">
@@ -58,7 +51,7 @@ export const ProfileCard = ({ about, avatarSrc, linkedinUrl }: ProfileCardProps)
               rel="noopener noreferrer"
               aria-label="LinkedIn profile"
               size="small"
-              sx={{ color: accentColor }}
+              sx={linkedinButtonSx}
             >
               <LinkedInIcon fontSize="small" />
             </IconButton>
@@ -66,7 +59,7 @@ export const ProfileCard = ({ about, avatarSrc, linkedinUrl }: ProfileCardProps)
         </Stack>
 
         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-          <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+          <Typography variant="subtitle2" sx={secondaryStrongSx}>
             {about.title}
           </Typography>
           {about.location && (
@@ -82,7 +75,7 @@ export const ProfileCard = ({ about, avatarSrc, linkedinUrl }: ProfileCardProps)
         </Stack>
       </Stack>
       {about.bio && (
-        <Typography variant="body2" sx={{ whiteSpace: 'pre-line', color: 'text.primary' }}>
+        <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
           {bioContent}
         </Typography>
       )}

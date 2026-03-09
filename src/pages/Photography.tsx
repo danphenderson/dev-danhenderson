@@ -6,10 +6,12 @@ import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
 import { LoadingBars } from '../components/LoadingBars';
 import { usePhotographyData } from '../hooks/usePhotographyData';
+import { useAppStyles } from '../styles/appStyles';
 
 const fallbackBackgroundImage = 'assets/photography/landscape/landscape-lime-kiln.jpg';
 
 export default function Photography() {
+  const appStyles = useAppStyles();
   const { categories } = usePhotographyData();
   const loadedImagesRef = useRef<Set<string>>(new Set());
   const [loadedImages, setLoadedImages] = useState(0);
@@ -39,13 +41,13 @@ export default function Photography() {
               overline="Photography"
               title="Collections"
               subtitle="A selection of field work, climbing days, and stargazing nights."
-              sx={{ mb: 0 }}
+              sx={appStyles.compactSectionHeadingSx}
             />
             <Typography variant="body2" color="text.secondary">
               {categories.length} albums
             </Typography>
             {isLoading && (
-              <Box sx={{ mt: 1 }}>
+              <Box sx={appStyles.sectionLoadingSx}>
                 <LoadingBars label="Loading photography albums" compact />
               </Box>
             )}
@@ -57,17 +59,9 @@ export default function Photography() {
             <Grid item key={card.name} xs={12} sm={6} md={4}>
               <SectionCard
                 delayMs={baseDelay + index * staggerDelay}
-                sx={{ height: '100%', display: 'flex', flexDirection: 'column', gap: 1.5 }}
+                sx={appStyles.photographyCardSx}
               >
-                <Box
-                  sx={{
-                    position: 'relative',
-                    borderRadius: 1.5,
-                    overflow: 'hidden',
-                    pt: '70%',
-                    backgroundColor: 'rgba(15, 23, 42, 0.08)',
-                  }}
-                >
+                <Box sx={appStyles.photographyMediaSx}>
                   <Box
                     component="img"
                     src={card.src}
@@ -76,13 +70,7 @@ export default function Photography() {
                     decoding="async"
                     onLoad={() => handleImageReady(card.src)}
                     onError={() => handleImageReady(card.src)}
-                    sx={{
-                      position: 'absolute',
-                      inset: 0,
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                    }}
+                    sx={appStyles.photographyImageSx}
                   />
                 </Box>
 
@@ -100,7 +88,7 @@ export default function Photography() {
                   to={`/photography/${card.slug}`}
                   variant="outlined"
                   size="small"
-                  sx={{ alignSelf: 'flex-start', textTransform: 'none' }}
+                  sx={appStyles.inlineStartSx}
                 >
                   View album
                 </Button>

@@ -6,6 +6,7 @@ import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
 import { QuiltedImageList } from '../components/PhotoAlbum';
 import { usePhotographyData } from '../hooks/usePhotographyData';
+import { useAppStyles } from '../styles/appStyles';
 
 const fallbackBackgroundImage = 'assets/photography/landscape/landscape-lime-kiln.jpg';
 const legacySlugMap: Record<string, string> = {
@@ -14,6 +15,7 @@ const legacySlugMap: Record<string, string> = {
 };
 
 export default function PhotographyCategory() {
+  const appStyles = useAppStyles();
   const { slug } = useParams<{ slug?: string }>();
   const { categories } = usePhotographyData();
   const slugKey = slug?.toLowerCase();
@@ -38,7 +40,7 @@ export default function PhotographyCategory() {
               to="/photography"
               startIcon={<ArrowBackIcon />}
               size="small"
-              sx={{ alignSelf: 'flex-start', textTransform: 'none' }}
+              sx={appStyles.inlineStartSx}
             >
               Back to photography
             </Button>
@@ -46,7 +48,7 @@ export default function PhotographyCategory() {
               overline="Photography"
               title={category?.name ?? 'Album not found'}
               subtitle={category?.description}
-              sx={{ mb: 0 }}
+              sx={appStyles.compactSectionHeadingSx}
             />
             {category ? (
               <Typography variant="body2" color="text.secondary">
@@ -61,7 +63,7 @@ export default function PhotographyCategory() {
         </SectionCard>
 
         {category && (
-          <SectionCard delayMs={140} sx={{ p: { xs: 1.5, md: 2 } }}>
+          <SectionCard delayMs={140} sx={appStyles.albumSectionSx}>
             <QuiltedImageList imageData={category.album} albumLabel={category.name} />
           </SectionCard>
         )}

@@ -1,6 +1,6 @@
 import { Box, Grid, Paper } from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
 import type { SxProps, Theme } from '@mui/material/styles';
+import { useAppStyles } from '../styles/appStyles';
 import { resolvePublicAssetPath } from '../utils/assets';
 
 interface BackgroundPaperProps {
@@ -21,49 +21,22 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
   shellSx,
 }) => {
   const resolvedImage = resolvePublicAssetPath(image);
-  const theme = useTheme();
-  const overlayColor = alpha(theme.palette.common.black, theme.palette.mode === 'light' ? 0.4 : 0.6);
-  const shellBackground = alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.72 : 0.6);
-  const shellBorder = `1px solid ${alpha(theme.palette.divider, 0.5)}`;
+  const appStyles = useAppStyles();
   const resolvedContentSx = Array.isArray(contentSx) ? contentSx : contentSx ? [contentSx] : [];
   const resolvedShellSx = Array.isArray(shellSx) ? shellSx : shellSx ? [shellSx] : [];
 
   return (
-    <Grid container component="main" sx={{ minHeight: '100vh' }}>
+    <Grid container component="main" sx={appStyles.backgroundRootSx}>
       <Grid
         item
         xs={12}
         sm={12}
         md={12}
-        sx={{
-          backgroundImage: `url('${resolvedImage}')`,
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          position: 'relative',
-          minHeight: '100vh',
-          '&::before': {
-            content: '""',
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0,
-            backgroundColor: overlayColor,
-          },
-        }}
+        sx={appStyles.getBackgroundImageSx(resolvedImage)}
       >
         <Box
           sx={[
-            {
-              position: 'relative',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: contentAlign,
-              minHeight: '100vh',
-              width: '100%',
-              padding: '50px 0',
-            },
+            appStyles.getBackgroundContentSx(contentAlign),
             ...resolvedContentSx,
           ]}
         >
@@ -71,20 +44,14 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
             <Paper
               elevation={10}
               sx={[
-                {
-                  backgroundColor: shellBackground,
-                  padding: 2,
-                  borderRadius: 2,
-                  border: shellBorder,
-                  boxShadow: theme.shadows[6],
-                },
+                appStyles.backgroundShellSx,
                 ...resolvedShellSx,
               ]}
             >
               {children}
             </Paper>
           ) : (
-            <Box sx={{ width: '100%' }}>{children}</Box>
+            <Box sx={appStyles.backgroundChildrenSx}>{children}</Box>
           )}
         </Box>
       </Grid>

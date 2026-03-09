@@ -10,7 +10,7 @@ import {
   Typography,
   Zoom,
 } from '@mui/material';
-import { useCvStyles } from '../styles/cvTheme';
+import { useCvStyles } from '../styles/cvStyles';
 
 type ToolsAccordionProps = {
   id?: string;
@@ -31,7 +31,7 @@ export const ToolsAccordion = ({
   defaultExpanded = true,
   children,
 }: ToolsAccordionProps) => {
-  const { subtleBorder, subtleSurface } = useCvStyles();
+  const { getToolsAccordionSx, sectionTitleSx, toolsChipSx, toolsWrapSx } = useCvStyles();
   const fallbackId = useId();
   const [expanded, setExpanded] = useState(defaultExpanded);
   const [showTools, setShowTools] = useState(defaultExpanded);
@@ -55,23 +55,7 @@ export const ToolsAccordion = ({
         onEntered: () => setShowTools(true),
         onExit: () => setShowTools(false),
       }}
-      sx={{
-        border: subtleBorder,
-        backgroundColor: subtleSurface,
-        borderRadius: 2,
-        '&::before': { display: 'none' },
-        '& .MuiAccordionSummary-root': {
-          minHeight: dense ? 44 : 56,
-          px: { xs: 1.25, sm: 1.5 },
-        },
-        '& .MuiAccordionSummary-content': {
-          my: dense ? 0.25 : 0.5,
-        },
-        '& .MuiAccordionDetails-root': {
-          px: { xs: 1.25, sm: 1.5 },
-          pb: dense ? 1.25 : 1.5,
-        },
-      }}
+      sx={getToolsAccordionSx(dense)}
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon sx={{ color: 'text.secondary' }} />}
@@ -79,7 +63,7 @@ export const ToolsAccordion = ({
         id={summaryId}
       >
         <Stack spacing={0.25} sx={{ width: '100%' }}>
-          <Typography variant="subtitle2" fontWeight={700} sx={{ color: 'text.primary' }}>
+          <Typography variant="subtitle2" fontWeight={700} sx={sectionTitleSx}>
             {title}
           </Typography>
 
@@ -95,13 +79,7 @@ export const ToolsAccordion = ({
         {children ? (
           <Box sx={{ width: '100%' }}>{children}</Box>
         ) : (
-          <Box
-            sx={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: 0.75,
-            }}
-          >
+          <Box sx={toolsWrapSx}>
             {tools
               .filter((t): t is string => typeof t === 'string' && t.trim().length > 0)
               .map((tool, idx) => (
@@ -114,12 +92,7 @@ export const ToolsAccordion = ({
                     label={tool}
                     size={dense ? 'small' : 'medium'}
                     variant="outlined"
-                    sx={{
-                      border: subtleBorder,
-                      backgroundColor: subtleSurface,
-                      fontWeight: 500,
-                      color: 'text.primary',
-                    }}
+                    sx={toolsChipSx}
                   />
                 </Zoom>
               ))}

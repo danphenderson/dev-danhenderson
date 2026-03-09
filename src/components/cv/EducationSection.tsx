@@ -2,12 +2,15 @@ import { Box, Stack, Typography } from '@mui/material';
 import type { EducationInfo } from '../../data/cv';
 import { AnimatedContentCard } from '../AnimatedContentCard';
 import { ToolsAccordion } from '../ToolsAccordion';
+import { useCvStyles } from '../../styles/cvStyles';
 
 type EducationSectionProps = {
   education: EducationInfo;
 };
 
 export const EducationSection = ({ education }: EducationSectionProps) => {
+  const { detailBlockSx, getDetailListSx, sectionTitleSx } = useCvStyles();
+
   if (!education.entries || education.entries.length === 0) {
     return null;
   }
@@ -16,7 +19,7 @@ export const EducationSection = ({ education }: EducationSectionProps) => {
     <Stack spacing={2.25}>
       {education.entries.map((entry, index) => (
         <AnimatedContentCard key={`${entry.university}-${entry.program}-${index}`} delayMs={index * 90}>
-          <Typography variant="h6" fontWeight={700} sx={{ color: 'text.primary' }}>
+          <Typography variant="h6" fontWeight={700} sx={sectionTitleSx}>
             {entry.university}
           </Typography>
 
@@ -40,7 +43,7 @@ export const EducationSection = ({ education }: EducationSectionProps) => {
           )}
 
           {entry.highlights?.filter((highlight) => highlight.trim().length > 0).length ? (
-            <Box component="ul" sx={{ paddingLeft: 3, margin: '10px 0 0' }}>
+            <Box component="ul" sx={getDetailListSx(1.25, 0)}>
               {entry.highlights
                 ?.filter((highlight) => highlight.trim().length > 0)
                 .map((highlight, highlightIndex) => (
@@ -52,7 +55,7 @@ export const EducationSection = ({ education }: EducationSectionProps) => {
           ) : null}
 
           {entry.tools?.filter((tool) => tool.trim().length > 0).length ? (
-            <Box sx={{ mt: 1.5 }}>
+            <Box sx={detailBlockSx}>
               <ToolsAccordion
                 id={`education-tools-${index}`}
                 title="Tools used"

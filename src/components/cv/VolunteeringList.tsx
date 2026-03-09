@@ -1,6 +1,7 @@
 import { Box, Link, Stack, Typography } from '@mui/material';
 import type { VolunteeringEntry } from '../../data/cv';
 import { AnimatedContentCard } from '../AnimatedContentCard';
+import { useCvStyles } from '../../styles/cvStyles';
 
 type VolunteeringListProps = {
   volunteering: VolunteeringEntry[];
@@ -10,6 +11,8 @@ type VolunteeringListProps = {
 const volunteeringStaggerMs = 80;
 
 export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: VolunteeringListProps) => {
+  const { getDetailListSx, secondaryItalicSx, secondaryStrongSx, sectionTitleSx } = useCvStyles();
+
   if (volunteering.length === 0) {
     return null;
   }
@@ -38,12 +41,12 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
                     color="inherit"
                     underline="hover"
                     variant="h6"
-                    sx={{ color: 'text.primary', fontWeight: 700 }}
+                    sx={sectionTitleSx}
                   >
                     {entry.organization}
                   </Link>
                 ) : (
-                  <Typography variant="h6" fontWeight={700} sx={{ color: 'text.primary' }}>
+                  <Typography variant="h6" fontWeight={700} sx={sectionTitleSx}>
                     {entry.organization}
                   </Typography>
                 )}
@@ -53,18 +56,18 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
               </Box>
 
               <Box sx={{ textAlign: { xs: 'left', sm: 'right' } }}>
-                <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+                <Typography variant="subtitle2" sx={secondaryStrongSx}>
                   {entry.dateRange}
                 </Typography>
                 {entry.location && (
-                  <Typography variant="body2" sx={{ color: 'text.secondary', fontStyle: 'italic' }}>
+                  <Typography variant="body2" sx={secondaryItalicSx}>
                     {entry.location}
                   </Typography>
                 )}
               </Box>
             </Stack>
 
-            <Box component="ul" sx={{ paddingLeft: 3, margin: 0 }}>
+            <Box component="ul" sx={getDetailListSx(0, 0)}>
               {entry.highlights.map((highlight, highlightIndex) => (
                 <Typography component="li" variant="body2" key={`${highlight}-${highlightIndex}`}>
                   {highlight}

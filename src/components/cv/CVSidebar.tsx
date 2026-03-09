@@ -14,6 +14,7 @@ import { CVGitHubSection } from './CVGitHubSection';
 import { ProfileCard } from './ProfileCard';
 import { SectionHeading } from './SectionHeading';
 import { ToolsAccordion } from '../ToolsAccordion';
+import { useCvStyles } from '../../styles/cvStyles';
 
 export type CVSidebarSection = 'about' | 'github' | 'certificates' | 'tools';
 
@@ -58,12 +59,14 @@ export const CVSidebar = ({
   githubProjectTitle,
   spacing = 2.5,
 }: CVSidebarProps) => {
+  const { sectionHeadingCompactSx } = useCvStyles();
+
   return (
     <Stack spacing={spacing}>
       {sections.includes('about') && (
         <SectionCard delayMs={aboutDelayMs}>
           <Stack spacing={2}>
-            <SectionHeading overline="About" sx={{ mb: 0.5 }} />
+            <SectionHeading overline="About" sx={sectionHeadingCompactSx} />
             <ProfileCard about={about} linkedinUrl={linkedinUrl} />
             {resumeDownloadAction}
           </Stack>
@@ -93,7 +96,7 @@ export const CVSidebar = ({
       {sections.includes('tools') && (
         <SectionCard delayMs={toolsDelayMs}>
           <Stack spacing={2}>
-            <SectionHeading overline="Stack & Tools" sx={{ mb: 0.5 }} />
+            <SectionHeading overline="Stack & Tools" sx={sectionHeadingCompactSx} />
             {stackAndTools.map((section) => (
               <ToolsAccordion
                 key={section.title}

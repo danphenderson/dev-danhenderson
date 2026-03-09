@@ -1,5 +1,5 @@
 import { Box, BoxProps, Typography } from '@mui/material';
-import { useCvStyles } from '../../styles/cvTheme';
+import { useCvStyles } from '../../styles/cvStyles';
 
 type SectionHeadingProps = BoxProps & {
   overline: string;
@@ -8,7 +8,7 @@ type SectionHeadingProps = BoxProps & {
 };
 
 export const SectionHeading = ({ overline, title, subtitle, sx, ...props }: SectionHeadingProps) => {
-  const { overlineSx } = useCvStyles();
+  const { overlineSx, sectionHeadingTitleSx, sectionHeadingSubtitleSx } = useCvStyles();
 
   return (
     <Box sx={sx} {...props}>
@@ -16,12 +16,12 @@ export const SectionHeading = ({ overline, title, subtitle, sx, ...props }: Sect
         {overline}
       </Typography>
       {title && (
-        <Typography variant="h4" sx={{ mb: subtitle ? 1 : 2, color: 'text.primary' }}>
+        <Typography variant="h4" sx={sectionHeadingTitleSx(subtitle)}>
           {title}
         </Typography>
       )}
       {subtitle && (
-        <Typography variant="subtitle1" color="text.secondary" sx={{ mb: 2 }}>
+        <Typography variant="subtitle1" color="text.secondary" sx={sectionHeadingSubtitleSx}>
           {subtitle}
         </Typography>
       )}

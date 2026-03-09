@@ -4,285 +4,146 @@
 [![Build](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml)
 [![Node 20.x](https://img.shields.io/badge/node-20.x-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 
-Source code for [danhenderson.dev](https://www.danhenderson.dev): a personal site with an interactive CV, climbing log, and photography galleries built with React + TypeScript + MUI.
-
-## Table of Contents
-- [Overview](#overview)
-- [Core Features](#core-features)
-- [Tech Stack](#tech-stack)
-- [Routes](#routes)
-- [Architecture](#architecture)
-- [Project Structure](#project-structure)
-- [Data Model and Content Sources](#data-model-and-content-sources)
-- [Getting Started](#getting-started)
-- [NPM Scripts](#npm-scripts)
-- [Customization Guide](#customization-guide)
-- [Deployment Notes](#deployment-notes)
-- [Development Workflow](#development-workflow)
-- [Troubleshooting](#troubleshooting)
+Source for [danhenderson.dev](https://www.danhenderson.dev), a client-side portfolio site built with React, TypeScript, and MUI. The app stays fully static-hostable: content is stored in local TypeScript modules, routes are handled in the browser, and the CV enhances itself with public GitHub data when it is available.
 
 ## Overview
-This repository powers a multi-page portfolio site focused on:
 
-- `CV`: A resume-style experience page with static content and live GitHub activity.
-- `Climbing`: A sortable climbing tick list and route to-do table.
-- `Photography`: Album browsing and category-specific image galleries.
-- `Home`: Welcome page with optional SoundCloud-powered intro audio.
+This repository powers four main areas:
 
-The app is a client-side SPA (React Router) and uses local TypeScript data modules plus GitHub API calls for dynamic CV highlights.
+- `/` for the home page and optional welcome audio
+- `/cv` for the interactive CV, downloadable resume link, and GitHub-backed highlights
+- `/climbing` for climbing ticks and to-do routes
+- `/photography` for gallery browsing and album detail pages
 
-## Core Features
-- Fully client-side React app with route-based sections.
-- Light/Dark theming with persistent preference (`localStorage`).
-- Animated content entry cards (`IntersectionObserver` + MUI `Zoom`).
-- Optional welcome audio prompt with playback controls in the header.
-- Responsive navigation (desktop links + mobile menu).
-- Live GitHub profile enrichment with fallback content if API calls fail.
-- Climbing data tables via MUI X `DataGrid`.
-- Photo album/category browsing with lazy-loaded images.
-
-## Tech Stack
-- `React 18`
-- `TypeScript`
-- `react-router-dom` (v6)
-- `@mui/material` + Emotion
-- `@mui/x-data-grid`
-- `react-github-calendar`
-- `react-scripts` (Create React App toolchain)
+The site is a React Router single-page app. Keep unknown-route rewrites, `PUBLIC_URL` compatibility, and shipped static assets intact when making changes.
 
 ## Routes
 
 | Route | Page | Purpose |
 | --- | --- | --- |
-| `/` | `Home` | Intro hero + optional welcome audio prompt |
-| `/cv` | `CV` | Profile, experience, education, certificates, tools, code examples, GitHub sections |
-| `/climbing` | `Climbing` | Tick list and to-do routes in paginated data tables |
-| `/photography` | `Photography` | Category cards for photo albums |
-| `/photography/:slug` | `PhotographyCategory` | Photos for a selected album |
+| `/` | `Home` | Intro page with optional welcome audio prompt |
+| `/cv` | `CV` | Resume-style experience, education, certificates, tools, code samples, and GitHub sections |
+| `/climbing` | `Climbing` | Tick list and route wish list in MUI X DataGrid tables |
+| `/photography` | `Photography` | Photography collection index |
+| `/photography/:slug` | `PhotographyCategory` | Album view for a selected collection |
 | `*` | `NotFound` | Fallback page |
 
-## Architecture
-### Component Structure
+## Stack
 
-```mermaid
-flowchart TD
-  index["index.tsx"]
-  theme["ThemeProvider"]
-  audio["WelcomeAudioProvider"]
-  app["App"]
-  iframe["Hidden SoundCloud iframe"]
+- React 18
+- TypeScript
+- React Router v6
+- MUI + Emotion
+- MUI X DataGrid
+- `react-github-calendar`
+- Create React App (`react-scripts`)
+- Node 20.x in CI
 
-  index --> theme --> audio --> app
-  audio -.manages.-> iframe
-
-  app --> router["BrowserRouter"]
-  router --> header["Header"]
-  router --> routes["Routes"]
-  router --> footer["Footer"]
-
-  header --> headerTheme["useTheme (ThemeProvider context)"]
-  header --> headerAudio["useWelcomeAudio (audio controls + hints)"]
-
-  routes --> rHome["/ -> Home"]
-  routes --> rCV["/cv -> CV"]
-  routes --> rClimb["/climbing -> Climbing"]
-  routes --> rPhoto["/photography -> Photography"]
-  routes --> rPhotoCat["/photography/:slug -> PhotographyCategory"]
-  routes --> r404["* -> NotFound"]
-
-  rHome --> home["Home"]
-  home --> homeBg["BackgroundPaper"]
-  home --> homeDialog["Audio prompt Dialog"]
-
-  rCV --> cv["CV"]
-  cv --> cvData["useGithubProfile"]
-  cv --> cvBg["BackgroundPaper"]
-  cv --> cvAbout["ProfileCard"]
-  cv --> cvExp["ExperienceList"]
-  cv --> cvEdu["EducationSection"]
-  cv --> cvGh["GitHub sections"]
-  cv --> cvCert["CertificatesList"]
-  cv --> cvTools["ToolsAccordion (Stack & Tools)"]
-  cv --> cvCode["CodingExamplesSection"]
-  cv --> cvAnim["AnimatedContentCard wrappers"]
-
-  cvGh --> ghActivity["GitHubActivityList"]
-  cvGh --> ghContrib["GitHubContributions"]
-  cvGh --> ghCalendar["GitHubContributionCalendar"]
-  cvGh --> ghProjects["GitHubProjects"]
-
-  rClimb --> climbing["Climbing"]
-  climbing --> climbData["useClimbingData"]
-  climbing --> climbBg["BackgroundPaper"]
-  climbing --> climbCard["AnimatedContentCard"]
-  climbing --> climbHead["SectionHeading"]
-  climbing --> climbGrid["DataGrid (ticks + todos)"]
-  climbing --> climbLoad["LoadingBars overlay"]
-
-  rPhoto --> photo["Photography"]
-  photo --> photoData["usePhotographyData"]
-  photo --> photoBg["BackgroundPaper"]
-  photo --> photoHead["SectionHeading"]
-  photo --> photoCards["AnimatedContentCard grid of albums"]
-  photo --> photoLoad["LoadingBars while images load"]
-
-  rPhotoCat --> photoCat["PhotographyCategory"]
-  photoCat --> photoCatParams["useParams(slug)"]
-  photoCat --> photoCatData["usePhotographyData"]
-  photoCat --> photoCatBg["BackgroundPaper"]
-  photoCat --> photoCatHead["SectionHeading"]
-  photoCat --> photoAlbum["QuiltedImageList"]
-
-  r404 --> notFound["NotFound"]
-  notFound --> notFoundBg["BackgroundPaper"]
-```
-
-## Project Structure
-```text
-.
-├── public/
-│   ├── assets/                     # Images, certificates, audio asset references
-│   └── index.html
-├── src/
-│   ├── components/                 # Shared UI and CV-specific components
-│   ├── data/                       # CV, climbing, and photography content
-│   ├── hooks/                      # Data adapters/hooks (GitHub, climbs, photos)
-│   ├── pages/                      # Route-level pages
-│   ├── styles/
-│   ├── App.tsx                     # Router and route registration
-│   ├── ThemeProvider.tsx           # MUI theme + theme state
-│   └── WelcomeAudioProvider.tsx    # SoundCloud widget integration and state
-├── package.json
-└── README.md
-```
-
-## Data Model and Content Sources
-
-### Local data modules
-- `src/data/cv.ts`
-  - Profile/contact info
-  - Experience entries
-  - Education data
-  - Certificates
-  - Stack/tools list
-  - GitHub fallback activity/projects
-- `src/data/climbs.ts`
-  - `ticks`: sent routes with dates
-  - `todos`: project/wishlist routes
-  - Current dataset size: ~566 ticks and ~352 todos
-- `src/data/photography.ts`
-  - Album category cards + per-album images
-  - Current dataset size: 4 categories, 43 photos
-
-### Runtime API data
-`src/hooks/useGithubProfile.ts` fetches from GitHub:
-- User events: `GET /users/:username/events/public`
-- User repos: `GET /users/:username/repos`
-- Public PR contribution search: `GET /search/issues`
-- Repo metadata enrichment: `GET /repos/:owner/:repo`
-
-If API calls fail or are rate-limited, CV sections gracefully fall back to static content from `src/data/cv.ts`.
-
-## Getting Started
+## Local Development
 
 ### Prerequisites
-- Node.js 18+ recommended
-- npm 9+ recommended
+
+- Node.js 20.x
+- npm
 
 ### Install
+
 ```bash
 npm install
 ```
 
-### Run locally
+### Run the dev server
+
 ```bash
 npm start
 ```
 
-By default, the app runs on port `3001` (from `package.json`):
+The development server defaults to port `3001`.
 
-```bash
-PORT=${PORT:-3001} react-scripts start
-```
-
-Override port if needed:
+Use a different port when needed:
 
 ```bash
 PORT=3000 npm start
 ```
 
-## NPM Scripts
+### Available scripts
 
-| Script | Command | Description |
+| Script | Command | Purpose |
 | --- | --- | --- |
-| `start` | `PORT=${PORT:-3001} react-scripts start` | Start dev server |
-| `build` | `react-scripts build` | Create production build in `build/` |
-| `test` | `react-scripts test` | Run test runner in watch mode |
-| `eject` | `react-scripts eject` | Eject CRA config (irreversible) |
+| `npm start` | `PORT=${PORT:-3001} react-scripts start` | Start the local dev server |
+| `npm run build` | `react-scripts build` | Create the production build in `build/` |
+| `npm test` | `react-scripts test` | Start the Jest runner |
+| `npm run eject` | `react-scripts eject` | Eject CRA configuration |
 
-## Customization Guide
+### CI workflows
 
-### Update CV content
-Edit `src/data/cv.ts`:
-- `aboutMe`
-- `experiences`
-- `educationInfo`
-- `certificates`
-- `codingExamples`
-- `stackAndTools`
+GitHub Actions workflows live in `.github/workflows/`:
 
-### Update downloadable resume PDF
-- Replace `public/assets/daniel-henderson-resume.pdf` with the latest document.
-- Download button metadata is configured in `src/data/cv.ts` via `resumePdfUrl` and `resumeDownloadFilename`.
-- This PDF is intentionally maintained as a separate artifact and may differ from live `/cv` content.
-- LaTeX source is available at `resume/daniel-henderson-resume.tex`.
-- Compile locally with `pdflatex -output-directory public/assets resume/daniel-henderson-resume.tex` and then verify the generated `public/assets/daniel-henderson-resume.pdf`.
+- `tests.yml` runs `CI=true npm test -- --watch=false --passWithNoTests --coverage`
+- `build.yml` runs `npm run build`
 
-### Update climbing logs
-Edit `src/data/climbs.ts`:
-- `ticks` entries for completed routes
-- `todos` entries for targets
+## Content Sources
 
-The `useClimbingData` hook sorts/normalizes these for table display.
+### Primary maintainer entry points
 
-### Update photography collections
-Edit `src/data/photography.ts`:
-- Add or remove categories
-- Add/remove items in each category’s `album`
+- `src/data/cv.ts`
+  - primary CV content
+  - resume download metadata
+  - fallback GitHub activity, projects, and contributions used when runtime requests fail
+- `src/data/climbs.ts`
+  - climbing ticks and to-do routes consumed by `useClimbingData`
+  - keep route formatting compatible with the existing sorting and normalization logic
+- `src/data/photography.ts`
+  - photography collections, album images, and route slugs consumed by `usePhotographyData`
+  - preserve slug stability so existing album URLs continue to resolve
+- `src/ThemeProvider.tsx`
+  - application palette, typography, and component theme overrides
+  - persisted theme key: `danhenderson-theme`
+- `src/WelcomeAudioProvider.tsx`
+  - SoundCloud embed URL and welcome-audio behavior
+  - persisted audio consent key: `danhenderson-welcome-audio-consent`
+- `resume/daniel-henderson-resume.tex`
+  - LaTeX source for the downloadable PDF in `public/assets/daniel-henderson-resume.pdf`
 
-Album route slugs are explicitly defined as `slug` values in `src/data/photography.ts` and consumed by `usePhotographyData`.
+### Repository layout
 
-### Update colors and typography
-Edit `src/ThemeProvider.tsx`:
-- Palette tokens
-- Typography scale
-- Component style overrides
+```text
+.
+├── .github/workflows/   # Build and test automation
+├── public/assets/       # Shipped images, certificates, media, and resume PDF
+├── resume/              # LaTeX resume source
+├── src/components/      # Shared UI and CV-specific components
+├── src/data/            # Source-of-truth content modules
+├── src/hooks/           # Data adapters for GitHub, climbing, and photography
+├── src/pages/           # Route-level pages
+├── src/types/           # Shared TypeScript models
+├── src/utils/           # Asset/date helpers and similar utilities
+└── README.md
+```
 
-Theme mode persists to `localStorage` via key: `danhenderson-theme`.
+### Common maintenance tasks
 
-### Update welcome audio
-Edit `src/WelcomeAudioProvider.tsx`:
-- `TRACK_EMBED_URL` for SoundCloud track
-- Widget behavior for autoplay/pause/repeat
-
-Audio prompt dismissal is persisted via: `danhenderson-welcome-audio-prompt`.
+- Update CV copy, certificates, code examples, or GitHub fallback content in `src/data/cv.ts`.
+- Replace the downloadable resume PDF at `public/assets/daniel-henderson-resume.pdf` and keep related metadata aligned in `src/data/cv.ts`.
+- Update theme tokens and component overrides in `src/ThemeProvider.tsx`.
+- Update welcome-audio behavior or track configuration in `src/WelcomeAudioProvider.tsx`.
+- When changing climbing or photography data, keep `useClimbingData` sorting assumptions and photography slug behavior intact.
 
 ## Deployment Notes
-- Build output is generated in `build/`.
-- This is a client-side SPA; configure your host to rewrite unknown paths to `index.html`.
-- Static asset URLs are prefixed by `PUBLIC_URL` (`assetBasePath` in `src/data/cv.ts` and background resolution logic in `BackgroundPaper`), so set `PUBLIC_URL` when deploying under a subpath.
-- Ensure `public/assets/` is shipped with the build (photos, certificates, and media references).
 
-## Development Workflow
-- Lint/test workflow is CRA default.
-- Pre-commit hooks are configured in `.pre-commit-config.yaml` (trailing whitespace, EOF fixer, YAML/TOML checks, etc.).
-- TypeScript model types are centralized in `src/types/data.ts`.
+- Production output is generated in `build/`.
+- The host must rewrite unknown routes to `index.html` so direct links like `/cv` and `/photography/:slug` work.
+- Set `PUBLIC_URL` when deploying under a subpath so generated asset URLs resolve correctly.
+- Ship `public/assets/` with the deployment.
+- The CV fetches public GitHub data at runtime; if requests fail or are rate-limited, the UI falls back to static content from `src/data/cv.ts`.
 
-## Troubleshooting
-- GitHub sections show fallback data:
-  - Cause: network error or GitHub API rate limiting.
-  - Action: reload later, or use an authenticated API strategy if you add a backend proxy.
-- Images not loading in production:
-  - Check `PUBLIC_URL` and asset paths under `public/assets`.
-- Direct linking to `/cv` or `/photography/...` fails on host:
-  - Add SPA rewrites to `index.html`.
+## Validation
+
+README claims in this repo should stay aligned with `package.json`, `src/App.tsx`, `src/data/`, `src/ThemeProvider.tsx`, and `src/WelcomeAudioProvider.tsx`.
+
+Use these checks after meaningful changes:
+
+```bash
+npm run build
+CI=true npm test -- --watch=false --passWithNoTests
+```

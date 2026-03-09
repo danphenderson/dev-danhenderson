@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { Box } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
+import { useAppStyles } from '../../styles/appStyles';
 import BackgroundPaper from '../BackgroundPaper';
 
 type PageFrameProps = {
@@ -16,6 +17,7 @@ export const PageFrame = ({
   maxWidth = 1400,
   containerSx,
 }: PageFrameProps) => {
+  const appStyles = useAppStyles();
   const sxArray = Array.isArray(containerSx) ? containerSx : containerSx ? [containerSx] : [];
 
   return (
@@ -23,10 +25,8 @@ export const PageFrame = ({
       <Box
         sx={[
           {
+            ...appStyles.pageFrameContainerSx,
             maxWidth,
-            mx: 'auto',
-            px: { xs: 1.5, md: 3 },
-            py: { xs: 2, md: 3 },
           },
           ...sxArray,
         ]}

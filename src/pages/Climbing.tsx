@@ -6,6 +6,7 @@ import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
 import { LoadingBars } from '../components/LoadingBars';
 import { useClimbingData, TickRow, TodoRow } from '../hooks/useClimbingData';
+import { useAppStyles } from '../styles/appStyles';
 
 const columns: GridColDef<TickRow>[] = [
   { field: 'date', headerName: 'Date', flex: 0.7, minWidth: 120 },
@@ -50,21 +51,21 @@ const todoColumns: GridColDef<TodoRow>[] = [
   { field: 'location', headerName: 'Location', flex: 1, minWidth: 150 },
 ];
 
-const LoadingOverlay = () => (
-  <Box sx={{ width: '100%', p: 2 }}>
-    <LoadingBars label="Loading climbing data" compact />
-  </Box>
-);
-
 export default function Climbing() {
+  const appStyles = useAppStyles();
   const { ticks, todos, loading, todosLoading, error, todosError } = useClimbingData();
+  const LoadingOverlay = () => (
+    <Box sx={appStyles.loadingOverlaySx}>
+      <LoadingBars label="Loading climbing data" compact />
+    </Box>
+  );
 
   return (
     <PageFrame image="assets/climbing/climbing-locations.png" maxWidth={1200}>
-      <SectionCard sx={{ p: { xs: 2.5, md: 3.5 } }}>
+      <SectionCard sx={appStyles.climbingCardSx}>
         <Stack spacing={2}>
           <SectionHeading overline="Climbing" title="Recorded Ascents" />
-          <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+          <Typography variant="subtitle2" sx={appStyles.sectionLeadSx}>
             A collection of routes I've remembered to tick on Mountain Project.
           </Typography>
           {error && (
@@ -72,7 +73,7 @@ export default function Climbing() {
               {error}
             </Alert>
           )}
-          <Box sx={{ width: '100%' }}>
+          <Box sx={appStyles.dataGridContainerSx}>
             <DataGrid
               rows={ticks}
               columns={columns}
@@ -89,7 +90,7 @@ export default function Climbing() {
             />
           </Box>
           <SectionHeading overline="Climbing" title="To-Do Routes" sx={{ mt: 2 }} />
-          <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+          <Typography variant="subtitle2" sx={appStyles.sectionLeadSx}>
             A collection of routes I'm interested in climbing
           </Typography>
           {todosError && (
@@ -97,7 +98,7 @@ export default function Climbing() {
               {todosError}
             </Alert>
           )}
-          <Box sx={{ width: '100%' }}>
+          <Box sx={appStyles.dataGridContainerSx}>
             <DataGrid
               rows={todos}
               columns={todoColumns}

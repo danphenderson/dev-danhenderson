@@ -21,7 +21,7 @@ export const CertificatesList = ({ certificates }: CertificatesListProps) => (
             rel="noopener noreferrer"
             variant="outlined"
             size="small"
-            sx={{ mt: 1, textTransform: 'none' }}
+            sx={{ mt: 1 }}
           >
             View Certificate
           </Button>

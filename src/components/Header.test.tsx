@@ -1,11 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { useTheme as useAppTheme } from '../ThemeProvider';
+import { useAppTheme } from '../ThemeProvider';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import Header from './Header';
 
 jest.mock('../ThemeProvider', () => ({
-  useTheme: jest.fn(),
+  useAppTheme: jest.fn(),
 }));
 
 jest.mock('../WelcomeAudioProvider', () => ({
@@ -36,7 +36,6 @@ const createAudioState = (
 describe('Header controls', () => {
   beforeEach(() => {
     mockUseAppTheme.mockReturnValue({
-      theme: {} as any,
       mode: 'light',
       toggleTheme: jest.fn(),
     });
@@ -78,7 +77,6 @@ describe('Header controls', () => {
     const toggleTheme = jest.fn();
     const setShowDarkModeHint = jest.fn();
     mockUseAppTheme.mockReturnValue({
-      theme: {} as any,
       mode: 'light',
       toggleTheme,
     });

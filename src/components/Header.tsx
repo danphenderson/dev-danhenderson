@@ -5,10 +5,11 @@ import Toolbar from '@mui/material/Toolbar';
 import { Box, Slide } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
-import { alpha, useTheme as useMuiTheme } from '@mui/material/styles';
+import { useTheme as useMuiTheme } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
-import { useTheme as useAppTheme } from '../ThemeProvider';
+import { useAppTheme } from '../ThemeProvider';
 import { avatar as avatarSrc } from '../data/cv';
+import { useAppStyles } from '../styles/appStyles';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { HeaderActions } from './header/HeaderActions';
 import { HeaderNav } from './header/HeaderNav';
@@ -46,6 +47,7 @@ const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
 
 export default function Header() {
   const { mode, toggleTheme } = useAppTheme();
+  const appStyles = useAppStyles();
   const muiTheme = useMuiTheme();
   const location = useLocation();
   const {
@@ -61,64 +63,21 @@ export default function Header() {
   const showAvatar =
     path.startsWith('/cv') || path.startsWith('/climbing') || path.startsWith('/photography');
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
-  const headerIconSx = { fontSize: { xs: 26, md: 30 } };
   const iconButtonSize = isMobile ? 'medium' : ('large' as const);
   const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState<null | HTMLElement>(null);
   const mobileMenuOpen = Boolean(mobileMenuAnchor);
   const pauseButtonRef = React.useRef<HTMLButtonElement | null>(null);
   const themeButtonRef = React.useRef<HTMLButtonElement | null>(null);
-  const themeRingColor = alpha(muiTheme.palette.primary.light, 0.9);
-  const themeGlowColor = alpha(muiTheme.palette.primary.main, 0.35);
   const themeHintTitle = mode === 'dark' ? 'Try light mode' : 'Try dark mode';
   const themeHintBody =
     mode === 'dark'
       ? 'Tap this button to switch back to light mode.'
       : 'Tap this button to switch to dark mode.';
   const pauseHighlightSx = showPauseHint
-    ? {
-        position: 'relative',
-        overflow: 'visible',
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          inset: -6,
-          borderRadius: '50%',
-          border: '2px solid rgba(255, 179, 128, 0.95)',
-          animation: `${pulseRing} 1.6s ease-out infinite`,
-          pointerEvents: 'none',
-        },
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          inset: -2,
-          borderRadius: '50%',
-          boxShadow: '0 0 0 3px rgba(255, 179, 128, 0.35)',
-          pointerEvents: 'none',
-        },
-      }
+    ? appStyles.getHeaderHighlightSx('secondary', `${pulseRing} 1.6s ease-out infinite`)
     : {};
   const themeHighlightSx = showDarkModeHint
-    ? {
-        position: 'relative',
-        overflow: 'visible',
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          inset: -6,
-          borderRadius: '50%',
-          border: `2px solid ${themeRingColor}`,
-          animation: `${pulseRing} 1.6s ease-out infinite`,
-          pointerEvents: 'none',
-        },
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          inset: -2,
-          borderRadius: '50%',
-          boxShadow: `0 0 0 3px ${themeGlowColor}`,
-          pointerEvents: 'none',
-        },
-      }
+    ? appStyles.getHeaderHighlightSx('primary', `${pulseRing} 1.6s ease-out infinite`)
     : {};
 
   React.useEffect(() => {
@@ -158,14 +117,12 @@ export default function Header() {
     <>
       <HideOnScroll>
         <AppBar position="fixed" elevation={6}>
-          <Toolbar
-            sx={{ px: { xs: 1.5, md: 2.5 }, gap: { xs: 1.5, md: 2.5 }, minHeight: { xs: 64, md: 80 } }}
-          >
+          <Toolbar sx={appStyles.headerToolbarSx}>
             <HeaderNav
               pages={pages}
               isMobile={isMobile}
               iconButtonSize={iconButtonSize}
-              headerIconSx={headerIconSx}
+              headerIconSx={appStyles.headerIconSx}
               mobileMenuOpen={mobileMenuOpen}
               mobileMenuAnchor={mobileMenuAnchor}
               onMobileMenuOpen={handleMobileMenuOpen}
@@ -174,25 +131,17 @@ export default function Header() {
                 showAvatar ? (
                   <HeaderActions
                     iconButtonSize={iconButtonSize}
-                    headerIconSx={headerIconSx}
+                    headerIconSx={appStyles.headerIconSx}
                     showAvatar
                     avatarSrc={avatarSrc}
                   />
                 ) : null
               }
             />
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-                flexShrink: 0,
-                ml: { xs: 'auto', md: 0 },
-              }}
-            >
+            <Box sx={appStyles.headerActionsContainerSx}>
               <HeaderActions
                 iconButtonSize={iconButtonSize}
-                headerIconSx={headerIconSx}
+                headerIconSx={appStyles.headerIconSx}
                 showAudioControl
                 isPlaying={isPlaying}
                 onToggleAudio={handleAudioToggle}
@@ -226,7 +175,7 @@ export default function Header() {
           </Toolbar>
         </AppBar>
       </HideOnScroll>
-      <Toolbar sx={{ minHeight: { xs: 64, md: 80 } }} />
+      <Toolbar sx={appStyles.headerOffsetToolbarSx} />
     </>
   );
 }

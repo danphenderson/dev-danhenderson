@@ -4,7 +4,6 @@ import { PaletteMode } from '@mui/material';
 import {
   alpha,
   createTheme,
-  Theme,
   ThemeProvider as MuiThemeProvider,
 } from '@mui/material/styles';
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
@@ -185,6 +184,9 @@ const createAppTheme = (mode: PaletteMode) =>
           root: {
             borderRadius: 14,
             overflow: 'hidden',
+            '&::before': {
+              display: 'none',
+            },
           },
         },
       },
@@ -197,13 +199,11 @@ const createAppTheme = (mode: PaletteMode) =>
   });
 
 type ThemeContextValue = {
-  theme: Theme;
   mode: PaletteMode;
   toggleTheme: () => void;
 };
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: createAppTheme('light'),
   mode: 'light',
   toggleTheme: () => {},
 });
@@ -236,7 +236,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
   if (!children) return null;
 
   return (
-    <ThemeContext.Provider value={{ theme, mode, toggleTheme }}>
+    <ThemeContext.Provider value={{ mode, toggleTheme }}>
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
         {children}
@@ -245,6 +245,6 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
   );
 };
 
-export const useTheme = () => useContext(ThemeContext);
+export const useAppTheme = () => useContext(ThemeContext);
 
 export default ThemeProvider;

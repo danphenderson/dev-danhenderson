@@ -12,6 +12,7 @@ import type { PaletteMode } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { MutableRefObject } from 'react';
 import { Link } from 'react-router-dom';
+import { useAppStyles } from '../../styles/appStyles';
 
 type HeaderActionsProps = {
   iconButtonSize: 'small' | 'medium' | 'large';
@@ -50,6 +51,11 @@ export const HeaderActions = ({
   showDarkModeHint = false,
   themeHighlightSx,
 }: HeaderActionsProps) => {
+  const appStyles = useAppStyles();
+  const pauseButtonSx = (pauseHighlightSx
+    ? [appStyles.headerAudioControlSx, pauseHighlightSx]
+    : appStyles.headerAudioControlSx) as SxProps<Theme>;
+
   return (
     <Stack direction="row" spacing={{ xs: 1, md: 2 }} alignItems="center">
       {showAvatar && avatarSrc && (
@@ -60,16 +66,12 @@ export const HeaderActions = ({
             color="inherit"
             aria-label="Go to home"
             size={iconButtonSize}
-            sx={{ p: { xs: 0.5, md: 0.625 } }}
+            sx={appStyles.headerAvatarButtonSx}
           >
             <Avatar
               src={avatarSrc}
               alt="Daniel Henderson"
-              sx={{
-                width: { xs: 40, md: 50 },
-                height: { xs: 40, md: 50 },
-                border: '2.5px solid rgba(255,255,255,0.8)',
-              }}
+              sx={appStyles.headerAvatarSx}
             />
           </IconButton>
         </Tooltip>
@@ -85,7 +87,7 @@ export const HeaderActions = ({
               onClick={onToggleAudio}
               aria-label={isPlaying ? 'Pause welcome audio' : 'Play welcome audio'}
               aria-describedby={showPauseHint ? 'pause-audio-popover' : undefined}
-              sx={{ mr: 0.625, ...(pauseHighlightSx || {}) }}
+              sx={pauseButtonSx}
             >
               {isPlaying ? (
                 <PauseCircleOutlineIcon sx={headerIconSx} />

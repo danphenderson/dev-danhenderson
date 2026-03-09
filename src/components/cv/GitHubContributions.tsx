@@ -2,6 +2,7 @@ import { Box, Stack, Typography } from '@mui/material';
 import type { GitHubContribution } from '../../data/cv';
 import { LoadingBars } from '../LoadingBars';
 import { ContentCard } from '../ContentCard';
+import { useCvStyles } from '../../styles/cvStyles';
 import { GitHubLinkChipList } from './GitHubLinkChipList';
 
 type GitHubContributionsProps = {
@@ -19,6 +20,15 @@ export const GitHubContributions = ({
   startDelayMs = 0,
   itemStaggerMs = 80,
 }: GitHubContributionsProps) => {
+  const {
+    contributionCardMetaSx,
+    contributionCardNameSx,
+    contributionCardSx,
+    contributionInlineLabelSx,
+    contributionInlineMetaSx,
+    contributionInlineNameSx,
+  } = useCvStyles();
+
   if (loading) {
     return (
       <LoadingBars label="Loading GitHub contributions" compact />
@@ -46,15 +56,12 @@ export const GitHubContributions = ({
           label: (
             <Box
               component="span"
-              sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}
+              sx={contributionInlineLabelSx}
             >
-              <Box
-                component="span"
-                sx={{ fontWeight: 600, color: 'text.primary', overflowWrap: 'anywhere' }}
-              >
+              <Box component="span" sx={contributionInlineNameSx}>
                 {project.name}
               </Box>
-              <Box component="span" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+              <Box component="span" sx={contributionInlineMetaSx}>
                 ★ {project.stars ?? 0}
               </Box>
             </Box>
@@ -77,30 +84,15 @@ export const GitHubContributions = ({
           href={project.url}
           target="_blank"
           rel="noopener noreferrer"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: 1.5,
-            textDecoration: 'none',
-            transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-            p: 1.5,
-            '&:hover': {
-              transform: 'translateY(-2px)',
-              boxShadow: 6,
-            },
-          }}
+          sx={contributionCardSx}
         >
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Typography
-              variant="subtitle2"
-              sx={{ color: 'text.primary', fontWeight: 700, overflowWrap: 'anywhere' }}
-            >
+            <Typography variant="subtitle2" sx={contributionCardNameSx}>
               {project.name}
             </Typography>
           </Box>
           <Stack direction="row" spacing={0.5} alignItems="center" sx={{ flexShrink: 0 }}>
-            <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+            <Typography variant="body2" sx={contributionCardMetaSx}>
               ★ {project.stars ?? 0}
             </Typography>
           </Stack>

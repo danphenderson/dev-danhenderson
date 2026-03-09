@@ -1,7 +1,7 @@
 import { Stack, Typography } from '@mui/material';
 import type { CodingExample } from '../../data/cv';
 import { AnimatedContentCard } from '../AnimatedContentCard';
-import { useCvStyles } from '../../styles/cvTheme';
+import { useCvStyles } from '../../styles/cvStyles';
 
 type CodingExamplesSectionProps = {
   examples: CodingExample[];
@@ -9,9 +9,8 @@ type CodingExamplesSectionProps = {
 };
 const experienceStaggerMs = 80;
 
-
 export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExamplesSectionProps) => {
-  const { accentColor } = useCvStyles();
+  const { codingExampleLinkSx } = useCvStyles();
 
   return (
     <Stack spacing={2.25}>
@@ -23,32 +22,25 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
             delayMs={startDelayMs + index * experienceStaggerMs}
           >
             <Stack spacing={1.25}>
-          {primaryLink ? (
-            <Typography
-              variant="h6"
-              component="a"
-              href={primaryLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              sx={{
-                borderColor: accentColor,
-                color: 'text.primary',
-                textDecoration: 'none',
-                '&:hover': {
-                  textDecoration: 'underline',
-                },
-              }}
-            >
-              {example.title}
-            </Typography>
-          ) : (
-            <Typography variant="h6">{example.title}</Typography>
-          )}
-            <Typography variant="body2">{example.description}</Typography>
-          </Stack>
-        </AnimatedContentCard>
+              {primaryLink ? (
+                <Typography
+                  variant="h6"
+                  component="a"
+                  href={primaryLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={codingExampleLinkSx}
+                >
+                  {example.title}
+                </Typography>
+              ) : (
+                <Typography variant="h6">{example.title}</Typography>
+              )}
+              <Typography variant="body2">{example.description}</Typography>
+            </Stack>
+          </AnimatedContentCard>
         );
       })}
     </Stack>
   );
-}
+};

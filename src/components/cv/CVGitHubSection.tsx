@@ -6,6 +6,7 @@ import type {
   GitHubProject,
 } from '../../data/cv';
 import { githubUsername } from '../../data/cv';
+import { useCvStyles } from '../../styles/cvStyles';
 import { ANIMATED_CARD_DURATION_MS } from '../AnimatedContentCard';
 import { SectionCard } from '../layout/SectionCard';
 import { SectionPanel } from '../layout/SectionPanel';
@@ -27,29 +28,6 @@ type CVGitHubSectionProps = {
   overlineSx?: SxProps<Theme>;
 };
 
-const ghostCardSx = {
-  p: 0,
-  border: 'none',
-  backgroundColor: 'transparent',
-  boxShadow: 'none',
-  borderRadius: 0,
-};
-
-const githubSectionTitleSx = {
-  color: 'text.primary',
-  fontWeight: 700,
-};
-
-const githubSectionDividerSx = {
-  borderColor: 'divider',
-};
-
-const defaultOverlineSx = {
-  mb: 0.5,
-  ml: { xs: 1.5, md: 1.5 },
-  mt: { xs: 0.75, md: 0.75 },
-};
-
 const nestedDelayBaseMs = 160;
 const githubStaggerMs = 200;
 
@@ -62,23 +40,25 @@ export const CVGitHubSection = ({
   sectionDelayMs = 0,
   nestedDelayOffsetMs = 0,
   projectTitle = 'Public Projects',
-  overlineSx = defaultOverlineSx,
+  overlineSx,
 }: CVGitHubSectionProps) => {
+  const { cardResetSx, dividerSx, githubDefaultOverlineSx, sectionTitleSx } = useCvStyles();
   const githubNestedBaseDelayMs = ANIMATED_CARD_DURATION_MS + nestedDelayBaseMs + nestedDelayOffsetMs;
   const githubItemDelayOffsetMs = ANIMATED_CARD_DURATION_MS + nestedDelayBaseMs;
   const githubActivityDelayMs = githubNestedBaseDelayMs;
   const githubActivityItemsDelayMs = githubActivityDelayMs + githubItemDelayOffsetMs;
   const githubContributionsDelayMs = githubNestedBaseDelayMs + githubStaggerMs;
   const githubContributionsItemsDelayMs = githubContributionsDelayMs + githubItemDelayOffsetMs;
+  const resolvedOverlineSx = overlineSx ?? githubDefaultOverlineSx;
 
   return (
     <SectionCard delayMs={sectionDelayMs}>
       <Stack spacing={2}>
-        <SectionHeading overline="GitHub" sx={overlineSx} />
+        <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
 
-        <SectionCard delayMs={githubActivityDelayMs} sx={ghostCardSx}>
+        <SectionCard delayMs={githubActivityDelayMs} sx={cardResetSx}>
           <Stack spacing={1}>
-            <Typography variant="subtitle2" sx={githubSectionTitleSx}>
+            <Typography variant="subtitle2" sx={sectionTitleSx}>
               Recent Activity
             </Typography>
             <SectionPanel>
@@ -92,10 +72,10 @@ export const CVGitHubSection = ({
           </Stack>
         </SectionCard>
 
-        <SectionCard delayMs={githubContributionsDelayMs} sx={ghostCardSx}>
+        <SectionCard delayMs={githubContributionsDelayMs} sx={cardResetSx}>
           <Stack spacing={1}>
-            <Divider sx={githubSectionDividerSx} />
-            <Typography variant="subtitle2" sx={githubSectionTitleSx}>
+            <Divider sx={dividerSx} />
+            <Typography variant="subtitle2" sx={sectionTitleSx}>
               Contributions
             </Typography>
             <SectionPanel>
@@ -109,17 +89,17 @@ export const CVGitHubSection = ({
           </Stack>
         </SectionCard>
 
-        <SectionCard delayMs={githubNestedBaseDelayMs + githubStaggerMs * 2} sx={ghostCardSx}>
+        <SectionCard delayMs={githubNestedBaseDelayMs + githubStaggerMs * 2} sx={cardResetSx}>
           <Stack spacing={1}>
-            <Divider sx={githubSectionDividerSx} />
+            <Divider sx={dividerSx} />
             <GitHubContributionCalendar username={githubUsername} contained={false} />
           </Stack>
         </SectionCard>
 
-        <SectionCard delayMs={githubNestedBaseDelayMs + githubStaggerMs * 3} sx={ghostCardSx}>
+        <SectionCard delayMs={githubNestedBaseDelayMs + githubStaggerMs * 3} sx={cardResetSx}>
           <Stack spacing={1}>
-            <Divider sx={githubSectionDividerSx} />
-            <Typography variant="subtitle2" sx={githubSectionTitleSx}>
+            <Divider sx={dividerSx} />
+            <Typography variant="subtitle2" sx={sectionTitleSx}>
               {projectTitle}
             </Typography>
             <SectionPanel>

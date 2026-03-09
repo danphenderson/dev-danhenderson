@@ -19,13 +19,10 @@ import {
   volunteering,
 } from '../data/cv';
 import { useGithubProfile } from '../hooks/useGithubProfile';
-
-const pageContainerSx = {
-  px: { xs: 1.5, md: 5 },
-  py: { xs: 2, md: 4 },
-};
+import { useAppStyles } from '../styles/appStyles';
 
 export default function CV() {
+  const appStyles = useAppStyles();
   const { activity, projects, contributions, loading, error } = useGithubProfile();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
@@ -34,11 +31,7 @@ export default function CV() {
 
   const resumeDownloadAction = (
     <Box
-      sx={{
-        display: 'flex',
-        justifyContent: { xs: 'stretch', sm: 'flex-end' },
-        mb: { xs: 1.5, md: 2 },
-      }}
+      sx={appStyles.resumeDownloadContainerSx}
     >
       <Button
         component="a"
@@ -47,7 +40,7 @@ export default function CV() {
         variant="outlined"
         size="small"
         aria-label="Download resume as PDF"
-        sx={{ width: { xs: '100%', sm: 'flex-end' } }}
+        sx={appStyles.resumeDownloadButtonSx}
       >
         Download Resume (PDF)
       </Button>
@@ -56,7 +49,7 @@ export default function CV() {
 
   if (isMobile) {
     return (
-      <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={pageContainerSx}>
+      <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
         <Stack spacing={2.5}>
           <CVSidebar
             sections={['about']}
@@ -126,15 +119,10 @@ export default function CV() {
   }
 
   return (
-    <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={pageContainerSx}>
+    <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
       <Grid container spacing={3} alignItems="stretch">
         <Grid item xs={12} md={5} lg={4} sx={{ order: { xs: 2, md: 1 } }}>
-          <Box
-            sx={{
-              height: '100%',
-              p: { xs: 2.5, md: 3 },
-            }}
-          >
+          <Box sx={appStyles.cvSidebarPaneSx}>
             <CVSidebar
               sections={['about', 'github', 'certificates', 'tools']}
               about={aboutMe}
@@ -158,11 +146,7 @@ export default function CV() {
         </Grid>
 
         <Grid item xs={12} md={7} lg={8} sx={{ order: { xs: 1, md: 2 } }}>
-          <Box
-            sx={{
-              p: { xs: 2.5, md: 3.5 },
-            }}
-          >
+          <Box sx={appStyles.cvMainPaneSx}>
             <CVMainColumn
               sections={['experience', 'education', 'volunteering', 'coding']}
               experiences={experiences}

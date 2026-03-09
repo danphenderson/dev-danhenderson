@@ -1,7 +1,7 @@
 import { Box, Chip, Link, Stack, Typography } from '@mui/material';
 import type { Experience, ExperienceProject } from '../../data/cv';
 import { AnimatedContentCard } from '../AnimatedContentCard';
-import { useCvStyles } from '../../styles/cvTheme';
+import { useCvStyles } from '../../styles/cvStyles';
 import { ToolsAccordion } from '../ToolsAccordion';
 
 type ExperienceListProps = {
@@ -10,12 +10,14 @@ type ExperienceListProps = {
 };
 
 const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) => {
+  const { getDetailListSx } = useCvStyles();
+
   if (!projects || projects.length === 0) {
     return null;
   }
 
   return (
-    <Box component="ul" sx={{ paddingLeft: 3, margin: '10px 0' }}>
+    <Box component="ul" sx={getDetailListSx(1.25, 1.25)}>
       {projects.map((project, projectIndex) => {
         if (typeof project === 'string') {
           return (
@@ -46,7 +48,7 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
 const experienceStaggerMs = 80;
 
 export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceListProps) => {
-  const { accentColor, accentTint } = useCvStyles();
+  const { detailBlockSx, experienceIndustryChipSx, secondaryStrongSx, sectionTitleSx } = useCvStyles();
 
   return (
     <Stack spacing={2.25}>
@@ -56,10 +58,16 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
           delayMs={startDelayMs + index * experienceStaggerMs}
         >
           <Stack spacing={1.25}>
-            <Stack direction="row" justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} spacing={1.5} flexWrap="wrap">
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems={{ xs: 'flex-start', sm: 'center' }}
+              spacing={1.5}
+              flexWrap="wrap"
+            >
               <Box>
                 <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                  <Typography variant="h6" fontWeight={700} sx={{ color: 'text.primary' }}>
+                  <Typography variant="h6" fontWeight={700} sx={sectionTitleSx}>
                     {experience.title}
                   </Typography>
                   {experience.industry && (
@@ -67,12 +75,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                       size="small"
                       label={experience.industry}
                       variant="outlined"
-                      sx={{
-                        borderColor: accentColor,
-                        color: 'text.primary',
-                        backgroundColor: accentTint,
-                        fontWeight: 600,
-                      }}
+                      sx={experienceIndustryChipSx}
                     />
                   )}
                 </Stack>
@@ -85,12 +88,12 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                       color="inherit"
                       underline="hover"
                       variant="subtitle2"
-                      sx={{ color: 'text.secondary', fontWeight: 700 }}
+                      sx={secondaryStrongSx}
                     >
                       {experience.company}
                     </Link>
                   ) : (
-                    <Typography variant="subtitle2" sx={{ color: 'text.secondary', fontWeight: 700 }}>
+                    <Typography variant="subtitle2" sx={secondaryStrongSx}>
                       {experience.company}
                     </Typography>
                   )}
@@ -110,7 +113,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
             </Typography>
           )}
           {experience.projects?.length ? (
-            <Box sx={{ mt: 1.5 }}>
+            <Box sx={detailBlockSx}>
               <ToolsAccordion
                 id={`experience-projects-${index}`}
                 title="Details"
@@ -123,7 +126,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
             </Box>
           ) : null}
           {experience.tools?.filter((tool) => tool.trim().length > 0).length ? (
-            <Box sx={{ mt: 1.5 }}>
+            <Box sx={detailBlockSx}>
               <ToolsAccordion
                 id={`experience-tools-${index}`}
                 title="Tools used"

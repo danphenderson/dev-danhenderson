@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import BackgroundPaper from '../components/BackgroundPaper';
+import { useAppStyles } from '../styles/appStyles';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 
 export default function Home() {
+  const appStyles = useAppStyles();
   const {
     play,
     isPlaying,
@@ -66,15 +68,11 @@ export default function Home() {
     <BackgroundPaper
       image="assets/home.jpg"
       contentAlign="flex-end"
-      contentSx={{ pb: '194px' }}
-      shellSx={{ p: 1.5, pb: 0.5 }}
+      contentSx={appStyles.homeHeroContentSx}
+      shellSx={appStyles.homeHeroShellSx}
     >
       <Stack spacing={2} alignItems="center">
-        <Typography
-          variant="h1"
-          align="center"
-          sx={{ color: '#fff', fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' }, lineHeight: '1.5' }}
-        >
+        <Typography variant="h1" align="center" sx={appStyles.homeHeroTitleSx}>
           Hi, my passions are mathematics, computers, and adventures
         </Typography>
       </Stack>
