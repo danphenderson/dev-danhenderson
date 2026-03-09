@@ -25,7 +25,9 @@ export default function Home() {
       return;
     }
 
-    setIsPromptOpen(false);
+    if (audioConsent === 'declined') {
+      setIsPromptOpen(false);
+    }
   }, [audioConsent, isPlaying]);
 
   useEffect(
