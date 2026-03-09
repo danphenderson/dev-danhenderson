@@ -46,6 +46,33 @@ The site is a React Router single-page app. Keep unknown-route rewrites, `PUBLIC
 - Route pages compose shared layout primitives such as `BackgroundPaper`, `PageFrame`, and `SectionCard`.
 - `/cv` is split into reusable CV building blocks such as `CVSidebar`, `CVMainColumn`, `ProfileCard`, `ExperienceList`, and GitHub-backed sections.
 
+## Data Model and Content Sources
+
+### Local data modules
+- `src/data/cv.ts`
+  - Profile/contact info
+  - Experience entries
+  - Education data
+  - Certificates
+  - Stack/tools list
+  - GitHub fallback activity/projects
+- `src/data/climbs.ts`
+  - `ticks`: sent routes with dates
+  - `todos`: project/wishlist routes
+  - Current dataset size: ~566 ticks and ~352 todos
+- `src/data/photography.ts`
+  - Album category cards + per-album images
+  - Current dataset size: 4 categories, 43 photos
+
+### Runtime API data
+`src/hooks/useGithubProfile.ts` fetches from GitHub:
+- User events: `GET /users/:username/events/public`
+- User repos: `GET /users/:username/repos`
+- Public PR contribution search: `GET /search/issues`
+- Repo metadata enrichment: `GET /repos/:owner/:repo`
+
+If API calls fail or are rate-limited, CV sections gracefully fall back to static content from `src/data/cv.ts`.
+
 ## Local Development
 
 ### Prerequisites
