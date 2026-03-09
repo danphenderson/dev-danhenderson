@@ -62,7 +62,7 @@ export default function PhotographyCategory() {
 
         {category && (
           <SectionCard delayMs={140} sx={{ p: { xs: 1.5, md: 2 } }}>
-            <QuiltedImageList ImageData={category.album} albumLabel={category.name} />
+            <QuiltedImageList imageData={category.album} albumLabel={category.name} />
           </SectionCard>
         )}
       </Stack>
