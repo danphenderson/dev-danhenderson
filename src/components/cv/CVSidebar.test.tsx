@@ -5,6 +5,7 @@ import { CVSidebar } from './CVSidebar';
 
 const mockCertificatesList = jest.fn((_: { startDelayMs?: number }) => <div data-testid="certificates-list" />);
 const mockCVGitHubSection = jest.fn((_: { itemOffsetMs?: number }) => <div data-testid="github-section" />);
+const mockStackAndToolsSection = jest.fn((_: { startDelayMs?: number }) => <div data-testid="stack-tools-section" />);
 
 jest.mock('../layout/SectionCard', () => ({
   SectionCard: ({ children }: { children: ReactNode }) => <div>{children}</div>,
@@ -22,17 +23,18 @@ jest.mock('./ProfileCard', () => ({
   ProfileCard: () => <div data-testid="profile-card" />,
 }));
 
-jest.mock('../ToolsAccordion', () => ({
-  ToolsAccordion: () => <div data-testid="tools-accordion" />,
+jest.mock('./StackAndToolsSection', () => ({
+  StackAndToolsSection: (props: { startDelayMs?: number }) => mockStackAndToolsSection(props),
 }));
 
 describe('CVSidebar', () => {
   afterEach(() => {
     mockCertificatesList.mockClear();
     mockCVGitHubSection.mockClear();
+    mockStackAndToolsSection.mockClear();
   });
 
-  it('passes the shared item offset to certificates and GitHub content', () => {
+  it('passes the shared item offset to certificates, GitHub content, and stack/tools accordions', () => {
     render(
       <ThemeProvider>
         <CVSidebar
@@ -60,5 +62,6 @@ describe('CVSidebar', () => {
 
     expect(mockCertificatesList.mock.calls[0][0]).toEqual(expect.objectContaining({ startDelayMs: 120 }));
     expect(mockCVGitHubSection.mock.calls[0][0]).toEqual(expect.objectContaining({ itemOffsetMs: 120 }));
+    expect(mockStackAndToolsSection.mock.calls[0][0]).toEqual(expect.objectContaining({ startDelayMs: 120 }));
   });
 });

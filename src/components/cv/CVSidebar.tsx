@@ -13,7 +13,7 @@ import { CertificatesList } from './CertificatesList';
 import { CVGitHubSection } from './CVGitHubSection';
 import { ProfileCard } from './ProfileCard';
 import { SectionHeading } from './SectionHeading';
-import { ToolsAccordion } from '../ToolsAccordion';
+import { StackAndToolsSection } from './StackAndToolsSection';
 import { useCvStyles } from '../../styles/cvStyles';
 
 export type CVSidebarSection = 'about' | 'github' | 'certificates' | 'tools';
@@ -99,19 +99,7 @@ export const CVSidebar = ({
 
       {sections.includes('tools') && (
         <SectionCard delayMs={toolsDelayMs}>
-          <Stack spacing={2}>
-            <SectionHeading overline="Stack & Tools" sx={sectionHeadingCompactSx} />
-            {stackAndTools.map((section) => (
-              <ToolsAccordion
-                key={section.title}
-                title={section.title}
-                subtitle=""
-                tools={section.items}
-                dense
-                defaultExpanded={false}
-              />
-            ))}
-          </Stack>
+          <StackAndToolsSection sections={stackAndTools} startDelayMs={resolvedItemOffsetMs} />
         </SectionCard>
       )}
     </Stack>
