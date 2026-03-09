@@ -18,7 +18,8 @@ function srcset(image: string, size: number, rows = 1, cols = 1) {
 }
 
 function getDownloadFilename(image: string) {
-  const filename = image.split("/").pop()?.split("?")[0];
+  const lastSegment = image.split("/").pop() ?? image;
+  const filename = lastSegment.split("?")[0];
   return filename && filename.length > 0 ? filename : "photo.jpg";
 }
 

@@ -9,7 +9,7 @@ describe('QuiltedImageList', () => {
         albumLabel="Landscape"
         ImageData={[
           { img: '/assets/photography/landscape/photo-one.jpg', title: 'Sunset Rim' },
-          { img: '/assets/photography/landscape/photo-two.jpg', title: 'Missing' },
+          { img: '/assets/photography/landscape/photo-two.jpg', title: '' },
         ]}
       />
     );
