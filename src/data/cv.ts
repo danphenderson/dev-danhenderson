@@ -64,6 +64,15 @@ export type EducationEntry = {
   tools?: string[];
 };
 
+export type VolunteeringEntry = {
+  organization: string;
+  organizationUrl?: string;
+  role: string;
+  dateRange: string;
+  location?: string;
+  highlights: string[];
+};
+
 export type StackSection = {
   title: string;
   items: string[];
@@ -323,6 +332,39 @@ export const educationInfo: EducationInfo = {
     },
   ],
 };
+
+export const volunteering: VolunteeringEntry[] = [
+  {
+    organization: 'Little Brothers',
+    role: 'Friends of the Elderly',
+    dateRange: 'Feb 2026',
+    location: 'Houghton, MI',
+    highlights: [
+      'Contributed 16 volunteer hours sorting, cleaning, and repairing donated medical equipment accumulated over 20 years for reuse in support of isolated seniors.',
+    ],
+  },
+  {
+    organization: 'Access Fund',
+    organizationUrl: 'https://www.accessfund.org',
+    role: 'Conservation Team',
+    dateRange: 'May 2019 – Present',
+    location: 'Scarface Trail (Indian Creek, UT), Silver Mountain, MI, and Index, WA.',
+    highlights: [
+      'Supported trail construction and maintenance projects with the Access Fund conservation team at major climbing areas.',
+    ],
+  },
+  {
+    organization: 'MidWest Devo',
+    role: 'Co-Founder & Volunteer Leadership',
+    dateRange: 'Feb 2013 – Feb 2015',
+    location: 'United States',
+    highlights: [
+      'Co-founded regional youth cycling development team.',
+      'Earned a $1,500 Keweenaw Community Foundation grant to build a pump track and skills area.',
+      'Recruited athletes, secured grassroots sponsorships and supported five athletes to attend USA Cycling mountain bike nationals.',
+    ],
+  },
+];
 
 export const stackAndTools: StackSection[] = [
   {
