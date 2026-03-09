@@ -7,7 +7,6 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 import ThemeProvider from './ThemeProvider';
 import { WelcomeAudioProvider } from './WelcomeAudioProvider';
-import './styles/print.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement)
 

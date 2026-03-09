@@ -80,7 +80,7 @@ export const aboutMe: AboutMe = {
   phone: '',
   location: 'Seattle, WA',
   bioLink: {
-    text: 'Mathematics MS student (expected summer 2026)',
+    text: 'M.S. Mathematics student in the applied/computational track (expected Aug 2026)',
     url: mtuMathGraduateUrl,
   },
   bio:
@@ -181,7 +181,7 @@ export const experiences: Experience[] = [
       'Taught a 4-credit undergraduate mathematics section, including recorded lectures, assessments, grading, office hours, and course administration.',
       'Coordinated content, rubrics, and student support with supervising faculty and peer instructors to keep sections aligned.',
       'Authored Mathematica walkthroughs that reinforced conceptual understanding and computational fluency.',
-      'Earned a 4.8/5.0 average student evaluation score at a 58\% response rate.',
+      'Earned a 4.8/5.0 average student evaluation score at a 58% response rate.',
     ],
     tools: ['Mathematica', 'Gradescope', 'Canvas', 'Panapto', 'Zoom', 'HTML'],
   },
@@ -212,7 +212,7 @@ export const experiences: Experience[] = [
     projects: [
       "Supported architectural design, releases, and deployments of data-engineering assets, including data governance, security, and integrity of the platform's data lakehouse.",
       "Repartitioned 50TB datalake, yielding improved query performance to accelerate nightly DBT builds and support analytics and reporting.",
-      "Reduced AWS ETL cost by 50\% from upgrading ETL jobs to Glue 3.0 and moving batch workloads to EMR on transient EC2 fleets, supported by an internal platform library for provisioning, networking, security, monitoring, and scaling EMR clusters.",
+      "Reduced AWS ETL cost by 50% from upgrading ETL jobs to Glue 3.0 and moving batch workloads to EMR on transient EC2 fleets, supported by an internal platform library for provisioning, networking, security, monitoring, and scaling EMR clusters.",
       "Built a reconciliation service across PostgreSQL, AWS Glue Data Catalog, Redshift, and S3 to identify and resolve data inconsistencies, reducing tenant-state investigations from hours to minutes.",
       "Centralized infrastructure delivery by building an internal CDK library through a major refactor that removed technical debt and git submodules, while introducing semantic versioning practices, enabling more reliable and efficient deployments.",
       "Migrated data team’s software assets from Bitbucket to GitHub Enterprise, standardizing CI/CD into GitHub Actions and hooks.",
@@ -220,7 +220,7 @@ export const experiences: Experience[] = [
       "Supported hiring and onboarding during an organizational transition, including new engineering and data leadership and interns.",
     ],
     tools: [
-      'AWS: EC2, S3, SNS, SQS, Cloudformation, Cloudtrail, Cloudwatch, Lambda, Glue (\& Glue Data Catalog), EMR, Redshift, RDS, Athena, Quicksight', 'Python', 'PySpark', 'Jupyter', 'DBT (Data Build Tool)', 'GitHub Enterprise', 'Docker',
+      'AWS: EC2, S3, SNS, SQS, Cloudformation, Cloudtrail, Cloudwatch, Lambda, Glue (& Glue Data Catalog), EMR, Redshift, RDS, Athena, Quicksight', 'Python', 'PySpark', 'Jupyter', 'DBT (Data Build Tool)', 'GitHub Enterprise', 'Docker',
       'Sentry', 'Slack', 'SonarCloud', 'Django', 'OpenAPI/Swagger', 'Jupyter', 'DBeaver', 'Postman', 'Visual Studio Code',
     ],
   },
@@ -270,7 +270,7 @@ export const experiences: Experience[] = [
     title: 'Mathematics Tutor | Part Time',
     startDate: 'September 2015',
     endDate: 'May 2018 (2 yrs 9 mos)',
-    description: 'Tutor to NCAA student-athletes in calculus (I, II, \& III), ordinary differential equations, and linear algebra.',
+    description: 'Tutor to NCAA student-athletes in calculus (I, II, & III), ordinary differential equations, and linear algebra.',
     projects: [],
     tools: ['Mathematica']
   },
@@ -298,7 +298,6 @@ export const educationInfo: EducationInfo = {
       status: 'Expected Summer 2026',
       dateRange: 'Fall 2024 – Present',
       highlights: [
-        'Advisor: Jiguang Sun (Department of Mathematical Sciences).',
         'Pedagogical training in curriculum design, assessment, and evidence-based instruction.',
         'Submissions to Numerical Analysis: A Graduate Course errata, improving correctness and clarity in the text.',
         "Coursework: Linear Algebra, Numerical Optimization, Error-Correcting Codes, Theoretical Numerical Analysis, Ordinary Differential Equations, Partial Differential Equations, Numerical Methods for PDEs, Discontinuous Galerkin Methods, Teaching College Mathematics"
@@ -318,7 +317,7 @@ export const educationInfo: EducationInfo = {
         'Junior Partner, Applied Portfolio Management Program ($1.8M AUM)',
         "Recipient of Dean's List award for six semesters (Spring 2015, Summer 2015, Fall 2019, Spring 2020, Fall 2020, & Spring 2021)",
         'Certificate of Merit for Outstanding Academic Achievement in Calculus II with Technology, Mathematical Sciences Department',
-        "Relevant Coursework: Scientific Computing, Programming at Software & Hardware interface, Data Structures, Formal Models of Computation, Artificial Intelligence, Concurrent Computing, Optimization & Graph Algorithms, Team Software Project, Real Analysis (I \& II), Abstract Algebra, Complex Analysis, Linear Algebra, Numerical Linear Algebra, Ordinary Differential Equations, Partial Differential Equations (PDEs), Numerical Methods for PDEs, Nonlinear Dynamics and Chaos, Combinatorics, Probability, Statistics (I & II), Regression Analysis, History of Mathematics"
+        "Relevant Coursework: Scientific Computing, Programming at Software & Hardware interface, Data Structures, Formal Models of Computation, Artificial Intelligence, Concurrent Computing, Optimization & Graph Algorithms, Team Software Project, Real Analysis (I & II), Abstract Algebra, Complex Analysis, Linear Algebra, Numerical Linear Algebra, Ordinary Differential Equations, Partial Differential Equations (PDEs), Numerical Methods for PDEs, Nonlinear Dynamics and Chaos, Combinatorics, Probability, Statistics (I & II), Regression Analysis, History of Mathematics"
       ],
       tools: ['Java', 'C', 'C++', 'Python', 'Matlab', 'Mathematica', 'SQL', 'Assembly (MIPS)'],
     },
@@ -412,4 +411,12 @@ export const fallbackGitHubProjects: GitHubProject[] = [
   { name: 'masterplan-app', url: 'https://github.com/danphenderson/masterplan-app' },
 ];
 
+export const fallbackGitHubContributions: GitHubContribution[] = [
+  { name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright' },
+  { name: 'JuliaLang/julia', url: 'https://github.com/JuliaLang/julia' },
+  { name: 'dbt-labs/dbt-core', url: 'https://github.com/dbt-labs/dbt-core' },
+  { name: 'SciML/DifferentialEquations.jl', url: 'https://github.com/SciML/DifferentialEquations.jl' },
+];
+
 export const MAX_VISIBLE_CONTRIBUTIONS = 20;
+export const MAX_CONTRIBUTION_ENRICHMENTS = 8;

@@ -1,11 +1,37 @@
-1. High: climbing dates render one day early for users west of UTC. In useClimbingData.ts (line 13) and useClimbingData.ts (line 20), ISO YYYY-MM-DD strings are parsed with new Date(...) and then localized. On this machine, new Date('2025-06-26').toLocaleDateString() resolves to 6/25/2025, so the climbing log is wrong for US viewers.
+## Portfolio Correctness + Debt Cleanup + Component Refactor
 
-2. High: subpath deployments will break several background images because PUBLIC_URL is applied twice. BackgroundPaper.tsx (line 19) and BackgroundPaper.tsx (line 23) prepend PUBLIC_URL, while cv.ts (line 1) and photography.ts (line 4) already do that for some assets. With PUBLIC_URL=/portfolio, /portfolio/assets/... becomes /portfolio/portfolio/assets/.... That hits pages like CV.tsx (line 100) and PhotographyCategory.tsx (line 22).
+### Summary- Deliver patches in 4 waves: critical correctness/privacy, GitHub reliability, cruft/performance cleanup, and component refactor.
+- Prioritize user-visible correctness first, then reliability, then maintainability and component abstraction.
 
-3. Medium: the GitHub “Contributions” section can mislabel non-contribution repos as community work. useGithubProfile.ts (line 152) collects every external repo from public events before any event-type filtering, and useGithubProfile.ts (line 156) only excludes self-owned repos. A watch/star-style event can therefore appear under the “Contributions” heading rendered at CV.tsx (line 143).
+### Key Changes
+- **Wave 1 (critical fixes)**
+  - Replace timezone-sensitive date rendering in climbing with a UTC-safe formatter that preserves the source calendar date.
+  - Normalize background image resolution so `PUBLIC_URL` is applied exactly once.
+  - Defer SoundCloud script+iframe creation until explicit user consent; persist consent choice.
+- **Wave 2 (GitHub data quality/resilience)**
+  - Restrict contribution repo extraction to contribution-like event types.
+  - Add `fallbackGitHubContributions` in `src/data/cv.ts` and wire it into `useGithubProfile` initialization + error fallback.
+  - Cap repo enrichment calls (default: 8) and preserve last-known-good data when enrichment partially fails.
+- **Wave 3 (cruft + perf debt)**
+  - Remove dead components and unused placeholder stylesheet if unneeded.
+  - Remove unused npm dependencies and refresh lockfile.
+  - Fix low-noise lint issues (`accentTint` unused, unnecessary escapes, invalid width token, bioLink text mismatch).
+  - Convert photography slugs to explicit stable slugs (kebab-case) and align sitemap entries; add compatibility handling for old `new%20mexico` link.
+  - Remove technical debt.
+- **Wave 4 (component refactor)**
+  - Extract shared layout primitives (for example `PageFrame`, `SectionCard`, and `SectionPanel`) and migrate `CV`, `Climbing`, `Photography`, and `PhotographyCategory` to reduce repeated wrapper/layout/styling code.
+  - Split `src/pages/CV.tsx` into composable sections (`CVSidebar`, `CVMainColumn`, `CVGitHubSection`) so the page file only handles route-level data wiring and responsive composition.
+  - Consolidate duplicated GitHub list/chip rendering into a shared component (for example `GitHubLinkChipList`) and reuse it in `GitHubActivityList`, `GitHubContributions`, and `GitHubProjects`.
+  - Refactor `Header` into container + presentational subcomponents (`HeaderNav`, `HeaderActions`, `HintPopover`) while preserving existing behavior, a11y attributes, and responsive navigation/audio controls.
+  - Move CV-specific style helpers (`useCvStyles`) out of `ThemeProvider.tsx` into a dedicated theme utility module to separate global theme state from CV UI tokens.
+  - Add targeted tests for extracted logic/components where practical (at minimum, CV GitHub section rendering and header audio/theme control behavior).
+  - Verification gate: run build + manual smoke checks on desktop/mobile for `/cv`, `/climbing`, `/photography`, and `/photography/:slug`, confirming no UX regressions.
+### Public Interfaces / Type Changes
+- Add `fallbackGitHubContributions` export in `src/data/cv.ts`.
+- Add stable `slug` field to photography category data model (or equivalent typed mapping utility).
+- Add reusable utility for background image resolution and UTC-safe climbing date formatting.
 
-4. Medium: GitHub fallback behavior is incomplete for contributions. Activity and projects have curated fallbacks in cv.ts (line 398) and cv.ts (line 404), but contributions start empty in useGithubProfile.ts (line 107) and useGithubProfile.ts (line 113), then stay empty on first-load failure via useGithubProfile.ts (line 229) and useGithubProfile.ts (line 251). The UI degrades to “no contributions found” instead of real fallback content.
-
-5. Medium: the welcome-audio flow is opt-out in practice, not opt-in. The whole app is wrapped in index.tsx (line 15) and index.tsx (line 16), and WelcomeAudioProvider.tsx (line 49), WelcomeAudioProvider.tsx (line 58), WelcomeAudioProvider.tsx (line 63), WelcomeAudioProvider.tsx (line 151), and WelcomeAudioProvider.tsx (line 154) load SoundCloud resources before the user answers the dialog. That is a privacy/performance mismatch with the UI wording.
-
-6. Low: the intended inline bio link on the CV page never renders. cv.ts (line 82) defines bioLink.text as “Mathematics MS student (expected summer 2026)”, but the actual bio copy at cv.ts (line 87) uses different text. Since ProfileCard.tsx (line 19) and ProfileCard.tsx (line 22) rely on exact substring matching, the link silently disappears.
+### Assumptions (defaults chosen)
+- Keep CRA for this patch set; toolchain migration (e.g., Vite) is deferred to a separate effort.
+- Preserve current UX/content except where needed for correctness/privacy.
+- Keep existing production routes functional while introducing canonical slug behavior.

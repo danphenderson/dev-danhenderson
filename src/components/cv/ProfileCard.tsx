@@ -3,7 +3,7 @@ import { useTheme } from '@mui/material/styles';
 import type { ReactNode } from 'react';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import type { AboutMe } from '../../data/cv';
-import { useCvStyles } from '../../ThemeProvider';
+import { useCvStyles } from '../../styles/cvTheme';
 
 type ProfileCardProps = {
   about: AboutMe;

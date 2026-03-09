@@ -1,10 +1,8 @@
-import { Box, Chip, Stack, Typography } from '@mui/material';
-import GitHubIcon from '@mui/icons-material/GitHub';
+import { Box, Stack, Typography } from '@mui/material';
 import type { GitHubContribution } from '../../data/cv';
 import { LoadingBars } from '../LoadingBars';
-import { AnimatedContentCard } from '../AnimatedContentCard';
 import { ContentCard } from '../ContentCard';
-import { useCvStyles } from '../../ThemeProvider';
+import { GitHubLinkChipList } from './GitHubLinkChipList';
 
 type GitHubContributionsProps = {
   contributions: GitHubContribution[];
@@ -21,8 +19,6 @@ export const GitHubContributions = ({
   startDelayMs = 0,
   itemStaggerMs = 80,
 }: GitHubContributionsProps) => {
-  const { subtleBorder, subtleSurface } = useCvStyles();
-
   if (loading) {
     return (
       <LoadingBars label="Loading GitHub contributions" compact />
@@ -42,72 +38,33 @@ export const GitHubContributions = ({
   );
 
   if (variant === 'list') {
-    const chipSx = {
-      border: subtleBorder,
-      backgroundColor: subtleSurface,
-      fontWeight: 600,
-      color: 'text.primary',
-      width: '100%',
-      height: 'auto',
-      justifyContent: 'flex-start',
-      alignItems: 'center',
-      '& .MuiChip-icon': {
-        alignSelf: 'center',
-        marginLeft: 0.5,
-        marginRight: 0.5,
-        fontSize: 18,
-        color: 'text.secondary',
-      },
-      '& .MuiChip-label': {
-        whiteSpace: 'normal',
-        textOverflow: 'clip',
-        lineHeight: 1.4,
-        px: 1,
-        py: 0.25,
-        overflowWrap: 'anywhere',
-      },
-    };
-    const chipWrapperSx = {
-      width: '100%',
-      p: { xs: 0, md: 0 },
-      border: 'none',
-      backgroundColor: 'transparent',
-      boxShadow: 'none',
-      borderRadius: 0,
-    };
-
     return (
-      <Stack spacing={0.5}>
-        {sortedContributions.map((project, index) => (
-          <AnimatedContentCard
-            key={project.name}
-            delayMs={startDelayMs + index * itemStaggerMs}
-            sx={chipWrapperSx}
-          >
-            <Chip
-              icon={<GitHubIcon />}
-              label={
-                <Box component="span" sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}>
-                  <Box component="span" sx={{ fontWeight: 600, color: 'text.primary', overflowWrap: 'anywhere' }}>
-                    {project.name}
-                  </Box>
-                  <Box component="span" sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                    ★ {project.stars ?? 0}
-                  </Box>
-                </Box>
-              }
-              component="a"
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              clickable
-              variant="outlined"
-              size="small"
-              sx={chipSx}
-            />
-          </AnimatedContentCard>
-        ))}
-      </Stack>
+      <GitHubLinkChipList
+        items={sortedContributions.map((project) => ({
+          key: project.name,
+          href: project.url,
+          label: (
+            <Box
+              component="span"
+              sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}
+            >
+              <Box
+                component="span"
+                sx={{ fontWeight: 600, color: 'text.primary', overflowWrap: 'anywhere' }}
+              >
+                {project.name}
+              </Box>
+              <Box component="span" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                ★ {project.stars ?? 0}
+              </Box>
+            </Box>
+          ),
+        }))}
+        layout="stack"
+        animateItems
+        startDelayMs={startDelayMs}
+        itemStaggerMs={itemStaggerMs}
+      />
     );
   }
 
