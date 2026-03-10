@@ -1,3 +1,4 @@
+import { Button } from '@mui/material';
 import { fireEvent, render, screen } from '@testing-library/react';
 import ThemeProvider from '../ThemeProvider';
 import { TabPanel } from './TabPanel';
@@ -56,5 +57,41 @@ describe('TabPanel', () => {
 
     expect(screen.queryByRole('tab')).not.toBeInTheDocument();
     expect(screen.getByRole('tabpanel', { name: 'Skills' })).toBeVisible();
+  });
+
+  it('matches the resume button typography and outline treatment', () => {
+    render(
+      <ThemeProvider>
+        <>
+          <Button variant="outlined" size="small">
+            Download Resume (PDF)
+          </Button>
+          <TabPanel
+            ariaLabel="Experience sections"
+            items={[
+              { value: 'details', label: 'Details', content: <div>Details body</div> },
+              { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+            ]}
+            tabsVariant="fullWidth"
+          />
+        </>
+      </ThemeProvider>
+    );
+
+    const resumeButton = screen.getByRole('button', { name: 'Download Resume (PDF)' });
+    const detailsTab = screen.getByRole('tab', { name: 'Details' });
+    const tabList = screen.getByRole('tablist', { name: 'Experience sections' });
+    const tabsRoot = tabList.closest('.MuiTabs-root');
+
+    expect(tabsRoot).not.toBeNull();
+
+    const tabPanelRoot = tabsRoot?.parentElement;
+
+    expect(tabPanelRoot).not.toBeNull();
+    expect(window.getComputedStyle(detailsTab).fontWeight).toBe(window.getComputedStyle(resumeButton).fontWeight);
+    expect(window.getComputedStyle(tabPanelRoot as HTMLElement).backgroundColor)
+      .toBe(window.getComputedStyle(resumeButton).backgroundColor);
+    expect(window.getComputedStyle(tabPanelRoot as HTMLElement).borderTopColor)
+      .toBe(window.getComputedStyle(resumeButton).borderTopColor);
   });
 });

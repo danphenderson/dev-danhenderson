@@ -30,6 +30,7 @@ export const useCvStyles = () => {
     const subtleBorder = `1px solid ${alpha(accentColor, isLight ? 0.2 : 0.38)}`;
     const subtleSurface = alpha(theme.palette.background.paper, isLight ? 0.74 : 0.58);
     const accentTint = alpha(accentColor, isLight ? 0.14 : 0.24);
+    const interactiveOutlineColor = accentColor;
     const interactiveSurfaceHoverShadow = isLight
       ? `0 0 0 1px ${alpha(accentColor, 0.24)}, 0 8px 20px ${alpha(accentColor, 0.14)}`
       : `0 0 0 1px ${alpha(accentColor, 0.34)}, 0 10px 24px ${alpha(accentColor, 0.18)}`;
@@ -119,8 +120,8 @@ export const useCvStyles = () => {
     } satisfies SxProps<Theme>;
 
     const getTabPanelSx = () => ({
-      border: subtleBorder,
-      backgroundColor: subtleSurface,
+      border: `1px solid ${interactiveOutlineColor}`,
+      backgroundColor: alpha(accentColor, 0.04),
       borderRadius: 2,
       overflow: 'hidden',
     }) satisfies SxProps<Theme>;
@@ -128,7 +129,7 @@ export const useCvStyles = () => {
     const getTabListSx = (dense: boolean) => ({
       minHeight: dense ? 44 : 52,
       px: { xs: 0.5, sm: 0.75 },
-      backgroundColor: alpha(accentColor, isLight ? 0.06 : 0.16),
+      backgroundColor: 'transparent',
       '& .MuiTabs-flexContainer': {
         gap: 0.25,
       },
@@ -151,8 +152,8 @@ export const useCvStyles = () => {
       fontFamily: 'inherit',
       fontSize: 'inherit',
       lineHeight: 'inherit',
-      fontWeight: 'inherit',
-      letterSpacing: 'inherit',
+      fontWeight: theme.typography.button.fontWeight,
+      letterSpacing: theme.typography.button.letterSpacing,
       alignItems: 'flex-start',
       justifyContent: 'flex-start',
       color: accentColor,
@@ -166,7 +167,7 @@ export const useCvStyles = () => {
       px: { xs: 1.25, sm: 1.5 },
       pt: hasTabs ? (dense ? 1.25 : 1.5) : 0,
       pb: dense ? 1.25 : 1.5,
-      borderTop: hasTabs ? `1px solid ${alpha(accentColor, isLight ? 0.12 : 0.24)}` : 'none',
+      borderTop: hasTabs ? `1px solid ${interactiveOutlineColor}` : 'none',
     }) satisfies SxProps<Theme>;
 
     const cardResetSx = {
