@@ -86,6 +86,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
     contentListStackSpacing,
     detailBlockSx,
     experienceDescriptionSx,
+    experienceHeaderRowSx,
     experienceIndustryChipSx,
     minWidthResetSx,
     secondaryStrongSx,
@@ -124,45 +125,11 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
 
         return (
           <>
-            <Stack spacing={1.25}>
-              <Stack
-                direction="row"
-                justifyContent="space-between"
-                alignItems={{ xs: 'flex-start', sm: 'center' }}
-                spacing={1.5}
-                flexWrap="wrap"
-                width="100%"
-              >
-                <Box sx={minWidthResetSx}>
-                  <Typography variant="h6" sx={sectionTitleSx}>
-                    {experience.title}
-                  </Typography>
-                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                    {experience.companyUrl ? (
-                      <Link
-                        href={experience.companyUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        color="inherit"
-                        underline="hover"
-                        variant="subtitle2"
-                        sx={secondaryStrongSx}
-                      >
-                        {experience.company}
-                      </Link>
-                    ) : (
-                      <Typography variant="subtitle2" sx={secondaryStrongSx}>
-                        {experience.company}
-                      </Typography>
-                    )}
-                    <Typography variant="subtitle2" sx={secondaryTextSx}>
-                      •
-                    </Typography>
-                    <Typography variant="subtitle2" sx={secondaryTextSx}>
-                      {experience.startDate} - {experience.endDate}
-                    </Typography>
-                  </Stack>
-                </Box>
+            <Stack spacing={0.75} width="100%">
+              <Box sx={experienceHeaderRowSx}>
+                <Typography variant="h6" sx={[sectionTitleSx, minWidthResetSx]}>
+                  {experience.title}
+                </Typography>
                 {experience.industry && (
                   <Chip
                     size="small"
@@ -171,6 +138,31 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                     sx={experienceIndustryChipSx}
                   />
                 )}
+              </Box>
+              <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={minWidthResetSx}>
+                {experience.companyUrl ? (
+                  <Link
+                    href={experience.companyUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    color="inherit"
+                    underline="hover"
+                    variant="subtitle2"
+                    sx={secondaryStrongSx}
+                  >
+                    {experience.company}
+                  </Link>
+                ) : (
+                  <Typography variant="subtitle2" sx={secondaryStrongSx}>
+                    {experience.company}
+                  </Typography>
+                )}
+                <Typography variant="subtitle2" sx={secondaryTextSx}>
+                  •
+                </Typography>
+                <Typography variant="subtitle2" sx={secondaryTextSx}>
+                  {experience.startDate} - {experience.endDate}
+                </Typography>
               </Stack>
             </Stack>
             {experience.description && (

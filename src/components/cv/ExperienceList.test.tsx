@@ -65,6 +65,29 @@ describe('ExperienceList', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('keeps the industry chip in the title row', () => {
+    const hemodynamicsExperience = experiences.find(
+      (experience) => experience.title === 'Graduate Research Assistant | Hemodynamics'
+    );
+
+    expect(hemodynamicsExperience).toBeDefined();
+
+    render(
+      <ThemeProvider>
+        <ExperienceList experiences={[hemodynamicsExperience!]} />
+      </ThemeProvider>
+    );
+
+    const titleRow = screen
+      .getByRole('heading', { name: 'Graduate Research Assistant | Hemodynamics' })
+      .parentElement;
+
+    expect(titleRow).not.toBeNull();
+    expect(titleRow).toHaveTextContent('Higher Education');
+    expect(titleRow).not.toHaveTextContent('Michigan Technological University');
+    expect(screen.getByText('Michigan Technological University')).toBeInTheDocument();
+  });
+
   it('renders inline project links for the research assistant entry without separate reference bullets', () => {
     const researchAssistant = experiences.find(
       (experience) => experience.title === 'Research Assistant | Full Time'

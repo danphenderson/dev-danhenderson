@@ -32,7 +32,6 @@ export const useCvStyles = () => {
     const accentTint = alpha(accentColor, isLight ? 0.14 : 0.24);
     const interactiveOutlineColor = accentColor;
     const selectedTabSurface = alpha(accentColor, isLight ? 0.1 : 0.2);
-    const selectedTabInset = `inset 0 0 0 1px ${alpha(accentColor, isLight ? 0.18 : 0.28)}`;
     const tabPanelRadius = theme.shape.borderRadius * 2;
     const interactiveSurfaceHoverShadow = isLight
       ? `0 0 0 1px ${alpha(accentColor, 0.24)}, 0 8px 20px ${alpha(accentColor, 0.14)}`
@@ -166,7 +165,7 @@ export const useCvStyles = () => {
       '&.Mui-selected': {
         color: accentColor,
         backgroundColor: selectedTabSurface,
-        boxShadow: selectedTabInset,
+        boxShadow: interactiveSurfaceHoverShadow,
         zIndex: 1,
       },
       '&.Mui-selected:first-of-type': {
@@ -280,13 +279,28 @@ export const useCvStyles = () => {
         border: `2px solid ${alpha(theme.palette.common.white, isLight ? 0.9 : 0.72)}`,
       } satisfies SxProps<Theme>,
       profileBioSx: { whiteSpace: 'pre-line' } satisfies SxProps<Theme>,
+      experienceHeaderRowSx: {
+        display: 'grid',
+        gridTemplateColumns: 'minmax(0, 1fr) auto',
+        alignItems: 'start',
+        columnGap: 1.5,
+        rowGap: 0.5,
+        width: '100%',
+      } satisfies SxProps<Theme>,
       experienceIndustryChipSx: {
         borderColor: accentColor,
         color: 'text.primary',
         backgroundColor: accentTint,
         fontWeight: 600,
-        ml: 'auto',
+        justifySelf: 'end',
+        alignSelf: 'flex-start',
         flexShrink: 0,
+        height: 24,
+        '& .MuiChip-label': {
+          px: 1.125,
+          fontSize: theme.typography.pxToRem(12),
+          lineHeight: 1.1,
+        },
       } satisfies SxProps<Theme>,
       experienceDescriptionSx: { mt: 1 } satisfies SxProps<Theme>,
       getDetailListSx,

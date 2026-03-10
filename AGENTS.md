@@ -79,4 +79,4 @@ Include:
 - what validation was run
 - any deployment follow-up required (for example SPA rewrites, assets, or `PUBLIC_URL` concerns)
 
-For any meaningful code change, implement the narrowest set of tests relevant to validate functionality.
+For any meaningful code change, implement the narrowest set of tests relevant to validate new functionality and prevent regressions.
