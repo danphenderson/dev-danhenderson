@@ -9,13 +9,13 @@ export const useCvStyles = () => {
   return useMemo(() => {
     const motionTokens = {
       itemOffsetMs: 120,
-      itemStaggerMs: 80,
-      sectionStaggerMs: 80,
+      itemStaggerMs: 120,
+      sectionStaggerMs: 120,
       githubSubsectionStaggerMs: 120,
-      accordionChipStaggerMs: 20,
+      accordionChipStaggerMs: 120,
     } as const;
     const contentListStackSpacing = 2.25;
-    const compactSidebarSectionSpacing = 1;
+    const compactSidebarSectionSpacing = 0;
     const accentColor = theme.palette.primary.main;
     const isLight = theme.palette.mode === 'light';
     const cardGradientStart = alpha(

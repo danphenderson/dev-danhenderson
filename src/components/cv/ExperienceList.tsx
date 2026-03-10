@@ -1,5 +1,11 @@
+import { Fragment } from 'react';
 import { Box, Chip, Link, Stack, Typography } from '@mui/material';
-import type { Experience, ExperienceProject } from '../../data/cv';
+import type {
+  Experience,
+  ExperienceDescription,
+  ExperienceProject,
+  ExperienceProjectSegment,
+} from '../../data/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { useCvStyles } from '../../styles/cvStyles';
 import { SkillsAccordion } from '../SkillsAccordion';
@@ -8,6 +14,27 @@ type ExperienceListProps = {
   experiences: Experience[];
   startDelayMs?: number;
 };
+
+const renderInlineSegments = (segments: ExperienceProjectSegment[]) =>
+  segments.map((segment, segmentIndex) => {
+    const content = segment.link ? (
+      <Link href={segment.link} target="_blank" rel="noopener noreferrer" underline="hover">
+        {segment.text}
+      </Link>
+    ) : (
+      <Box component="span">{segment.text}</Box>
+    );
+
+    return (
+      <Fragment key={segmentIndex}>
+        {segment.lineBreakBefore ? <br /> : null}
+        {content}
+      </Fragment>
+    );
+  });
+
+const renderExperienceDescription = (description: ExperienceDescription) =>
+  typeof description === 'string' ? description : renderInlineSegments(description);
 
 const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) => {
   const { getDetailListSx } = useCvStyles();
@@ -23,6 +50,14 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
           return (
             <Typography component="li" variant="body2" key={projectIndex}>
               {project}
+            </Typography>
+          );
+        }
+
+        if (Array.isArray(project)) {
+          return (
+            <Typography component="li" variant="body2" key={projectIndex}>
+              {renderInlineSegments(project)}
             </Typography>
           );
         }
@@ -116,7 +151,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
           </Stack>
           {experience.description && (
             <Typography variant="body2" sx={experienceDescriptionSx}>
-              {experience.description}
+              {renderExperienceDescription(experience.description)}
             </Typography>
           )}
           {experience.projects?.length ? (

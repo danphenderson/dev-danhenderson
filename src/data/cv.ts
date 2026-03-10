@@ -36,7 +36,9 @@ export type Certificate = {
   link?: string;
 };
 
-export type ExperienceProject = string | { text: string; link?: string };
+export type ExperienceProjectSegment = { text: string; link?: string; lineBreakBefore?: boolean };
+export type ExperienceDescription = string | ExperienceProjectSegment[];
+export type ExperienceProject = string | ExperienceProjectSegment | ExperienceProjectSegment[];
 
 export type Experience = {
   company: string;
@@ -46,7 +48,7 @@ export type Experience = {
   startDate: string;
   endDate: string;
   impactHighlights?: string[];
-  description?: string;
+  description?: ExperienceDescription;
   projects?: ExperienceProject[];
   skills?: string[];
 };
@@ -169,7 +171,20 @@ export const experiences: Experience[] = [
     startDate: 'May 2025',
     endDate: 'Current',
     description:
-      `Researching macrocirculatory blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches. Advisor: Jiguang Sun, Department of Mathematical Sciences.`,
+      [
+        {
+          text:
+            'Researching macrocirculatory blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.',
+        },
+        {
+          text: 'Advisor: ',
+          lineBreakBefore: true,
+        },
+        {
+          text: 'Jiguang Sun',
+          link: 'https://pages.mtu.edu/~jiguangs/Homepage_of_Jiguang_Sun/Welcome.html',
+        },
+      ],
     projects: [
       'Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).',
       'Derived and analyzed Navier–Stokes formulations for blood (including Newtonian and generalized-Newtonian viscosity models), documenting the kinematic roles of Reynolds/Womersley numbers and related nondimensional parameters.',
@@ -261,14 +276,20 @@ export const experiences: Experience[] = [
     endDate: 'Nov 2021 (7 mos)',
     description: 'Contributor to quasi-Newton optimization research (Azzam, Henderson, Ong, Struthers; 2022), led numerical experiments.',
     projects: [
-      '2022, Azzam J, Henderson D, Ong BW, and Struthers AA, Quasi-Newton Optimization with Hessian Samples',
-      'Built BlockOpt.jl, an open-source Julia implementation of the paper’s trust-region quasi-Newton methods.',
-      'Built UncNLPrograms.jl to create an automatic-differentiation optimization benchmark suite to test paper’s methods.',
-      { text: 'Article:', link: 'https://lnkd.in/gfP39wZX' },
-      { text: 'Zenodo DOI:', link: 'https://zenodo.org/record/5826808#.Y_QyR-zMJzW' },
-      { text: 'Documentation:', link: 'https://danphenderson.github.io/BlockOpt.jl/dev/' },
-      { text: 'Repository (BlockOpt.jl):', link: 'https://github.com/danphenderson/BlockOpt.jl' },
-      { text: 'Repository (UncNLPrograms.jl):', link: 'https://github.com/danphenderson/UncNLPrograms.jl' },
+      [
+        { text: '2022, Azzam J, Henderson D, Ong BW, and Struthers AA, ' },
+        { text: 'Quasi-Newton Optimization with Hessian Samples', link: 'https://lnkd.in/gfP39wZX' },
+      ],
+      [
+        { text: 'Built ' },
+        { text: 'BlockOpt.jl', link: 'https://github.com/danphenderson/BlockOpt.jl' },
+        { text: ', an open-source Julia implementation of the paper’s trust-region quasi-Newton methods.' },
+      ],
+      [
+        { text: 'Built ' },
+        { text: 'UncNLPrograms.jl', link: 'https://github.com/danphenderson/UncNLPrograms.jl' },
+        { text: ' to create an automatic-differentiation optimization benchmark suite to test paper’s methods.' },
+      ],
     ],
     skills: ['Research', 'Julia', 'ForwardDiff.jl', 'CUTEst', 'LaTeX', 'TRS.jl', 'Mathematica', 'Overleaf'],
   },
