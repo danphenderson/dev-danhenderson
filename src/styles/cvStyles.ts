@@ -32,7 +32,6 @@ export const useCvStyles = () => {
     const accentTint = alpha(accentColor, isLight ? 0.14 : 0.24);
     const interactiveOutlineColor = accentColor;
     const selectedTabSurface = alpha(accentColor, isLight ? 0.1 : 0.2);
-    const tabPanelRadius = theme.shape.borderRadius * 2;
     const interactiveSurfaceHoverShadow = isLight
       ? `0 0 0 1px ${alpha(accentColor, 0.24)}, 0 8px 20px ${alpha(accentColor, 0.14)}`
       : `0 0 0 1px ${alpha(accentColor, 0.34)}, 0 10px 24px ${alpha(accentColor, 0.18)}`;
@@ -170,22 +169,6 @@ export const useCvStyles = () => {
         backgroundColor: selectedTabSurface,
         boxShadow: interactiveSurfaceHoverShadow,
         zIndex: 1,
-      },
-      '&.Mui-selected:first-of-type': {
-        borderTopLeftRadius: tabPanelRadius,
-        borderBottomLeftRadius: tabPanelRadius,
-      },
-      '&.Mui-selected:last-of-type': {
-        borderTopRightRadius: tabPanelRadius,
-        borderBottomRightRadius: tabPanelRadius,
-      },
-      '&.Mui-selected:not(:first-of-type)': {
-        borderTopLeftRadius: 0,
-        borderBottomLeftRadius: 0,
-      },
-      '&.Mui-selected:not(:last-of-type)': {
-        borderTopRightRadius: 0,
-        borderBottomRightRadius: 0,
       },
     }) satisfies SxProps<Theme>;
 
