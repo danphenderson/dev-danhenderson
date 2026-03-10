@@ -124,12 +124,24 @@ describe('TabPanel', () => {
       expect(window.getComputedStyle(tabsRoot as HTMLElement).paddingLeft).toBe('0px');
       expect(window.getComputedStyle(tabsRoot as HTMLElement).paddingRight).toBe('0px');
       expect(window.getComputedStyle(tabList).gap).toBe('0px');
+      expect(window.getComputedStyle(detailsTab).alignItems).toBe('center');
+      expect(window.getComputedStyle(detailsTab).justifyContent).toBe('center');
+      expect(window.getComputedStyle(detailsTab).textAlign).toBe('center');
+      expect(window.getComputedStyle(skillsTab).alignItems).toBe('center');
+      expect(window.getComputedStyle(skillsTab).justifyContent).toBe('center');
+      expect(window.getComputedStyle(skillsTab).textAlign).toBe('center');
+
+      const indicator = tabsRoot?.querySelector('.MuiTabs-indicator');
+
+      expect(indicator).not.toBeNull();
+      expect(window.getComputedStyle(indicator as HTMLElement).display).toBe('none');
 
       fireEvent.click(detailsTab);
 
       const detailsStyle = window.getComputedStyle(detailsTab);
 
       expect(detailsStyle.backgroundColor).not.toBe('transparent');
+      expect(detailsStyle.boxShadow).not.toContain('inset');
       expect(parseFloat(detailsStyle.borderTopLeftRadius)).toBeGreaterThan(0);
       expect(parseFloat(detailsStyle.borderBottomLeftRadius)).toBeGreaterThan(0);
       expect(parseFloat(detailsStyle.borderTopRightRadius)).toBe(0);
@@ -140,6 +152,7 @@ describe('TabPanel', () => {
       const skillsStyle = window.getComputedStyle(skillsTab);
 
       expect(skillsStyle.backgroundColor).not.toBe('transparent');
+      expect(skillsStyle.boxShadow).not.toContain('inset');
       expect(parseFloat(skillsStyle.borderTopLeftRadius)).toBe(0);
       expect(parseFloat(skillsStyle.borderBottomLeftRadius)).toBe(0);
       expect(parseFloat(skillsStyle.borderTopRightRadius)).toBeGreaterThan(0);

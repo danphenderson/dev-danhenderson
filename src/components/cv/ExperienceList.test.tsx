@@ -86,6 +86,11 @@ describe('ExperienceList', () => {
     expect(titleRow).toHaveTextContent('Higher Education');
     expect(titleRow).not.toHaveTextContent('Michigan Technological University');
     expect(screen.getByText('Michigan Technological University')).toBeInTheDocument();
+
+    const industryChip = screen.getByText('Higher Education').closest('.MuiChip-root');
+
+    expect(industryChip).not.toBeNull();
+    expect(getComputedStyle(industryChip!).color).toBe('rgb(27, 168, 224)');
   });
 
   it('renders inline project links for the research assistant entry without separate reference bullets', () => {

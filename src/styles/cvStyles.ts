@@ -108,10 +108,14 @@ export const useCvStyles = () => {
       transitionDelay: `${delayMs}ms`,
     });
 
+    const interactiveAccentTextSx = {
+      color: accentColor,
+    } satisfies SxProps<Theme>;
+
     const interactiveSurfaceSx = {
       ...theme.typography.button,
       fontFamily: theme.typography.fontFamily,
-      color: accentColor,
+      ...interactiveAccentTextSx,
       textTransform: 'none',
       transition: 'color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
       '&:hover': {
@@ -136,9 +140,7 @@ export const useCvStyles = () => {
         gap: 0,
       },
       '& .MuiTabs-indicator': {
-        height: 3,
-        borderRadius: 999,
-        backgroundColor: accentColor,
+        display: 'none',
       },
       '& .MuiTabs-scrollButtons': {
         color: 'text.secondary',
@@ -156,14 +158,15 @@ export const useCvStyles = () => {
       lineHeight: 'inherit',
       fontWeight: theme.typography.button.fontWeight,
       letterSpacing: theme.typography.button.letterSpacing,
-      alignItems: 'flex-start',
-      justifyContent: 'flex-start',
-      color: accentColor,
+      alignItems: 'center',
+      justifyContent: 'center',
+      textAlign: 'center',
+      ...interactiveAccentTextSx,
       position: 'relative',
       zIndex: 0,
       borderRadius: 0,
       '&.Mui-selected': {
-        color: accentColor,
+        ...interactiveAccentTextSx,
         backgroundColor: selectedTabSurface,
         boxShadow: interactiveSurfaceHoverShadow,
         zIndex: 1,
@@ -265,6 +268,7 @@ export const useCvStyles = () => {
       wrapItemContainerSx: { width: 'auto' } satisfies SxProps<Theme>,
       fullWidthSx: { width: '100%' } satisfies SxProps<Theme>,
       minWidthResetSx: { minWidth: 0 } satisfies SxProps<Theme>,
+      interactiveAccentTextSx,
       interactiveSurfaceSx: interactiveSurfaceSx satisfies SxProps<Theme>,
       getSectionDelayMs,
       getItemDelayMs,
@@ -289,7 +293,7 @@ export const useCvStyles = () => {
       } satisfies SxProps<Theme>,
       experienceIndustryChipSx: {
         borderColor: accentColor,
-        color: 'text.primary',
+        ...interactiveAccentTextSx,
         backgroundColor: accentTint,
         fontWeight: 600,
         justifySelf: 'end',
