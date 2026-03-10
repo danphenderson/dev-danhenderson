@@ -5,6 +5,7 @@ import { useCvStyles } from '../styles/cvStyles';
 import { AnimatedContentCard } from './AnimatedContentCard';
 
 type AnimatedContentListLayout = 'stack' | 'wrap';
+type AnimatedContentItemSurface = 'card' | 'panel' | 'plain';
 
 type AnimatedContentListProps<Item> = {
   items: Item[];
@@ -18,6 +19,7 @@ type AnimatedContentListProps<Item> = {
   containerSx?: SxProps<Theme>;
   itemSx?: SxProps<Theme>;
   itemContainerSx?: SxProps<Theme>;
+  itemSurface?: AnimatedContentItemSurface;
 };
 
 export const AnimatedContentList = <Item,>({
@@ -32,24 +34,34 @@ export const AnimatedContentList = <Item,>({
   containerSx,
   itemSx,
   itemContainerSx,
+  itemSurface = 'card',
 }: AnimatedContentListProps<Item>) => {
   const {
+    cardResetSx,
     getItemDelayMs,
     getWrapListSx,
     motionTokens,
+    sectionPanelSx,
     wrapItemContainerSx,
   } = useCvStyles();
   const containerSxArray = Array.isArray(containerSx) ? containerSx : containerSx ? [containerSx] : [];
+  const itemSxArray = Array.isArray(itemSx) ? itemSx : itemSx ? [itemSx] : [];
   const itemContainerSxArray = Array.isArray(itemContainerSx) ? itemContainerSx : itemContainerSx ? [itemContainerSx] : [];
   const resolvedItemContainerSx =
     layout === 'wrap' ? [wrapItemContainerSx, ...itemContainerSxArray] : itemContainerSxArray;
   const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.itemStaggerMs;
+  const itemSurfaceSx =
+    itemSurface === 'panel'
+      ? [cardResetSx, sectionPanelSx]
+      : itemSurface === 'plain'
+        ? [cardResetSx]
+        : [];
 
   const animatedItems = items.map((item, index) => (
     <AnimatedContentCard
       key={getItemKey(item, index)}
       delayMs={getItemDelayMs(index, startDelayMs, resolvedItemStaggerMs)}
-      sx={itemSx}
+      sx={[...itemSurfaceSx, ...itemSxArray]}
       containerSx={resolvedItemContainerSx}
     >
       {renderItem(item, index)}

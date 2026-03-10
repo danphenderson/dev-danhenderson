@@ -14,6 +14,7 @@ export const useCvStyles = () => {
       githubSubsectionStaggerMs: 120,
       accordionChipStaggerMs: 20,
     } as const;
+    const contentListStackSpacing = 2.25;
     const accentColor = theme.palette.primary.main;
     const isLight = theme.palette.mode === 'light';
     const cardGradientStart = alpha(
@@ -103,13 +104,16 @@ export const useCvStyles = () => {
     const cardResetSx = {
       p: 0,
       border: 'none',
+      background: 'none',
       backgroundColor: 'transparent',
       boxShadow: 'none',
       borderRadius: 0,
+      backdropFilter: 'none',
     };
 
     return {
       motionTokens,
+      contentListStackSpacing,
       accentColor,
       accentTint,
       contentCardSx: {
@@ -192,6 +196,8 @@ export const useCvStyles = () => {
         color: 'text.primary',
         backgroundColor: accentTint,
         fontWeight: 600,
+        ml: 'auto',
+        flexShrink: 0,
       } satisfies SxProps<Theme>,
       experienceDescriptionSx: { mt: 1 } satisfies SxProps<Theme>,
       getDetailListSx,

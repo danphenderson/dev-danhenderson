@@ -9,14 +9,15 @@ type CertificatesListProps = {
 };
 
 export const CertificatesList = ({ certificates, startDelayMs = 0 }: CertificatesListProps) => {
-  const { certificateActionSx, secondaryTextSx } = useCvStyles();
+  const { certificateActionSx, contentListStackSpacing, secondaryTextSx } = useCvStyles();
 
   return (
     <AnimatedContentList
       items={certificates}
       getItemKey={(certificate, index) => `${certificate.title}-${index}`}
       startDelayMs={startDelayMs}
-      stackSpacing={1.5}
+      stackSpacing={contentListStackSpacing}
+      itemSurface="panel"
       renderItem={(certificate) => (
         <>
           <Typography variant="h6">{certificate.title}</Typography>

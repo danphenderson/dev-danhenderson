@@ -10,6 +10,7 @@ type VolunteeringListProps = {
 
 export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: VolunteeringListProps) => {
   const {
+    contentListStackSpacing,
     getDetailListSx,
     secondaryItalicSx,
     secondaryStrongSx,
@@ -26,7 +27,8 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
       items={volunteering}
       getItemKey={(entry, index) => `${entry.organization}-${entry.role}-${index}`}
       startDelayMs={startDelayMs}
-      stackSpacing={2.25}
+      stackSpacing={contentListStackSpacing}
+      itemSurface="panel"
       renderItem={(entry) => (
         <>
           <Stack spacing={1}>

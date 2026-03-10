@@ -35,6 +35,8 @@ The site is a React Router single-page app. Keep unknown-route rewrites, `PUBLIC
 - React Router v6
 - MUI + Emotion
 - MUI X DataGrid
+- `@fontsource/source-sans-3`
+- `@fontsource/space-grotesk`
 - `react-github-calendar`
 - Create React App (`react-scripts`)
 - Node 20.x in CI
@@ -58,6 +60,7 @@ Animation behavior is intentionally centralized for the CV route instead of bein
 - `src/components/AnimatedContentList.tsx`
   - shared staggered list wrapper for repeatable CV content such as experience, education, volunteering, certificates, coding examples, and GitHub items
   - supports both stacked and wrapped layouts while keeping delay math out of feature components
+  - supports reusable item surface modes (`card`, `panel`, `plain`) so section components avoid repeated card/panel styling logic
 - `src/components/AnimatedZoomList.tsx`
   - shared staggered `Zoom` list for accordion chip reveals
   - used by the CV tools accordion so chip timing is not defined inline
@@ -97,7 +100,7 @@ When changing CV motion:
 - `src/data/climbs.ts`
   - `ticks`: sent routes with dates
   - `todos`: project/wishlist routes
-  - Current dataset size: ~566 ticks and ~352 todos
+  - Current dataset size: 566 ticks and 352 todos
 - `src/data/photography.ts`
   - Album category cards + per-album images
   - Current dataset size: 4 categories, 43 photos
@@ -154,6 +157,12 @@ GitHub Actions workflows live in `.github/workflows/`:
 - `tests.yml` runs `CI=true npm test -- --watch=false --passWithNoTests --coverage`
 - `build.yml` runs `npm run build`
 
+### Known technical debt
+
+- The app still depends on Create React App (`react-scripts`), which is no longer actively maintained.
+- Current build/test output includes a `babel-preset-react-app` warning about `@babel/plugin-proposal-private-property-in-object` being transitive-only.
+- React Router v6 future-flag warnings appear in tests (`v7_startTransition`, `v7_relativeSplatPath`); behavior is currently correct but migration planning is pending.
+
 ## Content Sources
 
 ### Primary maintainer entry points
@@ -174,6 +183,9 @@ GitHub Actions workflows live in `.github/workflows/`:
 - `src/WelcomeAudioProvider.tsx`
   - SoundCloud embed URL and welcome-audio behavior
   - persisted audio consent key: `danhenderson-welcome-audio-consent`
+- `src/utils/assets.ts`
+  - centralized `PUBLIC_URL`-aware asset path resolution via `resolvePublicAssetPath(...)`
+  - used by shared layout wrappers such as `BackgroundPaper` to keep local and deployed asset paths consistent
 - `resume/daniel-henderson-resume.tex`
   - LaTeX source for the downloadable PDF in `public/assets/daniel-henderson-resume.pdf`
 
@@ -200,6 +212,7 @@ GitHub Actions workflows live in `.github/workflows/`:
 - Update app theme tokens and MUI component overrides in `src/ThemeProvider.tsx`.
 - Keep reusable page and CV styling centralized in `src/styles/appStyles.ts` and `src/styles/cvStyles.ts` rather than reintroducing component-local `sx` fragments.
 - Update welcome-audio behavior or track configuration in `src/WelcomeAudioProvider.tsx`.
+- Use `resolvePublicAssetPath(...)` from `src/utils/assets.ts` when adding new local asset paths to keep `PUBLIC_URL` behavior stable.
 - When changing climbing or photography data, preserve `useClimbingData` sorting assumptions and photography slug stability.
 
 ## Deployment Notes
@@ -207,12 +220,13 @@ GitHub Actions workflows live in `.github/workflows/`:
 - Production output is generated in `build/`.
 - The host must rewrite unknown routes to `index.html` so direct links like `/cv` and `/photography/:slug` work.
 - Set `PUBLIC_URL` when deploying under a subpath so generated asset URLs resolve correctly.
+- Route local asset URLs through `resolvePublicAssetPath(...)` (already used by `BackgroundPaper`) to avoid subpath regressions.
 - Ship `public/assets/` with the deployment.
 - The CV fetches public GitHub data at runtime; if requests fail or are rate-limited, the UI falls back to static content from `src/data/cv.ts`.
 
 ## Validation
 
-README claims in this repo should stay aligned with `package.json`, `src/App.tsx`, `src/data/`, `src/ThemeProvider.tsx`, and `src/WelcomeAudioProvider.tsx`.
+README claims in this repo should stay aligned with `package.json`, `src/App.tsx`, `src/data/`, `src/ThemeProvider.tsx`, `src/WelcomeAudioProvider.tsx`, and `src/utils/assets.ts`.
 
 Use these checks after meaningful changes:
 

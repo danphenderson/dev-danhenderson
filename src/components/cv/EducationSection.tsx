@@ -11,6 +11,7 @@ type EducationSectionProps = {
 
 export const EducationSection = ({ education, startDelayMs = 0 }: EducationSectionProps) => {
   const {
+    contentListStackSpacing,
     detailBlockSx,
     educationMetaSx,
     educationProgramSx,
@@ -28,7 +29,8 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
       items={education.entries}
       getItemKey={(entry, index) => `${entry.university}-${entry.program}-${index}`}
       startDelayMs={startDelayMs}
-      stackSpacing={2.25}
+      stackSpacing={contentListStackSpacing}
+      itemSurface="panel"
       renderItem={(entry, index) => (
         <>
           <Typography variant="h6" sx={sectionTitleSx}>

@@ -47,6 +47,7 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
 
 export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceListProps) => {
   const {
+    contentListStackSpacing,
     detailBlockSx,
     experienceDescriptionSx,
     experienceIndustryChipSx,
@@ -60,7 +61,8 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
       items={experiences}
       getItemKey={(experience, index) => `${experience.company}-${index}`}
       startDelayMs={startDelayMs}
-      stackSpacing={2.25}
+      stackSpacing={contentListStackSpacing}
+      itemSurface="panel"
       renderItem={(experience, index) => (
         <>
           <Stack spacing={1.25}>
@@ -70,21 +72,12 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
               alignItems={{ xs: 'flex-start', sm: 'center' }}
               spacing={1.5}
               flexWrap="wrap"
+              width="100%"
             >
-              <Box>
-                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                  <Typography variant="h6" sx={sectionTitleSx}>
-                    {experience.title}
-                  </Typography>
-                  {experience.industry && (
-                    <Chip
-                      size="small"
-                      label={experience.industry}
-                      variant="outlined"
-                      sx={experienceIndustryChipSx}
-                    />
-                  )}
-                </Stack>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography variant="h6" sx={sectionTitleSx}>
+                  {experience.title}
+                </Typography>
                 <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
                   {experience.companyUrl ? (
                     <Link
@@ -111,6 +104,14 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                   </Typography>
                 </Stack>
               </Box>
+              {experience.industry && (
+                <Chip
+                  size="small"
+                  label={experience.industry}
+                  variant="outlined"
+                  sx={experienceIndustryChipSx}
+                />
+              )}
             </Stack>
           </Stack>
           {experience.description && (

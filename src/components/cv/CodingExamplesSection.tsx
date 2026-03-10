@@ -9,14 +9,15 @@ type CodingExamplesSectionProps = {
 };
 
 export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExamplesSectionProps) => {
-  const { codingExampleLinkSx } = useCvStyles();
+  const { codingExampleLinkSx, contentListStackSpacing } = useCvStyles();
 
   return (
     <AnimatedContentList
       items={examples}
       getItemKey={(example, index) => `${example.title}-${index}`}
       startDelayMs={startDelayMs}
-      stackSpacing={2.25}
+      stackSpacing={contentListStackSpacing}
+      itemSurface="panel"
       renderItem={(example) => {
         const primaryLink = example.links[0];
 

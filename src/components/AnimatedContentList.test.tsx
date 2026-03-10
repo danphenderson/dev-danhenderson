@@ -3,6 +3,8 @@ import type { ReactNode } from 'react';
 import ThemeProvider from '../ThemeProvider';
 import { AnimatedContentList } from './AnimatedContentList';
 
+type MockSx = { [key: string]: unknown } | Array<{ [key: string]: unknown }>;
+
 const getContainerWidth = (containerSx?: { width?: string } | Array<{ width?: string }>) => {
   if (Array.isArray(containerSx)) {
     return containerSx.find((entry) => entry?.width)?.width ?? '';
@@ -11,20 +13,41 @@ const getContainerWidth = (containerSx?: { width?: string } | Array<{ width?: st
   return containerSx?.width ?? '';
 };
 
+const hasSxEntry = (sx?: MockSx, predicate?: (entry: { [key: string]: unknown }) => boolean) => {
+  const sxEntries = Array.isArray(sx) ? sx : sx ? [sx] : [];
+
+  return predicate ? sxEntries.some((entry) => predicate(entry)) : false;
+};
+
 jest.mock('./AnimatedContentCard', () => ({
   AnimatedContentCard: ({
     children,
     delayMs,
     containerSx,
+    sx,
   }: {
     children: ReactNode;
     delayMs: number;
     containerSx?: { width?: string } | Array<{ width?: string }>;
+    sx?: MockSx;
   }) => (
     <div
       data-testid="animated-content-item"
       data-delay={String(delayMs)}
       data-container-width={getContainerWidth(containerSx)}
+      data-has-card-reset={String(
+        hasSxEntry(
+          sx,
+          (entry) =>
+            entry.background === 'none' &&
+            entry.backgroundColor === 'transparent' &&
+            entry.border === 'none' &&
+            entry.boxShadow === 'none'
+        )
+      )}
+      data-has-panel-surface={String(
+        hasSxEntry(sx, (entry) => entry.borderRadius === 1.5 && entry.p === 1)
+      )}
     >
       {children}
     </div>
@@ -72,5 +95,41 @@ describe('AnimatedContentList', () => {
     expect(items[0]).toHaveAttribute('data-container-width', 'auto');
     expect(screen.getByText('GitHub')).toBeInTheDocument();
     expect(screen.getByText('Projects')).toBeInTheDocument();
+  });
+
+  it('can downgrade items to panel surfaces without reusing the full card treatment', () => {
+    render(
+      <ThemeProvider>
+        <AnimatedContentList
+          items={['Experience']}
+          getItemKey={(item) => item}
+          itemSurface="panel"
+          renderItem={(item) => <div>{item}</div>}
+        />
+      </ThemeProvider>
+    );
+
+    const item = screen.getByTestId('animated-content-item');
+
+    expect(item).toHaveAttribute('data-has-card-reset', 'true');
+    expect(item).toHaveAttribute('data-has-panel-surface', 'true');
+  });
+
+  it('can render plain animated wrappers when the child already owns its surface', () => {
+    render(
+      <ThemeProvider>
+        <AnimatedContentList
+          items={['Tools']}
+          getItemKey={(item) => item}
+          itemSurface="plain"
+          renderItem={(item) => <div>{item}</div>}
+        />
+      </ThemeProvider>
+    );
+
+    const item = screen.getByTestId('animated-content-item');
+
+    expect(item).toHaveAttribute('data-has-card-reset', 'true');
+    expect(item).toHaveAttribute('data-has-panel-surface', 'false');
   });
 });
