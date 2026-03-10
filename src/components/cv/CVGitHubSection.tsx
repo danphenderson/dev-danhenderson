@@ -1,4 +1,4 @@
-import { Divider, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type {
   GitHubActivityItem,
@@ -6,7 +6,7 @@ import type {
   GitHubProject,
 } from '../../data/cv';
 import { githubUsername } from '../../data/cv';
-import { ANIMATED_CARD_DURATION_MS } from '../AnimatedContentCard';
+import { useCvStyles } from '../../styles/cvStyles';
 import { SectionCard } from '../layout/SectionCard';
 import { SectionPanel } from '../layout/SectionPanel';
 import { GitHubActivityList } from './GitHubActivityList';
@@ -14,6 +14,7 @@ import { GitHubContributionCalendar } from './GitHubContributionCalendar';
 import { GitHubContributions } from './GitHubContributions';
 import { GitHubProjects } from './GitHubProjects';
 import { SectionHeading } from './SectionHeading';
+import { cvSectionAnchorSx } from './cvSectionMetadata';
 
 type CVGitHubSectionProps = {
   activity: GitHubActivityItem[];
@@ -23,35 +24,11 @@ type CVGitHubSectionProps = {
   error?: string | null;
   sectionDelayMs?: number;
   nestedDelayOffsetMs?: number;
+  itemOffsetMs?: number;
   projectTitle?: string;
   overlineSx?: SxProps<Theme>;
+  sectionId?: string;
 };
-
-const ghostCardSx = {
-  p: 0,
-  border: 'none',
-  backgroundColor: 'transparent',
-  boxShadow: 'none',
-  borderRadius: 0,
-};
-
-const githubSectionTitleSx = {
-  color: 'text.primary',
-  fontWeight: 700,
-};
-
-const githubSectionDividerSx = {
-  borderColor: 'divider',
-};
-
-const defaultOverlineSx = {
-  mb: 0.5,
-  ml: { xs: 1.5, md: 1.5 },
-  mt: { xs: 0.75, md: 0.75 },
-};
-
-const nestedDelayBaseMs = 160;
-const githubStaggerMs = 200;
 
 export const CVGitHubSection = ({
   activity,
@@ -61,24 +38,34 @@ export const CVGitHubSection = ({
   error,
   sectionDelayMs = 0,
   nestedDelayOffsetMs = 0,
+  itemOffsetMs,
   projectTitle = 'Public Projects',
-  overlineSx = defaultOverlineSx,
+  overlineSx,
+  sectionId,
 }: CVGitHubSectionProps) => {
-  const githubNestedBaseDelayMs = ANIMATED_CARD_DURATION_MS + nestedDelayBaseMs + nestedDelayOffsetMs;
-  const githubItemDelayOffsetMs = ANIMATED_CARD_DURATION_MS + nestedDelayBaseMs;
-  const githubActivityDelayMs = githubNestedBaseDelayMs;
-  const githubActivityItemsDelayMs = githubActivityDelayMs + githubItemDelayOffsetMs;
-  const githubContributionsDelayMs = githubNestedBaseDelayMs + githubStaggerMs;
-  const githubContributionsItemsDelayMs = githubContributionsDelayMs + githubItemDelayOffsetMs;
+  const {
+    cardResetSx,
+    compactSidebarSectionSpacing,
+    getSectionDelayMs,
+    motionTokens,
+    sectionHeadingCompactSx,
+    sectionTitleSx,
+  } = useCvStyles();
+  const resolvedItemOffsetMs = itemOffsetMs ?? motionTokens.itemOffsetMs;
+  const githubActivityDelayMs = getSectionDelayMs(0, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
+  const githubContributionsDelayMs = getSectionDelayMs(1, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
+  const githubCalendarDelayMs = getSectionDelayMs(2, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
+  const githubProjectsDelayMs = getSectionDelayMs(3, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
+  const resolvedOverlineSx = overlineSx ?? sectionHeadingCompactSx;
 
   return (
-    <SectionCard delayMs={sectionDelayMs}>
-      <Stack spacing={2}>
-        <SectionHeading overline="GitHub" sx={overlineSx} />
+    <SectionCard delayMs={sectionDelayMs} id={sectionId} sx={cvSectionAnchorSx}>
+      <Stack spacing={compactSidebarSectionSpacing}>
+        <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
 
-        <SectionCard delayMs={githubActivityDelayMs} sx={ghostCardSx}>
-          <Stack spacing={1}>
-            <Typography variant="subtitle2" sx={githubSectionTitleSx}>
+        <SectionCard delayMs={githubActivityDelayMs} sx={cardResetSx}>
+          <Stack spacing={compactSidebarSectionSpacing}>
+            <Typography variant="subtitle2" sx={sectionTitleSx}>
               Recent Activity
             </Typography>
             <SectionPanel>
@@ -86,16 +73,15 @@ export const CVGitHubSection = ({
                 activity={activity}
                 loading={loading}
                 error={error}
-                startDelayMs={githubActivityItemsDelayMs}
+                startDelayMs={resolvedItemOffsetMs}
               />
             </SectionPanel>
           </Stack>
         </SectionCard>
 
-        <SectionCard delayMs={githubContributionsDelayMs} sx={ghostCardSx}>
-          <Stack spacing={1}>
-            <Divider sx={githubSectionDividerSx} />
-            <Typography variant="subtitle2" sx={githubSectionTitleSx}>
+        <SectionCard delayMs={githubContributionsDelayMs} sx={cardResetSx}>
+          <Stack spacing={compactSidebarSectionSpacing}>
+            <Typography variant="subtitle2" sx={sectionTitleSx}>
               Contributions
             </Typography>
             <SectionPanel>
@@ -103,27 +89,29 @@ export const CVGitHubSection = ({
                 contributions={contributions}
                 loading={loading}
                 variant="list"
-                startDelayMs={githubContributionsItemsDelayMs}
+                startDelayMs={resolvedItemOffsetMs}
               />
             </SectionPanel>
           </Stack>
         </SectionCard>
 
-        <SectionCard delayMs={githubNestedBaseDelayMs + githubStaggerMs * 2} sx={ghostCardSx}>
-          <Stack spacing={1}>
-            <Divider sx={githubSectionDividerSx} />
+        <SectionCard delayMs={githubCalendarDelayMs} sx={cardResetSx}>
+          <Stack spacing={compactSidebarSectionSpacing}>
             <GitHubContributionCalendar username={githubUsername} contained={false} />
           </Stack>
         </SectionCard>
 
-        <SectionCard delayMs={githubNestedBaseDelayMs + githubStaggerMs * 3} sx={ghostCardSx}>
-          <Stack spacing={1}>
-            <Divider sx={githubSectionDividerSx} />
-            <Typography variant="subtitle2" sx={githubSectionTitleSx}>
+        <SectionCard delayMs={githubProjectsDelayMs} sx={cardResetSx}>
+          <Stack spacing={compactSidebarSectionSpacing}>
+            <Typography variant="subtitle2" sx={sectionTitleSx}>
               {projectTitle}
             </Typography>
             <SectionPanel>
-              <GitHubProjects projects={projects} />
+              <GitHubProjects
+                projects={projects}
+                animateItems
+                startDelayMs={resolvedItemOffsetMs}
+              />
             </SectionPanel>
           </Stack>
         </SectionCard>

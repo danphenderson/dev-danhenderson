@@ -3,8 +3,41 @@ import type { ReactNode } from 'react';
 import ThemeProvider from '../../ThemeProvider';
 import { VolunteeringList } from './VolunteeringList';
 
+type MockSx = { [key: string]: unknown } | Array<{ [key: string]: unknown }>;
+
+const hasSxEntry = (sx?: MockSx, predicate?: (entry: { [key: string]: unknown }) => boolean) => {
+  const sxEntries = Array.isArray(sx) ? sx : sx ? [sx] : [];
+
+  return predicate ? sxEntries.some((entry) => predicate(entry)) : false;
+};
+
 jest.mock('../AnimatedContentCard', () => ({
-  AnimatedContentCard: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  AnimatedContentCard: ({
+    children,
+    sx,
+  }: {
+    children: ReactNode;
+    sx?: MockSx;
+  }) => (
+    <div
+      data-testid="volunteering-item"
+      data-has-card-reset={String(
+        hasSxEntry(
+          sx,
+          (entry) =>
+            entry.background === 'none' &&
+            entry.backgroundColor === 'transparent' &&
+            entry.border === 'none' &&
+            entry.boxShadow === 'none'
+        )
+      )}
+      data-has-panel-surface={String(
+        hasSxEntry(sx, (entry) => entry.borderRadius === 1.5 && entry.p === 1)
+      )}
+    >
+      {children}
+    </div>
+  ),
 }));
 
 describe('VolunteeringList', () => {
@@ -34,5 +67,7 @@ describe('VolunteeringList', () => {
       screen.getByText('Supported trail construction and maintenance projects with the Access Fund conservation team.')
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Access Fund' })).toHaveAttribute('href', 'https://www.accessfund.org');
+    expect(screen.getByTestId('volunteering-item')).toHaveAttribute('data-has-card-reset', 'true');
+    expect(screen.getByTestId('volunteering-item')).toHaveAttribute('data-has-panel-surface', 'true');
   });
 });

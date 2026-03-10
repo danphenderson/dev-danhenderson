@@ -4,7 +4,6 @@ import { PaletteMode } from '@mui/material';
 import {
   alpha,
   createTheme,
-  Theme,
   ThemeProvider as MuiThemeProvider,
 } from '@mui/material/styles';
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
@@ -61,19 +60,19 @@ const createAppTheme = (mode: PaletteMode) =>
       },
       h4: {
         fontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'].join(','),
-        fontWeight: 650,
+        fontWeight: 600,
         fontSize: 'clamp(1.3rem, 2.1vw, 1.65rem)',
         lineHeight: 1.2,
       },
       h5: {
         fontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'].join(','),
-        fontWeight: 650,
+        fontWeight: 600,
         fontSize: '1.22rem',
         lineHeight: 1.25,
       },
       h6: {
         fontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'].join(','),
-        fontWeight: 650,
+        fontWeight: 600,
         fontSize: '1.06rem',
         lineHeight: 1.3,
       },
@@ -138,10 +137,10 @@ const createAppTheme = (mode: PaletteMode) =>
       MuiAppBar: {
         styleOverrides: {
           root: ({ theme }) => ({
-            backgroundColor:
-              theme.palette.mode === 'light'
-                ? alpha('#0f253f', 0.88)
-                : alpha('#08111f', 0.86),
+            backgroundColor: alpha(
+              theme.palette.primary.contrastText,
+              theme.palette.mode === 'light' ? 0.88 : 0.86
+            ),
             borderBottom: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.24 : 0.36)}`,
             backdropFilter: 'blur(10px)',
           }),
@@ -180,11 +179,90 @@ const createAppTheme = (mode: PaletteMode) =>
           }),
         },
       },
+      MuiSpeedDial: {
+        defaultProps: {
+          FabProps: {
+            size: 'medium',
+          },
+        },
+        styleOverrides: {
+          root: ({ theme }) => ({
+            zIndex: theme.zIndex.appBar - 1,
+          }),
+          fab: ({ theme }) => ({
+            color: theme.palette.text.primary,
+            backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.94 : 0.82),
+            border: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.28 : 0.52)}`,
+            boxShadow: theme.palette.mode === 'light'
+              ? `0 12px 28px ${alpha(theme.palette.common.black, 0.18)}`
+              : `0 14px 30px ${alpha(theme.palette.common.black, 0.34)}`,
+            backdropFilter: 'blur(12px)',
+            '&:hover': {
+              backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.98 : 0.9),
+            },
+            '&:focus-visible': {
+              outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
+              outlineOffset: 3,
+            },
+          }),
+          actions: {
+            gap: 8,
+            paddingBlock: 8,
+          },
+        },
+      },
+      MuiSpeedDialAction: {
+        defaultProps: {
+          tooltipPlacement: 'left',
+        },
+        styleOverrides: {
+          fab: ({ theme }) => ({
+            color: theme.palette.text.primary,
+            backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.95 : 0.86),
+            border: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.22 : 0.46)}`,
+            boxShadow: theme.palette.mode === 'light'
+              ? `0 10px 22px ${alpha(theme.palette.common.black, 0.14)}`
+              : `0 12px 24px ${alpha(theme.palette.common.black, 0.3)}`,
+            '&:hover': {
+              backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 1 : 0.92),
+            },
+            '&:focus-visible': {
+              outline: `2px solid ${alpha(theme.palette.primary.light, 0.7)}`,
+              outlineOffset: 3,
+            },
+          }),
+          staticTooltipLabel: ({ theme }) => ({
+            ...theme.typography.button,
+            color: theme.palette.text.primary,
+            backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.96 : 0.88),
+            border: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.18 : 0.38)}`,
+            borderRadius: 999,
+            boxShadow: theme.palette.mode === 'light'
+              ? `0 10px 22px ${alpha(theme.palette.common.black, 0.12)}`
+              : `0 12px 24px ${alpha(theme.palette.common.black, 0.28)}`,
+            padding: '6px 12px',
+            backdropFilter: 'blur(12px)',
+          }),
+        },
+      },
+      MuiSpeedDialIcon: {
+        styleOverrides: {
+          icon: {
+            fontSize: 24,
+          },
+          openIcon: {
+            fontSize: 22,
+          },
+        },
+      },
       MuiAccordion: {
         styleOverrides: {
           root: {
             borderRadius: 14,
             overflow: 'hidden',
+            '&::before': {
+              display: 'none',
+            },
           },
         },
       },
@@ -197,13 +275,11 @@ const createAppTheme = (mode: PaletteMode) =>
   });
 
 type ThemeContextValue = {
-  theme: Theme;
   mode: PaletteMode;
   toggleTheme: () => void;
 };
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: createAppTheme('light'),
   mode: 'light',
   toggleTheme: () => {},
 });
@@ -236,7 +312,7 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
   if (!children) return null;
 
   return (
-    <ThemeContext.Provider value={{ theme, mode, toggleTheme }}>
+    <ThemeContext.Provider value={{ mode, toggleTheme }}>
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
         {children}
@@ -245,6 +321,6 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
   );
 };
 
-export const useTheme = () => useContext(ThemeContext);
+export const useAppTheme = () => useContext(ThemeContext);
 
 export default ThemeProvider;

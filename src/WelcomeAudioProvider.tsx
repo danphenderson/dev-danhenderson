@@ -46,6 +46,15 @@ const TRACK_EMBED_URL =
   'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A298021432&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true';
 const AUDIO_CONSENT_STORAGE_KEY = 'danhenderson-welcome-audio-consent';
 const LEGACY_AUDIO_PROMPT_STORAGE_KEY = 'danhenderson-welcome-audio-prompt';
+const hiddenAudioIframeStyle = {
+  position: 'absolute',
+  width: 0,
+  height: 0,
+  border: 0,
+  clipPath: 'inset(50%)',
+  clip: 'rect(0 0 0 0)',
+  overflow: 'hidden',
+} as const;
 
 let widgetScriptPromise: Promise<void> | null = null;
 
@@ -343,15 +352,7 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
           title="Welcome audio"
           src={TRACK_EMBED_URL}
           allow="autoplay"
-          style={{
-            position: 'absolute',
-            width: 0,
-            height: 0,
-            border: 0,
-            clipPath: 'inset(50%)',
-            clip: 'rect(0 0 0 0)',
-            overflow: 'hidden',
-          }}
+          style={hiddenAudioIframeStyle}
           aria-hidden={true}
         />
       )}

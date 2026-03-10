@@ -3,6 +3,7 @@ import { Box, Button, IconButton, Menu, MenuItem, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { MouseEvent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { useAppStyles } from '../../styles/appStyles';
 
 export type HeaderPage = {
   name: string;
@@ -32,9 +33,11 @@ export const HeaderNav = ({
   onMobileMenuClose,
   leftContent,
 }: HeaderNavProps) => {
+  const appStyles = useAppStyles();
+
   return (
     <>
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 0.5, md: 1 }, flexShrink: 0 }}>
+      <Box sx={appStyles.headerNavLeadSx}>
         {isMobile && (
           <IconButton
             id="mobile-nav-button"
@@ -51,13 +54,13 @@ export const HeaderNav = ({
         )}
         {leftContent}
       </Box>
-      <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: 'center', minWidth: 0 }}>
+      <Box sx={appStyles.headerNavDesktopSx}>
         <Stack direction="row" spacing={{ md: 5 }}>
           {pages.map(({ name, path }) => (
             <Button
               key={name}
               size="large"
-              sx={{ color: 'white', fontSize: { md: '1.5rem' } }}
+              sx={appStyles.headerNavButtonSx}
               component={Link}
               to={path}
               aria-label={`Go to ${name}`}

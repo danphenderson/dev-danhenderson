@@ -1,83 +1,31 @@
-import { useState, useEffect } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
-import { useWelcomeAudio } from '../WelcomeAudioProvider';
+import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
+import { useAppStyles } from '../styles/appStyles';
+import { useCvStyles } from '../styles/cvStyles';
 
 export default function Home() {
-  const {
-    play,
-    isPlaying,
-    error,
-    audioConsent,
-    declineAudioConsent,
-    showPauseHint,
-    setShowPauseHint,
-    setShowDarkModeHint,
-  } = useWelcomeAudio();
-  const [isPromptOpen, setIsPromptOpen] = useState(false);
-  const [hasShownDarkModePrompt, setHasShownDarkModePrompt] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const hasHandledAudioPrompt = audioConsent !== 'unknown';
-
-  useEffect(() => {
-    if (audioConsent === 'unknown' && !isPlaying) {
-      setIsPromptOpen(true);
-      return;
-    }
-
-    if (audioConsent === 'declined') {
-      setIsPromptOpen(false);
-    }
-  }, [audioConsent, isPlaying]);
-
-  useEffect(
-    () => () => {
-      setShowPauseHint(false);
-      setShowDarkModeHint(false);
-    },
-    [setShowPauseHint, setShowDarkModeHint],
-  );
-
-  useEffect(() => {
-    if (hasShownDarkModePrompt || !hasHandledAudioPrompt || showPauseHint || isPromptOpen) return;
-    setShowDarkModeHint(true);
-    setHasShownDarkModePrompt(true);
-  }, [hasHandledAudioPrompt, hasShownDarkModePrompt, showPauseHint, isPromptOpen, setShowDarkModeHint]);
-
-  const handleOptOut = () => {
-    declineAudioConsent();
-    setIsPromptOpen(false);
-  };
-
-  const handlePlay = async () => {
-    try {
-      setIsLoading(true);
-      await play();
-      setIsPromptOpen(false);
-      setShowPauseHint(true);
-    } catch (err) {
-      console.error('Unable to play welcome audio', err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const appStyles = useAppStyles();
+  const { cardResetSx } = useCvStyles();
+  const { error, isHeroAnimationReady, isLoading, isPromptOpen, handleOptOut, handlePlay } =
+    useHomeWelcomeSequence();
 
   return (
     <BackgroundPaper
       image="assets/home.jpg"
       contentAlign="flex-end"
-      contentSx={{ pb: '194px' }}
-      shellSx={{ p: 1.5, pb: 0.5 }}
+      contentSx={appStyles.homeHeroContentSx}
+      showShell={isHeroAnimationReady}
+      shellSx={appStyles.homeHeroShellSx}
     >
-      <Stack spacing={2} alignItems="center">
-        <Typography
-          variant="h1"
-          align="center"
-          sx={{ color: '#fff', fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' }, lineHeight: '1.5' }}
-        >
-          Hi, my passions are mathematics, computers, and adventures
-        </Typography>
-      </Stack>
+      <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
+        <Stack spacing={2} alignItems="center">
+          <Typography variant="h1" align="center" sx={appStyles.homeHeroTitleSx}>
+            Hi, my passions are mathematics, computers, and adventures
+          </Typography>
+        </Stack>
+      </AnimatedContentCard>
 
       <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
         <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>

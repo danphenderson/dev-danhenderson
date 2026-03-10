@@ -1,7 +1,9 @@
 import { Stack } from '@mui/material';
 import type { CodingExample, EducationInfo, Experience, VolunteeringEntry } from '../../data/cv';
 import { SectionCard } from '../layout/SectionCard';
+import { useCvStyles } from '../../styles/cvStyles';
 import { CodingExamplesSection } from './CodingExamplesSection';
+import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { EducationSection } from './EducationSection';
 import { ExperienceList } from './ExperienceList';
 import { SectionHeading } from './SectionHeading';
@@ -19,9 +21,9 @@ type CVMainColumnProps = {
   educationDelayMs?: number;
   volunteeringDelayMs?: number;
   codingDelayMs?: number;
-  experienceItemsDelayMs?: number;
-  volunteeringItemsDelayMs?: number;
+  itemOffsetMs?: number;
   spacing?: number;
+  sectionIds?: Partial<Record<CVMainColumnSection, string>>;
 };
 
 export const CVMainColumn = ({
@@ -34,37 +36,40 @@ export const CVMainColumn = ({
   educationDelayMs = 0,
   volunteeringDelayMs = 0,
   codingDelayMs = 0,
-  experienceItemsDelayMs = 0,
-  volunteeringItemsDelayMs = 0,
+  itemOffsetMs,
   spacing = 3.5,
+  sectionIds,
 }: CVMainColumnProps) => {
+  const { motionTokens } = useCvStyles();
+  const resolvedItemOffsetMs = itemOffsetMs ?? motionTokens.itemOffsetMs;
+
   return (
     <Stack spacing={spacing}>
       {sections.includes('experience') && (
-        <SectionCard delayMs={experienceDelayMs}>
+        <SectionCard delayMs={experienceDelayMs} id={sectionIds?.experience} sx={cvSectionAnchorSx}>
           <SectionHeading overline="Experience" title="Roles & Impact" />
-          <ExperienceList experiences={experiences} startDelayMs={experienceItemsDelayMs} />
+          <ExperienceList experiences={experiences} startDelayMs={resolvedItemOffsetMs} />
         </SectionCard>
       )}
 
       {sections.includes('education') && (
-        <SectionCard delayMs={educationDelayMs}>
+        <SectionCard delayMs={educationDelayMs} id={sectionIds?.education} sx={cvSectionAnchorSx}>
           <SectionHeading overline="Education" />
-          <EducationSection education={education} />
+          <EducationSection education={education} startDelayMs={resolvedItemOffsetMs} />
         </SectionCard>
       )}
 
       {sections.includes('volunteering') && (
-        <SectionCard delayMs={volunteeringDelayMs}>
+        <SectionCard delayMs={volunteeringDelayMs} id={sectionIds?.volunteering} sx={cvSectionAnchorSx}>
           <SectionHeading overline="Volunteering" title="Community Impact" />
-          <VolunteeringList volunteering={volunteering} startDelayMs={volunteeringItemsDelayMs} />
+          <VolunteeringList volunteering={volunteering} startDelayMs={resolvedItemOffsetMs} />
         </SectionCard>
       )}
 
       {sections.includes('coding') && (
-        <SectionCard delayMs={codingDelayMs}>
+        <SectionCard delayMs={codingDelayMs} id={sectionIds?.coding} sx={cvSectionAnchorSx}>
           <SectionHeading overline="Coding Examples" title="Selected Work" />
-          <CodingExamplesSection examples={codingExamples} />
+          <CodingExamplesSection examples={codingExamples} startDelayMs={resolvedItemOffsetMs} />
         </SectionCard>
       )}
     </Stack>

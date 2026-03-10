@@ -1,70 +1,107 @@
 import { Box, Stack, Typography } from '@mui/material';
 import type { EducationInfo } from '../../data/cv';
-import { AnimatedContentCard } from '../AnimatedContentCard';
-import { ToolsAccordion } from '../ToolsAccordion';
+import { AnimatedContentList } from '../AnimatedContentList';
+import { SkillsChipList } from '../SkillsChipList';
+import { TabPanel, TabPanelItem } from '../TabPanel';
+import { useCvStyles } from '../../styles/cvStyles';
 
 type EducationSectionProps = {
   education: EducationInfo;
+  startDelayMs?: number;
 };
 
-export const EducationSection = ({ education }: EducationSectionProps) => {
+export const EducationSection = ({ education, startDelayMs = 0 }: EducationSectionProps) => {
+  const {
+    contentListStackSpacing,
+    detailBlockSx,
+    educationMetaSx,
+    educationProgramSx,
+    getDetailListSx,
+    sectionTitleSx,
+    secondaryTextSx,
+  } = useCvStyles();
+
   if (!education.entries || education.entries.length === 0) {
     return null;
   }
 
   return (
-    <Stack spacing={2.25}>
-      {education.entries.map((entry, index) => (
-        <AnimatedContentCard key={`${entry.university}-${entry.program}-${index}`} delayMs={index * 90}>
-          <Typography variant="h6" fontWeight={700} sx={{ color: 'text.primary' }}>
-            {entry.university}
-          </Typography>
+    <AnimatedContentList
+      items={education.entries}
+      getItemKey={(entry, index) => `${entry.university}-${entry.program}-${index}`}
+      startDelayMs={startDelayMs}
+      stackSpacing={contentListStackSpacing}
+      itemSurface="panel"
+      renderItem={(entry, index) => {
+        const filteredHighlights = entry.highlights?.filter((highlight) => highlight.trim().length > 0) ?? [];
+        const filteredSkills = entry.skills?.filter((tool) => tool.trim().length > 0) ?? [];
+        const educationTabs: TabPanelItem[] = [];
 
-          <Typography variant="subtitle1" sx={{ mt: 0.75 }}>
-            {entry.program}
-          </Typography>
-
-          {(entry.status || entry.dateRange) && (
-            <Stack spacing={0.25} sx={{ mt: 0.5 }}>
-              {entry.status && (
-                <Typography variant="subtitle2" color="text.secondary">
-                  {entry.status}
-                </Typography>
-              )}
-              {entry.dateRange && (
-                <Typography variant="subtitle2" color="text.secondary">
-                  {entry.dateRange}
-                </Typography>
-              )}
-            </Stack>
-          )}
-
-          {entry.highlights?.filter((highlight) => highlight.trim().length > 0).length ? (
-            <Box component="ul" sx={{ paddingLeft: 3, margin: '10px 0 0' }}>
-              {entry.highlights
-                ?.filter((highlight) => highlight.trim().length > 0)
-                .map((highlight, highlightIndex) => (
+        if (filteredHighlights.length) {
+          educationTabs.push({
+            value: 'highlights',
+            label: 'Highlights',
+            content: (
+              <Box component="ul" sx={getDetailListSx(0, 0)}>
+                {filteredHighlights.map((highlight, highlightIndex) => (
                   <Typography component="li" variant="body2" key={`${highlight}-${highlightIndex}`}>
                     {highlight}
                   </Typography>
                 ))}
-            </Box>
-          ) : null}
+              </Box>
+            ),
+          });
+        }
 
-          {entry.tools?.filter((tool) => tool.trim().length > 0).length ? (
-            <Box sx={{ mt: 1.5 }}>
-              <ToolsAccordion
-                id={`education-tools-${index}`}
-                title="Tools used"
-                subtitle=""
-                tools={entry.tools}
-                dense
-                defaultExpanded={false}
-              />
-            </Box>
-          ) : null}
-        </AnimatedContentCard>
-      ))}
-    </Stack>
+        if (filteredSkills.length) {
+          educationTabs.push({
+            value: 'skills',
+            label: 'Skills',
+            renderContent: (selected) => (
+              <SkillsChipList skills={filteredSkills} dense in={selected} />
+            ),
+          });
+        }
+
+        return (
+          <>
+            <Typography variant="h6" sx={sectionTitleSx}>
+              {entry.university}
+            </Typography>
+
+            <Typography variant="subtitle1" sx={educationProgramSx}>
+              {entry.program}
+            </Typography>
+
+            {(entry.status || entry.dateRange) && (
+              <Stack spacing={0.25} sx={educationMetaSx}>
+                {entry.status && (
+                  <Typography variant="subtitle2" sx={secondaryTextSx}>
+                    {entry.status}
+                  </Typography>
+                )}
+                {entry.dateRange && (
+                  <Typography variant="subtitle2" sx={secondaryTextSx}>
+                    {entry.dateRange}
+                  </Typography>
+                )}
+              </Stack>
+            )}
+
+            {educationTabs.length ? (
+              <Box sx={detailBlockSx}>
+                <TabPanel
+                  id={`education-details-${index}`}
+                  ariaLabel={`${entry.program} details`}
+                  items={educationTabs}
+                  dense
+                  tabsVariant="fullWidth"
+                />
+              </Box>
+            ) : null}
+          </>
+        );
+      }}
+    />
   );
 };

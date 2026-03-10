@@ -3,9 +3,17 @@ import { GitHubLinkChipList } from './GitHubLinkChipList';
 
 type GitHubProjectsProps = {
   projects: GitHubProject[];
+  animateItems?: boolean;
+  startDelayMs?: number;
+  itemStaggerMs?: number;
 };
 
-export const GitHubProjects = ({ projects }: GitHubProjectsProps) => {
+export const GitHubProjects = ({
+  projects,
+  animateItems = false,
+  startDelayMs = 0,
+  itemStaggerMs,
+}: GitHubProjectsProps) => {
   return (
     <GitHubLinkChipList
       items={projects.map((project) => ({
@@ -14,6 +22,9 @@ export const GitHubProjects = ({ projects }: GitHubProjectsProps) => {
         href: project.url,
       }))}
       layout="wrap"
+      animateItems={animateItems}
+      startDelayMs={startDelayMs}
+      itemStaggerMs={itemStaggerMs}
     />
   );
 };
