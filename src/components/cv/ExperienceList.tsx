@@ -7,8 +7,9 @@ import type {
   ExperienceProjectSegment,
 } from '../../data/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
+import { SkillsChipList } from '../SkillsChipList';
+import { TabPanel, TabPanelItem } from '../TabPanel';
 import { useCvStyles } from '../../styles/cvStyles';
-import { SkillsAccordion } from '../SkillsAccordion';
 
 type ExperienceListProps = {
   experiences: Experience[];
@@ -44,7 +45,7 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
   }
 
   return (
-    <Box component="ul" sx={getDetailListSx(1.25, 1.25)}>
+    <Box component="ul" sx={getDetailListSx(0, 0)}>
       {projects.map((project, projectIndex) => {
         if (typeof project === 'string') {
           return (
@@ -98,89 +99,98 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
       startDelayMs={startDelayMs}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
-      renderItem={(experience, index) => (
-        <>
-          <Stack spacing={1.25}>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems={{ xs: 'flex-start', sm: 'center' }}
-              spacing={1.5}
-              flexWrap="wrap"
-              width="100%"
-            >
-              <Box sx={{ minWidth: 0 }}>
-                <Typography variant="h6" sx={sectionTitleSx}>
-                  {experience.title}
-                </Typography>
-                <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-                  {experience.companyUrl ? (
-                    <Link
-                      href={experience.companyUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      color="inherit"
-                      underline="hover"
-                      variant="subtitle2"
-                      sx={secondaryStrongSx}
-                    >
-                      {experience.company}
-                    </Link>
-                  ) : (
-                    <Typography variant="subtitle2" sx={secondaryStrongSx}>
-                      {experience.company}
-                    </Typography>
-                  )}
-                  <Typography variant="subtitle2" sx={secondaryTextSx}>
-                    •
-                  </Typography>
-                  <Typography variant="subtitle2" sx={secondaryTextSx}>
-                    {experience.startDate} - {experience.endDate}
-                  </Typography>
-                </Stack>
-              </Box>
-              {experience.industry && (
-                <Chip
-                  size="small"
-                  label={experience.industry}
-                  variant="outlined"
-                  sx={experienceIndustryChipSx}
-                />
-              )}
-            </Stack>
-          </Stack>
-          {experience.description && (
-            <Typography variant="body2" sx={experienceDescriptionSx}>
-              {renderExperienceDescription(experience.description)}
-            </Typography>
-          )}
-          {experience.projects?.length ? (
-            <Box sx={detailBlockSx}>
-              <SkillsAccordion
-                id={`experience-projects-${index}`}
-                title="Details"
-                subtitle=""
-                dense
-                defaultExpanded={false}
+      renderItem={(experience, index) => {
+        const filteredSkills = experience.skills?.filter((tool) => tool.trim().length > 0) ?? [];
+        const experienceTabs: TabPanelItem[] = [];
+
+        if (experience.projects?.length) {
+          experienceTabs.push({
+            value: 'details',
+            label: 'Details',
+            content: <ExperienceProjects projects={experience.projects} />,
+          });
+        }
+
+        if (filteredSkills.length) {
+          experienceTabs.push({
+            value: 'skills',
+            label: 'Skills',
+            renderContent: (selected) => (
+              <SkillsChipList skills={filteredSkills} dense in={selected} />
+            ),
+          });
+        }
+
+        return (
+          <>
+            <Stack spacing={1.25}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems={{ xs: 'flex-start', sm: 'center' }}
+                spacing={1.5}
+                flexWrap="wrap"
+                width="100%"
               >
-                <ExperienceProjects projects={experience.projects} />
-              </SkillsAccordion>
-            </Box>
-          ) : null}
-          {experience.skills?.filter((tool) => tool.trim().length > 0).length ? (
-            <Box sx={detailBlockSx}>
-              <SkillsAccordion
-                id={`experience-tools-${index}`}
-                title="Skills"
-                subtitle=""
-                skills={experience.skills}
-                dense
-                defaultExpanded={false}
-              />
-            </Box>
-          ) : null}
-        </>
-      )}
+                <Box sx={{ minWidth: 0 }}>
+                  <Typography variant="h6" sx={sectionTitleSx}>
+                    {experience.title}
+                  </Typography>
+                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                    {experience.companyUrl ? (
+                      <Link
+                        href={experience.companyUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        color="inherit"
+                        underline="hover"
+                        variant="subtitle2"
+                        sx={secondaryStrongSx}
+                      >
+                        {experience.company}
+                      </Link>
+                    ) : (
+                      <Typography variant="subtitle2" sx={secondaryStrongSx}>
+                        {experience.company}
+                      </Typography>
+                    )}
+                    <Typography variant="subtitle2" sx={secondaryTextSx}>
+                      •
+                    </Typography>
+                    <Typography variant="subtitle2" sx={secondaryTextSx}>
+                      {experience.startDate} - {experience.endDate}
+                    </Typography>
+                  </Stack>
+                </Box>
+                {experience.industry && (
+                  <Chip
+                    size="small"
+                    label={experience.industry}
+                    variant="outlined"
+                    sx={experienceIndustryChipSx}
+                  />
+                )}
+              </Stack>
+            </Stack>
+            {experience.description && (
+              <Typography variant="body2" sx={experienceDescriptionSx}>
+                {renderExperienceDescription(experience.description)}
+              </Typography>
+            )}
+            {experienceTabs.length ? (
+              <Box sx={detailBlockSx}>
+                <TabPanel
+                  id={`experience-details-${index}`}
+                  ariaLabel={`${experience.title} supplemental information`}
+                  items={experienceTabs}
+                  dense
+                  tabsVariant="fullWidth"
+                />
+              </Box>
+            ) : null}
+          </>
+        );
+      }}
     />
   );
 };

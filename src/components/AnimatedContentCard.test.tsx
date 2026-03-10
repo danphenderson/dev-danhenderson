@@ -87,4 +87,73 @@ describe('AnimatedContentCard', () => {
 
     expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'true');
   });
+
+  it('supports externally controlled visibility', () => {
+    jest.useFakeTimers();
+    setReducedMotionPreference(false);
+
+    const { rerender } = render(
+      <ThemeProvider>
+        <AnimatedContentCard delayMs={120} visible={false}>
+          <div>Controlled Card</div>
+        </AnimatedContentCard>
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'false');
+
+    rerender(
+      <ThemeProvider>
+        <AnimatedContentCard delayMs={120} visible>
+          <div>Controlled Card</div>
+        </AnimatedContentCard>
+      </ThemeProvider>
+    );
+
+    act(() => {
+      jest.advanceTimersByTime(119);
+    });
+
+    expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'false');
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+
+    expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'true');
+
+    rerender(
+      <ThemeProvider>
+        <AnimatedContentCard delayMs={120} visible={false}>
+          <div>Controlled Card</div>
+        </AnimatedContentCard>
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'false');
+  });
+
+  it('keeps controlled content hidden under reduced motion until it is shown', () => {
+    setReducedMotionPreference(true);
+
+    const { rerender } = render(
+      <ThemeProvider>
+        <AnimatedContentCard visible={false}>
+          <div>Reduced Motion Controlled Card</div>
+        </AnimatedContentCard>
+      </ThemeProvider>
+    );
+
+    expect(screen.queryByText('Reduced Motion Controlled Card')).not.toBeInTheDocument();
+
+    rerender(
+      <ThemeProvider>
+        <AnimatedContentCard visible>
+          <div>Reduced Motion Controlled Card</div>
+        </AnimatedContentCard>
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText('Reduced Motion Controlled Card')).toBeInTheDocument();
+  });
 });

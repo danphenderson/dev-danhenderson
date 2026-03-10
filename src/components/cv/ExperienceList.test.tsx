@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../ThemeProvider';
 import { experiences } from '../../data/cv';
@@ -12,21 +12,6 @@ jest.mock('../AnimatedContentList', () => ({
     items: unknown[];
     renderItem: (item: unknown, index: number) => ReactNode;
   }) => <div>{items.map((item, index) => <div key={index}>{renderItem(item, index)}</div>)}</div>,
-}));
-
-jest.mock('../SkillsAccordion', () => ({
-  SkillsAccordion: ({
-    children,
-    title,
-  }: {
-    children?: ReactNode;
-    title: string;
-  }) => (
-    <section>
-      <div>{title}</div>
-      {children}
-    </section>
-  ),
 }));
 
 describe('ExperienceList', () => {
@@ -50,6 +35,34 @@ describe('ExperienceList', () => {
       'https://pages.mtu.edu/~jiguangs/Homepage_of_Jiguang_Sun/Welcome.html'
     );
     expect(advisorLink.closest('p')?.querySelectorAll('br')).toHaveLength(1);
+    expect(screen.getByRole('tab', { name: 'Details' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Skills' })).toBeInTheDocument();
+  });
+
+  it('switches between details and skills within the shared tab panel', () => {
+    const hemodynamicsExperience = experiences.find(
+      (experience) => experience.title === 'Graduate Research Assistant | Hemodynamics'
+    );
+
+    expect(hemodynamicsExperience).toBeDefined();
+
+    render(
+      <ThemeProvider>
+        <ExperienceList experiences={[hemodynamicsExperience!]} />
+      </ThemeProvider>
+    );
+
+    expect(
+      screen.queryByText('Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).')
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('PyTorch')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
+
+    expect(screen.getByText('PyTorch')).toBeVisible();
+    expect(
+      screen.queryByText('Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).')
+    ).not.toBeInTheDocument();
   });
 
   it('renders inline project links for the research assistant entry without separate reference bullets', () => {
@@ -64,6 +77,8 @@ describe('ExperienceList', () => {
         <ExperienceList experiences={[researchAssistant!]} />
       </ThemeProvider>
     );
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Details' }));
 
     const detailList = screen.getByRole('list');
 

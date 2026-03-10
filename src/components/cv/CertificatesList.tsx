@@ -9,7 +9,7 @@ type CertificatesListProps = {
 };
 
 export const CertificatesList = ({ certificates, startDelayMs = 0 }: CertificatesListProps) => {
-  const { certificateActionSx, contentListStackSpacing, secondaryTextSx } = useCvStyles();
+  const { certificateActionSx, contentListStackSpacing, interactiveSurfaceSx, secondaryTextSx } = useCvStyles();
 
   return (
     <AnimatedContentList
@@ -31,7 +31,7 @@ export const CertificatesList = ({ certificates, startDelayMs = 0 }: Certificate
               rel="noopener noreferrer"
               variant="outlined"
               size="small"
-              sx={certificateActionSx}
+              sx={[interactiveSurfaceSx, certificateActionSx]}
             >
               View Certificate
             </Button>

@@ -30,6 +30,9 @@ export const useCvStyles = () => {
     const subtleBorder = `1px solid ${alpha(accentColor, isLight ? 0.2 : 0.38)}`;
     const subtleSurface = alpha(theme.palette.background.paper, isLight ? 0.74 : 0.58);
     const accentTint = alpha(accentColor, isLight ? 0.14 : 0.24);
+    const interactiveSurfaceHoverShadow = isLight
+      ? `0 0 0 1px ${alpha(accentColor, 0.24)}, 0 8px 20px ${alpha(accentColor, 0.14)}`
+      : `0 0 0 1px ${alpha(accentColor, 0.34)}, 0 10px 24px ${alpha(accentColor, 0.18)}`;
 
     const getDetailListSx = (marginTop = 1.25, marginBottom = 0): SxProps<Theme> => ({
       pl: 3,
@@ -85,22 +88,69 @@ export const useCvStyles = () => {
       transitionDelay: `${delayMs}ms`,
     });
 
-    const getSkillsAccordionSx = (dense: boolean): SxProps<Theme> => ({
+    const interactiveSurfaceSx = {
+      ...theme.typography.button,
+      fontFamily: theme.typography.fontFamily,
+      color: accentColor,
+      textTransform: 'none',
+      transition: 'color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+      '&:hover': {
+        backgroundColor: alpha(accentColor, isLight ? 0.08 : 0.16),
+        borderColor: alpha(accentColor, isLight ? 0.72 : 0.84),
+        boxShadow: interactiveSurfaceHoverShadow,
+      },
+    } satisfies SxProps<Theme>;
+
+    const getTabPanelSx = () => ({
       border: subtleBorder,
       backgroundColor: subtleSurface,
       borderRadius: 2,
-      '& .MuiAccordionSummary-root': {
-        minHeight: dense ? 44 : 56,
-        px: { xs: 1.25, sm: 1.5 },
+      overflow: 'hidden',
+    }) satisfies SxProps<Theme>;
+
+    const getTabListSx = (dense: boolean) => ({
+      minHeight: dense ? 44 : 52,
+      px: { xs: 0.5, sm: 0.75 },
+      backgroundColor: alpha(accentColor, isLight ? 0.06 : 0.16),
+      '& .MuiTabs-flexContainer': {
+        gap: 0.25,
       },
-      '& .MuiAccordionSummary-content': {
-        my: dense ? 0.25 : 0.5,
+      '& .MuiTabs-indicator': {
+        height: 3,
+        borderRadius: 999,
+        backgroundColor: accentColor,
       },
-      '& .MuiAccordionDetails-root': {
-        px: { xs: 1.25, sm: 1.5 },
-        pb: dense ? 1.25 : 1.5,
+      '& .MuiTabs-scrollButtons': {
+        color: 'text.secondary',
       },
-    });
+    }) satisfies SxProps<Theme>;
+
+    const getTabSx = (dense: boolean) => ({
+      minHeight: dense ? 44 : 52,
+      minWidth: 0,
+      maxWidth: 'none',
+      px: { xs: 1.25, sm: 1.5 },
+      py: dense ? 1 : 1.25,
+      fontFamily: 'inherit',
+      fontSize: 'inherit',
+      lineHeight: 'inherit',
+      fontWeight: 'inherit',
+      letterSpacing: 'inherit',
+      alignItems: 'flex-start',
+      justifyContent: 'flex-start',
+      color: accentColor,
+      borderRadius: 1.25,
+      '&.Mui-selected': {
+        color: accentColor,
+      },
+    }) satisfies SxProps<Theme>;
+
+    const getTabPanelBodySx = (dense: boolean, hasTabs: boolean) => ({
+      px: { xs: 1.25, sm: 1.5 },
+      pt: hasTabs ? (dense ? 1.25 : 1.5) : 0,
+      pb: dense ? 1.25 : 1.5,
+      borderTop: hasTabs ? `1px solid ${alpha(accentColor, isLight ? 0.12 : 0.24)}` : 'none',
+    }) satisfies SxProps<Theme>;
 
     const cardResetSx = {
       p: 0,
@@ -173,6 +223,7 @@ export const useCvStyles = () => {
       } satisfies SxProps<Theme>,
       wrapItemContainerSx: { width: 'auto' } satisfies SxProps<Theme>,
       fullWidthSx: { width: '100%' } satisfies SxProps<Theme>,
+      interactiveSurfaceSx: interactiveSurfaceSx satisfies SxProps<Theme>,
       getSectionDelayMs,
       getItemDelayMs,
       getAnimatedZoomItemSx,
@@ -275,7 +326,10 @@ export const useCvStyles = () => {
         },
       } satisfies SxProps<Theme>,
       githubCalendarSizeSx: { width: '100%', minHeight: 140 } satisfies SxProps<Theme>,
-      getSkillsAccordionSx,
+      getTabPanelSx,
+      getTabListSx,
+      getTabSx,
+      getTabPanelBodySx,
       skillsChipSx: {
         border: subtleBorder,
         backgroundColor: subtleSurface,
@@ -288,7 +342,10 @@ export const useCvStyles = () => {
         gap: 0.75,
       } satisfies SxProps<Theme>,
       contentCardInsetSx: { p: { xs: 1.5, md: 2 } } satisfies SxProps<Theme>,
-      certificateActionSx: { mt: 1 } satisfies SxProps<Theme>,
+      certificateActionSx: {
+        mt: 1,
+        color: accentColor,
+      } satisfies SxProps<Theme>,
       volunteeringMetaSx: {
         textAlign: { xs: 'left', sm: 'right' },
       } satisfies SxProps<Theme>,

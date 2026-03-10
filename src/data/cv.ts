@@ -77,6 +77,7 @@ export type VolunteeringEntry = {
 
 export type StackSection = {
   title: string;
+  tabLabel?: string;
   items: string[];
 };
 
@@ -390,6 +391,7 @@ export const volunteering: VolunteeringEntry[] = [
 export const stackAndTools: StackSection[] = [
   {
     title: 'Development Stack and Tools',
+    tabLabel: 'Dev Stack',
     items: [
       'macOS',
       'Homebrew package manager',
@@ -415,6 +417,7 @@ export const stackAndTools: StackSection[] = [
   },
   {
     title: 'Programing & Scripting Languages',
+    tabLabel: 'Languages',
     items: [
       'Python',
       'Java',
@@ -431,14 +434,17 @@ export const stackAndTools: StackSection[] = [
   },
   {
     title: 'ETL & API Frameworks',
+    tabLabel: 'ETL/API',
     items: ['Data Build Tool (DBT)', 'Django', 'FastAPI', 'Apache Spark (PySpark)'],
   },
   {
     title: 'Databases',
+    tabLabel: 'DBs',
     items: ['Redshift', 'PostgreSQL', 'Neo4j'],
   },
   {
     title: 'Services',
+    tabLabel: 'Services',
     items: [
       'Amazon Management Console',
       'Sentry',

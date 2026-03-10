@@ -64,6 +64,8 @@ Animation behavior is intentionally centralized for the CV route instead of bein
 - `src/components/AnimatedZoomList.tsx`
   - shared staggered `Zoom` list for accordion chip reveals
   - used by the CV tools accordion so chip timing is not defined inline
+- `src/hooks/useHomeWelcomeSequence.ts`
+  - coordinates the home-page intro so the hero shell and title stay hidden until the welcome dialog and follow-up hints have been dismissed
 - `src/styles/cvStyles.ts`
   - source of truth for CV motion tokens and delay helpers
   - current tokens are:

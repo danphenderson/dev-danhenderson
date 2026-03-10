@@ -1,7 +1,7 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../ThemeProvider';
-import { SkillsAccordion } from './SkillsAccordion';
+import { SkillsChipList } from './SkillsChipList';
 
 jest.mock('@mui/material', () => {
   const actual = jest.requireActual('@mui/material');
@@ -39,22 +39,26 @@ const setReducedMotionPreference = (matches: boolean) => {
   }));
 };
 
-describe('SkillsAccordion', () => {
+describe('SkillsChipList', () => {
   afterEach(() => {
     window.matchMedia = defaultMatchMedia;
     jest.clearAllMocks();
   });
 
-  it('animates chips concurrently with accordion expansion', () => {
+  it('animates chips when the list becomes active', () => {
     setReducedMotionPreference(false);
 
-    render(
+    const { rerender } = render(
       <ThemeProvider>
-        <SkillsAccordion title="Toolkit" skills={['React', 'TypeScript']} defaultExpanded={false} />
+        <SkillsChipList skills={['React', 'TypeScript']} in={false} />
       </ThemeProvider>
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /Toolkit/ }));
+    rerender(
+      <ThemeProvider>
+        <SkillsChipList skills={['React', 'TypeScript']} in />
+      </ThemeProvider>
+    );
 
     screen.getAllByTestId('chip-zoom').forEach((zoom) => {
       expect(zoom).toHaveAttribute('data-in', 'true');
@@ -67,11 +71,9 @@ describe('SkillsAccordion', () => {
 
     render(
       <ThemeProvider>
-        <SkillsAccordion title="Toolkit" skills={['React', 'TypeScript']} defaultExpanded={false} />
+        <SkillsChipList skills={['React', 'TypeScript']} />
       </ThemeProvider>
     );
-
-    fireEvent.click(screen.getByRole('button', { name: /Toolkit/ }));
 
     expect(screen.queryByTestId('chip-zoom')).not.toBeInTheDocument();
     expect(screen.getByText('React')).toBeInTheDocument();

@@ -12,6 +12,7 @@ const DEFAULT_ROOT_MARGIN = '0px 0px -10% 0px';
 type AnimatedContentCardProps<RootComponent extends ElementType = 'div'> = ContentCardProps<RootComponent> & {
   delayMs?: number;
   triggerOnView?: boolean;
+  visible?: boolean;
   threshold?: number;
   rootMargin?: string;
   containerSx?: SxProps<Theme>;
@@ -20,6 +21,7 @@ type AnimatedContentCardProps<RootComponent extends ElementType = 'div'> = Conte
 export const AnimatedContentCard = <RootComponent extends ElementType = 'div'>({
   delayMs = 0,
   triggerOnView = true,
+  visible,
   threshold = DEFAULT_THRESHOLD,
   rootMargin = DEFAULT_ROOT_MARGIN,
   ...props
@@ -27,6 +29,7 @@ export const AnimatedContentCard = <RootComponent extends ElementType = 'div'>({
   <AnimatedCard
     delayMs={delayMs}
     triggerOnView={triggerOnView}
+    visible={visible}
     threshold={threshold}
     rootMargin={rootMargin}
     {...props}
@@ -36,6 +39,7 @@ export const AnimatedContentCard = <RootComponent extends ElementType = 'div'>({
 const AnimatedCard = <RootComponent extends ElementType = 'div'>({
   delayMs = 0,
   triggerOnView = true,
+  visible,
   threshold = DEFAULT_THRESHOLD,
   rootMargin = DEFAULT_ROOT_MARGIN,
   containerSx,
@@ -46,10 +50,14 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hasTriggered, setHasTriggered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const isVisibilityControlled = typeof visible === 'boolean';
   const containerSxArray = Array.isArray(containerSx) ? containerSx : containerSx ? [containerSx] : [];
 
   useEffect(() => {
     if (prefersReducedMotion) {
+      return undefined;
+    }
+    if (isVisibilityControlled) {
       return undefined;
     }
     if (!triggerOnView) {
@@ -79,11 +87,26 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [prefersReducedMotion, triggerOnView, threshold, rootMargin]);
+  }, [prefersReducedMotion, isVisibilityControlled, triggerOnView, threshold, rootMargin]);
 
   useEffect(() => {
     if (prefersReducedMotion) {
       return undefined;
+    }
+    if (isVisibilityControlled) {
+      if (!visible) {
+        if (isVisible) {
+          setIsVisible(false);
+        }
+        return undefined;
+      }
+      if (isVisible) return undefined;
+      if (typeof window === 'undefined') {
+        setIsVisible(true);
+        return undefined;
+      }
+      const timeoutId = window.setTimeout(() => setIsVisible(true), Math.max(0, delayMs));
+      return () => window.clearTimeout(timeoutId);
     }
     if (isVisible || !hasTriggered) return undefined;
     if (typeof window === 'undefined') {
@@ -92,14 +115,14 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
     }
     const timeoutId = window.setTimeout(() => setIsVisible(true), Math.max(0, delayMs));
     return () => window.clearTimeout(timeoutId);
-  }, [delayMs, hasTriggered, isVisible, prefersReducedMotion]);
+  }, [delayMs, hasTriggered, isVisible, prefersReducedMotion, isVisibilityControlled, visible]);
 
   const content = <ContentCard {...props} />;
 
   if (prefersReducedMotion) {
     return (
       <Box sx={[appStyles.animatedCardContainerSx, ...containerSxArray]}>
-        {content}
+        {!isVisibilityControlled || visible ? content : null}
       </Box>
     );
   }

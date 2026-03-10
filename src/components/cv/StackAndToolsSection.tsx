@@ -2,7 +2,8 @@ import { Stack } from '@mui/material';
 import type { StackSection } from '../../data/cv';
 import { useCvStyles } from '../../styles/cvStyles';
 import { AnimatedContentList } from '../AnimatedContentList';
-import { SkillsAccordion } from '../SkillsAccordion';
+import { SkillsChipList } from '../SkillsChipList';
+import { TabPanel, TabPanelItem } from '../TabPanel';
 import { SectionHeading } from './SectionHeading';
 
 type StackAndToolsSectionProps = {
@@ -18,24 +19,33 @@ export const StackAndToolsSection = ({
     compactSidebarSectionSpacing,
     sectionHeadingCompactSx,
   } = useCvStyles();
+  const stackTabs: TabPanelItem[] = sections.map((section, index) => ({
+    value: `${index}`,
+    label: section.title,
+    shortLabel: section.tabLabel,
+    renderContent: (selected) => <SkillsChipList skills={section.items} dense in={selected} />,
+  }));
+
+  if (stackTabs.length === 0) {
+    return null;
+  }
 
   return (
     <Stack spacing={compactSidebarSectionSpacing}>
       <SectionHeading overline="Stack & Tools" sx={sectionHeadingCompactSx} />
 
       <AnimatedContentList
-        items={sections}
-        getItemKey={(section, index) => `${section.title}-${index}`}
+        items={['stack-tools']}
+        getItemKey={(item) => item}
         startDelayMs={startDelayMs}
         stackSpacing={compactSidebarSectionSpacing}
         itemSurface="plain"
-        renderItem={(section) => (
-          <SkillsAccordion
-            title={section.title}
-            subtitle=""
-            skills={section.items}
+        renderItem={() => (
+          <TabPanel
+            ariaLabel="Stack and tools categories"
+            items={stackTabs}
             dense
-            defaultExpanded={false}
+            tabsVariant="scrollable"
           />
         )}
       />

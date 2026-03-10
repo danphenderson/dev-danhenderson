@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../ThemeProvider';
 import { StackAndToolsSection } from './StackAndToolsSection';
@@ -43,18 +43,14 @@ jest.mock('../AnimatedContentCard', () => ({
   ),
 }));
 
-jest.mock('../SkillsAccordion', () => ({
-  SkillsAccordion: ({ title }: { title: string }) => <div data-testid="skills-accordion">{title}</div>,
-}));
-
 describe('StackAndToolsSection', () => {
-  it('renders tool sections through the shared animated list with the provided offset', () => {
+  it('renders the shared tab panel through the animated list with the provided offset', () => {
     render(
       <ThemeProvider>
         <StackAndToolsSection
           sections={[
-            { title: 'Languages', items: ['TypeScript', 'Python'] },
-            { title: 'Cloud', items: ['AWS'] },
+            { title: 'Programming Languages', tabLabel: 'Languages', items: ['TypeScript', 'Python'] },
+            { title: 'Cloud Services', tabLabel: 'Cloud', items: ['AWS'] },
           ]}
           startDelayMs={120}
         />
@@ -63,11 +59,16 @@ describe('StackAndToolsSection', () => {
 
     expect(screen.getByText('Stack & Tools')).toBeInTheDocument();
     expect(screen.getAllByTestId('animated-content-item')[0]).toHaveAttribute('data-delay', '120');
-    expect(screen.getAllByTestId('animated-content-item')[1]).toHaveAttribute('data-delay', '200');
     expect(screen.getAllByTestId('animated-content-item')[0]).toHaveAttribute('data-has-card-reset', 'true');
     expect(screen.getAllByTestId('animated-content-item')[0]).toHaveAttribute('data-has-panel-surface', 'false');
-    expect(screen.getAllByTestId('skills-accordion')).toHaveLength(2);
-    expect(screen.getByText('Languages')).toBeInTheDocument();
-    expect(screen.getByText('Cloud')).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Programming Languages' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Cloud Services' })).toBeInTheDocument();
+    expect(screen.queryByText('TypeScript')).not.toBeInTheDocument();
+    expect(screen.queryByText('AWS')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Cloud Services' }));
+
+    expect(screen.getByText('AWS')).toBeVisible();
+    expect(screen.queryByText('TypeScript')).not.toBeInTheDocument();
   });
 });
