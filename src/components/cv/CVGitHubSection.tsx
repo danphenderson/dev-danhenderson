@@ -1,4 +1,4 @@
-import { Divider, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type {
   GitHubActivityItem,
@@ -42,10 +42,10 @@ export const CVGitHubSection = ({
 }: CVGitHubSectionProps) => {
   const {
     cardResetSx,
-    dividerSx,
+    compactSidebarSectionSpacing,
     getSectionDelayMs,
-    githubDefaultOverlineSx,
     motionTokens,
+    sectionHeadingCompactSx,
     sectionTitleSx,
   } = useCvStyles();
   const resolvedItemOffsetMs = itemOffsetMs ?? motionTokens.itemOffsetMs;
@@ -53,15 +53,15 @@ export const CVGitHubSection = ({
   const githubContributionsDelayMs = getSectionDelayMs(1, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
   const githubCalendarDelayMs = getSectionDelayMs(2, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
   const githubProjectsDelayMs = getSectionDelayMs(3, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
-  const resolvedOverlineSx = overlineSx ?? githubDefaultOverlineSx;
+  const resolvedOverlineSx = overlineSx ?? sectionHeadingCompactSx;
 
   return (
     <SectionCard delayMs={sectionDelayMs}>
-      <Stack spacing={2}>
+      <Stack spacing={compactSidebarSectionSpacing}>
         <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
 
         <SectionCard delayMs={githubActivityDelayMs} sx={cardResetSx}>
-          <Stack spacing={1}>
+          <Stack spacing={compactSidebarSectionSpacing}>
             <Typography variant="subtitle2" sx={sectionTitleSx}>
               Recent Activity
             </Typography>
@@ -77,8 +77,7 @@ export const CVGitHubSection = ({
         </SectionCard>
 
         <SectionCard delayMs={githubContributionsDelayMs} sx={cardResetSx}>
-          <Stack spacing={1}>
-            <Divider sx={dividerSx} />
+          <Stack spacing={compactSidebarSectionSpacing}>
             <Typography variant="subtitle2" sx={sectionTitleSx}>
               Contributions
             </Typography>
@@ -94,15 +93,13 @@ export const CVGitHubSection = ({
         </SectionCard>
 
         <SectionCard delayMs={githubCalendarDelayMs} sx={cardResetSx}>
-          <Stack spacing={1}>
-            <Divider sx={dividerSx} />
+          <Stack spacing={compactSidebarSectionSpacing}>
             <GitHubContributionCalendar username={githubUsername} contained={false} />
           </Stack>
         </SectionCard>
 
         <SectionCard delayMs={githubProjectsDelayMs} sx={cardResetSx}>
-          <Stack spacing={1}>
-            <Divider sx={dividerSx} />
+          <Stack spacing={compactSidebarSectionSpacing}>
             <Typography variant="subtitle2" sx={sectionTitleSx}>
               {projectTitle}
             </Typography>

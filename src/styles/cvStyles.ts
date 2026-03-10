@@ -15,6 +15,7 @@ export const useCvStyles = () => {
       accordionChipStaggerMs: 20,
     } as const;
     const contentListStackSpacing = 2.25;
+    const compactSidebarSectionSpacing = 1;
     const accentColor = theme.palette.primary.main;
     const isLight = theme.palette.mode === 'light';
     const cardGradientStart = alpha(
@@ -155,7 +156,7 @@ export const useCvStyles = () => {
         mb: 2,
         color: 'text.secondary',
       } satisfies SxProps<Theme>,
-      sectionHeadingCompactSx: { mb: 0.5 } satisfies SxProps<Theme>,
+      sectionHeadingCompactSx: { mb: 0 } satisfies SxProps<Theme>,
       subtleBorder,
       subtleSurface,
       sectionPanelSx: {
@@ -165,12 +166,7 @@ export const useCvStyles = () => {
         p: 1,
       } satisfies SxProps<Theme>,
       cardResetSx: cardResetSx satisfies SxProps<Theme>,
-      githubDefaultOverlineSx: {
-        mb: 0.5,
-        ml: 1.5,
-        mt: 0.75,
-      } satisfies SxProps<Theme>,
-      dividerSx: { borderColor: 'divider' } satisfies SxProps<Theme>,
+      compactSidebarSectionSpacing,
       chipWrapperSx: {
         width: '100%',
         ...cardResetSx,

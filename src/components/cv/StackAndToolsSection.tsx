@@ -14,17 +14,20 @@ export const StackAndToolsSection = ({
   sections,
   startDelayMs = 0,
 }: StackAndToolsSectionProps) => {
-  const { contentListStackSpacing, sectionHeadingCompactSx } = useCvStyles();
+  const {
+    compactSidebarSectionSpacing,
+    sectionHeadingCompactSx,
+  } = useCvStyles();
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={compactSidebarSectionSpacing}>
       <SectionHeading overline="Stack & Tools" sx={sectionHeadingCompactSx} />
 
       <AnimatedContentList
         items={sections}
         getItemKey={(section, index) => `${section.title}-${index}`}
         startDelayMs={startDelayMs}
-        stackSpacing={contentListStackSpacing}
+        stackSpacing={compactSidebarSectionSpacing}
         itemSurface="plain"
         renderItem={(section) => (
           <SkillsAccordion

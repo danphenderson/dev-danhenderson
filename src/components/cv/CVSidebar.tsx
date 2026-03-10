@@ -61,7 +61,11 @@ export const CVSidebar = ({
   githubProjectTitle,
   spacing = 2.5,
 }: CVSidebarProps) => {
-  const { motionTokens, sectionHeadingCompactSx } = useCvStyles();
+  const {
+    compactSidebarSectionSpacing,
+    motionTokens,
+    sectionHeadingCompactSx,
+  } = useCvStyles();
   const resolvedItemOffsetMs = itemOffsetMs ?? motionTokens.itemOffsetMs;
 
   return (
@@ -69,8 +73,10 @@ export const CVSidebar = ({
       {sections.includes('about') && (
         <SectionCard delayMs={aboutDelayMs}>
           <Stack spacing={2}>
-            <SectionHeading overline="About" sx={sectionHeadingCompactSx} />
-            <ProfileCard about={about} linkedinUrl={linkedinUrl} />
+            <Stack spacing={compactSidebarSectionSpacing}>
+              <SectionHeading overline="About" sx={sectionHeadingCompactSx} />
+              <ProfileCard about={about} linkedinUrl={linkedinUrl} />
+            </Stack>
             {resumeDownloadAction}
           </Stack>
         </SectionCard>
