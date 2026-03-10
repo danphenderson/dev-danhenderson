@@ -255,7 +255,6 @@ export const useCvStyles = () => {
         boxShadow: theme.shadows[6],
         border: `2px solid ${alpha(theme.palette.common.white, isLight ? 0.9 : 0.72)}`,
       } satisfies SxProps<Theme>,
-      linkedinButtonSx: { color: accentColor } satisfies SxProps<Theme>,
       profileBioSx: { whiteSpace: 'pre-line' } satisfies SxProps<Theme>,
       experienceIndustryChipSx: {
         borderColor: accentColor,

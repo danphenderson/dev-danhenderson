@@ -210,9 +210,6 @@ export const useAppStyles = () => {
         justifyContent: 'flex-end',
         mb: { xs: 1.5, md: 2 },
       } satisfies SxProps<Theme>,
-      resumeDownloadButtonSx: {
-        width: { xs: '100%', sm: 'auto' },
-      } satisfies SxProps<Theme>,
       cvSidebarPaneSx: {
         height: '100%',
         p: { xs: 2.5, md: 3 },

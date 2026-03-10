@@ -8,6 +8,7 @@ import type {
   GitHubProject,
   StackSection,
 } from '../../data/cv';
+import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { SectionCard } from '../layout/SectionCard';
 import { CertificatesList } from './CertificatesList';
 import { CVGitHubSection } from './CVGitHubSection';
@@ -21,8 +22,7 @@ export type CVSidebarSection = 'about' | 'github' | 'certificates' | 'tools';
 type CVSidebarProps = {
   sections: CVSidebarSection[];
   about: AboutMe;
-  linkedinUrl?: string;
-  resumeDownloadAction: ReactNode;
+  aboutActions?: ReactNode;
   activity: GitHubActivityItem[];
   contributions: GitHubContribution[];
   projects: GitHubProject[];
@@ -38,13 +38,13 @@ type CVSidebarProps = {
   itemOffsetMs?: number;
   githubProjectTitle?: string;
   spacing?: number;
+  sectionIds?: Partial<Record<CVSidebarSection, string>>;
 };
 
 export const CVSidebar = ({
   sections,
   about,
-  linkedinUrl,
-  resumeDownloadAction,
+  aboutActions,
   activity,
   contributions,
   projects,
@@ -60,6 +60,7 @@ export const CVSidebar = ({
   itemOffsetMs,
   githubProjectTitle,
   spacing = 2.5,
+  sectionIds,
 }: CVSidebarProps) => {
   const {
     compactSidebarSectionSpacing,
@@ -71,13 +72,13 @@ export const CVSidebar = ({
   return (
     <Stack spacing={spacing}>
       {sections.includes('about') && (
-        <SectionCard delayMs={aboutDelayMs}>
+        <SectionCard delayMs={aboutDelayMs} id={sectionIds?.about} sx={cvSectionAnchorSx}>
           <Stack spacing={2}>
             <Stack spacing={compactSidebarSectionSpacing}>
               <SectionHeading overline="About" sx={sectionHeadingCompactSx} />
-              <ProfileCard about={about} linkedinUrl={linkedinUrl} />
+              <ProfileCard about={about} />
             </Stack>
-            {resumeDownloadAction}
+            {aboutActions}
           </Stack>
         </SectionCard>
       )}
@@ -89,6 +90,7 @@ export const CVSidebar = ({
           projects={projects}
           loading={loading}
           error={error}
+          sectionId={sectionIds?.github}
           sectionDelayMs={githubDelayMs}
           nestedDelayOffsetMs={githubNestedDelayOffsetMs}
           itemOffsetMs={resolvedItemOffsetMs}
@@ -97,14 +99,14 @@ export const CVSidebar = ({
       )}
 
       {sections.includes('certificates') && (
-        <SectionCard delayMs={certificatesDelayMs}>
+        <SectionCard delayMs={certificatesDelayMs} id={sectionIds?.certificates} sx={cvSectionAnchorSx}>
           <SectionHeading overline="Certificates" title="Credentials" />
           <CertificatesList certificates={certificates} startDelayMs={resolvedItemOffsetMs} />
         </SectionCard>
       )}
 
       {sections.includes('tools') && (
-        <SectionCard delayMs={toolsDelayMs}>
+        <SectionCard delayMs={toolsDelayMs} id={sectionIds?.tools} sx={cvSectionAnchorSx}>
           <StackAndToolsSection sections={stackAndTools} startDelayMs={resolvedItemOffsetMs} />
         </SectionCard>
       )}

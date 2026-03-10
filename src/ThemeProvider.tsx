@@ -179,6 +179,82 @@ const createAppTheme = (mode: PaletteMode) =>
           }),
         },
       },
+      MuiSpeedDial: {
+        defaultProps: {
+          FabProps: {
+            size: 'medium',
+          },
+        },
+        styleOverrides: {
+          root: ({ theme }) => ({
+            zIndex: theme.zIndex.appBar - 1,
+          }),
+          fab: ({ theme }) => ({
+            color: theme.palette.text.primary,
+            backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.94 : 0.82),
+            border: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.28 : 0.52)}`,
+            boxShadow: theme.palette.mode === 'light'
+              ? `0 12px 28px ${alpha(theme.palette.common.black, 0.18)}`
+              : `0 14px 30px ${alpha(theme.palette.common.black, 0.34)}`,
+            backdropFilter: 'blur(12px)',
+            '&:hover': {
+              backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.98 : 0.9),
+            },
+            '&:focus-visible': {
+              outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
+              outlineOffset: 3,
+            },
+          }),
+          actions: {
+            gap: 8,
+            paddingBlock: 8,
+          },
+        },
+      },
+      MuiSpeedDialAction: {
+        defaultProps: {
+          tooltipPlacement: 'left',
+        },
+        styleOverrides: {
+          fab: ({ theme }) => ({
+            color: theme.palette.text.primary,
+            backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.95 : 0.86),
+            border: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.22 : 0.46)}`,
+            boxShadow: theme.palette.mode === 'light'
+              ? `0 10px 22px ${alpha(theme.palette.common.black, 0.14)}`
+              : `0 12px 24px ${alpha(theme.palette.common.black, 0.3)}`,
+            '&:hover': {
+              backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 1 : 0.92),
+            },
+            '&:focus-visible': {
+              outline: `2px solid ${alpha(theme.palette.primary.light, 0.7)}`,
+              outlineOffset: 3,
+            },
+          }),
+          staticTooltipLabel: ({ theme }) => ({
+            ...theme.typography.button,
+            color: theme.palette.text.primary,
+            backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.96 : 0.88),
+            border: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.18 : 0.38)}`,
+            borderRadius: 999,
+            boxShadow: theme.palette.mode === 'light'
+              ? `0 10px 22px ${alpha(theme.palette.common.black, 0.12)}`
+              : `0 12px 24px ${alpha(theme.palette.common.black, 0.28)}`,
+            padding: '6px 12px',
+            backdropFilter: 'blur(12px)',
+          }),
+        },
+      },
+      MuiSpeedDialIcon: {
+        styleOverrides: {
+          icon: {
+            fontSize: 24,
+          },
+          openIcon: {
+            fontSize: 22,
+          },
+        },
+      },
       MuiAccordion: {
         styleOverrides: {
           root: {

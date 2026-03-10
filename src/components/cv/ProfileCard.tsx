@@ -1,18 +1,15 @@
-import { Avatar, IconButton, Link, Stack, Typography } from '@mui/material';
+import { Avatar, Link, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import type { AboutMe } from '../../data/cv';
 import { useCvStyles } from '../../styles/cvStyles';
 
 type ProfileCardProps = {
   about: AboutMe;
   avatarSrc?: string;
-  linkedinUrl?: string;
 };
 
-export const ProfileCard = ({ about, avatarSrc, linkedinUrl }: ProfileCardProps) => {
+export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
   const {
-    linkedinButtonSx,
     primaryTextSx,
     profileAvatarSx,
     profileBioSx,
@@ -51,19 +48,6 @@ export const ProfileCard = ({ about, avatarSrc, linkedinUrl }: ProfileCardProps)
           <Typography variant="h4" sx={primaryTextSx}>
             {about.name}
           </Typography>
-          {linkedinUrl && (
-            <IconButton
-              component="a"
-              href={linkedinUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="LinkedIn profile"
-              size="small"
-              sx={linkedinButtonSx}
-            >
-              <LinkedInIcon fontSize="small" />
-            </IconButton>
-          )}
         </Stack>
 
         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">

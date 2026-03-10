@@ -14,6 +14,7 @@ import { GitHubContributionCalendar } from './GitHubContributionCalendar';
 import { GitHubContributions } from './GitHubContributions';
 import { GitHubProjects } from './GitHubProjects';
 import { SectionHeading } from './SectionHeading';
+import { cvSectionAnchorSx } from './cvSectionMetadata';
 
 type CVGitHubSectionProps = {
   activity: GitHubActivityItem[];
@@ -26,6 +27,7 @@ type CVGitHubSectionProps = {
   itemOffsetMs?: number;
   projectTitle?: string;
   overlineSx?: SxProps<Theme>;
+  sectionId?: string;
 };
 
 export const CVGitHubSection = ({
@@ -39,6 +41,7 @@ export const CVGitHubSection = ({
   itemOffsetMs,
   projectTitle = 'Public Projects',
   overlineSx,
+  sectionId,
 }: CVGitHubSectionProps) => {
   const {
     cardResetSx,
@@ -56,7 +59,7 @@ export const CVGitHubSection = ({
   const resolvedOverlineSx = overlineSx ?? sectionHeadingCompactSx;
 
   return (
-    <SectionCard delayMs={sectionDelayMs}>
+    <SectionCard delayMs={sectionDelayMs} id={sectionId} sx={cvSectionAnchorSx}>
       <Stack spacing={compactSidebarSectionSpacing}>
         <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
 
