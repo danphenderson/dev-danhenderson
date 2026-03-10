@@ -137,10 +137,10 @@ const createAppTheme = (mode: PaletteMode) =>
       MuiAppBar: {
         styleOverrides: {
           root: ({ theme }) => ({
-            backgroundColor:
-              theme.palette.mode === 'light'
-                ? alpha('#0f253f', 0.88)
-                : alpha('#08111f', 0.86),
+            backgroundColor: alpha(
+              theme.palette.primary.contrastText,
+              theme.palette.mode === 'light' ? 0.88 : 0.86
+            ),
             borderBottom: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.24 : 0.36)}`,
             backdropFilter: 'blur(10px)',
           }),

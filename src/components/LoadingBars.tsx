@@ -1,6 +1,5 @@
 import { keyframes } from '@emotion/react';
 import { LinearProgress, Stack } from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useAppStyles } from '../styles/appStyles';
 
@@ -16,7 +15,6 @@ const pulse = keyframes`
 `;
 
 export const LoadingBars = ({ label = 'Loading', compact = false }: LoadingBarsProps) => {
-  const theme = useTheme();
   const prefersReducedMotion = usePrefersReducedMotion();
   const appStyles = useAppStyles();
   const barHeight = compact ? 4 : 6;
@@ -31,8 +29,7 @@ export const LoadingBars = ({ label = 'Loading', compact = false }: LoadingBarsP
   return (
     <Stack role="status" aria-live="polite" aria-label={label} spacing={barSpacing}>
       {bars.map((bar) => {
-        const palette = theme.palette[bar.tone];
-        const trackColor = alpha(palette.main, theme.palette.mode === 'light' ? 0.16 : 0.25);
+        const { barColor, trackColor } = appStyles.getLoadingBarToneColors(bar.tone);
 
         return (
           <LinearProgress
@@ -43,7 +40,7 @@ export const LoadingBars = ({ label = 'Loading', compact = false }: LoadingBarsP
             sx={appStyles.getLoadingBarSx({
               height: barHeight,
               trackColor,
-              barColor: palette.main,
+              barColor,
               animation: pulseAnimation,
               animationDelay: prefersReducedMotion ? '0ms' : `${bar.delay}ms`,
             })}

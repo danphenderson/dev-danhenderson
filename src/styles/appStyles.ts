@@ -3,6 +3,7 @@ import { alpha, SxProps, Theme, useTheme } from '@mui/material/styles';
 
 type BackgroundContentAlign = 'flex-start' | 'center' | 'flex-end';
 type HeaderHighlightTone = 'primary' | 'secondary';
+type LoadingBarTone = 'primary' | 'secondary' | 'success';
 
 export const useAppStyles = () => {
   const theme = useTheme();
@@ -94,6 +95,17 @@ export const useAppStyles = () => {
         animationDelay,
       },
     });
+
+    const getLoadingBarToneColors = (
+      tone: LoadingBarTone
+    ) => {
+      const palette = theme.palette[tone];
+
+      return {
+        barColor: palette.main,
+        trackColor: alpha(palette.main, theme.palette.mode === 'light' ? 0.16 : 0.25),
+      };
+    };
 
     const pageFrameContainerSx: SxProps<Theme> = {
       mx: 'auto',
@@ -314,6 +326,7 @@ export const useAppStyles = () => {
       loadingOverlaySx: { width: '100%', p: 2 } satisfies SxProps<Theme>,
       animatedCardContainerSx: { width: '100%' } satisfies SxProps<Theme>,
       getLoadingBarSx,
+      getLoadingBarToneColors,
       quiltedImageItemSx,
       photoDownloadButtonSx: {
         color: theme.palette.text.primary,

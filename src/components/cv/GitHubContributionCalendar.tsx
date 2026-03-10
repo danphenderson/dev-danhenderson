@@ -1,6 +1,4 @@
-import { useMemo } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
 import { GitHubCalendar } from 'react-github-calendar';
 import { ContentCard } from '../ContentCard';
 import { useCvStyles } from '../../styles/cvStyles';
@@ -14,39 +12,15 @@ export const GitHubContributionCalendar = ({
   username,
   contained = true,
 }: GitHubContributionCalendarProps) => {
-  const theme = useTheme();
   const {
-    accentColor,
     contentCardInsetSx,
+    githubCalendarColorScheme,
     githubCalendarContainerSx,
     githubCalendarSizeSx,
+    githubCalendarTheme,
     sectionTitleSx,
     secondaryTextSx,
   } = useCvStyles();
-
-  const calendarTheme = useMemo(
-    () => {
-      const baseTone = alpha(theme.palette.text.primary, theme.palette.mode === 'light' ? 0.12 : 0.2);
-
-      return {
-        light: [
-          baseTone,
-          alpha(accentColor, 0.25),
-          alpha(accentColor, 0.45),
-          alpha(accentColor, 0.65),
-          alpha(accentColor, 0.85),
-        ],
-        dark: [
-          baseTone,
-          alpha(accentColor, 0.35),
-          alpha(accentColor, 0.55),
-          alpha(accentColor, 0.75),
-          accentColor,
-        ],
-      };
-    },
-    [accentColor, theme]
-  );
 
   const calendarContent = (
     <Stack spacing={1}>
@@ -63,8 +37,8 @@ export const GitHubContributionCalendar = ({
             blockSize={9}
             blockMargin={2}
             fontSize={12}
-            colorScheme={theme.palette.mode}
-            theme={calendarTheme}
+            colorScheme={githubCalendarColorScheme}
+            theme={githubCalendarTheme}
             showColorLegend
             showMonthLabels
             showTotalCount

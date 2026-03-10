@@ -33,6 +33,23 @@ export const useCvStyles = () => {
     const interactiveSurfaceHoverShadow = isLight
       ? `0 0 0 1px ${alpha(accentColor, 0.24)}, 0 8px 20px ${alpha(accentColor, 0.14)}`
       : `0 0 0 1px ${alpha(accentColor, 0.34)}, 0 10px 24px ${alpha(accentColor, 0.18)}`;
+    const githubCalendarBaseTone = alpha(theme.palette.text.primary, isLight ? 0.12 : 0.2);
+    const githubCalendarTheme = {
+      light: [
+        githubCalendarBaseTone,
+        alpha(accentColor, 0.25),
+        alpha(accentColor, 0.45),
+        alpha(accentColor, 0.65),
+        alpha(accentColor, 0.85),
+      ],
+      dark: [
+        githubCalendarBaseTone,
+        alpha(accentColor, 0.35),
+        alpha(accentColor, 0.55),
+        alpha(accentColor, 0.75),
+        accentColor,
+      ],
+    };
 
     const getDetailListSx = (marginTop = 1.25, marginBottom = 0): SxProps<Theme> => ({
       pl: 3,
@@ -325,6 +342,8 @@ export const useCvStyles = () => {
           fontWeight: 700,
         },
       } satisfies SxProps<Theme>,
+      githubCalendarColorScheme: theme.palette.mode,
+      githubCalendarTheme,
       githubCalendarSizeSx: { width: '100%', minHeight: 140 } satisfies SxProps<Theme>,
       getTabPanelSx,
       getTabListSx,
