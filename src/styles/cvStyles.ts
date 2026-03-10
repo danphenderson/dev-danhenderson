@@ -240,6 +240,7 @@ export const useCvStyles = () => {
       } satisfies SxProps<Theme>,
       wrapItemContainerSx: { width: 'auto' } satisfies SxProps<Theme>,
       fullWidthSx: { width: '100%' } satisfies SxProps<Theme>,
+      minWidthResetSx: { minWidth: 0 } satisfies SxProps<Theme>,
       interactiveSurfaceSx: interactiveSurfaceSx satisfies SxProps<Theme>,
       getSectionDelayMs,
       getItemDelayMs,

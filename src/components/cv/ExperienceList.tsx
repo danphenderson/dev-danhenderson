@@ -87,6 +87,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
     detailBlockSx,
     experienceDescriptionSx,
     experienceIndustryChipSx,
+    minWidthResetSx,
     secondaryStrongSx,
     secondaryTextSx,
     sectionTitleSx,
@@ -132,7 +133,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                 flexWrap="wrap"
                 width="100%"
               >
-                <Box sx={{ minWidth: 0 }}>
+                <Box sx={minWidthResetSx}>
                   <Typography variant="h6" sx={sectionTitleSx}>
                     {experience.title}
                   </Typography>
