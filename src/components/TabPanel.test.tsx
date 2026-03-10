@@ -94,4 +94,56 @@ describe('TabPanel', () => {
     expect(window.getComputedStyle(tabPanelRoot as HTMLElement).borderTopColor)
       .toBe(window.getComputedStyle(resumeButton).borderTopColor);
   });
+
+  it.each(['fullWidth', 'scrollable'] as const)(
+    'renders selected outer tabs as flush half-pills for %s tabs',
+    (tabsVariant) => {
+      render(
+        <ThemeProvider>
+          <TabPanel
+            ariaLabel={`${tabsVariant} experience sections`}
+            items={[
+              { value: 'details', label: 'Details', content: <div>Details body</div> },
+              { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+            ]}
+            tabsVariant={tabsVariant}
+          />
+        </ThemeProvider>
+      );
+
+      const detailsTab = screen.getByRole('tab', { name: 'Details' });
+      const skillsTab = screen.getByRole('tab', { name: 'Skills' });
+      const tabList = screen.getByRole('tablist', { name: `${tabsVariant} experience sections` });
+      const tabsRoot = tabList.closest('.MuiTabs-root');
+
+      expect(tabsRoot).not.toBeNull();
+
+      const tabPanelRoot = tabsRoot?.parentElement;
+
+      expect(tabPanelRoot).not.toBeNull();
+      expect(window.getComputedStyle(tabsRoot as HTMLElement).paddingLeft).toBe('0px');
+      expect(window.getComputedStyle(tabsRoot as HTMLElement).paddingRight).toBe('0px');
+      expect(window.getComputedStyle(tabList).gap).toBe('0px');
+
+      fireEvent.click(detailsTab);
+
+      const detailsStyle = window.getComputedStyle(detailsTab);
+
+      expect(detailsStyle.backgroundColor).not.toBe('transparent');
+      expect(parseFloat(detailsStyle.borderTopLeftRadius)).toBeGreaterThan(0);
+      expect(parseFloat(detailsStyle.borderBottomLeftRadius)).toBeGreaterThan(0);
+      expect(parseFloat(detailsStyle.borderTopRightRadius)).toBe(0);
+      expect(parseFloat(detailsStyle.borderBottomRightRadius)).toBe(0);
+
+      fireEvent.click(skillsTab);
+
+      const skillsStyle = window.getComputedStyle(skillsTab);
+
+      expect(skillsStyle.backgroundColor).not.toBe('transparent');
+      expect(parseFloat(skillsStyle.borderTopLeftRadius)).toBe(0);
+      expect(parseFloat(skillsStyle.borderBottomLeftRadius)).toBe(0);
+      expect(parseFloat(skillsStyle.borderTopRightRadius)).toBeGreaterThan(0);
+      expect(parseFloat(skillsStyle.borderBottomRightRadius)).toBeGreaterThan(0);
+    }
+  );
 });

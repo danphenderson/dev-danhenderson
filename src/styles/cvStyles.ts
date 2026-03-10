@@ -31,6 +31,9 @@ export const useCvStyles = () => {
     const subtleSurface = alpha(theme.palette.background.paper, isLight ? 0.74 : 0.58);
     const accentTint = alpha(accentColor, isLight ? 0.14 : 0.24);
     const interactiveOutlineColor = accentColor;
+    const selectedTabSurface = alpha(accentColor, isLight ? 0.1 : 0.2);
+    const selectedTabInset = `inset 0 0 0 1px ${alpha(accentColor, isLight ? 0.18 : 0.28)}`;
+    const tabPanelRadius = theme.shape.borderRadius * 2;
     const interactiveSurfaceHoverShadow = isLight
       ? `0 0 0 1px ${alpha(accentColor, 0.24)}, 0 8px 20px ${alpha(accentColor, 0.14)}`
       : `0 0 0 1px ${alpha(accentColor, 0.34)}, 0 10px 24px ${alpha(accentColor, 0.18)}`;
@@ -128,10 +131,10 @@ export const useCvStyles = () => {
 
     const getTabListSx = (dense: boolean) => ({
       minHeight: dense ? 44 : 52,
-      px: { xs: 0.5, sm: 0.75 },
+      px: 0,
       backgroundColor: 'transparent',
       '& .MuiTabs-flexContainer': {
-        gap: 0.25,
+        gap: 0,
       },
       '& .MuiTabs-indicator': {
         height: 3,
@@ -157,9 +160,30 @@ export const useCvStyles = () => {
       alignItems: 'flex-start',
       justifyContent: 'flex-start',
       color: accentColor,
-      borderRadius: 1.25,
+      position: 'relative',
+      zIndex: 0,
+      borderRadius: 0,
       '&.Mui-selected': {
         color: accentColor,
+        backgroundColor: selectedTabSurface,
+        boxShadow: selectedTabInset,
+        zIndex: 1,
+      },
+      '&.Mui-selected:first-of-type': {
+        borderTopLeftRadius: tabPanelRadius,
+        borderBottomLeftRadius: tabPanelRadius,
+      },
+      '&.Mui-selected:last-of-type': {
+        borderTopRightRadius: tabPanelRadius,
+        borderBottomRightRadius: tabPanelRadius,
+      },
+      '&.Mui-selected:not(:first-of-type)': {
+        borderTopLeftRadius: 0,
+        borderBottomLeftRadius: 0,
+      },
+      '&.Mui-selected:not(:last-of-type)': {
+        borderTopRightRadius: 0,
+        borderBottomRightRadius: 0,
       },
     }) satisfies SxProps<Theme>;
 
