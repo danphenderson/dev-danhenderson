@@ -76,7 +76,7 @@ Notes:
 Include:
 - what changed
 - which routes or data modules were affected
-- what validation was run
-- any deployment follow-up required (for example SPA rewrites, assets, or `PUBLIC_URL` concerns)
+- explain the rationale for the change and how it fits with the existing architecture and content patterns
 
-For any meaningful code change, implement the narrowest set of tests relevant to validate new functionality and prevent regressions.
+Do not include:
+- test coverage of the change
