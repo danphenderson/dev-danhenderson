@@ -439,6 +439,17 @@ export const useComponentStyles = () => {
       getAnimatedZoomItemSx,
       getGitHubChipSx,
       getWrapListSx,
+      profileHeaderRowSx: {
+        width: '100%',
+        display: 'grid',
+        gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: 'minmax(0, 1fr) auto' },
+        columnGap: 1.5,
+        rowGap: 1,
+        alignItems: 'start',
+      } satisfies SxProps<Theme>,
+      profileHeaderContentSx: {
+        minWidth: 0,
+      } satisfies SxProps<Theme>,
       profileNameRowSx: { rowGap: 0.5 } satisfies SxProps<Theme>,
       profileMetaRowSx: {
         width: '100%',
@@ -454,7 +465,9 @@ export const useComponentStyles = () => {
       profileInlineActionsSx: {
         display: 'flex',
         alignItems: 'center',
-        ml: 'auto',
+        justifySelf: { xs: 'flex-start', sm: 'end' },
+        alignSelf: 'start',
+        pt: { sm: 0.25 },
         flexShrink: 0,
       } satisfies SxProps<Theme>,
       profileAvatarSx: {

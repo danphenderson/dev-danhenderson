@@ -19,6 +19,8 @@ const getLineStart = (text: string, markerIndex: number): number => {
 
 export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => {
   const {
+    profileHeaderContentSx,
+    profileHeaderRowSx,
     profileInlineActionsSx,
     profileMetaContentSx,
     profileMetaRowSx,
@@ -88,32 +90,34 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
           sx={profileAvatarSx}
         />
       )}
-      <Stack spacing={0.75} width="100%">
-        <Stack direction="row" sx={profileNameRowSx}>
-          <Typography variant="h4" sx={primaryTextSx}>
-            {about.name}
-          </Typography>
-        </Stack>
-
-        <Stack direction="row" sx={profileMetaRowSx}>
-          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={profileMetaContentSx}>
-            <Typography variant="subtitle2" sx={secondaryStrongSx}>
-              {about.title}
+      <Box sx={profileHeaderRowSx}>
+        <Stack spacing={0.75} sx={profileHeaderContentSx}>
+          <Stack direction="row" sx={profileNameRowSx}>
+            <Typography variant="h4" sx={primaryTextSx}>
+              {about.name}
             </Typography>
-            {about.location && (
-              <>
-                <Typography variant="subtitle2" sx={secondaryTextSx}>
-                  •
-                </Typography>
-                <Typography variant="subtitle2" sx={secondaryTextSx}>
-                  {about.location}
-                </Typography>
-              </>
-            )}
           </Stack>
-          {actions && <Box sx={profileInlineActionsSx}>{actions}</Box>}
+
+          <Stack direction="row" sx={profileMetaRowSx}>
+            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={profileMetaContentSx}>
+              <Typography variant="subtitle2" sx={secondaryStrongSx}>
+                {about.title}
+              </Typography>
+              {about.location && (
+                <>
+                  <Typography variant="subtitle2" sx={secondaryTextSx}>
+                    •
+                  </Typography>
+                  <Typography variant="subtitle2" sx={secondaryTextSx}>
+                    {about.location}
+                  </Typography>
+                </>
+              )}
+            </Stack>
+          </Stack>
         </Stack>
-      </Stack>
+        {actions && <Box sx={profileInlineActionsSx}>{actions}</Box>}
+      </Box>
       {about.bio && (
         <Typography variant="body2" sx={[primaryTextSx, profileBioSx]}>
           {bioContent}

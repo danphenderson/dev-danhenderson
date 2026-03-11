@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import ThemeProvider from '../../ThemeProvider';
 import { ProfileCard } from './ProfileCard';
 import type { AboutMe } from '../../types/cv';
@@ -25,7 +25,7 @@ describe('ProfileCard', () => {
     expect(screen.getByText('Seattle, WA')).toBeInTheDocument();
   });
 
-  it('renders inline actions beside the title and location row without affecting profile details', () => {
+  it('renders actions in the profile header without affecting profile details', () => {
     render(
       <ThemeProvider>
         <ProfileCard
@@ -35,14 +35,24 @@ describe('ProfileCard', () => {
       </ThemeProvider>
     );
 
-    const title = screen.getByText('Software Engineer');
-    const metaRow = title.parentElement?.parentElement;
-
-    expect(metaRow).not.toBeNull();
-    expect(within(metaRow!).getByRole('button', { name: 'Open about actions' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Open about actions' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Test User' })).toBeInTheDocument();
     expect(screen.getByText('Software Engineer')).toBeInTheDocument();
     expect(screen.getByText('Seattle, WA')).toBeInTheDocument();
+  });
+
+  it('renders actions even when location is omitted', () => {
+    render(
+      <ThemeProvider>
+        <ProfileCard
+          about={{ ...baseAbout, location: '' }}
+          actions={<button type="button">Open about actions</button>}
+        />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByRole('button', { name: 'Open about actions' })).toBeInTheDocument();
+    expect(screen.queryByText('Seattle, WA')).not.toBeInTheDocument();
   });
 
   it('renders bio text', () => {
