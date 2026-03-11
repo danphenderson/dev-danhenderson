@@ -1,4 +1,4 @@
-import { Avatar, Link, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Link, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { AboutMe } from '../../data/cv';
 import { useCvStyles } from '../../styles/cvStyles';
@@ -8,6 +8,8 @@ type ProfileCardProps = {
   avatarSrc?: string;
 };
 
+const STATUS_MARKER = 'Open to opportunities';
+
 export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
   const {
     primaryTextSx,
@@ -16,6 +18,7 @@ export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
     profileNameRowSx,
     secondaryStrongSx,
     secondaryTextSx,
+    statusBreatheSx,
   } = useCvStyles();
   const bioLink = about.bioLink;
   const bioText = about.bio;
@@ -23,15 +26,49 @@ export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
   let bioContent: ReactNode = bioText;
 
   if (bioLink && bioLinkIndex >= 0) {
-    bioContent = (
-      <>
-        {bioText.slice(0, bioLinkIndex)}
-        <Link href={bioLink.url} target="_blank" rel="noopener noreferrer" underline="hover">
-          {bioLink.text}
-        </Link>
-        {bioText.slice(bioLinkIndex + bioLink.text.length)}
-      </>
-    );
+    const beforeLink = bioText.slice(0, bioLinkIndex);
+    const afterLink = bioText.slice(bioLinkIndex + bioLink.text.length);
+    const statusIdx = afterLink.indexOf(STATUS_MARKER);
+
+    if (statusIdx >= 0) {
+      const lastNewline = afterLink.lastIndexOf('\n', statusIdx);
+      const lineStart = lastNewline >= 0 ? lastNewline + 1 : statusIdx;
+      const beforeStatus = afterLink.slice(0, lineStart);
+      const statusLine = afterLink.slice(lineStart);
+
+      bioContent = (
+        <>
+          {beforeLink}
+          <Link href={bioLink.url} target="_blank" rel="noopener noreferrer" underline="hover">
+            {bioLink.text}
+          </Link>
+          {beforeStatus}
+          <Box component="span" sx={statusBreatheSx}>{statusLine}</Box>
+        </>
+      );
+    } else {
+      bioContent = (
+        <>
+          {beforeLink}
+          <Link href={bioLink.url} target="_blank" rel="noopener noreferrer" underline="hover">
+            {bioLink.text}
+          </Link>
+          {afterLink}
+        </>
+      );
+    }
+  } else {
+    const statusIdx = bioText.indexOf(STATUS_MARKER);
+    if (statusIdx >= 0) {
+      const lastNewline = bioText.lastIndexOf('\n', statusIdx);
+      const lineStart = lastNewline >= 0 ? lastNewline + 1 : statusIdx;
+      bioContent = (
+        <>
+          {bioText.slice(0, lineStart)}
+          <Box component="span" sx={statusBreatheSx}>{bioText.slice(lineStart)}</Box>
+        </>
+      );
+    }
   }
 
   return (
