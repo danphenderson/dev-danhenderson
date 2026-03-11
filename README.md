@@ -1,4 +1,4 @@
-# danhenderson.dev source (`dev-danhenderson`)
+# [danhenderson.dev](https://www.danhenderson.dev)
 
 [![Tests](https://github.com/danphenderson/dev-danhenderson/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/tests.yml)
 [![Build](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml)
