@@ -1,10 +1,12 @@
-import { ElementType, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Box, Zoom } from '@mui/material';
-import { SxProps, Theme } from '@mui/material/styles';
+import type { ElementType } from 'react';
+import type { SxProps, Theme } from '@mui/material/styles';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useAppStyles } from '../styles/appStyles';
 import { normalizeSxProp } from '../utils/sx';
-import { ContentCard, ContentCardProps } from './ContentCard';
+import { ContentCard } from './ContentCard';
+import type { ContentCardProps } from './ContentCard';
 
 export const ANIMATED_CARD_DURATION_MS = 280;
 const DEFAULT_THRESHOLD = 0;

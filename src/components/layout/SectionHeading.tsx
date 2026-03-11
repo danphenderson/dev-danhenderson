@@ -1,4 +1,5 @@
-import { Box, BoxProps, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
+import type { BoxProps } from '@mui/material';
 import { useComponentStyles } from '../../styles/componentStyles';
 
 type SectionHeadingProps = BoxProps & {

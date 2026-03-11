@@ -1,7 +1,8 @@
 import { Box, Stack, Typography } from '@mui/material';
 import type { CodingExample } from '../../types/cv';
 import { SkillsChipList } from '../SkillsChipList';
-import { TabPanel, TabPanelItem } from '../TabPanel';
+import { TabPanel } from '../TabPanel';
+import type { TabPanelItem } from '../TabPanel';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { useComponentStyles } from '../../styles/componentStyles';
 

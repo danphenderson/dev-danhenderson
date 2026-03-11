@@ -1,6 +1,7 @@
-import { Fragment, ReactNode } from 'react';
+import { Fragment } from 'react';
 import { Box, Zoom } from '@mui/material';
-import { SxProps, Theme } from '@mui/material/styles';
+import type { ReactNode } from 'react';
+import type { SxProps, Theme } from '@mui/material/styles';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
 
