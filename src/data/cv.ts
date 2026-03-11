@@ -481,7 +481,7 @@ export const experiences: Experience[] = [
       "Centralized infrastructure delivery by building an internal CDK library through a major refactor that removed technical debt and git submodules, while introducing semantic versioning practices, enabling more reliable and efficient deployments.",
       "Migrated data team’s software assets from Bitbucket to GitHub Enterprise, standardizing CI/CD into GitHub Actions and hooks.",
       "Processed AWS CloudTrail logs into Parquet and built a dashboard to support security analytics and HITRUST compliance.",
-      "Supported hiring and onboarding during an organizational transition, including new engineering and data leadership and interns.",
+      "Supported hiring and onboarding during an organizational transition, including new engineering and data leadership and interns, and helped ensure continuity through a reorganization that included my departure.",
     ],
     skills: [
       'AWS: EC2, S3, SNS, SQS, Cloudformation, Cloudtrail, Cloudwatch, Lambda, Glue (& Glue Data Catalog), EMR, Redshift, RDS, Athena, Quicksight', 'Python', 'PySpark', 'Jupyter', 'DBT (Data Build Tool)', 'GitHub Enterprise', 'Docker',
