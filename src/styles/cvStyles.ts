@@ -91,18 +91,6 @@ export const useCvStyles = () => {
       gap,
     });
 
-    const getSectionNavigatorContainerSx = (sticky: boolean): SxProps<Theme> => ({
-      width: '100%',
-      mb: { xs: 2.5, md: 3 },
-      ...(sticky
-        ? {
-          position: { xs: 'static', md: 'sticky' },
-          top: { md: 96 },
-          zIndex: 2,
-        }
-        : {}),
-    });
-
     const getSectionDelayMs = (
       index: number,
       startDelayMs: number = 0,
@@ -217,15 +205,17 @@ export const useCvStyles = () => {
         p: { xs: 2, md: 2.5 },
         transition: 'border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
       } satisfies SxProps<Theme>,
-      getSectionNavigatorContainerSx,
-      sectionNavigatorCardSx: {
+      sectionNavigatorRootSx: {
         display: 'grid',
         gridTemplateColumns: 'auto minmax(0, 1fr)',
         alignItems: 'center',
         columnGap: 1,
-        borderRadius: 999,
-        p: { xs: 1, md: 1.25 },
-        overflow: 'hidden',
+        rowGap: 0.75,
+        width: '100%',
+        borderRadius: 1.5,
+        border: subtleBorder,
+        backgroundColor: subtleSurface,
+        p: 1,
       } satisfies SxProps<Theme>,
       sectionNavigatorLeadSx: {
         color: accentColor,

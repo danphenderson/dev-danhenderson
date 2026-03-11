@@ -96,9 +96,7 @@ export default function CV() {
     </Box>
   );
 
-  const sectionNavigator = (
-    <CVSectionNavigator sections={cvSectionNavigationOrder} sticky testId="cv-section-navigator-desktop" />
-  );
+  const sectionNavigator = <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator" />;
 
   if (isMobile) {
     return (
@@ -108,6 +106,8 @@ export default function CV() {
             sections={['about']}
             about={aboutMe}
             aboutActions={aboutSpeedDial}
+            aboutFooter={sectionNavigator}
+            aboutTriggerOnView={false}
             activity={activity}
             contributions={contributions}
             projects={projects}
@@ -118,14 +118,13 @@ export default function CV() {
             sectionIds={{ about: sidebarSectionIds.about }}
           />
 
-          <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator-mobile" />
-
           <CVMainColumn
             sections={['experience', 'education', 'volunteering']}
             experiences={experiences}
             education={educationInfo}
             volunteering={volunteering}
             codingExamples={codingExamples}
+            experienceTriggerOnView={false}
             itemOffsetMs={itemOffsetMs}
             spacing={2.5}
             sectionIds={{
@@ -192,6 +191,7 @@ export default function CV() {
               sections={['about', 'github', 'certificates', 'tools']}
               about={aboutMe}
               aboutActions={aboutSpeedDial}
+              aboutFooter={sectionNavigator}
               activity={activity}
               contributions={contributions}
               projects={projects}
@@ -214,7 +214,6 @@ export default function CV() {
 
         <Grid item xs={12} md={7} lg={8} sx={appStyles.cvMainGridItemSx}>
           <Box sx={appStyles.cvMainPaneSx}>
-            {sectionNavigator}
             <CVMainColumn
               sections={['experience', 'education', 'volunteering', 'coding']}
               experiences={experiences}

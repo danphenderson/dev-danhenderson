@@ -61,6 +61,7 @@ describe('CVSidebar', () => {
             location: 'Seattle, WA',
           }}
           aboutActions={<div data-testid="about-actions">Actions</div>}
+          aboutFooter={<div data-testid="about-footer">Navigator</div>}
           activity={[]}
           contributions={[]}
           projects={[]}
@@ -80,6 +81,7 @@ describe('CVSidebar', () => {
     );
 
     expect(screen.getByTestId('about-actions')).toBeInTheDocument();
+    expect(screen.getByTestId('about-footer')).toBeInTheDocument();
     expect(renderedSectionCardIds).toEqual([
       cvSectionMetadata.about.id,
       cvSectionMetadata.certificates.id,

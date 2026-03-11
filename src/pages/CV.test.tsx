@@ -135,7 +135,7 @@ describe('CV page section navigation', () => {
     expect(getAnimatedSectionCard('coding')).toHaveAttribute('data-delay-ms', '360');
   });
 
-  it('renders ABOUT actions and ordered desktop navigation chips, then scrolls to the right section ids', () => {
+  it('renders ABOUT actions and places the navigation bar at the bottom of the about section on desktop', () => {
     render(
       <ThemeProvider>
         <CV />
@@ -143,7 +143,7 @@ describe('CV page section navigation', () => {
     );
 
     const aboutDial = screen.getByTestId('speed-dial-open-about-actions');
-    const desktopNavigator = screen.getByTestId('cv-section-navigator-desktop');
+    const aboutSection = document.getElementById(cvSectionMetadata.about.id);
 
     expect(
       within(aboutDial).getAllByTestId('speed-dial-action').map((action) => action.getAttribute('aria-label'))
@@ -164,13 +164,17 @@ describe('CV page section navigation', () => {
       'download',
       'Daniel-Henderson-Resume.pdf'
     );
-    expect(screen.queryByTestId('cv-section-navigator-mobile')).not.toBeInTheDocument();
+    expect(aboutSection).not.toBeNull();
 
-    const navigationActions = within(desktopNavigator).getAllByRole('button');
+    const navigator = within(aboutSection!).getByTestId('cv-section-navigator');
+    const navigationActions = within(navigator).getAllByRole('button');
+
+    expect(aboutDial.compareDocumentPosition(navigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     expect(navigationActions.map((action) => action.textContent)).toEqual(
       cvSectionNavigationOrder.map((sectionKey) => cvSectionMetadata[sectionKey].navLabel)
     );
+    expect(within(navigator).queryByRole('button', { name: 'About' })).not.toBeInTheDocument();
 
     navigationActions.forEach((action, index) => {
       const expectedSectionId = cvSectionMetadata[cvSectionNavigationOrder[index]].id;
@@ -182,7 +186,7 @@ describe('CV page section navigation', () => {
     });
   });
 
-  it('renders the mobile chip navigator inline between the about section and the main CV sections', () => {
+  it('renders the same navigation bar inside the about section on mobile', () => {
     mockUseMediaQuery.mockReturnValue(true);
 
     render(
@@ -191,18 +195,24 @@ describe('CV page section navigation', () => {
       </ThemeProvider>
     );
 
-    const mobileNavigator = screen.getByTestId('cv-section-navigator-mobile');
     const aboutSection = document.getElementById(cvSectionMetadata.about.id);
     const experienceSection = document.getElementById(cvSectionMetadata.experience.id);
+    const aboutDial = screen.getByTestId('speed-dial-open-about-actions');
 
-    expect(mobileNavigator).toBeInTheDocument();
-    expect(screen.queryByTestId('cv-section-navigator-desktop')).not.toBeInTheDocument();
+    expect(getAnimatedSectionCard('about')).toHaveAttribute('data-delay-ms', '0');
+    expect(getAnimatedSectionCard('about')).toHaveAttribute('data-trigger-on-view', 'false');
+    expect(getAnimatedSectionCard('experience')).toHaveAttribute('data-delay-ms', '0');
+    expect(getAnimatedSectionCard('experience')).toHaveAttribute('data-trigger-on-view', 'false');
     expect(aboutSection).not.toBeNull();
     expect(experienceSection).not.toBeNull();
-    expect(aboutSection!.compareDocumentPosition(mobileNavigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(mobileNavigator.compareDocumentPosition(experienceSection!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(aboutSection!.compareDocumentPosition(experienceSection!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+    const navigator = within(aboutSection!).getByTestId('cv-section-navigator');
+
+    expect(aboutDial.compareDocumentPosition(navigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(
-      within(mobileNavigator).getAllByRole('button').map((action) => action.textContent)
+      within(navigator).getAllByRole('button').map((action) => action.textContent)
     ).toEqual(cvSectionNavigationOrder.map((sectionKey) => cvSectionMetadata[sectionKey].navLabel));
+    expect(within(navigator).queryByRole('button', { name: 'About' })).not.toBeInTheDocument();
   });
 });

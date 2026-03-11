@@ -3,7 +3,7 @@ import type { SxProps, Theme } from '@mui/material/styles';
 export const cvSectionAnchorSx: SxProps<Theme> = {
   scrollMarginTop: {
     xs: 80,
-    md: 152,
+    md: 96,
   },
 };
 
@@ -53,7 +53,6 @@ export const cvSectionMetadata = {
 export type CVSectionKey = keyof typeof cvSectionMetadata;
 
 export const cvSectionNavigationOrder: CVSectionKey[] = [
-  'about',
   'experience',
   'education',
   'volunteering',

@@ -23,6 +23,7 @@ type CVSidebarProps = {
   sections: CVSidebarSection[];
   about: AboutMe;
   aboutActions?: ReactNode;
+  aboutFooter?: ReactNode;
   activity: GitHubActivityItem[];
   contributions: GitHubContribution[];
   projects: GitHubProject[];
@@ -46,6 +47,7 @@ export const CVSidebar = ({
   sections,
   about,
   aboutActions,
+  aboutFooter,
   activity,
   contributions,
   projects,
@@ -85,7 +87,12 @@ export const CVSidebar = ({
               <SectionHeading overline="About" sx={sectionHeadingCompactSx} />
               <ProfileCard about={about} />
             </Stack>
-            {aboutActions}
+            {(aboutActions || aboutFooter) && (
+              <Stack spacing={1.5}>
+                {aboutActions}
+                {aboutFooter}
+              </Stack>
+            )}
           </Stack>
         </SectionCard>
       )}
