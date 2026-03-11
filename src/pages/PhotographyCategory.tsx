@@ -1,7 +1,7 @@
 import { Link as RouterLink, Navigate, useParams } from 'react-router-dom';
 import { Button, Stack, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { SectionHeading } from '../components/cv/SectionHeading';
+import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
 import { QuiltedImageList } from '../components/PhotoAlbum';

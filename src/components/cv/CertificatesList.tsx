@@ -1,7 +1,7 @@
 import { Button, Typography } from '@mui/material';
 import type { Certificate } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
-import { useCvStyles } from '../../styles/cvStyles';
+import { useComponentStyles } from '../../styles/componentStyles';
 
 type CertificatesListProps = {
   certificates: Certificate[];
@@ -9,7 +9,7 @@ type CertificatesListProps = {
 };
 
 export const CertificatesList = ({ certificates, startDelayMs = 0 }: CertificatesListProps) => {
-  const { certificateActionSx, contentListStackSpacing, interactiveSurfaceSx, secondaryTextSx } = useCvStyles();
+  const { certificateActionSx, contentListStackSpacing, interactiveSurfaceSx, secondaryTextSx } = useComponentStyles();
 
   return (
     <AnimatedContentList

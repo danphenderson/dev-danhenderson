@@ -3,11 +3,11 @@ import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
-import { useCvStyles } from '../styles/cvStyles';
+import { useComponentStyles } from '../styles/componentStyles';
 
 export default function Home() {
   const appStyles = useAppStyles();
-  const { cardResetSx } = useCvStyles();
+  const { cardResetSx } = useComponentStyles();
   const { error, isHeroAnimationReady, isLoading, isPromptOpen, handleOptOut, handlePlay } =
     useHomeWelcomeSequence();
 

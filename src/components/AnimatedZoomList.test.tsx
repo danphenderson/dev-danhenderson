@@ -27,8 +27,8 @@ jest.mock('@mui/material', () => {
   };
 });
 
-jest.mock('../styles/cvStyles', () => ({
-  useCvStyles: () => ({
+jest.mock('../styles/componentStyles', () => ({
+  useComponentStyles: () => ({
     motionTokens: {
       accordionChipStaggerMs: 20,
     },

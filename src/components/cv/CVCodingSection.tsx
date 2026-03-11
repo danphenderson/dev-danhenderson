@@ -2,7 +2,7 @@ import type { CodingExample } from '../../types/cv';
 import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { CodingExamplesSection } from './CodingExamplesSection';
-import { SectionHeading } from './SectionHeading';
+import { SectionHeading } from '../layout/SectionHeading';
 
 type CVCodingSectionProps = {
   examples: CodingExample[];

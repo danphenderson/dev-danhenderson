@@ -1,6 +1,6 @@
 import { ReactNode, SyntheticEvent, useEffect, useId, useMemo, useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
-import { useCvStyles } from '../styles/cvStyles';
+import { useComponentStyles } from '../styles/componentStyles';
 
 export type TabPanelItem = {
   value: string;
@@ -49,7 +49,7 @@ export const TabPanel = ({
   hideTabsWhenSingle = false,
   tabsVariant = 'standard',
 }: TabPanelProps) => {
-  const { getTabListSx, getTabPanelBodySx, getTabPanelSx, getTabSx, interactiveSurfaceSx } = useCvStyles();
+  const { getTabListSx, getTabPanelBodySx, getTabPanelSx, getTabSx, interactiveSurfaceSx } = useComponentStyles();
   const fallbackId = useId();
   const tabPanelId = idProp ?? fallbackId;
   const enabledItems = useMemo(() => items.filter((item) => !item.disabled), [items]);

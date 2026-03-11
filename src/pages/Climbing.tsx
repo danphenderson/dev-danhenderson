@@ -1,7 +1,7 @@
 import React from 'react';
 import { Alert, Box, Link as MuiLink, Stack, Typography } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { SectionHeading } from '../components/cv/SectionHeading';
+import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
 import { LoadingBars } from '../components/LoadingBars';

@@ -2,7 +2,7 @@ import { Fragment, ReactNode } from 'react';
 import { Box, Zoom } from '@mui/material';
 import { SxProps, Theme } from '@mui/material/styles';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
-import { useCvStyles } from '../styles/cvStyles';
+import { useComponentStyles } from '../styles/componentStyles';
 
 type AnimatedZoomListProps<Item> = {
   items: Item[];
@@ -28,7 +28,7 @@ export const AnimatedZoomList = <Item,>({
     getAnimatedZoomItemSx,
     getSectionDelayMs,
     motionTokens,
-  } = useCvStyles();
+  } = useComponentStyles();
   const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.accordionChipStaggerMs;
 
   if (prefersReducedMotion) {
