@@ -1,5 +1,5 @@
 import type { PhotoCategory } from '../types/data';
-import { assetBasePath } from './cv';
+import { assetBasePath } from '../utils/assets';
 
 const withBase = (path: string) => `${assetBasePath}${path}`;
 

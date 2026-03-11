@@ -3,6 +3,7 @@ import { Box, Stack } from '@mui/material';
 import { SxProps, Theme } from '@mui/material/styles';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useCvStyles } from '../styles/cvStyles';
+import { normalizeSxProp } from '../utils/sx';
 import { AnimatedContentCard } from './AnimatedContentCard';
 
 type AnimatedContentListLayout = 'stack' | 'wrap';
@@ -56,9 +57,9 @@ export const AnimatedContentList = <Item,>({
   } = useCvStyles();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hasEnteredView, setHasEnteredView] = useState(!mountItemsOnView || prefersReducedMotion);
-  const containerSxArray = Array.isArray(containerSx) ? containerSx : containerSx ? [containerSx] : [];
-  const itemSxArray = Array.isArray(itemSx) ? itemSx : itemSx ? [itemSx] : [];
-  const itemContainerSxArray = Array.isArray(itemContainerSx) ? itemContainerSx : itemContainerSx ? [itemContainerSx] : [];
+  const containerSxArray = normalizeSxProp(containerSx);
+  const itemSxArray = normalizeSxProp(itemSx);
+  const itemContainerSxArray = normalizeSxProp(itemContainerSx);
   const resolvedItemContainerSx =
     layout === 'wrap' ? [wrapItemContainerSx, ...itemContainerSxArray] : itemContainerSxArray;
   const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.itemStaggerMs;

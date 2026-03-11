@@ -3,6 +3,7 @@ import { Box, Chip, Stack } from '@mui/material';
 import { SxProps, Theme } from '@mui/material/styles';
 import { ReactNode } from 'react';
 import { useCvStyles } from '../../styles/cvStyles';
+import { normalizeSxProp } from '../../utils/sx';
 import { AnimatedZoomList } from '../AnimatedZoomList';
 
 export type GitHubLinkChipItem = {
@@ -33,7 +34,7 @@ export const GitHubLinkChipList = ({
   wrapGap = 0.75,
 }: GitHubLinkChipListProps) => {
   const { chipWaveSx, getChipWaveDelaySx, getGitHubChipSx, getWrapListSx } = useCvStyles();
-  const customChipSx = Array.isArray(chipSx) ? chipSx : chipSx ? [chipSx] : [];
+  const customChipSx = normalizeSxProp(chipSx);
   const baseChipSx: SxProps<Theme> = getGitHubChipSx(layout);
   const animatedContainerSx: SxProps<Theme> = layout === 'wrap'
     ? getWrapListSx(wrapGap)

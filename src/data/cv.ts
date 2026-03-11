@@ -1,4 +1,6 @@
-export const assetBasePath = process.env.PUBLIC_URL || '';
+import { assetBasePath } from '../utils/assets';
+
+export { assetBasePath };
 
 export const avatar = `${assetBasePath}/assets/home.jpg`;
 export const cvBackgroundImage = `${assetBasePath}/assets/photography/landscape/landscape-tieton-south-fork-3.jpg`;
