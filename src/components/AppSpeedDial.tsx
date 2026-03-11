@@ -7,11 +7,13 @@ import type { FabProps } from '@mui/material/Fab';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { SpeedDialActionProps } from '@mui/material/SpeedDialAction';
 import type { SpeedDialProps } from '@mui/material/SpeedDial';
+import { Link } from 'react-router-dom';
 
 export type AppSpeedDialAction = {
   id: string;
   label: string;
   icon: ReactNode;
+  to?: string;
   href?: string;
   download?: string | boolean;
   external?: boolean;
@@ -60,7 +62,10 @@ export const AppSpeedDial = ({
       },
     };
 
-    if (action.href) {
+    if (action.to) {
+      resolvedFabProps.component = Link;
+      resolvedFabProps.to = action.to;
+    } else if (action.href) {
       resolvedFabProps.component = 'a';
       resolvedFabProps.href = action.href;
     }

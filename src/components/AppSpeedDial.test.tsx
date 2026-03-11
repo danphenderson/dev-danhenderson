@@ -46,13 +46,28 @@ jest.mock('@mui/material/SpeedDialAction', () => ({
     tooltipOpen?: boolean;
     tooltipTitle?: ReactNode;
   }) => {
-    const { component, onClick, ...restFabProps } = FabProps ?? {};
+    const { component, onClick, to, ...restFabProps } = FabProps ?? {};
 
     if (component === 'a') {
       return (
         <a
           data-testid="speed-dial-action"
           data-tooltip-open={String(Boolean(tooltipOpen))}
+          onClick={onClick as MouseEventHandler<HTMLAnchorElement>}
+          {...restFabProps}
+        >
+          {tooltipTitle}
+          {icon}
+        </a>
+      );
+    }
+
+    if (component && typeof to === 'string') {
+      return (
+        <a
+          data-testid="speed-dial-action"
+          data-tooltip-open={String(Boolean(tooltipOpen))}
+          href={to}
           onClick={onClick as MouseEventHandler<HTMLAnchorElement>}
           {...restFabProps}
         >
@@ -159,6 +174,35 @@ describe('AppSpeedDial', () => {
     fireEvent.click(screen.getByRole('button', { name: 'ABOUT' }));
 
     expect(onJump).toHaveBeenCalledTimes(1);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByTestId('speed-dial-actions')).not.toBeInTheDocument();
+  });
+
+  it('maps internal route actions onto action links and closes the menu after selection', () => {
+    render(
+      <AppSpeedDial
+        ariaLabel="Open page navigation"
+        icon={<span>Open</span>}
+        actions={[
+          {
+            id: 'home',
+            label: 'Home',
+            icon: <span>Home</span>,
+            to: '/',
+          },
+        ]}
+      />
+    );
+
+    const trigger = screen.getByRole('button', { name: 'Open page navigation' });
+
+    fireEvent.click(trigger);
+
+    const homeAction = screen.getByRole('link', { name: 'Home' });
+    expect(homeAction).toHaveAttribute('href', '/');
+
+    fireEvent.click(homeAction);
+
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
     expect(screen.queryByTestId('speed-dial-actions')).not.toBeInTheDocument();
   });

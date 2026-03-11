@@ -1,5 +1,9 @@
 import * as React from 'react';
 import { keyframes } from '@emotion/react';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import PhotoCameraOutlinedIcon from '@mui/icons-material/PhotoCameraOutlined';
+import TerrainIcon from '@mui/icons-material/Terrain';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Box, Slide } from '@mui/material';
@@ -11,8 +15,10 @@ import { useAppTheme } from '../ThemeProvider';
 import { avatar as avatarSrc } from '../data/cv';
 import { useAppStyles } from '../styles/appStyles';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
+import type { AppSpeedDialAction } from './AppSpeedDial';
 import { HeaderActions } from './header/HeaderActions';
 import { HeaderNav } from './header/HeaderNav';
+import { HeaderPageDial } from './header/HeaderPageDial';
 import { HintPopover } from './header/HintPopover';
 
 const pages = [
@@ -20,6 +26,85 @@ const pages = [
   { name: 'Climbing', path: '/climbing' },
   { name: 'Photography', path: '/photography' },
 ];
+
+type HeaderPageDialMode = 'cv' | 'climbing' | 'photography';
+
+const pageDialActionsByMode: Record<HeaderPageDialMode, AppSpeedDialAction[]> = {
+  cv: [
+    {
+      id: 'climbing',
+      label: 'Climbing',
+      icon: <TerrainIcon fontSize="small" />,
+      to: '/climbing',
+    },
+    {
+      id: 'photography',
+      label: 'Photography',
+      icon: <PhotoCameraOutlinedIcon fontSize="small" />,
+      to: '/photography',
+    },
+    {
+      id: 'home',
+      label: 'Home',
+      icon: <HomeOutlinedIcon fontSize="small" />,
+      to: '/',
+    },
+  ],
+  climbing: [
+    {
+      id: 'cv',
+      label: 'CV',
+      icon: <DescriptionOutlinedIcon fontSize="small" />,
+      to: '/cv',
+    },
+    {
+      id: 'photography',
+      label: 'Photography',
+      icon: <PhotoCameraOutlinedIcon fontSize="small" />,
+      to: '/photography',
+    },
+    {
+      id: 'home',
+      label: 'Home',
+      icon: <HomeOutlinedIcon fontSize="small" />,
+      to: '/',
+    },
+  ],
+  photography: [
+    {
+      id: 'cv',
+      label: 'CV',
+      icon: <DescriptionOutlinedIcon fontSize="small" />,
+      to: '/cv',
+    },
+    {
+      id: 'climbing',
+      label: 'Climbing',
+      icon: <TerrainIcon fontSize="small" />,
+      to: '/climbing',
+    },
+    {
+      id: 'home',
+      label: 'Home',
+      icon: <HomeOutlinedIcon fontSize="small" />,
+      to: '/',
+    },
+  ],
+};
+
+const getHeaderPageDialMode = (path: string): HeaderPageDialMode | null => {
+  if (path.startsWith('/cv')) {
+    return 'cv';
+  }
+  if (path.startsWith('/climbing')) {
+    return 'climbing';
+  }
+  if (path.startsWith('/photography')) {
+    return 'photography';
+  }
+
+  return null;
+};
 
 const pulseRing = keyframes`
   0% {
@@ -60,8 +145,10 @@ export default function Header() {
     setShowDarkModeHint,
   } = useWelcomeAudio();
   const path = location.pathname.toLowerCase();
-  const showAvatar =
-    path.startsWith('/cv') || path.startsWith('/climbing') || path.startsWith('/photography');
+  const pageDialMode = getHeaderPageDialMode(path);
+  const showPageDial = Boolean(pageDialMode);
+  const pageDialActions = pageDialMode ? pageDialActionsByMode[pageDialMode] : [];
+  const showNavigationLinks = !showPageDial;
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const iconButtonSize = isMobile ? 'medium' : ('large' as const);
   const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState<null | HTMLElement>(null);
@@ -81,10 +168,10 @@ export default function Header() {
     : {};
 
   React.useEffect(() => {
-    if (!isMobile && mobileMenuOpen) {
+    if ((!isMobile || !showNavigationLinks) && mobileMenuOpen) {
       setMobileMenuAnchor(null);
     }
-  }, [isMobile, mobileMenuOpen]);
+  }, [isMobile, mobileMenuOpen, showNavigationLinks]);
 
   const handleMobileMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMobileMenuAnchor(event.currentTarget);
@@ -120,6 +207,7 @@ export default function Header() {
           <Toolbar sx={appStyles.headerToolbarSx}>
             <HeaderNav
               pages={pages}
+              showNavigationLinks={showNavigationLinks}
               isMobile={isMobile}
               iconButtonSize={iconButtonSize}
               headerIconSx={appStyles.headerIconSx}
@@ -128,12 +216,11 @@ export default function Header() {
               onMobileMenuOpen={handleMobileMenuOpen}
               onMobileMenuClose={handleMobileMenuClose}
               leftContent={
-                showAvatar ? (
-                  <HeaderActions
+                showPageDial ? (
+                  <HeaderPageDial
                     iconButtonSize={iconButtonSize}
-                    headerIconSx={appStyles.headerIconSx}
-                    showAvatar
                     avatarSrc={avatarSrc}
+                    actions={pageDialActions}
                   />
                 ) : null
               }

@@ -1,8 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { MemoryRouter } from 'react-router-dom';
 import { useAppTheme } from '../ThemeProvider';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import Header from './Header';
+
+jest.mock('@mui/material/useMediaQuery', () => jest.fn());
 
 jest.mock('../ThemeProvider', () => ({
   useAppTheme: jest.fn(),
@@ -12,6 +15,31 @@ jest.mock('../WelcomeAudioProvider', () => ({
   useWelcomeAudio: jest.fn(),
 }));
 
+jest.mock('./header/HeaderPageDial', () => ({
+  HeaderPageDial: ({
+    actions,
+  }: {
+    actions: Array<{ id: string; label: string; to?: string }>;
+  }) => (
+    <div data-testid="header-page-dial">
+      <button type="button" aria-label="Open page navigation">
+        Open page navigation
+      </button>
+      {actions.map((action) => (
+        <span
+          key={action.id}
+          data-testid="header-page-dial-action"
+          data-label={action.label}
+          data-path={action.to ?? ''}
+        >
+          {action.label}
+        </span>
+      ))}
+    </div>
+  ),
+}));
+
+const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQuery>;
 const mockUseAppTheme = useAppTheme as jest.MockedFunction<typeof useAppTheme>;
 const mockUseWelcomeAudio = useWelcomeAudio as jest.MockedFunction<typeof useWelcomeAudio>;
 
@@ -33,12 +61,27 @@ const createAudioState = (
   ...overrides,
 });
 
+const renderHeader = (initialEntry: string) =>
+  render(
+    <MemoryRouter initialEntries={[initialEntry]}>
+      <Header />
+    </MemoryRouter>
+  );
+
+const getPageDialActions = () =>
+  screen.getAllByTestId('header-page-dial-action').map((action) => ({
+    label: action.getAttribute('data-label'),
+    path: action.getAttribute('data-path'),
+  }));
+
 describe('Header controls', () => {
   beforeEach(() => {
+    mockUseMediaQuery.mockReturnValue(false);
     mockUseAppTheme.mockReturnValue({
       mode: 'light',
       toggleTheme: jest.fn(),
     });
+    mockUseWelcomeAudio.mockReturnValue(createAudioState());
   });
 
   afterEach(() => {
@@ -49,11 +92,7 @@ describe('Header controls', () => {
     const play = jest.fn().mockResolvedValue(undefined);
     mockUseWelcomeAudio.mockReturnValue(createAudioState({ isPlaying: false, play }));
 
-    render(
-      <MemoryRouter initialEntries={['/cv']}>
-        <Header />
-      </MemoryRouter>
-    );
+    renderHeader('/cv');
 
     fireEvent.click(screen.getByRole('button', { name: 'Play welcome audio' }));
     expect(play).toHaveBeenCalledTimes(1);
@@ -63,11 +102,7 @@ describe('Header controls', () => {
     const pause = jest.fn();
     mockUseWelcomeAudio.mockReturnValue(createAudioState({ isPlaying: true, pause }));
 
-    render(
-      <MemoryRouter initialEntries={['/cv']}>
-        <Header />
-      </MemoryRouter>
-    );
+    renderHeader('/cv');
 
     fireEvent.click(screen.getByRole('button', { name: 'Pause welcome audio' }));
     expect(pause).toHaveBeenCalledTimes(1);
@@ -87,14 +122,77 @@ describe('Header controls', () => {
       })
     );
 
-    render(
-      <MemoryRouter initialEntries={['/cv']}>
-        <Header />
-      </MemoryRouter>
-    );
+    renderHeader('/cv');
 
     fireEvent.click(screen.getByLabelText('Toggle color theme'));
     expect(setShowDarkModeHint).toHaveBeenCalledWith(false);
     expect(toggleTheme).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps the current desktop navigation links on the home route', () => {
+    renderHeader('/');
+
+    expect(screen.queryByTestId('header-page-dial')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Go to CV' })).toHaveAttribute('href', '/cv');
+    expect(screen.getByRole('link', { name: 'Go to Climbing' })).toHaveAttribute(
+      'href',
+      '/climbing'
+    );
+    expect(screen.getByRole('link', { name: 'Go to Photography' })).toHaveAttribute(
+      'href',
+      '/photography'
+    );
+  });
+
+  it('keeps the current mobile menu trigger on the home route', () => {
+    mockUseMediaQuery.mockReturnValue(true);
+
+    renderHeader('/');
+
+    expect(screen.getByRole('button', { name: 'Open navigation menu' })).toBeInTheDocument();
+    expect(screen.queryByTestId('header-page-dial')).not.toBeInTheDocument();
+  });
+
+  it('shows the cv page dial actions and hides the desktop nav links', () => {
+    renderHeader('/cv');
+
+    expect(screen.getByRole('button', { name: 'Open page navigation' })).toBeInTheDocument();
+    expect(getPageDialActions()).toEqual([
+      { label: 'Climbing', path: '/climbing' },
+      { label: 'Photography', path: '/photography' },
+      { label: 'Home', path: '/' },
+    ]);
+    expect(screen.queryByRole('link', { name: 'Go to CV' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to Climbing' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to Photography' })).not.toBeInTheDocument();
+  });
+
+  it('hides the mobile hamburger when the page dial is active', () => {
+    mockUseMediaQuery.mockReturnValue(true);
+
+    renderHeader('/cv');
+
+    expect(screen.getByRole('button', { name: 'Open page navigation' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Open navigation menu' })).not.toBeInTheDocument();
+  });
+
+  it('uses the climbing page dial target set on the climbing route', () => {
+    renderHeader('/climbing');
+
+    expect(getPageDialActions()).toEqual([
+      { label: 'CV', path: '/cv' },
+      { label: 'Photography', path: '/photography' },
+      { label: 'Home', path: '/' },
+    ]);
+  });
+
+  it('uses the photography page dial target set on photography detail routes', () => {
+    renderHeader('/photography/landscape');
+
+    expect(getPageDialActions()).toEqual([
+      { label: 'CV', path: '/cv' },
+      { label: 'Climbing', path: '/climbing' },
+      { label: 'Home', path: '/' },
+    ]);
   });
 });
