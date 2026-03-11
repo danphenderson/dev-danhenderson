@@ -27,7 +27,22 @@ export type CodingExample = {
   title: string;
   description: string;
   links: string[];
+  tabs?: CodingExampleTab[];
 };
+
+export type CodingExampleTab =
+  | {
+      value: string;
+      label: string;
+      kind: 'list';
+      items: string[];
+    }
+  | {
+      value: string;
+      label: string;
+      kind: 'skills';
+      skills: string[];
+    };
 
 export type Certificate = {
   title: string;
@@ -106,45 +121,269 @@ Open to opportunities at the intersection of systems and production software (sc
 };
 
 export const codingExamples: CodingExample[] = [
-    {
+  {
     title: 'typewriter CLI',
     description: 'Typewriter is a pip-installable CLI built on Typer and LibCST to normalize None-related type annotations while preserving formatting and comments.',
     links: ['https://github.com/danphenderson/python-typewriter'],
+    tabs: [
+      {
+        value: 'purpose',
+        label: 'Purpose',
+        kind: 'list',
+        items: [
+          'Normalize `None`-related annotations across a codebase.',
+          'Target repo-wide cleanup rather than ad-hoc edits.',
+          'Preserve formatting and comments while changing types.',
+        ],
+      },
+      {
+        value: 'rewrites',
+        label: 'Rewrites',
+        kind: 'list',
+        items: [
+          'Use concrete-syntax-tree transforms instead of regex replacement.',
+          'Keep diffs readable after automated edits.',
+          'Package the workflow as a pip-installable CLI.',
+        ],
+      },
+      {
+        value: 'stack',
+        label: 'Stack',
+        kind: 'skills',
+        skills: ['Python', 'Typer', 'LibCST', 'CLI tooling', 'Type annotations'],
+      },
+    ],
   },
   {
     title: 'chromex Python Library',
     description: "An asynchronous interface for headless browser automation's that is built on bs4 and selenium.",
     links: ['https://github.com/danphenderson/python-chromex'],
+    tabs: [
+      {
+        value: 'workflow',
+        label: 'Workflow',
+        kind: 'list',
+        items: [
+          'Wrap headless-browser automation behind an async-friendly Python interface.',
+          'Target pages that need a real browser before extraction.',
+          'Bridge navigation, automation, and parsing in one flow.',
+        ],
+      },
+      {
+        value: 'automation',
+        label: 'Automation',
+        kind: 'list',
+        items: [
+          'Pair Selenium-driven rendering with BeautifulSoup-based parsing.',
+          'Support scripted browsing and scraping workloads.',
+          'Abstract repeated browser-session plumbing into a reusable library.',
+        ],
+      },
+      {
+        value: 'stack',
+        label: 'Stack',
+        kind: 'skills',
+        skills: ['Python', 'asyncio', 'Selenium', 'BeautifulSoup', 'Browser automation'],
+      },
+    ],
   },
   {
     title: 'Portfolio using React, TypeScript, and AWS',
     description: 'An interactive CV, climbing log, and photography galleries built with React + TypeScript + MUI and deployed on AWS using S3, CloudFront, and Route53.',
     links: ['https://github.com/danphenderson/dev-danhenderson'],
+    tabs: [
+      {
+        value: 'product',
+        label: 'Product',
+        kind: 'list',
+        items: [
+          'Combine an interactive CV, climbing log, and photography galleries in one SPA.',
+          'Keep content in TypeScript data modules for static hosting.',
+          'Enhance the CV with GitHub-backed data when available.',
+        ],
+      },
+      {
+        value: 'architecture',
+        label: 'Architecture',
+        kind: 'list',
+        items: [
+          'Use client-side routing with host rewrites to `index.html`.',
+          'Reuse MUI/CV primitives to keep sections consistent.',
+          'Preserve `PUBLIC_URL`-compatible asset handling for deployment.',
+        ],
+      },
+      {
+        value: 'cloud',
+        label: 'Cloud',
+        kind: 'skills',
+        skills: ['React', 'TypeScript', 'MUI', 'React Router', 'AWS S3', 'CloudFront', 'Route53'],
+      },
+    ],
   },
   {
     title: 'BlockOpt.jl Julia Package',
     description: 'An optim-style Julia package built with ForwardDiff.jl and TRS.jl that presents a novel scheme for an unconstrained Quasi-Newton minimization of a smooth objective function.',
     links: ['https://github.com/danphenderson/BlockOpt.jl'],
+    tabs: [
+      {
+        value: 'research',
+        label: 'Research',
+        kind: 'list',
+        items: [
+          'Explore a block-oriented quasi-Newton approach for smooth unconstrained minimization.',
+          'Frame the repo as solver experimentation, not just utility wrappers.',
+          'Target optimization problems where derivative information matters.',
+        ],
+      },
+      {
+        value: 'numerics',
+        label: 'Numerics',
+        kind: 'list',
+        items: [
+          'Use automatic differentiation for derivative evaluation.',
+          'Rely on trust-region tooling to support iterative minimization.',
+          'Position Julia as the environment for numerical experimentation.',
+        ],
+      },
+      {
+        value: 'stack',
+        label: 'Stack',
+        kind: 'skills',
+        skills: ['Julia', 'ForwardDiff.jl', 'TRS.jl', 'Numerical optimization', 'Scientific computing'],
+      },
+    ],
   },
   {
     title: 'UncNLPrograms.jl Julia Package',
     description: 'A subset of high-dimensional, nonlinear, and unconstrained optimization problems from CUTEst in native Julia to test solvers using Automatic/Algorithmic Differentiation.',
     links: ['https://github.com/danphenderson/UncNLPrograms.jl'],
+    tabs: [
+      {
+        value: 'benchmarks',
+        label: 'Benchmarks',
+        kind: 'list',
+        items: [
+          'Port a subset of nonlinear unconstrained test problems into native Julia.',
+          'Reduce friction when benchmarking solvers on high-dimensional problems.',
+          'Create reusable problem definitions for experimentation.',
+        ],
+      },
+      {
+        value: 'solver-use',
+        label: 'Solver Use',
+        kind: 'list',
+        items: [
+          'Support AD-friendly optimization workflows without external wrappers.',
+          'Help compare solver behavior across a consistent benchmark set.',
+          'Complement nonlinear optimization research work.',
+        ],
+      },
+      {
+        value: 'stack',
+        label: 'Stack',
+        kind: 'skills',
+        skills: ['Julia', 'CUTEst-style benchmarks', 'Automatic differentiation', 'Nonlinear optimization', 'Scientific computing'],
+      },
+    ],
   },
   {
     title: 'MasterPlan Java Application',
     description: 'A Java application that allows users to create and manage a structure (directed acyclic graph) of tasks and corresponding subtasks.',
     links: ['https://github.com/danphenderson/masterplan-app'],
+    tabs: [
+      {
+        value: 'planning',
+        label: 'Planning',
+        kind: 'list',
+        items: [
+          'Let users model tasks and subtasks as a directed acyclic graph.',
+          'Turn dependency structure into a clearer execution order.',
+          'Focus on breaking larger work into manageable units.',
+        ],
+      },
+      {
+        value: 'model',
+        label: 'Model',
+        kind: 'list',
+        items: [
+          'Use DAG rules to prevent cyclic task relationships.',
+          'Highlight graph-based domain modeling in a Java application.',
+          'Treat dependency management as the core product behavior.',
+        ],
+      },
+      {
+        value: 'stack',
+        label: 'Stack',
+        kind: 'skills',
+        skills: ['Java', 'DAG data model', 'Task management', 'Object-oriented design'],
+      },
+    ],
   },
   {
     title: 'LeetCode Python Solutions',
     description: 'A collection of LeetCode problems with corresponding solutions and brief discussions on the approaches used.',
     links: ['https://github.com/danphenderson/leetcode-solutions'],
+    tabs: [
+      {
+        value: 'practice',
+        label: 'Practice',
+        kind: 'list',
+        items: [
+          'Store worked problems with matching Python solutions.',
+          'Add brief discussions so the repo is useful for review, not just submission history.',
+          'Act as a reusable study reference for interview prep.',
+        ],
+      },
+      {
+        value: 'patterns',
+        label: 'Patterns',
+        kind: 'list',
+        items: [
+          'Emphasize clean implementations over throwaway one-off code.',
+          'Make common algorithmic patterns easier to revisit.',
+          'Support repeated practice with lightweight written reasoning.',
+        ],
+      },
+      {
+        value: 'stack',
+        label: 'Stack',
+        kind: 'skills',
+        skills: ['Python', 'Algorithms', 'Data structures', 'Interview practice'],
+      },
+    ],
   },
   {
     title: 'Runge-Kutta Methods Matlab Library',
     description: 'Implementation of various Runge-Kutta methods for solving ordinary differential equations.',
     links: ['https://github.com/danphenderson/runge-kutta-matlab'],
+    tabs: [
+      {
+        value: 'methods',
+        label: 'Methods',
+        kind: 'list',
+        items: [
+          'Implement multiple Runge-Kutta methods for solving ordinary differential equations.',
+          'Package them as reusable MATLAB routines instead of isolated scripts.',
+          'Center the library on numerical-method experimentation.',
+        ],
+      },
+      {
+        value: 'numerics',
+        label: 'Numerics',
+        kind: 'list',
+        items: [
+          'Support comparison of integrators across accuracy and stability tradeoffs.',
+          'Keep solver behavior inspectable for coursework or research.',
+          'Focus on classical ODE time-stepping techniques.',
+        ],
+      },
+      {
+        value: 'stack',
+        label: 'Stack',
+        kind: 'skills',
+        skills: ['MATLAB', 'ODE solvers', 'Runge-Kutta methods', 'Numerical analysis'],
+      },
+    ],
   },
 ];
 

@@ -95,6 +95,31 @@ describe('TabPanel', () => {
       .toBe(window.getComputedStyle(resumeButton).borderTopColor);
   });
 
+  it.each(['fullWidth', 'scrollable'] as const)('left-aligns tab labels for %s tabs', (tabsVariant) => {
+    render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel={`${tabsVariant} alignment sections`}
+          items={[
+            { value: 'details', label: 'Details', content: <div>Details body</div> },
+            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+          ]}
+          tabsVariant={tabsVariant}
+        />
+      </ThemeProvider>
+    );
+
+    const detailsTab = screen.getByRole('tab', { name: 'Details' });
+    const skillsTab = screen.getByRole('tab', { name: 'Skills' });
+
+    expect(window.getComputedStyle(detailsTab).alignItems).toBe('flex-start');
+    expect(window.getComputedStyle(detailsTab).justifyContent).toBe('center');
+    expect(window.getComputedStyle(detailsTab).textAlign).toBe('left');
+    expect(window.getComputedStyle(skillsTab).alignItems).toBe('flex-start');
+    expect(window.getComputedStyle(skillsTab).justifyContent).toBe('center');
+    expect(window.getComputedStyle(skillsTab).textAlign).toBe('left');
+  });
+
   it.each(['fullWidth', 'scrollable'] as const)(
     'renders selected outer tabs as flush half-pills for %s tabs',
     (tabsVariant) => {
@@ -124,12 +149,6 @@ describe('TabPanel', () => {
       expect(window.getComputedStyle(tabsRoot as HTMLElement).paddingLeft).toBe('0px');
       expect(window.getComputedStyle(tabsRoot as HTMLElement).paddingRight).toBe('0px');
       expect(window.getComputedStyle(tabList).gap).toBe('0px');
-      expect(window.getComputedStyle(detailsTab).alignItems).toBe('center');
-      expect(window.getComputedStyle(detailsTab).justifyContent).toBe('center');
-      expect(window.getComputedStyle(detailsTab).textAlign).toBe('center');
-      expect(window.getComputedStyle(skillsTab).alignItems).toBe('center');
-      expect(window.getComputedStyle(skillsTab).justifyContent).toBe('center');
-      expect(window.getComputedStyle(skillsTab).textAlign).toBe('center');
 
       const indicator = tabsRoot?.querySelector('.MuiTabs-indicator');
 
