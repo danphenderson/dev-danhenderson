@@ -10,6 +10,34 @@ type EducationSectionProps = {
   startDelayMs?: number;
 };
 
+const courseworkPrefixPattern = /^(?:Relevant\s+)?Coursework:\s*/i;
+
+const splitEducationHighlights = (highlights?: string[]) =>
+  (highlights ?? []).reduce<{ highlights: string[]; coursework: string[] }>(
+    (groups, highlight) => {
+      const trimmedHighlight = highlight.trim();
+
+      if (!trimmedHighlight) {
+        return groups;
+      }
+
+      if (courseworkPrefixPattern.test(trimmedHighlight)) {
+        const courses = trimmedHighlight
+          .replace(courseworkPrefixPattern, '')
+          .split(',')
+          .map((course) => course.trim())
+          .filter((course) => course.length > 0);
+
+        groups.coursework.push(...(courses.length ? courses : [trimmedHighlight]));
+        return groups;
+      }
+
+      groups.highlights.push(trimmedHighlight);
+      return groups;
+    },
+    { highlights: [], coursework: [] }
+  );
+
 export const EducationSection = ({ education, startDelayMs = 0 }: EducationSectionProps) => {
   const {
     contentListStackSpacing,
@@ -34,7 +62,9 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
       renderItem={(entry, index) => {
-        const filteredHighlights = entry.highlights?.filter((highlight) => highlight.trim().length > 0) ?? [];
+        const { highlights: filteredHighlights, coursework: filteredCoursework } = splitEducationHighlights(
+          entry.highlights
+        );
         const filteredSkills = entry.skills?.filter((tool) => tool.trim().length > 0) ?? [];
         const educationTabs: TabPanelItem[] = [];
 
@@ -47,6 +77,22 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
                 {filteredHighlights.map((highlight, highlightIndex) => (
                   <Typography component="li" variant="body2" key={`${highlight}-${highlightIndex}`}>
                     {highlight}
+                  </Typography>
+                ))}
+              </Box>
+            ),
+          });
+        }
+
+        if (filteredCoursework.length) {
+          educationTabs.push({
+            value: 'coursework',
+            label: 'Coursework',
+            content: (
+              <Box component="ul" sx={getDetailListSx(0, 0)}>
+                {filteredCoursework.map((course, courseIndex) => (
+                  <Typography component="li" variant="body2" key={`${course}-${courseIndex}`}>
+                    {course}
                   </Typography>
                 ))}
               </Box>

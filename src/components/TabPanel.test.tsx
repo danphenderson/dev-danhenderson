@@ -1,7 +1,14 @@
-import { Button } from '@mui/material';
+import { Button, Chip } from '@mui/material';
 import { fireEvent, render, screen } from '@testing-library/react';
 import ThemeProvider from '../ThemeProvider';
+import { useCvStyles } from '../styles/cvStyles';
 import { TabPanel } from './TabPanel';
+
+const IndustryChip = () => {
+  const { experienceIndustryChipSx } = useCvStyles();
+
+  return <Chip size="small" label="Industry" variant="outlined" sx={experienceIndustryChipSx} />;
+};
 
 describe('TabPanel', () => {
   it('starts with no selected tab and preserves full labels for accessibility when short labels are displayed', () => {
@@ -118,6 +125,38 @@ describe('TabPanel', () => {
     expect(window.getComputedStyle(skillsTab).alignItems).toBe('flex-start');
     expect(window.getComputedStyle(skillsTab).justifyContent).toBe('center');
     expect(window.getComputedStyle(skillsTab).textAlign).toBe('left');
+  });
+
+  it('matches the industry chip label size and uses the compact dense tab height', () => {
+    render(
+      <ThemeProvider>
+        <>
+          <IndustryChip />
+          <TabPanel
+            ariaLabel="Dense experience sections"
+            items={[
+              { value: 'details', label: 'Details', content: <div>Details body</div> },
+              { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+            ]}
+            dense
+            tabsVariant="fullWidth"
+          />
+        </>
+      </ThemeProvider>
+    );
+
+    const industryChipLabel = screen.getByText('Industry').closest('.MuiChip-label');
+    const detailsTab = screen.getByRole('tab', { name: 'Details' });
+    const tabsRoot = screen.getByRole('tablist', { name: 'Dense experience sections' }).closest('.MuiTabs-root');
+
+    expect(industryChipLabel).not.toBeNull();
+    expect(tabsRoot).not.toBeNull();
+    expect(window.getComputedStyle(detailsTab).fontSize).toBe(window.getComputedStyle(industryChipLabel as HTMLElement).fontSize);
+    expect(window.getComputedStyle(detailsTab).lineHeight).toBe(
+      window.getComputedStyle(industryChipLabel as HTMLElement).lineHeight
+    );
+    expect(window.getComputedStyle(detailsTab).minHeight).toBe('36px');
+    expect(window.getComputedStyle(tabsRoot as HTMLElement).minHeight).toBe('36px');
   });
 
   it.each(['fullWidth', 'scrollable'] as const)(

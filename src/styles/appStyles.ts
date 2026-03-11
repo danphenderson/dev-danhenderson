@@ -210,17 +210,17 @@ export const useAppStyles = () => {
         justifyContent: 'flex-end',
         mb: { xs: 1.5, md: 2 },
       } satisfies SxProps<Theme>,
-      cvSidebarPaneSx: {
+      cvPagePaneSx: {
         height: '100%',
         p: { xs: 2.5, md: 3 },
       } satisfies SxProps<Theme>,
-      cvMainPaneSx: {
+      cvPagePrimaryPaneSx: {
         p: { xs: 2.5, md: 3.5 },
       } satisfies SxProps<Theme>,
-      cvSidebarGridItemSx: {
+      cvDesktopAsideGridItemSx: {
         order: { xs: 2, md: 1 },
       } satisfies SxProps<Theme>,
-      cvMainGridItemSx: {
+      cvDesktopMainGridItemSx: {
         order: { xs: 1, md: 2 },
       } satisfies SxProps<Theme>,
       homeHeroContentSx: { pb: 24.25 } satisfies SxProps<Theme>,

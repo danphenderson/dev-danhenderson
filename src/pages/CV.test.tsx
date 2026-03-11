@@ -2,7 +2,8 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ThemeProvider from '../ThemeProvider';
-import { cvSectionMetadata, cvSectionNavigationOrder } from '../components/cv/cvSectionMetadata';
+import { CVSectionKey, cvSectionMetadata, cvSectionNavigationOrder } from '../components/cv/cvSectionMetadata';
+import { cvPageSectionLayout } from './cvPageLayout';
 import CV from './CV';
 
 jest.mock('@mui/material/useMediaQuery', () => jest.fn());
@@ -92,7 +93,8 @@ const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQu
 describe('CV page section navigation', () => {
   const scrollIntoViewMock = jest.fn();
   let getElementByIdSpy: jest.SpyInstance;
-  const getAnimatedSectionCard = (sectionKey: keyof typeof cvSectionMetadata) =>
+
+  const getAnimatedSectionCard = (sectionKey: CVSectionKey) =>
     screen.getByTestId(`animated-card-${cvSectionMetadata[sectionKey].id}`);
 
   beforeAll(() => {
@@ -113,29 +115,42 @@ describe('CV page section navigation', () => {
     getElementByIdSpy.mockRestore();
   });
 
-  it('loads ABOUT and EXPERIENCE immediately on desktop while preserving the staggered sequence for later sections', () => {
+  it('renders the desktop top row and both desktop columns while preserving the desktop motion contract', () => {
     render(
       <ThemeProvider>
         <CV />
       </ThemeProvider>
     );
 
-    expect(getAnimatedSectionCard('about')).toHaveAttribute('data-delay-ms', '0');
-    expect(getAnimatedSectionCard('about')).toHaveAttribute('data-trigger-on-view', 'false');
-    expect(getAnimatedSectionCard('experience')).toHaveAttribute('data-delay-ms', '0');
-    expect(getAnimatedSectionCard('experience')).toHaveAttribute('data-trigger-on-view', 'false');
+    const desktopTopRegion = screen.getByTestId('cv-desktop-top-region');
+    const desktopSidebarRegion = screen.getByTestId('cv-desktop-sidebar-region');
+    const desktopMainRegion = screen.getByTestId('cv-desktop-main-region');
 
-    expect(getAnimatedSectionCard('github')).toHaveAttribute('data-delay-ms', '120');
-    expect(getAnimatedSectionCard('github')).toHaveAttribute('data-trigger-on-view', 'true');
-    expect(getAnimatedSectionCard('education')).toHaveAttribute('data-delay-ms', '120');
-    expect(getAnimatedSectionCard('education')).toHaveAttribute('data-trigger-on-view', 'true');
-    expect(getAnimatedSectionCard('certificates')).toHaveAttribute('data-delay-ms', '240');
-    expect(getAnimatedSectionCard('volunteering')).toHaveAttribute('data-delay-ms', '240');
-    expect(getAnimatedSectionCard('tools')).toHaveAttribute('data-delay-ms', '360');
-    expect(getAnimatedSectionCard('coding')).toHaveAttribute('data-delay-ms', '360');
+    expect(within(desktopTopRegion).getByTestId(`animated-card-${cvSectionMetadata.about.id}`)).toBeInTheDocument();
+    expect(within(desktopSidebarRegion).getByTestId(`animated-card-${cvSectionMetadata.github.id}`)).toBeInTheDocument();
+    expect(
+      within(desktopSidebarRegion).getByTestId(`animated-card-${cvSectionMetadata.certificates.id}`)
+    ).toBeInTheDocument();
+    expect(within(desktopSidebarRegion).getByTestId(`animated-card-${cvSectionMetadata.tools.id}`)).toBeInTheDocument();
+    expect(within(desktopMainRegion).getByTestId(`animated-card-${cvSectionMetadata.experience.id}`)).toBeInTheDocument();
+    expect(within(desktopMainRegion).getByTestId(`animated-card-${cvSectionMetadata.education.id}`)).toBeInTheDocument();
+    expect(
+      within(desktopMainRegion).getByTestId(`animated-card-${cvSectionMetadata.volunteering.id}`)
+    ).toBeInTheDocument();
+    expect(within(desktopMainRegion).getByTestId(`animated-card-${cvSectionMetadata.coding.id}`)).toBeInTheDocument();
+
+    (Object.keys(cvPageSectionLayout) as CVSectionKey[]).forEach((sectionKey) => {
+      const { delayMs, triggerOnView } = cvPageSectionLayout[sectionKey].desktop;
+
+      expect(getAnimatedSectionCard(sectionKey)).toHaveAttribute('data-delay-ms', `${delayMs}`);
+      expect(getAnimatedSectionCard(sectionKey)).toHaveAttribute(
+        'data-trigger-on-view',
+        String(triggerOnView)
+      );
+    });
   });
 
-  it('renders ABOUT actions and places the navigation bar at the bottom of the about section on desktop', () => {
+  it('renders ABOUT actions and keeps the section navigator in the ABOUT section on desktop', () => {
     render(
       <ThemeProvider>
         <CV />
@@ -170,7 +185,6 @@ describe('CV page section navigation', () => {
     const navigationActions = within(navigator).getAllByRole('button');
 
     expect(aboutDial.compareDocumentPosition(navigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-
     expect(navigationActions.map((action) => action.textContent)).toEqual(
       cvSectionNavigationOrder.map((sectionKey) => cvSectionMetadata[sectionKey].navLabel)
     );
@@ -186,7 +200,7 @@ describe('CV page section navigation', () => {
     });
   });
 
-  it('renders the same navigation bar inside the about section on mobile', () => {
+  it('renders the mobile stacked order and keeps ABOUT ahead of EXPERIENCE with the current mobile motion contract', () => {
     mockUseMediaQuery.mockReturnValue(true);
 
     render(
@@ -195,24 +209,31 @@ describe('CV page section navigation', () => {
       </ThemeProvider>
     );
 
+    const orderedMobileSections = Object.entries(cvPageSectionLayout)
+      .sort((left, right) => left[1].mobile.order - right[1].mobile.order)
+      .map(([key]) => key as CVSectionKey);
+
+    orderedMobileSections.forEach((sectionKey) => {
+      const { delayMs, triggerOnView } = cvPageSectionLayout[sectionKey].mobile;
+
+      expect(getAnimatedSectionCard(sectionKey)).toHaveAttribute('data-delay-ms', `${delayMs}`);
+      expect(getAnimatedSectionCard(sectionKey)).toHaveAttribute(
+        'data-trigger-on-view',
+        String(triggerOnView)
+      );
+    });
+
     const aboutSection = document.getElementById(cvSectionMetadata.about.id);
     const experienceSection = document.getElementById(cvSectionMetadata.experience.id);
     const aboutDial = screen.getByTestId('speed-dial-open-about-actions');
+    const navigator = within(aboutSection!).getByTestId('cv-section-navigator');
 
-    expect(getAnimatedSectionCard('about')).toHaveAttribute('data-delay-ms', '0');
-    expect(getAnimatedSectionCard('about')).toHaveAttribute('data-trigger-on-view', 'false');
-    expect(getAnimatedSectionCard('experience')).toHaveAttribute('data-delay-ms', '0');
-    expect(getAnimatedSectionCard('experience')).toHaveAttribute('data-trigger-on-view', 'false');
     expect(aboutSection).not.toBeNull();
     expect(experienceSection).not.toBeNull();
     expect(aboutSection!.compareDocumentPosition(experienceSection!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-
-    const navigator = within(aboutSection!).getByTestId('cv-section-navigator');
-
     expect(aboutDial.compareDocumentPosition(navigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(
       within(navigator).getAllByRole('button').map((action) => action.textContent)
     ).toEqual(cvSectionNavigationOrder.map((sectionKey) => cvSectionMetadata[sectionKey].navLabel));
-    expect(within(navigator).queryByRole('button', { name: 'About' })).not.toBeInTheDocument();
   });
 });

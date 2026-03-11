@@ -33,18 +33,35 @@ describe('EducationSection', () => {
     expect(mockAnimatedContentList.mock.calls[0][0]).toEqual(
       expect.objectContaining({ mountItemsOnView: true })
     );
-    expect(screen.getByRole('tab', { name: 'Highlights' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Skills' })).toBeInTheDocument();
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
+      'Highlights',
+      'Coursework',
+      'Skills',
+    ]);
     expect(
       screen.queryByText('Pedagogical training in curriculum design, assessment, and evidence-based instruction.')
     ).not.toBeInTheDocument();
+    expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
     expect(screen.queryByText('LaTeX')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Highlights' }));
+
+    expect(
+      screen.getByText('Pedagogical training in curriculum design, assessment, and evidence-based instruction.')
+    ).toBeVisible();
+    expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Coursework' }));
+
+    expect(screen.getByText('Linear Algebra')).toBeVisible();
+    expect(screen.getByText('Numerical Optimization')).toBeVisible();
+    expect(
+      screen.queryByText('Pedagogical training in curriculum design, assessment, and evidence-based instruction.')
+    ).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
 
     expect(screen.getByText('LaTeX')).toBeVisible();
-    expect(
-      screen.queryByText('Pedagogical training in curriculum design, assessment, and evidence-based instruction.')
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
   });
 });

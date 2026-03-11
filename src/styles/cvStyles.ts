@@ -32,6 +32,8 @@ export const useCvStyles = () => {
     const accentTint = alpha(accentColor, isLight ? 0.14 : 0.24);
     const interactiveOutlineColor = accentColor;
     const selectedTabSurface = alpha(accentColor, isLight ? 0.1 : 0.2);
+    const compactLabelFontSize = theme.typography.pxToRem(12);
+    const compactLabelLineHeight = 1.1;
     const interactiveSurfaceHoverShadow = isLight
       ? `0 0 0 1px ${alpha(accentColor, 0.24)}, 0 8px 20px ${alpha(accentColor, 0.14)}`
       : `0 0 0 1px ${alpha(accentColor, 0.34)}, 0 10px 24px ${alpha(accentColor, 0.18)}`;
@@ -132,7 +134,7 @@ export const useCvStyles = () => {
     }) satisfies SxProps<Theme>;
 
     const getTabListSx = (dense: boolean) => ({
-      minHeight: dense ? 44 : 52,
+      minHeight: dense ? 36 : 40,
       px: 0,
       backgroundColor: 'transparent',
       '& .MuiTabs-flexContainer': {
@@ -147,14 +149,14 @@ export const useCvStyles = () => {
     }) satisfies SxProps<Theme>;
 
     const getTabSx = (dense: boolean) => ({
-      minHeight: dense ? 44 : 52,
+      minHeight: dense ? 36 : 40,
       minWidth: 0,
       maxWidth: 'none',
       px: { xs: 1.25, sm: 1.5 },
-      py: dense ? 1 : 1.25,
+      py: dense ? 0.75 : 1,
       fontFamily: 'inherit',
-      fontSize: 'inherit',
-      lineHeight: 'inherit',
+      fontSize: compactLabelFontSize,
+      lineHeight: compactLabelLineHeight,
       fontWeight: theme.typography.button.fontWeight,
       letterSpacing: theme.typography.button.letterSpacing,
       alignItems: 'flex-start',
@@ -334,8 +336,8 @@ export const useCvStyles = () => {
         height: 24,
         '& .MuiChip-label': {
           px: 1.125,
-          fontSize: theme.typography.pxToRem(12),
-          lineHeight: 1.1,
+          fontSize: compactLabelFontSize,
+          lineHeight: compactLabelLineHeight,
         },
       } satisfies SxProps<Theme>,
       experienceDescriptionSx: { mt: 1 } satisfies SxProps<Theme>,
