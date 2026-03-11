@@ -43,7 +43,7 @@ export const GitHubLinkChipList = ({
       gap: stackSpacing,
     };
 
-  const renderChip = (item: GitHubLinkChipItem, index: number = 0) => {
+  const renderChip = (item: GitHubLinkChipItem, index: number) => {
     const isLink = Boolean(item.href);
 
     return (

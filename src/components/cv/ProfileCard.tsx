@@ -10,6 +10,12 @@ type ProfileCardProps = {
 
 const STATUS_MARKER = 'Open to opportunities';
 
+/** Return the index of the line start containing `markerIndex`. */
+const getLineStart = (text: string, markerIndex: number): number => {
+  const lastNewline = text.lastIndexOf('\n', markerIndex);
+  return lastNewline >= 0 ? lastNewline + 1 : markerIndex;
+};
+
 export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
   const {
     primaryTextSx,
@@ -31,8 +37,7 @@ export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
     const statusIdx = afterLink.indexOf(STATUS_MARKER);
 
     if (statusIdx >= 0) {
-      const lastNewline = afterLink.lastIndexOf('\n', statusIdx);
-      const lineStart = lastNewline >= 0 ? lastNewline + 1 : statusIdx;
+      const lineStart = getLineStart(afterLink, statusIdx);
       const beforeStatus = afterLink.slice(0, lineStart);
       const statusLine = afterLink.slice(lineStart);
 
@@ -60,8 +65,7 @@ export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
   } else {
     const statusIdx = bioText.indexOf(STATUS_MARKER);
     if (statusIdx >= 0) {
-      const lastNewline = bioText.lastIndexOf('\n', statusIdx);
-      const lineStart = lastNewline >= 0 ? lastNewline + 1 : statusIdx;
+      const lineStart = getLineStart(bioText, statusIdx);
       bioContent = (
         <>
           {bioText.slice(0, lineStart)}
