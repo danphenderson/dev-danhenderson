@@ -29,6 +29,7 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
     <AnimatedContentList
       items={education.entries}
       getItemKey={(entry, index) => `${entry.university}-${entry.program}-${index}`}
+      mountItemsOnView
       startDelayMs={startDelayMs}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"

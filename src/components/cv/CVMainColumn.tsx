@@ -18,6 +18,7 @@ type CVMainColumnProps = {
   volunteering: VolunteeringEntry[];
   codingExamples: CodingExample[];
   experienceDelayMs?: number;
+  experienceTriggerOnView?: boolean;
   educationDelayMs?: number;
   volunteeringDelayMs?: number;
   codingDelayMs?: number;
@@ -33,6 +34,7 @@ export const CVMainColumn = ({
   volunteering,
   codingExamples,
   experienceDelayMs = 0,
+  experienceTriggerOnView = true,
   educationDelayMs = 0,
   volunteeringDelayMs = 0,
   codingDelayMs = 0,
@@ -46,7 +48,12 @@ export const CVMainColumn = ({
   return (
     <Stack spacing={spacing}>
       {sections.includes('experience') && (
-        <SectionCard delayMs={experienceDelayMs} id={sectionIds?.experience} sx={cvSectionAnchorSx}>
+        <SectionCard
+          delayMs={experienceDelayMs}
+          triggerOnView={experienceTriggerOnView}
+          id={sectionIds?.experience}
+          sx={cvSectionAnchorSx}
+        >
           <SectionHeading overline="Experience" title="Roles & Impact" />
           <ExperienceList experiences={experiences} startDelayMs={resolvedItemOffsetMs} />
         </SectionCard>

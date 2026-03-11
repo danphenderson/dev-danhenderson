@@ -26,6 +26,7 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
     <AnimatedContentList
       items={volunteering}
       getItemKey={(entry, index) => `${entry.organization}-${entry.role}-${index}`}
+      mountItemsOnView
       startDelayMs={startDelayMs}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"

@@ -91,6 +91,18 @@ export const useCvStyles = () => {
       gap,
     });
 
+    const getSectionNavigatorContainerSx = (sticky: boolean): SxProps<Theme> => ({
+      width: '100%',
+      mb: { xs: 2.5, md: 3 },
+      ...(sticky
+        ? {
+          position: { xs: 'static', md: 'sticky' },
+          top: { md: 96 },
+          zIndex: 2,
+        }
+        : {}),
+    });
+
     const getSectionDelayMs = (
       index: number,
       startDelayMs: number = 0,
@@ -204,6 +216,60 @@ export const useCvStyles = () => {
         backdropFilter: 'blur(10px)',
         p: { xs: 2, md: 2.5 },
         transition: 'border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
+      } satisfies SxProps<Theme>,
+      getSectionNavigatorContainerSx,
+      sectionNavigatorCardSx: {
+        display: 'grid',
+        gridTemplateColumns: 'auto minmax(0, 1fr)',
+        alignItems: 'center',
+        columnGap: 1,
+        borderRadius: 999,
+        p: { xs: 1, md: 1.25 },
+        overflow: 'hidden',
+      } satisfies SxProps<Theme>,
+      sectionNavigatorLeadSx: {
+        color: accentColor,
+        whiteSpace: 'nowrap',
+        lineHeight: 1,
+        mr: 0.5,
+      } satisfies SxProps<Theme>,
+      sectionNavigatorRailSx: {
+        minWidth: 0,
+        overflowX: 'auto',
+        overflowY: 'hidden',
+        scrollbarWidth: 'thin',
+        py: 0.25,
+        pr: 0.25,
+        '&::-webkit-scrollbar': {
+          height: 6,
+        },
+        '&::-webkit-scrollbar-thumb': {
+          backgroundColor: alpha(accentColor, isLight ? 0.28 : 0.4),
+          borderRadius: 999,
+        },
+        '& > *': {
+          flexShrink: 0,
+        },
+      } satisfies SxProps<Theme>,
+      sectionNavigatorChipSx: {
+        borderColor: alpha(accentColor, isLight ? 0.28 : 0.5),
+        backgroundColor: alpha(accentColor, isLight ? 0.08 : 0.18),
+        color: accentColor,
+        fontWeight: 600,
+        height: 30,
+        cursor: 'pointer',
+        '& .MuiChip-label': {
+          px: 1.25,
+          whiteSpace: 'nowrap',
+        },
+        '&:hover': {
+          backgroundColor: alpha(accentColor, isLight ? 0.14 : 0.24),
+          boxShadow: interactiveSurfaceHoverShadow,
+        },
+        '&.Mui-focusVisible': {
+          outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
+          outlineOffset: 2,
+        },
       } satisfies SxProps<Theme>,
       overlineSx: {
         color: accentColor,

@@ -1,26 +1,17 @@
-import { ReactNode } from 'react';
 import { Box, Grid, Stack } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme as useMuiTheme } from '@mui/material/styles';
-import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import DownloadIcon from '@mui/icons-material/Download';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import UnfoldMoreIcon from '@mui/icons-material/UnfoldMore';
-import VolunteerActivismOutlinedIcon from '@mui/icons-material/VolunteerActivismOutlined';
-import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
-import WorkspacePremiumOutlinedIcon from '@mui/icons-material/WorkspacePremiumOutlined';
-import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
-import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import { AppSpeedDial, AppSpeedDialAction } from '../components/AppSpeedDial';
+import { CVSectionNavigator } from '../components/cv/CVSectionNavigator';
 import { CVMainColumn } from '../components/cv/CVMainColumn';
 import { CVSidebar } from '../components/cv/CVSidebar';
 import {
-  CVSectionKey,
-  cvProductivitySectionOrder,
+  cvSectionNavigationOrder,
   cvSectionMetadata,
 } from '../components/cv/cvSectionMetadata';
 import { PageFrame } from '../components/layout/PageFrame';
@@ -42,17 +33,6 @@ import { useGithubProfile } from '../hooks/useGithubProfile';
 import { useAppStyles } from '../styles/appStyles';
 import { useCvStyles } from '../styles/cvStyles';
 
-const cvProductivityIcons: Record<CVSectionKey, ReactNode> = {
-  about: <InfoOutlinedIcon fontSize="small" />,
-  experience: <WorkOutlineIcon fontSize="small" />,
-  education: <SchoolOutlinedIcon fontSize="small" />,
-  volunteering: <VolunteerActivismOutlinedIcon fontSize="small" />,
-  github: <GitHubIcon fontSize="small" />,
-  certificates: <WorkspacePremiumOutlinedIcon fontSize="small" />,
-  tools: <BuildOutlinedIcon fontSize="small" />,
-  coding: <CodeOutlinedIcon fontSize="small" />,
-};
-
 export default function CV() {
   const appStyles = useAppStyles();
   const { getSectionDelayMs, motionTokens } = useCvStyles();
@@ -73,13 +53,6 @@ export default function CV() {
     volunteering: cvSectionMetadata.volunteering.id,
     coding: cvSectionMetadata.coding.id,
   } as const;
-
-  const handleJumpToSection = (sectionKey: CVSectionKey) => () => {
-    document.getElementById(cvSectionMetadata[sectionKey].id)?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
-  };
 
   const aboutActions: AppSpeedDialAction[] = [
     {
@@ -111,13 +84,6 @@ export default function CV() {
     },
   ];
 
-  const productivityActions: AppSpeedDialAction[] = cvProductivitySectionOrder.map((sectionKey) => ({
-    id: `jump-${sectionKey}`,
-    label: cvSectionMetadata[sectionKey].label,
-    icon: cvProductivityIcons[sectionKey],
-    onClick: handleJumpToSection(sectionKey),
-  }));
-
   const aboutSpeedDial = (
     <Box sx={[appStyles.resumeDownloadContainerSx, { mb: 0 }]}>
       <AppSpeedDial
@@ -130,18 +96,8 @@ export default function CV() {
     </Box>
   );
 
-  const productivitySpeedDial = (
-    <AppSpeedDial
-      ariaLabel="Open CV section navigation"
-      icon={<UnfoldMoreIcon />}
-      actions={productivityActions}
-      actionLabelsAlwaysOpen
-      sx={{
-        position: 'fixed',
-        right: { xs: 16, md: 28 },
-        bottom: { xs: 16, md: 28 },
-      }}
-    />
+  const sectionNavigator = (
+    <CVSectionNavigator sections={cvSectionNavigationOrder} sticky testId="cv-section-navigator-desktop" />
   );
 
   if (isMobile) {
@@ -161,6 +117,8 @@ export default function CV() {
             stackAndTools={stackAndTools}
             sectionIds={{ about: sidebarSectionIds.about }}
           />
+
+          <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator-mobile" />
 
           <CVMainColumn
             sections={['experience', 'education', 'volunteering']}
@@ -221,7 +179,6 @@ export default function CV() {
             sectionIds={{ coding: mainSectionIds.coding }}
           />
         </Stack>
-        {productivitySpeedDial}
       </PageFrame>
     );
   }
@@ -243,6 +200,7 @@ export default function CV() {
               certificates={certificates}
               stackAndTools={stackAndTools}
               aboutDelayMs={getSectionDelayMs(0)}
+              aboutTriggerOnView={false}
               githubDelayMs={getSectionDelayMs(1)}
               certificatesDelayMs={getSectionDelayMs(2)}
               toolsDelayMs={getSectionDelayMs(3)}
@@ -256,6 +214,7 @@ export default function CV() {
 
         <Grid item xs={12} md={7} lg={8} sx={appStyles.cvMainGridItemSx}>
           <Box sx={appStyles.cvMainPaneSx}>
+            {sectionNavigator}
             <CVMainColumn
               sections={['experience', 'education', 'volunteering', 'coding']}
               experiences={experiences}
@@ -263,6 +222,7 @@ export default function CV() {
               volunteering={volunteering}
               codingExamples={codingExamples}
               experienceDelayMs={getSectionDelayMs(0)}
+              experienceTriggerOnView={false}
               educationDelayMs={getSectionDelayMs(1)}
               volunteeringDelayMs={getSectionDelayMs(2)}
               codingDelayMs={getSectionDelayMs(3)}
@@ -273,7 +233,6 @@ export default function CV() {
           </Box>
         </Grid>
       </Grid>
-      {productivitySpeedDial}
     </PageFrame>
   );
 }

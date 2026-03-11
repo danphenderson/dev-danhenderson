@@ -15,6 +15,7 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
     <AnimatedContentList
       items={examples}
       getItemKey={(example, index) => `${example.title}-${index}`}
+      mountItemsOnView
       startDelayMs={startDelayMs}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
