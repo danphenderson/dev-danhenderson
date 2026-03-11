@@ -436,10 +436,10 @@ export const experiences: Experience[] = [
     company: 'Michigan Technological University',
     companyUrl: mtuMathGraduateUrl,
     industry: 'Higher Education',
-    title: 'Instructor | Calculus I with Technology',
+    title: 'Instructor',
     startDate: 'Jan 2025',
     endDate: 'May 2025 (5 mos)',
-    description: 'Department of Mathematical Sciences Graduate Teaching Assistantship',
+    description: 'Department of Mathematical Sciences Graduate Teaching Assistantship instructor of Calculus I with Technology',
     projects: [
       'Taught a 4-credit undergraduate mathematics section, delivering recorded lectures, proctoring exams, holding office hours, and managing grading and day-to-day course operations.',
       'Delivered lecture material consistently and on schedule, maintaining alignment with the course coordinator’s instructional plan.',
@@ -453,11 +453,11 @@ export const experiences: Experience[] = [
     company: 'Michigan Technological University',
     companyUrl: mtuMathGraduateUrl,
     industry: 'Higher Education',
-    title: 'Graduate Teaching Assistant | Calculus I with Technology',
+    title: 'Graduate Teaching Assistant',
     startDate: 'Aug 2024',
     endDate: 'Dec 2024 (5 mos)',
     description:
-      'Department of Mathematical Sciences Graduate Teaching Assistantship',
+      'Department of Mathematical Sciences Graduate Teaching Assistantship assistant of Calculus I with Technology',
     projects: [
       'Managed grading and individualized feedback for an assigned section through Gradescope and office hours.',
       'Helped design rubrics so assessment remained consistent across sections.',
@@ -468,7 +468,7 @@ export const experiences: Experience[] = [
     company: 'Lucerna Health',
     companyUrl: 'https://getlucerna.com',
     industry: 'HealthTech',
-    title: 'Data Pipeline Engineer | Full Time',
+    title: 'Data Pipeline Engineer',
     startDate: 'Apr 2022',
     endDate: 'Dec 2022 (9 mos)',
     description:
@@ -565,8 +565,8 @@ export const educationInfo: EducationInfo = {
     {
       university: 'Michigan Technological University',
       program: 'MS Mathematics, Applied/Computational',
-      status: 'Expected Summer 2026',
-      dateRange: 'Fall 2024 – Present',
+      status: 'Fall 2024 – Present, Expected Summer 2026',
+      dateRange: 'Cumulative: 3.44',
       highlights: [
         'Pedagogical training in curriculum design, assessment, and evidence-based instruction.',
         'Submissions to Numerical Analysis: A Graduate Course errata, improving correctness and clarity in the text.',
@@ -576,8 +576,9 @@ export const educationInfo: EducationInfo = {
     },
     {
       university: 'Michigan Technological University',
-      program: 'B.S. Cum Laude, Mathematics, Applied/Computational & Minor in Computer Science',
-      status: 'Cumulative: 3.56 | Departmental: 3.71',
+      program: 'B.S. Cum Laude, Mathematics, Applied/Computational',
+      status: 'Minor in Computer Science',
+      dateRange: 'Cumulative: 3.56 | Departmental: 3.71',
       highlights: [
         'President & V.P., Finance Club',
         'Representative, Undergraduate Student Government',
