@@ -64,7 +64,7 @@ export default function Climbing() {
     <PageFrame image="assets/climbing/climbing-locations.png" maxWidth={1200}>
       <SectionCard sx={appStyles.climbingCardSx}>
         <Stack spacing={2}>
-          <SectionHeading overline="Climbing" title="Recorded Ascents" />
+          <SectionHeading overline="Climbing"/>
           <Typography variant="subtitle2" sx={appStyles.sectionLeadSx}>
             A collection of routes I've remembered to tick on Mountain Project.
           </Typography>
@@ -89,9 +89,9 @@ export default function Climbing() {
               loading={loading}
             />
           </Box>
-          <SectionHeading overline="Climbing" title="To-Do Routes" sx={appStyles.sectionHeadingOffsetSx} />
+          <SectionHeading overline="TODO Routes" sx={appStyles.sectionHeadingOffsetSx} />
           <Typography variant="subtitle2" sx={appStyles.sectionLeadSx}>
-            A collection of routes I'm interested in climbing
+            A collection of routes I'm interested in climbing.
           </Typography>
           {todosError && (
             <Alert severity="error" sx={appStyles.errorAlertSx}>

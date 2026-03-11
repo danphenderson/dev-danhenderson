@@ -36,11 +36,10 @@ export const CVAboutSection = ({
       <Stack spacing={2}>
         <Stack spacing={compactSidebarSectionSpacing}>
           <SectionHeading overline="About" sx={sectionHeadingCompactSx} />
-          <ProfileCard about={about} />
+          <ProfileCard about={about} actions={actions} />
         </Stack>
-        {(actions || footer) && (
+        {footer && (
           <Stack spacing={1.5}>
-            {actions}
             {footer}
           </Stack>
         )}

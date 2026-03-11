@@ -100,7 +100,7 @@ export default function CV() {
   ];
 
   const aboutSpeedDial = (
-    <Box sx={[appStyles.resumeDownloadContainerSx, { mb: 0 }]}>
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <AppSpeedDial
         ariaLabel="Open about actions"
         icon={<MoreHorizIcon />}

@@ -6,6 +6,7 @@ import { useCvStyles } from '../../styles/cvStyles';
 type ProfileCardProps = {
   about: AboutMe;
   avatarSrc?: string;
+  actions?: ReactNode;
 };
 
 const STATUS_MARKER = 'Open to opportunities';
@@ -16,8 +17,11 @@ const getLineStart = (text: string, markerIndex: number): number => {
   return lastNewline >= 0 ? lastNewline + 1 : markerIndex;
 };
 
-export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
+export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => {
   const {
+    profileInlineActionsSx,
+    profileMetaContentSx,
+    profileMetaRowSx,
     primaryTextSx,
     profileAvatarSx,
     profileBioSx,
@@ -85,26 +89,29 @@ export const ProfileCard = ({ about, avatarSrc }: ProfileCardProps) => {
         />
       )}
       <Stack spacing={0.75} width="100%">
-        <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap" sx={profileNameRowSx}>
+        <Stack direction="row" sx={profileNameRowSx}>
           <Typography variant="h4" sx={primaryTextSx}>
             {about.name}
           </Typography>
         </Stack>
 
-        <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
-          <Typography variant="subtitle2" sx={secondaryStrongSx}>
-            {about.title}
-          </Typography>
-          {about.location && (
-            <>
-              <Typography variant="subtitle2" sx={secondaryTextSx}>
-                •
-              </Typography>
-              <Typography variant="subtitle2" sx={secondaryTextSx}>
-                {about.location}
-              </Typography>
-            </>
-          )}
+        <Stack direction="row" sx={profileMetaRowSx}>
+          <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={profileMetaContentSx}>
+            <Typography variant="subtitle2" sx={secondaryStrongSx}>
+              {about.title}
+            </Typography>
+            {about.location && (
+              <>
+                <Typography variant="subtitle2" sx={secondaryTextSx}>
+                  •
+                </Typography>
+                <Typography variant="subtitle2" sx={secondaryTextSx}>
+                  {about.location}
+                </Typography>
+              </>
+            )}
+          </Stack>
+          {actions && <Box sx={profileInlineActionsSx}>{actions}</Box>}
         </Stack>
       </Stack>
       {about.bio && (

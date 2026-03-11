@@ -28,11 +28,15 @@ jest.mock('../layout/SectionCard', () => ({
 }));
 
 jest.mock('./ProfileCard', () => ({
-  ProfileCard: () => <div data-testid="profile-card" />,
+  ProfileCard: ({ actions }: { actions?: ReactNode }) => (
+    <div data-testid="profile-card">
+      {actions}
+    </div>
+  ),
 }));
 
 describe('CVAboutSection', () => {
-  it('renders profile content, actions, footer, and section card motion props', () => {
+  it('forwards actions into the profile card, renders footer, and keeps section card motion props', () => {
     render(
       <ThemeProvider>
         <CVAboutSection
@@ -53,8 +57,10 @@ describe('CVAboutSection', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('profile-card')).toBeInTheDocument();
-    expect(screen.getByTestId('about-actions')).toBeInTheDocument();
+    const profileCard = screen.getByTestId('profile-card');
+
+    expect(profileCard).toBeInTheDocument();
+    expect(profileCard).toContainElement(screen.getByTestId('about-actions'));
     expect(screen.getByTestId('about-footer')).toBeInTheDocument();
     expect(screen.getByTestId(`section-card-${cvSectionMetadata.about.id}`)).toHaveAttribute(
       'data-delay-ms',

@@ -438,6 +438,23 @@ export const useCvStyles = () => {
       getGitHubChipSx,
       getWrapListSx,
       profileNameRowSx: { rowGap: 0.5 } satisfies SxProps<Theme>,
+      profileMetaRowSx: {
+        width: '100%',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        columnGap: 1,
+        rowGap: 0.5,
+      } satisfies SxProps<Theme>,
+      profileMetaContentSx: {
+        flex: '1 1 auto',
+        minWidth: 0,
+      } satisfies SxProps<Theme>,
+      profileInlineActionsSx: {
+        display: 'flex',
+        alignItems: 'center',
+        ml: 'auto',
+        flexShrink: 0,
+      } satisfies SxProps<Theme>,
       profileAvatarSx: {
         width: 96,
         height: 96,

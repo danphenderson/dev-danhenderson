@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import ThemeProvider from '../../ThemeProvider';
 import { ProfileCard } from './ProfileCard';
 import type { AboutMe } from '../../data/cv';
@@ -21,6 +21,26 @@ describe('ProfileCard', () => {
     );
 
     expect(screen.getByText('Test User')).toBeInTheDocument();
+    expect(screen.getByText('Software Engineer')).toBeInTheDocument();
+    expect(screen.getByText('Seattle, WA')).toBeInTheDocument();
+  });
+
+  it('renders inline actions beside the title and location row without affecting profile details', () => {
+    render(
+      <ThemeProvider>
+        <ProfileCard
+          about={baseAbout}
+          actions={<button type="button">Open about actions</button>}
+        />
+      </ThemeProvider>
+    );
+
+    const title = screen.getByText('Software Engineer');
+    const metaRow = title.parentElement?.parentElement;
+
+    expect(metaRow).not.toBeNull();
+    expect(within(metaRow!).getByRole('button', { name: 'Open about actions' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Test User' })).toBeInTheDocument();
     expect(screen.getByText('Software Engineer')).toBeInTheDocument();
     expect(screen.getByText('Seattle, WA')).toBeInTheDocument();
   });

@@ -57,13 +57,23 @@ export const CVGitHubSection = ({
   const githubCalendarDelayMs = getSectionDelayMs(2, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
   const githubProjectsDelayMs = getSectionDelayMs(3, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
   const resolvedOverlineSx = overlineSx ?? sectionHeadingCompactSx;
+  const githubSubsectionCardSx: SxProps<Theme> = [
+    cardResetSx,
+    {
+      '&::after': {
+        animation: 'none',
+        boxShadow: 'none',
+        content: 'none',
+      },
+    },
+  ];
 
   return (
     <SectionCard delayMs={sectionDelayMs} id={sectionId} sx={cvSectionAnchorSx}>
       <Stack spacing={compactSidebarSectionSpacing}>
         <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
 
-        <SectionCard delayMs={githubActivityDelayMs} sx={cardResetSx}>
+        <SectionCard delayMs={githubActivityDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
             <Typography variant="subtitle2" sx={sectionTitleSx}>
               Recent Activity
@@ -79,7 +89,7 @@ export const CVGitHubSection = ({
           </Stack>
         </SectionCard>
 
-        <SectionCard delayMs={githubContributionsDelayMs} sx={cardResetSx}>
+        <SectionCard delayMs={githubContributionsDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
             <Typography variant="subtitle2" sx={sectionTitleSx}>
               Contributions
@@ -95,13 +105,13 @@ export const CVGitHubSection = ({
           </Stack>
         </SectionCard>
 
-        <SectionCard delayMs={githubCalendarDelayMs} sx={cardResetSx}>
+        <SectionCard delayMs={githubCalendarDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
             <GitHubContributionCalendar username={githubUsername} contained={false} />
           </Stack>
         </SectionCard>
 
-        <SectionCard delayMs={githubProjectsDelayMs} sx={cardResetSx}>
+        <SectionCard delayMs={githubProjectsDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
             <Typography variant="subtitle2" sx={sectionTitleSx}>
               {projectTitle}
