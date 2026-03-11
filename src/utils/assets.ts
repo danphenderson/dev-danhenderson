@@ -1,5 +1,3 @@
-export const assetBasePath = process.env.PUBLIC_URL || '';
-
 const ABSOLUTE_OR_PROTOCOL_RELATIVE_URL_REGEX = /^(?:[a-z][a-z\d+\-.]*:)?\/\//i;
 const INLINE_DATA_REGEX = /^(?:data|blob):/i;
 

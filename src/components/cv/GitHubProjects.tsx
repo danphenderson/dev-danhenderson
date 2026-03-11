@@ -1,4 +1,4 @@
-import type { GitHubProject } from '../../data/cv';
+import type { GitHubProject } from '../../types/cv';
 import { GitHubLinkChipList } from './GitHubLinkChipList';
 
 type GitHubProjectsProps = {

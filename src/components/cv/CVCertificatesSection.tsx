@@ -1,8 +1,8 @@
-import type { Certificate } from '../../data/cv';
+import type { Certificate } from '../../types/cv';
 import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { CertificatesList } from './CertificatesList';
-import { SectionHeading } from './SectionHeading';
+import { SectionHeading } from '../layout/SectionHeading';
 
 type CVCertificatesSectionProps = {
   certificates: Certificate[];

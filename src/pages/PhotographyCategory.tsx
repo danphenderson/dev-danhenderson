@@ -1,14 +1,13 @@
 import { Link as RouterLink, Navigate, useParams } from 'react-router-dom';
 import { Button, Stack, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { SectionHeading } from '../components/cv/SectionHeading';
+import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
 import { QuiltedImageList } from '../components/PhotoAlbum';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
-
-const fallbackBackgroundImage = 'assets/photography/landscape/landscape-lime-kiln.jpg';
+import { fallbackBackgroundImage } from '../data/photography';
 const legacySlugMap: Record<string, string> = {
   'new mexico': 'new-mexico',
   'new%20mexico': 'new-mexico',

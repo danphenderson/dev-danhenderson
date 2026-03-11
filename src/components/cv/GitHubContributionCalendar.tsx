@@ -1,7 +1,7 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { GitHubCalendar } from 'react-github-calendar';
 import { ContentCard } from '../ContentCard';
-import { useCvStyles } from '../../styles/cvStyles';
+import { useComponentStyles } from '../../styles/componentStyles';
 
 type GitHubContributionCalendarProps = {
   username: string;
@@ -20,7 +20,7 @@ export const GitHubContributionCalendar = ({
     githubCalendarTheme,
     sectionTitleSx,
     secondaryTextSx,
-  } = useCvStyles();
+  } = useComponentStyles();
 
   const calendarContent = (
     <Stack spacing={1}>

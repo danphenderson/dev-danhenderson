@@ -1,9 +1,9 @@
 import { Box, Stack, Typography } from '@mui/material';
-import type { CodingExample } from '../../data/cv';
+import type { CodingExample } from '../../types/cv';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel, TabPanelItem } from '../TabPanel';
 import { AnimatedContentList } from '../AnimatedContentList';
-import { useCvStyles } from '../../styles/cvStyles';
+import { useComponentStyles } from '../../styles/componentStyles';
 
 type CodingExamplesSectionProps = {
   examples: CodingExample[];
@@ -11,7 +11,7 @@ type CodingExamplesSectionProps = {
 };
 
 export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExamplesSectionProps) => {
-  const { codingExampleLinkSx, contentListStackSpacing, detailBlockSx, getDetailListSx } = useCvStyles();
+  const { codingExampleLinkSx, contentListStackSpacing, detailBlockSx, getDetailListSx } = useComponentStyles();
 
   return (
     <AnimatedContentList

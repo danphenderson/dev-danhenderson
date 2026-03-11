@@ -1,11 +1,11 @@
 import type { ReactNode } from 'react';
 import { Stack } from '@mui/material';
-import type { AboutMe } from '../../data/cv';
-import { useCvStyles } from '../../styles/cvStyles';
+import type { AboutMe } from '../../types/cv';
+import { useComponentStyles } from '../../styles/componentStyles';
 import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { ProfileCard } from './ProfileCard';
-import { SectionHeading } from './SectionHeading';
+import { SectionHeading } from '../layout/SectionHeading';
 
 type CVAboutSectionProps = {
   about: AboutMe;
@@ -24,7 +24,7 @@ export const CVAboutSection = ({
   triggerOnView = true,
   sectionId,
 }: CVAboutSectionProps) => {
-  const { compactSidebarSectionSpacing, sectionHeadingCompactSx } = useCvStyles();
+  const { compactSidebarSectionSpacing, sectionHeadingCompactSx } = useComponentStyles();
 
   return (
     <SectionCard

@@ -1,11 +1,11 @@
 import { Button, Chip } from '@mui/material';
 import { fireEvent, render, screen } from '@testing-library/react';
 import ThemeProvider from '../ThemeProvider';
-import { useCvStyles } from '../styles/cvStyles';
+import { useComponentStyles } from '../styles/componentStyles';
 import { TabPanel } from './TabPanel';
 
 const IndustryChip = () => {
-  const { experienceIndustryChipSx } = useCvStyles();
+  const { experienceIndustryChipSx } = useComponentStyles();
 
   return <Chip size="small" label="Industry" variant="outlined" sx={experienceIndustryChipSx} />;
 };

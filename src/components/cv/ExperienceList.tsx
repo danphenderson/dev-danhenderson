@@ -5,11 +5,11 @@ import type {
   ExperienceDescription,
   ExperienceProject,
   ExperienceProjectSegment,
-} from '../../data/cv';
+} from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel, TabPanelItem } from '../TabPanel';
-import { useCvStyles } from '../../styles/cvStyles';
+import { useComponentStyles } from '../../styles/componentStyles';
 
 type ExperienceListProps = {
   experiences: Experience[];
@@ -38,7 +38,7 @@ const renderExperienceDescription = (description: ExperienceDescription) =>
   typeof description === 'string' ? description : renderInlineSegments(description);
 
 const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) => {
-  const { getDetailListSx } = useCvStyles();
+  const { getDetailListSx } = useComponentStyles();
 
   if (!projects || projects.length === 0) {
     return null;
@@ -92,7 +92,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
     secondaryStrongSx,
     secondaryTextSx,
     sectionTitleSx,
-  } = useCvStyles();
+  } = useComponentStyles();
 
   return (
     <AnimatedContentList

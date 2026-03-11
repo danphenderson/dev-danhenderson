@@ -1,6 +1,6 @@
 import { Box, Chip, Stack, Typography } from '@mui/material';
 import { CVSectionKey, cvSectionMetadata } from './cvSectionMetadata';
-import { useCvStyles } from '../../styles/cvStyles';
+import { useComponentStyles } from '../../styles/componentStyles';
 
 type CVSectionNavigatorProps = {
   sections: CVSectionKey[];
@@ -16,7 +16,7 @@ export const CVSectionNavigator = ({
     sectionNavigatorLeadSx,
     sectionNavigatorRailSx,
     sectionNavigatorChipSx,
-  } = useCvStyles();
+  } = useComponentStyles();
 
   const handleJumpToSection = (sectionKey: CVSectionKey) => () => {
     document.getElementById(cvSectionMetadata[sectionKey].id)?.scrollIntoView({

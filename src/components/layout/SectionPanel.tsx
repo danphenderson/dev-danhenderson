@@ -1,10 +1,10 @@
 import { Box } from '@mui/material';
 import type { BoxProps } from '@mui/material';
-import { useCvStyles } from '../../styles/cvStyles';
+import { useComponentStyles } from '../../styles/componentStyles';
 import { normalizeSxProp } from '../../utils/sx';
 
 export const SectionPanel = ({ children, sx, ...props }: BoxProps) => {
-  const { sectionPanelSx } = useCvStyles();
+  const { sectionPanelSx } = useComponentStyles();
 
   return (
     <Box

@@ -1,7 +1,7 @@
 import { Box, Link, Stack, Typography } from '@mui/material';
-import type { VolunteeringEntry } from '../../data/cv';
+import type { VolunteeringEntry } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
-import { useCvStyles } from '../../styles/cvStyles';
+import { useComponentStyles } from '../../styles/componentStyles';
 
 type VolunteeringListProps = {
   volunteering: VolunteeringEntry[];
@@ -16,7 +16,7 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
     secondaryStrongSx,
     sectionTitleSx,
     volunteeringMetaSx,
-  } = useCvStyles();
+  } = useComponentStyles();
 
   if (volunteering.length === 0) {
     return null;

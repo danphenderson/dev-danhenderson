@@ -1,10 +1,11 @@
 import { Button, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import BackgroundPaper from '../components/BackgroundPaper';
+import { fallbackBackgroundImage } from '../data/photography';
 
 export default function NotFound() {
   return (
-    <BackgroundPaper image='assets/photography/landscape/landscape-lime-kiln.jpg'>
+    <BackgroundPaper image={fallbackBackgroundImage}>
       <Typography variant="h2" marginTop={3}>404 Not Found</Typography>
       <Typography variant="body1" sx={{ mt: 1, opacity: 0.85 }}>
         The page you&apos;re looking for doesn&apos;t exist.

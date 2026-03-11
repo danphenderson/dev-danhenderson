@@ -1,106 +1,46 @@
-import { assetBasePath } from '../utils/assets';
+import type {
+  AboutMe,
+  Certificate,
+  CodingExample,
+  EducationInfo,
+  Experience,
+  GitHubActivityItem,
+  GitHubContribution,
+  GitHubProject,
+  StackSection,
+  VolunteeringEntry,
+} from '../types/cv';
+import { resolvePublicAssetPath } from '../utils/assets';
 
-export { assetBasePath };
+export type {
+  AboutMe,
+  Certificate,
+  CodingExample,
+  CodingExampleTab,
+  EducationEntry,
+  EducationInfo,
+  Experience,
+  ExperienceDescription,
+  ExperienceProject,
+  ExperienceProjectSegment,
+  GitHubActivityItem,
+  GitHubContribution,
+  GitHubProject,
+  StackSection,
+  VolunteeringEntry,
+} from '../types/cv';
 
-export const avatar = `${assetBasePath}/assets/home.jpg`;
-export const cvBackgroundImage = `${assetBasePath}/assets/photography/landscape/landscape-tieton-south-fork-3.jpg`;
-export const resumePdfUrl = `${assetBasePath}/assets/daniel-henderson-resume.pdf`;
+const assetPath = (path: string) => resolvePublicAssetPath(path);
+
+export const avatar = assetPath('/assets/home.jpg');
+export const cvBackgroundImage = assetPath('/assets/photography/landscape/landscape-tieton-south-fork-3.jpg');
+export const resumePdfUrl = assetPath('/assets/daniel-henderson-resume.pdf');
 export const resumeDownloadFilename = 'Daniel-Henderson-Resume.pdf';
 
 export const githubUsername = 'danphenderson';
 export const githubProfileUrl = 'https://github.com/danphenderson';
 export const linkedinProfileUrl = 'https://www.linkedin.com/in/daniel-henderson-6a9485bb/';
 const mtuMathGraduateUrl = 'https://www.mtu.edu/math/graduate/students/';
-
-export type AboutMe = {
-  name: string;
-  title: string;
-  email: string;
-  phone: string;
-  location: string;
-  bio: string;
-  bioLink?: {
-    text: string;
-    url: string;
-  };
-};
-
-export type CodingExample = {
-  title: string;
-  description: string;
-  links: string[];
-  tabs?: CodingExampleTab[];
-};
-
-export type CodingExampleTab =
-  | {
-      value: string;
-      label: string;
-      kind: 'list';
-      items: string[];
-    }
-  | {
-      value: string;
-      label: string;
-      kind: 'skills';
-      skills: string[];
-    };
-
-export type Certificate = {
-  title: string;
-  issuer: string;
-  date: string;
-  link?: string;
-};
-
-export type ExperienceProjectSegment = { text: string; link?: string; lineBreakBefore?: boolean };
-export type ExperienceDescription = string | ExperienceProjectSegment[];
-export type ExperienceProject = string | ExperienceProjectSegment | ExperienceProjectSegment[];
-
-export type Experience = {
-  company: string;
-  companyUrl?: string;
-  industry?: string;
-  title: string;
-  startDate: string;
-  endDate: string;
-  impactHighlights?: string[];
-  description?: ExperienceDescription;
-  projects?: ExperienceProject[];
-  skills?: string[];
-};
-
-export type EducationInfo = {
-  entries: EducationEntry[];
-};
-
-export type EducationEntry = {
-  university: string;
-  program: string;
-  status?: string;
-  dateRange?: string;
-  highlights?: string[];
-  skills?: string[];
-};
-
-export type VolunteeringEntry = {
-  organization: string;
-  organizationUrl?: string;
-  role: string;
-  dateRange: string;
-  location?: string;
-  highlights: string[];
-};
-
-export type StackSection = {
-  title: string;
-  tabLabel?: string;
-  items: string[];
-};
-
-export type GitHubActivityItem = { label: string; href?: string };
-export type GitHubContribution = { name: string; url: string; stars?: number };
-export type GitHubProject = { name: string; url: string };
 
 export const aboutMe: AboutMe = {
   name: 'Daniel Henderson',
@@ -394,13 +334,13 @@ export const certificates: Certificate[] = [
     title: 'AWS Certified Solutions Architect – Associate',
     issuer: 'Amazon Web Services',
     date: 'February 5th, 2024',
-    link: `${assetBasePath}/assets/aws-soln-architect-cert.pdf`,
+    link: assetPath('/assets/aws-soln-architect-cert.pdf'),
   },
   {
     title: 'AWS Cloud Practitioner',
     issuer: 'Amazon Web Services',
     date: 'January 19th, 2024',
-    link: `${assetBasePath}/assets/aws-cloud-practitioner-cert.pdf`,
+    link: assetPath('/assets/aws-cloud-practitioner-cert.pdf'),
   },
 ];
 
@@ -483,7 +423,7 @@ export const experiences: Experience[] = [
       "Centralized infrastructure delivery by building an internal CDK library through a major refactor that removed technical debt and git submodules, while introducing semantic versioning practices, enabling more reliable and efficient deployments.",
       "Migrated data team’s software assets from Bitbucket to GitHub Enterprise, standardizing CI/CD into GitHub Actions and hooks.",
       "Processed AWS CloudTrail logs into Parquet and built a dashboard to support security analytics and HITRUST compliance.",
-      "Supported hiring and onboarding during an organizational transition, including new engineering and data leadership and interns.",
+      "Supported hiring and onboarding during an organizational transition, including new engineering and data leadership and interns, and helped ensure continuity through a reorganization that included my departure.",
     ],
     skills: [
       'AWS: EC2, S3, SNS, SQS, Cloudformation, Cloudtrail, Cloudwatch, Lambda, Glue (& Glue Data Catalog), EMR, Redshift, RDS, Athena, Quicksight', 'Python', 'PySpark', 'Jupyter', 'DBT (Data Build Tool)', 'GitHub Enterprise', 'Docker',

@@ -2,7 +2,7 @@ import { keyframes } from '@emotion/react';
 import { LinearProgress, Stack } from '@mui/material';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useAppStyles } from '../styles/appStyles';
-import { useCvStyles } from '../styles/cvStyles';
+import { useComponentStyles } from '../styles/componentStyles';
 
 type LoadingBarsProps = {
   label?: string;
@@ -18,7 +18,7 @@ const pulse = keyframes`
 export const LoadingBars = ({ label = 'Loading', compact = false }: LoadingBarsProps) => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const appStyles = useAppStyles();
-  const { motionTokens } = useCvStyles();
+  const { motionTokens } = useComponentStyles();
   const barHeight = compact ? 4 : 6;
   const barSpacing = compact ? 0.75 : 1;
   const pulseAnimation = prefersReducedMotion

@@ -1,9 +1,9 @@
 import { Box, Stack, Typography } from '@mui/material';
-import type { EducationInfo } from '../../data/cv';
+import type { EducationInfo } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel, TabPanelItem } from '../TabPanel';
-import { useCvStyles } from '../../styles/cvStyles';
+import { useComponentStyles } from '../../styles/componentStyles';
 
 type EducationSectionProps = {
   education: EducationInfo;
@@ -47,7 +47,7 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
     getDetailListSx,
     sectionTitleSx,
     secondaryTextSx,
-  } = useCvStyles();
+  } = useComponentStyles();
 
   if (!education.entries || education.entries.length === 0) {
     return null;

@@ -6,11 +6,11 @@ import {
   breathe,
   reducedMotionSx,
   shimmerSweep,
-} from './cvAnimations';
+} from './animations';
 
 type GitHubChipLayout = 'stack' | 'wrap';
 
-export const useCvStyles = () => {
+export const useComponentStyles = () => {
   const theme = useMuiTheme();
 
   return useMemo(() => {
