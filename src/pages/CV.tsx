@@ -105,6 +105,7 @@ export default function CV() {
         ariaLabel="Open about actions"
         icon={<MoreHorizIcon />}
         actions={aboutActions}
+        FabProps={{ size: 'small' }}
         direction="left"
         actionTooltipPlacement="top"
       />
