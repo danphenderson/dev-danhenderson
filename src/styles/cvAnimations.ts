@@ -3,11 +3,11 @@ import { keyframes } from '@emotion/react';
 /**
  * Shimmer sweep – a translucent highlight that slides across an element.
  * Applied via a `::after` pseudo-element with a linear-gradient background.
- * Used on: section overline labels, GitHub section header.
+ * Used on: interactive tab hover states.
  */
 export const shimmerSweep = keyframes`
-  0%   { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0%   { transform: translateX(-115%); }
+  100% { transform: translateX(115%); }
 `;
 
 /**
@@ -16,8 +16,14 @@ export const shimmerSweep = keyframes`
  * Used on: industry tags, skill chips, contribution chips.
  */
 export const ambientPulse = keyframes`
-  0%, 100% { opacity: 0; }
-  50%      { opacity: 1; }
+  0%, 100% {
+    opacity: 0.08;
+    transform: scale(0.99);
+  }
+  50% {
+    opacity: 0.92;
+    transform: scale(1.0);
+  }
 `;
 
 /**
@@ -35,8 +41,14 @@ export const backgroundSweep = keyframes`
  * Used on: "Open to opportunities" status text.
  */
 export const breathe = keyframes`
-  0%, 100% { opacity: 0.78; }
-  50%      { opacity: 1; }
+  0%, 100% {
+    opacity: 0.78;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-1px);
+  }
 `;
 
 /** Disable all ambient animations when the user prefers reduced motion. */

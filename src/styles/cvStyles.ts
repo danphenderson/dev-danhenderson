@@ -25,6 +25,14 @@ export const useCvStyles = () => {
     const compactSidebarSectionSpacing = 0;
     const accentColor = theme.palette.primary.main;
     const isLight = theme.palette.mode === 'light';
+    const ambientMotion = {
+      tabHoverShimmerMs: 900,
+      pillPulseMs: 4200,
+      chipWaveMs: 7600,
+      borderGlowMs: 6800,
+      statusBreatheMs: 2800,
+      chipWaveDelaySeconds: 0.55,
+    } as const;
     const cardGradientStart = alpha(
       isLight ? theme.palette.common.white : theme.palette.background.paper,
       isLight ? 0.92 : 0.84
@@ -186,7 +194,7 @@ export const useCvStyles = () => {
       },
       '&:hover::after': {
         opacity: 1,
-        animation: `${shimmerSweep} 1.2s ease-in-out`,
+        animation: `${shimmerSweep} ${ambientMotion.tabHoverShimmerMs}ms linear`,
       },
       '&.Mui-selected': {
         ...interactiveAccentTextSx,
@@ -223,25 +231,10 @@ export const useCvStyles = () => {
 
     /* ── ambient animation helpers ────────────────────────────── */
 
-    const shimmerGradient = `linear-gradient(90deg, transparent 0%, ${alpha(accentColor, isLight ? 0.10 : 0.14)} 50%, transparent 100%)`;
-    const glowShadow = `0 0 8px 2px ${alpha(accentColor, isLight ? 0.12 : 0.18)}`;
-    const borderGlowShadow = `0 0 14px 0 ${alpha(accentColor, isLight ? 0.06 : 0.10)}`;
-    const chipWaveGradient = `linear-gradient(90deg, transparent 25%, ${alpha(accentColor, isLight ? 0.07 : 0.10)} 50%, transparent 75%)`;
-
-    /** Pseudo-element shimmer overlay for section overlines and header rails. */
-    const shimmerOverlaySx = {
-      position: 'relative' as const,
-      overflow: 'hidden' as const,
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        inset: 0,
-        background: shimmerGradient,
-        animation: `${shimmerSweep} 8s ease-in-out infinite`,
-        pointerEvents: 'none',
-      },
-      ...reducedMotionSx,
-    };
+    const shimmerGradient = `linear-gradient(90deg, transparent 0%, ${alpha(accentColor, isLight ? 0.04 : 0.08)} 18%, ${alpha(theme.palette.primary.light, isLight ? 0.24 : 0.2)} 50%, ${alpha(accentColor, isLight ? 0.12 : 0.16)} 82%, transparent 100%)`;
+    const glowShadow = `0 0 12px 2px ${alpha(accentColor, isLight ? 0.18 : 0.26)}, 0 0 24px 4px ${alpha(accentColor, isLight ? 0.10 : 0.18)}`;
+    const borderGlowShadow = `0 0 18px 2px ${alpha(accentColor, isLight ? 0.12 : 0.2)}, 0 0 28px 6px ${alpha(accentColor, isLight ? 0.06 : 0.12)}`;
+    const chipWaveGradient = `linear-gradient(90deg, transparent 0%, ${alpha(accentColor, isLight ? 0.04 : 0.08)} 18%, ${alpha(theme.palette.primary.light, isLight ? 0.18 : 0.16)} 50%, ${alpha(accentColor, isLight ? 0.09 : 0.14)} 82%, transparent 100%)`;
 
     /** Pulse glow pseudo-element for pills and tags. */
     const pillPulseOverlaySx = {
@@ -250,11 +243,11 @@ export const useCvStyles = () => {
       '&::after': {
         content: '""',
         position: 'absolute',
-        inset: -1,
+        inset: -2,
         borderRadius: 'inherit',
         boxShadow: glowShadow,
         opacity: 0,
-        animation: `${ambientPulse} 6s ease-in-out infinite`,
+        animation: `${ambientPulse} ${ambientMotion.pillPulseMs}ms ease-in-out infinite`,
         pointerEvents: 'none',
       },
       ...reducedMotionSx,
@@ -263,9 +256,10 @@ export const useCvStyles = () => {
     /** Background-position sweep for chip rows (wave effect). */
     const chipWaveSx = {
       backgroundImage: chipWaveGradient,
-      backgroundSize: '200% 100%',
+      backgroundSize: '240% 100%',
       backgroundRepeat: 'no-repeat' as const,
-      animation: `${backgroundSweep} 12s ease-in-out infinite`,
+      backgroundPosition: '200% center',
+      animation: `${backgroundSweep} ${ambientMotion.chipWaveMs}ms linear infinite`,
       ...reducedMotionSx,
     };
 
@@ -275,29 +269,56 @@ export const useCvStyles = () => {
       '&::after': {
         content: '""',
         position: 'absolute',
-        inset: 0,
+        inset: -1,
         borderRadius: 'inherit',
         boxShadow: borderGlowShadow,
         opacity: 0,
-        animation: `${ambientPulse} 10s ease-in-out infinite`,
+        animation: `${ambientPulse} ${ambientMotion.borderGlowMs}ms ease-in-out infinite`,
         pointerEvents: 'none',
         zIndex: 0,
       },
       ...reducedMotionSx,
     };
 
+    const textBreatheSx = {
+      display: 'inline-block' as const,
+      transformOrigin: 'left center',
+      animation: `${breathe} ${ambientMotion.statusBreatheMs}ms ease-in-out infinite`,
+      ...reducedMotionSx,
+    };
+
     /** Breathing opacity for "Open to opportunities" status text. */
     const statusBreatheSx = {
-      display: 'inline' as const,
-      animation: `${breathe} 4s ease-in-out infinite`,
-      ...reducedMotionSx,
+      ...textBreatheSx,
+      fontWeight: 600,
+      textShadow: `0 0 10px ${alpha(accentColor, isLight ? 0.12 : 0.22)}`,
+    };
+
+    const sectionHeadingTextBreatheSx = {
+      ...textBreatheSx,
+      textShadow: `0 0 8px ${alpha(accentColor, isLight ? 0.08 : 0.16)}`,
+    };
+
+    const sectionHeadingOverlineTextSx = {
+      ...sectionHeadingTextBreatheSx,
+      animationDelay: '0ms',
+    };
+
+    const sectionHeadingTitleTextSx = {
+      ...sectionHeadingTextBreatheSx,
+      animationDelay: '120ms',
+    };
+
+    const sectionHeadingSubtitleTextSx = {
+      ...sectionHeadingTextBreatheSx,
+      animationDelay: '240ms',
     };
 
     /**
      * Returns per-chip animation-delay for a staggered wave effect.
      * Use with `chipWaveSx` on individual chips.
      */
-    const getChipWaveDelaySx = (index: number, interval = 1.8) => ({
+    const getChipWaveDelaySx = (index: number, interval = ambientMotion.chipWaveDelaySeconds) => ({
       animationDelay: `${index * interval}s`,
     });
 
@@ -365,9 +386,8 @@ export const useCvStyles = () => {
         letterSpacing: '0.18em',
         fontWeight: 700,
         textTransform: 'uppercase',
-        display: 'inline-block',
-        ...shimmerOverlaySx,
       } satisfies SxProps<Theme>,
+      sectionHeadingOverlineTextSx: sectionHeadingOverlineTextSx satisfies SxProps<Theme>,
       sectionTitleSx: {
         color: 'text.primary',
         fontWeight: 700,
@@ -382,14 +402,16 @@ export const useCvStyles = () => {
       } satisfies SxProps<Theme>,
       secondaryTextSx: { color: 'text.secondary' } satisfies SxProps<Theme>,
       primaryTextSx: { color: 'text.primary' } satisfies SxProps<Theme>,
-      sectionHeadingTitleSx: (subtitle?: string): SxProps<Theme> => ({
+      sectionHeadingTitleSx: (subtitle?: string) => ({
         mb: subtitle ? 1 : 2,
         color: 'text.primary',
-      }),
+      } satisfies SxProps<Theme>),
+      sectionHeadingTitleTextSx: sectionHeadingTitleTextSx satisfies SxProps<Theme>,
       sectionHeadingSubtitleSx: {
         mb: 2,
         color: 'text.secondary',
       } satisfies SxProps<Theme>,
+      sectionHeadingSubtitleTextSx: sectionHeadingSubtitleTextSx satisfies SxProps<Theme>,
       sectionHeadingCompactSx: { mb: 0 } satisfies SxProps<Theme>,
       subtleBorder,
       subtleSurface,
