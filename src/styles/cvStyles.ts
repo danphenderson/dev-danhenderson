@@ -189,6 +189,13 @@ export const useCvStyles = () => {
       backdropFilter: 'none',
     };
 
+    const sharedPillChipSx = {
+      border: subtleBorder,
+      backgroundColor: subtleSurface,
+      fontWeight: 500,
+      color: 'text.primary',
+    } satisfies SxProps<Theme>;
+
     return {
       motionTokens,
       contentListStackSpacing,
@@ -206,11 +213,10 @@ export const useCvStyles = () => {
         transition: 'border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
       } satisfies SxProps<Theme>,
       sectionNavigatorRootSx: {
-        display: 'grid',
-        gridTemplateColumns: 'auto minmax(0, 1fr)',
-        alignItems: 'center',
-        columnGap: 1,
-        rowGap: 0.75,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        gap: 0.75,
         width: '100%',
         borderRadius: 1.5,
         border: subtleBorder,
@@ -221,39 +227,26 @@ export const useCvStyles = () => {
         color: accentColor,
         whiteSpace: 'nowrap',
         lineHeight: 1,
-        mr: 0.5,
       } satisfies SxProps<Theme>,
       sectionNavigatorRailSx: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 0.75,
+        alignItems: 'center',
         minWidth: 0,
-        overflowX: 'auto',
-        overflowY: 'hidden',
-        scrollbarWidth: 'thin',
-        py: 0.25,
-        pr: 0.25,
-        '&::-webkit-scrollbar': {
-          height: 6,
-        },
-        '&::-webkit-scrollbar-thumb': {
-          backgroundColor: alpha(accentColor, isLight ? 0.28 : 0.4),
-          borderRadius: 999,
-        },
-        '& > *': {
-          flexShrink: 0,
-        },
+        width: '100%',
       } satisfies SxProps<Theme>,
       sectionNavigatorChipSx: {
-        borderColor: alpha(accentColor, isLight ? 0.28 : 0.5),
-        backgroundColor: alpha(accentColor, isLight ? 0.08 : 0.18),
-        color: accentColor,
-        fontWeight: 600,
-        height: 30,
+        ...sharedPillChipSx,
+        height: 32,
         cursor: 'pointer',
         '& .MuiChip-label': {
           px: 1.25,
           whiteSpace: 'nowrap',
         },
         '&:hover': {
-          backgroundColor: alpha(accentColor, isLight ? 0.14 : 0.24),
+          backgroundColor: alpha(accentColor, isLight ? 0.1 : 0.16),
+          borderColor: alpha(accentColor, isLight ? 0.36 : 0.52),
           boxShadow: interactiveSurfaceHoverShadow,
         },
         '&.Mui-focusVisible': {
@@ -432,10 +425,7 @@ export const useCvStyles = () => {
       getTabSx,
       getTabPanelBodySx,
       skillsChipSx: {
-        border: subtleBorder,
-        backgroundColor: subtleSurface,
-        fontWeight: 500,
-        color: 'text.primary',
+        ...sharedPillChipSx,
       } satisfies SxProps<Theme>,
       skillsWrapSx: {
         display: 'flex',
