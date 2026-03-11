@@ -1,10 +1,10 @@
 import { Stack } from '@mui/material';
-import type { StackSection } from '../../data/cv';
-import { useCvStyles } from '../../styles/cvStyles';
+import type { StackSection } from '../../types/cv';
+import { useComponentStyles } from '../../styles/componentStyles';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel, TabPanelItem } from '../TabPanel';
-import { SectionHeading } from './SectionHeading';
+import { SectionHeading } from '../layout/SectionHeading';
 
 type StackAndToolsSectionProps = {
   sections: StackSection[];
@@ -18,7 +18,7 @@ export const StackAndToolsSection = ({
   const {
     compactSidebarSectionSpacing,
     sectionHeadingCompactSx,
-  } = useCvStyles();
+  } = useComponentStyles();
   const stackTabs: TabPanelItem[] = sections.map((section, index) => ({
     value: `${index}`,
     label: section.title,

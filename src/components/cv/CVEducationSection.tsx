@@ -1,8 +1,8 @@
-import type { EducationInfo } from '../../data/cv';
+import type { EducationInfo } from '../../types/cv';
 import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { EducationSection } from './EducationSection';
-import { SectionHeading } from './SectionHeading';
+import { SectionHeading } from '../layout/SectionHeading';
 
 type CVEducationSectionProps = {
   education: EducationInfo;

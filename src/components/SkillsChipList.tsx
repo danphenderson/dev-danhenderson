@@ -1,6 +1,6 @@
 import { Chip } from '@mui/material';
 import { AnimatedZoomList } from './AnimatedZoomList';
-import { useCvStyles } from '../styles/cvStyles';
+import { useComponentStyles } from '../styles/componentStyles';
 
 type SkillsChipListProps = {
   skills?: string[];
@@ -13,7 +13,7 @@ export const SkillsChipList = ({
   dense = false,
   in: inProp = true,
 }: SkillsChipListProps) => {
-  const { chipWaveSx, getChipWaveDelaySx, skillsChipSx, skillsWrapSx } = useCvStyles();
+  const { chipWaveSx, getChipWaveDelaySx, skillsChipSx, skillsWrapSx } = useComponentStyles();
   const filteredSkills = skills.filter((skill): skill is string => typeof skill === 'string' && skill.trim().length > 0);
 
   if (filteredSkills.length === 0) {

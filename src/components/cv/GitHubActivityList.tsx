@@ -1,7 +1,7 @@
 import { Box, Typography } from '@mui/material';
-import type { GitHubActivityItem } from '../../data/cv';
+import type { GitHubActivityItem } from '../../types/cv';
 import { LoadingBars } from '../LoadingBars';
-import { useCvStyles } from '../../styles/cvStyles';
+import { useComponentStyles } from '../../styles/componentStyles';
 import { GitHubLinkChipList } from './GitHubLinkChipList';
 
 type GitHubActivityListProps = {
@@ -19,7 +19,7 @@ export const GitHubActivityList = ({
   startDelayMs = 0,
   itemStaggerMs,
 }: GitHubActivityListProps) => {
-  const { secondaryTextSx } = useCvStyles();
+  const { secondaryTextSx } = useComponentStyles();
 
   return (
     <Box>

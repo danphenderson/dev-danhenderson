@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import ThemeProvider from '../../ThemeProvider';
 import { ProfileCard } from './ProfileCard';
-import type { AboutMe } from '../../data/cv';
+import type { AboutMe } from '../../types/cv';
 
 const baseAbout: AboutMe = {
   name: 'Test User',

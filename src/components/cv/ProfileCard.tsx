@@ -1,7 +1,7 @@
 import { Avatar, Box, Link, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import type { AboutMe } from '../../data/cv';
-import { useCvStyles } from '../../styles/cvStyles';
+import type { AboutMe } from '../../types/cv';
+import { useComponentStyles } from '../../styles/componentStyles';
 
 type ProfileCardProps = {
   about: AboutMe;
@@ -29,7 +29,7 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
     secondaryStrongSx,
     secondaryTextSx,
     statusBreatheSx,
-  } = useCvStyles();
+  } = useComponentStyles();
   const bioLink = about.bioLink;
   const bioText = about.bio;
   const bioLinkIndex = bioLink ? bioText.indexOf(bioLink.text) : -1;

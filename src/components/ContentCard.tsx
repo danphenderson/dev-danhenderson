@@ -1,7 +1,7 @@
 import { ElementType } from 'react';
 import { Box, BoxProps } from '@mui/material';
 import { SxProps, Theme } from '@mui/material/styles';
-import { useCvStyles } from '../styles/cvStyles';
+import { useComponentStyles } from '../styles/componentStyles';
 
 export type ContentCardProps<RootComponent extends ElementType = 'div'> = BoxProps<RootComponent> & {
   sx?: SxProps<Theme>;
@@ -15,7 +15,7 @@ export const ContentCard = <RootComponent extends ElementType = 'div'>({
   sx,
   ...props
 }: ContentCardProps<RootComponent>) => {
-  const { contentCardSx } = useCvStyles();
+  const { contentCardSx } = useComponentStyles();
   const sxArray = Array.isArray(sx) ? sx : sx ? [sx] : [];
 
   return (

@@ -1,0 +1,89 @@
+export type AboutMe = {
+  name: string;
+  title: string;
+  email: string;
+  phone: string;
+  location: string;
+  bio: string;
+  bioLink?: {
+    text: string;
+    url: string;
+  };
+};
+
+export type CodingExample = {
+  title: string;
+  description: string;
+  links: string[];
+  tabs?: CodingExampleTab[];
+};
+
+export type CodingExampleTab =
+  | {
+      value: string;
+      label: string;
+      kind: 'list';
+      items: string[];
+    }
+  | {
+      value: string;
+      label: string;
+      kind: 'skills';
+      skills: string[];
+    };
+
+export type Certificate = {
+  title: string;
+  issuer: string;
+  date: string;
+  link?: string;
+};
+
+export type ExperienceProjectSegment = { text: string; link?: string; lineBreakBefore?: boolean };
+export type ExperienceDescription = string | ExperienceProjectSegment[];
+export type ExperienceProject = string | ExperienceProjectSegment | ExperienceProjectSegment[];
+
+export type Experience = {
+  company: string;
+  companyUrl?: string;
+  industry?: string;
+  title: string;
+  startDate: string;
+  endDate: string;
+  impactHighlights?: string[];
+  description?: ExperienceDescription;
+  projects?: ExperienceProject[];
+  skills?: string[];
+};
+
+export type EducationInfo = {
+  entries: EducationEntry[];
+};
+
+export type EducationEntry = {
+  university: string;
+  program: string;
+  status?: string;
+  dateRange?: string;
+  highlights?: string[];
+  skills?: string[];
+};
+
+export type VolunteeringEntry = {
+  organization: string;
+  organizationUrl?: string;
+  role: string;
+  dateRange: string;
+  location?: string;
+  highlights: string[];
+};
+
+export type StackSection = {
+  title: string;
+  tabLabel?: string;
+  items: string[];
+};
+
+export type GitHubActivityItem = { label: string; href?: string };
+export type GitHubContribution = { name: string; url: string; stars?: number };
+export type GitHubProject = { name: string; url: string };

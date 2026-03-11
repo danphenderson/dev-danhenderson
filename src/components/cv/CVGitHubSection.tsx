@@ -4,16 +4,16 @@ import type {
   GitHubActivityItem,
   GitHubContribution,
   GitHubProject,
-} from '../../data/cv';
+} from '../../types/cv';
 import { githubUsername } from '../../data/cv';
-import { useCvStyles } from '../../styles/cvStyles';
+import { useComponentStyles } from '../../styles/componentStyles';
 import { SectionCard } from '../layout/SectionCard';
 import { SectionPanel } from '../layout/SectionPanel';
 import { GitHubActivityList } from './GitHubActivityList';
 import { GitHubContributionCalendar } from './GitHubContributionCalendar';
 import { GitHubContributions } from './GitHubContributions';
 import { GitHubProjects } from './GitHubProjects';
-import { SectionHeading } from './SectionHeading';
+import { SectionHeading } from '../layout/SectionHeading';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 
 type CVGitHubSectionProps = {
@@ -50,7 +50,7 @@ export const CVGitHubSection = ({
     motionTokens,
     sectionHeadingCompactSx,
     sectionTitleSx,
-  } = useCvStyles();
+  } = useComponentStyles();
   const resolvedItemOffsetMs = itemOffsetMs ?? motionTokens.itemOffsetMs;
   const githubActivityDelayMs = getSectionDelayMs(0, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
   const githubContributionsDelayMs = getSectionDelayMs(1, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);

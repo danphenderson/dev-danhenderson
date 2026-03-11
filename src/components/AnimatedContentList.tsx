@@ -2,7 +2,7 @@ import { ReactNode, useEffect, useRef, useState } from 'react';
 import { Box, Stack } from '@mui/material';
 import { SxProps, Theme } from '@mui/material/styles';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
-import { useCvStyles } from '../styles/cvStyles';
+import { useComponentStyles } from '../styles/componentStyles';
 import { AnimatedContentCard } from './AnimatedContentCard';
 
 type AnimatedContentListLayout = 'stack' | 'wrap';
@@ -53,7 +53,7 @@ export const AnimatedContentList = <Item,>({
     motionTokens,
     sectionPanelSx,
     wrapItemContainerSx,
-  } = useCvStyles();
+  } = useComponentStyles();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hasEnteredView, setHasEnteredView] = useState(!mountItemsOnView || prefersReducedMotion);
   const containerSxArray = Array.isArray(containerSx) ? containerSx : containerSx ? [containerSx] : [];

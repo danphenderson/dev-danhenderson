@@ -45,7 +45,7 @@ import {
   cvPageSectionLayout,
 } from './cvPageLayout';
 import { useAppStyles } from '../styles/appStyles';
-import { useCvStyles } from '../styles/cvStyles';
+import { useComponentStyles } from '../styles/componentStyles';
 
 type CVResolvedSectionDescriptor = {
   id: string;
@@ -61,7 +61,7 @@ type CVResolvedSectionDescriptor = {
 
 export default function CV() {
   const appStyles = useAppStyles();
-  const { motionTokens } = useCvStyles();
+  const { motionTokens } = useComponentStyles();
   const { activity, projects, contributions, loading, error } = useGithubProfile();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
