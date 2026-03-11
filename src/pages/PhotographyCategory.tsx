@@ -7,8 +7,7 @@ import { SectionCard } from '../components/layout/SectionCard';
 import { QuiltedImageList } from '../components/PhotoAlbum';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
-
-const fallbackBackgroundImage = 'assets/photography/landscape/landscape-lime-kiln.jpg';
+import { fallbackBackgroundImage } from '../data/photography';
 const legacySlugMap: Record<string, string> = {
   'new mexico': 'new-mexico',
   'new%20mexico': 'new-mexico',

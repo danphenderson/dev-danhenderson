@@ -7,8 +7,7 @@ import { SectionCard } from '../components/layout/SectionCard';
 import { LoadingBars } from '../components/LoadingBars';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
-
-const fallbackBackgroundImage = 'assets/photography/landscape/landscape-lime-kiln.jpg';
+import { fallbackBackgroundImage } from '../data/photography';
 
 export default function Photography() {
   const appStyles = useAppStyles();

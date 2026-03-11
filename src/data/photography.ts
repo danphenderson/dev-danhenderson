@@ -3,6 +3,8 @@ import { resolvePublicAssetPath } from '../utils/assets';
 
 const withBase = (path: string) => resolvePublicAssetPath(path);
 
+export const fallbackBackgroundImage = 'assets/photography/landscape/landscape-lime-kiln.jpg';
+
 export const photographyCategories: PhotoCategory[] = [
   {
     slug: "landscape",
