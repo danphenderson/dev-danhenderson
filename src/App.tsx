@@ -12,7 +12,7 @@ import { Box } from '@mui/material';
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Box>
         <Header/>
         <Routes>

@@ -2,6 +2,7 @@ import { Box, Grid, Paper } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { useAppStyles } from '../styles/appStyles';
 import { resolvePublicAssetPath } from '../utils/assets';
+import { normalizeSxProp } from '../utils/sx';
 
 interface BackgroundPaperProps {
   image: string;
@@ -22,8 +23,6 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
 }) => {
   const resolvedImage = resolvePublicAssetPath(image);
   const appStyles = useAppStyles();
-  const resolvedContentSx = Array.isArray(contentSx) ? contentSx : contentSx ? [contentSx] : [];
-  const resolvedShellSx = Array.isArray(shellSx) ? shellSx : shellSx ? [shellSx] : [];
 
   return (
     <Grid container component="main" sx={appStyles.backgroundRootSx}>
@@ -37,14 +36,14 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
         <Box
           sx={[
             appStyles.getBackgroundContentSx(contentAlign),
-            ...resolvedContentSx,
+            ...normalizeSxProp(contentSx),
           ]}
         >
           {showShell ? (
             <Paper
               sx={[
                 appStyles.backgroundShellSx,
-                ...resolvedShellSx,
+                ...normalizeSxProp(shellSx),
               ]}
             >
               {children}

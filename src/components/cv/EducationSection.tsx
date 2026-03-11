@@ -2,7 +2,8 @@ import { Box, Stack, Typography } from '@mui/material';
 import type { EducationInfo } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
-import { TabPanel, TabPanelItem } from '../TabPanel';
+import { TabPanel } from '../TabPanel';
+import type { TabPanelItem } from '../TabPanel';
 import { useComponentStyles } from '../../styles/componentStyles';
 
 type EducationSectionProps = {

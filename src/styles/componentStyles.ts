@@ -20,6 +20,8 @@ export const useComponentStyles = () => {
       sectionStaggerMs: 120,
       githubSubsectionStaggerMs: 120,
       accordionChipStaggerMs: 120,
+      loadingPulseDurationMs: 1600,
+      loadingBarStaggerMs: 200,
     } as const;
     const contentListStackSpacing = 2.25;
     const compactSidebarSectionSpacing = 0;

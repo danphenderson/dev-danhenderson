@@ -1,5 +1,6 @@
-import { ReactNode, SyntheticEvent, useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
+import type { ReactNode, SyntheticEvent } from 'react';
 import { useComponentStyles } from '../styles/componentStyles';
 
 export type TabPanelItem = {

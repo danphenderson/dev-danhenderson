@@ -1,8 +1,9 @@
 import GitHubIcon from '@mui/icons-material/GitHub';
 import { Box, Chip, Stack } from '@mui/material';
-import { SxProps, Theme } from '@mui/material/styles';
-import { ReactNode } from 'react';
+import type { SxProps, Theme } from '@mui/material/styles';
+import type { ReactNode } from 'react';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { normalizeSxProp } from '../../utils/sx';
 import { AnimatedZoomList } from '../AnimatedZoomList';
 
 export type GitHubLinkChipItem = {
@@ -33,7 +34,7 @@ export const GitHubLinkChipList = ({
   wrapGap = 0.75,
 }: GitHubLinkChipListProps) => {
   const { chipWaveSx, getChipWaveDelaySx, getGitHubChipSx, getWrapListSx } = useComponentStyles();
-  const customChipSx = Array.isArray(chipSx) ? chipSx : chipSx ? [chipSx] : [];
+  const customChipSx = normalizeSxProp(chipSx);
   const baseChipSx: SxProps<Theme> = getGitHubChipSx(layout);
   const animatedContainerSx: SxProps<Theme> = layout === 'wrap'
     ? getWrapListSx(wrapGap)
