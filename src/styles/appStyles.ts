@@ -244,7 +244,7 @@ export const useAppStyles = () => {
         alignItems: 'center',
         justifyContent: 'flex-end',
         flexShrink: 0,
-        ml: { xs: 'auto', md: 0 },
+        ml: 'auto',
       } satisfies SxProps<Theme>,
       headerNavLeadSx: {
         display: 'flex',
@@ -269,6 +269,19 @@ export const useAppStyles = () => {
         width: { xs: 40, md: 50 },
         height: { xs: 40, md: 50 },
         border: `2.5px solid ${alpha(theme.palette.common.white, 0.8)}`,
+      } satisfies SxProps<Theme>,
+      headerPageDialSx: {
+        position: 'relative',
+        overflow: 'visible',
+        flexShrink: 0,
+        '& .MuiSpeedDial-actions': {
+          position: 'absolute',
+          left: '100%',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          marginLeft: 0,
+          paddingLeft: 1.5,
+        },
       } satisfies SxProps<Theme>,
       headerAudioControlSx: {
         mr: 0.625,

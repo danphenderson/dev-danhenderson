@@ -1,35 +1,19 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
 import ThemeProvider from '../../ThemeProvider';
 import { HeaderActions } from './HeaderActions';
 
 const renderHeaderActions = (props: Partial<React.ComponentProps<typeof HeaderActions>> = {}) =>
   render(
     <ThemeProvider>
-      <MemoryRouter>
-        <HeaderActions
-          iconButtonSize="medium"
-          headerIconSx={{ fontSize: 24 }}
-          {...props}
-        />
-      </MemoryRouter>
+      <HeaderActions
+        iconButtonSize="medium"
+        headerIconSx={{ fontSize: 24 }}
+        {...props}
+      />
     </ThemeProvider>
   );
 
 describe('HeaderActions', () => {
-  it('renders the avatar button linking to home when showAvatar is true', () => {
-    renderHeaderActions({ showAvatar: true, avatarSrc: '/avatar.jpg' });
-
-    expect(screen.getByRole('link', { name: 'Go to home' })).toBeInTheDocument();
-    expect(screen.getByAltText('Daniel Henderson')).toBeInTheDocument();
-  });
-
-  it('hides the avatar when showAvatar is false', () => {
-    renderHeaderActions({ showAvatar: false });
-
-    expect(screen.queryByRole('link', { name: 'Go to home' })).not.toBeInTheDocument();
-  });
-
   it('renders the play button when showAudioControl is true and not playing', () => {
     renderHeaderActions({ showAudioControl: true, isPlaying: false });
 

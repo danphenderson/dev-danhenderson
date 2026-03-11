@@ -1,8 +1,8 @@
-import { cvSectionMetadata, cvProductivitySectionOrder } from './cvSectionMetadata';
+import { cvSectionMetadata, cvSectionNavigationOrder } from './cvSectionMetadata';
 import type { CVSectionKey } from './cvSectionMetadata';
 
 describe('cvSectionMetadata', () => {
-  it('defines IDs and labels for all expected CV sections', () => {
+  it('defines IDs, labels, and navLabels for all expected CV sections', () => {
     const expectedKeys: CVSectionKey[] = [
       'about',
       'experience',
@@ -18,6 +18,7 @@ describe('cvSectionMetadata', () => {
       expect(cvSectionMetadata[key]).toBeDefined();
       expect(cvSectionMetadata[key].id).toBeTruthy();
       expect(cvSectionMetadata[key].label).toBeTruthy();
+      expect(cvSectionMetadata[key].navLabel).toBeTruthy();
     });
   });
 
@@ -26,9 +27,11 @@ describe('cvSectionMetadata', () => {
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it('exports a productivity section order that includes all section keys', () => {
+  it('exports a navigation order that covers navigable sections', () => {
     const allKeys = Object.keys(cvSectionMetadata) as CVSectionKey[];
-    expect(cvProductivitySectionOrder).toEqual(expect.arrayContaining(allKeys));
-    expect(cvProductivitySectionOrder).toHaveLength(allKeys.length);
+    cvSectionNavigationOrder.forEach((key) => {
+      expect(allKeys).toContain(key);
+    });
+    expect(cvSectionNavigationOrder.length).toBeGreaterThan(0);
   });
 });

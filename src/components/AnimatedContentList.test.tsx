@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../ThemeProvider';
 import { AnimatedContentList } from './AnimatedContentList';
@@ -55,6 +55,13 @@ jest.mock('./AnimatedContentCard', () => ({
 }));
 
 describe('AnimatedContentList', () => {
+  const defaultIntersectionObserver = window.IntersectionObserver;
+
+  afterEach(() => {
+    window.IntersectionObserver = defaultIntersectionObserver;
+    jest.clearAllMocks();
+  });
+
   it('computes stack delays from the provided offset and stagger', () => {
     render(
       <ThemeProvider>
@@ -131,5 +138,52 @@ describe('AnimatedContentList', () => {
 
     expect(item).toHaveAttribute('data-has-card-reset', 'true');
     expect(item).toHaveAttribute('data-has-panel-surface', 'false');
+  });
+
+  it('can wait to mount animated items until the list enters the viewport', () => {
+    const observe = jest.fn();
+    const disconnect = jest.fn();
+    let handleIntersection: IntersectionObserverCallback | undefined;
+
+    Object.defineProperty(window, 'IntersectionObserver', {
+      writable: true,
+      value: jest.fn().mockImplementation((callback: IntersectionObserverCallback) => {
+        handleIntersection = callback;
+
+        return {
+          observe,
+          disconnect,
+          unobserve: jest.fn(),
+          takeRecords: jest.fn(),
+          root: null,
+          rootMargin: '0px 0px -10% 0px',
+          thresholds: [0],
+        };
+      }),
+    });
+
+    render(
+      <ThemeProvider>
+        <AnimatedContentList
+          items={['Selected Work']}
+          getItemKey={(item) => item}
+          mountItemsOnView
+          renderItem={(item) => <div>{item}</div>}
+        />
+      </ThemeProvider>
+    );
+
+    expect(screen.queryByText('Selected Work')).not.toBeInTheDocument();
+    expect(observe).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      handleIntersection?.(
+        [{ isIntersecting: true } as IntersectionObserverEntry],
+        {} as IntersectionObserver
+      );
+    });
+
+    expect(screen.getByText('Selected Work')).toBeInTheDocument();
+    expect(disconnect).toHaveBeenCalled();
   });
 });

@@ -3,7 +3,6 @@ import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import {
-  Avatar,
   IconButton,
   Stack,
   Tooltip,
@@ -11,14 +10,11 @@ import {
 import type { PaletteMode } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { MutableRefObject } from 'react';
-import { Link } from 'react-router-dom';
 import { useAppStyles } from '../../styles/appStyles';
 
 type HeaderActionsProps = {
   iconButtonSize: 'small' | 'medium' | 'large';
   headerIconSx: SxProps<Theme>;
-  showAvatar?: boolean;
-  avatarSrc?: string;
   showAudioControl?: boolean;
   isPlaying?: boolean;
   onToggleAudio?: () => void;
@@ -36,8 +32,6 @@ type HeaderActionsProps = {
 export const HeaderActions = ({
   iconButtonSize,
   headerIconSx,
-  showAvatar = false,
-  avatarSrc,
   showAudioControl = false,
   isPlaying = false,
   onToggleAudio,
@@ -58,25 +52,6 @@ export const HeaderActions = ({
 
   return (
     <Stack direction="row" spacing={{ xs: 1, md: 2 }} alignItems="center">
-      {showAvatar && avatarSrc && (
-        <Tooltip title="Back to home">
-          <IconButton
-            component={Link}
-            to="/"
-            color="inherit"
-            aria-label="Go to home"
-            size={iconButtonSize}
-            sx={appStyles.headerAvatarButtonSx}
-          >
-            <Avatar
-              src={avatarSrc}
-              alt="Daniel Henderson"
-              sx={appStyles.headerAvatarSx}
-            />
-          </IconButton>
-        </Tooltip>
-      )}
-
       {showAudioControl && (
         <Tooltip title={isPlaying ? 'Pause welcome audio' : 'Play welcome audio'}>
           <span>

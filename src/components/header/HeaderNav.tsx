@@ -12,6 +12,7 @@ export type HeaderPage = {
 
 type HeaderNavProps = {
   pages: HeaderPage[];
+  showNavigationLinks: boolean;
   isMobile: boolean;
   iconButtonSize: 'small' | 'medium' | 'large';
   headerIconSx: SxProps<Theme>;
@@ -24,6 +25,7 @@ type HeaderNavProps = {
 
 export const HeaderNav = ({
   pages,
+  showNavigationLinks,
   isMobile,
   iconButtonSize,
   headerIconSx,
@@ -38,7 +40,7 @@ export const HeaderNav = ({
   return (
     <>
       <Box sx={appStyles.headerNavLeadSx}>
-        {isMobile && (
+        {showNavigationLinks && isMobile && (
           <IconButton
             id="mobile-nav-button"
             color="inherit"
@@ -54,37 +56,41 @@ export const HeaderNav = ({
         )}
         {leftContent}
       </Box>
-      <Box sx={appStyles.headerNavDesktopSx}>
-        <Stack direction="row" spacing={{ md: 5 }}>
+      {showNavigationLinks && (
+        <Box sx={appStyles.headerNavDesktopSx}>
+          <Stack direction="row" spacing={{ md: 5 }}>
+            {pages.map(({ name, path }) => (
+              <Button
+                key={name}
+                size="large"
+                sx={appStyles.headerNavButtonSx}
+                component={Link}
+                to={path}
+                aria-label={`Go to ${name}`}
+              >
+                {name}
+              </Button>
+            ))}
+          </Stack>
+        </Box>
+      )}
+      {showNavigationLinks && (
+        <Menu
+          id="mobile-nav-menu"
+          anchorEl={mobileMenuAnchor}
+          open={mobileMenuOpen}
+          onClose={onMobileMenuClose}
+          MenuListProps={{ 'aria-labelledby': 'mobile-nav-button' }}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+        >
           {pages.map(({ name, path }) => (
-            <Button
-              key={name}
-              size="large"
-              sx={appStyles.headerNavButtonSx}
-              component={Link}
-              to={path}
-              aria-label={`Go to ${name}`}
-            >
+            <MenuItem key={name} component={Link} to={path} onClick={onMobileMenuClose}>
               {name}
-            </Button>
+            </MenuItem>
           ))}
-        </Stack>
-      </Box>
-      <Menu
-        id="mobile-nav-menu"
-        anchorEl={mobileMenuAnchor}
-        open={mobileMenuOpen}
-        onClose={onMobileMenuClose}
-        MenuListProps={{ 'aria-labelledby': 'mobile-nav-button' }}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-      >
-        {pages.map(({ name, path }) => (
-          <MenuItem key={name} component={Link} to={path} onClick={onMobileMenuClose}>
-            {name}
-          </MenuItem>
-        ))}
-      </Menu>
+        </Menu>
+      )}
     </>
   );
 };

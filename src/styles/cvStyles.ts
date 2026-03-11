@@ -32,7 +32,6 @@ export const useCvStyles = () => {
     const accentTint = alpha(accentColor, isLight ? 0.14 : 0.24);
     const interactiveOutlineColor = accentColor;
     const selectedTabSurface = alpha(accentColor, isLight ? 0.1 : 0.2);
-    const tabPanelRadius = theme.shape.borderRadius * 2;
     const interactiveSurfaceHoverShadow = isLight
       ? `0 0 0 1px ${alpha(accentColor, 0.24)}, 0 8px 20px ${alpha(accentColor, 0.14)}`
       : `0 0 0 1px ${alpha(accentColor, 0.34)}, 0 10px 24px ${alpha(accentColor, 0.18)}`;
@@ -171,22 +170,6 @@ export const useCvStyles = () => {
         boxShadow: interactiveSurfaceHoverShadow,
         zIndex: 1,
       },
-      '&.Mui-selected:first-of-type': {
-        borderTopLeftRadius: tabPanelRadius,
-        borderBottomLeftRadius: tabPanelRadius,
-      },
-      '&.Mui-selected:last-of-type': {
-        borderTopRightRadius: tabPanelRadius,
-        borderBottomRightRadius: tabPanelRadius,
-      },
-      '&.Mui-selected:not(:first-of-type)': {
-        borderTopLeftRadius: 0,
-        borderBottomLeftRadius: 0,
-      },
-      '&.Mui-selected:not(:last-of-type)': {
-        borderTopRightRadius: 0,
-        borderBottomRightRadius: 0,
-      },
     }) satisfies SxProps<Theme>;
 
     const getTabPanelBodySx = (dense: boolean, hasTabs: boolean) => ({
@@ -206,6 +189,13 @@ export const useCvStyles = () => {
       backdropFilter: 'none',
     };
 
+    const sharedPillChipSx = {
+      border: subtleBorder,
+      backgroundColor: subtleSurface,
+      fontWeight: 500,
+      color: 'text.primary',
+    } satisfies SxProps<Theme>;
+
     return {
       motionTokens,
       contentListStackSpacing,
@@ -221,6 +211,48 @@ export const useCvStyles = () => {
         backdropFilter: 'blur(10px)',
         p: { xs: 2, md: 2.5 },
         transition: 'border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
+      } satisfies SxProps<Theme>,
+      sectionNavigatorRootSx: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        gap: 0.75,
+        width: '100%',
+        borderRadius: 1.5,
+        border: subtleBorder,
+        backgroundColor: subtleSurface,
+        p: 1,
+      } satisfies SxProps<Theme>,
+      sectionNavigatorLeadSx: {
+        color: accentColor,
+        whiteSpace: 'nowrap',
+        lineHeight: 1,
+      } satisfies SxProps<Theme>,
+      sectionNavigatorRailSx: {
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 0.75,
+        alignItems: 'center',
+        minWidth: 0,
+        width: '100%',
+      } satisfies SxProps<Theme>,
+      sectionNavigatorChipSx: {
+        ...sharedPillChipSx,
+        height: 32,
+        cursor: 'pointer',
+        '& .MuiChip-label': {
+          px: 1.25,
+          whiteSpace: 'nowrap',
+        },
+        '&:hover': {
+          backgroundColor: alpha(accentColor, isLight ? 0.1 : 0.16),
+          borderColor: alpha(accentColor, isLight ? 0.36 : 0.52),
+          boxShadow: interactiveSurfaceHoverShadow,
+        },
+        '&.Mui-focusVisible': {
+          outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
+          outlineOffset: 2,
+        },
       } satisfies SxProps<Theme>,
       overlineSx: {
         color: accentColor,
@@ -393,10 +425,7 @@ export const useCvStyles = () => {
       getTabSx,
       getTabPanelBodySx,
       skillsChipSx: {
-        border: subtleBorder,
-        backgroundColor: subtleSurface,
-        fontWeight: 500,
-        color: 'text.primary',
+        ...sharedPillChipSx,
       } satisfies SxProps<Theme>,
       skillsWrapSx: {
         display: 'flex',

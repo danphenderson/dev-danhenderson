@@ -23,6 +23,7 @@ type CVSidebarProps = {
   sections: CVSidebarSection[];
   about: AboutMe;
   aboutActions?: ReactNode;
+  aboutFooter?: ReactNode;
   activity: GitHubActivityItem[];
   contributions: GitHubContribution[];
   projects: GitHubProject[];
@@ -31,6 +32,7 @@ type CVSidebarProps = {
   certificates: Certificate[];
   stackAndTools: StackSection[];
   aboutDelayMs?: number;
+  aboutTriggerOnView?: boolean;
   githubDelayMs?: number;
   certificatesDelayMs?: number;
   toolsDelayMs?: number;
@@ -45,6 +47,7 @@ export const CVSidebar = ({
   sections,
   about,
   aboutActions,
+  aboutFooter,
   activity,
   contributions,
   projects,
@@ -53,6 +56,7 @@ export const CVSidebar = ({
   certificates,
   stackAndTools,
   aboutDelayMs = 0,
+  aboutTriggerOnView = true,
   githubDelayMs = 0,
   certificatesDelayMs = 0,
   toolsDelayMs = 0,
@@ -72,13 +76,23 @@ export const CVSidebar = ({
   return (
     <Stack spacing={spacing}>
       {sections.includes('about') && (
-        <SectionCard delayMs={aboutDelayMs} id={sectionIds?.about} sx={cvSectionAnchorSx}>
+        <SectionCard
+          delayMs={aboutDelayMs}
+          triggerOnView={aboutTriggerOnView}
+          id={sectionIds?.about}
+          sx={cvSectionAnchorSx}
+        >
           <Stack spacing={2}>
             <Stack spacing={compactSidebarSectionSpacing}>
               <SectionHeading overline="About" sx={sectionHeadingCompactSx} />
               <ProfileCard about={about} />
             </Stack>
-            {aboutActions}
+            {(aboutActions || aboutFooter) && (
+              <Stack spacing={1.5}>
+                {aboutActions}
+                {aboutFooter}
+              </Stack>
+            )}
           </Stack>
         </SectionCard>
       )}

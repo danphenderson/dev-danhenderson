@@ -4,17 +4,25 @@ import ThemeProvider from '../../ThemeProvider';
 import { educationInfo } from '../../data/cv';
 import { EducationSection } from './EducationSection';
 
+const mockAnimatedContentList = jest.fn();
+
 jest.mock('../AnimatedContentList', () => ({
-  AnimatedContentList: ({
-    items,
-    renderItem,
-  }: {
+  AnimatedContentList: (props: {
     items: unknown[];
     renderItem: (item: unknown, index: number) => ReactNode;
-  }) => <div>{items.map((item, index) => <div key={index}>{renderItem(item, index)}</div>)}</div>,
+    mountItemsOnView?: boolean;
+  }) => {
+    mockAnimatedContentList(props);
+
+    return <div>{props.items.map((item, index) => <div key={index}>{props.renderItem(item, index)}</div>)}</div>;
+  },
 }));
 
 describe('EducationSection', () => {
+  afterEach(() => {
+    mockAnimatedContentList.mockClear();
+  });
+
   it('groups highlights and skills into the shared tab panel', () => {
     render(
       <ThemeProvider>
@@ -22,6 +30,9 @@ describe('EducationSection', () => {
       </ThemeProvider>
     );
 
+    expect(mockAnimatedContentList.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ mountItemsOnView: true })
+    );
     expect(screen.getByRole('tab', { name: 'Highlights' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Skills' })).toBeInTheDocument();
     expect(

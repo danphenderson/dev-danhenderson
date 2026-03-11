@@ -15,6 +15,7 @@ export const CertificatesList = ({ certificates, startDelayMs = 0 }: Certificate
     <AnimatedContentList
       items={certificates}
       getItemKey={(certificate, index) => `${certificate.title}-${index}`}
+      mountItemsOnView
       startDelayMs={startDelayMs}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"

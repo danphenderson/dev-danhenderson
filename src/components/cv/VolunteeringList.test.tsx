@@ -3,44 +3,34 @@ import type { ReactNode } from 'react';
 import ThemeProvider from '../../ThemeProvider';
 import { VolunteeringList } from './VolunteeringList';
 
-type MockSx = { [key: string]: unknown } | Array<{ [key: string]: unknown }>;
+const mockAnimatedContentList = jest.fn();
 
-const hasSxEntry = (sx?: MockSx, predicate?: (entry: { [key: string]: unknown }) => boolean) => {
-  const sxEntries = Array.isArray(sx) ? sx : sx ? [sx] : [];
+jest.mock('../AnimatedContentList', () => ({
+  AnimatedContentList: (props: {
+    items: unknown[];
+    renderItem: (item: unknown, index: number) => ReactNode;
+    itemSurface?: string;
+    mountItemsOnView?: boolean;
+  }) => {
+    mockAnimatedContentList(props);
 
-  return predicate ? sxEntries.some((entry) => predicate(entry)) : false;
-};
-
-jest.mock('../AnimatedContentCard', () => ({
-  AnimatedContentCard: ({
-    children,
-    sx,
-  }: {
-    children: ReactNode;
-    sx?: MockSx;
-  }) => (
-    <div
-      data-testid="volunteering-item"
-      data-has-card-reset={String(
-        hasSxEntry(
-          sx,
-          (entry) =>
-            entry.background === 'none' &&
-            entry.backgroundColor === 'transparent' &&
-            entry.border === 'none' &&
-            entry.boxShadow === 'none'
-        )
-      )}
-      data-has-panel-surface={String(
-        hasSxEntry(sx, (entry) => entry.borderRadius === 1.5 && entry.p === 1)
-      )}
-    >
-      {children}
-    </div>
-  ),
+    return (
+      <div
+        data-testid="volunteering-list"
+        data-item-surface={props.itemSurface ?? ''}
+        data-mount-items-on-view={String(Boolean(props.mountItemsOnView))}
+      >
+        {props.items.map((item, index) => <div key={index}>{props.renderItem(item, index)}</div>)}
+      </div>
+    );
+  },
 }));
 
 describe('VolunteeringList', () => {
+  afterEach(() => {
+    mockAnimatedContentList.mockClear();
+  });
+
   it('renders volunteering entries with role, date, location, and highlights', () => {
     render(
       <ThemeProvider>
@@ -67,7 +57,7 @@ describe('VolunteeringList', () => {
       screen.getByText('Supported trail construction and maintenance projects with the Access Fund conservation team.')
     ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Access Fund' })).toHaveAttribute('href', 'https://www.accessfund.org');
-    expect(screen.getByTestId('volunteering-item')).toHaveAttribute('data-has-card-reset', 'true');
-    expect(screen.getByTestId('volunteering-item')).toHaveAttribute('data-has-panel-surface', 'true');
+    expect(screen.getByTestId('volunteering-list')).toHaveAttribute('data-item-surface', 'panel');
+    expect(screen.getByTestId('volunteering-list')).toHaveAttribute('data-mount-items-on-view', 'true');
   });
 });

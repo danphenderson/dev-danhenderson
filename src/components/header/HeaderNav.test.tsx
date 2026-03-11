@@ -15,6 +15,7 @@ describe('HeaderNav', () => {
         <MemoryRouter>
           <HeaderNav
             pages={pages}
+            showNavigationLinks={true}
             isMobile={false}
             iconButtonSize="medium"
             headerIconSx={{ fontSize: 24 }}
@@ -31,12 +32,36 @@ describe('HeaderNav', () => {
     expect(screen.getByRole('link', { name: 'Go to Climbing' })).toBeInTheDocument();
   });
 
+  it('hides navigation links when showNavigationLinks is false', () => {
+    render(
+      <ThemeProvider>
+        <MemoryRouter>
+          <HeaderNav
+            pages={pages}
+            showNavigationLinks={false}
+            isMobile={false}
+            iconButtonSize="medium"
+            headerIconSx={{ fontSize: 24 }}
+            mobileMenuOpen={false}
+            mobileMenuAnchor={null}
+            onMobileMenuOpen={jest.fn()}
+            onMobileMenuClose={jest.fn()}
+          />
+        </MemoryRouter>
+      </ThemeProvider>
+    );
+
+    expect(screen.queryByRole('link', { name: 'Go to CV' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to Climbing' })).not.toBeInTheDocument();
+  });
+
   it('renders the mobile menu button when isMobile is true', () => {
     render(
       <ThemeProvider>
         <MemoryRouter>
           <HeaderNav
             pages={pages}
+            showNavigationLinks={true}
             isMobile={true}
             iconButtonSize="medium"
             headerIconSx={{ fontSize: 24 }}
@@ -60,6 +85,7 @@ describe('HeaderNav', () => {
         <MemoryRouter>
           <HeaderNav
             pages={pages}
+            showNavigationLinks={true}
             isMobile={true}
             iconButtonSize="medium"
             headerIconSx={{ fontSize: 24 }}
@@ -83,6 +109,7 @@ describe('HeaderNav', () => {
         <MemoryRouter>
           <HeaderNav
             pages={pages}
+            showNavigationLinks={true}
             isMobile={false}
             iconButtonSize="medium"
             headerIconSx={{ fontSize: 24 }}
