@@ -407,18 +407,18 @@ export const experiences: Experience[] = [
     company: 'Michigan Technological University',
     companyUrl: mtuMathGraduateUrl,
     industry: 'Higher Education',
-    title: 'Graduate Research Assistant | Hemodynamics',
+    title: 'Graduate Research Assistant',
     startDate: 'May 2025',
     endDate: 'Current',
     description:
       [
         {
           text:
-            'Researching macrocirculatory blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.',
+            'Researching blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.',
         },
         {
-          text: 'Advisor: ',
-          lineBreakBefore: true,
+          text: ' Advisor: ',
+          lineBreakBefore: false,
         },
         {
           text: 'Jiguang Sun',

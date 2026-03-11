@@ -25,7 +25,7 @@ export const CVCodingSection = ({
     id={sectionId}
     sx={cvSectionAnchorSx}
   >
-    <SectionHeading overline="Coding Examples" title="Selected Work" />
+    <SectionHeading overline="Coding Examples" />
     <CodingExamplesSection examples={examples} startDelayMs={itemOffsetMs} />
   </SectionCard>
 );

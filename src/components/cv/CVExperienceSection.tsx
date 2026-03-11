@@ -25,7 +25,7 @@ export const CVExperienceSection = ({
     id={sectionId}
     sx={cvSectionAnchorSx}
   >
-    <SectionHeading overline="Experience" title="Roles & Impact" />
+    <SectionHeading overline="Experience"/>
     <ExperienceList experiences={experiences} startDelayMs={itemOffsetMs} />
   </SectionCard>
 );
