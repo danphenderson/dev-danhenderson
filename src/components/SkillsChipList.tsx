@@ -13,7 +13,7 @@ export const SkillsChipList = ({
   dense = false,
   in: inProp = true,
 }: SkillsChipListProps) => {
-  const { skillsChipSx, skillsWrapSx } = useCvStyles();
+  const { chipWaveSx, getChipWaveDelaySx, skillsChipSx, skillsWrapSx } = useCvStyles();
   const filteredSkills = skills.filter((skill): skill is string => typeof skill === 'string' && skill.trim().length > 0);
 
   if (filteredSkills.length === 0) {
@@ -32,7 +32,7 @@ export const SkillsChipList = ({
           label={skill}
           size={dense ? 'small' : 'medium'}
           variant="outlined"
-          sx={skillsChipSx}
+          sx={[skillsChipSx, chipWaveSx, getChipWaveDelaySx(index)]}
         />
       )}
     />

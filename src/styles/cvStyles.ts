@@ -1,5 +1,12 @@
 import { useMemo } from 'react';
 import { alpha, SxProps, Theme, useTheme as useMuiTheme } from '@mui/material/styles';
+import {
+  ambientPulse,
+  backgroundSweep,
+  breathe,
+  reducedMotionSx,
+  shimmerSweep,
+} from './cvAnimations';
 
 type GitHubChipLayout = 'stack' | 'wrap';
 
@@ -166,12 +173,28 @@ export const useCvStyles = () => {
       position: 'relative',
       zIndex: 0,
       borderRadius: 0,
+      overflow: 'hidden',
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        inset: 0,
+        background: shimmerGradient,
+        transform: 'translateX(-100%)',
+        opacity: 0,
+        transition: 'opacity 0.3s ease',
+        pointerEvents: 'none',
+      },
+      '&:hover::after': {
+        opacity: 1,
+        animation: `${shimmerSweep} 1.2s ease-in-out`,
+      },
       '&.Mui-selected': {
         ...interactiveAccentTextSx,
         backgroundColor: selectedTabSurface,
         boxShadow: interactiveSurfaceHoverShadow,
         zIndex: 1,
       },
+      ...reducedMotionSx,
     }) satisfies SxProps<Theme>;
 
     const getTabPanelBodySx = (dense: boolean, hasTabs: boolean) => ({
@@ -198,6 +221,86 @@ export const useCvStyles = () => {
       color: 'text.primary',
     } satisfies SxProps<Theme>;
 
+    /* ── ambient animation helpers ────────────────────────────── */
+
+    const shimmerGradient = `linear-gradient(90deg, transparent 0%, ${alpha(accentColor, isLight ? 0.10 : 0.14)} 50%, transparent 100%)`;
+    const glowShadow = `0 0 8px 2px ${alpha(accentColor, isLight ? 0.12 : 0.18)}`;
+    const borderGlowShadow = `0 0 14px 0 ${alpha(accentColor, isLight ? 0.06 : 0.10)}`;
+    const chipWaveGradient = `linear-gradient(90deg, transparent 25%, ${alpha(accentColor, isLight ? 0.07 : 0.10)} 50%, transparent 75%)`;
+
+    /** Pseudo-element shimmer overlay for section overlines and header rails. */
+    const shimmerOverlaySx = {
+      position: 'relative' as const,
+      overflow: 'hidden' as const,
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        inset: 0,
+        background: shimmerGradient,
+        animation: `${shimmerSweep} 8s ease-in-out infinite`,
+        pointerEvents: 'none',
+      },
+      ...reducedMotionSx,
+    };
+
+    /** Pulse glow pseudo-element for pills and tags. */
+    const pillPulseOverlaySx = {
+      position: 'relative' as const,
+      overflow: 'visible' as const,
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        inset: -1,
+        borderRadius: 'inherit',
+        boxShadow: glowShadow,
+        opacity: 0,
+        animation: `${ambientPulse} 6s ease-in-out infinite`,
+        pointerEvents: 'none',
+      },
+      ...reducedMotionSx,
+    };
+
+    /** Background-position sweep for chip rows (wave effect). */
+    const chipWaveSx = {
+      backgroundImage: chipWaveGradient,
+      backgroundSize: '200% 100%',
+      backgroundRepeat: 'no-repeat' as const,
+      animation: `${backgroundSweep} 12s ease-in-out infinite`,
+      ...reducedMotionSx,
+    };
+
+    /** Border-glow breathing for content cards / sections. */
+    const borderGlowOverlaySx = {
+      position: 'relative' as const,
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        inset: 0,
+        borderRadius: 'inherit',
+        boxShadow: borderGlowShadow,
+        opacity: 0,
+        animation: `${ambientPulse} 10s ease-in-out infinite`,
+        pointerEvents: 'none',
+        zIndex: 0,
+      },
+      ...reducedMotionSx,
+    };
+
+    /** Breathing opacity for "Open to opportunities" status text. */
+    const statusBreatheSx = {
+      display: 'inline' as const,
+      animation: `${breathe} 4s ease-in-out infinite`,
+      ...reducedMotionSx,
+    };
+
+    /**
+     * Returns per-chip animation-delay for a staggered wave effect.
+     * Use with `chipWaveSx` on individual chips.
+     */
+    const getChipWaveDelaySx = (index: number, interval = 1.8) => ({
+      animationDelay: `${index * interval}s`,
+    });
+
     return {
       motionTokens,
       contentListStackSpacing,
@@ -213,6 +316,7 @@ export const useCvStyles = () => {
         backdropFilter: 'blur(10px)',
         p: { xs: 2, md: 2.5 },
         transition: 'border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
+        ...borderGlowOverlaySx,
       } satisfies SxProps<Theme>,
       sectionNavigatorRootSx: {
         display: 'flex',
@@ -261,6 +365,8 @@ export const useCvStyles = () => {
         letterSpacing: '0.18em',
         fontWeight: 700,
         textTransform: 'uppercase',
+        display: 'inline-block',
+        ...shimmerOverlaySx,
       } satisfies SxProps<Theme>,
       sectionTitleSx: {
         color: 'text.primary',
@@ -339,6 +445,7 @@ export const useCvStyles = () => {
           fontSize: compactLabelFontSize,
           lineHeight: compactLabelLineHeight,
         },
+        ...pillPulseOverlaySx,
       } satisfies SxProps<Theme>,
       experienceDescriptionSx: { mt: 1 } satisfies SxProps<Theme>,
       getDetailListSx,
@@ -428,6 +535,7 @@ export const useCvStyles = () => {
       getTabPanelBodySx,
       skillsChipSx: {
         ...sharedPillChipSx,
+        ...pillPulseOverlaySx,
       } satisfies SxProps<Theme>,
       skillsWrapSx: {
         display: 'flex',
@@ -442,6 +550,10 @@ export const useCvStyles = () => {
       volunteeringMetaSx: {
         textAlign: { xs: 'left', sm: 'right' },
       } satisfies SxProps<Theme>,
+      /* ── exposed animation utilities ───────────────────────── */
+      statusBreatheSx,
+      chipWaveSx,
+      getChipWaveDelaySx,
     };
   }, [theme]);
 };
