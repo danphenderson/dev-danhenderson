@@ -1,4 +1,4 @@
-import type { CodingExample } from '../../data/cv';
+import type { CodingExample } from '../../types/cv';
 import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { CodingExamplesSection } from './CodingExamplesSection';

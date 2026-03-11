@@ -7,7 +7,7 @@ import {
   fallbackGitHubProjects,
   githubUsername,
 } from '../data/cv';
-import type { GitHubActivityItem, GitHubContribution, GitHubProject } from '../data/cv';
+import type { GitHubActivityItem, GitHubContribution, GitHubProject } from '../types/cv';
 
 type GitHubEvent = {
   id: string;

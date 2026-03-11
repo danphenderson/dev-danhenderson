@@ -1,5 +1,5 @@
 import { Button, Typography } from '@mui/material';
-import type { Certificate } from '../../data/cv';
+import type { Certificate } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { useCvStyles } from '../../styles/cvStyles';
 

@@ -1,4 +1,4 @@
-import type { Experience } from '../../data/cv';
+import type { Experience } from '../../types/cv';
 import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { ExperienceList } from './ExperienceList';

@@ -1,4 +1,4 @@
-import type { StackSection } from '../../data/cv';
+import type { StackSection } from '../../types/cv';
 import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { StackAndToolsSection } from './StackAndToolsSection';

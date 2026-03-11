@@ -5,7 +5,7 @@ import type {
   ExperienceDescription,
   ExperienceProject,
   ExperienceProjectSegment,
-} from '../../data/cv';
+} from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel, TabPanelItem } from '../TabPanel';

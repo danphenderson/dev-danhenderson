@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Stack } from '@mui/material';
-import type { AboutMe } from '../../data/cv';
+import type { AboutMe } from '../../types/cv';
 import { useCvStyles } from '../../styles/cvStyles';
 import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../ThemeProvider';
-import type { CodingExample } from '../../data/cv';
+import type { CodingExample } from '../../types/cv';
 import { codingExamples } from '../../data/cv';
 import { CodingExamplesSection } from './CodingExamplesSection';
 

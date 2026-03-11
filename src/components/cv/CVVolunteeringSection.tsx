@@ -1,4 +1,4 @@
-import type { VolunteeringEntry } from '../../data/cv';
+import type { VolunteeringEntry } from '../../types/cv';
 import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { SectionHeading } from './SectionHeading';

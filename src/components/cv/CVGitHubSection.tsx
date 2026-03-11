@@ -4,7 +4,7 @@ import type {
   GitHubActivityItem,
   GitHubContribution,
   GitHubProject,
-} from '../../data/cv';
+} from '../../types/cv';
 import { githubUsername } from '../../data/cv';
 import { useCvStyles } from '../../styles/cvStyles';
 import { SectionCard } from '../layout/SectionCard';

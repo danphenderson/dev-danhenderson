@@ -1,7 +1,7 @@
 import type { PhotoCategory } from '../types/data';
-import { assetBasePath } from './cv';
+import { resolvePublicAssetPath } from '../utils/assets';
 
-const withBase = (path: string) => `${assetBasePath}${path}`;
+const withBase = (path: string) => resolvePublicAssetPath(path);
 
 export const photographyCategories: PhotoCategory[] = [
   {

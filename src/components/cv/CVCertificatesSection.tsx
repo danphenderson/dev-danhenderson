@@ -1,4 +1,4 @@
-import type { Certificate } from '../../data/cv';
+import type { Certificate } from '../../types/cv';
 import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { CertificatesList } from './CertificatesList';

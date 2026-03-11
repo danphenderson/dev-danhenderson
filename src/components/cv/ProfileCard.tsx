@@ -1,6 +1,6 @@
 import { Avatar, Box, Link, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import type { AboutMe } from '../../data/cv';
+import type { AboutMe } from '../../types/cv';
 import { useCvStyles } from '../../styles/cvStyles';
 
 type ProfileCardProps = {

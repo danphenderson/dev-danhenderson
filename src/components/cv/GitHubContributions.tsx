@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from '@mui/material';
-import type { GitHubContribution } from '../../data/cv';
+import type { GitHubContribution } from '../../types/cv';
 import { LoadingBars } from '../LoadingBars';
 import { ContentCard } from '../ContentCard';
 import { useCvStyles } from '../../styles/cvStyles';

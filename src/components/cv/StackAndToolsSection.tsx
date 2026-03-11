@@ -1,5 +1,5 @@
 import { Stack } from '@mui/material';
-import type { StackSection } from '../../data/cv';
+import type { StackSection } from '../../types/cv';
 import { useCvStyles } from '../../styles/cvStyles';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
