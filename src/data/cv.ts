@@ -391,7 +391,7 @@ export const certificates: Certificate[] = [
   {
     title: 'AWS Certified Solutions Architect – Associate',
     issuer: 'Amazon Web Services',
-    date: 'Feburary 5th, 2024',
+    date: 'February 5th, 2024',
     link: `${assetBasePath}/assets/aws-soln-architect-cert.pdf`,
   },
   {
