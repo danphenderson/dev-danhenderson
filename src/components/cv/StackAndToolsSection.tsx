@@ -2,6 +2,7 @@ import { Stack } from '@mui/material';
 import type { StackSection } from '../../types/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { AnimatedContentList } from '../AnimatedContentList';
+import { ANIMATED_CARD_DURATION_MS } from '../AnimatedContentCard';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem } from '../TabPanel';
@@ -21,6 +22,7 @@ export const StackAndToolsSection = ({
 }: StackAndToolsSectionProps) => {
   const {
     compactSidebarSectionSpacing,
+    getItemDelayMs,
     sectionHeadingCompactSx,
   } = useComponentStyles();
   const stackTabs: TabPanelItem[] = sections.map((section, index) => ({
@@ -52,6 +54,7 @@ export const StackAndToolsSection = ({
             dense
             hideTabsWhenSingle
             tabsVariant="scrollable"
+            initialPanelGrowDelayMs={getItemDelayMs(0, startDelayMs) + ANIMATED_CARD_DURATION_MS + 60}
           />
         )}
       />

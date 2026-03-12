@@ -4,8 +4,8 @@ import ThemeProvider from '../../ThemeProvider';
 import { CVAboutSection } from './CVAboutSection';
 import { cvSectionMetadata } from './cvSectionMetadata';
 
-jest.mock('../layout/SectionCard', () => ({
-  SectionCard: ({
+jest.mock('./CVSectionCard', () => ({
+  CVSectionCard: ({
     children,
     id,
     delayMs,

@@ -28,6 +28,8 @@ export const createComponentStyleMap = (theme: Theme) => {
     pillPulseMs: 4200,
     chipWaveMs: 7600,
     borderGlowMs: 6800,
+    cvSectionBorderSweepMs: 5400,
+    cvSectionBottomGlowMs: 4200,
     statusBreatheMs: 2800,
     chipWaveDelaySeconds: 0.55,
   } as const;
@@ -165,6 +167,8 @@ export const createComponentStyleMap = (theme: Theme) => {
   const glowShadow = `0 0 12px 2px ${alpha(accentColor, isLight ? 0.18 : 0.26)}, 0 0 24px 4px ${alpha(accentColor, isLight ? 0.10 : 0.18)}`;
   const borderGlowShadow = `0 0 18px 2px ${alpha(accentColor, isLight ? 0.12 : 0.2)}, 0 0 28px 6px ${alpha(accentColor, isLight ? 0.06 : 0.12)}`;
   const chipWaveGradient = `linear-gradient(90deg, transparent 0%, ${alpha(accentColor, isLight ? 0.04 : 0.08)} 18%, ${alpha(theme.palette.primary.light, isLight ? 0.18 : 0.16)} 50%, ${alpha(accentColor, isLight ? 0.09 : 0.14)} 82%, transparent 100%)`;
+  const cvSectionBorderGradient = `linear-gradient(100deg, ${alpha(accentColor, 0)} 0%, ${alpha(accentColor, isLight ? 0.12 : 0.18)} 18%, ${alpha(theme.palette.primary.light, isLight ? 0.52 : 0.4)} 50%, ${alpha(accentColor, isLight ? 0.14 : 0.22)} 82%, ${alpha(accentColor, 0)} 100%)`;
+  const cvSectionBottomGlowGradient = `radial-gradient(80% 140% at 50% 100%, ${alpha(theme.palette.primary.light, isLight ? 0.32 : 0.26)} 0%, ${alpha(accentColor, isLight ? 0.2 : 0.24)} 38%, ${alpha(accentColor, 0)} 100%)`;
 
   const getTabSx = (dense: boolean) => ({
     minHeight: dense ? 36 : 40,
@@ -327,6 +331,49 @@ export const createComponentStyleMap = (theme: Theme) => {
       transition: 'border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
       ...borderGlowOverlaySx,
     } satisfies SxProps<Theme>,
+    cvSectionCardSx: {
+      position: 'relative',
+      overflow: 'hidden',
+      isolation: 'isolate',
+      '& > *': {
+        position: 'relative',
+        zIndex: 1,
+      },
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        left: '10%',
+        right: '10%',
+        bottom: -14,
+        height: 56,
+        borderRadius: '999px',
+        background: cvSectionBottomGlowGradient,
+        filter: 'blur(12px)',
+        opacity: isLight ? 0.6 : 0.72,
+        animation: `${ambientPulse} ${ambientMotion.cvSectionBottomGlowMs}ms ease-in-out infinite`,
+        pointerEvents: 'none',
+        zIndex: 0,
+      },
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        inset: 0,
+        padding: '1px',
+        borderRadius: 'inherit',
+        background: cvSectionBorderGradient,
+        backgroundSize: '220% 100%',
+        backgroundPosition: '200% center',
+        WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+        WebkitMaskComposite: 'xor',
+        maskComposite: 'exclude',
+        opacity: isLight ? 0.92 : 0.84,
+        boxShadow: 'none',
+        animation: `${backgroundSweep} ${ambientMotion.cvSectionBorderSweepMs}ms linear infinite`,
+        pointerEvents: 'none',
+        zIndex: 0,
+      },
+      ...reducedMotionSx,
+    } satisfies SxProps<Theme>,
     sectionNavigatorRootSx: {
       display: 'flex',
       flexDirection: 'column',
@@ -427,14 +474,16 @@ export const createComponentStyleMap = (theme: Theme) => {
     getWrapListSx,
     profileHeaderRowSx: {
       width: '100%',
-      display: 'grid',
-      gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: 'minmax(0, 1fr) auto' },
-      columnGap: 1.5,
-      rowGap: 1,
+      position: 'relative',
+      display: { xs: 'block', sm: 'grid' },
+      gridTemplateColumns: { sm: 'minmax(0, 1fr) auto' },
+      columnGap: { sm: 1.5 },
+      rowGap: { sm: 0.75 },
       alignItems: 'start',
     } satisfies SxProps<Theme>,
     profileHeaderContentSx: {
       minWidth: 0,
+      pr: { xs: 7, sm: 0 },
     } satisfies SxProps<Theme>,
     profileNameRowSx: { rowGap: 0.5 } satisfies SxProps<Theme>,
     profileMetaRowSx: {
@@ -451,9 +500,12 @@ export const createComponentStyleMap = (theme: Theme) => {
     profileInlineActionsSx: {
       display: 'flex',
       alignItems: 'center',
-      justifySelf: { xs: 'flex-start', sm: 'end' },
+      justifySelf: 'end',
       alignSelf: 'start',
-      pt: { sm: 0.25 },
+      position: { xs: 'absolute', sm: 'static' },
+      top: { xs: 0, sm: 'auto' },
+      right: { xs: 0, sm: 'auto' },
+      pt: 0.25,
       flexShrink: 0,
     } satisfies SxProps<Theme>,
     profileAvatarSx: {

@@ -2,9 +2,11 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../ThemeProvider';
 import { educationInfo } from '../../data/cv';
+import { ANIMATED_CARD_DURATION_MS } from '../AnimatedContentCard';
 import { EducationSection } from './EducationSection';
 
 const mockAnimatedContentList = jest.fn();
+const mockTabPanel = jest.fn();
 
 jest.mock('../AnimatedContentList', () => ({
   AnimatedContentList: (props: {
@@ -18,9 +20,24 @@ jest.mock('../AnimatedContentList', () => ({
   },
 }));
 
+jest.mock('../TabPanel', () => {
+  const actual = jest.requireActual('../TabPanel');
+
+  return {
+    ...actual,
+    TabPanel: (props: Record<string, unknown>) => {
+      mockTabPanel(props);
+      const { initialPanelGrowDelayMs: _initialPanelGrowDelayMs, ...rest } = props;
+
+      return actual.TabPanel(rest);
+    },
+  };
+});
+
 describe('EducationSection', () => {
   afterEach(() => {
     mockAnimatedContentList.mockClear();
+    mockTabPanel.mockClear();
   });
 
   it('groups highlights and skills into the shared tab panel', () => {
@@ -33,6 +50,9 @@ describe('EducationSection', () => {
     expect(mockAnimatedContentList.mock.calls[0][0]).toEqual(
       expect.objectContaining({ mountItemsOnView: true })
     );
+    expect(mockTabPanel.mock.calls[0][0]).toEqual(expect.objectContaining({
+      initialPanelGrowDelayMs: ANIMATED_CARD_DURATION_MS + 60,
+    }));
     expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
       'Highlights',
       'Coursework',

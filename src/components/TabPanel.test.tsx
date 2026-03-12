@@ -1,8 +1,13 @@
 import { Button, Chip } from '@mui/material';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import ThemeProvider from '../ThemeProvider';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { TabPanel } from './TabPanel';
+
+jest.mock('../hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: jest.fn(() => false),
+}));
 
 const IndustryChip = () => {
   const { experienceIndustryChipSx } = useComponentStyles();
@@ -10,7 +15,17 @@ const IndustryChip = () => {
   return <Chip size="small" label="Industry" variant="outlined" sx={experienceIndustryChipSx} />;
 };
 
+const mockUsePrefersReducedMotion = jest.mocked(usePrefersReducedMotion);
+
 describe('TabPanel', () => {
+  beforeEach(() => {
+    mockUsePrefersReducedMotion.mockReturnValue(false);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('starts with no selected tab and preserves full labels for accessibility when short labels are displayed', () => {
     render(
       <ThemeProvider>
@@ -209,4 +224,107 @@ describe('TabPanel', () => {
       expect(screen.queryByText('Details body')).not.toBeInTheDocument();
     }
   );
+
+  it('delays the initial grow for a visible-on-mount panel', () => {
+    jest.useFakeTimers();
+
+    render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel="Single supplemental section"
+          items={[{ value: 'skills', label: 'Skills', content: <div>Skills body</div> }]}
+          hideTabsWhenSingle
+          initialPanelGrowDelayMs={120}
+        />
+      </ThemeProvider>
+    );
+
+    expect(screen.queryByRole('tabpanel', { name: 'Skills' })).not.toBeInTheDocument();
+
+    act(() => {
+      jest.advanceTimersByTime(119);
+    });
+
+    expect(screen.queryByRole('tabpanel', { name: 'Skills' })).not.toBeInTheDocument();
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+
+    expect(screen.getByRole('tabpanel', { name: 'Skills' })).toBeVisible();
+  });
+
+  it('waits for the configured delay before showing the first manually selected panel', () => {
+    jest.useFakeTimers();
+
+    render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel="Supplemental sections"
+          items={[
+            { value: 'details', label: 'Details', content: <div>Details body</div> },
+            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+          ]}
+          initialPanelGrowDelayMs={120}
+        />
+      </ThemeProvider>
+    );
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Details' }));
+
+    expect(screen.queryByText('Details body')).not.toBeInTheDocument();
+
+    act(() => {
+      jest.advanceTimersByTime(120);
+    });
+
+    expect(screen.getByText('Details body')).toBeVisible();
+  });
+
+  it('switches later tab selections instantly after the initial grow completes', () => {
+    jest.useFakeTimers();
+
+    render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel="Supplemental sections"
+          items={[
+            { value: 'details', label: 'Details', content: <div>Details body</div> },
+            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+          ]}
+          initialPanelGrowDelayMs={120}
+        />
+      </ThemeProvider>
+    );
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Details' }));
+
+    act(() => {
+      jest.advanceTimersByTime(120 + 220);
+    });
+
+    expect(screen.getByText('Details body')).toBeVisible();
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
+
+    expect(screen.getByText('Skills body')).toBeVisible();
+    expect(screen.queryByText('Details body')).not.toBeInTheDocument();
+  });
+
+  it('bypasses the initial grow delay when reduced motion is preferred', () => {
+    mockUsePrefersReducedMotion.mockReturnValue(true);
+
+    render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel="Single supplemental section"
+          items={[{ value: 'skills', label: 'Skills', content: <div>Skills body</div> }]}
+          hideTabsWhenSingle
+          initialPanelGrowDelayMs={120}
+        />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByRole('tabpanel', { name: 'Skills' })).toBeVisible();
+  });
 });

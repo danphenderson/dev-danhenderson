@@ -7,6 +7,7 @@ import type {
 } from '../../types/cv';
 import { githubUsername } from '../../data/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { CVSectionCard } from './CVSectionCard';
 import { SectionCard } from '../layout/SectionCard';
 import { SectionPanel } from '../layout/SectionPanel';
 import { GitHubActivityList } from './GitHubActivityList';
@@ -72,7 +73,7 @@ export const CVGitHubSection = ({
   ];
 
   return (
-    <SectionCard delayMs={sectionDelayMs} id={sectionId} sx={cvSectionAnchorSx}>
+    <CVSectionCard delayMs={sectionDelayMs} id={sectionId} sx={cvSectionAnchorSx}>
       <Stack spacing={compactSidebarSectionSpacing}>
         <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
         {lead && <SectionLeadText>{lead}</SectionLeadText>}
@@ -130,6 +131,6 @@ export const CVGitHubSection = ({
           </Stack>
         </SectionCard>
       </Stack>
-    </SectionCard>
+    </CVSectionCard>
   );
 };

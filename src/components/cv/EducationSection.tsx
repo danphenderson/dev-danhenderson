@@ -1,6 +1,7 @@
 import { Box, Stack } from '@mui/material';
 import type { EducationInfo } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
+import { ANIMATED_CARD_DURATION_MS } from '../AnimatedContentCard';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem } from '../TabPanel';
@@ -47,6 +48,7 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
     educationMetaSx,
     educationProgramSx,
     getDetailListSx,
+    getItemDelayMs,
   } = useComponentStyles();
 
   if (!education.entries || education.entries.length === 0) {
@@ -67,6 +69,7 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
         );
         const filteredSkills = entry.skills?.filter((tool) => tool.trim().length > 0) ?? [];
         const educationTabs: TabPanelItem[] = [];
+        const initialPanelGrowDelayMs = getItemDelayMs(index, startDelayMs) + ANIMATED_CARD_DURATION_MS + 60;
 
         if (filteredHighlights.length) {
           educationTabs.push({
@@ -146,6 +149,7 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
                   dense
                   hideTabsWhenSingle
                   tabsVariant="fullWidth"
+                  initialPanelGrowDelayMs={initialPanelGrowDelayMs}
                 />
               </Box>
             ) : null}

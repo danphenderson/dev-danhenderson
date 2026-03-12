@@ -2,10 +2,10 @@ import type { ReactNode } from 'react';
 import { Stack } from '@mui/material';
 import type { AboutMe } from '../../types/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { ProfileCard } from './ProfileCard';
 import { SectionHeading } from '../layout/SectionHeading';
+import { CVSectionCard } from './CVSectionCard';
 
 type CVAboutSectionProps = {
   about: AboutMe;
@@ -27,7 +27,7 @@ export const CVAboutSection = ({
   const { compactSidebarSectionSpacing, sectionHeadingCompactSx } = useComponentStyles();
 
   return (
-    <SectionCard
+    <CVSectionCard
       delayMs={delayMs}
       triggerOnView={triggerOnView}
       id={sectionId}
@@ -44,6 +44,6 @@ export const CVAboutSection = ({
           </Stack>
         )}
       </Stack>
-    </SectionCard>
+    </CVSectionCard>
   );
 };

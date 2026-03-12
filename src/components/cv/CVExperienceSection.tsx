@@ -1,8 +1,8 @@
 import type { Experience } from '../../types/cv';
-import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { ExperienceList } from './ExperienceList';
 import { SectionHeading } from '../layout/SectionHeading';
+import { CVSectionCard } from './CVSectionCard';
 
 type CVExperienceSectionProps = {
   experiences: Experience[];
@@ -19,7 +19,7 @@ export const CVExperienceSection = ({
   itemOffsetMs,
   sectionId,
 }: CVExperienceSectionProps) => (
-  <SectionCard
+  <CVSectionCard
     delayMs={delayMs}
     triggerOnView={triggerOnView}
     id={sectionId}
@@ -27,5 +27,5 @@ export const CVExperienceSection = ({
   >
     <SectionHeading overline="Experience"/>
     <ExperienceList experiences={experiences} startDelayMs={itemOffsetMs} />
-  </SectionCard>
+  </CVSectionCard>
 );

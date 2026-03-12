@@ -7,6 +7,7 @@ import type {
   ExperienceProjectSegment,
 } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
+import { ANIMATED_CARD_DURATION_MS } from '../AnimatedContentCard';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem } from '../TabPanel';
@@ -90,6 +91,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
     experienceDescriptionSx,
     experienceHeaderRowSx,
     experienceIndustryChipSx,
+    getItemDelayMs,
     minWidthResetSx,
     secondaryStrongSx,
   } = useComponentStyles();
@@ -104,6 +106,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
       renderItem={(experience, index) => {
         const filteredSkills = experience.skills?.filter((tool) => tool.trim().length > 0) ?? [];
         const experienceTabs: TabPanelItem[] = [];
+        const initialPanelGrowDelayMs = getItemDelayMs(index, startDelayMs) + ANIMATED_CARD_DURATION_MS + 60;
 
         if (experience.projects?.length) {
           experienceTabs.push({
@@ -179,6 +182,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                   dense
                   hideTabsWhenSingle
                   tabsVariant="fullWidth"
+                  initialPanelGrowDelayMs={initialPanelGrowDelayMs}
                 />
               </Box>
             ) : null}

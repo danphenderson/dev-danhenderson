@@ -1,8 +1,8 @@
 import type { EducationInfo } from '../../types/cv';
-import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { EducationSection } from './EducationSection';
 import { SectionHeading } from '../layout/SectionHeading';
+import { CVSectionCard } from './CVSectionCard';
 
 type CVEducationSectionProps = {
   education: EducationInfo;
@@ -19,7 +19,7 @@ export const CVEducationSection = ({
   itemOffsetMs,
   sectionId,
 }: CVEducationSectionProps) => (
-  <SectionCard
+  <CVSectionCard
     delayMs={delayMs}
     triggerOnView={triggerOnView}
     id={sectionId}
@@ -27,5 +27,5 @@ export const CVEducationSection = ({
   >
     <SectionHeading overline="Education" />
     <EducationSection education={education} startDelayMs={itemOffsetMs} />
-  </SectionCard>
+  </CVSectionCard>
 );

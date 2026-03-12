@@ -2,7 +2,10 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../ThemeProvider';
 import { experiences } from '../../data/cv';
+import { ANIMATED_CARD_DURATION_MS } from '../AnimatedContentCard';
 import { ExperienceList } from './ExperienceList';
+
+const mockTabPanel = jest.fn();
 
 jest.mock('../AnimatedContentList', () => ({
   AnimatedContentList: ({
@@ -14,7 +17,25 @@ jest.mock('../AnimatedContentList', () => ({
   }) => <div>{items.map((item, index) => <div key={index}>{renderItem(item, index)}</div>)}</div>,
 }));
 
+jest.mock('../TabPanel', () => {
+  const actual = jest.requireActual('../TabPanel');
+
+  return {
+    ...actual,
+    TabPanel: (props: Record<string, unknown>) => {
+      mockTabPanel(props);
+      const { initialPanelGrowDelayMs: _initialPanelGrowDelayMs, ...rest } = props;
+
+      return actual.TabPanel(rest);
+    },
+  };
+});
+
 describe('ExperienceList', () => {
+  beforeEach(() => {
+    mockTabPanel.mockClear();
+  });
+
   it('renders an inline advisor link in the hemodynamics description', () => {
     const hemodynamicsExperience = experiences.find(
       (experience) => experience.title === 'Graduate Research Assistant'
@@ -37,6 +58,9 @@ describe('ExperienceList', () => {
     expect(advisorLink.closest('p')?.querySelectorAll('br')).toHaveLength(0);
     expect(screen.getByRole('tab', { name: 'Highlights' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Skills' })).toBeInTheDocument();
+    expect(mockTabPanel.mock.calls[0][0]).toEqual(expect.objectContaining({
+      initialPanelGrowDelayMs: ANIMATED_CARD_DURATION_MS + 60,
+    }));
     expect(
       screen.getByText(
         'Researching blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.'

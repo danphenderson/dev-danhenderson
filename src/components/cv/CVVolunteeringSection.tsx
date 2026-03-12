@@ -1,8 +1,8 @@
 import type { VolunteeringEntry } from '../../types/cv';
-import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { SectionHeading } from '../layout/SectionHeading';
 import { VolunteeringList } from './VolunteeringList';
+import { CVSectionCard } from './CVSectionCard';
 
 type CVVolunteeringSectionProps = {
   volunteering: VolunteeringEntry[];
@@ -19,7 +19,7 @@ export const CVVolunteeringSection = ({
   itemOffsetMs,
   sectionId,
 }: CVVolunteeringSectionProps) => (
-  <SectionCard
+  <CVSectionCard
     delayMs={delayMs}
     triggerOnView={triggerOnView}
     id={sectionId}
@@ -27,5 +27,5 @@ export const CVVolunteeringSection = ({
   >
     <SectionHeading overline="Volunteering"/>
     <VolunteeringList volunteering={volunteering} startDelayMs={itemOffsetMs} />
-  </SectionCard>
+  </CVSectionCard>
 );

@@ -1,8 +1,8 @@
 import type { Certificate } from '../../types/cv';
-import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { CertificatesList } from './CertificatesList';
 import { SectionHeading } from '../layout/SectionHeading';
+import { CVSectionCard } from './CVSectionCard';
 
 type CVCertificatesSectionProps = {
   certificates: Certificate[];
@@ -19,7 +19,7 @@ export const CVCertificatesSection = ({
   itemOffsetMs,
   sectionId,
 }: CVCertificatesSectionProps) => (
-  <SectionCard
+  <CVSectionCard
     delayMs={delayMs}
     triggerOnView={triggerOnView}
     id={sectionId}
@@ -27,5 +27,5 @@ export const CVCertificatesSection = ({
   >
     <SectionHeading overline="Certificates"/>
     <CertificatesList certificates={certificates} startDelayMs={itemOffsetMs} />
-  </SectionCard>
+  </CVSectionCard>
 );

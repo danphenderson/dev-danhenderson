@@ -1,8 +1,8 @@
 import type { CodingExample } from '../../types/cv';
-import { SectionCard } from '../layout/SectionCard';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { CodingExamplesSection } from './CodingExamplesSection';
 import { SectionHeading } from '../layout/SectionHeading';
+import { CVSectionCard } from './CVSectionCard';
 
 type CVCodingSectionProps = {
   examples: CodingExample[];
@@ -19,7 +19,7 @@ export const CVCodingSection = ({
   itemOffsetMs,
   sectionId,
 }: CVCodingSectionProps) => (
-  <SectionCard
+  <CVSectionCard
     delayMs={delayMs}
     triggerOnView={triggerOnView}
     id={sectionId}
@@ -27,5 +27,5 @@ export const CVCodingSection = ({
   >
     <SectionHeading overline="Coding Examples" />
     <CodingExamplesSection examples={examples} startDelayMs={itemOffsetMs} />
-  </SectionCard>
+  </CVSectionCard>
 );
