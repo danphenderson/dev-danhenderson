@@ -34,7 +34,7 @@ describe('ExperienceList', () => {
       'href',
       'https://pages.mtu.edu/~jiguangs/Homepage_of_Jiguang_Sun/Welcome.html'
     );
-    expect(advisorLink.closest('p')?.querySelectorAll('br')).toHaveLength(1);
+    expect(advisorLink.closest('p')?.querySelectorAll('br')).toHaveLength(0);
     expect(screen.getByRole('tab', { name: 'Details' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Skills' })).toBeInTheDocument();
   });
