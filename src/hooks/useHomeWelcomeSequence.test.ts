@@ -12,22 +12,35 @@ const createMockAudioState = (overrides: Record<string, unknown> = {}) => ({
   audioConsent: 'unknown' as AudioConsent,
   grantAudioConsent: jest.fn(),
   declineAudioConsent: jest.fn(),
+  ...overrides,
+});
+
+const createMockOnboardingState = (overrides: Record<string, unknown> = {}) => ({
   showPauseHint: false,
-  setShowPauseHint: jest.fn(),
   showDarkModeHint: false,
-  setShowDarkModeHint: jest.fn(),
+  openPauseHint: jest.fn(),
+  dismissPauseHint: jest.fn(),
+  openDarkModeHint: jest.fn(),
+  dismissDarkModeHint: jest.fn(),
+  resetHints: jest.fn(),
   ...overrides,
 });
 
 let mockAudioState = createMockAudioState();
+let mockOnboardingState = createMockOnboardingState();
 
 jest.mock('../WelcomeAudioProvider', () => ({
   useWelcomeAudio: () => mockAudioState,
 }));
 
+jest.mock('../WelcomeOnboardingProvider', () => ({
+  useWelcomeOnboarding: () => mockOnboardingState,
+}));
+
 describe('useHomeWelcomeSequence', () => {
   beforeEach(() => {
     mockAudioState = createMockAudioState();
+    mockOnboardingState = createMockOnboardingState();
   });
 
   it('opens prompt when audioConsent is unknown', () => {
@@ -69,7 +82,8 @@ describe('useHomeWelcomeSequence', () => {
 
     expect(mockAudioState.play).toHaveBeenCalledTimes(1);
     expect(result.current.isPromptOpen).toBe(false);
-    expect(mockAudioState.setShowPauseHint).toHaveBeenCalledWith(true);
+    expect(mockOnboardingState.dismissDarkModeHint).toHaveBeenCalledTimes(1);
+    expect(mockOnboardingState.openPauseHint).toHaveBeenCalledTimes(1);
   });
 
   it('handlePlay sets isLoading during play', async () => {
@@ -117,13 +131,20 @@ describe('useHomeWelcomeSequence', () => {
     const { unmount } = renderHook(() => useHomeWelcomeSequence());
     unmount();
 
-    expect(mockAudioState.setShowPauseHint).toHaveBeenCalledWith(false);
-    expect(mockAudioState.setShowDarkModeHint).toHaveBeenCalledWith(false);
+    expect(mockOnboardingState.resetHints).toHaveBeenCalledTimes(1);
   });
 
   it('returns error from audio context', () => {
     mockAudioState = createMockAudioState({ error: 'Something went wrong' });
     const { result } = renderHook(() => useHomeWelcomeSequence());
     expect(result.current.error).toBe('Something went wrong');
+  });
+
+  it('opens the dark mode hint once the audio prompt has been handled and no pause hint is visible', () => {
+    mockAudioState = createMockAudioState({ audioConsent: 'declined' });
+    const { result } = renderHook(() => useHomeWelcomeSequence());
+
+    expect(result.current.isPromptOpen).toBe(false);
+    expect(mockOnboardingState.openDarkModeHint).toHaveBeenCalledTimes(1);
   });
 });

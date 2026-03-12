@@ -3,7 +3,9 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { MemoryRouter } from 'react-router-dom';
 import { useAppTheme } from '../ThemeProvider';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
+import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
 import Header from './Header';
+import { routerFuture } from '../routerFuture';
 
 jest.mock('@mui/material/useMediaQuery', () => jest.fn());
 
@@ -13,6 +15,10 @@ jest.mock('../ThemeProvider', () => ({
 
 jest.mock('../WelcomeAudioProvider', () => ({
   useWelcomeAudio: jest.fn(),
+}));
+
+jest.mock('../WelcomeOnboardingProvider', () => ({
+  useWelcomeOnboarding: jest.fn(),
 }));
 
 jest.mock('./header/HeaderPageDial', () => ({
@@ -42,6 +48,7 @@ jest.mock('./header/HeaderPageDial', () => ({
 const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQuery>;
 const mockUseAppTheme = useAppTheme as jest.MockedFunction<typeof useAppTheme>;
 const mockUseWelcomeAudio = useWelcomeAudio as jest.MockedFunction<typeof useWelcomeAudio>;
+const mockUseWelcomeOnboarding = useWelcomeOnboarding as jest.MockedFunction<typeof useWelcomeOnboarding>;
 
 const createAudioState = (
   overrides: Partial<ReturnType<typeof useWelcomeAudio>> = {}
@@ -54,16 +61,25 @@ const createAudioState = (
   audioConsent: 'granted',
   grantAudioConsent: jest.fn(),
   declineAudioConsent: jest.fn(),
+  ...overrides,
+});
+
+const createOnboardingState = (
+  overrides: Partial<ReturnType<typeof useWelcomeOnboarding>> = {}
+): ReturnType<typeof useWelcomeOnboarding> => ({
   showPauseHint: false,
-  setShowPauseHint: jest.fn(),
   showDarkModeHint: false,
-  setShowDarkModeHint: jest.fn(),
+  openPauseHint: jest.fn(),
+  dismissPauseHint: jest.fn(),
+  openDarkModeHint: jest.fn(),
+  dismissDarkModeHint: jest.fn(),
+  resetHints: jest.fn(),
   ...overrides,
 });
 
 const renderHeader = (initialEntry: string) =>
   render(
-    <MemoryRouter initialEntries={[initialEntry]}>
+    <MemoryRouter initialEntries={[initialEntry]} future={routerFuture}>
       <Header />
     </MemoryRouter>
   );
@@ -82,6 +98,7 @@ describe('Header controls', () => {
       toggleTheme: jest.fn(),
     });
     mockUseWelcomeAudio.mockReturnValue(createAudioState());
+    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState());
   });
 
   afterEach(() => {
@@ -110,22 +127,22 @@ describe('Header controls', () => {
 
   it('toggles theme and dismisses dark mode hint when theme button is clicked', () => {
     const toggleTheme = jest.fn();
-    const setShowDarkModeHint = jest.fn();
+    const dismissDarkModeHint = jest.fn();
     mockUseAppTheme.mockReturnValue({
       mode: 'light',
       toggleTheme,
     });
-    mockUseWelcomeAudio.mockReturnValue(
-      createAudioState({
+    mockUseWelcomeOnboarding.mockReturnValue(
+      createOnboardingState({
         showDarkModeHint: true,
-        setShowDarkModeHint,
+        dismissDarkModeHint,
       })
     );
 
     renderHeader('/cv');
 
     fireEvent.click(screen.getByLabelText('Toggle color theme'));
-    expect(setShowDarkModeHint).toHaveBeenCalledWith(false);
+    expect(dismissDarkModeHint).toHaveBeenCalledTimes(1);
     expect(toggleTheme).toHaveBeenCalledTimes(1);
   });
 

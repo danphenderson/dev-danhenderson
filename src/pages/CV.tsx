@@ -61,6 +61,11 @@ type CVResolvedSectionDescriptor = {
   triggerOnView: boolean;
 };
 
+type CVSectionDefinition = {
+  key: CVSectionKey;
+  render: (layout: { delayMs: number; triggerOnView: boolean }) => ReactNode;
+};
+
 export default function CV() {
   const appStyles = useAppStyles();
   const { motionTokens } = useComponentStyles();
@@ -115,95 +120,66 @@ export default function CV() {
   );
 
   const sectionNavigator = <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator" />;
-  const sectionDescriptors: Record<CVSectionKey, CVResolvedSectionDescriptor> = {
-    about: {
-      id: cvSectionMetadata.about.id,
+  const sectionDefinitions: CVSectionDefinition[] = [
+    {
       key: 'about',
-      node: (
+      render: (layout) => (
         <CVAboutSection
           about={aboutMe}
           actions={aboutSpeedDial}
           footer={sectionNavigator}
-          delayMs={cvPageSectionLayout.about[layoutMode].delayMs}
-          triggerOnView={cvPageSectionLayout.about[layoutMode].triggerOnView}
+          delayMs={layout.delayMs}
+          triggerOnView={layout.triggerOnView}
           sectionId={cvSectionMetadata.about.id}
         />
       ),
-      placement: {
-        order: cvPageSectionLayout.about[layoutMode].order,
-        region: cvPageSectionLayout.about[layoutMode].region,
-      },
-      delayMs: cvPageSectionLayout.about[layoutMode].delayMs,
-      triggerOnView: cvPageSectionLayout.about[layoutMode].triggerOnView,
     },
-    experience: {
-      id: cvSectionMetadata.experience.id,
+    {
       key: 'experience',
-      node: (
+      render: (layout) => (
         <CVExperienceSection
           experiences={experiences}
-          delayMs={cvPageSectionLayout.experience[layoutMode].delayMs}
-          triggerOnView={cvPageSectionLayout.experience[layoutMode].triggerOnView}
+          delayMs={layout.delayMs}
+          triggerOnView={layout.triggerOnView}
           itemOffsetMs={itemOffsetMs}
           sectionId={cvSectionMetadata.experience.id}
         />
       ),
-      placement: {
-        order: cvPageSectionLayout.experience[layoutMode].order,
-        region: cvPageSectionLayout.experience[layoutMode].region,
-      },
-      delayMs: cvPageSectionLayout.experience[layoutMode].delayMs,
-      triggerOnView: cvPageSectionLayout.experience[layoutMode].triggerOnView,
     },
-    education: {
-      id: cvSectionMetadata.education.id,
+    {
       key: 'education',
-      node: (
+      render: (layout) => (
         <CVEducationSection
           education={educationInfo}
-          delayMs={cvPageSectionLayout.education[layoutMode].delayMs}
-          triggerOnView={cvPageSectionLayout.education[layoutMode].triggerOnView}
+          delayMs={layout.delayMs}
+          triggerOnView={layout.triggerOnView}
           itemOffsetMs={itemOffsetMs}
           sectionId={cvSectionMetadata.education.id}
         />
       ),
-      placement: {
-        order: cvPageSectionLayout.education[layoutMode].order,
-        region: cvPageSectionLayout.education[layoutMode].region,
-      },
-      delayMs: cvPageSectionLayout.education[layoutMode].delayMs,
-      triggerOnView: cvPageSectionLayout.education[layoutMode].triggerOnView,
     },
-    volunteering: {
-      id: cvSectionMetadata.volunteering.id,
+    {
       key: 'volunteering',
-      node: (
+      render: (layout) => (
         <CVVolunteeringSection
           volunteering={volunteering}
-          delayMs={cvPageSectionLayout.volunteering[layoutMode].delayMs}
-          triggerOnView={cvPageSectionLayout.volunteering[layoutMode].triggerOnView}
+          delayMs={layout.delayMs}
+          triggerOnView={layout.triggerOnView}
           itemOffsetMs={itemOffsetMs}
           sectionId={cvSectionMetadata.volunteering.id}
         />
       ),
-      placement: {
-        order: cvPageSectionLayout.volunteering[layoutMode].order,
-        region: cvPageSectionLayout.volunteering[layoutMode].region,
-      },
-      delayMs: cvPageSectionLayout.volunteering[layoutMode].delayMs,
-      triggerOnView: cvPageSectionLayout.volunteering[layoutMode].triggerOnView,
     },
-    github: {
-      id: cvSectionMetadata.github.id,
+    {
       key: 'github',
-      node: (
+      render: (layout) => (
         <CVGitHubSection
           activity={activity}
           contributions={contributions}
           projects={projects}
           loading={loading}
           error={error}
-          sectionDelayMs={cvPageSectionLayout.github[layoutMode].delayMs}
+          sectionDelayMs={layout.delayMs}
           nestedDelayOffsetMs={githubNestedDelayOffsetMs}
           itemOffsetMs={itemOffsetMs}
           projectTitle={isMobile ? 'Public Projects' : 'Projects'}
@@ -211,75 +187,64 @@ export default function CV() {
           sectionId={cvSectionMetadata.github.id}
         />
       ),
-      placement: {
-        order: cvPageSectionLayout.github[layoutMode].order,
-        region: cvPageSectionLayout.github[layoutMode].region,
-      },
-      delayMs: cvPageSectionLayout.github[layoutMode].delayMs,
-      triggerOnView: cvPageSectionLayout.github[layoutMode].triggerOnView,
     },
-    certificates: {
-      id: cvSectionMetadata.certificates.id,
+    {
       key: 'certificates',
-      node: (
+      render: (layout) => (
         <CVCertificatesSection
           certificates={certificates}
-          delayMs={cvPageSectionLayout.certificates[layoutMode].delayMs}
-          triggerOnView={cvPageSectionLayout.certificates[layoutMode].triggerOnView}
+          delayMs={layout.delayMs}
+          triggerOnView={layout.triggerOnView}
           itemOffsetMs={itemOffsetMs}
           sectionId={cvSectionMetadata.certificates.id}
         />
       ),
-      placement: {
-        order: cvPageSectionLayout.certificates[layoutMode].order,
-        region: cvPageSectionLayout.certificates[layoutMode].region,
-      },
-      delayMs: cvPageSectionLayout.certificates[layoutMode].delayMs,
-      triggerOnView: cvPageSectionLayout.certificates[layoutMode].triggerOnView,
     },
-    tools: {
-      id: cvSectionMetadata.tools.id,
+    {
       key: 'tools',
-      node: (
+      render: (layout) => (
         <CVStackToolsSection
           sections={stackAndTools}
           lead={stackAndToolsLead}
-          delayMs={cvPageSectionLayout.tools[layoutMode].delayMs}
-          triggerOnView={cvPageSectionLayout.tools[layoutMode].triggerOnView}
+          delayMs={layout.delayMs}
+          triggerOnView={layout.triggerOnView}
           itemOffsetMs={itemOffsetMs}
           sectionId={cvSectionMetadata.tools.id}
         />
       ),
-      placement: {
-        order: cvPageSectionLayout.tools[layoutMode].order,
-        region: cvPageSectionLayout.tools[layoutMode].region,
-      },
-      delayMs: cvPageSectionLayout.tools[layoutMode].delayMs,
-      triggerOnView: cvPageSectionLayout.tools[layoutMode].triggerOnView,
     },
-    coding: {
-      id: cvSectionMetadata.coding.id,
+    {
       key: 'coding',
-      node: (
+      render: (layout) => (
         <CVCodingSection
           examples={codingExamples}
-          delayMs={cvPageSectionLayout.coding[layoutMode].delayMs}
-          triggerOnView={cvPageSectionLayout.coding[layoutMode].triggerOnView}
+          delayMs={layout.delayMs}
+          triggerOnView={layout.triggerOnView}
           itemOffsetMs={itemOffsetMs}
           sectionId={cvSectionMetadata.coding.id}
         />
       ),
-      placement: {
-        order: cvPageSectionLayout.coding[layoutMode].order,
-        region: cvPageSectionLayout.coding[layoutMode].region,
-      },
-      delayMs: cvPageSectionLayout.coding[layoutMode].delayMs,
-      triggerOnView: cvPageSectionLayout.coding[layoutMode].triggerOnView,
     },
-  };
+  ];
+
+  const sectionDescriptors: CVResolvedSectionDescriptor[] = sectionDefinitions.map(({ key, render }) => {
+    const layout = cvPageSectionLayout[key][layoutMode];
+
+    return {
+      id: cvSectionMetadata[key].id,
+      key,
+      node: render(layout),
+      placement: {
+        order: layout.order,
+        region: layout.region,
+      },
+      delayMs: layout.delayMs,
+      triggerOnView: layout.triggerOnView,
+    };
+  });
 
   const getSectionNodesForRegion = (region: CVSectionRegion) =>
-    (Object.values(sectionDescriptors) as CVResolvedSectionDescriptor[])
+    sectionDescriptors
       .filter((descriptor) => descriptor.placement.region === region)
       .sort((left, right) => left.placement.order - right.placement.order)
       .map((descriptor) => (

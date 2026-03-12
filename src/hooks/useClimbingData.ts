@@ -35,9 +35,5 @@ export function useClimbingData() {
   return {
     ticks,
     todos,
-    loading: false,
-    todosLoading: false,
-    error: null as string | null,
-    todosError: null as string | null,
   };
 }

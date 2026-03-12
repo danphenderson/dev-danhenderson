@@ -15,6 +15,7 @@ import { useAppTheme } from '../ThemeProvider';
 import { avatar as avatarSrc } from '../data/cv';
 import { useAppStyles } from '../styles/appStyles';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
+import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
 import type { AppSpeedDialAction } from './AppSpeedDial';
 import { HeaderActions } from './header/HeaderActions';
 import { HeaderNav } from './header/HeaderNav';
@@ -139,11 +140,13 @@ export default function Header() {
     isPlaying,
     pause,
     play,
-    showPauseHint,
-    setShowPauseHint,
-    showDarkModeHint,
-    setShowDarkModeHint,
   } = useWelcomeAudio();
+  const {
+    showPauseHint,
+    dismissPauseHint,
+    showDarkModeHint,
+    dismissDarkModeHint,
+  } = useWelcomeOnboarding();
   const path = location.pathname.toLowerCase();
   const pageDialMode = getHeaderPageDialMode(path);
   const showPageDial = Boolean(pageDialMode);
@@ -195,7 +198,7 @@ export default function Header() {
 
   const handleThemeToggle = () => {
     if (showDarkModeHint) {
-      setShowDarkModeHint(false);
+      dismissDarkModeHint();
     }
     toggleTheme();
   };
@@ -247,7 +250,7 @@ export default function Header() {
               id="pause-audio-popover"
               open={showPauseHint && Boolean(pauseButtonRef.current)}
               anchorEl={pauseButtonRef.current}
-              onClose={() => setShowPauseHint(false)}
+              onClose={dismissPauseHint}
               title="Pause anytime"
               body="Use this pause button in the header to stop the welcome audio whenever you want."
             />
@@ -255,7 +258,7 @@ export default function Header() {
               id="dark-mode-popover"
               open={showDarkModeHint && Boolean(themeButtonRef.current)}
               anchorEl={themeButtonRef.current}
-              onClose={() => setShowDarkModeHint(false)}
+              onClose={dismissDarkModeHint}
               title={themeHintTitle}
               body={themeHintBody}
             />

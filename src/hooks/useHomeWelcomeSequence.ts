@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
+import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
 
 type HomeWelcomeSequence = {
   error?: string;
@@ -17,11 +18,16 @@ export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
     error,
     audioConsent,
     declineAudioConsent,
-    showPauseHint,
-    setShowPauseHint,
-    showDarkModeHint,
-    setShowDarkModeHint,
   } = useWelcomeAudio();
+  const {
+    showPauseHint,
+    showDarkModeHint,
+    openPauseHint,
+    openDarkModeHint,
+    dismissPauseHint,
+    dismissDarkModeHint,
+    resetHints,
+  } = useWelcomeOnboarding();
   const [isPromptOpen, setIsPromptOpen] = useState(false);
   const [hasShownDarkModePrompt, setHasShownDarkModePrompt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,21 +46,21 @@ export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
 
   useEffect(
     () => () => {
-      setShowPauseHint(false);
-      setShowDarkModeHint(false);
+      resetHints();
     },
-    [setShowPauseHint, setShowDarkModeHint],
+    [resetHints],
   );
 
   useEffect(() => {
     if (hasShownDarkModePrompt || !hasHandledAudioPrompt || showPauseHint || isPromptOpen) return;
-    setShowDarkModeHint(true);
+    openDarkModeHint();
     setHasShownDarkModePrompt(true);
-  }, [hasHandledAudioPrompt, hasShownDarkModePrompt, showPauseHint, isPromptOpen, setShowDarkModeHint]);
+  }, [hasHandledAudioPrompt, hasShownDarkModePrompt, showPauseHint, isPromptOpen, openDarkModeHint]);
 
   const handleOptOut = () => {
     declineAudioConsent();
     setIsPromptOpen(false);
+    dismissPauseHint();
   };
 
   const handlePlay = async () => {
@@ -62,7 +68,8 @@ export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
       setIsLoading(true);
       await play();
       setIsPromptOpen(false);
-      setShowPauseHint(true);
+      dismissDarkModeHint();
+      openPauseHint();
     } catch (err) {
       console.error('Unable to play welcome audio', err);
     } finally {

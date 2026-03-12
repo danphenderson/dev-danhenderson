@@ -1,5 +1,6 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { useGithubProfile } from './useGithubProfile';
+import { resetGitHubProfileDataCacheForTests } from './githubProfileData';
 
 const fallbackActivity = [
   { label: 'Maintaining BlockOpt.jl (trust-region quasi-Newton optimizer in Julia).', href: 'https://github.com/danphenderson/BlockOpt.jl' },
@@ -37,6 +38,7 @@ describe('useGithubProfile', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    resetGitHubProfileDataCacheForTests();
   });
 
   afterEach(() => {

@@ -55,13 +55,4 @@ describe('useClimbingData', () => {
       expect(todo.id.length).toBeGreaterThan(0);
     });
   });
-
-  it('returns expected loading and error states', () => {
-    const { result } = renderHook(() => useClimbingData());
-
-    expect(result.current.loading).toBe(false);
-    expect(result.current.todosLoading).toBe(false);
-    expect(result.current.error).toBeNull();
-    expect(result.current.todosError).toBeNull();
-  });
 });

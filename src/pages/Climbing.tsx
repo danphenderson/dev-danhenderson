@@ -1,10 +1,9 @@
 import React from 'react';
-import { Alert, Box, Link as MuiLink, Stack } from '@mui/material';
+import { Box, Link as MuiLink, Stack } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
-import { LoadingBars } from '../components/LoadingBars';
 import { useClimbingData, TickRow, TodoRow } from '../hooks/useClimbingData';
 import { useAppStyles } from '../styles/appStyles';
 import { SectionLeadText } from '../components/text';
@@ -54,12 +53,7 @@ const todoColumns: GridColDef<TodoRow>[] = [
 
 export default function Climbing() {
   const appStyles = useAppStyles();
-  const { ticks, todos, loading, todosLoading, error, todosError } = useClimbingData();
-  const LoadingOverlay = () => (
-    <Box sx={appStyles.loadingOverlaySx}>
-      <LoadingBars label="Loading climbing data" compact />
-    </Box>
-  );
+  const { ticks, todos } = useClimbingData();
 
   return (
     <PageFrame image="assets/climbing/climbing-locations.png" maxWidth={1200}>
@@ -69,11 +63,6 @@ export default function Climbing() {
           <SectionLeadText sx={appStyles.sectionLeadSx}>
             A collection of routes I've remembered to tick on Mountain Project.
           </SectionLeadText>
-          {error && (
-            <Alert severity="error" sx={appStyles.errorAlertSx}>
-              {error}
-            </Alert>
-          )}
           <Box sx={appStyles.dataGridContainerSx}>
             <DataGrid
               rows={ticks}
@@ -81,24 +70,17 @@ export default function Climbing() {
               autoHeight
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10, 25, 50]}
-              slots={{ loadingOverlay: LoadingOverlay }}
               initialState={{
                 pagination: {
                   paginationModel: { pageSize: 10, page: 0 },
                 },
               }}
-              loading={loading}
             />
           </Box>
           <SectionHeading overline="TODO Routes" sx={appStyles.sectionHeadingOffsetSx} />
           <SectionLeadText sx={appStyles.sectionLeadSx}>
             A collection of routes I'm interested in climbing.
           </SectionLeadText>
-          {todosError && (
-            <Alert severity="error" sx={appStyles.errorAlertSx}>
-              {todosError}
-            </Alert>
-          )}
           <Box sx={appStyles.dataGridContainerSx}>
             <DataGrid
               rows={todos}
@@ -106,13 +88,11 @@ export default function Climbing() {
               autoHeight
               disableRowSelectionOnClick
               pageSizeOptions={[5, 10, 25, 50]}
-              slots={{ loadingOverlay: LoadingOverlay }}
               initialState={{
                 pagination: {
                   paginationModel: { pageSize: 10, page: 0 },
                 },
               }}
-              loading={todosLoading}
             />
           </Box>
         </Stack>

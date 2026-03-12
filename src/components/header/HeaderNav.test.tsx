@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ThemeProvider from '../../ThemeProvider';
+import { routerFuture } from '../../routerFuture';
 import { HeaderNav } from './HeaderNav';
 
 const pages = [
@@ -12,7 +13,7 @@ describe('HeaderNav', () => {
   it('renders desktop navigation buttons for each page', () => {
     render(
       <ThemeProvider>
-        <MemoryRouter>
+        <MemoryRouter future={routerFuture}>
           <HeaderNav
             pages={pages}
             showNavigationLinks={true}
@@ -35,7 +36,7 @@ describe('HeaderNav', () => {
   it('hides navigation links when showNavigationLinks is false', () => {
     render(
       <ThemeProvider>
-        <MemoryRouter>
+        <MemoryRouter future={routerFuture}>
           <HeaderNav
             pages={pages}
             showNavigationLinks={false}
@@ -58,7 +59,7 @@ describe('HeaderNav', () => {
   it('renders the mobile menu button when isMobile is true', () => {
     render(
       <ThemeProvider>
-        <MemoryRouter>
+        <MemoryRouter future={routerFuture}>
           <HeaderNav
             pages={pages}
             showNavigationLinks={true}
@@ -82,7 +83,7 @@ describe('HeaderNav', () => {
 
     render(
       <ThemeProvider>
-        <MemoryRouter>
+        <MemoryRouter future={routerFuture}>
           <HeaderNav
             pages={pages}
             showNavigationLinks={true}
@@ -106,7 +107,7 @@ describe('HeaderNav', () => {
   it('renders leftContent when provided', () => {
     render(
       <ThemeProvider>
-        <MemoryRouter>
+        <MemoryRouter future={routerFuture}>
           <HeaderNav
             pages={pages}
             showNavigationLinks={true}

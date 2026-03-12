@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { routerFuture } from '../routerFuture';
 import ThemeProvider from '../ThemeProvider';
 import NotFound from './NotFound';
 
@@ -11,7 +12,7 @@ jest.mock('../components/BackgroundPaper', () => ({
 describe('NotFound', () => {
   it('renders 404 Not Found message', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={routerFuture}>
         <ThemeProvider>
           <NotFound />
         </ThemeProvider>
@@ -23,7 +24,7 @@ describe('NotFound', () => {
 
   it('renders navigation links', () => {
     render(
-      <MemoryRouter>
+      <MemoryRouter future={routerFuture}>
         <ThemeProvider>
           <NotFound />
         </ThemeProvider>

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ThemeProvider from '../ThemeProvider';
 import Home from './Home';
+import { WelcomeOnboardingProvider, useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
 
 type MockWelcomeAudioState = {
   play: () => Promise<void>;
@@ -12,10 +13,6 @@ type MockWelcomeAudioState = {
   audioConsent: 'unknown' | 'granted' | 'declined';
   grantAudioConsent: () => void;
   declineAudioConsent: () => void;
-  showPauseHint: boolean;
-  setShowPauseHint: (show: boolean) => void;
-  showDarkModeHint: boolean;
-  setShowDarkModeHint: (show: boolean) => void;
 };
 
 const mockWelcomeAudioContext = React.createContext<MockWelcomeAudioState | null>(null);
@@ -71,11 +68,31 @@ jest.mock('../components/BackgroundPaper', () => ({
   ),
 }));
 
+const OnboardingStateProbe = () => {
+  const {
+    showPauseHint,
+    showDarkModeHint,
+    dismissPauseHint,
+    dismissDarkModeHint,
+  } = useWelcomeOnboarding();
+
+  return (
+    <>
+      <button onClick={dismissPauseHint} type="button">
+        Dismiss pause hint
+      </button>
+      <button onClick={dismissDarkModeHint} type="button">
+        Dismiss dark mode hint
+      </button>
+      <div data-testid="pause-hint-open">{String(showPauseHint)}</div>
+      <div data-testid="dark-mode-hint-open">{String(showDarkModeHint)}</div>
+    </>
+  );
+};
+
 const HomeHarness = ({ initialAudioConsent = 'unknown' }: { initialAudioConsent?: MockWelcomeAudioState['audioConsent'] }) => {
   const [audioConsent, setAudioConsent] = React.useState<MockWelcomeAudioState['audioConsent']>(initialAudioConsent);
   const [isPlaying, setIsPlaying] = React.useState(initialAudioConsent === 'granted');
-  const [showPauseHint, setShowPauseHint] = React.useState(false);
-  const [showDarkModeHint, setShowDarkModeHint] = React.useState(false);
   const pause = React.useMemo(() => jest.fn(), []);
   const grantAudioConsent = React.useMemo(() => jest.fn(), []);
 
@@ -86,7 +103,6 @@ const HomeHarness = ({ initialAudioConsent = 'unknown' }: { initialAudioConsent?
 
   const declineAudioConsent = React.useCallback(() => {
     setAudioConsent('declined');
-    setShowPauseHint(false);
   }, []);
 
   return (
@@ -100,22 +116,13 @@ const HomeHarness = ({ initialAudioConsent = 'unknown' }: { initialAudioConsent?
         audioConsent,
         grantAudioConsent,
         declineAudioConsent,
-        showPauseHint,
-        setShowPauseHint,
-        showDarkModeHint,
-        setShowDarkModeHint,
       }}
     >
       <ThemeProvider>
-        <Home />
-        <button onClick={() => setShowPauseHint(false)} type="button">
-          Dismiss pause hint
-        </button>
-        <button onClick={() => setShowDarkModeHint(false)} type="button">
-          Dismiss dark mode hint
-        </button>
-        <div data-testid="pause-hint-open">{String(showPauseHint)}</div>
-        <div data-testid="dark-mode-hint-open">{String(showDarkModeHint)}</div>
+        <WelcomeOnboardingProvider>
+          <Home />
+          <OnboardingStateProbe />
+        </WelcomeOnboardingProvider>
       </ThemeProvider>
     </MockWelcomeAudioProvider>
   );

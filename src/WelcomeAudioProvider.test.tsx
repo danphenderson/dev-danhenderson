@@ -21,10 +21,25 @@ const AudioConsumer = () => {
 describe('WelcomeAudioProvider', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    window.SC = {
+      Widget: () => ({
+        play: jest.fn(),
+        pause: jest.fn(),
+        bind: jest.fn((event: string, listener: () => void) => {
+          if (event === 'ready') {
+            listener();
+          }
+        }),
+        unbind: jest.fn(),
+        isPaused: jest.fn((callback: (paused: boolean) => void) => callback(true)),
+        setLoop: jest.fn(),
+      }),
+    };
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
+    delete window.SC;
   });
 
   it('provides default context values', () => {
@@ -38,15 +53,16 @@ describe('WelcomeAudioProvider', () => {
     expect(screen.getByTestId('playing')).toHaveTextContent('false');
   });
 
-  it('grantAudioConsent persists granted to localStorage and renders the iframe', () => {
+  it('grantAudioConsent persists granted to localStorage and renders the iframe', async () => {
     render(
       <WelcomeAudioProvider>
         <AudioConsumer />
       </WelcomeAudioProvider>
     );
 
-    act(() => {
+    await act(async () => {
       screen.getByRole('button', { name: 'grant' }).click();
+      await Promise.resolve();
     });
 
     expect(screen.getByTestId('consent')).toHaveTextContent('granted');

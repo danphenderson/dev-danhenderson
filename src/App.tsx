@@ -9,10 +9,11 @@ import Climbing from './pages/Climbing';
 import NotFound from './pages/NotFound';
 
 import { Box } from '@mui/material';
+import { routerFuture } from './routerFuture';
 
 export default function App() {
   return (
-    <BrowserRouter basename={process.env.PUBLIC_URL}>
+    <BrowserRouter basename={process.env.PUBLIC_URL} future={routerFuture}>
       <Box>
         <Header/>
         <Routes>

@@ -160,7 +160,7 @@ describe('TabPanel', () => {
   });
 
   it.each(['fullWidth', 'scrollable'] as const)(
-    'renders selected outer tabs as flush half-pills for %s tabs',
+    'switches the selected tab and rendered panel for %s tabs',
     (tabsVariant) => {
       render(
         <ThemeProvider>
@@ -196,25 +196,17 @@ describe('TabPanel', () => {
 
       fireEvent.click(detailsTab);
 
-      const detailsStyle = window.getComputedStyle(detailsTab);
-
-      expect(detailsStyle.backgroundColor).not.toBe('transparent');
-      expect(detailsStyle.boxShadow).not.toContain('inset');
-      expect(parseFloat(detailsStyle.borderTopLeftRadius)).toBeGreaterThan(0);
-      expect(parseFloat(detailsStyle.borderBottomLeftRadius)).toBeGreaterThan(0);
-      expect(parseFloat(detailsStyle.borderTopRightRadius)).toBe(0);
-      expect(parseFloat(detailsStyle.borderBottomRightRadius)).toBe(0);
+      expect(detailsTab).toHaveAttribute('aria-selected', 'true');
+      expect(skillsTab).toHaveAttribute('aria-selected', 'false');
+      expect(screen.getByText('Details body')).toBeVisible();
+      expect(screen.queryByText('Skills body')).not.toBeInTheDocument();
 
       fireEvent.click(skillsTab);
 
-      const skillsStyle = window.getComputedStyle(skillsTab);
-
-      expect(skillsStyle.backgroundColor).not.toBe('transparent');
-      expect(skillsStyle.boxShadow).not.toContain('inset');
-      expect(parseFloat(skillsStyle.borderTopLeftRadius)).toBe(0);
-      expect(parseFloat(skillsStyle.borderBottomLeftRadius)).toBe(0);
-      expect(parseFloat(skillsStyle.borderTopRightRadius)).toBeGreaterThan(0);
-      expect(parseFloat(skillsStyle.borderBottomRightRadius)).toBeGreaterThan(0);
+      expect(detailsTab).toHaveAttribute('aria-selected', 'false');
+      expect(skillsTab).toHaveAttribute('aria-selected', 'true');
+      expect(screen.getByText('Skills body')).toBeVisible();
+      expect(screen.queryByText('Details body')).not.toBeInTheDocument();
     }
   );
 });

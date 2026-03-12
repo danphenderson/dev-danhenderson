@@ -11,10 +11,6 @@ jest.mock('../hooks/useClimbingData', () => ({
     todos: [
       { id: 'todo-1', route: 'The Tooth', grade: '5.4', location: 'Alpental', url: 'https://mp.com/route/2' },
     ],
-    loading: false,
-    todosLoading: false,
-    error: null,
-    todosError: null,
   }),
   TickRow: undefined,
   TodoRow: undefined,

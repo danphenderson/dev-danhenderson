@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import { routerFuture } from '../routerFuture';
 import ThemeProvider from '../ThemeProvider';
 import Photography from './Photography';
 
@@ -39,7 +40,7 @@ describe('Photography', () => {
   it('renders the photography page with album count and category cards', () => {
     render(
       <ThemeProvider>
-        <MemoryRouter>
+        <MemoryRouter future={routerFuture}>
           <Photography />
         </MemoryRouter>
       </ThemeProvider>

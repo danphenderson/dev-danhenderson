@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { routerFuture } from '../routerFuture';
 import ThemeProvider from '../ThemeProvider';
 import PhotographyCategory from './PhotographyCategory';
 
@@ -40,7 +41,7 @@ jest.mock('../components/PhotoAlbum', () => ({
 const renderWithSlug = (slug: string) =>
   render(
     <ThemeProvider>
-      <MemoryRouter initialEntries={[`/photography/${slug}`]}>
+      <MemoryRouter initialEntries={[`/photography/${slug}`]} future={routerFuture}>
         <Routes>
           <Route path="/photography/:slug" element={<PhotographyCategory />} />
         </Routes>
