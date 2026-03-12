@@ -151,6 +151,10 @@ PORT=3000 npm start
 | `npm run build` | `react-scripts build` | Create the production build in `build/` |
 | `npm test` | `react-scripts test` | Start the Jest runner |
 | `npm run eject` | `react-scripts eject` | Eject CRA configuration |
+| `npm run test:e2e` | `playwright test` | Run Playwright end-to-end tests (headless) |
+| `npm run test:e2e:headed` | `playwright test --headed` | Run E2E tests in a visible browser |
+| `npm run test:e2e:ui` | `playwright test --ui` | Open the Playwright interactive UI runner |
+| `npm run serve:e2e` | `serve -s build -l 3100` | Serve the production build locally on port 3100 |
 
 ### CI workflows
 
@@ -158,6 +162,56 @@ GitHub Actions workflows live in `.github/workflows/`:
 
 - `tests.yml` runs `CI=true npm test -- --watch=false --passWithNoTests --coverage`
 - `build.yml` runs `npm run build`
+
+### End-to-end testing
+
+[Playwright](https://playwright.dev/) provides browser-level E2E coverage that complements the Jest unit/integration suite. Tests live in `e2e/` and run against a production build served on port `3100`.
+
+#### Prerequisites
+
+Install the Chromium browser binary that Playwright requires (one-time setup):
+
+```bash
+npx playwright install chromium
+```
+
+#### Running E2E tests
+
+Build the app first, then run the test suite:
+
+```bash
+npm run build
+npm run test:e2e
+```
+
+Playwright automatically starts a local server (`serve -s build -l 3100`) before running the tests and shuts it down afterwards. Outside CI, it reuses an already-running server on that port so you can keep `npm run serve:e2e` running in a separate terminal for faster iteration.
+
+#### Additional modes
+
+```bash
+npm run test:e2e:headed    # Watch tests run in a visible browser window
+npm run test:e2e:ui        # Open the Playwright interactive UI runner
+```
+
+#### Test structure
+
+```text
+e2e/
+├── helpers/
+│   └── github.ts          # Reusable GitHub API mock handlers (success + failure)
+├── home.spec.ts            # Home hero render and welcome audio prompt dismissal
+├── cv.github.spec.ts       # CV render, mocked GitHub API success, and graceful fallback
+├── climbing.spec.ts        # Climbing route tables render
+├── photography.spec.ts     # Photography category cards and direct slug navigation
+└── not-found.spec.ts       # 404 page for unknown routes
+```
+
+#### Configuration highlights
+
+- **Browser**: Chromium only (initial rollout).
+- **Reduced motion**: Tests call `page.emulateMedia({ reducedMotion: 'reduce' })` before navigation so animated content renders immediately without waiting for `IntersectionObserver`-driven `Zoom` transitions.
+- **CI behavior**: Single worker, retries twice, uses the `github` reporter, and traces/screenshots/video are captured on first retry or failure.
+- **Artifacts**: Test output goes to `e2e-results/` and the HTML report to `playwright-report/`; both are git-ignored.
 
 ### Known technical debt
 
@@ -196,6 +250,7 @@ GitHub Actions workflows live in `.github/workflows/`:
 ```text
 .
 ├── .github/workflows/   # Build and test automation
+├── e2e/                 # Playwright end-to-end tests
 ├── public/assets/       # Shipped images, certificates, media, and resume PDF
 ├── resume/              # LaTeX resume source
 ├── src/components/      # Shared UI and CV-specific components
@@ -235,4 +290,5 @@ Use these checks after meaningful changes:
 ```bash
 npm run build
 CI=true npm test -- --watch=false --passWithNoTests
+npm run test:e2e
 ```
