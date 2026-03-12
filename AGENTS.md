@@ -44,6 +44,9 @@ Runtime system and developer instructions override repository instructions. With
 - If the task is review-only, prioritize findings over implementation and distinguish required fixes from optional improvements.
 - For UI edits, identify whether the change is page-local or shared-component-impacting before editing, then validate accordingly.
 
+## Concurrent work
+- Multiple agents and the repository developer may work on the same branch at the same time. Treat the branch as shared and assume others may push changes at any time.
+
 ## Commands
 Use the narrowest relevant validation first, then expand if needed.
 

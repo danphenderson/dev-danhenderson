@@ -188,3 +188,8 @@ yarn-error.log*
 
 deploy.sh
 build.tar.gz
+
+# Playwright
+e2e-results/
+playwright-report/
+blob-report/
