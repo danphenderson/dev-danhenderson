@@ -64,7 +64,7 @@ export const CVEntryHeader = ({
       {supportingMeta && supportingMeta.length > 0 && (
         <Stack direction="row" spacing={1} flexWrap="wrap" sx={cvEntrySupportingMetaSx}>
           {supportingMeta.map((meta, index) => (
-            <Fragment key={index}>
+            <Fragment key={`${meta}-${index}`}>
               {index > 0 && <MetaText>•</MetaText>}
               <MetaText>{meta}</MetaText>
             </Fragment>

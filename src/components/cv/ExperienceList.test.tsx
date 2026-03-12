@@ -112,6 +112,7 @@ describe('ExperienceList', () => {
     const industryChip = screen.getByText('Higher Education').closest('.MuiChip-root');
 
     expect(industryChip).not.toBeNull();
+    expect(getComputedStyle(industryChip!).color).toBe('rgb(27, 168, 224)');
   });
 
   it('renders inline project links for the research assistant entry without separate reference bullets', () => {
