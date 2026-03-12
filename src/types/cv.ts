@@ -64,8 +64,10 @@ export type EducationEntry = {
   university: string;
   program: string;
   summary: string;
-  status?: string;
   dateRange?: string;
+  gpa?: string;
+  minor?: string;
+  expectedCompletion?: string;
   highlights?: string[];
   skills?: string[];
 };

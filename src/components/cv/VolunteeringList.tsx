@@ -1,8 +1,9 @@
-import { Box, Link, Stack } from '@mui/material';
+import { Box } from '@mui/material';
 import type { VolunteeringEntry } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { EntrySubtitle, EntryTitle, StrongMetaText, BodyText, ListItemText } from '../text';
+import { BodyText, ListItemText } from '../text';
+import { CVEntryHeader } from './CVEntryHeader';
 
 type VolunteeringListProps = {
   volunteering: VolunteeringEntry[];
@@ -13,9 +14,6 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
   const {
     contentListStackSpacing,
     getDetailListSx,
-    secondaryItalicSx,
-    sectionTitleSx,
-    volunteeringMetaSx,
   } = useComponentStyles();
 
   if (volunteering.length === 0) {
@@ -32,60 +30,23 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
       itemSurface="panel"
       renderItem={(entry) => (
         <>
-          <Stack spacing={1}>
-            <Stack
-              direction="row"
-              justifyContent="space-between"
-              alignItems={{ xs: 'flex-start', sm: 'flex-start' }}
-              spacing={1.5}
-              flexWrap="wrap"
-            >
-              <Box>
-                {entry.organizationUrl ? (
-                  <Link
-                    href={entry.organizationUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    color="inherit"
-                    underline="hover"
-                    sx={{ textDecorationColor: 'currentColor' }}
-                  >
-                    <EntryTitle component="span" sx={sectionTitleSx}>
-                      {entry.organization}
-                    </EntryTitle>
-                  </Link>
-                ) : (
-                  <EntryTitle>
-                    {entry.organization}
-                  </EntryTitle>
-                )}
-                <EntrySubtitle sx={secondaryItalicSx}>
-                  {entry.role}
-                </EntrySubtitle>
-              </Box>
+          <CVEntryHeader
+            title={entry.role}
+            organization={entry.organization}
+            organizationUrl={entry.organizationUrl}
+            dateRange={entry.dateRange}
+            supportingMeta={entry.location ? [entry.location] : undefined}
+          />
 
-              <Box sx={volunteeringMetaSx}>
-                <StrongMetaText>
-                  {entry.dateRange}
-                </StrongMetaText>
-                {entry.location && (
-                  <BodyText sx={secondaryItalicSx}>
-                    {entry.location}
-                  </BodyText>
-                )}
-              </Box>
-            </Stack>
+          <BodyText>{entry.summary}</BodyText>
 
-            <BodyText>{entry.summary}</BodyText>
-
-            <Box component="ul" sx={getDetailListSx(0, 0)}>
-              {entry.highlights.map((highlight, highlightIndex) => (
-                <ListItemText key={`${highlight}-${highlightIndex}`}>
-                  {highlight}
-                </ListItemText>
-              ))}
-            </Box>
-          </Stack>
+          <Box component="ul" sx={getDetailListSx(0, 0)}>
+            {entry.highlights.map((highlight, highlightIndex) => (
+              <ListItemText key={`${highlight}-${highlightIndex}`}>
+                {highlight}
+              </ListItemText>
+            ))}
+          </Box>
         </>
       )}
     />

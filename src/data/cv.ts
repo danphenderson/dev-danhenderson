@@ -513,8 +513,9 @@ export const educationInfo: EducationInfo = {
       program: 'MS Mathematics, Applied/Computational',
       summary:
         'Graduate work centered on applied mathematics, numerical methods, and computational modeling for hemodynamics research.',
-      status: 'Fall 2024 – Present, Expected Summer 2026',
-      dateRange: 'Cumulative: 3.44',
+      dateRange: 'Fall 2024 – Present',
+      expectedCompletion: 'Expected Summer 2026',
+      gpa: 'Cumulative: 3.44',
       highlights: [
         'Pedagogical training in curriculum design, assessment, and evidence-based instruction.',
         'Submissions to Numerical Analysis: A Graduate Course errata, improving correctness and clarity in the text.',
@@ -527,8 +528,8 @@ export const educationInfo: EducationInfo = {
       program: 'B.S. Cum Laude, Mathematics, Applied/Computational',
       summary:
         'Applied/computational mathematics degree paired with computer science coursework, scientific computing, and campus leadership experience.',
-      status: 'Minor in Computer Science',
-      dateRange: 'Cumulative: 3.56 | Departmental: 3.71',
+      minor: 'Computer Science',
+      gpa: 'Cumulative: 3.56 | Departmental: 3.71',
       highlights: [
         'President & V.P., Finance Club',
         'Representative, Undergraduate Student Government',

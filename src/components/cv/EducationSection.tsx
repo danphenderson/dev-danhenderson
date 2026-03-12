@@ -1,11 +1,12 @@
-import { Box, Stack } from '@mui/material';
+import { Box } from '@mui/material';
 import type { EducationInfo } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem } from '../TabPanel';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { BodyText, EntrySubtitle, EntryTitle, MetaText, ListItemText } from '../text';
+import { BodyText, ListItemText } from '../text';
+import { CVEntryHeader } from './CVEntryHeader';
 
 type EducationSectionProps = {
   education: EducationInfo;
@@ -44,8 +45,6 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
   const {
     contentListStackSpacing,
     detailBlockSx,
-    educationMetaSx,
-    educationProgramSx,
     getDetailListSx,
   } = useComponentStyles();
 
@@ -112,28 +111,16 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
 
         return (
           <>
-            <EntryTitle>
-              {entry.university}
-            </EntryTitle>
-
-            <EntrySubtitle sx={educationProgramSx}>
-              {entry.program}
-            </EntrySubtitle>
-
-            {(entry.status || entry.dateRange) && (
-              <Stack spacing={0.25} sx={educationMetaSx}>
-                {entry.status && (
-                  <MetaText>
-                    {entry.status}
-                  </MetaText>
-                )}
-                {entry.dateRange && (
-                  <MetaText>
-                    {entry.dateRange}
-                  </MetaText>
-                )}
-              </Stack>
-            )}
+            <CVEntryHeader
+              title={entry.program}
+              organization={entry.university}
+              dateRange={entry.dateRange}
+              supportingMeta={[
+                ...(entry.expectedCompletion ? [entry.expectedCompletion] : []),
+                ...(entry.minor ? [`Minor in ${entry.minor}`] : []),
+                ...(entry.gpa ? [entry.gpa] : []),
+              ].filter(Boolean)}
+            />
 
             <BodyText>{entry.summary}</BodyText>
 

@@ -69,4 +69,37 @@ describe('EducationSection', () => {
     expect(screen.getByText('LaTeX')).toBeVisible();
     expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
   });
+
+  it('renders the program as title and university as secondary label with explicit metadata', () => {
+    render(
+      <ThemeProvider>
+        <EducationSection education={{ entries: [educationInfo.entries[0]] }} />
+      </ThemeProvider>
+    );
+
+    const programHeading = screen.getByRole('heading', { name: 'MS Mathematics, Applied/Computational' });
+
+    expect(programHeading).toBeInTheDocument();
+
+    const titleRow = programHeading.parentElement;
+
+    expect(titleRow).toHaveTextContent('Fall 2024 – Present');
+
+    expect(screen.getByText('Michigan Technological University')).toBeInTheDocument();
+    expect(screen.getByText('Expected Summer 2026')).toBeInTheDocument();
+    expect(screen.getByText('Cumulative: 3.44')).toBeInTheDocument();
+  });
+
+  it('renders minor as supporting metadata for the BS entry', () => {
+    render(
+      <ThemeProvider>
+        <EducationSection education={{ entries: [educationInfo.entries[1]] }} />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByRole('heading', { name: 'B.S. Cum Laude, Mathematics, Applied/Computational' })).toBeInTheDocument();
+    expect(screen.getByText('Michigan Technological University')).toBeInTheDocument();
+    expect(screen.getByText('Minor in Computer Science')).toBeInTheDocument();
+    expect(screen.getByText('Cumulative: 3.56 | Departmental: 3.71')).toBeInTheDocument();
+  });
 });

@@ -80,7 +80,7 @@ describe('ExperienceList', () => {
     ).toBeVisible();
   });
 
-  it('keeps the industry chip in the title row', () => {
+  it('places the date range in the title row and the industry chip in the organization row', () => {
     const hemodynamicsExperience = experiences.find(
       (experience) => experience.title === 'Graduate Research Assistant'
     );
@@ -98,9 +98,16 @@ describe('ExperienceList', () => {
       .parentElement;
 
     expect(titleRow).not.toBeNull();
-    expect(titleRow).toHaveTextContent('Higher Education');
     expect(titleRow).not.toHaveTextContent('Michigan Technological University');
-    expect(screen.getByText('Michigan Technological University')).toBeInTheDocument();
+
+    const dateText = `${hemodynamicsExperience!.startDate} – ${hemodynamicsExperience!.endDate}`;
+
+    expect(titleRow).toHaveTextContent(dateText);
+
+    const orgRow = screen.getByText('Michigan Technological University').parentElement;
+
+    expect(orgRow).not.toBeNull();
+    expect(orgRow).toHaveTextContent('Higher Education');
 
     const industryChip = screen.getByText('Higher Education').closest('.MuiChip-root');
 

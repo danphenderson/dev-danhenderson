@@ -515,7 +515,7 @@ export const createComponentStyleMap = (theme: Theme) => {
       border: `2px solid ${alpha(theme.palette.common.white, isLight ? 0.9 : 0.72)}`,
     } satisfies SxProps<Theme>,
     profileBioSx: { whiteSpace: 'pre-line' } satisfies SxProps<Theme>,
-    experienceHeaderRowSx: {
+    cvEntryHeaderRowSx: {
       display: 'grid',
       gridTemplateColumns: 'minmax(0, 1fr) auto',
       alignItems: 'start',
@@ -523,7 +523,7 @@ export const createComponentStyleMap = (theme: Theme) => {
       rowGap: 0.5,
       width: '100%',
     } satisfies SxProps<Theme>,
-    experienceIndustryChipSx: {
+    cvEntryChipSx: {
       borderColor: accentColor,
       ...interactiveAccentTextSx,
       backgroundColor: accentTint,
@@ -539,11 +539,10 @@ export const createComponentStyleMap = (theme: Theme) => {
       },
       ...pillPulseOverlaySx,
     } satisfies SxProps<Theme>,
+    cvEntrySupportingMetaSx: { mt: 0.5 } satisfies SxProps<Theme>,
     experienceDescriptionSx: { mt: 1 } satisfies SxProps<Theme>,
     getDetailListSx,
     detailBlockSx: { mt: 1.5 } satisfies SxProps<Theme>,
-    educationProgramSx: { mt: 0.75 } satisfies SxProps<Theme>,
-    educationMetaSx: { mt: 0.5 } satisfies SxProps<Theme>,
     codingExampleLinkSx: {
       color: 'text.primary',
       textDecoration: 'none',
@@ -638,9 +637,6 @@ export const createComponentStyleMap = (theme: Theme) => {
     certificateActionSx: {
       mt: 1,
       color: accentColor,
-    } satisfies SxProps<Theme>,
-    volunteeringMetaSx: {
-      textAlign: { xs: 'left', sm: 'right' },
     } satisfies SxProps<Theme>,
     statusBreatheSx,
     chipWaveSx,
