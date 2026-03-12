@@ -5,6 +5,7 @@ import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem } from '../TabPanel';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { EntryTitle, MetaText, ListItemText } from '../text';
 
 type EducationSectionProps = {
   education: EducationInfo;
@@ -46,8 +47,6 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
     educationMetaSx,
     educationProgramSx,
     getDetailListSx,
-    sectionTitleSx,
-    secondaryTextSx,
   } = useComponentStyles();
 
   if (!education.entries || education.entries.length === 0) {
@@ -76,9 +75,9 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
             content: (
               <Box component="ul" sx={getDetailListSx(0, 0)}>
                 {filteredHighlights.map((highlight, highlightIndex) => (
-                  <Typography component="li" variant="body2" key={`${highlight}-${highlightIndex}`}>
+                  <ListItemText key={`${highlight}-${highlightIndex}`}>
                     {highlight}
-                  </Typography>
+                  </ListItemText>
                 ))}
               </Box>
             ),
@@ -92,9 +91,9 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
             content: (
               <Box component="ul" sx={getDetailListSx(0, 0)}>
                 {filteredCoursework.map((course, courseIndex) => (
-                  <Typography component="li" variant="body2" key={`${course}-${courseIndex}`}>
+                  <ListItemText key={`${course}-${courseIndex}`}>
                     {course}
-                  </Typography>
+                  </ListItemText>
                 ))}
               </Box>
             ),
@@ -113,9 +112,9 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
 
         return (
           <>
-            <Typography variant="h6" sx={sectionTitleSx}>
+            <EntryTitle>
               {entry.university}
-            </Typography>
+            </EntryTitle>
 
             <Typography variant="subtitle1" sx={educationProgramSx}>
               {entry.program}
@@ -124,14 +123,14 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
             {(entry.status || entry.dateRange) && (
               <Stack spacing={0.25} sx={educationMetaSx}>
                 {entry.status && (
-                  <Typography variant="subtitle2" sx={secondaryTextSx}>
+                  <MetaText>
                     {entry.status}
-                  </Typography>
+                  </MetaText>
                 )}
                 {entry.dateRange && (
-                  <Typography variant="subtitle2" sx={secondaryTextSx}>
+                  <MetaText>
                     {entry.dateRange}
-                  </Typography>
+                  </MetaText>
                 )}
               </Stack>
             )}

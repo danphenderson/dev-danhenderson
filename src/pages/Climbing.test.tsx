@@ -38,9 +38,9 @@ describe('Climbing', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText('Recorded Ascents')).toBeInTheDocument();
-    expect(screen.getByText('To-Do Routes')).toBeInTheDocument();
+    expect(screen.getByText('Climbing')).toBeInTheDocument();
+    expect(screen.getByText('TODO Routes')).toBeInTheDocument();
     expect(screen.getByText("A collection of routes I've remembered to tick on Mountain Project.")).toBeInTheDocument();
-    expect(screen.getByText("A collection of routes I'm interested in climbing")).toBeInTheDocument();
+    expect(screen.getByText("A collection of routes I'm interested in climbing.")).toBeInTheDocument();
   });
 });

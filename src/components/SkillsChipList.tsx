@@ -1,6 +1,7 @@
 import { Chip } from '@mui/material';
 import { AnimatedZoomList } from './AnimatedZoomList';
 import { useComponentStyles } from '../styles/componentStyles';
+import { ChipLabel } from './text';
 
 type SkillsChipListProps = {
   skills?: string[];
@@ -29,7 +30,7 @@ export const SkillsChipList = ({
       renderItem={(skill, index) => (
         <Chip
           key={`${skill}-${index}`}
-          label={skill}
+          label={<ChipLabel>{skill}</ChipLabel>}
           size={dense ? 'small' : 'medium'}
           variant="outlined"
           sx={[skillsChipSx, chipWaveSx, getChipWaveDelaySx(index)]}

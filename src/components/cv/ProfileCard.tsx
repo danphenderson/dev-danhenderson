@@ -2,6 +2,7 @@ import { Avatar, Box, Link, Stack, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { AboutMe } from '../../types/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { StatusInlineText, StrongMetaText, MetaText, BodyText } from '../text';
 
 type ProfileCardProps = {
   about: AboutMe;
@@ -28,9 +29,6 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
     profileAvatarSx,
     profileBioSx,
     profileNameRowSx,
-    secondaryStrongSx,
-    secondaryTextSx,
-    statusBreatheSx,
   } = useComponentStyles();
   const bioLink = about.bioLink;
   const bioText = about.bio;
@@ -54,7 +52,7 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
             {bioLink.text}
           </Link>
           {beforeStatus}
-          <Box component="span" sx={statusBreatheSx}>{statusLine}</Box>
+          <StatusInlineText>{statusLine}</StatusInlineText>
         </>
       );
     } else {
@@ -75,7 +73,7 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
       bioContent = (
         <>
           {bioText.slice(0, lineStart)}
-          <Box component="span" sx={statusBreatheSx}>{bioText.slice(lineStart)}</Box>
+          <StatusInlineText>{bioText.slice(lineStart)}</StatusInlineText>
         </>
       );
     }
@@ -100,17 +98,17 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
 
           <Stack direction="row" sx={profileMetaRowSx}>
             <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={profileMetaContentSx}>
-              <Typography variant="subtitle2" sx={secondaryStrongSx}>
+              <StrongMetaText>
                 {about.title}
-              </Typography>
+              </StrongMetaText>
               {about.location && (
                 <>
-                  <Typography variant="subtitle2" sx={secondaryTextSx}>
+                  <MetaText>
                     •
-                  </Typography>
-                  <Typography variant="subtitle2" sx={secondaryTextSx}>
+                  </MetaText>
+                  <MetaText>
                     {about.location}
-                  </Typography>
+                  </MetaText>
                 </>
               )}
             </Stack>
@@ -119,9 +117,9 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
         {actions && <Box sx={profileInlineActionsSx}>{actions}</Box>}
       </Box>
       {about.bio && (
-        <Typography variant="body2" sx={[primaryTextSx, profileBioSx]}>
+        <BodyText sx={[primaryTextSx, profileBioSx]}>
           {bioContent}
-        </Typography>
+        </BodyText>
       )}
     </Stack>
   );

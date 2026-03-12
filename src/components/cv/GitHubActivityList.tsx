@@ -1,8 +1,9 @@
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import type { GitHubActivityItem } from '../../types/cv';
 import { LoadingBars } from '../LoadingBars';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { GitHubLinkChipList } from './GitHubLinkChipList';
+import { CaptionText } from '../text';
 
 type GitHubActivityListProps = {
   activity: GitHubActivityItem[];
@@ -39,9 +40,9 @@ export const GitHubActivityList = ({
         />
       )}
       {error && (
-        <Typography variant="caption" sx={secondaryTextSx}>
+        <CaptionText sx={secondaryTextSx}>
           {error}
-        </Typography>
+        </CaptionText>
       )}
     </Box>
   );

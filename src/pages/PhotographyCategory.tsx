@@ -1,5 +1,5 @@
 import { Link as RouterLink, Navigate, useParams } from 'react-router-dom';
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
@@ -8,6 +8,7 @@ import { QuiltedImageList } from '../components/PhotoAlbum';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
+import { BodyText } from '../components/text';
 const legacySlugMap: Record<string, string> = {
   'new mexico': 'new-mexico',
   'new%20mexico': 'new-mexico',
@@ -50,13 +51,13 @@ export default function PhotographyCategory() {
               sx={appStyles.compactSectionHeadingSx}
             />
             {category ? (
-              <Typography variant="body2" sx={appStyles.secondaryTextSx}>
+              <BodyText sx={appStyles.secondaryTextSx}>
                 {category.album.length} photos
-              </Typography>
+              </BodyText>
             ) : (
-              <Typography variant="body2" sx={appStyles.secondaryTextSx}>
+              <BodyText sx={appStyles.secondaryTextSx}>
                 This album does not exist or has been moved.
-              </Typography>
+              </BodyText>
             )}
           </Stack>
         </SectionCard>

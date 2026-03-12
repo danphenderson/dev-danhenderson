@@ -8,6 +8,7 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import type { SpeedDialActionProps } from '@mui/material/SpeedDialAction';
 import type { SpeedDialProps } from '@mui/material/SpeedDial';
 import { Link } from 'react-router-dom';
+import { InteractiveLabel } from './text';
 
 export type AppSpeedDialAction = {
   id: string;
@@ -97,7 +98,7 @@ export const AppSpeedDial = ({
         <SpeedDialAction
           key={action.id}
           icon={action.icon}
-          tooltipTitle={action.label}
+          tooltipTitle={<InteractiveLabel>{action.label}</InteractiveLabel>}
           tooltipPlacement={actionTooltipPlacement}
           tooltipOpen={actionLabelsAlwaysOpen && open}
           FabProps={getActionFabProps(action)}
