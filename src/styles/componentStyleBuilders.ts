@@ -24,7 +24,7 @@ export const createComponentStyleMap = (theme: Theme) => {
   const accentColor = theme.palette.primary.main;
   const isLight = theme.palette.mode === 'light';
   const ambientMotion = {
-    tabHoverShimmerMs: 900,
+    tabHoverShimmerMs: 400,
     pillPulseMs: 4200,
     chipWaveMs: 7600,
     borderGlowMs: 6800,

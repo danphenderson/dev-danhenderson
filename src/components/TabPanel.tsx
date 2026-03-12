@@ -1,7 +1,6 @@
 import { useEffect, useId, useMemo, useState } from 'react';
-import { Box, Grow, Tab, Tabs } from '@mui/material';
+import { Box, Tab, Tabs } from '@mui/material';
 import type { ReactNode, SyntheticEvent } from 'react';
-import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { InteractiveLabel } from './text';
 
@@ -27,11 +26,7 @@ type TabPanelProps = {
   keepMounted?: boolean;
   hideTabsWhenSingle?: boolean;
   tabsVariant?: 'standard' | 'scrollable' | 'fullWidth';
-  initialPanelGrowDelayMs?: number;
 };
-
-const INITIAL_PANEL_GROW_DURATION_MS = 220;
-const INITIAL_PANEL_GROW_ORIGIN = 'center top';
 
 const getInitialValue = (
   items: TabPanelItem[],
@@ -55,10 +50,8 @@ export const TabPanel = ({
   keepMounted = false,
   hideTabsWhenSingle = false,
   tabsVariant = 'standard',
-  initialPanelGrowDelayMs,
 }: TabPanelProps) => {
   const { getTabListSx, getTabPanelBodySx, getTabPanelSx, getTabSx, interactiveSurfaceSx } = useComponentStyles();
-  const prefersReducedMotion = usePrefersReducedMotion();
   const fallbackId = useId();
   const tabPanelId = idProp ?? fallbackId;
   const enabledItems = useMemo(() => items.filter((item) => !item.disabled), [items]);
@@ -68,11 +61,6 @@ export const TabPanel = ({
     [defaultValue, enabledItems, shouldRenderTabs]
   );
   const [internalValue, setInternalValue] = useState<TabPanelValue>(resolvedDefaultValue);
-  const shouldAnimateInitialPanelGrow =
-    typeof initialPanelGrowDelayMs === 'number' && initialPanelGrowDelayMs >= 0 && !prefersReducedMotion;
-  const [initialGrowDelayElapsed, setInitialGrowDelayElapsed] = useState(!shouldAnimateInitialPanelGrow);
-  const [initialGrowValue, setInitialGrowValue] = useState<string | null>(null);
-  const [hasCompletedInitialGrow, setHasCompletedInitialGrow] = useState(!shouldAnimateInitialPanelGrow);
 
   useEffect(() => {
     if (valueProp !== undefined) {
@@ -84,57 +72,14 @@ export const TabPanel = ({
     );
   }, [enabledItems, resolvedDefaultValue, valueProp]);
 
-  useEffect(() => {
-    if (!shouldAnimateInitialPanelGrow) {
-      setInitialGrowDelayElapsed(true);
-      setInitialGrowValue(null);
-      setHasCompletedInitialGrow(true);
-      return undefined;
-    }
-
-    setInitialGrowDelayElapsed(initialPanelGrowDelayMs === 0);
-    setInitialGrowValue(null);
-    setHasCompletedInitialGrow(false);
-
-    if (initialPanelGrowDelayMs === 0 || typeof window === 'undefined') {
-      return undefined;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      setInitialGrowDelayElapsed(true);
-    }, initialPanelGrowDelayMs);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [initialPanelGrowDelayMs, shouldAnimateInitialPanelGrow]);
+  if (enabledItems.length === 0) {
+    return null;
+  }
 
   const candidateValue = valueProp === undefined ? internalValue : valueProp;
   const resolvedValue = enabledItems.some((item) => item.value === candidateValue)
     ? candidateValue
     : resolvedDefaultValue;
-  const hasSelectionChangedDuringInitialGrow =
-    shouldAnimateInitialPanelGrow &&
-    !hasCompletedInitialGrow &&
-    initialGrowValue !== null &&
-    resolvedValue !== initialGrowValue;
-  const shouldRunInitialGrow =
-    shouldAnimateInitialPanelGrow && !hasCompletedInitialGrow && !hasSelectionChangedDuringInitialGrow;
-
-  useEffect(() => {
-    if (!shouldRunInitialGrow || !initialGrowDelayElapsed || initialGrowValue !== null || typeof resolvedValue !== 'string') {
-      return;
-    }
-
-    setInitialGrowValue(resolvedValue);
-  }, [initialGrowDelayElapsed, initialGrowValue, resolvedValue, shouldRunInitialGrow]);
-
-  useEffect(() => {
-    if (!hasSelectionChangedDuringInitialGrow) {
-      return;
-    }
-
-    setInitialGrowValue(null);
-    setHasCompletedInitialGrow(true);
-  }, [hasSelectionChangedDuringInitialGrow]);
 
   const setValue = (nextValue: TabPanelValue) => {
     if (valueProp === undefined) {
@@ -147,10 +92,6 @@ export const TabPanel = ({
   const handleChange = (_event: SyntheticEvent, nextValue: string) => {
     setValue(nextValue);
   };
-
-  if (enabledItems.length === 0) {
-    return null;
-  }
 
   return (
     <Box sx={getTabPanelSx()}>
@@ -197,63 +138,9 @@ export const TabPanel = ({
         const isSelected = item.value === resolvedValue;
         const tabId = `${tabPanelId}-tab-${item.value}`;
         const panelId = `${tabPanelId}-panel-${item.value}`;
-        const isAnimatingInitialGrow = shouldRunInitialGrow && isSelected && initialGrowValue === item.value;
-        const isPendingInitialGrow =
-          shouldRunInitialGrow &&
-          isSelected &&
-          (!initialGrowDelayElapsed || (initialGrowValue !== null && initialGrowValue !== item.value) || initialGrowValue === null);
-        const isVisible = isSelected && !isPendingInitialGrow;
-        const content = getTabContent(item, isVisible);
 
         if (!keepMounted && !isSelected) {
           return null;
-        }
-
-        if (isAnimatingInitialGrow) {
-          return (
-            <Grow
-              key={item.value}
-              in
-              appear
-              timeout={INITIAL_PANEL_GROW_DURATION_MS}
-              style={{ transformOrigin: INITIAL_PANEL_GROW_ORIGIN }}
-              onEntered={() => {
-                setInitialGrowValue(null);
-                setHasCompletedInitialGrow(true);
-              }}
-            >
-              <Box
-                role="tabpanel"
-                id={panelId}
-                aria-labelledby={shouldRenderTabs ? tabId : undefined}
-                aria-label={shouldRenderTabs ? undefined : item.label}
-                hidden={false}
-                sx={getTabPanelBodySx(dense, shouldRenderTabs)}
-              >
-                {content}
-              </Box>
-            </Grow>
-          );
-        }
-
-        if (isPendingInitialGrow) {
-          if (!keepMounted) {
-            return null;
-          }
-
-          return (
-            <Box
-              key={item.value}
-              role="tabpanel"
-              id={panelId}
-              aria-labelledby={shouldRenderTabs ? tabId : undefined}
-              aria-label={shouldRenderTabs ? undefined : item.label}
-              hidden
-              sx={[getTabPanelBodySx(dense, shouldRenderTabs), { display: 'none' }]}
-            >
-              {content}
-            </Box>
-          );
         }
 
         return (
@@ -266,7 +153,7 @@ export const TabPanel = ({
             hidden={!isSelected}
             sx={getTabPanelBodySx(dense, shouldRenderTabs)}
           >
-            {content}
+            {getTabContent(item, isSelected)}
           </Box>
         );
       })}

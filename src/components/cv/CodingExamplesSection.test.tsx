@@ -3,11 +3,9 @@ import type { ReactNode } from 'react';
 import ThemeProvider from '../../ThemeProvider';
 import type { CodingExample } from '../../types/cv';
 import { codingExamples } from '../../data/cv';
-import { ANIMATED_CARD_DURATION_MS } from '../AnimatedContentCard';
 import { CodingExamplesSection } from './CodingExamplesSection';
 
 const mockAnimatedContentList = jest.fn();
-const mockTabPanel = jest.fn();
 
 jest.mock('../AnimatedContentList', () => ({
   AnimatedContentList: (props: {
@@ -22,24 +20,9 @@ jest.mock('../AnimatedContentList', () => ({
   },
 }));
 
-jest.mock('../TabPanel', () => {
-  const actual = jest.requireActual('../TabPanel');
-
-  return {
-    ...actual,
-    TabPanel: (props: Record<string, unknown>) => {
-      mockTabPanel(props);
-      const { initialPanelGrowDelayMs: _initialPanelGrowDelayMs, ...rest } = props;
-
-      return actual.TabPanel(rest);
-    },
-  };
-});
-
 describe('CodingExamplesSection', () => {
   afterEach(() => {
     mockAnimatedContentList.mockClear();
-    mockTabPanel.mockClear();
   });
 
   it('waits for the section list to enter view before mounting animated work items', () => {
@@ -52,9 +35,6 @@ describe('CodingExamplesSection', () => {
     expect(mockAnimatedContentList.mock.calls[0][0]).toEqual(expect.objectContaining({
       mountItemsOnView: true,
       startDelayMs: 120,
-    }));
-    expect(mockTabPanel.mock.calls[0][0]).toEqual(expect.objectContaining({
-      initialPanelGrowDelayMs: 120 + ANIMATED_CARD_DURATION_MS + 60,
     }));
   });
 

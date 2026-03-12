@@ -1,6 +1,5 @@
 import { Box, Link, Stack } from '@mui/material';
 import type { CodingExample } from '../../types/cv';
-import { ANIMATED_CARD_DURATION_MS } from '../AnimatedContentCard';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem } from '../TabPanel';
@@ -14,8 +13,7 @@ type CodingExamplesSectionProps = {
 };
 
 export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExamplesSectionProps) => {
-  const { codingExampleLinkSx, contentListStackSpacing, detailBlockSx, getDetailListSx, getItemDelayMs } =
-    useComponentStyles();
+  const { codingExampleLinkSx, contentListStackSpacing, detailBlockSx, getDetailListSx } = useComponentStyles();
 
   return (
     <AnimatedContentList
@@ -27,7 +25,6 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
       itemSurface="panel"
       renderItem={(example, index) => {
         const primaryLink = example.links[0];
-        const initialPanelGrowDelayMs = getItemDelayMs(index, startDelayMs) + ANIMATED_CARD_DURATION_MS + 60;
         const exampleTabs = (example.tabs ?? []).reduce<TabPanelItem[]>((tabs, tab) => {
           if (tab.kind === 'list') {
             const items = tab.items.filter((item) => item.trim().length > 0);
@@ -98,7 +95,6 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
                   dense
                   hideTabsWhenSingle
                   tabsVariant="fullWidth"
-                  initialPanelGrowDelayMs={initialPanelGrowDelayMs}
                 />
               </Box>
             ) : null}
