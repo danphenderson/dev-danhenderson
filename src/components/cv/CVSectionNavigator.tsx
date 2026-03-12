@@ -1,6 +1,7 @@
-import { Box, Chip, Stack, Typography } from '@mui/material';
+import { Box, Chip, Stack } from '@mui/material';
 import { CVSectionKey, cvSectionMetadata } from './cvSectionMetadata';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { SectionLabel, ChipLabel } from '../text';
 
 type CVSectionNavigatorProps = {
   sections: CVSectionKey[];
@@ -27,14 +28,14 @@ export const CVSectionNavigator = ({
 
   return (
     <Box component="nav" aria-label="CV section navigation" sx={sectionNavigatorRootSx} data-testid={testId}>
-      <Typography variant="overline" sx={sectionNavigatorLeadSx}>
+      <SectionLabel sx={sectionNavigatorLeadSx}>
         Jump to
-      </Typography>
+      </SectionLabel>
       <Stack direction="row" spacing={1} sx={sectionNavigatorRailSx}>
         {sections.map((sectionKey) => (
           <Chip
             key={sectionKey}
-            label={cvSectionMetadata[sectionKey].navLabel}
+            label={<ChipLabel>{cvSectionMetadata[sectionKey].navLabel}</ChipLabel>}
             onClick={handleJumpToSection(sectionKey)}
             clickable
             size="small"

@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Box, Chip, Link, Stack, Typography } from '@mui/material';
+import { Box, Chip, Link, Stack } from '@mui/material';
 import type {
   Experience,
   ExperienceDescription,
@@ -11,6 +11,7 @@ import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem } from '../TabPanel';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { EntryTitle, StrongMetaText, MetaText, BodyText, ListItemText, ChipLabel } from '../text';
 
 type ExperienceListProps = {
   experiences: Experience[];
@@ -50,24 +51,24 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
       {projects.map((project, projectIndex) => {
         if (typeof project === 'string') {
           return (
-            <Typography component="li" variant="body2" key={projectIndex}>
+            <ListItemText key={projectIndex}>
               {project}
-            </Typography>
+            </ListItemText>
           );
         }
 
         if (Array.isArray(project)) {
           return (
-            <Typography component="li" variant="body2" key={projectIndex}>
+            <ListItemText key={projectIndex}>
               {renderInlineSegments(project)}
-            </Typography>
+            </ListItemText>
           );
         }
 
         const linkLabel = project.text.replace(/:\s*$/, '');
 
         return (
-          <Typography component="li" variant="body2" key={projectIndex}>
+          <ListItemText key={projectIndex}>
             {project.link ? (
               <Link href={project.link} target="_blank" rel="noopener noreferrer" underline="hover">
                 {linkLabel}
@@ -75,7 +76,7 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
             ) : (
               project.text
             )}
-          </Typography>
+          </ListItemText>
         );
       })}
     </Box>
@@ -91,8 +92,6 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
     experienceIndustryChipSx,
     minWidthResetSx,
     secondaryStrongSx,
-    secondaryTextSx,
-    sectionTitleSx,
   } = useComponentStyles();
 
   return (
@@ -128,13 +127,13 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
           <>
             <Stack spacing={0.75} width="100%">
               <Box sx={experienceHeaderRowSx}>
-                <Typography variant="h6" sx={[sectionTitleSx, minWidthResetSx]}>
+                <EntryTitle sx={minWidthResetSx}>
                   {experience.title}
-                </Typography>
+                </EntryTitle>
                 {experience.industry && (
                   <Chip
                     size="small"
-                    label={experience.industry}
+                    label={<ChipLabel>{experience.industry}</ChipLabel>}
                     variant="outlined"
                     sx={experienceIndustryChipSx}
                   />
@@ -154,22 +153,22 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                     {experience.company}
                   </Link>
                 ) : (
-                  <Typography variant="subtitle2" sx={secondaryStrongSx}>
+                  <StrongMetaText>
                     {experience.company}
-                  </Typography>
+                  </StrongMetaText>
                 )}
-                <Typography variant="subtitle2" sx={secondaryTextSx}>
+                <MetaText>
                   •
-                </Typography>
-                <Typography variant="subtitle2" sx={secondaryTextSx}>
+                </MetaText>
+                <MetaText>
                   {experience.startDate} - {experience.endDate}
-                </Typography>
+                </MetaText>
               </Stack>
             </Stack>
             {experience.description && (
-              <Typography variant="body2" sx={experienceDescriptionSx}>
+              <BodyText sx={experienceDescriptionSx}>
                 {renderExperienceDescription(experience.description)}
-              </Typography>
+              </BodyText>
             )}
             {experienceTabs.length ? (
               <Box sx={detailBlockSx}>

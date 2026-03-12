@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
 import type { ReactNode, SyntheticEvent } from 'react';
 import { useComponentStyles } from '../styles/componentStyles';
+import { InteractiveLabel } from './text';
 
 export type TabPanelItem = {
   value: string;
@@ -124,7 +125,7 @@ export const TabPanel = ({
                   event.stopPropagation();
                   setValue(false);
                 }}
-                label={visibleLabel}
+                label={<InteractiveLabel>{visibleLabel}</InteractiveLabel>}
                 value={item.value}
                 sx={[interactiveSurfaceSx, getTabSx(dense)]}
               />

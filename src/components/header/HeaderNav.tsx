@@ -4,6 +4,7 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import { MouseEvent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStyles } from '../../styles/appStyles';
+import { NavigationLabel } from '../text';
 
 export type HeaderPage = {
   name: string;
@@ -68,7 +69,7 @@ export const HeaderNav = ({
                 to={path}
                 aria-label={`Go to ${name}`}
               >
-                {name}
+                <NavigationLabel>{name}</NavigationLabel>
               </Button>
             ))}
           </Stack>
@@ -86,7 +87,7 @@ export const HeaderNav = ({
         >
           {pages.map(({ name, path }) => (
             <MenuItem key={name} component={Link} to={path} onClick={onMobileMenuClose}>
-              {name}
+              <NavigationLabel>{name}</NavigationLabel>
             </MenuItem>
           ))}
         </Menu>

@@ -4,6 +4,7 @@ import { LoadingBars } from '../LoadingBars';
 import { ContentCard } from '../ContentCard';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { GitHubLinkChipList } from './GitHubLinkChipList';
+import { ChipMetaLabel, EntryTitle, MetaText, BodyText } from '../text';
 
 type GitHubContributionsProps = {
   contributions: GitHubContribution[];
@@ -26,7 +27,6 @@ export const GitHubContributions = ({
     contributionCardMetaRowSx,
     contributionCardNameSx,
     contributionCardSx,
-    contributionInlineLabelSx,
     contributionInlineMetaSx,
     contributionInlineNameSx,
     secondaryTextSx,
@@ -57,17 +57,14 @@ export const GitHubContributions = ({
           key: project.name,
           href: project.url,
           label: (
-            <Box
-              component="span"
-              sx={contributionInlineLabelSx}
-            >
+            <ChipMetaLabel>
               <Box component="span" sx={contributionInlineNameSx}>
                 {project.name}
               </Box>
               <Box component="span" sx={contributionInlineMetaSx}>
                 ★ {project.stars ?? 0}
               </Box>
-            </Box>
+            </ChipMetaLabel>
           ),
         }))}
         layout="stack"
@@ -90,14 +87,14 @@ export const GitHubContributions = ({
           sx={contributionCardSx}
         >
           <Box sx={contributionCardBodySx}>
-            <Typography variant="subtitle2" sx={contributionCardNameSx}>
+            <EntryTitle sx={contributionCardNameSx}>
               {project.name}
-            </Typography>
+            </EntryTitle>
           </Box>
           <Stack direction="row" spacing={0.5} alignItems="center" sx={contributionCardMetaRowSx}>
-            <Typography variant="body2" sx={contributionCardMetaSx}>
+            <MetaText sx={contributionCardMetaSx}>
               ★ {project.stars ?? 0}
-            </Typography>
+            </MetaText>
           </Stack>
         </ContentCard>
       ))}
