@@ -4,7 +4,7 @@ import { LoadingBars } from '../LoadingBars';
 import { ContentCard } from '../ContentCard';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { GitHubLinkChipList } from './GitHubLinkChipList';
-import { ChipMetaLabel, EntryTitle, MetaText, BodyText } from '../text';
+import { BodyText, ChipMetaLabel, EntryTitle, MetaText } from '../text';
 
 type GitHubContributionsProps = {
   contributions: GitHubContribution[];
