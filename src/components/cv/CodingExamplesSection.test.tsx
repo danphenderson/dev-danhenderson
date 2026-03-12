@@ -38,7 +38,7 @@ describe('CodingExamplesSection', () => {
     }));
   });
 
-  it('renders project tabs from data, starts collapsed, and toggles between list and stack content', () => {
+  it('renders project tabs from data, shows the summary immediately, and toggles between list and stack content', () => {
     render(
       <ThemeProvider>
         <CodingExamplesSection examples={[codingExamples[0]]} />
@@ -52,6 +52,11 @@ describe('CodingExamplesSection', () => {
     expect(screen.getByRole('tab', { name: 'Purpose' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Rewrites' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Stack' })).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Typewriter is a pip-installable CLI built on Typer and LibCST to normalize None-related type annotations while preserving formatting and comments.'
+      )
+    ).toBeVisible();
     expect(screen.queryByText('Normalize `None`-related annotations across a codebase.')).not.toBeInTheDocument();
     expect(screen.queryByText('Python')).not.toBeInTheDocument();
 

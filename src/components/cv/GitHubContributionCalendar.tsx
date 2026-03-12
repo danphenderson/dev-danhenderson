@@ -1,7 +1,8 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { GitHubCalendar } from 'react-github-calendar';
 import { ContentCard } from '../ContentCard';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { BodyText, SubsectionTitle } from '../text';
 
 type GitHubContributionCalendarProps = {
   username: string;
@@ -24,12 +25,12 @@ export const GitHubContributionCalendar = ({
 
   const calendarContent = (
     <Stack spacing={1}>
-      <Typography variant="subtitle2" sx={sectionTitleSx}>
+      <SubsectionTitle sx={sectionTitleSx}>
         Contribution calendar
-      </Typography>
-      <Typography variant="body2" sx={secondaryTextSx}>
+      </SubsectionTitle>
+      <BodyText sx={secondaryTextSx}>
         Yearly GitHub activity at a glance.
-      </Typography>
+      </BodyText>
       <Box sx={githubCalendarContainerSx}>
         <Box sx={githubCalendarSizeSx}>
           <GitHubCalendar

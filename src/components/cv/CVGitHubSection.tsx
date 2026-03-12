@@ -1,4 +1,4 @@
-import { Stack, Typography } from '@mui/material';
+import { Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type {
   GitHubActivityItem,
@@ -15,6 +15,7 @@ import { GitHubContributions } from './GitHubContributions';
 import { GitHubProjects } from './GitHubProjects';
 import { SectionHeading } from '../layout/SectionHeading';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
+import { SectionLeadText, SubsectionTitle } from '../text';
 
 type CVGitHubSectionProps = {
   activity: GitHubActivityItem[];
@@ -26,6 +27,7 @@ type CVGitHubSectionProps = {
   nestedDelayOffsetMs?: number;
   itemOffsetMs?: number;
   projectTitle?: string;
+  lead?: string;
   overlineSx?: SxProps<Theme>;
   sectionId?: string;
 };
@@ -40,6 +42,7 @@ export const CVGitHubSection = ({
   nestedDelayOffsetMs = 0,
   itemOffsetMs,
   projectTitle = 'Public Projects',
+  lead,
   overlineSx,
   sectionId,
 }: CVGitHubSectionProps) => {
@@ -72,12 +75,13 @@ export const CVGitHubSection = ({
     <SectionCard delayMs={sectionDelayMs} id={sectionId} sx={cvSectionAnchorSx}>
       <Stack spacing={compactSidebarSectionSpacing}>
         <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
+        {lead && <SectionLeadText>{lead}</SectionLeadText>}
 
         <SectionCard delayMs={githubActivityDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
-            <Typography variant="subtitle2" sx={sectionTitleSx}>
+            <SubsectionTitle sx={sectionTitleSx}>
               Recent Activity
-            </Typography>
+            </SubsectionTitle>
             <SectionPanel>
               <GitHubActivityList
                 activity={activity}
@@ -91,9 +95,9 @@ export const CVGitHubSection = ({
 
         <SectionCard delayMs={githubContributionsDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
-            <Typography variant="subtitle2" sx={sectionTitleSx}>
+            <SubsectionTitle sx={sectionTitleSx}>
               Contributions
-            </Typography>
+            </SubsectionTitle>
             <SectionPanel>
               <GitHubContributions
                 contributions={contributions}
@@ -113,9 +117,9 @@ export const CVGitHubSection = ({
 
         <SectionCard delayMs={githubProjectsDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
-            <Typography variant="subtitle2" sx={sectionTitleSx}>
+            <SubsectionTitle sx={sectionTitleSx}>
               {projectTitle}
-            </Typography>
+            </SubsectionTitle>
             <SectionPanel>
               <GitHubProjects
                 projects={projects}

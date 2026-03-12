@@ -83,6 +83,17 @@ export const EntryTitle = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   );
 };
 
+/** Entry-level subtitle – `variant="subtitle1"`, italic secondary text. */
+export const EntrySubtitle = ({ children, sx, ...rest }: TextPrimitiveProps) => {
+  const { secondaryItalicSx } = useComponentStyles();
+
+  return (
+    <Typography component="p" variant="subtitle1" sx={mergeSx([secondaryItalicSx], sx)} {...rest}>
+      {children}
+    </Typography>
+  );
+};
+
 /** GitHub subsection / nav overline label – `variant="overline"`, accent text. */
 export const SectionLabel = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { sectionNavigatorLeadSx } = useComponentStyles();
@@ -99,7 +110,7 @@ export const MetaText = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { secondaryTextSx } = useComponentStyles();
 
   return (
-    <Typography variant="subtitle2" sx={mergeSx([secondaryTextSx], sx)} {...rest}>
+    <Typography component="p" variant="subtitle2" sx={mergeSx([secondaryTextSx], sx)} {...rest}>
       {children}
     </Typography>
   );
@@ -110,7 +121,7 @@ export const StrongMetaText = ({ children, sx, ...rest }: TextPrimitiveProps) =>
   const { secondaryStrongSx } = useComponentStyles();
 
   return (
-    <Typography variant="subtitle2" sx={mergeSx([secondaryStrongSx], sx)} {...rest}>
+    <Typography component="p" variant="subtitle2" sx={mergeSx([secondaryStrongSx], sx)} {...rest}>
       {children}
     </Typography>
   );
@@ -137,9 +148,24 @@ export const ListItemText = ({ children, sx, ...rest }: TextPrimitiveProps) => (
   </Typography>
 );
 
-/** Section lead/subtitle text – `variant="subtitle2"` with bold secondary styling. */
-export const SectionLeadText = ({ children, sx, ...rest }: TextPrimitiveProps) => (
-  <Typography variant="subtitle2" sx={sx} {...rest}>
-    {children}
-  </Typography>
-);
+/** Section lead/subtitle text – `variant="subtitle2"` with secondary text styling. */
+export const SectionLeadText = ({ children, sx, ...rest }: TextPrimitiveProps) => {
+  const { secondaryTextSx } = useComponentStyles();
+
+  return (
+    <Typography component="p" variant="subtitle2" sx={mergeSx([secondaryTextSx], sx)} {...rest}>
+      {children}
+    </Typography>
+  );
+};
+
+/** Repeated subsection title – `variant="subtitle2"`, primary text, bold. */
+export const SubsectionTitle = ({ children, sx, ...rest }: TextPrimitiveProps) => {
+  const { sectionTitleSx } = useComponentStyles();
+
+  return (
+    <Typography variant="subtitle2" sx={mergeSx([sectionTitleSx], sx)} {...rest}>
+      {children}
+    </Typography>
+  );
+};

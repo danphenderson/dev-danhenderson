@@ -39,6 +39,11 @@ describe('EducationSection', () => {
       'Skills',
     ]);
     expect(
+      screen.getByText(
+        'Graduate work centered on applied mathematics, numerical methods, and computational modeling for hemodynamics research.'
+      )
+    ).toBeVisible();
+    expect(
       screen.queryByText('Pedagogical training in curriculum design, assessment, and evidence-based instruction.')
     ).not.toBeInTheDocument();
     expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();

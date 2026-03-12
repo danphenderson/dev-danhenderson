@@ -1,11 +1,11 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import type { EducationInfo } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem } from '../TabPanel';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { EntryTitle, MetaText, ListItemText } from '../text';
+import { BodyText, EntrySubtitle, EntryTitle, MetaText, ListItemText } from '../text';
 
 type EducationSectionProps = {
   education: EducationInfo;
@@ -116,9 +116,9 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
               {entry.university}
             </EntryTitle>
 
-            <Typography variant="subtitle1" sx={educationProgramSx}>
+            <EntrySubtitle sx={educationProgramSx}>
               {entry.program}
-            </Typography>
+            </EntrySubtitle>
 
             {(entry.status || entry.dateRange) && (
               <Stack spacing={0.25} sx={educationMetaSx}>
@@ -135,6 +135,8 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
               </Stack>
             )}
 
+            <BodyText>{entry.summary}</BodyText>
+
             {educationTabs.length ? (
               <Box sx={detailBlockSx}>
                 <TabPanel
@@ -142,6 +144,7 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
                   ariaLabel={`${entry.program} details`}
                   items={educationTabs}
                   dense
+                  hideTabsWhenSingle
                   tabsVariant="fullWidth"
                 />
               </Box>

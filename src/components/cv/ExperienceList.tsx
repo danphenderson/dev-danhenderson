@@ -108,7 +108,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
         if (experience.projects?.length) {
           experienceTabs.push({
             value: 'details',
-            label: 'Details',
+            label: 'Highlights',
             content: <ExperienceProjects projects={experience.projects} />,
           });
         }
@@ -177,6 +177,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                   ariaLabel={`${experience.title} supplemental information`}
                   items={experienceTabs}
                   dense
+                  hideTabsWhenSingle
                   tabsVariant="fullWidth"
                 />
               </Box>

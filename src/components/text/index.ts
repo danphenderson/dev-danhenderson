@@ -6,6 +6,7 @@ export {
   HeaderSubtitle,
   DisplayTitle,
   EntryTitle,
+  EntrySubtitle,
   SectionLabel,
   MetaText,
   StrongMetaText,
@@ -13,6 +14,7 @@ export {
   BodyText,
   ListItemText,
   SectionLeadText,
+  SubsectionTitle,
 } from './TypographyPrimitives';
 
 export {

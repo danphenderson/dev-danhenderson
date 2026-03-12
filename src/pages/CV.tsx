@@ -31,9 +31,11 @@ import {
   cvBackgroundImage,
   educationInfo,
   experiences,
+  githubSectionLead,
   githubProfileUrl,
   linkedinProfileUrl,
   stackAndTools,
+  stackAndToolsLead,
   volunteering,
   resumeDownloadFilename,
   resumePdfUrl,
@@ -205,6 +207,7 @@ export default function CV() {
           nestedDelayOffsetMs={githubNestedDelayOffsetMs}
           itemOffsetMs={itemOffsetMs}
           projectTitle={isMobile ? 'Public Projects' : 'Projects'}
+          lead={githubSectionLead}
           sectionId={cvSectionMetadata.github.id}
         />
       ),
@@ -240,6 +243,7 @@ export default function CV() {
       node: (
         <CVStackToolsSection
           sections={stackAndTools}
+          lead={stackAndToolsLead}
           delayMs={cvPageSectionLayout.tools[layoutMode].delayMs}
           triggerOnView={cvPageSectionLayout.tools[layoutMode].triggerOnView}
           itemOffsetMs={itemOffsetMs}

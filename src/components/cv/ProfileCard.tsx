@@ -1,8 +1,8 @@
-import { Avatar, Box, Link, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Link, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { AboutMe } from '../../types/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { StatusInlineText, StrongMetaText, MetaText, BodyText } from '../text';
+import { HeaderTitle, StatusInlineText, StrongMetaText, MetaText, BodyText } from '../text';
 
 type ProfileCardProps = {
   about: AboutMe;
@@ -91,9 +91,9 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
       <Box sx={profileHeaderRowSx}>
         <Stack spacing={0.75} sx={profileHeaderContentSx}>
           <Stack direction="row" sx={profileNameRowSx}>
-            <Typography variant="h4" sx={primaryTextSx}>
+            <HeaderTitle sx={[primaryTextSx, { mb: 0 }]}>
               {about.name}
-            </Typography>
+            </HeaderTitle>
           </Stack>
 
           <Stack direction="row" sx={profileMetaRowSx}>

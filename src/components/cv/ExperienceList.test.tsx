@@ -35,11 +35,16 @@ describe('ExperienceList', () => {
       'https://pages.mtu.edu/~jiguangs/Homepage_of_Jiguang_Sun/Welcome.html'
     );
     expect(advisorLink.closest('p')?.querySelectorAll('br')).toHaveLength(0);
-    expect(screen.getByRole('tab', { name: 'Details' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Highlights' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Skills' })).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Researching blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.'
+      )
+    ).toBeVisible();
   });
 
-  it('switches between details and skills within the shared tab panel', () => {
+  it('switches between highlights and skills within the shared tab panel while keeping the summary visible', () => {
     const hemodynamicsExperience = experiences.find(
       (experience) => experience.title === 'Graduate Research Assistant'
     );
@@ -56,6 +61,11 @@ describe('ExperienceList', () => {
       screen.queryByText('Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).')
     ).not.toBeInTheDocument();
     expect(screen.queryByText('PyTorch')).not.toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Researching blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.'
+      )
+    ).toBeVisible();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
 
@@ -63,6 +73,11 @@ describe('ExperienceList', () => {
     expect(
       screen.queryByText('Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).')
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Researching blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.'
+      )
+    ).toBeVisible();
   });
 
   it('keeps the industry chip in the title row', () => {
@@ -106,7 +121,7 @@ describe('ExperienceList', () => {
       </ThemeProvider>
     );
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Details' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Highlights' }));
 
     const detailList = screen.getByRole('list');
 

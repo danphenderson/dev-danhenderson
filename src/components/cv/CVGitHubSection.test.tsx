@@ -22,11 +22,15 @@ describe('CVGitHubSection', () => {
           projects={[{ name: 'portfolio-site', url: 'https://github.com/danphenderson/dev-danhenderson' }]}
           loading={false}
           error={null}
+          lead="Recent activity, open-source contributions, and public repositories from GitHub."
         />
       </ThemeProvider>
     );
 
     expect(screen.getByText('GitHub')).toBeInTheDocument();
+    expect(
+      screen.getByText('Recent activity, open-source contributions, and public repositories from GitHub.')
+    ).toBeVisible();
     expect(screen.getByText('Recent Activity')).toBeInTheDocument();
     expect(screen.getByText('Contributions')).toBeInTheDocument();
     expect(screen.getByText('Contribution calendar')).toBeInTheDocument();
@@ -34,5 +38,7 @@ describe('CVGitHubSection', () => {
     expect(screen.getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
     expect(screen.getByText('microsoft/playwright')).toBeInTheDocument();
     expect(screen.getByText('portfolio-site')).toBeInTheDocument();
+    expect(screen.getByText('Recent Activity').tagName).toBe('H6');
+    expect(screen.getByText('Recent Activity')).toHaveClass('MuiTypography-subtitle2');
   });
 });

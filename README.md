@@ -46,7 +46,7 @@ The site is a React Router single-page app. Keep unknown-route rewrites, `PUBLIC
 - `src/index.tsx` bootstraps the app and wraps it with `ThemeProvider` and `WelcomeAudioProvider`.
 - `src/App.tsx` owns `BrowserRouter`, the shared `Header` / `Footer`, and route registration.
 - Route pages compose shared layout primitives such as `BackgroundPaper`, `PageFrame`, and `SectionCard`.
-- `/cv` is split into reusable CV building blocks such as `CVSidebar`, `CVMainColumn`, `ProfileCard`, `ExperienceList`, and GitHub-backed sections.
+- `/cv` is composed from reusable section components such as `CVAboutSection`, `CVExperienceSection`, `CVEducationSection`, `CVVolunteeringSection`, `CVGitHubSection`, `CVCertificatesSection`, `CVStackToolsSection`, and `CVCodingSection`, with layout orchestration in `src/pages/cvPageLayout.ts`.
 
 ## Animation Behavior
 
@@ -66,15 +66,15 @@ Animation behavior is intentionally centralized for the CV route instead of bein
   - used by the CV tools accordion so chip timing is not defined inline
 - `src/hooks/useHomeWelcomeSequence.ts`
   - coordinates the home-page intro so the hero shell and title stay hidden until the welcome dialog and follow-up hints have been dismissed
-- `src/styles/cvStyles.ts`
-  - source of truth for CV motion tokens and delay helpers
-  - current tokens are:
+- `src/styles/componentStyles.ts`
+  - source of truth for shared motion tokens and delay helpers used by CV animation wrappers and sections
+  - current motion tokens are:
     - `itemOffsetMs = 120`
-    - `itemStaggerMs = 80`
-    - `sectionStaggerMs = 80`
+    - `itemStaggerMs = 120`
+    - `sectionStaggerMs = 120`
     - `githubSubsectionStaggerMs = 120`
-    - `accordionChipStaggerMs = 20`
-  - exposes helpers such as `getSectionDelayMs(...)` and `getItemDelayMs(...)` so `/cv` composition code does not own raw timing constants
+    - `accordionChipStaggerMs = 120`
+  - exposes helpers such as `getSectionDelayMs(...)`, `getItemDelayMs(...)`, and `getAnimatedZoomItemSx(...)` so feature components avoid hardcoding delay math
 
 Current `/cv` sequencing rules:
 
@@ -85,7 +85,7 @@ Current `/cv` sequencing rules:
 
 When changing CV motion:
 
-- prefer updating `src/styles/cvStyles.ts` tokens/helpers first
+- prefer updating `src/styles/componentStyles.ts` tokens/helpers first
 - reuse `AnimatedContentCard`, `AnimatedContentList`, and `AnimatedZoomList`
 - avoid reintroducing inline transition-delay styles or per-component timing constants unless there is a route-specific reason
 
@@ -98,7 +98,7 @@ When changing CV motion:
   - Education data
   - Certificates
   - Stack/tools list
-  - GitHub fallback activity/projects
+  - GitHub fallback activity, projects, and contributions
 - `src/data/climbs.ts`
   - `ticks`: sent routes with dates
   - `todos`: project/wishlist routes
@@ -202,6 +202,7 @@ GitHub Actions workflows live in `.github/workflows/`:
 ├── src/data/            # Source-of-truth content modules
 ├── src/hooks/           # Data adapters for GitHub, climbing, and photography
 ├── src/pages/           # Route-level pages
+├── src/styles/          # Shared animation, layout, and component style tokens
 ├── src/types/           # Shared TypeScript models
 ├── src/utils/           # Asset/date helpers and similar utilities
 └── README.md
@@ -212,7 +213,7 @@ GitHub Actions workflows live in `.github/workflows/`:
 - Update CV copy, certificates, code examples, and GitHub fallback content in `src/data/cv.ts`.
 - Replace the downloadable resume PDF at `public/assets/daniel-henderson-resume.pdf` and keep related metadata in `src/data/cv.ts` aligned with it.
 - Update app theme tokens and MUI component overrides in `src/ThemeProvider.tsx`.
-- Keep reusable page and CV styling centralized in `src/styles/appStyles.ts` and `src/styles/cvStyles.ts` rather than reintroducing component-local `sx` fragments.
+- Keep reusable page and CV styling centralized in `src/styles/appStyles.ts` and `src/styles/componentStyles.ts` rather than reintroducing component-local `sx` fragments.
 - Update welcome-audio behavior or track configuration in `src/WelcomeAudioProvider.tsx`.
 - Use `resolvePublicAssetPath(...)` from `src/utils/assets.ts` when adding new local asset paths to keep `PUBLIC_URL` behavior stable.
 - When changing climbing or photography data, preserve `useClimbingData` sorting assumptions and photography slug stability.
@@ -228,7 +229,7 @@ GitHub Actions workflows live in `.github/workflows/`:
 
 ## Validation
 
-README claims in this repo should stay aligned with `package.json`, `src/App.tsx`, `src/data/`, `src/ThemeProvider.tsx`, `src/WelcomeAudioProvider.tsx`, and `src/utils/assets.ts`.
+README claims in this repo should stay aligned with `package.json`, `src/App.tsx`, `src/data/`, `src/ThemeProvider.tsx`, `src/WelcomeAudioProvider.tsx`, `src/utils/assets.ts`, and `src/styles/componentStyles.ts`.
 
 Use these checks after meaningful changes:
 

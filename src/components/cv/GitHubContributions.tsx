@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import type { GitHubContribution } from '../../types/cv';
 import { LoadingBars } from '../LoadingBars';
 import { ContentCard } from '../ContentCard';
@@ -40,9 +40,9 @@ export const GitHubContributions = ({
 
   if (!contributions.length) {
     return (
-      <Typography variant="body2" sx={secondaryTextSx}>
+      <BodyText sx={secondaryTextSx}>
         No recent community contributions found. Showing personal projects below.
-      </Typography>
+      </BodyText>
     );
   }
 

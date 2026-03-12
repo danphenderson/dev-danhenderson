@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Link, Stack } from '@mui/material';
 import type { CodingExample } from '../../types/cv';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
@@ -69,16 +69,18 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
           <>
             <Stack spacing={1.25}>
               {primaryLink ? (
-                <Typography
-                  variant="h6"
-                  component="a"
+                <Link
                   href={primaryLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  sx={codingExampleLinkSx}
+                  color="inherit"
+                  underline="hover"
+                  sx={{ textDecorationColor: 'currentColor' }}
                 >
-                  {example.title}
-                </Typography>
+                  <EntryTitle component="span" sx={codingExampleLinkSx}>
+                    {example.title}
+                  </EntryTitle>
+                </Link>
               ) : (
                 <EntryTitle>{example.title}</EntryTitle>
               )}
@@ -91,6 +93,7 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
                   ariaLabel={`${example.title} project details`}
                   items={exampleTabs}
                   dense
+                  hideTabsWhenSingle
                   tabsVariant="fullWidth"
                 />
               </Box>

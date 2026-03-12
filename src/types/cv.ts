@@ -63,6 +63,7 @@ export type EducationInfo = {
 export type EducationEntry = {
   university: string;
   program: string;
+  summary: string;
   status?: string;
   dateRange?: string;
   highlights?: string[];
@@ -73,6 +74,7 @@ export type VolunteeringEntry = {
   organization: string;
   organizationUrl?: string;
   role: string;
+  summary: string;
   dateRange: string;
   location?: string;
   highlights: string[];

@@ -6,14 +6,17 @@ import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem } from '../TabPanel';
 import { SectionHeading } from '../layout/SectionHeading';
+import { SectionLeadText } from '../text';
 
 type StackAndToolsSectionProps = {
   sections: StackSection[];
+  lead?: string;
   startDelayMs?: number;
 };
 
 export const StackAndToolsSection = ({
   sections,
+  lead,
   startDelayMs = 0,
 }: StackAndToolsSectionProps) => {
   const {
@@ -34,6 +37,7 @@ export const StackAndToolsSection = ({
   return (
     <Stack spacing={compactSidebarSectionSpacing}>
       <SectionHeading overline="Stack & Tools" sx={sectionHeadingCompactSx} />
+      {lead && <SectionLeadText>{lead}</SectionLeadText>}
 
       <AnimatedContentList
         items={['stack-tools']}
@@ -46,6 +50,7 @@ export const StackAndToolsSection = ({
             ariaLabel="Stack and tools categories"
             items={stackTabs}
             dense
+            hideTabsWhenSingle
             tabsVariant="scrollable"
           />
         )}

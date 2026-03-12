@@ -52,12 +52,18 @@ describe('StackAndToolsSection', () => {
             { title: 'Programming Languages', tabLabel: 'Languages', items: ['TypeScript', 'Python'] },
             { title: 'Cloud Services', tabLabel: 'Cloud', items: ['AWS'] },
           ]}
+          lead="Daily development environment, languages, platform tooling, and services used across software, research, and data work."
           startDelayMs={120}
         />
       </ThemeProvider>
     );
 
     expect(screen.getByText('Stack & Tools')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Daily development environment, languages, platform tooling, and services used across software, research, and data work.'
+      )
+    ).toBeVisible();
     expect(screen.getAllByTestId('animated-content-item')[0]).toHaveAttribute('data-delay', '120');
     expect(screen.getAllByTestId('animated-content-item')[0]).toHaveAttribute('data-has-card-reset', 'true');
     expect(screen.getAllByTestId('animated-content-item')[0]).toHaveAttribute('data-has-panel-surface', 'false');

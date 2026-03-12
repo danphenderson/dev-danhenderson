@@ -1,8 +1,8 @@
-import { Box, Link, Stack, Typography } from '@mui/material';
+import { Box, Link, Stack } from '@mui/material';
 import type { VolunteeringEntry } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { EntryTitle, StrongMetaText, BodyText, ListItemText } from '../text';
+import { EntrySubtitle, EntryTitle, StrongMetaText, BodyText, ListItemText } from '../text';
 
 type VolunteeringListProps = {
   volunteering: VolunteeringEntry[];
@@ -48,19 +48,20 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
                     rel="noopener noreferrer"
                     color="inherit"
                     underline="hover"
-                    variant="h6"
-                    sx={sectionTitleSx}
+                    sx={{ textDecorationColor: 'currentColor' }}
                   >
-                    {entry.organization}
+                    <EntryTitle component="span" sx={sectionTitleSx}>
+                      {entry.organization}
+                    </EntryTitle>
                   </Link>
                 ) : (
                   <EntryTitle>
                     {entry.organization}
                   </EntryTitle>
                 )}
-                <Typography variant="subtitle1" sx={secondaryItalicSx}>
+                <EntrySubtitle sx={secondaryItalicSx}>
                   {entry.role}
-                </Typography>
+                </EntrySubtitle>
               </Box>
 
               <Box sx={volunteeringMetaSx}>
@@ -74,6 +75,8 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
                 )}
               </Box>
             </Stack>
+
+            <BodyText>{entry.summary}</BodyText>
 
             <Box component="ul" sx={getDetailListSx(0, 0)}>
               {entry.highlights.map((highlight, highlightIndex) => (

@@ -7,6 +7,7 @@ import {
   HeaderSubtitle,
   DisplayTitle,
   EntryTitle,
+  EntrySubtitle,
   SectionLabel,
   MetaText,
   StrongMetaText,
@@ -14,6 +15,7 @@ import {
   BodyText,
   ListItemText,
   SectionLeadText,
+  SubsectionTitle,
 } from './TypographyPrimitives';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
@@ -63,6 +65,15 @@ describe('Typography primitives', () => {
 
     expect(el.tagName).toBe('H6');
     expect(el).toHaveClass('MuiTypography-h6');
+  });
+
+  it('renders EntrySubtitle as a subtitle1 paragraph', () => {
+    render(<EntrySubtitle>Applied/Computational Mathematics</EntrySubtitle>, { wrapper });
+
+    const el = screen.getByText('Applied/Computational Mathematics');
+
+    expect(el.tagName).toBe('P');
+    expect(el).toHaveClass('MuiTypography-subtitle1');
   });
 
   it('renders SectionLabel as an overline span', () => {
@@ -120,6 +131,16 @@ describe('Typography primitives', () => {
 
     const el = screen.getByText('Intro text');
 
+    expect(el.tagName).toBe('P');
+    expect(el).toHaveClass('MuiTypography-subtitle2');
+  });
+
+  it('renders SubsectionTitle as a subtitle2 heading', () => {
+    render(<SubsectionTitle>Recent Activity</SubsectionTitle>, { wrapper });
+
+    const el = screen.getByText('Recent Activity');
+
+    expect(el.tagName).toBe('H6');
     expect(el).toHaveClass('MuiTypography-subtitle2');
   });
 

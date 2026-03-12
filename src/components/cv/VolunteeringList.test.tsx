@@ -40,6 +40,7 @@ describe('VolunteeringList', () => {
               organization: 'Access Fund',
               organizationUrl: 'https://www.accessfund.org',
               role: 'Conservation Team',
+              summary: 'Stewardship volunteer work supporting access, trail durability, and maintenance at major climbing areas.',
               dateRange: 'May 2019 – Present',
               location: 'Index, WA',
               highlights: ['Supported trail construction and maintenance projects with the Access Fund conservation team.'],
@@ -51,6 +52,11 @@ describe('VolunteeringList', () => {
 
     expect(screen.getByText('Access Fund')).toBeInTheDocument();
     expect(screen.getByText('Conservation Team')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Stewardship volunteer work supporting access, trail durability, and maintenance at major climbing areas.'
+      )
+    ).toBeInTheDocument();
     expect(screen.getByText('May 2019 – Present')).toBeInTheDocument();
     expect(screen.getByText('Index, WA')).toBeInTheDocument();
     expect(

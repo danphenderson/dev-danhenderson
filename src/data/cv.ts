@@ -41,6 +41,10 @@ export const githubUsername = 'danphenderson';
 export const githubProfileUrl = 'https://github.com/danphenderson';
 export const linkedinProfileUrl = 'https://www.linkedin.com/in/daniel-henderson-6a9485bb/';
 const mtuMathGraduateUrl = 'https://www.mtu.edu/math/graduate/students/';
+export const githubSectionLead =
+  'Recent activity, open-source contributions, and public repositories from GitHub.';
+export const stackAndToolsLead =
+  'Daily development environment, languages, platform tooling, and services used across software, research, and data work.';
 
 export const aboutMe: AboutMe = {
   name: 'Daniel Henderson',
@@ -507,6 +511,8 @@ export const educationInfo: EducationInfo = {
     {
       university: 'Michigan Technological University',
       program: 'MS Mathematics, Applied/Computational',
+      summary:
+        'Graduate work centered on applied mathematics, numerical methods, and computational modeling for hemodynamics research.',
       status: 'Fall 2024 – Present, Expected Summer 2026',
       dateRange: 'Cumulative: 3.44',
       highlights: [
@@ -519,6 +525,8 @@ export const educationInfo: EducationInfo = {
     {
       university: 'Michigan Technological University',
       program: 'B.S. Cum Laude, Mathematics, Applied/Computational',
+      summary:
+        'Applied/computational mathematics degree paired with computer science coursework, scientific computing, and campus leadership experience.',
       status: 'Minor in Computer Science',
       dateRange: 'Cumulative: 3.56 | Departmental: 3.71',
       highlights: [
@@ -541,6 +549,8 @@ export const volunteering: VolunteeringEntry[] = [
   {
     organization: 'Little Brothers',
     role: 'Friends of the Elderly',
+    summary:
+      'Service work focused on restoring donated medical equipment so it could be reused in support of older adults in the community.',
     dateRange: 'Feb 2026',
     location: 'Houghton, MI',
     highlights: [
@@ -551,6 +561,8 @@ export const volunteering: VolunteeringEntry[] = [
     organization: 'Access Fund',
     organizationUrl: 'https://www.accessfund.org',
     role: 'Conservation Team',
+    summary:
+      'Stewardship volunteer work supporting access, trail durability, and maintenance at major climbing areas.',
     dateRange: 'May 2019 – Present',
     location: 'Scarface Trail (Indian Creek, UT), Silver Mountain, MI, and Index, WA.',
     highlights: [
@@ -560,6 +572,8 @@ export const volunteering: VolunteeringEntry[] = [
   {
     organization: 'MidWest Devo',
     role: 'Co-Founder & Volunteer Leadership',
+    summary:
+      'Grassroots youth cycling program leadership spanning fundraising, athlete support, and community program building.',
     dateRange: 'Feb 2013 – Feb 2015',
     location: 'United States',
     highlights: [
@@ -598,7 +612,7 @@ export const stackAndTools: StackSection[] = [
     ],
   },
   {
-    title: 'Programing & Scripting Languages',
+    title: 'Programming & Scripting Languages',
     tabLabel: 'Languages',
     items: [
       'Python',

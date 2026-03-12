@@ -5,6 +5,7 @@ import { StackAndToolsSection } from './StackAndToolsSection';
 
 type CVStackToolsSectionProps = {
   sections: StackSection[];
+  lead?: string;
   delayMs?: number;
   triggerOnView?: boolean;
   itemOffsetMs?: number;
@@ -13,6 +14,7 @@ type CVStackToolsSectionProps = {
 
 export const CVStackToolsSection = ({
   sections,
+  lead,
   delayMs = 0,
   triggerOnView = true,
   itemOffsetMs,
@@ -24,6 +26,6 @@ export const CVStackToolsSection = ({
     id={sectionId}
     sx={cvSectionAnchorSx}
   >
-    <StackAndToolsSection sections={sections} startDelayMs={itemOffsetMs} />
+    <StackAndToolsSection sections={sections} lead={lead} startDelayMs={itemOffsetMs} />
   </SectionCard>
 );
