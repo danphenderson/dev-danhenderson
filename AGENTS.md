@@ -46,11 +46,6 @@ Runtime system and developer instructions override repository instructions. With
 
 ## Concurrent work
 - Multiple agents and the repository developer may work on the same branch at the same time. Treat the branch as shared and assume others may push changes at any time.
-- Pull the latest remote changes before starting work to reduce conflicts with recent commits.
-- Keep changes focused on the assigned task and avoid editing files outside the task's scope. Smaller, non-overlapping edits reduce merge conflict risk.
-- If a push fails because the remote branch has advanced, pull or rebase to incorporate the new commits, resolve any conflicts, and retry.
-- Do not force-push or rewrite shared branch history.
-- When planning changes, prefer touching fewer files and making surgical edits over broad refactors. This limits the surface area for conflicts with concurrent work.
 
 ## Commands
 Use the narrowest relevant validation first, then expand if needed.
