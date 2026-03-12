@@ -26,7 +26,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `npx serve -s build -l ${PORT}`,
+    command: `serve -s build -l ${PORT}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
   },

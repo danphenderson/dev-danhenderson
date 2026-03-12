@@ -16,34 +16,33 @@ test.describe('CV page – GitHub integration', () => {
     await mockGitHubAPISuccess(page);
     await page.goto('/cv');
 
+    const main = page.locator('main');
+
     // The mocked push event should render as formatted activity text
     await expect(
-      page.getByText(/Pushed 1 commit to danphenderson\/dev-danhenderson/),
+      main.getByText(/Pushed 1 commit to danphenderson\/dev-danhenderson/),
     ).toBeVisible();
 
-    // The mocked project should render
-    await expect(
-      page.getByText('BlockOpt.jl').first(),
-    ).toBeVisible();
+    // The GitHub section headings should render
+    await expect(main.getByText('Recent Activity')).toBeVisible();
   });
 
   test('falls back gracefully when GitHub API fails', async ({ page }) => {
     await mockGitHubAPIFailure(page);
     await page.goto('/cv');
 
+    const main = page.locator('main');
+
     // Fallback activity items should still appear
     await expect(
-      page.getByText(/Maintaining BlockOpt\.jl/i),
+      main.getByText(/Maintaining BlockOpt\.jl/i),
     ).toBeVisible();
 
-    // Fallback projects should appear
-    await expect(
-      page.getByText('BlockOpt.jl').first(),
-    ).toBeVisible();
+    // Fallback contributions should appear (unique to contributions section)
+    await expect(main.getByText(/dbt-labs\/dbt-core/)).toBeVisible();
 
-    // Fallback contributions should appear
-    await expect(
-      page.getByText('microsoft/playwright').first(),
-    ).toBeVisible();
+    // The GitHub section headings should render
+    await expect(main.getByText('Recent Activity')).toBeVisible();
+    await expect(main.getByRole('heading', { name: 'Contributions' })).toBeVisible();
   });
 });

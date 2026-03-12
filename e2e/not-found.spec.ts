@@ -15,8 +15,9 @@ test.describe('Not Found page', () => {
 
   test('provides navigation links back to known routes', async ({ page }) => {
     await page.goto('/unknown');
-    await expect(page.getByRole('link', { name: 'Home' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'CV' }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Photography' }).first()).toBeVisible();
+    const main = page.locator('main');
+    await expect(main.getByRole('link', { name: 'Home' })).toBeVisible();
+    await expect(main.getByRole('link', { name: 'CV' })).toBeVisible();
+    await expect(main.getByRole('link', { name: 'Photography' })).toBeVisible();
   });
 });

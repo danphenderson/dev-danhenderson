@@ -7,7 +7,10 @@ test.beforeEach(async ({ page }) => {
 test.describe('Climbing page', () => {
   test('renders climbing route tables', async ({ page }) => {
     await page.goto('/climbing');
-    await expect(page.getByText('Climbing').first()).toBeVisible();
-    await expect(page.getByText('TODO Routes')).toBeVisible();
+    const main = page.locator('main');
+    await expect(
+      main.getByText("A collection of routes I've remembered to tick on Mountain Project."),
+    ).toBeVisible();
+    await expect(main.getByText('TODO Routes')).toBeVisible();
   });
 });
