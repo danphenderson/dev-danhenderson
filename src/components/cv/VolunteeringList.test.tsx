@@ -31,7 +31,7 @@ describe('VolunteeringList', () => {
     mockAnimatedContentList.mockClear();
   });
 
-  it('renders volunteering entries with role, date, location, and highlights', () => {
+  it('renders volunteering entries with role as title, organization as secondary label, and date in the title row', () => {
     render(
       <ThemeProvider>
         <VolunteeringList
@@ -50,15 +50,21 @@ describe('VolunteeringList', () => {
       </ThemeProvider>
     );
 
+    const roleHeading = screen.getByRole('heading', { name: 'Conservation Team' });
+
+    expect(roleHeading).toBeInTheDocument();
+
+    const titleRow = roleHeading.parentElement;
+
+    expect(titleRow).toHaveTextContent('May 2019 – Present');
+
     expect(screen.getByText('Access Fund')).toBeInTheDocument();
-    expect(screen.getByText('Conservation Team')).toBeInTheDocument();
+    expect(screen.getByText('Index, WA')).toBeInTheDocument();
     expect(
       screen.getByText(
         'Stewardship volunteer work supporting access, trail durability, and maintenance at major climbing areas.'
       )
     ).toBeInTheDocument();
-    expect(screen.getByText('May 2019 – Present')).toBeInTheDocument();
-    expect(screen.getByText('Index, WA')).toBeInTheDocument();
     expect(
       screen.getByText('Supported trail construction and maintenance projects with the Access Fund conservation team.')
     ).toBeInTheDocument();

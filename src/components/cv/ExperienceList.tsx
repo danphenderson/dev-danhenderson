@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Box, Chip, Link, Stack } from '@mui/material';
+import { Box, Link } from '@mui/material';
 import type {
   Experience,
   ExperienceDescription,
@@ -11,7 +11,8 @@ import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem } from '../TabPanel';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { EntryTitle, StrongMetaText, MetaText, BodyText, ListItemText, ChipLabel } from '../text';
+import { BodyText, ListItemText } from '../text';
+import { CVEntryHeader } from './CVEntryHeader';
 
 type ExperienceListProps = {
   experiences: Experience[];
@@ -88,10 +89,6 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
     contentListStackSpacing,
     detailBlockSx,
     experienceDescriptionSx,
-    experienceHeaderRowSx,
-    experienceIndustryChipSx,
-    minWidthResetSx,
-    secondaryStrongSx,
   } = useComponentStyles();
 
   return (
@@ -125,46 +122,13 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
 
         return (
           <>
-            <Stack spacing={0.75} width="100%">
-              <Box sx={experienceHeaderRowSx}>
-                <EntryTitle sx={minWidthResetSx}>
-                  {experience.title}
-                </EntryTitle>
-                {experience.industry && (
-                  <Chip
-                    size="small"
-                    label={<ChipLabel>{experience.industry}</ChipLabel>}
-                    variant="outlined"
-                    sx={experienceIndustryChipSx}
-                  />
-                )}
-              </Box>
-              <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={minWidthResetSx}>
-                {experience.companyUrl ? (
-                  <Link
-                    href={experience.companyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    color="inherit"
-                    underline="hover"
-                    variant="subtitle2"
-                    sx={secondaryStrongSx}
-                  >
-                    {experience.company}
-                  </Link>
-                ) : (
-                  <StrongMetaText>
-                    {experience.company}
-                  </StrongMetaText>
-                )}
-                <MetaText>
-                  •
-                </MetaText>
-                <MetaText>
-                  {experience.startDate} - {experience.endDate}
-                </MetaText>
-              </Stack>
-            </Stack>
+            <CVEntryHeader
+              title={experience.title}
+              organization={experience.company}
+              organizationUrl={experience.companyUrl}
+              dateRange={`${experience.startDate} – ${experience.endDate}`}
+              chip={experience.industry ? { label: experience.industry } : undefined}
+            />
             {experience.description && (
               <BodyText sx={experienceDescriptionSx}>
                 {renderExperienceDescription(experience.description)}

@@ -5,9 +5,9 @@ import { useComponentStyles } from '../styles/componentStyles';
 import { TabPanel } from './TabPanel';
 
 const IndustryChip = () => {
-  const { experienceIndustryChipSx } = useComponentStyles();
+  const { cvEntryChipSx } = useComponentStyles();
 
-  return <Chip size="small" label="Industry" variant="outlined" sx={experienceIndustryChipSx} />;
+  return <Chip size="small" label="Industry" variant="outlined" sx={cvEntryChipSx} />;
 };
 
 describe('TabPanel', () => {
