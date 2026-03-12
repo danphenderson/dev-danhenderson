@@ -17,7 +17,7 @@ jest.mock('../AnimatedContentList', () => ({
 describe('ExperienceList', () => {
   it('renders an inline advisor link in the hemodynamics description', () => {
     const hemodynamicsExperience = experiences.find(
-      (experience) => experience.title === 'Graduate Research Assistant | Hemodynamics'
+      (experience) => experience.title === 'Graduate Research Assistant'
     );
 
     expect(hemodynamicsExperience).toBeDefined();
@@ -41,7 +41,7 @@ describe('ExperienceList', () => {
 
   it('switches between details and skills within the shared tab panel', () => {
     const hemodynamicsExperience = experiences.find(
-      (experience) => experience.title === 'Graduate Research Assistant | Hemodynamics'
+      (experience) => experience.title === 'Graduate Research Assistant'
     );
 
     expect(hemodynamicsExperience).toBeDefined();
@@ -67,7 +67,7 @@ describe('ExperienceList', () => {
 
   it('keeps the industry chip in the title row', () => {
     const hemodynamicsExperience = experiences.find(
-      (experience) => experience.title === 'Graduate Research Assistant | Hemodynamics'
+      (experience) => experience.title === 'Graduate Research Assistant'
     );
 
     expect(hemodynamicsExperience).toBeDefined();
@@ -79,7 +79,7 @@ describe('ExperienceList', () => {
     );
 
     const titleRow = screen
-      .getByRole('heading', { name: 'Graduate Research Assistant | Hemodynamics' })
+      .getByRole('heading', { name: 'Graduate Research Assistant' })
       .parentElement;
 
     expect(titleRow).not.toBeNull();

@@ -8,6 +8,7 @@ import { LoadingBars } from '../components/LoadingBars';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
+import { BodyText } from '../components/text';
 
 export default function Photography() {
   const appStyles = useAppStyles();
@@ -42,9 +43,9 @@ export default function Photography() {
               subtitle="A selection of field work, climbing days, and stargazing nights."
               sx={appStyles.compactSectionHeadingSx}
             />
-            <Typography variant="body2" sx={appStyles.secondaryTextSx}>
+            <BodyText sx={appStyles.secondaryTextSx}>
               {categories.length} albums
-            </Typography>
+            </BodyText>
             {isLoading && (
               <Box sx={appStyles.sectionLoadingSx}>
                 <LoadingBars label="Loading photography albums" compact />
@@ -77,9 +78,9 @@ export default function Photography() {
                   <Typography variant="h6" sx={appStyles.primaryTextSx}>
                     {card.name}
                   </Typography>
-                  <Typography variant="body2" sx={appStyles.secondaryTextSx}>
+                  <BodyText sx={appStyles.secondaryTextSx}>
                     {card.description}
-                  </Typography>
+                  </BodyText>
                 </Stack>
 
                 <Button

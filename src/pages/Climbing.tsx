@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Box, Link as MuiLink, Stack, Typography } from '@mui/material';
+import { Alert, Box, Link as MuiLink, Stack } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
@@ -7,6 +7,7 @@ import { SectionCard } from '../components/layout/SectionCard';
 import { LoadingBars } from '../components/LoadingBars';
 import { useClimbingData, TickRow, TodoRow } from '../hooks/useClimbingData';
 import { useAppStyles } from '../styles/appStyles';
+import { SectionLeadText } from '../components/text';
 
 const columns: GridColDef<TickRow>[] = [
   { field: 'date', headerName: 'Date', flex: 0.7, minWidth: 120 },
@@ -65,9 +66,9 @@ export default function Climbing() {
       <SectionCard sx={appStyles.climbingCardSx}>
         <Stack spacing={2}>
           <SectionHeading overline="Climbing"/>
-          <Typography variant="subtitle2" sx={appStyles.sectionLeadSx}>
+          <SectionLeadText sx={appStyles.sectionLeadSx}>
             A collection of routes I've remembered to tick on Mountain Project.
-          </Typography>
+          </SectionLeadText>
           {error && (
             <Alert severity="error" sx={appStyles.errorAlertSx}>
               {error}
@@ -90,9 +91,9 @@ export default function Climbing() {
             />
           </Box>
           <SectionHeading overline="TODO Routes" sx={appStyles.sectionHeadingOffsetSx} />
-          <Typography variant="subtitle2" sx={appStyles.sectionLeadSx}>
+          <SectionLeadText sx={appStyles.sectionLeadSx}>
             A collection of routes I'm interested in climbing.
-          </Typography>
+          </SectionLeadText>
           {todosError && (
             <Alert severity="error" sx={appStyles.errorAlertSx}>
               {todosError}

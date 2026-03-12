@@ -5,6 +5,7 @@ import { TabPanel } from '../TabPanel';
 import type { TabPanelItem } from '../TabPanel';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { EntryTitle, BodyText, ListItemText } from '../text';
 
 type CodingExamplesSectionProps = {
   examples: CodingExample[];
@@ -38,9 +39,9 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
               content: (
                 <Box component="ul" sx={getDetailListSx(0, 0)}>
                   {items.map((item) => (
-                    <Typography component="li" variant="body2" key={item}>
+                    <ListItemText key={item}>
                       {item}
-                    </Typography>
+                    </ListItemText>
                   ))}
                 </Box>
               ),
@@ -79,9 +80,9 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
                   {example.title}
                 </Typography>
               ) : (
-                <Typography variant="h6">{example.title}</Typography>
+                <EntryTitle>{example.title}</EntryTitle>
               )}
-              <Typography variant="body2">{example.description}</Typography>
+              <BodyText>{example.description}</BodyText>
             </Stack>
             {exampleTabs.length ? (
               <Box sx={detailBlockSx}>

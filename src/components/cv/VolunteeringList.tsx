@@ -2,6 +2,7 @@ import { Box, Link, Stack, Typography } from '@mui/material';
 import type { VolunteeringEntry } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { EntryTitle, StrongMetaText, BodyText, ListItemText } from '../text';
 
 type VolunteeringListProps = {
   volunteering: VolunteeringEntry[];
@@ -13,7 +14,6 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
     contentListStackSpacing,
     getDetailListSx,
     secondaryItalicSx,
-    secondaryStrongSx,
     sectionTitleSx,
     volunteeringMetaSx,
   } = useComponentStyles();
@@ -54,9 +54,9 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
                     {entry.organization}
                   </Link>
                 ) : (
-                  <Typography variant="h6" sx={sectionTitleSx}>
+                  <EntryTitle>
                     {entry.organization}
-                  </Typography>
+                  </EntryTitle>
                 )}
                 <Typography variant="subtitle1" sx={secondaryItalicSx}>
                   {entry.role}
@@ -64,22 +64,22 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
               </Box>
 
               <Box sx={volunteeringMetaSx}>
-                <Typography variant="subtitle2" sx={secondaryStrongSx}>
+                <StrongMetaText>
                   {entry.dateRange}
-                </Typography>
+                </StrongMetaText>
                 {entry.location && (
-                  <Typography variant="body2" sx={secondaryItalicSx}>
+                  <BodyText sx={secondaryItalicSx}>
                     {entry.location}
-                  </Typography>
+                  </BodyText>
                 )}
               </Box>
             </Stack>
 
             <Box component="ul" sx={getDetailListSx(0, 0)}>
               {entry.highlights.map((highlight, highlightIndex) => (
-                <Typography component="li" variant="body2" key={`${highlight}-${highlightIndex}`}>
+                <ListItemText key={`${highlight}-${highlightIndex}`}>
                   {highlight}
-                </Typography>
+                </ListItemText>
               ))}
             </Box>
           </Stack>

@@ -1,7 +1,8 @@
-import { Button, Typography } from '@mui/material';
+import { Button } from '@mui/material';
 import type { Certificate } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { EntryTitle, MetaText } from '../text';
 
 type CertificatesListProps = {
   certificates: Certificate[];
@@ -9,7 +10,7 @@ type CertificatesListProps = {
 };
 
 export const CertificatesList = ({ certificates, startDelayMs = 0 }: CertificatesListProps) => {
-  const { certificateActionSx, contentListStackSpacing, interactiveSurfaceSx, secondaryTextSx } = useComponentStyles();
+  const { certificateActionSx, contentListStackSpacing, interactiveSurfaceSx } = useComponentStyles();
 
   return (
     <AnimatedContentList
@@ -21,10 +22,10 @@ export const CertificatesList = ({ certificates, startDelayMs = 0 }: Certificate
       itemSurface="panel"
       renderItem={(certificate) => (
         <>
-          <Typography variant="h6">{certificate.title}</Typography>
-          <Typography variant="subtitle2" sx={secondaryTextSx}>
+          <EntryTitle>{certificate.title}</EntryTitle>
+          <MetaText>
             {certificate.issuer} issued on {certificate.date}
-          </Typography>
+          </MetaText>
           {certificate.link && (
             <Button
               href={certificate.link}
