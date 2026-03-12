@@ -6,41 +6,33 @@ import { mergeSx } from './textFactory';
 
 /* ────────────────────────────────────────────────────────── *
  *  Inline label primitives (span-based)                      *
+ *                                                            *
+ *  InteractiveLabel, NavigationLabel, and ChipLabel share    *
+ *  the same implementation today. They exist as separate     *
+ *  exports so call-sites express *why* a label is used       *
+ *  (interactive control vs navigation vs chip). This allows  *
+ *  each surface to diverge in the future without a           *
+ *  cross-cutting refactor.                                   *
  * ────────────────────────────────────────────────────────── */
 
 type InlineLabelProps = Omit<TypographyProps<'span'>, 'variant' | 'component'> & {
   sx?: SxProps<Theme>;
 };
 
-/**
- * Generic interactive label for tabs, speed-dial tooltips, etc.
- * Renders an inline `<span>`.
- */
-export const InteractiveLabel = ({ children, sx, ...rest }: InlineLabelProps) => (
+const InlineLabel = ({ children, sx, ...rest }: InlineLabelProps) => (
   <Typography component="span" variant="inherit" sx={sx} {...rest}>
     {children}
   </Typography>
 );
 
-/**
- * Navigation label for header buttons and mobile menu items.
- * Renders an inline `<span>`.
- */
-export const NavigationLabel = ({ children, sx, ...rest }: InlineLabelProps) => (
-  <Typography component="span" variant="inherit" sx={sx} {...rest}>
-    {children}
-  </Typography>
-);
+/** Generic interactive label for tabs, speed-dial tooltips, etc. */
+export const InteractiveLabel = InlineLabel;
 
-/**
- * Chip label for skills, navigator chips, and GitHub chip rows.
- * Renders an inline `<span>`.
- */
-export const ChipLabel = ({ children, sx, ...rest }: InlineLabelProps) => (
-  <Typography component="span" variant="inherit" sx={sx} {...rest}>
-    {children}
-  </Typography>
-);
+/** Navigation label for header buttons and mobile menu items. */
+export const NavigationLabel = InlineLabel;
+
+/** Chip label for skills, navigator chips, and GitHub chip rows. */
+export const ChipLabel = InlineLabel;
 
 /**
  * Compound chip meta label – replaces bespoke `Box component="span"` nodes
