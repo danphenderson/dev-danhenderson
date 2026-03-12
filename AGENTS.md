@@ -17,6 +17,7 @@ Prefer changes that preserve the existing single-page-app architecture and stati
 - MUI X DataGrid
 - Create React App (`react-scripts`)
 - Node 20 in CI
+- webdev MCP server available for browser-based UI validation and screenshots
 
 ## Core expectations
 - Keep the app fully client-side unless the task explicitly calls for backend work.
@@ -65,6 +66,10 @@ Notes:
 - Welcome audio behavior lives in `src/WelcomeAudioProvider.tsx`.
 - Preserve localStorage-backed preferences unless the task explicitly asks to migrate them.
 - Avoid hardcoding theme in components or routes. Use the context and hooks provided.
+
+## UI validation
+- Use the webdev MCP server for browser-based validation when checking UI changes, route rendering, or screenshots.
+- Always tear down the browser session after UI validation is complete so no stale tabs or sessions remain open.
 
 ## Deployment-sensitive constraints
 - Production output is generated in `build/`.
