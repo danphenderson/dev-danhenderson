@@ -16,10 +16,10 @@ The current `TabPanel` swaps panel bodies abruptly, which makes the Education, E
 - Work safely on top of unrelated in-flight GitHub section edits already present in the shared branch.
 
 ## Affected files and responsibilities
-- `package.json` and `package-lock.json`: declare explicit `react-transition-group` dependency ownership and any needed type package.
-- `src/components/TabPanel.tsx`: extend `renderContent` with drawer render context while preserving existing content support and selection behavior.
-- `src/components/TabPanel.test.tsx`: replace brittle style comparison with stable behavioral coverage for controlled/uncontrolled state, deselection, `defaultValue`, `keepMounted`, and disabled-item handling.
-- `src/components/AnimatedSlideList.tsx`: provide the shared drawer-focused slide transition-group primitive for stacked and wrapped items.
+- `package.json` and `package-lock.json`: remove direct `react-transition-group` dependency ownership now that no local code imports from it.
+- `src/components/TabPanel.tsx`: keep `renderContent` panels mounted while inactive (with `hidden` attribute) so the drawer container exists before selection, while preserving unmount behavior for plain `content` panels.
+- `src/components/TabPanel.test.tsx`: replace brittle style comparison with stable behavioral coverage for controlled/uncontrolled state, deselection, `defaultValue`, `keepMounted`, disabled-item handling, and the new `renderContent` mounted-while-inactive lifecycle.
+- `src/components/AnimatedSlideList.tsx`: provide the shared drawer-focused slide primitive, driving each `Slide` with the `in` prop from selected state instead of `TransitionGroup` mount transitions.
 - `src/components/SkillsChipList.tsx`: add optional slide-mode rendering for tab drawers while preserving current zoom behavior as the default.
 - `src/styles/componentStyleBuilders.ts`: ensure tab drawer bodies clip and position slide content correctly.
 - `src/components/cv/ExperienceList.tsx`: move highlights and skills tabs onto the transition-aware render path.
@@ -29,7 +29,7 @@ The current `TabPanel` swaps panel bodies abruptly, which makes the Education, E
 - `src/components/cv/*.test.tsx` for those consumers plus `src/components/SkillsChipList.test.tsx`: align stale expectations and verify the animated drawer rendering path.
 
 ## Proposed approach
-First stabilize the failing tests so the new animation work starts from a clean baseline. Then add a small shared slide-group component that composes `TransitionGroup` with MUI `Slide`, uses stable node refs to avoid strict-mode `findDOMNode` warnings, supports both stack and wrap layouts, and falls back to immediate rendering under reduced motion. Extend `TabPanel` additively by passing drawer container context into `renderContent` while keeping `content` for static consumers. Finally, opt the named `/cv` tab consumers into the new path so bullet lists retain `ul`/`li` semantics and skill chips reuse `SkillsChipList` in slide mode only inside tab drawers.
+First stabilize the failing tests so the new animation work starts from a clean baseline. Then add a shared slide-list component that composes MUI `Slide` directly, using stable node refs to avoid strict-mode `findDOMNode` warnings, supporting both stack and wrap layouts, and falling back to immediate rendering under reduced motion. Each `Slide` is driven by the parent `selected` state through the `in` prop rather than relying on `TransitionGroup` mount/unmount transitions. Extend `TabPanel` so that `renderContent` panels remain mounted while inactive (hidden via the `hidden` attribute), ensuring the drawer container DOM node exists before the slide transition fires. The drawer container is treated only as slide-origin context (the `container` prop on `Slide`), not as a portal or mount host. Plain `content` panels retain the existing unmount-when-inactive behavior unless `keepMounted` is enabled. The four `/cv` tab consumers already thread `selected` and `renderContext` through `renderContent`, so no consumer rewrites are needed. The direct dependency on `react-transition-group` is removed since no local code imports from it; MUI's internal usage does not require app-level ownership.
 
 ## Execution steps
 1. Stabilize `TabPanel` and `CodingExamplesSection` tests, and broaden `TabPanel` coverage to its controlled, uncontrolled, deselect, disabled, and mount-state branches.
@@ -60,3 +60,7 @@ First stabilize the failing tests so the new animation work starts from a clean 
 - Desktop browser validation on `/cv` confirmed Experience, Education, Coding Example, and Stack & Tools tabs render the new drawer content while keeping surrounding summary text stable; the active stack drawer reported `position: relative` and `overflow: hidden` as intended for clipped slide content.
 - Mobile browser validation on `/cv` confirmed the same four tab groups render correctly after scrolling them into view at a narrow viewport.
 - Reduced-motion browser validation on `/cv` confirmed Experience, Education, and Coding Example drawer content appears immediately after tab selection; Stack & Tools also rendered immediately once revalidated through a direct panel DOM check.
+- The original `TransitionGroup`-based approach caused a staged tab drawer slide bug: items relied on mount/unmount transitions, but inactive tab panels were unmounted, so the `Slide` children never transitioned from `in={false}` to `in={true}`. Replaced with a state-driven model where `renderContent` panels stay mounted while inactive and each `Slide` is driven by selected state through the `in` prop.
+- Removed direct `react-transition-group` dependency from `package.json` and `@types/react-transition-group` from `devDependencies`. MUI's internal usage does not require app-level ownership.
+- Added `TabPanel` tests verifying that `renderContent` panels remain mounted while inactive with the `hidden` attribute, and that plain `content` panels still unmount when inactive.
+- Rewrote `AnimatedSlideList` tests to verify inactive-to-active state transitions through `Slide` `in` prop rerenders rather than relying on first-mount animation.
