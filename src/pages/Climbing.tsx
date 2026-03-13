@@ -1,12 +1,26 @@
-import React from 'react';
-import { Box, Link as MuiLink, Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../components/CommonLink';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
 import { useClimbingData, TickRow, TodoRow } from '../hooks/useClimbingData';
 import { useAppStyles } from '../styles/appStyles';
 import { SectionLeadText } from '../components/text';
+
+const renderRouteLink = (label: string, href: string) => (
+  <CommonLink
+    href={href}
+    target="_blank"
+    rel="noopener noreferrer"
+    underline="hover"
+    data-tooltip-id={COMMON_LINK_TOOLTIP_ID}
+    data-tooltip-content={`Open ${label} on Mountain Project.`}
+    data-tooltip-place="top"
+  >
+    {label}
+  </CommonLink>
+);
 
 const columns: GridColDef<TickRow>[] = [
   { field: 'date', headerName: 'Date', flex: 0.7, minWidth: 120 },
@@ -15,16 +29,7 @@ const columns: GridColDef<TickRow>[] = [
     headerName: 'Route',
     flex: 1.4,
     minWidth: 200,
-    renderCell: (params) => (
-      <MuiLink
-        href={params.row.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        underline="hover"
-      >
-        {params.value}
-      </MuiLink>
-    ),
+    renderCell: (params) => renderRouteLink(String(params.value), params.row.url),
   },
   { field: 'grade', headerName: 'Grade', flex: 0.6, minWidth: 100 },
   { field: 'location', headerName: 'Location', flex: 1, minWidth: 150 },
@@ -36,16 +41,7 @@ const todoColumns: GridColDef<TodoRow>[] = [
     headerName: 'Route',
     flex: 1.4,
     minWidth: 200,
-    renderCell: (params) => (
-      <MuiLink
-        href={params.row.url}
-        target="_blank"
-        rel="noopener noreferrer"
-        underline="hover"
-      >
-        {params.value}
-      </MuiLink>
-    ),
+    renderCell: (params) => renderRouteLink(String(params.value), params.row.url),
   },
   { field: 'grade', headerName: 'Grade', flex: 0.6, minWidth: 100 },
   { field: 'location', headerName: 'Location', flex: 1, minWidth: 150 },

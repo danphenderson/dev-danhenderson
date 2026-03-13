@@ -37,7 +37,7 @@ export const GitHubContributionCalendar = ({
     githubCalendarContainerSx,
     githubCalendarSizeSx,
     githubCalendarTheme,
-    sectionTitleSx,
+    supportAccentTitleSx,
     secondaryTextSx,
   } = useComponentStyles();
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(null);
@@ -326,7 +326,7 @@ export const GitHubContributionCalendar = ({
 
   const calendarContent = (
     <Stack spacing={1}>
-      <SubsectionTitle sx={sectionTitleSx}>
+      <SubsectionTitle sx={supportAccentTitleSx}>
         Contribution calendar
       </SubsectionTitle>
       <BodyText sx={secondaryTextSx}>

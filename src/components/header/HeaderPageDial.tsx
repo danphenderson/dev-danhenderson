@@ -21,6 +21,7 @@ export const HeaderPageDial = ({
       icon={<Avatar src={avatarSrc} alt="Daniel Henderson" sx={appStyles.headerAvatarSx} />}
       actions={actions}
       direction="right"
+      layer="header"
       actionTooltipPlacement="bottom"
       FabProps={{
         size: iconButtonSize,

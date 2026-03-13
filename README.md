@@ -234,8 +234,10 @@ e2e/
   - photography collections, album images, and route slugs consumed by `usePhotographyData`
   - preserve slug stability so existing album URLs continue to resolve
 - `src/ThemeProvider.tsx`
-  - application palette, typography, and component theme overrides
-  - persisted theme key: `danhenderson-theme`
+  - global light/dark mode and appearance preset state
+  - persisted keys: `danhenderson-theme`, `danhenderson-appearance`
+- `src/theme/appAppearance.ts`
+  - application appearance presets, typography directions, and surface/motion treatment tokens
 - `src/WelcomeAudioProvider.tsx`
   - SoundCloud embed URL and welcome-audio behavior
   - persisted audio consent key: `danhenderson-welcome-audio-consent`
@@ -267,7 +269,7 @@ e2e/
 
 - Update CV copy, certificates, code examples, and GitHub fallback content in `src/data/cv.ts`.
 - Replace the downloadable resume PDF at `public/assets/daniel-henderson-resume.pdf` and keep related metadata in `src/data/cv.ts` aligned with it.
-- Update app theme tokens and MUI component overrides in `src/ThemeProvider.tsx`.
+- Update global appearance presets in `src/theme/appAppearance.ts`, theme assembly in `src/theme/createAppTheme.ts`, and persisted theme state in `src/ThemeProvider.tsx`.
 - Keep reusable page and CV styling centralized in `src/styles/appStyles.ts` and `src/styles/componentStyles.ts` rather than reintroducing component-local `sx` fragments.
 - Update welcome-audio behavior or track configuration in `src/WelcomeAudioProvider.tsx`.
 - Use `resolvePublicAssetPath(...)` from `src/utils/assets.ts` when adding new local asset paths to keep `PUBLIC_URL` behavior stable.

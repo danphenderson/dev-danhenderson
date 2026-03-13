@@ -87,10 +87,12 @@ describe('EducationSection', () => {
 
     expect(screen.getByText('Michigan Technological University')).toBeInTheDocument();
     expect(screen.getByText('Expected Summer 2026')).toBeInTheDocument();
-    expect(screen.getByText('Cumulative: 3.44')).toBeInTheDocument();
+    const gpaChip = screen.getByText('Cumulative: 3.44').closest('.MuiChip-root');
+
+    expect(gpaChip).not.toBeNull();
   });
 
-  it('renders minor as supporting metadata for the BS entry', () => {
+  it('renders separate GPA chips while keeping minor as supporting metadata for the BS entry', () => {
     render(
       <ThemeProvider>
         <EducationSection education={{ entries: [educationInfo.entries[1]] }} />
@@ -98,8 +100,14 @@ describe('EducationSection', () => {
     );
 
     expect(screen.getByRole('heading', { name: 'B.S. Cum Laude, Mathematics, Applied/Computational' })).toBeInTheDocument();
-    expect(screen.getByText('Michigan Technological University')).toBeInTheDocument();
+    const organizationRow = screen.getByText('Michigan Technological University').parentElement;
+
+    expect(organizationRow).not.toBeNull();
+    expect(organizationRow).toHaveTextContent('Cumulative: 3.56');
+    expect(organizationRow).toHaveTextContent('Departmental: 3.71');
+    expect(screen.getByText('Cumulative: 3.56').closest('.MuiChip-root')).not.toBeNull();
+    expect(screen.getByText('Departmental: 3.71').closest('.MuiChip-root')).not.toBeNull();
     expect(screen.getByText('Minor in Computer Science')).toBeInTheDocument();
-    expect(screen.getByText('Cumulative: 3.56 | Departmental: 3.71')).toBeInTheDocument();
+    expect(screen.queryByText('Cumulative: 3.56 | Departmental: 3.71')).not.toBeInTheDocument();
   });
 });

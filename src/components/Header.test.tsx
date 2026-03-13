@@ -1,7 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { MemoryRouter } from 'react-router-dom';
 import { useAppTheme } from '../ThemeProvider';
+import { createAppTheme } from '../theme/createAppTheme';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
 import Header from './Header';
@@ -45,6 +47,27 @@ jest.mock('./header/HeaderPageDial', () => ({
   ),
 }));
 
+jest.mock('./header/HeaderAppearanceDial', () => ({
+  HeaderAppearanceDial: ({
+    onChangeAppearance,
+  }: {
+    onChangeAppearance: (appearance: 'atlas' | 'evergreen' | 'ember') => void;
+  }) => (
+    <div data-testid="header-appearance-dial">
+      <button type="button" aria-label="Open appearance presets">
+        Open appearance presets
+      </button>
+      <button
+        type="button"
+        aria-label="Use Ember appearance"
+        onClick={() => onChangeAppearance('ember')}
+      >
+        Use Ember appearance
+      </button>
+    </div>
+  ),
+}));
+
 const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQuery>;
 const mockUseAppTheme = useAppTheme as jest.MockedFunction<typeof useAppTheme>;
 const mockUseWelcomeAudio = useWelcomeAudio as jest.MockedFunction<typeof useWelcomeAudio>;
@@ -79,9 +102,11 @@ const createOnboardingState = (
 
 const renderHeader = (initialEntry: string) =>
   render(
-    <MemoryRouter initialEntries={[initialEntry]} future={routerFuture}>
-      <Header />
-    </MemoryRouter>
+    <MuiThemeProvider theme={createAppTheme('light', 'evergreen')}>
+      <MemoryRouter initialEntries={[initialEntry]} future={routerFuture}>
+        <Header />
+      </MemoryRouter>
+    </MuiThemeProvider>
   );
 
 const getPageDialActions = () =>
@@ -95,6 +120,8 @@ describe('Header controls', () => {
     mockUseMediaQuery.mockReturnValue(false);
     mockUseAppTheme.mockReturnValue({
       mode: 'light',
+      appearance: 'evergreen',
+      setAppearance: jest.fn(),
       toggleTheme: jest.fn(),
     });
     mockUseWelcomeAudio.mockReturnValue(createAudioState());
@@ -127,9 +154,12 @@ describe('Header controls', () => {
 
   it('toggles theme and dismisses dark mode hint when theme button is clicked', () => {
     const toggleTheme = jest.fn();
+    const setAppearance = jest.fn();
     const dismissDarkModeHint = jest.fn();
     mockUseAppTheme.mockReturnValue({
       mode: 'light',
+      appearance: 'evergreen',
+      setAppearance,
       toggleTheme,
     });
     mockUseWelcomeOnboarding.mockReturnValue(
@@ -144,6 +174,25 @@ describe('Header controls', () => {
     fireEvent.click(screen.getByLabelText('Toggle color theme'));
     expect(dismissDarkModeHint).toHaveBeenCalledTimes(1);
     expect(toggleTheme).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders the appearance dial on the home route and forwards preset changes', () => {
+    const setAppearance = jest.fn();
+    mockUseAppTheme.mockReturnValue({
+      mode: 'light',
+      appearance: 'evergreen',
+      setAppearance,
+      toggleTheme: jest.fn(),
+    });
+
+    renderHeader('/');
+
+    expect(screen.getByTestId('header-appearance-dial')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Use Ember appearance' }));
+
+    expect(setAppearance).toHaveBeenCalledTimes(1);
+    expect(setAppearance).toHaveBeenCalledWith('ember');
   });
 
   it('keeps the current desktop navigation links on the home route', () => {
@@ -174,6 +223,7 @@ describe('Header controls', () => {
     renderHeader('/cv');
 
     expect(screen.getByRole('button', { name: 'Open page navigation' })).toBeInTheDocument();
+    expect(screen.getByTestId('header-appearance-dial')).toBeInTheDocument();
     expect(getPageDialActions()).toEqual([
       { label: 'Climbing', path: '/climbing' },
       { label: 'Photography', path: '/photography' },

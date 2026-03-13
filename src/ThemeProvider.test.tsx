@@ -1,12 +1,26 @@
 import { render, screen, act } from '@testing-library/react';
 import ThemeProvider, { useAppTheme } from './ThemeProvider';
+import {
+  APP_APPEARANCE_STORAGE_KEY,
+  defaultAppAppearanceKey,
+} from './theme/appAppearance';
+
+const legacyCvAppearanceStorageKey = 'danhenderson-cv-appearance';
 
 const ThemeConsumer = () => {
-  const { mode, toggleTheme } = useAppTheme();
+  const {
+    mode,
+    appearance,
+    setAppearance,
+    toggleTheme,
+  } = useAppTheme();
+
   return (
     <div>
       <span data-testid="mode">{mode}</span>
+      <span data-testid="appearance">{appearance}</span>
       <button onClick={toggleTheme}>toggle</button>
+      <button onClick={() => setAppearance('atlas')}>set-atlas</button>
     </div>
   );
 };
@@ -38,9 +52,10 @@ describe('ThemeProvider', () => {
     );
 
     expect(screen.getByTestId('mode')).toHaveTextContent('light');
+    expect(screen.getByTestId('appearance')).toHaveTextContent(defaultAppAppearanceKey);
   });
 
-  it('toggleTheme switches mode to dark', () => {
+  it('toggleTheme switches mode to dark and persists it', () => {
     render(
       <ThemeProvider>
         <ThemeConsumer />
@@ -55,8 +70,24 @@ describe('ThemeProvider', () => {
     expect(window.localStorage.getItem('danhenderson-theme')).toBe('dark');
   });
 
+  it('setAppearance updates the global appearance and persists it', () => {
+    render(
+      <ThemeProvider>
+        <ThemeConsumer />
+      </ThemeProvider>
+    );
+
+    act(() => {
+      screen.getByRole('button', { name: 'set-atlas' }).click();
+    });
+
+    expect(screen.getByTestId('appearance')).toHaveTextContent('atlas');
+    expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe('atlas');
+  });
+
   it('reads stored theme from localStorage', () => {
     window.localStorage.setItem('danhenderson-theme', 'dark');
+    window.localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, 'ember');
 
     render(
       <ThemeProvider>
@@ -65,6 +96,20 @@ describe('ThemeProvider', () => {
     );
 
     expect(screen.getByTestId('mode')).toHaveTextContent('dark');
+    expect(screen.getByTestId('appearance')).toHaveTextContent('ember');
+  });
+
+  it('defaults to evergreen when only the legacy CV appearance storage key exists', () => {
+    window.localStorage.setItem(legacyCvAppearanceStorageKey, 'atlas');
+
+    render(
+      <ThemeProvider>
+        <ThemeConsumer />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('appearance')).toHaveTextContent(defaultAppAppearanceKey);
+    expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe(defaultAppAppearanceKey);
   });
 
   it('returns null when no children are provided', () => {

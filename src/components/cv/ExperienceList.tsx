@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Box, Link } from '@mui/material';
+import { Box } from '@mui/material';
 import type {
   Experience,
   ExperienceDescription,
@@ -10,6 +10,7 @@ import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem } from '../TabPanel';
+import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { BodyText, ListItemText } from '../text';
 import { CVEntryHeader } from './CVEntryHeader';
@@ -22,9 +23,17 @@ type ExperienceListProps = {
 const renderInlineSegments = (segments: ExperienceProjectSegment[]) =>
   segments.map((segment, segmentIndex) => {
     const content = segment.link ? (
-      <Link href={segment.link} target="_blank" rel="noopener noreferrer" underline="hover">
+      <CommonLink
+        href={segment.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        underline="hover"
+        data-tooltip-id={segment.tooltip ? COMMON_LINK_TOOLTIP_ID : undefined}
+        data-tooltip-content={segment.tooltip}
+        data-tooltip-place={segment.tooltip ? 'top' : undefined}
+      >
         {segment.text}
-      </Link>
+      </CommonLink>
     ) : (
       <Box component="span">{segment.text}</Box>
     );
@@ -71,9 +80,9 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
         return (
           <ListItemText key={projectIndex}>
             {project.link ? (
-              <Link href={project.link} target="_blank" rel="noopener noreferrer" underline="hover">
+              <CommonLink href={project.link} target="_blank" rel="noopener noreferrer" underline="hover">
                 {linkLabel}
-              </Link>
+              </CommonLink>
             ) : (
               project.text
             )}
@@ -120,6 +129,9 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
           });
         }
 
+        const hideSingleSupplementalTab =
+          experienceTabs.length === 1 && experienceTabs[0]?.value !== 'skills';
+
         return (
           <>
             <CVEntryHeader
@@ -141,7 +153,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                   ariaLabel={`${experience.title} supplemental information`}
                   items={experienceTabs}
                   dense
-                  hideTabsWhenSingle
+                  hideTabsWhenSingle={hideSingleSupplementalTab}
                   tabsVariant="fullWidth"
                 />
               </Box>

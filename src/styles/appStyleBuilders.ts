@@ -6,9 +6,14 @@ type LoadingBarTone = 'primary' | 'secondary' | 'success';
 
 export const createAppStyleMap = (theme: Theme) => {
   const isLight = theme.palette.mode === 'light';
-  const backgroundOverlayColor = alpha(theme.palette.common.black, isLight ? 0.4 : 0.6);
-  const shellBackgroundColor = alpha(theme.palette.background.paper, isLight ? 0.72 : 0.6);
-  const shellBorder = `1px solid ${alpha(theme.palette.divider, 0.5)}`;
+  const surface = theme.appearanceTreatment.surface;
+  const backgroundOverlayColor = alpha(theme.palette.common.black, surface.backgroundOverlayOpacity);
+  const shellBackgroundColor = alpha(theme.palette.background.paper, surface.panelSurfaceAlpha);
+  const shellBorder = `1px solid ${alpha(theme.palette.divider, surface.panelBorderAlpha)}`;
+  const homeHeroShellBackgroundColor = alpha(theme.palette.primary.contrastText, theme.palette.mode === 'light' ? 0.76 : 0.72);
+  const homeHeroShellBorder = `1px solid ${alpha(theme.palette.common.white, theme.palette.mode === 'light' ? 0.38 : 0.24)}`;
+  const homeHeroShellBlurPx = Math.max(surface.cardBlurPx + 2, 12);
+  const homeHeroShellShadow = `0 18px 40px ${alpha(theme.palette.common.black, theme.palette.mode === 'light' ? 0.22 : 0.34)}`;
   const photoPlaceholderColor = alpha(theme.palette.text.primary, isLight ? 0.08 : 0.18);
   const photoDownloadShadow = alpha(theme.palette.common.black, isLight ? 0.18 : 0.42);
 
@@ -115,6 +120,12 @@ export const createAppStyleMap = (theme: Theme) => {
   const headerIconSx: SxProps<Theme> = {
     fontSize: { xs: 26, md: 30 },
   };
+
+  const headerSpeedDialSx = {
+    position: 'relative',
+    overflow: 'visible',
+    flexShrink: 0,
+  } satisfies SxProps<Theme>;
 
   const photographyCardSx: SxProps<Theme> = {
     height: '100%',
@@ -233,7 +244,16 @@ export const createAppStyleMap = (theme: Theme) => {
       order: { xs: 1, md: 2 },
     } satisfies SxProps<Theme>,
     homeHeroContentSx: { pb: 24.25 } satisfies SxProps<Theme>,
-    homeHeroShellSx: { p: 1.5, pb: 0.5 } satisfies SxProps<Theme>,
+    homeHeroShellSx: {
+      p: 1.5,
+      pb: 0.5,
+      backgroundColor: homeHeroShellBackgroundColor,
+      backgroundImage: 'none',
+      border: homeHeroShellBorder,
+      boxShadow: homeHeroShellShadow,
+      backdropFilter: `blur(${homeHeroShellBlurPx}px)`,
+      WebkitBackdropFilter: `blur(${homeHeroShellBlurPx}px)`,
+    } satisfies SxProps<Theme>,
     homeHeroTitleSx: {
       color: theme.palette.common.white,
       fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
@@ -257,6 +277,7 @@ export const createAppStyleMap = (theme: Theme) => {
       flexShrink: 0,
       ml: 'auto',
     } satisfies SxProps<Theme>,
+    headerAppearanceDialSx: headerSpeedDialSx,
     headerNavLeadSx: {
       display: 'flex',
       alignItems: 'center',
@@ -282,9 +303,7 @@ export const createAppStyleMap = (theme: Theme) => {
       border: `2.5px solid ${alpha(theme.palette.common.white, 0.8)}`,
     } satisfies SxProps<Theme>,
     headerPageDialSx: {
-      position: 'relative',
-      overflow: 'visible',
-      flexShrink: 0,
+      ...headerSpeedDialSx,
       '& .MuiSpeedDial-actions': {
         position: 'absolute',
         left: '100%',

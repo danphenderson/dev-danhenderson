@@ -39,6 +39,25 @@ jest.mock('../WelcomeAudioProvider', () => {
   };
 });
 
+jest.mock('../components/text', () => {
+  const actual = jest.requireActual('../components/text');
+
+  return {
+    ...actual,
+    TypewriterText: ({
+      text,
+      timingPreset,
+    }: {
+      text: string;
+      timingPreset?: string;
+    }) => (
+      <span data-testid="typewriter-text" data-timing-preset={timingPreset ?? ''}>
+        {text}
+      </span>
+    ),
+  };
+});
+
 jest.mock('../components/AnimatedContentCard', () => ({
   AnimatedContentCard: ({
     children,
@@ -134,6 +153,7 @@ describe('Home welcome flow', () => {
 
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
+    expect(screen.queryByTestId('typewriter-text')).not.toBeInTheDocument();
 
     fireEvent.click(await screen.findByRole('button', { name: 'Play welcome audio' }));
 
@@ -150,6 +170,10 @@ describe('Home welcome flow', () => {
 
     await waitFor(() => expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true'));
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
+    expect(screen.getByTestId('typewriter-text')).toHaveTextContent(
+      'Hi, my passions are mathematics, computers, and adventures'
+    );
+    expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-timing-preset', 'headline');
   });
 
   it('waits for the theme hint to close before showing the hero card after opting out of audio', async () => {
@@ -157,6 +181,7 @@ describe('Home welcome flow', () => {
 
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
+    expect(screen.queryByTestId('typewriter-text')).not.toBeInTheDocument();
 
     fireEvent.click(await screen.findByRole('button', { name: 'No thanks' }));
 
@@ -168,5 +193,9 @@ describe('Home welcome flow', () => {
 
     await waitFor(() => expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true'));
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
+    expect(screen.getByTestId('typewriter-text')).toHaveTextContent(
+      'Hi, my passions are mathematics, computers, and adventures'
+    );
+    expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-timing-preset', 'headline');
   });
 });

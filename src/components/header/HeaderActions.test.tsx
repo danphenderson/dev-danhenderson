@@ -2,6 +2,18 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import ThemeProvider from '../../ThemeProvider';
 import { HeaderActions } from './HeaderActions';
 
+jest.mock('./HeaderAppearanceDial', () => ({
+  HeaderAppearanceDial: ({
+    onChangeAppearance,
+  }: {
+    onChangeAppearance: (appearance: 'atlas' | 'evergreen' | 'ember') => void;
+  }) => (
+    <button type="button" aria-label="Open appearance presets" onClick={() => onChangeAppearance('ember')}>
+      Open appearance presets
+    </button>
+  ),
+}));
+
 const renderHeaderActions = (props: Partial<React.ComponentProps<typeof HeaderActions>> = {}) =>
   render(
     <ThemeProvider>
@@ -48,5 +60,20 @@ describe('HeaderActions', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Toggle color theme' }));
 
     expect(onToggleTheme).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders the appearance dial and forwards selections when enabled', () => {
+    const onChangeAppearance = jest.fn();
+
+    renderHeaderActions({
+      showAppearanceControl: true,
+      appearance: 'evergreen',
+      onChangeAppearance,
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open appearance presets' }));
+
+    expect(onChangeAppearance).toHaveBeenCalledTimes(1);
+    expect(onChangeAppearance).toHaveBeenCalledWith('ember');
   });
 });

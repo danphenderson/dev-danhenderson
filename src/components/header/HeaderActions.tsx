@@ -3,6 +3,10 @@ import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import {
+  defaultAppAppearanceKey,
+  type AppAppearanceKey,
+} from '../../theme/appAppearance';
+import {
   IconButton,
   Stack,
   Tooltip,
@@ -11,6 +15,7 @@ import type { PaletteMode } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { MutableRefObject } from 'react';
 import { useAppStyles } from '../../styles/appStyles';
+import { HeaderAppearanceDial } from './HeaderAppearanceDial';
 
 type HeaderActionsProps = {
   iconButtonSize: 'small' | 'medium' | 'large';
@@ -21,6 +26,9 @@ type HeaderActionsProps = {
   pauseButtonRef?: MutableRefObject<HTMLButtonElement | null>;
   showPauseHint?: boolean;
   pauseHighlightSx?: SxProps<Theme>;
+  showAppearanceControl?: boolean;
+  appearance?: AppAppearanceKey;
+  onChangeAppearance?: (appearance: AppAppearanceKey) => void;
   showThemeControl?: boolean;
   mode?: PaletteMode;
   onToggleTheme?: () => void;
@@ -38,6 +46,9 @@ export const HeaderActions = ({
   pauseButtonRef,
   showPauseHint = false,
   pauseHighlightSx,
+  showAppearanceControl = false,
+  appearance = defaultAppAppearanceKey,
+  onChangeAppearance,
   showThemeControl = false,
   mode = 'light',
   onToggleTheme,
@@ -72,6 +83,14 @@ export const HeaderActions = ({
             </IconButton>
           </span>
         </Tooltip>
+      )}
+
+      {showAppearanceControl && onChangeAppearance && (
+        <HeaderAppearanceDial
+          appearance={appearance}
+          iconButtonSize={iconButtonSize}
+          onChangeAppearance={onChangeAppearance}
+        />
       )}
 
       {showThemeControl && (

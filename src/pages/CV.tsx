@@ -67,6 +67,10 @@ type CVSectionDefinition = {
 };
 
 export default function CV() {
+  return <CVRouteContent />;
+}
+
+const CVRouteContent = () => {
   const appStyles = useAppStyles();
   const { motionTokens } = useComponentStyles();
   const { activity, projects, contributions, loading, error } = useGithubProfile();
@@ -112,6 +116,7 @@ export default function CV() {
         ariaLabel="Open about actions"
         icon={<MoreHorizIcon />}
         actions={aboutActions}
+        layer="content"
         FabProps={{ size: 'small' }}
         direction="left"
         actionTooltipPlacement="top"
@@ -127,7 +132,11 @@ export default function CV() {
         <CVAboutSection
           about={aboutMe}
           actions={aboutSpeedDial}
-          footer={sectionNavigator}
+          footer={
+            <>
+              {sectionNavigator}
+            </>
+          }
           delayMs={layout.delayMs}
           triggerOnView={layout.triggerOnView}
           sectionId={cvSectionMetadata.about.id}
@@ -297,4 +306,4 @@ export default function CV() {
       </Grid>
     </PageFrame>
   );
-}
+};

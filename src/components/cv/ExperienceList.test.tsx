@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../ThemeProvider';
 import { experiences } from '../../data/cv';
+import { COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { ExperienceList } from './ExperienceList';
 
 jest.mock('../AnimatedContentList', () => ({
@@ -34,6 +35,8 @@ describe('ExperienceList', () => {
       'href',
       'https://pages.mtu.edu/~jiguangs/Homepage_of_Jiguang_Sun/Welcome.html'
     );
+    expect(advisorLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
+    expect(advisorLink).toHaveAttribute('data-tooltip-content', 'View faculty page');
     expect(advisorLink.closest('p')?.querySelectorAll('br')).toHaveLength(0);
     expect(screen.getByRole('tab', { name: 'Highlights' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Skills' })).toBeInTheDocument();
@@ -78,6 +81,29 @@ describe('ExperienceList', () => {
         'Researching blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.'
       )
     ).toBeVisible();
+  });
+
+  it('keeps a visible skills tab when skills are the only supplemental content', () => {
+    const mathematicsTutorExperience = experiences.find(
+      (experience) => experience.title === 'Mathematics Tutor | Part Time'
+    );
+
+    expect(mathematicsTutorExperience).toBeDefined();
+
+    render(
+      <ThemeProvider>
+        <ExperienceList experiences={[mathematicsTutorExperience!]} />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByRole('tab', { name: 'Skills' })).toBeInTheDocument();
+    expect(screen.queryByText('Teaching')).not.toBeInTheDocument();
+    expect(screen.queryByText('Mathematica')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
+
+    expect(screen.getByText('Teaching')).toBeVisible();
+    expect(screen.getByText('Mathematica')).toBeVisible();
   });
 
   it('places the date range in the title row and the industry chip in the organization row', () => {

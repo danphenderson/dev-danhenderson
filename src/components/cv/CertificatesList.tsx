@@ -10,7 +10,7 @@ type CertificatesListProps = {
 };
 
 export const CertificatesList = ({ certificates, startDelayMs = 0 }: CertificatesListProps) => {
-  const { certificateActionSx, contentListStackSpacing, interactiveSurfaceSx } = useComponentStyles();
+  const { certificateActionSx, contentListStackSpacing, supportAccentInteractiveSurfaceSx } = useComponentStyles();
 
   return (
     <AnimatedContentList
@@ -33,7 +33,7 @@ export const CertificatesList = ({ certificates, startDelayMs = 0 }: Certificate
               rel="noopener noreferrer"
               variant="outlined"
               size="small"
-              sx={[interactiveSurfaceSx, certificateActionSx]}
+              sx={[supportAccentInteractiveSurfaceSx, certificateActionSx]}
             >
               View Certificate
             </Button>

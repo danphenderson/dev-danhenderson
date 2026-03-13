@@ -132,7 +132,12 @@ const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
 };
 
 export default function Header() {
-  const { mode, toggleTheme } = useAppTheme();
+  const {
+    mode,
+    appearance,
+    setAppearance,
+    toggleTheme,
+  } = useAppTheme();
   const appStyles = useAppStyles();
   const muiTheme = useMuiTheme();
   const location = useLocation();
@@ -238,6 +243,9 @@ export default function Header() {
                 pauseButtonRef={pauseButtonRef}
                 showPauseHint={showPauseHint}
                 pauseHighlightSx={pauseHighlightSx}
+                showAppearanceControl
+                appearance={appearance}
+                onChangeAppearance={setAppearance}
                 showThemeControl
                 mode={mode}
                 onToggleTheme={handleThemeToggle}

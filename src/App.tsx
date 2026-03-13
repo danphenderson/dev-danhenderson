@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Footer from './components/Footer';
 import Header from './components/Header';
+import { CommonLinkTooltip } from './components/CommonLinkTooltip';
 import Home from './pages/Home';
 import Photography from './pages/Photography';
 import PhotographyCategory from './pages/PhotographyCategory';
@@ -25,6 +26,7 @@ export default function App() {
           <Route path="*" element={<NotFound/>} />
         </Routes>
         <Footer/>
+        <CommonLinkTooltip />
       </Box>
     </BrowserRouter>
   );

@@ -1,9 +1,10 @@
-import { Box, Link, Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import type { CodingExample } from '../../types/cv';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem } from '../TabPanel';
 import { AnimatedContentList } from '../AnimatedContentList';
+import { CommonLink } from '../CommonLink';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { EntryTitle, BodyText, ListItemText } from '../text';
 
@@ -69,7 +70,7 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
           <>
             <Stack spacing={1.25}>
               {primaryLink ? (
-                <Link
+                <CommonLink
                   href={primaryLink}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -80,7 +81,7 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
                   <EntryTitle component="span" sx={codingExampleLinkSx}>
                     {example.title}
                   </EntryTitle>
-                </Link>
+                </CommonLink>
               ) : (
                 <EntryTitle>{example.title}</EntryTitle>
               )}

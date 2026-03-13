@@ -8,6 +8,7 @@ export type AboutMe = {
   bioLink?: {
     text: string;
     url: string;
+    tooltip?: string;
   };
 };
 
@@ -39,7 +40,12 @@ export type Certificate = {
   link?: string;
 };
 
-export type ExperienceProjectSegment = { text: string; link?: string; lineBreakBefore?: boolean };
+export type ExperienceProjectSegment = {
+  text: string;
+  link?: string;
+  tooltip?: string;
+  lineBreakBefore?: boolean;
+};
 export type ExperienceDescription = string | ExperienceProjectSegment[];
 export type ExperienceProject = string | ExperienceProjectSegment | ExperienceProjectSegment[];
 
@@ -60,12 +66,17 @@ export type EducationInfo = {
   entries: EducationEntry[];
 };
 
+export type EducationGpaEntry = {
+  label: string;
+  value: string;
+};
+
 export type EducationEntry = {
   university: string;
   program: string;
   summary: string;
   dateRange?: string;
-  gpa?: string;
+  gpa?: EducationGpaEntry[];
   minor?: string;
   expectedCompletion?: string;
   highlights?: string[];

@@ -53,7 +53,7 @@ export const CVGitHubSection = ({
     getSectionDelayMs,
     motionTokens,
     sectionHeadingCompactSx,
-    sectionTitleSx,
+    supportAccentTitleSx,
   } = useComponentStyles();
   const resolvedItemOffsetMs = itemOffsetMs ?? motionTokens.itemOffsetMs;
   const githubActivityDelayMs = getSectionDelayMs(0, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
@@ -80,7 +80,7 @@ export const CVGitHubSection = ({
 
         <SectionCard delayMs={githubActivityDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={sectionTitleSx}>
+            <SubsectionTitle sx={supportAccentTitleSx}>
               Recent Activity
             </SubsectionTitle>
             <SectionPanel>
@@ -96,7 +96,7 @@ export const CVGitHubSection = ({
 
         <SectionCard delayMs={githubContributionsDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={sectionTitleSx}>
+            <SubsectionTitle sx={supportAccentTitleSx}>
               Contributions
             </SubsectionTitle>
             <SectionPanel>
@@ -118,7 +118,7 @@ export const CVGitHubSection = ({
 
         <SectionCard delayMs={githubProjectsDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={sectionTitleSx}>
+            <SubsectionTitle sx={supportAccentTitleSx}>
               {projectTitle}
             </SubsectionTitle>
             <SectionPanel>

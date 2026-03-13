@@ -3,8 +3,14 @@ import type { ReactNode } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ThemeProvider from '../ThemeProvider';
 import { CVSectionKey, cvSectionMetadata, cvSectionNavigationOrder } from '../components/cv/cvSectionMetadata';
+import {
+  APP_APPEARANCE_STORAGE_KEY,
+  defaultAppAppearanceKey,
+} from '../theme/appAppearance';
 import { cvPageSectionLayout } from './cvPageLayout';
 import CV from './CV';
+
+const legacyCvAppearanceStorageKey = 'danhenderson-cv-appearance';
 
 jest.mock('@mui/material/useMediaQuery', () => jest.fn());
 
@@ -107,6 +113,8 @@ describe('CV page section navigation', () => {
   beforeEach(() => {
     mockUseMediaQuery.mockReturnValue(false);
     scrollIntoViewMock.mockClear();
+    window.localStorage.removeItem(APP_APPEARANCE_STORAGE_KEY);
+    window.localStorage.removeItem(legacyCvAppearanceStorageKey);
     getElementByIdSpy = jest.spyOn(document, 'getElementById');
   });
 
@@ -198,6 +206,38 @@ describe('CV page section navigation', () => {
       expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
       expect(getElementByIdSpy).toHaveBeenLastCalledWith(expectedSectionId);
     });
+  });
+
+  it('ignores the legacy CV appearance key and uses the global default appearance key', () => {
+    window.localStorage.setItem(legacyCvAppearanceStorageKey, 'atlas');
+
+    render(
+      <ThemeProvider>
+        <CV />
+      </ThemeProvider>
+    );
+
+    const aboutSection = document.getElementById(cvSectionMetadata.about.id);
+
+    expect(aboutSection).not.toBeNull();
+    expect(within(aboutSection!).queryByText('Style Preview')).not.toBeInTheDocument();
+    expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe(defaultAppAppearanceKey);
+  });
+
+  it('respects the stored global appearance option on load', () => {
+    window.localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, 'atlas');
+
+    render(
+      <ThemeProvider>
+        <CV />
+      </ThemeProvider>
+    );
+
+    const aboutSection = document.getElementById(cvSectionMetadata.about.id);
+
+    expect(aboutSection).not.toBeNull();
+    expect(within(aboutSection!).queryByText('Style Preview')).not.toBeInTheDocument();
+    expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe('atlas');
   });
 
   it('renders the mobile stacked order and keeps ABOUT ahead of EXPERIENCE with the current mobile motion contract', () => {

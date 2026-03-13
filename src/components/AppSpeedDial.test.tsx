@@ -1,6 +1,10 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { MouseEventHandler, ReactNode, SyntheticEvent } from 'react';
+import type { Theme } from '@mui/material/styles';
 import { AppSpeedDial } from './AppSpeedDial';
+import { createAppTheme } from '../theme/createAppTheme';
+
+const mockSpeedDial = jest.fn();
 
 jest.mock('@mui/material/SpeedDial', () => ({
   __esModule: true,
@@ -11,6 +15,7 @@ jest.mock('@mui/material/SpeedDial', () => ({
     onClose,
     onOpen,
     open,
+    sx,
   }: {
     ariaLabel: string;
     children: ReactNode;
@@ -18,7 +23,9 @@ jest.mock('@mui/material/SpeedDial', () => ({
     onClose?: (event: SyntheticEvent, reason: string) => void;
     onOpen?: (event: SyntheticEvent, reason: string) => void;
     open?: boolean;
+    sx?: unknown;
   }) => (
+    mockSpeedDial({ ariaLabel, children, icon, onClose, onOpen, open, sx }),
     <div data-testid="speed-dial-root" data-open={String(Boolean(open))}>
       <button
         type="button"
@@ -102,6 +109,10 @@ jest.mock('@mui/material/SpeedDialIcon', () => ({
 }));
 
 describe('AppSpeedDial', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('maps external, mailto, and download actions onto action links', () => {
     render(
       <AppSpeedDial
@@ -205,5 +216,48 @@ describe('AppSpeedDial', () => {
 
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
     expect(screen.queryByTestId('speed-dial-actions')).not.toBeInTheDocument();
+  });
+
+  it('defaults content-layer speed dials below the app bar', () => {
+    const theme = createAppTheme('light', 'evergreen');
+
+    render(
+      <AppSpeedDial
+        ariaLabel="Open shared actions"
+        icon={<span>Open</span>}
+        actions={[]}
+      />
+    );
+
+    const speedDialProps = mockSpeedDial.mock.calls.at(-1)?.[0] as { sx: unknown };
+    const resolvedSx = speedDialProps.sx as ((theme: Theme) => Record<string, unknown>);
+    const layerSx = resolvedSx(theme);
+
+    expect(layerSx.zIndex).toBe(theme.zIndex.appBar - 1);
+    expect(layerSx['& .MuiSpeedDial-fab, & .MuiSpeedDial-actions']).toEqual({
+      zIndex: 'inherit',
+    });
+  });
+
+  it('lets header speed dials opt into the header layer and preserves caller sx', () => {
+    const theme = createAppTheme('dark', 'ember');
+    const customSx = { mr: 2 };
+
+    render(
+      <AppSpeedDial
+        ariaLabel="Open header actions"
+        icon={<span>Open</span>}
+        actions={[]}
+        layer="header"
+        sx={customSx}
+      />
+    );
+
+    const speedDialProps = mockSpeedDial.mock.calls.at(-1)?.[0] as { sx: unknown };
+    const resolvedSx = speedDialProps.sx as Array<unknown>;
+    const layerSx = (resolvedSx[0] as (theme: Theme) => Record<string, unknown>)(theme);
+
+    expect(layerSx.zIndex).toBe(theme.zIndex.appBar + 1);
+    expect(resolvedSx[1]).toBe(customSx);
   });
 });

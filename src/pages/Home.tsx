@@ -4,7 +4,9 @@ import BackgroundPaper from '../components/BackgroundPaper';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
-import { DisplayTitle } from '../components/text';
+import { DisplayTitle, TypewriterText } from '../components/text';
+
+const homeHeroHeadline = 'Hi, my passions are mathematics, computers, and adventures';
 
 export default function Home() {
   const appStyles = useAppStyles();
@@ -23,7 +25,12 @@ export default function Home() {
       <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
         <Stack spacing={2} alignItems="center">
           <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
-            Hi, my passions are mathematics, computers, and adventures
+            {isHeroAnimationReady ? (
+              <TypewriterText
+                text={homeHeroHeadline}
+                timingPreset="headline"
+              />
+            ) : null}
           </DisplayTitle>
         </Stack>
       </AnimatedContentCard>

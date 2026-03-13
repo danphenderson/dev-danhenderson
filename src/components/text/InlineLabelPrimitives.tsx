@@ -54,10 +54,15 @@ export const ChipMetaLabel = ({ children, sx, ...rest }: InlineLabelProps) => {
  * Renders an inline `<span>` with the breathing animation.
  */
 export const StatusInlineText = ({ children, sx, ...rest }: InlineLabelProps) => {
-  const { statusBreatheSx } = useComponentStyles();
+  const { supportAccentTextSx, statusBreatheSx } = useComponentStyles();
 
   return (
-    <Typography component="span" variant="inherit" sx={mergeSx([statusBreatheSx], sx)} {...rest}>
+    <Typography
+      component="span"
+      variant="inherit"
+      sx={mergeSx([supportAccentTextSx, statusBreatheSx], sx)}
+      {...rest}
+    >
       {children}
     </Typography>
   );

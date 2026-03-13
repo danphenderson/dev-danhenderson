@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../ThemeProvider';
+import { COMMON_LINK_TOOLTIP_ID } from '../components/CommonLink';
 import Climbing from './Climbing';
 
 jest.mock('../hooks/useClimbingData', () => ({
@@ -27,7 +28,7 @@ jest.mock('../components/AnimatedContentCard', () => ({
 }));
 
 describe('Climbing', () => {
-  it('renders the climbing page with section headings and data grids', () => {
+  it('renders the climbing page with section headings, data grids, and inline route links', () => {
     render(
       <ThemeProvider>
         <Climbing />
@@ -38,5 +39,20 @@ describe('Climbing', () => {
     expect(screen.getByText('TODO Routes')).toBeInTheDocument();
     expect(screen.getByText("A collection of routes I've remembered to tick on Mountain Project.")).toBeInTheDocument();
     expect(screen.getByText("A collection of routes I'm interested in climbing.")).toBeInTheDocument();
+    const tickLink = screen.getByRole('link', { name: 'Hyperspace' });
+    const todoLink = screen.getByRole('link', { name: 'The Tooth' });
+
+    expect(tickLink).toHaveAttribute(
+      'href',
+      'https://mp.com/route/1'
+    );
+    expect(tickLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
+    expect(tickLink).toHaveAttribute('data-tooltip-content', 'Open Hyperspace on Mountain Project.');
+    expect(todoLink).toHaveAttribute(
+      'href',
+      'https://mp.com/route/2'
+    );
+    expect(todoLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
+    expect(todoLink).toHaveAttribute('data-tooltip-content', 'Open The Tooth on Mountain Project.');
   });
 });

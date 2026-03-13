@@ -1,7 +1,8 @@
-import { Avatar, Box, Link, Stack } from '@mui/material';
+import { Avatar, Box, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { AboutMe } from '../../types/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { HeaderTitle, StatusInlineText, StrongMetaText, MetaText, BodyText } from '../text';
 
 type ProfileCardProps = {
@@ -33,6 +34,13 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
   const bioLink = about.bioLink;
   const bioText = about.bio;
   const bioLinkIndex = bioLink ? bioText.indexOf(bioLink.text) : -1;
+  const bioLinkTooltipProps = bioLink?.tooltip
+    ? {
+        'data-tooltip-id': COMMON_LINK_TOOLTIP_ID,
+        'data-tooltip-content': bioLink.tooltip,
+        'data-tooltip-place': 'top-start' as const,
+      }
+    : {};
   let bioContent: ReactNode = bioText;
 
   if (bioLink && bioLinkIndex >= 0) {
@@ -48,9 +56,15 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
       bioContent = (
         <>
           {beforeLink}
-          <Link href={bioLink.url} target="_blank" rel="noopener noreferrer" underline="hover">
+          <CommonLink
+            href={bioLink.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            underline="hover"
+            {...bioLinkTooltipProps}
+          >
             {bioLink.text}
-          </Link>
+          </CommonLink>
           {beforeStatus}
           <StatusInlineText>{statusLine}</StatusInlineText>
         </>
@@ -59,9 +73,15 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
       bioContent = (
         <>
           {beforeLink}
-          <Link href={bioLink.url} target="_blank" rel="noopener noreferrer" underline="hover">
+          <CommonLink
+            href={bioLink.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            underline="hover"
+            {...bioLinkTooltipProps}
+          >
             {bioLink.text}
-          </Link>
+          </CommonLink>
           {afterLink}
         </>
       );

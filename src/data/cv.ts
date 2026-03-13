@@ -55,6 +55,7 @@ export const aboutMe: AboutMe = {
   bioLink: {
     text: 'M.S. Mathematics student in the applied/computational track (expected Aug 2026)',
     url: mtuMathGraduateUrl,
+    tooltip: 'View the Michigan Tech graduate mathematics student page.',
   },
   bio:
 `M.S. Mathematics student in the applied/computational track (expected Aug 2026) researching macrocirculatory hemodynamics.
@@ -77,9 +78,9 @@ export const codingExamples: CodingExample[] = [
         label: 'Purpose',
         kind: 'list',
         items: [
-          'Normalize `None`-related annotations across a codebase.',
-          'Target repo-wide cleanup rather than ad-hoc edits.',
-          'Preserve formatting and comments while changing types.',
+          'Normalize `Union[..., None]` and default-`None` annotations across Python source files.',
+          'Support dry-run auditing with unified diffs through `typewriter run ... --check`.',
+          'Handle file paths, directories, or in-memory snippets via `--code`.',
         ],
       },
       {
@@ -87,9 +88,9 @@ export const codingExamples: CodingExample[] = [
         label: 'Rewrites',
         kind: 'list',
         items: [
-          'Use concrete-syntax-tree transforms instead of regex replacement.',
-          'Keep diffs readable after automated edits.',
-          'Package the workflow as a pip-installable CLI.',
+          'Rewrite `Union[T, None]` and related multi-type unions into `Optional[...]` forms.',
+          'Upgrade variable and parameter annotations to `Optional[...]` when the default value is `None`.',
+          'Add and deduplicate needed typing imports while preserving qualified references.',
         ],
       },
       {
@@ -110,9 +111,9 @@ export const codingExamples: CodingExample[] = [
         label: 'Workflow',
         kind: 'list',
         items: [
-          'Wrap headless-browser automation behind an async-friendly Python interface.',
-          'Target pages that need a real browser before extraction.',
-          'Bridge navigation, automation, and parsing in one flow.',
+          'Provide an async-oriented interface for browser automation and HTML extraction.',
+          'Center the package around reusable browser-driver code, shared base utilities, docs, and tests.',
+          'Preserve the project as a reference implementation even though it is marked deprecated in favor of Playwright.',
         ],
       },
       {
@@ -120,9 +121,9 @@ export const codingExamples: CodingExample[] = [
         label: 'Automation',
         kind: 'list',
         items: [
-          'Pair Selenium-driven rendering with BeautifulSoup-based parsing.',
-          'Support scripted browsing and scraping workloads.',
-          'Abstract repeated browser-session plumbing into a reusable library.',
+          'Use Selenium to drive rendered pages before parsing content with BeautifulSoup.',
+          'Bundle supporting automation dependencies such as `webdriver-manager` and `cchardet`.',
+          'Ship as an installable `chromex` package targeting Python 3.9+.',
         ],
       },
       {
@@ -143,9 +144,9 @@ export const codingExamples: CodingExample[] = [
         label: 'Product',
         kind: 'list',
         items: [
-          'Combine an interactive CV, climbing log, and photography galleries in one SPA.',
-          'Keep content in TypeScript data modules for static hosting.',
-          'Enhance the CV with GitHub-backed data when available.',
+          'Power a static portfolio with home, CV, climbing, photography index, and album-detail routes.',
+          'Store portfolio content in local TypeScript data modules with GitHub-backed CV enrichment when available.',
+          'Include resume-style CV sections alongside climbing tick/todo data and photography collections.',
         ],
       },
       {
@@ -153,9 +154,9 @@ export const codingExamples: CodingExample[] = [
         label: 'Architecture',
         kind: 'list',
         items: [
-          'Use client-side routing with host rewrites to `index.html`.',
-          'Reuse MUI/CV primitives to keep sections consistent.',
-          'Preserve `PUBLIC_URL`-compatible asset handling for deployment.',
+          'Use a React Router SPA with browser-handled routes and `PUBLIC_URL`-compatible asset handling.',
+          'Centralize CV animation behavior through shared wrappers and motion tokens instead of per-section timing.',
+          'Validate the app with Jest plus Playwright end-to-end tests against a production build.',
         ],
       },
       {
@@ -176,9 +177,9 @@ export const codingExamples: CodingExample[] = [
         label: 'Research',
         kind: 'list',
         items: [
-          'Explore a block-oriented quasi-Newton approach for smooth unconstrained minimization.',
-          'Frame the repo as solver experimentation, not just utility wrappers.',
-          'Target optimization problems where derivative information matters.',
+          'Package supplemental software for the “QN Optimization with Hessian Samples” work.',
+          'Implement a quasi-Newton block update strategy with a direct trust-region subproblem solve.',
+          'Pair solver code with docs, tests, and notebooks for numerical experimentation.',
         ],
       },
       {
@@ -186,9 +187,9 @@ export const codingExamples: CodingExample[] = [
         label: 'Numerics',
         kind: 'list',
         items: [
-          'Use automatic differentiation for derivative evaluation.',
-          'Rely on trust-region tooling to support iterative minimization.',
-          'Position Julia as the environment for numerical experimentation.',
+          'Use `ForwardDiff` for derivative information inside the Julia package.',
+          'Install alongside a specific `TRS.jl` dependency used by the trust-region solver path.',
+          'Organize the implementation around driver, model, options, simulation, and utility modules.',
         ],
       },
       {
@@ -209,9 +210,9 @@ export const codingExamples: CodingExample[] = [
         label: 'Benchmarks',
         kind: 'list',
         items: [
-          'Port a subset of nonlinear unconstrained test problems into native Julia.',
-          'Reduce friction when benchmarking solvers on high-dimensional problems.',
-          'Create reusable problem definitions for experimentation.',
+          'Provide native Julia implementations of high-dimensional unconstrained test problems drawn from CUTEst.',
+          'Expose adjustable problem dimensions and default iterates for solver experiments.',
+          'Keep benchmark definitions in `src/programs` behind a shared package interface.',
         ],
       },
       {
@@ -219,9 +220,9 @@ export const codingExamples: CodingExample[] = [
         label: 'Solver Use',
         kind: 'list',
         items: [
-          'Support AD-friendly optimization workflows without external wrappers.',
-          'Help compare solver behavior across a consistent benchmark set.',
-          'Complement nonlinear optimization research work.',
+          'Expose `Programs`, `SelectProgram`, `adjdim!`, `obj`, `grad`, `objgrad`, and `hessAD` as the main workflow.',
+          'Support gradient and Hessian evaluation with `ForwardDiff` in Julia-native experiments.',
+          'Position the package as a lightweight benchmark set inspired by `NLPModels`.',
         ],
       },
       {
@@ -242,9 +243,9 @@ export const codingExamples: CodingExample[] = [
         label: 'Planning',
         kind: 'list',
         items: [
-          'Let users model tasks and subtasks as a directed acyclic graph.',
-          'Turn dependency structure into a clearer execution order.',
-          'Focus on breaking larger work into manageable units.',
+          'Build a desktop planning app as a multi-module Maven project with separate `ui` and `infrastructure` modules.',
+          'Launch a JavaFX application from `MainApp` into a dedicated `MainView.fxml` shell.',
+          'Organize the UI around workspaces, categories, tags, archives, and account flows.',
         ],
       },
       {
@@ -252,9 +253,9 @@ export const codingExamples: CodingExample[] = [
         label: 'Model',
         kind: 'list',
         items: [
-          'Use DAG rules to prevent cyclic task relationships.',
-          'Highlight graph-based domain modeling in a Java application.',
-          'Treat dependency management as the core product behavior.',
+          'Target Java 11+, OpenJFX 16, JUnit 4, and Maven 3 for development and packaging.',
+          'Produce a shaded runnable JAR for the UI module through the Maven Shade plugin.',
+          'Use Java module boundaries so `io.masterplan.ui` depends on `io.masterplan.infrastructure`.',
         ],
       },
       {
@@ -262,72 +263,6 @@ export const codingExamples: CodingExample[] = [
         label: 'Stack',
         kind: 'skills',
         skills: ['Java', 'DAG data model', 'Task management', 'Object-oriented design'],
-      },
-    ],
-  },
-  {
-    title: 'LeetCode Python Solutions',
-    description: 'A collection of LeetCode problems with corresponding solutions and brief discussions on the approaches used.',
-    links: ['https://github.com/danphenderson/leetcode-solutions'],
-    tabs: [
-      {
-        value: 'practice',
-        label: 'Practice',
-        kind: 'list',
-        items: [
-          'Store worked problems with matching Python solutions.',
-          'Add brief discussions so the repo is useful for review, not just submission history.',
-          'Act as a reusable study reference for interview prep.',
-        ],
-      },
-      {
-        value: 'patterns',
-        label: 'Patterns',
-        kind: 'list',
-        items: [
-          'Emphasize clean implementations over throwaway one-off code.',
-          'Make common algorithmic patterns easier to revisit.',
-          'Support repeated practice with lightweight written reasoning.',
-        ],
-      },
-      {
-        value: 'stack',
-        label: 'Stack',
-        kind: 'skills',
-        skills: ['Python', 'Algorithms', 'Data structures', 'Interview practice'],
-      },
-    ],
-  },
-  {
-    title: 'Runge-Kutta Methods Matlab Library',
-    description: 'Implementation of various Runge-Kutta methods for solving ordinary differential equations.',
-    links: ['https://github.com/danphenderson/runge-kutta-matlab'],
-    tabs: [
-      {
-        value: 'methods',
-        label: 'Methods',
-        kind: 'list',
-        items: [
-          'Implement multiple Runge-Kutta methods for solving ordinary differential equations.',
-          'Package them as reusable MATLAB routines instead of isolated scripts.',
-          'Center the library on numerical-method experimentation.',
-        ],
-      },
-      {
-        value: 'numerics',
-        label: 'Numerics',
-        kind: 'list',
-        items: [
-          'Support comparison of integrators across accuracy and stability tradeoffs.',
-          'Keep solver behavior inspectable for coursework or research.',
-          'Focus on classical ODE time-stepping techniques.',
-        ],
-      },
-      {
-        value: 'stack',
-        label: 'Stack',
-        kind: 'skills',
-        skills: ['MATLAB', 'ODE solvers', 'Runge-Kutta methods', 'Numerical analysis'],
       },
     ],
   },
@@ -369,6 +304,7 @@ export const experiences: Experience[] = [
         {
           text: 'Jiguang Sun',
           link: 'https://pages.mtu.edu/~jiguangs/Homepage_of_Jiguang_Sun/Welcome.html',
+          tooltip: 'View faculty page',
         },
       ],
     projects: [
@@ -515,7 +451,7 @@ export const educationInfo: EducationInfo = {
         'Graduate work centered on applied mathematics, numerical methods, and computational modeling for hemodynamics research.',
       dateRange: 'Fall 2024 – Present',
       expectedCompletion: 'Expected Summer 2026',
-      gpa: 'Cumulative: 3.44',
+      gpa: [{ label: 'Cumulative', value: '3.44' }],
       highlights: [
         'Pedagogical training in curriculum design, assessment, and evidence-based instruction.',
         'Submissions to Numerical Analysis: A Graduate Course errata, improving correctness and clarity in the text.',
@@ -529,7 +465,10 @@ export const educationInfo: EducationInfo = {
       summary:
         'Applied/computational mathematics degree paired with computer science coursework, scientific computing, and campus leadership experience.',
       minor: 'Computer Science',
-      gpa: 'Cumulative: 3.56 | Departmental: 3.71',
+      gpa: [
+        { label: 'Cumulative', value: '3.56' },
+        { label: 'Departmental', value: '3.71' },
+      ],
       highlights: [
         'President & V.P., Finance Club',
         'Representative, Undergraduate Student Government',

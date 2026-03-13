@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import type { EducationInfo } from '../../types/cv';
+import type { EducationGpaEntry, EducationInfo } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
@@ -14,6 +14,9 @@ type EducationSectionProps = {
 };
 
 const courseworkPrefixPattern = /^(?:Relevant\s+)?Coursework:\s*/i;
+
+const getEducationGpaChipLabels = (gpa?: EducationGpaEntry[]) =>
+  (gpa ?? []).map(({ label, value }) => `${label}: ${value}`);
 
 const splitEducationHighlights = (highlights?: string[]) =>
   (highlights ?? []).reduce<{ highlights: string[]; coursework: string[] }>(
@@ -64,6 +67,7 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
         const { highlights: filteredHighlights, coursework: filteredCoursework } = splitEducationHighlights(
           entry.highlights
         );
+        const gpaChipLabels = getEducationGpaChipLabels(entry.gpa);
         const filteredSkills = entry.skills?.filter((tool) => tool.trim().length > 0) ?? [];
         const educationTabs: TabPanelItem[] = [];
 
@@ -115,10 +119,10 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
               title={entry.program}
               organization={entry.university}
               dateRange={entry.dateRange}
+              chips={gpaChipLabels.map((label) => ({ label }))}
               supportingMeta={[
                 ...(entry.expectedCompletion ? [entry.expectedCompletion] : []),
                 ...(entry.minor ? [`Minor in ${entry.minor}`] : []),
-                ...(entry.gpa ? [entry.gpa] : []),
               ].filter(Boolean)}
             />
 

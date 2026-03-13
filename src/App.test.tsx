@@ -43,6 +43,10 @@ jest.mock('./components/Footer', () => ({
   default: () => <footer data-testid="footer">Footer</footer>,
 }));
 
+jest.mock('./components/CommonLinkTooltip', () => ({
+  CommonLinkTooltip: () => <div data-testid="common-link-tooltip" />,
+}));
+
 describe('App', () => {
   it('renders the Header and Footer on every route', () => {
     render(
