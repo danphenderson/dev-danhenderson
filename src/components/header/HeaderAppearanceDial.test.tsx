@@ -74,6 +74,9 @@ describe('HeaderAppearanceDial', () => {
     expect(screen.getByRole('button', { name: 'Use Atlas appearance' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use Evergreen appearance' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use Ember appearance' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Use Solstice appearance' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Use Drift appearance' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Use Graphite appearance' })).toBeInTheDocument();
   });
 
   it('uses a down-opening dial on mobile', () => {

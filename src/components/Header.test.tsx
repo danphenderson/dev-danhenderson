@@ -4,6 +4,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { MemoryRouter } from 'react-router-dom';
 import { useAppTheme } from '../ThemeProvider';
 import { createAppTheme } from '../theme/createAppTheme';
+import type { AppAppearanceKey } from '../theme/appAppearance';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
 import Header from './Header';
@@ -53,7 +54,7 @@ jest.mock('./header/HeaderAppearanceDial', () => ({
     onToggleTheme,
     mode,
   }: {
-    onChangeAppearance?: (appearance: 'atlas' | 'evergreen' | 'ember') => void;
+    onChangeAppearance?: (appearance: AppAppearanceKey) => void;
     onToggleTheme?: () => void;
     mode?: 'light' | 'dark';
   }) => (

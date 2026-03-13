@@ -1,6 +1,12 @@
 import { PaletteMode } from '@mui/material';
 
-export type AppAppearanceKey = 'atlas' | 'evergreen' | 'ember';
+export type AppAppearanceKey =
+  | 'atlas'
+  | 'evergreen'
+  | 'ember'
+  | 'solstice'
+  | 'drift'
+  | 'graphite';
 
 type AppAppearancePalette = {
   primary: {
@@ -95,6 +101,25 @@ const serifHeadingFamily = [
   'serif',
 ];
 
+const sharedMotion: AppMotionTreatment = {
+  tabHoverShimmerMs: 500,
+  pillPulseEnabled: true,
+  pillPulseMs: 5200,
+  chipWaveEnabled: true,
+  chipWaveMs: 8600,
+  chipWaveDelaySeconds: 0.75,
+  borderGlowEnabled: true,
+  borderGlowMs: 8200,
+  sectionBorderSweepEnabled: true,
+  sectionBorderSweepMs: 6800,
+  sectionBottomGlowAnimated: true,
+  sectionBottomGlowMs: 5600,
+  statusBreatheEnabled: true,
+  statusBreatheMs: 3600,
+  headingBreatheEnabled: true,
+  headingBreatheMs: 3800,
+};
+
 export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset> = {
   atlas: {
     key: 'atlas',
@@ -188,24 +213,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         sectionBorderSweepOpacity: 0.5,
       },
     },
-    motion: {
-      tabHoverShimmerMs: 500,
-      pillPulseEnabled: true,
-      pillPulseMs: 5200,
-      chipWaveEnabled: true,
-      chipWaveMs: 8600,
-      chipWaveDelaySeconds: 0.75,
-      borderGlowEnabled: true,
-      borderGlowMs: 8200,
-      sectionBorderSweepEnabled: true,
-      sectionBorderSweepMs: 6800,
-      sectionBottomGlowAnimated: true,
-      sectionBottomGlowMs: 5600,
-      statusBreatheEnabled: true,
-      statusBreatheMs: 3600,
-      headingBreatheEnabled: true,
-      headingBreatheMs: 3800,
-    },
+    motion: sharedMotion,
   },
   evergreen: {
     key: 'evergreen',
@@ -299,24 +307,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         sectionBorderSweepOpacity: 0,
       },
     },
-    motion: {
-      tabHoverShimmerMs: 500,
-      pillPulseEnabled: true,
-      pillPulseMs: 5200,
-      chipWaveEnabled: true,
-      chipWaveMs: 8600,
-      chipWaveDelaySeconds: 0.75,
-      borderGlowEnabled: true,
-      borderGlowMs: 8200,
-      sectionBorderSweepEnabled: true,
-      sectionBorderSweepMs: 6800,
-      sectionBottomGlowAnimated: true,
-      sectionBottomGlowMs: 5600,
-      statusBreatheEnabled: true,
-      statusBreatheMs: 3600,
-      headingBreatheEnabled: true,
-      headingBreatheMs: 3800,
-    },
+    motion: sharedMotion,
   },
   ember: {
     key: 'ember',
@@ -410,24 +401,289 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         sectionBorderSweepOpacity: 0.82,
       },
     },
-    motion: {
-      tabHoverShimmerMs: 500,
-      pillPulseEnabled: true,
-      pillPulseMs: 5200,
-      chipWaveEnabled: true,
-      chipWaveMs: 8600,
-      chipWaveDelaySeconds: 0.75,
-      borderGlowEnabled: true,
-      borderGlowMs: 8200,
-      sectionBorderSweepEnabled: true,
-      sectionBorderSweepMs: 6800,
-      sectionBottomGlowAnimated: true,
-      sectionBottomGlowMs: 5600,
-      statusBreatheEnabled: true,
-      statusBreatheMs: 3600,
-      headingBreatheEnabled: true,
-      headingBreatheMs: 3800,
+    motion: sharedMotion,
+  },
+  solstice: {
+    key: 'solstice',
+    label: 'Solstice',
+    shortDescription: 'Golden amber and twilight violet for a celestial warmth.',
+    palette: {
+      light: {
+        primary: {
+          light: '#d4a254',
+          main: '#b8860b',
+          dark: '#886308',
+          contrastText: '#1c1408',
+        },
+        secondary: {
+          light: '#a78bbd',
+          main: '#7b5ea2',
+          dark: '#5a3f7a',
+        },
+        text: {
+          primary: '#2a2118',
+          secondary: '#6e5f52',
+        },
+        background: {
+          default: '#ede4d4',
+          paper: '#faf5ea',
+        },
+      },
+      dark: {
+        primary: {
+          light: '#e2b86a',
+          main: '#d4a030',
+          dark: '#a07820',
+          contrastText: '#14100a',
+        },
+        secondary: {
+          light: '#b89fd0',
+          main: '#8e6fb5',
+          dark: '#694d8e',
+        },
+        text: {
+          primary: '#f2ece0',
+          secondary: '#c4b8a4',
+        },
+        background: {
+          default: '#141018',
+          paper: '#1e1824',
+        },
+      },
     },
+    typography: {
+      bodyFontFamily: ['Source Sans 3', 'Helvetica Neue', 'Arial', 'sans-serif'],
+      headingFontFamily: serifHeadingFamily,
+    },
+    surface: {
+      light: {
+        backgroundOverlayOpacity: 0.5,
+        cardGradientStartAlpha: 0.95,
+        cardGradientEndAlpha: 0.9,
+        cardBorderAlpha: 0.22,
+        cardShadowAlpha: 0.14,
+        cardBlurPx: 8,
+        panelSurfaceAlpha: 0.84,
+        panelBorderAlpha: 0.16,
+        accentTintAlpha: 0.1,
+        secondaryTintAlpha: 0.12,
+        secondaryBorderAlpha: 0.2,
+        selectedSurfaceAlpha: 0.08,
+        glowStrength: 0.45,
+        textGlowStrength: 0.3,
+        secondaryGlowStrength: 0.55,
+        sectionBottomGlowOpacity: 0.24,
+        sectionBorderSweepOpacity: 0.32,
+      },
+      dark: {
+        backgroundOverlayOpacity: 0.62,
+        cardGradientStartAlpha: 0.88,
+        cardGradientEndAlpha: 0.92,
+        cardBorderAlpha: 0.32,
+        cardShadowAlpha: 0.34,
+        cardBlurPx: 8,
+        panelSurfaceAlpha: 0.68,
+        panelBorderAlpha: 0.28,
+        accentTintAlpha: 0.16,
+        secondaryTintAlpha: 0.16,
+        secondaryBorderAlpha: 0.26,
+        selectedSurfaceAlpha: 0.14,
+        glowStrength: 0.5,
+        textGlowStrength: 0.35,
+        secondaryGlowStrength: 0.6,
+        sectionBottomGlowOpacity: 0.28,
+        sectionBorderSweepOpacity: 0.36,
+      },
+    },
+    motion: sharedMotion,
+  },
+  drift: {
+    key: 'drift',
+    label: 'Drift',
+    shortDescription: 'Ocean blue and coral warmth inspired by coastal horizons.',
+    palette: {
+      light: {
+        primary: {
+          light: '#5da8c9',
+          main: '#2e7da6',
+          dark: '#1d5a7a',
+          contrastText: '#f4f8fa',
+        },
+        secondary: {
+          light: '#e8967c',
+          main: '#d06b4e',
+          dark: '#a04d35',
+        },
+        text: {
+          primary: '#18262e',
+          secondary: '#506874',
+        },
+        background: {
+          default: '#dbe8ee',
+          paper: '#f4f9fb',
+        },
+      },
+      dark: {
+        primary: {
+          light: '#6ebad8',
+          main: '#3e94bd',
+          dark: '#286d90',
+          contrastText: '#0a1418',
+        },
+        secondary: {
+          light: '#eda48e',
+          main: '#d87c62',
+          dark: '#b05a42',
+        },
+        text: {
+          primary: '#e8f0f4',
+          secondary: '#a8c0cc',
+        },
+        background: {
+          default: '#0c161c',
+          paper: '#142028',
+        },
+      },
+    },
+    typography: {
+      bodyFontFamily: ['Source Sans 3', 'Helvetica Neue', 'Arial', 'sans-serif'],
+      headingFontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'],
+    },
+    surface: {
+      light: {
+        backgroundOverlayOpacity: 0.48,
+        cardGradientStartAlpha: 0.94,
+        cardGradientEndAlpha: 0.88,
+        cardBorderAlpha: 0.2,
+        cardShadowAlpha: 0.12,
+        cardBlurPx: 10,
+        panelSurfaceAlpha: 0.82,
+        panelBorderAlpha: 0.16,
+        accentTintAlpha: 0.1,
+        secondaryTintAlpha: 0.1,
+        secondaryBorderAlpha: 0.18,
+        selectedSurfaceAlpha: 0.07,
+        glowStrength: 0.5,
+        textGlowStrength: 0.28,
+        secondaryGlowStrength: 0.52,
+        sectionBottomGlowOpacity: 0.26,
+        sectionBorderSweepOpacity: 0.38,
+      },
+      dark: {
+        backgroundOverlayOpacity: 0.6,
+        cardGradientStartAlpha: 0.86,
+        cardGradientEndAlpha: 0.9,
+        cardBorderAlpha: 0.34,
+        cardShadowAlpha: 0.3,
+        cardBlurPx: 10,
+        panelSurfaceAlpha: 0.66,
+        panelBorderAlpha: 0.3,
+        accentTintAlpha: 0.16,
+        secondaryTintAlpha: 0.14,
+        secondaryBorderAlpha: 0.26,
+        selectedSurfaceAlpha: 0.14,
+        glowStrength: 0.55,
+        textGlowStrength: 0.32,
+        secondaryGlowStrength: 0.58,
+        sectionBottomGlowOpacity: 0.3,
+        sectionBorderSweepOpacity: 0.42,
+      },
+    },
+    motion: sharedMotion,
+  },
+  graphite: {
+    key: 'graphite',
+    label: 'Graphite',
+    shortDescription: 'Cool slate surfaces with rose-gold accents for a refined edge.',
+    palette: {
+      light: {
+        primary: {
+          light: '#8895a4',
+          main: '#5a6978',
+          dark: '#3e4c5a',
+          contrastText: '#faf8f6',
+        },
+        secondary: {
+          light: '#d4a8a0',
+          main: '#b8796e',
+          dark: '#8e584e',
+        },
+        text: {
+          primary: '#1e2228',
+          secondary: '#5c636e',
+        },
+        background: {
+          default: '#e2e4e8',
+          paper: '#f6f6f8',
+        },
+      },
+      dark: {
+        primary: {
+          light: '#96a4b4',
+          main: '#6e7f92',
+          dark: '#4e5e6e',
+          contrastText: '#0e1014',
+        },
+        secondary: {
+          light: '#deb4ac',
+          main: '#c48e84',
+          dark: '#9c6860',
+        },
+        text: {
+          primary: '#eaecf0',
+          secondary: '#b0b6be',
+        },
+        background: {
+          default: '#101216',
+          paper: '#181c22',
+        },
+      },
+    },
+    typography: {
+      bodyFontFamily: ['Source Sans 3', 'Helvetica Neue', 'Arial', 'sans-serif'],
+      headingFontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'],
+    },
+    surface: {
+      light: {
+        backgroundOverlayOpacity: 0.52,
+        cardGradientStartAlpha: 0.96,
+        cardGradientEndAlpha: 0.9,
+        cardBorderAlpha: 0.2,
+        cardShadowAlpha: 0.12,
+        cardBlurPx: 8,
+        panelSurfaceAlpha: 0.86,
+        panelBorderAlpha: 0.14,
+        accentTintAlpha: 0.08,
+        secondaryTintAlpha: 0.1,
+        secondaryBorderAlpha: 0.16,
+        selectedSurfaceAlpha: 0.06,
+        glowStrength: 0.3,
+        textGlowStrength: 0.2,
+        secondaryGlowStrength: 0.42,
+        sectionBottomGlowOpacity: 0.2,
+        sectionBorderSweepOpacity: 0.28,
+      },
+      dark: {
+        backgroundOverlayOpacity: 0.64,
+        cardGradientStartAlpha: 0.9,
+        cardGradientEndAlpha: 0.94,
+        cardBorderAlpha: 0.3,
+        cardShadowAlpha: 0.3,
+        cardBlurPx: 8,
+        panelSurfaceAlpha: 0.7,
+        panelBorderAlpha: 0.26,
+        accentTintAlpha: 0.14,
+        secondaryTintAlpha: 0.14,
+        secondaryBorderAlpha: 0.24,
+        selectedSurfaceAlpha: 0.12,
+        glowStrength: 0.34,
+        textGlowStrength: 0.24,
+        secondaryGlowStrength: 0.48,
+        sectionBottomGlowOpacity: 0.24,
+        sectionBorderSweepOpacity: 0.32,
+      },
+    },
+    motion: sharedMotion,
   },
 };
 

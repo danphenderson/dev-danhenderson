@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import ThemeProvider from '../../ThemeProvider';
+import type { AppAppearanceKey } from '../../theme/appAppearance';
 import { HeaderActions } from './HeaderActions';
 
 jest.mock('./HeaderAppearanceDial', () => ({
@@ -8,7 +9,7 @@ jest.mock('./HeaderAppearanceDial', () => ({
     onToggleTheme,
     mode,
   }: {
-    onChangeAppearance?: (appearance: 'atlas' | 'evergreen' | 'ember') => void;
+    onChangeAppearance?: (appearance: AppAppearanceKey) => void;
     onToggleTheme?: () => void;
     mode?: 'light' | 'dark';
   }) => (
