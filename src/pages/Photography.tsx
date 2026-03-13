@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Box, Button, Grid, Stack, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
@@ -54,9 +54,9 @@ export default function Photography() {
           </Stack>
         </SectionCard>
 
-        <Grid container spacing={2.5}>
+        <Box sx={appStyles.photographyGridSx}>
           {categories.map((card, index) => (
-            <Grid item key={card.name} xs={12} sm={6} md={4}>
+            <Box key={card.name} sx={appStyles.photographyGridItemSx}>
               <SectionCard
                 delayMs={baseDelay + index * staggerDelay}
                 sx={appStyles.photographyCardSx}
@@ -93,9 +93,9 @@ export default function Photography() {
                   View album
                 </Button>
               </SectionCard>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Stack>
     </PageFrame>
   );

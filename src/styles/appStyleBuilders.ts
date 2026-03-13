@@ -123,6 +123,21 @@ export const createAppStyleMap = (theme: Theme) => {
     gap: 1.5,
   };
 
+  const photographyGridSx: SxProps<Theme> = {
+    display: 'grid',
+    gap: 2.5,
+    gridTemplateColumns: {
+      xs: 'minmax(0, 1fr)',
+      sm: 'repeat(2, minmax(0, 1fr))',
+      md: 'repeat(3, minmax(0, 1fr))',
+    },
+    alignItems: 'stretch',
+  };
+
+  const photographyGridItemSx: SxProps<Theme> = {
+    minWidth: 0,
+  };
+
   const photographyCardContentSx: SxProps<Theme> = {
     flexGrow: 1,
   };
@@ -225,6 +240,8 @@ export const createAppStyleMap = (theme: Theme) => {
       lineHeight: 1.5,
     } satisfies SxProps<Theme>,
     headerIconSx,
+    photographyGridSx,
+    photographyGridItemSx,
     headerToolbarSx: {
       px: { xs: 1.5, md: 2.5 },
       gap: { xs: 1.5, md: 2.5 },
