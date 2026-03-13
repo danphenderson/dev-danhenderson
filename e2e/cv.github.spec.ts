@@ -51,11 +51,14 @@ test.describe('CV page – GitHub integration', () => {
     await expectCommonLinkTooltip(page, littleBrothersLink, 'View organization site');
 
     await page.evaluate(() => window.scrollTo({ top: 1000, behavior: 'auto' }));
-    await expect(page.getByRole('button', { name: 'Back to top' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Back to top' }).click();
+    const sectionNavFab = page.getByRole('button', { name: 'CV section navigation' });
+    await expect(sectionNavFab).toBeVisible();
+
+    await sectionNavFab.hover();
+    await page.getByRole('menuitem', { name: 'Back to top' }).click();
     await page.waitForFunction(() => window.scrollY === 0);
-    await expect(page.getByRole('button', { name: 'Back to top' })).toHaveCount(0);
+    await expect(sectionNavFab).toHaveCount(0);
   });
 
   test('displays mocked GitHub activity when API succeeds', async ({ page }) => {

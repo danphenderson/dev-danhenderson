@@ -47,3 +47,7 @@ Keep `CVSectionNavigator` as the single owner of section navigation behavior, bu
 - Baseline tests passed before edits:
   - `npm test -- --watch=false --runInBand src/pages/CV.test.tsx`
   - `npm test -- --watch=false --runInBand src/components/AppSpeedDial.test.tsx src/components/BackToTopButton.test.tsx`
+- Implementation complete: floating speed dial replaces inline chip rail and BackToTopButton.
+- Idle-hide approach uses opacity dimming (not `unmountOnExit`) to avoid hover/focus fight per the identified risk.
+- All 23 unit tests and 3 E2E tests pass. Build succeeds. Browser validation confirmed at desktop (1280×720) and mobile (375×812) viewports.
+- CodeQL security scan: 0 alerts.

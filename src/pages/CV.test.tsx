@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ThemeProvider from '../ThemeProvider';
@@ -98,37 +98,34 @@ jest.mock('../components/AppSpeedDial', () => ({
   ),
 }));
 
-jest.mock('../components/BackToTopButton', () => ({
-  BackToTopButton: () => <div data-testid="back-to-top-button" />,
+jest.mock('../components/cv/CVSectionNavigator', () => ({
+  CVSectionNavigator: ({
+    sections,
+    testId,
+  }: {
+    sections: string[];
+    testId?: string;
+  }) => (
+    <nav data-testid={testId} aria-label="CV section navigation" data-sections={sections.join(',')}>
+      <div data-testid="cv-floating-section-dial" />
+    </nav>
+  ),
 }));
 
 const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQuery>;
 
 describe('CV page section navigation', () => {
-  const scrollIntoViewMock = jest.fn();
-  let getElementByIdSpy: jest.SpyInstance;
-
   const getAnimatedSectionCard = (sectionKey: CVSectionKey) =>
     screen.getByTestId(`animated-card-${cvSectionMetadata[sectionKey].id}`);
 
-  beforeAll(() => {
-    Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
-      configurable: true,
-      value: scrollIntoViewMock,
-    });
-  });
-
   beforeEach(() => {
     mockUseMediaQuery.mockReturnValue(false);
-    scrollIntoViewMock.mockClear();
     window.localStorage.removeItem(APP_APPEARANCE_STORAGE_KEY);
     window.localStorage.removeItem(legacyCvAppearanceStorageKey);
-    getElementByIdSpy = jest.spyOn(document, 'getElementById');
   });
 
   afterEach(() => {
     jest.clearAllMocks();
-    getElementByIdSpy.mockRestore();
   });
 
   it('renders the desktop top row and both desktop columns while preserving the desktop motion contract', () => {
@@ -166,7 +163,7 @@ describe('CV page section navigation', () => {
     });
   });
 
-  it('renders ABOUT actions and places the section navigator as the first desktop sidebar item', () => {
+  it('renders ABOUT actions and places a floating section navigator at the route root', () => {
     render(
       <ThemeProvider>
         <CV />
@@ -203,39 +200,28 @@ describe('CV page section navigation', () => {
     }));
     expect(aboutSection).not.toBeNull();
 
+    const navigator = screen.getByTestId('cv-section-navigator');
     const desktopSidebarRegion = screen.getByTestId('cv-desktop-sidebar-region');
-    const githubSidebarItem = screen.getByTestId('cv-section-region-item-sidebar-github');
-    const navigator = within(desktopSidebarRegion).getByTestId('cv-section-navigator');
-    const navigationActions = within(navigator).getAllByRole('button');
 
     expect(screen.queryByTestId('cv-sticky-section-navigator')).not.toBeInTheDocument();
     expect(within(aboutSection!).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
-    expect(aboutSection!.compareDocumentPosition(desktopSidebarRegion) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(navigator.compareDocumentPosition(githubSidebarItem) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(navigationActions.map((action) => action.textContent)).toEqual(
-      cvSectionNavigationOrder.map((sectionKey) => cvSectionMetadata[sectionKey].navLabel)
-    );
-    expect(within(navigator).queryByRole('button', { name: 'About' })).not.toBeInTheDocument();
-    expect(within(navigator).getByText('Sections')).toBeInTheDocument();
-
-    navigationActions.forEach((action, index) => {
-      const expectedSectionId = cvSectionMetadata[cvSectionNavigationOrder[index]].id;
-
-      fireEvent.click(action);
-
-      expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
-      expect(getElementByIdSpy).toHaveBeenLastCalledWith(expectedSectionId);
-    });
+    expect(within(desktopSidebarRegion).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
+    expect(navigator.getAttribute('data-sections')).toBe(cvSectionNavigationOrder.join(','));
+    expect(screen.getByTestId('cv-floating-section-dial')).toBeInTheDocument();
   });
 
-  it('renders the shared back-to-top control on the cv route', () => {
+  it('renders the floating section navigator as the CV route navigation control', () => {
     render(
       <ThemeProvider>
         <CV />
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('back-to-top-button')).toBeInTheDocument();
+    const navigator = screen.getByTestId('cv-section-navigator');
+
+    expect(navigator).toBeInTheDocument();
+    expect(navigator).toHaveAttribute('aria-label', 'CV section navigation');
+    expect(navigator.getAttribute('data-sections')).toBe(cvSectionNavigationOrder.join(','));
   });
 
   it('ignores the legacy CV appearance key and uses the global default appearance key', () => {
@@ -304,10 +290,6 @@ describe('CV page section navigation', () => {
     expect(screen.queryByTestId('cv-sticky-section-navigator')).not.toBeInTheDocument();
     expect(within(aboutSection!).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
     expect(aboutDial.compareDocumentPosition(navigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(navigator.compareDocumentPosition(experienceSection!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(
-      within(navigator).getAllByRole('button').map((action) => action.textContent)
-    ).toEqual(cvSectionNavigationOrder.map((sectionKey) => cvSectionMetadata[sectionKey].navLabel));
-    expect(within(navigator).getByText('Sections')).toBeInTheDocument();
+    expect(navigator.getAttribute('data-sections')).toBe(cvSectionNavigationOrder.join(','));
   });
 });
