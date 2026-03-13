@@ -53,7 +53,7 @@ jest.mock('./header/HeaderAppearanceDial', () => ({
     onToggleTheme,
     mode,
   }: {
-    onChangeAppearance?: (appearance: 'atlas' | 'evergreen' | 'ember') => void;
+    onChangeAppearance?: (appearance: string) => void;
     onToggleTheme?: () => void;
     mode?: 'light' | 'dark';
   }) => (
