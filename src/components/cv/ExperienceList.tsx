@@ -138,6 +138,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
               title={experience.title}
               organization={experience.company}
               organizationUrl={experience.companyUrl}
+              organizationTooltip={experience.companyTooltip}
               dateRange={`${experience.startDate} – ${experience.endDate}`}
               chip={experience.industry ? { label: experience.industry } : undefined}
             />

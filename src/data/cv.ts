@@ -40,7 +40,9 @@ export const resumeDownloadFilename = 'Daniel-Henderson-Resume.pdf';
 export const githubUsername = 'danphenderson';
 export const githubProfileUrl = 'https://github.com/danphenderson';
 export const linkedinProfileUrl = 'https://www.linkedin.com/in/daniel-henderson-6a9485bb/';
-const mtuMathGraduateUrl = 'https://www.mtu.edu/math/graduate/students/';
+const mtuMathGraduateBioUrl = 'https://www.mtu.edu/math/graduate/students/';
+const mtuGlobalCampusOrganizationUrl =
+  'https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad';
 export const githubSectionLead =
   'Recent activity, open-source contributions, and public repositories from GitHub.';
 export const stackAndToolsLead =
@@ -54,7 +56,7 @@ export const aboutMe: AboutMe = {
   location: 'Seattle, WA',
   bioLink: {
     text: 'M.S. Mathematics student in the applied/computational track (expected Aug 2026)',
-    url: mtuMathGraduateUrl,
+    url: mtuMathGraduateBioUrl,
     tooltip: 'View the Michigan Tech graduate mathematics student page.',
   },
   bio:
@@ -286,7 +288,8 @@ export const certificates: Certificate[] = [
 export const experiences: Experience[] = [
   {
     company: 'Michigan Technological University',
-    companyUrl: mtuMathGraduateUrl,
+    companyUrl: mtuGlobalCampusOrganizationUrl,
+    companyTooltip: 'View online graduate degrees page',
     industry: 'Higher Education',
     title: 'Graduate Research Assistant',
     startDate: 'May 2025',
@@ -316,7 +319,8 @@ export const experiences: Experience[] = [
   },
   {
     company: 'Michigan Technological University',
-    companyUrl: mtuMathGraduateUrl,
+    companyUrl: mtuGlobalCampusOrganizationUrl,
+    companyTooltip: 'View online graduate degrees page',
     industry: 'Higher Education',
     title: 'Instructor',
     startDate: 'Jan 2025',
@@ -333,7 +337,8 @@ export const experiences: Experience[] = [
   },
   {
     company: 'Michigan Technological University',
-    companyUrl: mtuMathGraduateUrl,
+    companyUrl: mtuGlobalCampusOrganizationUrl,
+    companyTooltip: 'View online graduate degrees page',
     industry: 'Higher Education',
     title: 'Graduate Teaching Assistant',
     startDate: 'Aug 2024',
@@ -349,6 +354,7 @@ export const experiences: Experience[] = [
   {
     company: 'Lucerna Health',
     companyUrl: 'https://getlucerna.com',
+    companyTooltip: 'View company site',
     industry: 'HealthTech',
     title: 'Data Pipeline Engineer',
     startDate: 'Apr 2022',
@@ -373,6 +379,7 @@ export const experiences: Experience[] = [
   {
     company: 'Lucerna Health',
     companyUrl: 'https://getlucerna.com',
+    companyTooltip: 'View company site',
     industry: 'HealthTech',
     title: 'Data Scientist | Contract',
     startDate: 'Nov 2021',
@@ -391,7 +398,8 @@ export const experiences: Experience[] = [
   },
   {
     company: 'Michigan Technological University',
-    companyUrl: mtuMathGraduateUrl,
+    companyUrl: mtuGlobalCampusOrganizationUrl,
+    companyTooltip: 'View online graduate degrees page',
     industry: 'Higher Education',
     title: 'Research Assistant | Full Time',
     startDate: 'May 2021',
@@ -417,7 +425,8 @@ export const experiences: Experience[] = [
   },
   {
     company: 'Michigan Technological University',
-    companyUrl: mtuMathGraduateUrl,
+    companyUrl: mtuGlobalCampusOrganizationUrl,
+    companyTooltip: 'View online graduate degrees page',
     industry: 'Higher Education',
     title: 'Mathematics Tutor | Part Time',
     startDate: 'September 2015',
@@ -426,9 +435,8 @@ export const experiences: Experience[] = [
     projects: [],
     skills: ['Teaching', 'Mathematica']
   },
-    {
+  {
     company: 'Various Locations',
-    companyUrl: mtuMathGraduateUrl,
     industry: 'Retail & Service',
     title: 'Bike Mechanic & Service Technician',
     startDate: 'Various Periods Starting 2012',
@@ -488,6 +496,8 @@ export const educationInfo: EducationInfo = {
 export const volunteering: VolunteeringEntry[] = [
   {
     organization: 'Little Brothers',
+    organizationUrl: 'https://lbfenetwork.org',
+    organizationTooltip: 'View organization site',
     role: 'Friends of the Elderly',
     summary:
       'Service work focused on restoring donated medical equipment so it could be reused in support of older adults in the community.',
@@ -500,6 +510,7 @@ export const volunteering: VolunteeringEntry[] = [
   {
     organization: 'Access Fund',
     organizationUrl: 'https://www.accessfund.org',
+    organizationTooltip: 'View organization site',
     role: 'Conservation Team',
     summary:
       'Stewardship volunteer work supporting access, trail durability, and maintenance at major climbing areas.',

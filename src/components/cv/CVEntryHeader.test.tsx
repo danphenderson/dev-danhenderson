@@ -1,8 +1,33 @@
 import { render, screen } from '@testing-library/react';
 import ThemeProvider from '../../ThemeProvider';
+import { COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { CVEntryHeader } from './CVEntryHeader';
 
 describe('CVEntryHeader', () => {
+  it('renders linked organizations with the shared tooltip attributes when explicitly provided', () => {
+    render(
+      <ThemeProvider>
+        <CVEntryHeader
+          title="Graduate Research Assistant"
+          organization="Michigan Technological University"
+          organizationUrl="https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad"
+          organizationTooltip="View online graduate degrees page"
+          dateRange="May 2025 – Current"
+        />
+      </ThemeProvider>
+    );
+
+    const organizationLink = screen.getByRole('link', { name: 'Michigan Technological University' });
+
+    expect(organizationLink).toHaveAttribute(
+      'href',
+      'https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad'
+    );
+    expect(organizationLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
+    expect(organizationLink).toHaveAttribute('data-tooltip-content', 'View online graduate degrees page');
+    expect(organizationLink).toHaveAttribute('data-tooltip-place', 'top');
+  });
+
   it('renders multiple chips in the organization row while leaving supporting metadata separate', () => {
     render(
       <ThemeProvider>

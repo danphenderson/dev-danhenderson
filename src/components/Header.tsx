@@ -163,12 +163,12 @@ export default function Header() {
   const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState<null | HTMLElement>(null);
   const mobileMenuOpen = Boolean(mobileMenuAnchor);
   const pauseButtonRef = React.useRef<HTMLButtonElement | null>(null);
-  const themeButtonRef = React.useRef<HTMLButtonElement | null>(null);
+  const appearanceDialRef = React.useRef<HTMLElement | null>(null);
   const themeHintTitle = mode === 'dark' ? 'Try light mode' : 'Try dark mode';
   const themeHintBody =
     mode === 'dark'
-      ? 'Tap this button to switch back to light mode.'
-      : 'Tap this button to switch to dark mode.';
+      ? 'Open this palette menu to switch back to light mode.'
+      : 'Open this palette menu to switch to dark mode.';
   const pauseHighlightSx = showPauseHint
     ? appStyles.getHeaderHighlightSx('secondary', `${pulseRing} 1.6s ease-out infinite`)
     : {};
@@ -209,6 +209,16 @@ export default function Header() {
     toggleTheme();
   };
 
+  const appearanceDial = {
+    appearance,
+    mode,
+    onChangeAppearance: setAppearance,
+    onToggleTheme: handleThemeToggle,
+    controlRef: appearanceDialRef,
+    triggerDescriptionId: showDarkModeHint ? 'dark-mode-popover' : undefined,
+    triggerHighlightSx: themeHighlightSx,
+  };
+
   return (
     <>
       <HideOnScroll>
@@ -244,15 +254,7 @@ export default function Header() {
                 pauseButtonRef={pauseButtonRef}
                 showPauseHint={showPauseHint}
                 pauseHighlightSx={pauseHighlightSx}
-                showAppearanceControl
-                appearance={appearance}
-                onChangeAppearance={setAppearance}
-                showThemeControl
-                mode={mode}
-                onToggleTheme={handleThemeToggle}
-                themeButtonRef={themeButtonRef}
-                showDarkModeHint={showDarkModeHint}
-                themeHighlightSx={themeHighlightSx}
+                appearanceDial={appearanceDial}
               />
             </Box>
             <HintPopover
@@ -265,8 +267,8 @@ export default function Header() {
             />
             <HintPopover
               id="dark-mode-popover"
-              open={showDarkModeHint && Boolean(themeButtonRef.current)}
-              anchorEl={themeButtonRef.current}
+              open={showDarkModeHint && Boolean(appearanceDialRef.current)}
+              anchorEl={appearanceDialRef.current}
               onClose={dismissDarkModeHint}
               title={themeHintTitle}
               body={themeHintBody}

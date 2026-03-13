@@ -14,9 +14,10 @@ const expectCommonLinkTooltip = async (
 ) => {
   const tooltip = page.locator(`#${COMMON_LINK_TOOLTIP_ID}`);
 
+  await link.scrollIntoViewIfNeeded();
   await expect(link).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
   await expect(link).toHaveAttribute('data-tooltip-content', content);
-  await link.focus();
+  await link.hover();
   await expect(tooltip).toBeVisible();
   await expect(tooltip).toContainText(content);
 };
@@ -31,6 +32,8 @@ test.describe('CV page – GitHub integration', () => {
       name: 'M.S. Mathematics student in the applied/computational track (expected Aug 2026)',
     });
     const advisorLink = page.getByRole('link', { name: 'Jiguang Sun' });
+    const mtuOrganizationLink = page.getByRole('link', { name: 'Michigan Technological University' }).first();
+    const littleBrothersLink = page.getByRole('link', { name: 'Little Brothers' });
 
     await expect(programLink).toHaveAttribute('href', 'https://www.mtu.edu/math/graduate/students/');
     await expectCommonLinkTooltip(
@@ -38,8 +41,14 @@ test.describe('CV page – GitHub integration', () => {
       programLink,
       'View the Michigan Tech graduate mathematics student page.',
     );
-    await advisorLink.scrollIntoViewIfNeeded();
     await expectCommonLinkTooltip(page, advisorLink, 'View faculty page');
+    await expect(mtuOrganizationLink).toHaveAttribute(
+      'href',
+      'https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad'
+    );
+    await expectCommonLinkTooltip(page, mtuOrganizationLink, 'View online graduate degrees page');
+    await expect(littleBrothersLink).toHaveAttribute('href', 'https://lbfenetwork.org');
+    await expectCommonLinkTooltip(page, littleBrothersLink, 'View organization site');
 
     await page.evaluate(() => window.scrollTo({ top: 1000, behavior: 'auto' }));
     await expect(page.getByRole('button', { name: 'Back to top' })).toBeVisible();

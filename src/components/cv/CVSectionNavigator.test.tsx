@@ -1,6 +1,6 @@
 import { act, render, screen } from '@testing-library/react';
 import ThemeProvider from '../../ThemeProvider';
-import { cvSectionMetadata } from './cvSectionMetadata';
+import { cvSectionMetadata, cvSectionViewportMetrics } from './cvSectionMetadata';
 import { CVSectionNavigator } from './CVSectionNavigator';
 
 describe('CVSectionNavigator', () => {
@@ -62,14 +62,16 @@ describe('CVSectionNavigator', () => {
     expect(window.getComputedStyle(chipRail as HTMLElement).flexGrow).toBe('1');
   });
 
-  it('highlights the section whose card is closest to the sticky guide while scrolling', () => {
+  it('highlights the section whose card is closest to the header guide while scrolling', () => {
     Object.defineProperty(window, 'innerHeight', {
       configurable: true,
       value: 900,
     });
-    appendSection(cvSectionMetadata.experience.id, { top: 108, height: 420 });
-    appendSection(cvSectionMetadata.education.id, { top: 620, height: 320 });
-    appendSection(cvSectionMetadata.github.id, { top: 512, height: 260 });
+    const activeLinePx = cvSectionViewportMetrics.desktop.activeLinePx;
+
+    appendSection(cvSectionMetadata.experience.id, { top: activeLinePx - 16, height: 420 });
+    appendSection(cvSectionMetadata.education.id, { top: activeLinePx + 360, height: 320 });
+    appendSection(cvSectionMetadata.github.id, { top: activeLinePx + 244, height: 260 });
 
     render(
       <ThemeProvider>
@@ -86,8 +88,8 @@ describe('CVSectionNavigator', () => {
     expect(githubButton).toHaveAttribute('aria-pressed', 'false');
 
     sectionRects.set(cvSectionMetadata.experience.id, { top: -340, height: 420 });
-    sectionRects.set(cvSectionMetadata.education.id, { top: 126, height: 320 });
-    sectionRects.set(cvSectionMetadata.github.id, { top: 448, height: 260 });
+    sectionRects.set(cvSectionMetadata.education.id, { top: activeLinePx - 8, height: 320 });
+    sectionRects.set(cvSectionMetadata.github.id, { top: activeLinePx + 220, height: 260 });
 
     act(() => {
       window.dispatchEvent(new Event('scroll'));

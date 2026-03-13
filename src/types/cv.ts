@@ -52,6 +52,7 @@ export type ExperienceProject = string | ExperienceProjectSegment | ExperiencePr
 export type Experience = {
   company: string;
   companyUrl?: string;
+  companyTooltip?: string;
   industry?: string;
   title: string;
   startDate: string;
@@ -86,6 +87,7 @@ export type EducationEntry = {
 export type VolunteeringEntry = {
   organization: string;
   organizationUrl?: string;
+  organizationTooltip?: string;
   role: string;
   summary: string;
   dateRange: string;

@@ -10,15 +10,18 @@ jest.mock('../AppSpeedDial', () => ({
     ariaLabel,
     actions,
     direction,
+    FabProps,
   }: {
     ariaLabel: string;
     actions: Array<{ id: string; label: string; onClick?: () => void }>;
     direction?: string;
+    FabProps?: { 'aria-describedby'?: string };
   }) => (
     <div
       data-testid="header-appearance-dial"
       data-aria-label={ariaLabel}
       data-direction={direction}
+      data-fab-aria-describedby={FabProps?.['aria-describedby'] ?? ''}
     >
       <button type="button" aria-label={ariaLabel}>
         {ariaLabel}
@@ -45,7 +48,9 @@ const renderDial = (props: Partial<React.ComponentProps<typeof HeaderAppearanceD
       <HeaderAppearanceDial
         appearance="evergreen"
         iconButtonSize="medium"
+        mode="light"
         onChangeAppearance={jest.fn()}
+        onToggleTheme={jest.fn()}
         {...props}
       />
     </ThemeProvider>
@@ -60,11 +65,12 @@ describe('HeaderAppearanceDial', () => {
     jest.clearAllMocks();
   });
 
-  it('uses a left-opening dial on desktop with one action per preset', () => {
+  it('uses a left-opening dial on desktop with the theme action and one action per preset', () => {
     renderDial();
 
     expect(screen.getByTestId('header-appearance-dial')).toHaveAttribute('data-direction', 'left');
     expect(screen.getByRole('button', { name: 'Open appearance presets' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Switch to dark mode' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use Atlas appearance' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use Evergreen appearance' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use Ember appearance' })).toBeInTheDocument();
@@ -87,5 +93,29 @@ describe('HeaderAppearanceDial', () => {
 
     expect(onChangeAppearance).toHaveBeenCalledTimes(1);
     expect(onChangeAppearance).toHaveBeenCalledWith('ember');
+  });
+
+  it('calls onToggleTheme when the theme action is chosen', () => {
+    const onToggleTheme = jest.fn();
+
+    renderDial({
+      mode: 'light',
+      onToggleTheme,
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Switch to dark mode' }));
+
+    expect(onToggleTheme).toHaveBeenCalledTimes(1);
+  });
+
+  it('wires the dark mode hint description to the dial trigger', () => {
+    renderDial({
+      triggerDescriptionId: 'dark-mode-popover',
+    });
+
+    expect(screen.getByTestId('header-appearance-dial')).toHaveAttribute(
+      'data-fab-aria-describedby',
+      'dark-mode-popover'
+    );
   });
 });

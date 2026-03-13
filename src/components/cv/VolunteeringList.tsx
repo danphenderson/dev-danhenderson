@@ -34,6 +34,7 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
             title={entry.role}
             organization={entry.organization}
             organizationUrl={entry.organizationUrl}
+            organizationTooltip={entry.organizationTooltip}
             dateRange={entry.dateRange}
             supportingMeta={entry.location ? [entry.location] : undefined}
           />

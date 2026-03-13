@@ -50,20 +50,35 @@ jest.mock('./header/HeaderPageDial', () => ({
 jest.mock('./header/HeaderAppearanceDial', () => ({
   HeaderAppearanceDial: ({
     onChangeAppearance,
+    onToggleTheme,
+    mode,
   }: {
-    onChangeAppearance: (appearance: 'atlas' | 'evergreen' | 'ember') => void;
+    onChangeAppearance?: (appearance: 'atlas' | 'evergreen' | 'ember') => void;
+    onToggleTheme?: () => void;
+    mode?: 'light' | 'dark';
   }) => (
     <div data-testid="header-appearance-dial">
       <button type="button" aria-label="Open appearance presets">
         Open appearance presets
       </button>
-      <button
-        type="button"
-        aria-label="Use Ember appearance"
-        onClick={() => onChangeAppearance('ember')}
-      >
-        Use Ember appearance
-      </button>
+      {onToggleTheme ? (
+        <button
+          type="button"
+          aria-label={`Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`}
+          onClick={() => onToggleTheme()}
+        >
+          Toggle theme
+        </button>
+      ) : null}
+      {onChangeAppearance ? (
+        <button
+          type="button"
+          aria-label="Use Ember appearance"
+          onClick={() => onChangeAppearance('ember')}
+        >
+          Use Ember appearance
+        </button>
+      ) : null}
     </div>
   ),
 }));
@@ -152,7 +167,7 @@ describe('Header controls', () => {
     expect(pause).toHaveBeenCalledTimes(1);
   });
 
-  it('toggles theme and dismisses dark mode hint when theme button is clicked', () => {
+  it('toggles theme and dismisses dark mode hint when the theme dial action is clicked', () => {
     const toggleTheme = jest.fn();
     const setAppearance = jest.fn();
     const dismissDarkModeHint = jest.fn();
@@ -171,7 +186,7 @@ describe('Header controls', () => {
 
     renderHeader('/cv');
 
-    fireEvent.click(screen.getByLabelText('Toggle color theme'));
+    fireEvent.click(screen.getByLabelText('Switch to dark mode'));
     expect(dismissDarkModeHint).toHaveBeenCalledTimes(1);
     expect(toggleTheme).toHaveBeenCalledTimes(1);
   });

@@ -1,20 +1,20 @@
 import type { SxProps, Theme } from '@mui/material/styles';
 
-export const cvStickySectionNavMetrics = {
+export const cvSectionViewportMetrics = {
   mobile: {
-    topOffsetPx: 72,
-    activeLinePx: 132,
+    anchorOffsetPx: 88,
+    activeLinePx: 88,
   },
   desktop: {
-    topOffsetPx: 96,
-    activeLinePx: 156,
+    anchorOffsetPx: 112,
+    activeLinePx: 112,
   },
 } as const;
 
 export const cvSectionAnchorSx: SxProps<Theme> = {
   scrollMarginTop: {
-    xs: cvStickySectionNavMetrics.mobile.activeLinePx,
-    md: cvStickySectionNavMetrics.desktop.activeLinePx,
+    xs: cvSectionViewportMetrics.mobile.anchorOffsetPx,
+    md: cvSectionViewportMetrics.desktop.anchorOffsetPx,
   },
 };
 

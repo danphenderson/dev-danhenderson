@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Box, Stack } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme as useMuiTheme } from '@mui/material/styles';
-import { CVSectionKey, cvSectionMetadata, cvStickySectionNavMetrics } from './cvSectionMetadata';
+import { CVSectionKey, cvSectionMetadata, cvSectionViewportMetrics } from './cvSectionMetadata';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { SectionLabel, ChipLabel } from '../text';
 
@@ -25,8 +25,8 @@ export const CVSectionNavigator = ({
   } = useComponentStyles();
   const [activeSection, setActiveSection] = useState<CVSectionKey | null>(sections[0] ?? null);
   const activeLinePx = isMobile
-    ? cvStickySectionNavMetrics.mobile.activeLinePx
-    : cvStickySectionNavMetrics.desktop.activeLinePx;
+    ? cvSectionViewportMetrics.mobile.activeLinePx
+    : cvSectionViewportMetrics.desktop.activeLinePx;
 
   useEffect(() => {
     if (sections.length === 0 || typeof window === 'undefined') {

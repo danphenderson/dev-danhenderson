@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 import { Box, Chip, Stack } from '@mui/material';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { CommonLink } from '../CommonLink';
+import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { EntryTitle, MetaText, StrongMetaText, ChipLabel } from '../text';
 
 type CVEntryChip = {
@@ -12,6 +12,7 @@ type CVEntryHeaderProps = {
   title: string;
   organization: string;
   organizationUrl?: string;
+  organizationTooltip?: string;
   dateRange?: string;
   chip?: CVEntryChip;
   chips?: CVEntryChip[];
@@ -22,6 +23,7 @@ export const CVEntryHeader = ({
   title,
   organization,
   organizationUrl,
+  organizationTooltip,
   dateRange,
   chip,
   chips,
@@ -54,6 +56,9 @@ export const CVEntryHeader = ({
             color="inherit"
             underline="hover"
             variant="subtitle2"
+            data-tooltip-id={organizationTooltip ? COMMON_LINK_TOOLTIP_ID : undefined}
+            data-tooltip-content={organizationTooltip}
+            data-tooltip-place={organizationTooltip ? 'top' : undefined}
             sx={[supportAccentStrongTextSx, minWidthResetSx]}
           >
             {organization}

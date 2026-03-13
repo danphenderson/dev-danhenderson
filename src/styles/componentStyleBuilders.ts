@@ -224,10 +224,6 @@ export const createComponentStyleMap = (theme: Theme) => {
   const cvSectionBorderGradient = `linear-gradient(100deg, ${alpha(accentColor, 0)} 0%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.12 : 0.18))} 18%, ${alpha(theme.palette.primary.light, scaleGlowAlpha(isLight ? 0.52 : 0.4))} 50%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.14 : 0.22))} 82%, ${alpha(accentColor, 0)} 100%)`;
   const cvSectionBottomGlowGradient = `radial-gradient(80% 140% at 50% 100%, ${alpha(theme.palette.primary.light, scaleGlowAlpha(isLight ? 0.32 : 0.26))} 0%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.2 : 0.24))} 38%, ${alpha(accentColor, 0)} 100%)`;
   const cvSectionSupportWash = `radial-gradient(130% 130% at 0% 0%, ${alpha(supportAccentLight, Math.min(surface.secondaryTintAlpha + (isLight ? 0.08 : 0.06), 0.24))} 0%, ${alpha(supportAccentColor, Math.min(surface.secondaryTintAlpha + 0.02, 0.18))} 24%, ${alpha(supportAccentColor, 0)} 70%)`;
-  const sectionNavigatorSurface = alpha(
-    theme.palette.background.paper,
-    Math.min(surface.panelSurfaceAlpha + (isLight ? 0.08 : 0.14), 0.9)
-  );
   const sectionNavigatorActiveShadow = `0 0 0 1px ${alpha(theme.palette.primary.light, isLight ? 0.32 : 0.42)}, 0 0 18px ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.16 : 0.24))}`;
   const hoverShimmerSx = motion.tabHoverShimmerMs !== null ? {
     position: 'relative' as const,
@@ -468,12 +464,12 @@ export const createComponentStyleMap = (theme: Theme) => {
       width: '100%',
       minWidth: 0,
       position: 'relative',
-      borderRadius: 999,
+      borderRadius: 2,
       border: subtleBorder,
-      backgroundColor: sectionNavigatorSurface,
-      boxShadow: theme.shadows[4],
-      backdropFilter: `blur(${Math.max(surface.cardBlurPx - 2, 8)}px)`,
-      WebkitBackdropFilter: `blur(${Math.max(surface.cardBlurPx - 2, 8)}px)`,
+      backgroundColor: subtleSurface,
+      boxShadow: 'none',
+      backdropFilter: 'none',
+      WebkitBackdropFilter: 'none',
       px: { xs: 1.25, md: 1.5 },
       py: 0.875,
     } satisfies SxProps<Theme>,

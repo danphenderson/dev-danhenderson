@@ -22,7 +22,6 @@ import {
   cvSectionNavigationOrder,
   CVSectionKey,
   cvSectionMetadata,
-  cvStickySectionNavMetrics,
 } from '../components/cv/cvSectionMetadata';
 import { CVGitHubSection } from '../components/cv/CVGitHubSection';
 import { PageFrame } from '../components/layout/PageFrame';
@@ -128,21 +127,6 @@ const CVRouteContent = () => {
   );
 
   const sectionNavigator = <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator" />;
-  const stickySectionNavigator = (
-    <Box
-      data-testid="cv-sticky-section-navigator"
-      sx={{
-        position: 'sticky',
-        top: {
-          xs: cvStickySectionNavMetrics.mobile.topOffsetPx,
-          md: cvStickySectionNavMetrics.desktop.topOffsetPx,
-        },
-        zIndex: (theme) => theme.zIndex.appBar - 1,
-      }}
-    >
-      {sectionNavigator}
-    </Box>
-  );
   const sectionDefinitions: CVSectionDefinition[] = [
     {
       key: 'about',
@@ -294,7 +278,7 @@ const CVRouteContent = () => {
         <>
           <CVSectionStack spacing={2.5}>
             {mobileAboutSection && renderSectionDescriptor(mobileAboutSection)}
-            {mobileAboutSection && stickySectionNavigator}
+            {mobileAboutSection && sectionNavigator}
             {mobileBodySections.map(renderSectionDescriptor)}
           </CVSectionStack>
           <BackToTopButton />
@@ -313,12 +297,11 @@ const CVRouteContent = () => {
             </CVSectionStack>
           </Box>
 
-          {stickySectionNavigator}
-
           <Grid container spacing={3} alignItems="stretch">
             <Grid item xs={12} md={5} lg={4} sx={appStyles.cvDesktopAsideGridItemSx}>
               <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-sidebar-region">
                 <CVSectionStack spacing={2.5}>
+                  {sectionNavigator}
                   {getSectionNodesForRegion('sidebar')}
                 </CVSectionStack>
               </Box>

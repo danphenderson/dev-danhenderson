@@ -5,14 +5,48 @@ import { HeaderActions } from './HeaderActions';
 jest.mock('./HeaderAppearanceDial', () => ({
   HeaderAppearanceDial: ({
     onChangeAppearance,
+    onToggleTheme,
+    mode,
   }: {
-    onChangeAppearance: (appearance: 'atlas' | 'evergreen' | 'ember') => void;
+    onChangeAppearance?: (appearance: 'atlas' | 'evergreen' | 'ember') => void;
+    onToggleTheme?: () => void;
+    mode?: 'light' | 'dark';
   }) => (
-    <button type="button" aria-label="Open appearance presets" onClick={() => onChangeAppearance('ember')}>
-      Open appearance presets
-    </button>
+    <div data-testid="header-appearance-dial">
+      <button type="button" aria-label="Open appearance presets">
+        Open appearance presets
+      </button>
+      {onToggleTheme ? (
+        <button
+          type="button"
+          aria-label={`Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`}
+          onClick={() => onToggleTheme()}
+        >
+          Toggle theme
+        </button>
+      ) : null}
+      {onChangeAppearance ? (
+        <button
+          type="button"
+          aria-label="Use Ember appearance"
+          onClick={() => onChangeAppearance('ember')}
+        >
+          Use Ember appearance
+        </button>
+      ) : null}
+    </div>
   ),
 }));
+
+const createAppearanceDial = (
+  overrides: Partial<NonNullable<React.ComponentProps<typeof HeaderActions>['appearanceDial']>> = {}
+) => ({
+  appearance: 'evergreen' as const,
+  mode: 'light' as const,
+  onChangeAppearance: jest.fn(),
+  onToggleTheme: jest.fn(),
+  ...overrides,
+});
 
 const renderHeaderActions = (props: Partial<React.ComponentProps<typeof HeaderActions>> = {}) =>
   render(
@@ -47,17 +81,18 @@ describe('HeaderActions', () => {
     expect(onToggleAudio).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the theme toggle when showThemeControl is true', () => {
-    renderHeaderActions({ showThemeControl: true, mode: 'light' });
+  it('renders the appearance dial when theme controls are enabled', () => {
+    renderHeaderActions({ appearanceDial: createAppearanceDial() });
 
-    expect(screen.getByRole('button', { name: 'Toggle color theme' })).toBeInTheDocument();
+    expect(screen.getByTestId('header-appearance-dial')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Switch to dark mode' })).toBeInTheDocument();
   });
 
-  it('calls onToggleTheme when the theme button is clicked', () => {
+  it('calls onToggleTheme when the theme action is clicked', () => {
     const onToggleTheme = jest.fn();
-    renderHeaderActions({ showThemeControl: true, onToggleTheme });
+    renderHeaderActions({ appearanceDial: createAppearanceDial({ onToggleTheme }) });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Toggle color theme' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Switch to dark mode' }));
 
     expect(onToggleTheme).toHaveBeenCalledTimes(1);
   });
@@ -66,12 +101,10 @@ describe('HeaderActions', () => {
     const onChangeAppearance = jest.fn();
 
     renderHeaderActions({
-      showAppearanceControl: true,
-      appearance: 'evergreen',
-      onChangeAppearance,
+      appearanceDial: createAppearanceDial({ onChangeAppearance }),
     });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Open appearance presets' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Use Ember appearance' }));
 
     expect(onChangeAppearance).toHaveBeenCalledTimes(1);
     expect(onChangeAppearance).toHaveBeenCalledWith('ember');

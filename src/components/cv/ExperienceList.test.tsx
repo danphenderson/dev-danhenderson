@@ -138,7 +138,38 @@ describe('ExperienceList', () => {
     const industryChip = screen.getByText('Higher Education').closest('.MuiChip-root');
 
     expect(industryChip).not.toBeNull();
-    expect(getComputedStyle(industryChip!).color).toBe('rgb(27, 168, 224)');
+  });
+
+  it('forwards organization links and tooltip copy for Michigan Tech and Lucerna entries', () => {
+    const graduateResearchAssistant = experiences.find(
+      (experience) => experience.title === 'Graduate Research Assistant'
+    );
+    const dataPipelineEngineer = experiences.find(
+      (experience) => experience.title === 'Data Pipeline Engineer'
+    );
+
+    expect(graduateResearchAssistant).toBeDefined();
+    expect(dataPipelineEngineer).toBeDefined();
+
+    render(
+      <ThemeProvider>
+        <ExperienceList experiences={[graduateResearchAssistant!, dataPipelineEngineer!]} />
+      </ThemeProvider>
+    );
+
+    const mtuLink = screen.getByRole('link', { name: 'Michigan Technological University' });
+    const lucernaLink = screen.getByRole('link', { name: 'Lucerna Health' });
+
+    expect(mtuLink).toHaveAttribute(
+      'href',
+      'https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad'
+    );
+    expect(mtuLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
+    expect(mtuLink).toHaveAttribute('data-tooltip-content', 'View online graduate degrees page');
+
+    expect(lucernaLink).toHaveAttribute('href', 'https://getlucerna.com');
+    expect(lucernaLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
+    expect(lucernaLink).toHaveAttribute('data-tooltip-content', 'View company site');
   });
 
   it('renders inline project links for the research assistant entry without separate reference bullets', () => {

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../ThemeProvider';
+import { COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { VolunteeringList } from './VolunteeringList';
 
 const mockAnimatedContentList = jest.fn();
@@ -71,5 +72,47 @@ describe('VolunteeringList', () => {
     expect(screen.getByRole('link', { name: 'Access Fund' })).toHaveAttribute('href', 'https://www.accessfund.org');
     expect(screen.getByTestId('volunteering-list')).toHaveAttribute('data-item-surface', 'panel');
     expect(screen.getByTestId('volunteering-list')).toHaveAttribute('data-mount-items-on-view', 'true');
+  });
+
+  it('renders tooltip-enabled organization links for Little Brothers and Access Fund', () => {
+    render(
+      <ThemeProvider>
+        <VolunteeringList
+          volunteering={[
+            {
+              organization: 'Little Brothers',
+              organizationUrl: 'https://lbfenetwork.org',
+              organizationTooltip: 'View organization site',
+              role: 'Friends of the Elderly',
+              summary: 'Service work focused on restoring donated medical equipment.',
+              dateRange: 'Feb 2026',
+              location: 'Houghton, MI',
+              highlights: ['Sorted, cleaned, and repaired donated medical equipment.'],
+            },
+            {
+              organization: 'Access Fund',
+              organizationUrl: 'https://www.accessfund.org',
+              organizationTooltip: 'View organization site',
+              role: 'Conservation Team',
+              summary: 'Stewardship volunteer work supporting access and maintenance.',
+              dateRange: 'May 2019 – Present',
+              location: 'Index, WA',
+              highlights: ['Supported trail construction and maintenance projects.'],
+            },
+          ]}
+        />
+      </ThemeProvider>
+    );
+
+    const littleBrothersLink = screen.getByRole('link', { name: 'Little Brothers' });
+    const accessFundLink = screen.getByRole('link', { name: 'Access Fund' });
+
+    expect(littleBrothersLink).toHaveAttribute('href', 'https://lbfenetwork.org');
+    expect(littleBrothersLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
+    expect(littleBrothersLink).toHaveAttribute('data-tooltip-content', 'View organization site');
+
+    expect(accessFundLink).toHaveAttribute('href', 'https://www.accessfund.org');
+    expect(accessFundLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
+    expect(accessFundLink).toHaveAttribute('data-tooltip-content', 'View organization site');
   });
 });

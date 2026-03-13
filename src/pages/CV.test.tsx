@@ -166,7 +166,7 @@ describe('CV page section navigation', () => {
     });
   });
 
-  it('renders ABOUT actions and docks the section navigator below the ABOUT section on desktop', () => {
+  it('renders ABOUT actions and places the section navigator as the first desktop sidebar item', () => {
     render(
       <ThemeProvider>
         <CV />
@@ -203,13 +203,15 @@ describe('CV page section navigation', () => {
     }));
     expect(aboutSection).not.toBeNull();
 
-    const stickyNavigator = screen.getByTestId('cv-sticky-section-navigator');
-    const navigator = within(stickyNavigator).getByTestId('cv-section-navigator');
+    const desktopSidebarRegion = screen.getByTestId('cv-desktop-sidebar-region');
+    const githubSidebarItem = screen.getByTestId('cv-section-region-item-sidebar-github');
+    const navigator = within(desktopSidebarRegion).getByTestId('cv-section-navigator');
     const navigationActions = within(navigator).getAllByRole('button');
 
+    expect(screen.queryByTestId('cv-sticky-section-navigator')).not.toBeInTheDocument();
     expect(within(aboutSection!).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
-    expect(aboutSection!.compareDocumentPosition(stickyNavigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(stickyNavigator.compareDocumentPosition(screen.getByTestId('cv-desktop-sidebar-region')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(aboutSection!.compareDocumentPosition(desktopSidebarRegion) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(navigator.compareDocumentPosition(githubSidebarItem) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(navigationActions.map((action) => action.textContent)).toEqual(
       cvSectionNavigationOrder.map((sectionKey) => cvSectionMetadata[sectionKey].navLabel)
     );
@@ -294,15 +296,15 @@ describe('CV page section navigation', () => {
     const aboutSection = document.getElementById(cvSectionMetadata.about.id);
     const experienceSection = document.getElementById(cvSectionMetadata.experience.id);
     const aboutDial = screen.getByTestId('speed-dial-open-about-actions');
-    const stickyNavigator = screen.getByTestId('cv-sticky-section-navigator');
-    const navigator = within(stickyNavigator).getByTestId('cv-section-navigator');
+    const navigator = screen.getByTestId('cv-section-navigator');
 
     expect(aboutSection).not.toBeNull();
     expect(experienceSection).not.toBeNull();
     expect(aboutSection!.compareDocumentPosition(experienceSection!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByTestId('cv-sticky-section-navigator')).not.toBeInTheDocument();
     expect(within(aboutSection!).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
-    expect(aboutDial.compareDocumentPosition(stickyNavigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(stickyNavigator.compareDocumentPosition(experienceSection!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(aboutDial.compareDocumentPosition(navigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(navigator.compareDocumentPosition(experienceSection!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(
       within(navigator).getAllByRole('button').map((action) => action.textContent)
     ).toEqual(cvSectionNavigationOrder.map((sectionKey) => cvSectionMetadata[sectionKey].navLabel));
