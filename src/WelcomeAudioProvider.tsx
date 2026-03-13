@@ -304,10 +304,15 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
       widgetRef.current = widget;
 
       await new Promise<void>((resolve, reject) => {
+        let widgetReady = false;
+
         const markReady = () => {
           if (unmountedRef.current) return;
 
-          cleanup();
+          widgetReady = true;
+          window.clearTimeout(timeoutId);
+          controller.signal.removeEventListener('abort', handleAbort);
+          widget.unbind('ready', markReady);
           setReady(true);
           widget.isPaused((paused: boolean) => {
             if (!unmountedRef.current) {
@@ -350,9 +355,11 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
           window.clearTimeout(timeoutId);
           controller.signal.removeEventListener('abort', handleAbort);
           widget.unbind('ready', markReady);
-          widget.unbind('play', handlePlay);
-          widget.unbind('pause', handlePause);
-          widget.unbind('finish', handleFinish);
+          if (!widgetReady) {
+            widget.unbind('play', handlePlay);
+            widget.unbind('pause', handlePause);
+            widget.unbind('finish', handleFinish);
+          }
         };
 
         widget.bind('ready', markReady);
