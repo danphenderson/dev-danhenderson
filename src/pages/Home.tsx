@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
-import { AnimatedContentCard } from '../components/AnimatedContentCard';
+import { AnimatedContentCard, ANIMATED_CARD_DURATION_MS } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
+import { HeroMotionPath } from '../components/HeroMotionPath';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
@@ -12,6 +14,14 @@ export default function Home() {
   const { error, isHeroAnimationReady, isLoading, isPromptOpen, handleOptOut, handlePlay } =
     useHomeWelcomeSequence();
 
+  const [isMotionPathPlaying, setIsMotionPathPlaying] = useState(false);
+
+  useEffect(() => {
+    if (!isHeroAnimationReady) return undefined;
+    const id = window.setTimeout(() => setIsMotionPathPlaying(true), ANIMATED_CARD_DURATION_MS);
+    return () => window.clearTimeout(id);
+  }, [isHeroAnimationReady]);
+
   return (
     <BackgroundPaper
       image="assets/home.jpg"
@@ -22,9 +32,11 @@ export default function Home() {
     >
       <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
         <Stack spacing={2} alignItems="center">
-          <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
-            Hi, my passions are mathematics, computers, and adventures
-          </DisplayTitle>
+          <HeroMotionPath playing={isMotionPathPlaying}>
+            <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
+              Hi, my passions are mathematics, computers, and adventures
+            </DisplayTitle>
+          </HeroMotionPath>
         </Stack>
       </AnimatedContentCard>
 

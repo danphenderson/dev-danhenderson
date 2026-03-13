@@ -40,6 +40,7 @@ jest.mock('../WelcomeAudioProvider', () => {
 });
 
 jest.mock('../components/AnimatedContentCard', () => ({
+  ANIMATED_CARD_DURATION_MS: 0,
   AnimatedContentCard: ({
     children,
     visible,
@@ -52,6 +53,31 @@ jest.mock('../components/AnimatedContentCard', () => ({
     </div>
   ),
 }));
+
+jest.mock('../components/HeroMotionPath', () => {
+  const React = require('react');
+
+  return {
+    HeroMotionPath: ({
+      children,
+      playing,
+      onComplete,
+    }: {
+      children: React.ReactNode;
+      playing: boolean;
+      onComplete?: () => void;
+    }) => {
+      React.useEffect(() => {
+        if (playing) onComplete?.();
+      }, [playing, onComplete]);
+      return (
+        <div data-testid="hero-motion-path" data-playing={String(Boolean(playing))}>
+          {playing ? children : null}
+        </div>
+      );
+    },
+  };
+});
 
 jest.mock('../components/BackgroundPaper', () => ({
   __esModule: true,
@@ -168,5 +194,31 @@ describe('Home welcome flow', () => {
 
     await waitFor(() => expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true'));
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
+  });
+});
+
+describe('Home hero motion path', () => {
+  it('does not play the motion path before the hero card is visible', () => {
+    render(<HomeHarness />);
+
+    expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-playing', 'false');
+    expect(screen.queryByText('Hi, my passions are mathematics, computers, and adventures')).not.toBeInTheDocument();
+  });
+
+  it('plays the motion path once the welcome sequence completes and the card zoom finishes', async () => {
+    render(<HomeHarness />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'No thanks' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.getByTestId('dark-mode-hint-open')).toHaveTextContent('true'));
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
+    await waitFor(() => expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true'));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-playing', 'true'),
+    );
+    expect(
+      screen.getByText('Hi, my passions are mathematics, computers, and adventures'),
+    ).toBeInTheDocument();
   });
 });
