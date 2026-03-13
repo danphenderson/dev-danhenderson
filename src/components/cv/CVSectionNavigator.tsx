@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { Zoom } from '@mui/material';
+import { Box, Zoom } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme as useMuiTheme } from '@mui/material/styles';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
@@ -36,6 +36,7 @@ type CVSectionNavigatorProps = {
 };
 
 const IDLE_TIMEOUT_MS = 2500;
+const IDLE_OPACITY = 0.32;
 
 export const CVSectionNavigator = ({
   sections,
@@ -46,7 +47,7 @@ export const CVSectionNavigator = ({
   const appStyles = useAppStyles();
   const prefersReducedMotion = usePrefersReducedMotion();
   const [activeSection, setActiveSection] = useState<CVSectionKey | null>(sections[0] ?? null);
-  const [idleHidden, setIdleHidden] = useState(false);
+  const [idle, setIdle] = useState(false);
   const [hovered, setHovered] = useState(false);
   const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrolledPastThreshold = useScrollTrigger(HEADER_HIDE_SCROLL_TRIGGER_OPTIONS);
@@ -55,14 +56,14 @@ export const CVSectionNavigator = ({
     : cvSectionViewportMetrics.desktop.activeLinePx;
 
   const resetIdleTimer = useCallback(() => {
-    setIdleHidden(false);
+    setIdle(false);
 
     if (idleTimerRef.current !== null) {
       clearTimeout(idleTimerRef.current);
     }
 
     idleTimerRef.current = setTimeout(() => {
-      setIdleHidden(true);
+      setIdle(true);
     }, IDLE_TIMEOUT_MS);
   }, []);
 
@@ -162,24 +163,30 @@ export const CVSectionNavigator = ({
     })),
   ];
 
-  const isVisible = scrolledPastThreshold && (!idleHidden || hovered);
+  const dimmed = idle && !hovered;
   const activeSectionSx = activeSection
     ? appStyles.cvFloatingDialActiveFabSx
     : undefined;
 
   return (
     <Zoom
-      in={isVisible}
+      in={scrolledPastThreshold}
       timeout={prefersReducedMotion ? 0 : { enter: 180, exit: 140 }}
       unmountOnExit
     >
-      <nav
+      <Box
+        component="nav"
         aria-label="CV section navigation"
         data-testid={testId}
-        onMouseEnter={() => setHovered(true)}
+        onMouseEnter={() => { setHovered(true); setIdle(false); }}
         onMouseLeave={() => setHovered(false)}
-        onFocus={() => setHovered(true)}
+        onFocus={() => { setHovered(true); setIdle(false); }}
         onBlur={() => setHovered(false)}
+        sx={{
+          opacity: dimmed ? IDLE_OPACITY : 1,
+          transition: prefersReducedMotion ? 'none' : 'opacity 300ms ease',
+          '&:hover': { opacity: 1 },
+        }}
       >
         <AppSpeedDial
           ariaLabel="CV section navigation"
@@ -193,7 +200,7 @@ export const CVSectionNavigator = ({
             ...(activeSectionSx ? [activeSectionSx] : []),
           ]}
         />
-      </nav>
+      </Box>
     </Zoom>
   );
 };
