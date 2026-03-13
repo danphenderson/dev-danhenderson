@@ -73,7 +73,7 @@ export default function CV() {
 const CVRouteContent = () => {
   const appStyles = useAppStyles();
   const { motionTokens } = useComponentStyles();
-  const { activity, projects, contributions, loading, error } = useGithubProfile();
+  const { activity, contributions, loading, error } = useGithubProfile();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const layoutMode: CVLayoutMode = isMobile ? 'mobile' : 'desktop';
@@ -180,13 +180,11 @@ const CVRouteContent = () => {
         <CVGitHubSection
           activity={activity}
           contributions={contributions}
-          projects={projects}
           loading={loading}
           error={error}
           sectionDelayMs={layout.delayMs}
           nestedDelayOffsetMs={githubNestedDelayOffsetMs}
           itemOffsetMs={itemOffsetMs}
-          projectTitle={isMobile ? 'Public Projects' : 'Projects'}
           lead={githubSectionLead}
           sectionId={cvSectionMetadata.github.id}
         />

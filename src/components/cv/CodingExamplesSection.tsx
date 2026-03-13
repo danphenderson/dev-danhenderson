@@ -1,8 +1,9 @@
 import { Box, Stack } from '@mui/material';
 import type { CodingExample } from '../../types/cv';
+import { AnimatedSlideList } from '../AnimatedSlideList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
-import type { TabPanelItem } from '../TabPanel';
+import type { TabPanelItem, TabPanelRenderContext } from '../TabPanel';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { CommonLink } from '../CommonLink';
 import { useComponentStyles } from '../../styles/componentStyles';
@@ -13,8 +14,33 @@ type CodingExamplesSectionProps = {
   startDelayMs?: number;
 };
 
+const CodingExampleDetailList = ({
+  items,
+  selected,
+  renderContext,
+}: {
+  items: string[];
+  selected: boolean;
+  renderContext: TabPanelRenderContext;
+}) => {
+  const { getDetailListSx } = useComponentStyles();
+
+  return (
+    <AnimatedSlideList
+      items={items}
+      getItemKey={(item, index) => `${item}-${index}`}
+      in={selected}
+      container={renderContext.getDrawerContainer}
+      containerComponent="ul"
+      containerSx={getDetailListSx(0, 0)}
+      itemComponent="li"
+      renderItem={(item) => <ListItemText component="span">{item}</ListItemText>}
+    />
+  );
+};
+
 export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExamplesSectionProps) => {
-  const { codingExampleLinkSx, contentListStackSpacing, detailBlockSx, getDetailListSx } = useComponentStyles();
+  const { codingExampleLinkSx, contentListStackSpacing, detailBlockSx } = useComponentStyles();
 
   return (
     <AnimatedContentList
@@ -37,14 +63,12 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
             tabs.push({
               value: tab.value,
               label: tab.label,
-              content: (
-                <Box component="ul" sx={getDetailListSx(0, 0)}>
-                  {items.map((item) => (
-                    <ListItemText key={item}>
-                      {item}
-                    </ListItemText>
-                  ))}
-                </Box>
+              renderContent: (selected, renderContext) => (
+                <CodingExampleDetailList
+                  items={items}
+                  selected={selected}
+                  renderContext={renderContext}
+                />
               ),
             });
 
@@ -60,7 +84,15 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
           tabs.push({
             value: tab.value,
             label: tab.label,
-            renderContent: (selected) => <SkillsChipList skills={skills} dense in={selected} />,
+            renderContent: (selected, renderContext) => (
+              <SkillsChipList
+                skills={skills}
+                dense
+                in={selected}
+                animation="slide"
+                drawerContainer={renderContext.getDrawerContainer}
+              />
+            ),
           });
 
           return tabs;

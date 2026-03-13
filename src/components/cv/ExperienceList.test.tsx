@@ -5,6 +5,8 @@ import { experiences } from '../../data/cv';
 import { COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { ExperienceList } from './ExperienceList';
 
+const mockAnimatedSlideList = jest.fn();
+
 jest.mock('../AnimatedContentList', () => ({
   AnimatedContentList: ({
     items,
@@ -15,7 +17,40 @@ jest.mock('../AnimatedContentList', () => ({
   }) => <div>{items.map((item, index) => <div key={index}>{renderItem(item, index)}</div>)}</div>,
 }));
 
+jest.mock('../AnimatedSlideList', () => ({
+  AnimatedSlideList: (props: {
+    items: unknown[];
+    getItemKey: (item: unknown, index: number) => string;
+    renderItem: (item: unknown, index: number) => ReactNode;
+    in: boolean;
+    layout?: 'stack' | 'wrap';
+    containerComponent?: React.ElementType;
+    itemComponent?: React.ElementType;
+  }) => {
+    mockAnimatedSlideList(props);
+
+    const React = require('react');
+
+    const ContainerComponent = props.containerComponent ?? 'div';
+    const ItemComponent = props.itemComponent ?? 'div';
+
+    return React.createElement(
+      ContainerComponent,
+      { 'data-testid': 'animated-slide-list', 'data-layout': props.layout ?? 'stack' },
+      props.in
+        ? props.items.map((item, index) =>
+          React.createElement(ItemComponent, { key: props.getItemKey(item, index) }, props.renderItem(item, index))
+        )
+        : null
+    );
+  },
+}));
+
 describe('ExperienceList', () => {
+  afterEach(() => {
+    mockAnimatedSlideList.mockClear();
+  });
+
   it('renders an inline advisor link in the hemodynamics description', () => {
     const hemodynamicsExperience = experiences.find(
       (experience) => experience.title === 'Graduate Research Assistant'
@@ -73,6 +108,7 @@ describe('ExperienceList', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
 
     expect(screen.getByText('PyTorch')).toBeVisible();
+    expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.layout === 'wrap')).toBe(true);
     expect(
       screen.queryByText('Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).')
     ).not.toBeInTheDocument();
@@ -189,6 +225,7 @@ describe('ExperienceList', () => {
 
     const detailList = screen.getByRole('list');
 
+    expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.containerComponent === 'ul' && props.itemComponent === 'li')).toBe(true);
     expect(within(detailList).getAllByRole('listitem')).toHaveLength(3);
     expect(
       screen.getByRole('link', { name: 'Quasi-Newton Optimization with Hessian Samples' })

@@ -5,9 +5,6 @@ import { CVGitHubSection } from './CVGitHubSection';
 
 const mockGitHubActivityList = jest.fn((_: { startDelayMs?: number }) => <div data-testid="github-activity-list" />);
 const mockGitHubContributions = jest.fn((_: { startDelayMs?: number }) => <div data-testid="github-contributions" />);
-const mockGitHubProjects = jest.fn((_: { startDelayMs?: number; animateItems?: boolean }) => (
-  <div data-testid="github-projects" />
-));
 
 jest.mock('../layout/SectionCard', () => ({
   SectionCard: ({ children }: { children: ReactNode }) => <div>{children}</div>,
@@ -21,10 +18,6 @@ jest.mock('./GitHubContributions', () => ({
   GitHubContributions: (props: { startDelayMs?: number }) => mockGitHubContributions(props),
 }));
 
-jest.mock('./GitHubProjects', () => ({
-  GitHubProjects: (props: { startDelayMs?: number; animateItems?: boolean }) => mockGitHubProjects(props),
-}));
-
 jest.mock('./GitHubContributionCalendar', () => ({
   GitHubContributionCalendar: () => <div data-testid="github-calendar" />,
 }));
@@ -33,16 +26,14 @@ describe('CVGitHubSection offsets', () => {
   afterEach(() => {
     mockGitHubActivityList.mockClear();
     mockGitHubContributions.mockClear();
-    mockGitHubProjects.mockClear();
   });
 
-  it('passes the shared item offset to all repeatable GitHub item groups', () => {
+  it('passes the shared item offset to the remaining repeatable GitHub item groups', () => {
     render(
       <ThemeProvider>
         <CVGitHubSection
           activity={[]}
           contributions={[]}
-          projects={[]}
           loading={false}
           error={null}
           itemOffsetMs={120}
@@ -52,8 +43,7 @@ describe('CVGitHubSection offsets', () => {
 
     expect(mockGitHubActivityList.mock.calls[0][0]).toEqual(expect.objectContaining({ startDelayMs: 120 }));
     expect(mockGitHubContributions.mock.calls[0][0]).toEqual(expect.objectContaining({ startDelayMs: 120 }));
-    expect(mockGitHubProjects.mock.calls[0][0]).toEqual(
-      expect.objectContaining({ startDelayMs: 120, animateItems: true })
-    );
+    expect(mockGitHubActivityList).toHaveBeenCalledTimes(1);
+    expect(mockGitHubContributions).toHaveBeenCalledTimes(1);
   });
 });

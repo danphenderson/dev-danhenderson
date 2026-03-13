@@ -6,10 +6,11 @@ import type {
   ExperienceProject,
   ExperienceProjectSegment,
 } from '../../types/cv';
+import { AnimatedSlideList } from '../AnimatedSlideList';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
-import type { TabPanelItem } from '../TabPanel';
+import type { TabPanelItem, TabPanelRenderContext } from '../TabPanel';
 import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { BodyText, ListItemText } from '../text';
@@ -49,7 +50,15 @@ const renderInlineSegments = (segments: ExperienceProjectSegment[]) =>
 const renderExperienceDescription = (description: ExperienceDescription) =>
   typeof description === 'string' ? description : renderInlineSegments(description);
 
-const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) => {
+const ExperienceProjects = ({
+  projects,
+  selected,
+  renderContext,
+}: {
+  projects?: ExperienceProject[];
+  selected: boolean;
+  renderContext: TabPanelRenderContext;
+}) => {
   const { getDetailListSx } = useComponentStyles();
 
   if (!projects || projects.length === 0) {
@@ -57,28 +66,27 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
   }
 
   return (
-    <Box component="ul" sx={getDetailListSx(0, 0)}>
-      {projects.map((project, projectIndex) => {
+    <AnimatedSlideList
+      items={projects}
+      getItemKey={(_project, projectIndex) => `experience-project-${projectIndex}`}
+      in={selected}
+      container={renderContext.getDrawerContainer}
+      containerComponent="ul"
+      containerSx={getDetailListSx(0, 0)}
+      itemComponent="li"
+      renderItem={(project) => {
         if (typeof project === 'string') {
-          return (
-            <ListItemText key={projectIndex}>
-              {project}
-            </ListItemText>
-          );
+          return <ListItemText component="span">{project}</ListItemText>;
         }
 
         if (Array.isArray(project)) {
-          return (
-            <ListItemText key={projectIndex}>
-              {renderInlineSegments(project)}
-            </ListItemText>
-          );
+          return <ListItemText component="span">{renderInlineSegments(project)}</ListItemText>;
         }
 
         const linkLabel = project.text.replace(/:\s*$/, '');
 
         return (
-          <ListItemText key={projectIndex}>
+          <ListItemText component="span">
             {project.link ? (
               <CommonLink href={project.link} target="_blank" rel="noopener noreferrer" underline="hover">
                 {linkLabel}
@@ -88,8 +96,8 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
             )}
           </ListItemText>
         );
-      })}
-    </Box>
+      }}
+    />
   );
 };
 
@@ -115,7 +123,13 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
           experienceTabs.push({
             value: 'details',
             label: 'Highlights',
-            content: <ExperienceProjects projects={experience.projects} />,
+            renderContent: (selected, renderContext) => (
+              <ExperienceProjects
+                projects={experience.projects}
+                selected={selected}
+                renderContext={renderContext}
+              />
+            ),
           });
         }
 
@@ -123,8 +137,14 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
           experienceTabs.push({
             value: 'skills',
             label: 'Skills',
-            renderContent: (selected) => (
-              <SkillsChipList skills={filteredSkills} dense in={selected} />
+            renderContent: (selected, renderContext) => (
+              <SkillsChipList
+                skills={filteredSkills}
+                dense
+                in={selected}
+                animation="slide"
+                drawerContainer={renderContext.getDrawerContainer}
+              />
             ),
           });
         }

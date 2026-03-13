@@ -1,4 +1,4 @@
-import { Button, Chip } from '@mui/material';
+import { Chip } from '@mui/material';
 import { fireEvent, render, screen } from '@testing-library/react';
 import ThemeProvider from '../ThemeProvider';
 import { useComponentStyles } from '../styles/componentStyles';
@@ -51,6 +51,63 @@ describe('TabPanel', () => {
     expect(screen.queryByText('Details body')).not.toBeInTheDocument();
   });
 
+  it('supports defaultValue for uncontrolled tabs and keeps tab/panel ids wired together', () => {
+    render(
+      <ThemeProvider>
+        <TabPanel
+          id="experience-details"
+          ariaLabel="Experience sections"
+          defaultValue="skills"
+          items={[
+            { value: 'details', label: 'Details', content: <div>Details body</div> },
+            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+          ]}
+          tabsVariant="fullWidth"
+        />
+      </ThemeProvider>
+    );
+
+    const skillsTab = screen.getByRole('tab', { name: 'Skills' });
+    const skillsPanel = screen.getByRole('tabpanel');
+
+    expect(skillsTab).toHaveAttribute('aria-selected', 'true');
+    expect(skillsTab).toHaveAttribute('id', 'experience-details-tab-skills');
+    expect(skillsTab).toHaveAttribute('aria-controls', 'experience-details-panel-skills');
+    expect(skillsPanel).toHaveAttribute('id', 'experience-details-panel-skills');
+    expect(skillsPanel).toHaveAttribute('aria-labelledby', 'experience-details-tab-skills');
+    expect(screen.getByText('Skills body')).toBeVisible();
+  });
+
+  it('passes drawer render context to renderContent callbacks', () => {
+    const renderContent = jest.fn((selected: boolean, context: { panelId: string; getDrawerContainer: () => HTMLDivElement | null }) => (
+      <div data-selected={String(selected)} data-panel-id={context.panelId}>
+        Details body
+      </div>
+    ));
+
+    render(
+      <ThemeProvider>
+        <TabPanel
+          id="context-test"
+          ariaLabel="Context sections"
+          defaultValue="details"
+          items={[
+            { value: 'details', label: 'Details', renderContent },
+            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+          ]}
+          tabsVariant="fullWidth"
+        />
+      </ThemeProvider>
+    );
+
+    const renderContext = renderContent.mock.calls[0][1];
+
+    expect(renderContent).toHaveBeenCalledWith(true, expect.objectContaining({ panelId: 'context-test-panel-details' }));
+    expect(renderContext.getDrawerContainer()).toHaveAttribute('id', 'context-test-panel-details');
+    expect(screen.getByText('Details body')).toHaveAttribute('data-selected', 'true');
+    expect(screen.getByText('Details body')).toHaveAttribute('data-panel-id', 'context-test-panel-details');
+  });
+
   it('can hide the tab strip when only one item is provided', () => {
     render(
       <ThemeProvider>
@@ -66,40 +123,24 @@ describe('TabPanel', () => {
     expect(screen.getByRole('tabpanel', { name: 'Skills' })).toBeVisible();
   });
 
-  it('matches the resume button typography and outline treatment', () => {
+  it('falls back to the remaining enabled item when disabled items leave a single visible panel', () => {
     render(
       <ThemeProvider>
-        <>
-          <Button variant="outlined" size="small">
-            Download Resume (PDF)
-          </Button>
-          <TabPanel
-            ariaLabel="Experience sections"
-            items={[
-              { value: 'details', label: 'Details', content: <div>Details body</div> },
-              { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
-            ]}
-            tabsVariant="fullWidth"
-          />
-        </>
+        <TabPanel
+          ariaLabel="Supplemental section"
+          hideTabsWhenSingle
+          items={[
+            { value: 'details', label: 'Details', content: <div>Details body</div>, disabled: true },
+            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+          ]}
+        />
       </ThemeProvider>
     );
 
-    const resumeButton = screen.getByRole('button', { name: 'Download Resume (PDF)' });
-    const detailsTab = screen.getByRole('tab', { name: 'Details' });
-    const tabList = screen.getByRole('tablist', { name: 'Experience sections' });
-    const tabsRoot = tabList.closest('.MuiTabs-root');
-
-    expect(tabsRoot).not.toBeNull();
-
-    const tabPanelRoot = tabsRoot?.parentElement;
-
-    expect(tabPanelRoot).not.toBeNull();
-    expect(window.getComputedStyle(detailsTab).fontWeight).toBe(window.getComputedStyle(resumeButton).fontWeight);
-    expect(window.getComputedStyle(tabPanelRoot as HTMLElement).backgroundColor)
-      .toBe(window.getComputedStyle(resumeButton).backgroundColor);
-    expect(window.getComputedStyle(tabPanelRoot as HTMLElement).borderTopColor)
-      .toBe(window.getComputedStyle(resumeButton).borderTopColor);
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    expect(screen.getByRole('tabpanel', { name: 'Skills' })).toBeVisible();
+    expect(screen.getByText('Skills body')).toBeVisible();
+    expect(screen.queryByText('Details body')).not.toBeInTheDocument();
   });
 
   it.each(['fullWidth', 'scrollable'] as const)('left-aligns tab labels for %s tabs', (tabsVariant) => {
@@ -157,6 +198,59 @@ describe('TabPanel', () => {
     );
     expect(window.getComputedStyle(detailsTab).minHeight).toBe('36px');
     expect(window.getComputedStyle(tabsRoot as HTMLElement).minHeight).toBe('36px');
+  });
+
+  it('keeps inactive panels mounted when keepMounted is enabled', () => {
+    render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel="Mounted panels"
+          keepMounted
+          items={[
+            { value: 'details', label: 'Details', content: <div>Details body</div> },
+            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+          ]}
+          tabsVariant="fullWidth"
+        />
+      </ThemeProvider>
+    );
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Details' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
+
+    expect(screen.getByText('Details body')).toBeInTheDocument();
+    expect(screen.getByText('Details body').closest('[role="tabpanel"]')).toHaveAttribute('hidden');
+    expect(screen.getByText('Skills body').closest('[role="tabpanel"]')).not.toHaveAttribute('hidden');
+  });
+
+  it('treats value as controlled and reports false when the selected tab is clicked again', () => {
+    const handleChange = jest.fn();
+
+    render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel="Controlled sections"
+          value="skills"
+          onChange={handleChange}
+          items={[
+            { value: 'details', label: 'Details', content: <div>Details body</div> },
+            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+          ]}
+          tabsVariant="fullWidth"
+        />
+      </ThemeProvider>
+    );
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Details' }));
+
+    expect(handleChange).toHaveBeenNthCalledWith(1, 'details');
+    expect(screen.getByText('Skills body')).toBeVisible();
+    expect(screen.queryByText('Details body')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
+
+    expect(handleChange).toHaveBeenNthCalledWith(2, false);
+    expect(screen.getByText('Skills body')).toBeVisible();
   });
 
   it.each(['fullWidth', 'scrollable'] as const)(

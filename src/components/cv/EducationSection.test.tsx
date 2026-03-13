@@ -5,6 +5,7 @@ import { educationInfo } from '../../data/cv';
 import { EducationSection } from './EducationSection';
 
 const mockAnimatedContentList = jest.fn();
+const mockAnimatedSlideList = jest.fn();
 
 jest.mock('../AnimatedContentList', () => ({
   AnimatedContentList: (props: {
@@ -18,9 +19,39 @@ jest.mock('../AnimatedContentList', () => ({
   },
 }));
 
+jest.mock('../AnimatedSlideList', () => ({
+  AnimatedSlideList: (props: {
+    items: unknown[];
+    getItemKey: (item: unknown, index: number) => string;
+    renderItem: (item: unknown, index: number) => ReactNode;
+    in: boolean;
+    layout?: 'stack' | 'wrap';
+    containerComponent?: React.ElementType;
+    itemComponent?: React.ElementType;
+  }) => {
+    mockAnimatedSlideList(props);
+
+    const React = require('react');
+
+    const ContainerComponent = props.containerComponent ?? 'div';
+    const ItemComponent = props.itemComponent ?? 'div';
+
+    return React.createElement(
+      ContainerComponent,
+      { 'data-testid': 'animated-slide-list', 'data-layout': props.layout ?? 'stack' },
+      props.in
+        ? props.items.map((item, index) =>
+          React.createElement(ItemComponent, { key: props.getItemKey(item, index) }, props.renderItem(item, index))
+        )
+        : null
+    );
+  },
+}));
+
 describe('EducationSection', () => {
   afterEach(() => {
     mockAnimatedContentList.mockClear();
+    mockAnimatedSlideList.mockClear();
   });
 
   it('groups highlights and skills into the shared tab panel', () => {
@@ -54,6 +85,7 @@ describe('EducationSection', () => {
     expect(
       screen.getByText('Pedagogical training in curriculum design, assessment, and evidence-based instruction.')
     ).toBeVisible();
+    expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.containerComponent === 'ul' && props.itemComponent === 'li')).toBe(true);
     expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Coursework' }));
@@ -67,6 +99,7 @@ describe('EducationSection', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
 
     expect(screen.getByText('LaTeX')).toBeVisible();
+    expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.layout === 'wrap')).toBe(true);
     expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
   });
 

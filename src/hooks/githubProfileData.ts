@@ -3,10 +3,9 @@ import {
   MAX_VISIBLE_CONTRIBUTIONS,
   fallbackGitHubActivity,
   fallbackGitHubContributions,
-  fallbackGitHubProjects,
   githubUsername,
 } from '../data/cv';
-import type { GitHubActivityItem, GitHubContribution, GitHubProject } from '../types/cv';
+import type { GitHubActivityItem, GitHubContribution } from '../types/cv';
 
 type GitHubEvent = {
   id: string;
@@ -40,7 +39,6 @@ type GitHubSearchIssues = {
 
 export type GitHubProfileData = {
   activity: GitHubActivityItem[];
-  projects: GitHubProject[];
   contributions: GitHubContribution[];
   encounteredError: boolean;
 };
@@ -173,16 +171,6 @@ const buildActivity = (events: GitHubEvent[]) => {
   return activity.length ? activity : fallbackGitHubActivity;
 };
 
-const buildProjects = (repos: GitHubRepo[]) => {
-  const projects = repos
-    .filter((repo) => !repo.fork && !repo.archived)
-    .sort((a, b) => b.stargazers_count - a.stargazers_count)
-    .slice(0, 8)
-    .map((repo) => ({ name: repo.name, url: repo.html_url }));
-
-  return projects.length ? projects : fallbackGitHubProjects;
-};
-
 const buildContributionCandidates = (repoNames: Set<string>) =>
   Array.from(repoNames)
     .slice(0, MAX_VISIBLE_CONTRIBUTIONS)
@@ -235,9 +223,8 @@ const enrichContributions = async (
 const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
   let encounteredError = false;
 
-  const [eventsResult, reposResult, contributionsResult] = await Promise.allSettled([
+  const [eventsResult, contributionsResult] = await Promise.allSettled([
     fetchJson<GitHubEvent[]>(`https://api.github.com/users/${githubUsername}/events/public?per_page=20`),
-    fetchJson<GitHubRepo[]>(`https://api.github.com/users/${githubUsername}/repos?per_page=100&sort=updated`),
     fetchJson<GitHubSearchIssues>(
       `https://api.github.com/search/issues?q=author:${githubUsername}+is:public+is:pr+-user:${githubUsername}&sort=updated&order=desc&per_page=30`
     ),
@@ -253,11 +240,6 @@ const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
   if (eventsResult.status === 'fulfilled') {
     getExternalContributionRepos(eventsResult.value).forEach((repoName) => externalRepos.add(repoName));
   }
-
-  const projects =
-    reposResult.status === 'fulfilled'
-      ? buildProjects(reposResult.value)
-      : (encounteredError = true, fallbackGitHubProjects);
 
   if (contributionsResult.status === 'fulfilled') {
     contributionsResult.value.items
@@ -276,7 +258,6 @@ const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
 
   return {
     activity,
-    projects,
     contributions: enrichedContributions.contributions,
     encounteredError,
   };

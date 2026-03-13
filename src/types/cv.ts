@@ -103,4 +103,3 @@ export type StackSection = {
 
 export type GitHubActivityItem = { label: string; href?: string };
 export type GitHubContribution = { name: string; url: string; stars?: number };
-export type GitHubProject = { name: string; url: string };

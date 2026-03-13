@@ -6,7 +6,6 @@ import type {
   Experience,
   GitHubActivityItem,
   GitHubContribution,
-  GitHubProject,
   StackSection,
   VolunteeringEntry,
 } from '../types/cv';
@@ -25,7 +24,6 @@ export type {
   ExperienceProjectSegment,
   GitHubActivityItem,
   GitHubContribution,
-  GitHubProject,
   StackSection,
   VolunteeringEntry,
 } from '../types/cv';
@@ -44,7 +42,7 @@ const mtuMathGraduateBioUrl = 'https://www.mtu.edu/math/graduate/students/';
 const mtuGlobalCampusOrganizationUrl =
   'https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad';
 export const githubSectionLead =
-  'Recent activity, open-source contributions, and public repositories from GitHub.';
+  'Recent activity, open-source contributions, and contribution history from GitHub.';
 export const stackAndToolsLead =
   'Daily development environment, languages, platform tooling, and services used across software, research, and data work.';
 
@@ -618,13 +616,6 @@ export const fallbackGitHubActivity: GitHubActivityItem[] = [
   { label: 'Maintaining BlockOpt.jl (trust-region quasi-Newton optimizer in Julia).', href: 'https://github.com/danphenderson/BlockOpt.jl' },
   { label: 'Experimenting with data/ML pipelines on AWS Glue, EMR, and CDK.', href: 'https://github.com/danphenderson' },
   { label: 'Shipping personal portfolio + CV site (React, TypeScript, AWS).', href: 'https://github.com/danphenderson/dev-danhenderson' },
-];
-
-export const fallbackGitHubProjects: GitHubProject[] = [
-  { name: 'BlockOpt.jl', url: 'https://github.com/danphenderson/BlockOpt.jl' },
-  { name: 'UncNLPrograms.jl', url: 'https://github.com/danphenderson/UncNLPrograms.jl' },
-  { name: 'python-chromex', url: 'https://github.com/danphenderson/python-chromex' },
-  { name: 'masterplan-app', url: 'https://github.com/danphenderson/masterplan-app' },
 ];
 
 export const fallbackGitHubContributions: GitHubContribution[] = [

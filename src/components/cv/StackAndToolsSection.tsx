@@ -27,7 +27,15 @@ export const StackAndToolsSection = ({
     value: `${index}`,
     label: section.title,
     shortLabel: section.tabLabel,
-    renderContent: (selected) => <SkillsChipList skills={section.items} dense in={selected} />,
+    renderContent: (selected, renderContext) => (
+      <SkillsChipList
+        skills={section.items}
+        dense
+        in={selected}
+        animation="slide"
+        drawerContainer={renderContext.getDrawerContainer}
+      />
+    ),
   }));
 
   if (stackTabs.length === 0) {

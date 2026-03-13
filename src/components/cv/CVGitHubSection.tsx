@@ -3,7 +3,6 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import type {
   GitHubActivityItem,
   GitHubContribution,
-  GitHubProject,
 } from '../../types/cv';
 import { githubUsername } from '../../data/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
@@ -13,7 +12,6 @@ import { SectionPanel } from '../layout/SectionPanel';
 import { GitHubActivityList } from './GitHubActivityList';
 import { GitHubContributionCalendar } from './GitHubContributionCalendar';
 import { GitHubContributions } from './GitHubContributions';
-import { GitHubProjects } from './GitHubProjects';
 import { SectionHeading } from '../layout/SectionHeading';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { SectionLeadText, SubsectionTitle } from '../text';
@@ -21,13 +19,11 @@ import { SectionLeadText, SubsectionTitle } from '../text';
 type CVGitHubSectionProps = {
   activity: GitHubActivityItem[];
   contributions: GitHubContribution[];
-  projects: GitHubProject[];
   loading: boolean;
   error?: string | null;
   sectionDelayMs?: number;
   nestedDelayOffsetMs?: number;
   itemOffsetMs?: number;
-  projectTitle?: string;
   lead?: string;
   overlineSx?: SxProps<Theme>;
   sectionId?: string;
@@ -36,13 +32,11 @@ type CVGitHubSectionProps = {
 export const CVGitHubSection = ({
   activity,
   contributions,
-  projects,
   loading,
   error,
   sectionDelayMs = 0,
   nestedDelayOffsetMs = 0,
   itemOffsetMs,
-  projectTitle = 'Public Projects',
   lead,
   overlineSx,
   sectionId,
@@ -59,7 +53,6 @@ export const CVGitHubSection = ({
   const githubActivityDelayMs = getSectionDelayMs(0, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
   const githubContributionsDelayMs = getSectionDelayMs(1, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
   const githubCalendarDelayMs = getSectionDelayMs(2, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
-  const githubProjectsDelayMs = getSectionDelayMs(3, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
   const resolvedOverlineSx = overlineSx ?? sectionHeadingCompactSx;
   const githubSubsectionCardSx: SxProps<Theme> = [
     cardResetSx,
@@ -113,21 +106,6 @@ export const CVGitHubSection = ({
         <SectionCard delayMs={githubCalendarDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
             <GitHubContributionCalendar username={githubUsername} contained={false} />
-          </Stack>
-        </SectionCard>
-
-        <SectionCard delayMs={githubProjectsDelayMs} sx={githubSubsectionCardSx}>
-          <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={supportAccentTitleSx}>
-              {projectTitle}
-            </SubsectionTitle>
-            <SectionPanel>
-              <GitHubProjects
-                projects={projects}
-                animateItems
-                startDelayMs={resolvedItemOffsetMs}
-              />
-            </SectionPanel>
           </Stack>
         </SectionCard>
       </Stack>

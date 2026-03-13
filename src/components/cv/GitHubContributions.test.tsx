@@ -39,7 +39,7 @@ describe('GitHubContributions', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText('No recent community contributions found. Showing personal projects below.')).toBeInTheDocument();
+    expect(screen.getByText('No recent community contributions found right now.')).toBeInTheDocument();
   });
 
   it('renders contribution cards sorted by stars in default cards variant', () => {

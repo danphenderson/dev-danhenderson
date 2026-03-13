@@ -18,7 +18,6 @@ jest.mock('@mui/material/useMediaQuery', () => jest.fn());
 jest.mock('../hooks/useGithubProfile', () => ({
   useGithubProfile: () => ({
     activity: [{ label: 'Pushed 2 commits to owner/repo', href: 'https://github.com/owner/repo' }],
-    projects: [{ name: 'portfolio-site', url: 'https://github.com/danphenderson/dev-danhenderson' }],
     contributions: [{ name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright', stars: 999 }],
     loading: false,
     error: null,
@@ -222,6 +221,31 @@ describe('CV page section navigation', () => {
     expect(navigator).toBeInTheDocument();
     expect(navigator).toHaveAttribute('aria-label', 'CV section navigation');
     expect(navigator.getAttribute('data-sections')).toBe(cvSectionNavigationOrder.join(','));
+  });
+
+  it('renders the GitHub section without the removed projects subsection', () => {
+    render(
+      <ThemeProvider>
+        <CV />
+      </ThemeProvider>
+    );
+
+    const githubSection = document.getElementById(cvSectionMetadata.github.id);
+
+    expect(githubSection).not.toBeNull();
+    expect(within(githubSection!).getByText('GitHub')).toBeInTheDocument();
+    expect(
+      within(githubSection!).getByText(
+        'Recent activity, open-source contributions, and contribution history from GitHub.'
+      )
+    ).toBeVisible();
+    expect(within(githubSection!).getByText('Recent Activity')).toBeInTheDocument();
+    expect(within(githubSection!).getByText('Contributions')).toBeInTheDocument();
+    expect(within(githubSection!).getByText('Contribution calendar')).toBeInTheDocument();
+    expect(within(githubSection!).getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
+    expect(within(githubSection!).getByText('microsoft/playwright')).toBeInTheDocument();
+    expect(within(githubSection!).queryByText('Projects')).not.toBeInTheDocument();
+    expect(within(githubSection!).queryByText('Public Projects')).not.toBeInTheDocument();
   });
 
   it('ignores the legacy CV appearance key and uses the global default appearance key', () => {

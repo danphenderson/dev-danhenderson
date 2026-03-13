@@ -13,31 +13,30 @@ jest.mock('../AnimatedContentCard', () => ({
 }));
 
 describe('CVGitHubSection', () => {
-  it('renders GitHub activity, contributions, calendar, and projects', () => {
+  it('renders GitHub activity, contributions, and the calendar without a projects block', () => {
     render(
       <ThemeProvider>
         <CVGitHubSection
           activity={[{ label: 'Pushed 2 commits to owner/repo', href: 'https://github.com/owner/repo' }]}
           contributions={[{ name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright', stars: 999 }]}
-          projects={[{ name: 'portfolio-site', url: 'https://github.com/danphenderson/dev-danhenderson' }]}
           loading={false}
           error={null}
-          lead="Recent activity, open-source contributions, and public repositories from GitHub."
+          lead="Recent activity, open-source contributions, and contribution history from GitHub."
         />
       </ThemeProvider>
     );
 
     expect(screen.getByText('GitHub')).toBeInTheDocument();
     expect(
-      screen.getByText('Recent activity, open-source contributions, and public repositories from GitHub.')
+      screen.getByText('Recent activity, open-source contributions, and contribution history from GitHub.')
     ).toBeVisible();
     expect(screen.getByText('Recent Activity')).toBeInTheDocument();
     expect(screen.getByText('Contributions')).toBeInTheDocument();
     expect(screen.getByText('Contribution calendar')).toBeInTheDocument();
-    expect(screen.getByText('Public Projects')).toBeInTheDocument();
     expect(screen.getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
     expect(screen.getByText('microsoft/playwright')).toBeInTheDocument();
-    expect(screen.getByText('portfolio-site')).toBeInTheDocument();
+    expect(screen.queryByText('Projects')).not.toBeInTheDocument();
+    expect(screen.queryByText('Public Projects')).not.toBeInTheDocument();
     expect(screen.getByText('Recent Activity').tagName).toBe('H6');
     expect(screen.getByText('Recent Activity')).toHaveClass('MuiTypography-subtitle2');
   });

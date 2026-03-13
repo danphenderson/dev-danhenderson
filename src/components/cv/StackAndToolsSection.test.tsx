@@ -5,6 +5,8 @@ import { StackAndToolsSection } from './StackAndToolsSection';
 
 type MockSx = { [key: string]: unknown } | Array<{ [key: string]: unknown }>;
 
+const mockAnimatedSlideList = jest.fn();
+
 const hasSxEntry = (sx?: MockSx, predicate?: (entry: { [key: string]: unknown }) => boolean) => {
   const sxEntries = Array.isArray(sx) ? sx : sx ? [sx] : [];
 
@@ -43,7 +45,28 @@ jest.mock('../AnimatedContentCard', () => ({
   ),
 }));
 
+jest.mock('../AnimatedSlideList', () => ({
+  AnimatedSlideList: (props: {
+    items: unknown[];
+    in: boolean;
+    layout?: 'stack' | 'wrap';
+    renderItem: (item: unknown, index: number) => React.ReactNode;
+  }) => {
+    mockAnimatedSlideList(props);
+
+    return (
+      <div data-testid="animated-slide-list" data-layout={props.layout ?? 'stack'}>
+        {props.in ? props.items.map(props.renderItem) : null}
+      </div>
+    );
+  },
+}));
+
 describe('StackAndToolsSection', () => {
+  afterEach(() => {
+    mockAnimatedSlideList.mockClear();
+  });
+
   it('renders the shared tab panel through the animated list with the provided offset', () => {
     render(
       <ThemeProvider>
@@ -75,6 +98,7 @@ describe('StackAndToolsSection', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Cloud Services' }));
 
     expect(screen.getByText('AWS')).toBeVisible();
+    expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.layout === 'wrap')).toBe(true);
     expect(screen.queryByText('TypeScript')).not.toBeInTheDocument();
   });
 });

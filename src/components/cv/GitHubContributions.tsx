@@ -41,7 +41,7 @@ export const GitHubContributions = ({
   if (!contributions.length) {
     return (
       <BodyText sx={secondaryTextSx}>
-        No recent community contributions found. Showing personal projects below.
+        No recent community contributions found right now.
       </BodyText>
     );
   }

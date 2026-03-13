@@ -104,6 +104,10 @@ export const createComponentStyleMap = (theme: Theme) => {
     transitionDelay: `${delayMs}ms`,
   });
 
+  const getAnimatedSlideItemSx = (delayMs: number): SxProps<Theme> => ({
+    transitionDelay: `${delayMs}ms`,
+  });
+
   const interactiveAccentTextSx = {
     color: accentColor,
   } satisfies SxProps<Theme>;
@@ -200,6 +204,9 @@ export const createComponentStyleMap = (theme: Theme) => {
   }) satisfies SxProps<Theme>;
 
   const getTabPanelBodySx = (dense: boolean, hasTabs: boolean) => ({
+    position: 'relative',
+    overflow: 'hidden',
+    minWidth: 0,
     px: { xs: 1.25, sm: 1.5 },
     pt: hasTabs ? (dense ? 1.25 : 1.5) : 0,
     pb: dense ? 1.25 : 1.5,
@@ -767,6 +774,7 @@ export const createComponentStyleMap = (theme: Theme) => {
     githubCalendarColorScheme: theme.palette.mode,
     githubCalendarTheme,
     githubCalendarSizeSx: { width: '100%', minHeight: 140 } satisfies SxProps<Theme>,
+    getAnimatedSlideItemSx,
     getTabPanelSx,
     getTabListSx,
     getTabSx,

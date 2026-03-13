@@ -1,15 +1,23 @@
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Box, Tab, Tabs } from '@mui/material';
 import type { ReactNode, SyntheticEvent } from 'react';
 import { useComponentStyles } from '../styles/componentStyles';
 import { InteractiveLabel } from './text';
+
+export type TabPanelRenderContext = {
+  getDrawerContainer: () => HTMLDivElement | null;
+  panelId: string;
+  tabId?: string;
+  dense: boolean;
+  hasTabs: boolean;
+};
 
 export type TabPanelItem = {
   value: string;
   label: string;
   shortLabel?: string;
   content?: ReactNode;
-  renderContent?: (selected: boolean) => ReactNode;
+  renderContent?: (selected: boolean, context: TabPanelRenderContext) => ReactNode;
   disabled?: boolean;
 };
 
@@ -36,8 +44,8 @@ const getInitialValue = (
   items.find((item) => item.value === defaultValue)?.value ??
   (autoSelectFirst ? items[0]?.value ?? false : false);
 
-const getTabContent = (item: TabPanelItem, selected: boolean) =>
-  item.renderContent ? item.renderContent(selected) : item.content ?? null;
+const getTabContent = (item: TabPanelItem, selected: boolean, context: TabPanelRenderContext) =>
+  item.renderContent ? item.renderContent(selected, context) : item.content ?? null;
 
 export const TabPanel = ({
   id: idProp,
@@ -61,6 +69,7 @@ export const TabPanel = ({
     [defaultValue, enabledItems, shouldRenderTabs]
   );
   const [internalValue, setInternalValue] = useState<TabPanelValue>(resolvedDefaultValue);
+  const panelBodyRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     if (valueProp !== undefined) {
@@ -138,6 +147,13 @@ export const TabPanel = ({
         const isSelected = item.value === resolvedValue;
         const tabId = `${tabPanelId}-tab-${item.value}`;
         const panelId = `${tabPanelId}-panel-${item.value}`;
+        const renderContext: TabPanelRenderContext = {
+          getDrawerContainer: () => panelBodyRefs.current[item.value] ?? null,
+          panelId,
+          tabId: shouldRenderTabs ? tabId : undefined,
+          dense,
+          hasTabs: shouldRenderTabs,
+        };
 
         if (!keepMounted && !isSelected) {
           return null;
@@ -146,6 +162,9 @@ export const TabPanel = ({
         return (
           <Box
             key={item.value}
+            ref={(node: HTMLDivElement | null) => {
+              panelBodyRefs.current[item.value] = node;
+            }}
             role="tabpanel"
             id={panelId}
             aria-labelledby={shouldRenderTabs ? tabId : undefined}
@@ -153,7 +172,7 @@ export const TabPanel = ({
             hidden={!isSelected}
             sx={getTabPanelBodySx(dense, shouldRenderTabs)}
           >
-            {getTabContent(item, isSelected)}
+            {getTabContent(item, isSelected, renderContext)}
           </Box>
         );
       })}

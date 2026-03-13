@@ -6,6 +6,7 @@ import { codingExamples } from '../../data/cv';
 import { CodingExamplesSection } from './CodingExamplesSection';
 
 const mockAnimatedContentList = jest.fn();
+const mockAnimatedSlideList = jest.fn();
 
 jest.mock('../AnimatedContentList', () => ({
   AnimatedContentList: (props: {
@@ -20,9 +21,39 @@ jest.mock('../AnimatedContentList', () => ({
   },
 }));
 
+jest.mock('../AnimatedSlideList', () => ({
+  AnimatedSlideList: (props: {
+    items: unknown[];
+    getItemKey: (item: unknown, index: number) => string;
+    renderItem: (item: unknown, index: number) => ReactNode;
+    in: boolean;
+    layout?: 'stack' | 'wrap';
+    containerComponent?: React.ElementType;
+    itemComponent?: React.ElementType;
+  }) => {
+    mockAnimatedSlideList(props);
+
+    const React = require('react');
+
+    const ContainerComponent = props.containerComponent ?? 'div';
+    const ItemComponent = props.itemComponent ?? 'div';
+
+    return React.createElement(
+      ContainerComponent,
+      { 'data-testid': 'animated-slide-list', 'data-layout': props.layout ?? 'stack' },
+      props.in
+        ? props.items.map((item, index) =>
+          React.createElement(ItemComponent, { key: props.getItemKey(item, index) }, props.renderItem(item, index))
+        )
+        : null
+    );
+  },
+}));
+
 describe('CodingExamplesSection', () => {
   afterEach(() => {
     mockAnimatedContentList.mockClear();
+    mockAnimatedSlideList.mockClear();
   });
 
   it('waits for the section list to enter view before mounting animated work items', () => {
@@ -57,20 +88,22 @@ describe('CodingExamplesSection', () => {
         'Typewriter is a pip-installable CLI built on Typer and LibCST to normalize None-related type annotations while preserving formatting and comments.'
       )
     ).toBeVisible();
-    expect(screen.queryByText('Normalize `None`-related annotations across a codebase.')).not.toBeInTheDocument();
+    expect(screen.queryByText('Normalize `Union[..., None]` and default-`None` annotations across Python source files.')).not.toBeInTheDocument();
     expect(screen.queryByText('Python')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Purpose' }));
 
-    expect(screen.getByText('Normalize `None`-related annotations across a codebase.')).toBeVisible();
-    expect(screen.getByText('Target repo-wide cleanup rather than ad-hoc edits.')).toBeVisible();
+    expect(screen.getByText('Normalize `Union[..., None]` and default-`None` annotations across Python source files.')).toBeVisible();
+    expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.containerComponent === 'ul' && props.itemComponent === 'li')).toBe(true);
+    expect(screen.getByText('Support dry-run auditing with unified diffs through `typewriter run ... --check`.')).toBeVisible();
     expect(screen.queryByText('Python')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Stack' }));
 
     expect(screen.getByText('Python')).toBeVisible();
     expect(screen.getByText('Typer')).toBeVisible();
-    expect(screen.queryByText('Normalize `None`-related annotations across a codebase.')).not.toBeInTheDocument();
+    expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.layout === 'wrap')).toBe(true);
+    expect(screen.queryByText('Normalize `Union[..., None]` and default-`None` annotations across Python source files.')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Stack' }));
 

@@ -5,9 +5,6 @@ import { resetGitHubProfileDataCacheForTests } from './githubProfileData';
 const fallbackActivity = [
   { label: 'Maintaining BlockOpt.jl (trust-region quasi-Newton optimizer in Julia).', href: 'https://github.com/danphenderson/BlockOpt.jl' },
 ];
-const fallbackProjects = [
-  { name: 'BlockOpt.jl', url: 'https://github.com/danphenderson/BlockOpt.jl' },
-];
 const fallbackContributions = [
   { name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright' },
 ];
@@ -16,9 +13,6 @@ jest.mock('../data/cv', () => ({
   githubUsername: 'testuser',
   fallbackGitHubActivity: [
     { label: 'Maintaining BlockOpt.jl (trust-region quasi-Newton optimizer in Julia).', href: 'https://github.com/danphenderson/BlockOpt.jl' },
-  ],
-  fallbackGitHubProjects: [
-    { name: 'BlockOpt.jl', url: 'https://github.com/danphenderson/BlockOpt.jl' },
   ],
   fallbackGitHubContributions: [
     { name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright' },
@@ -51,20 +45,25 @@ describe('useGithubProfile', () => {
     const { result } = renderHook(() => useGithubProfile());
 
     expect(result.current.activity).toEqual(fallbackActivity);
-    expect(result.current.projects).toEqual(fallbackProjects);
     expect(result.current.contributions).toEqual(fallbackContributions);
     expect(result.current.error).toBeNull();
   });
 
-  it('fetches and updates data on mount', async () => {
+  it('fetches and updates activity on mount', async () => {
     global.fetch = jest.fn()
-      .mockImplementationOnce(() => createOkResponse([]))
       .mockImplementationOnce(() =>
         createOkResponse([
-          { id: 1, name: 'my-repo', html_url: 'https://github.com/testuser/my-repo', stargazers_count: 5, fork: false, archived: false },
+          {
+            id: 'event-1',
+            type: 'PushEvent',
+            repo: { name: 'testuser/my-repo' },
+            payload: { commits: [{ sha: 'abc123' }], head: 'abc123' },
+          },
         ])
       )
-      .mockImplementationOnce(() => createOkResponse({ items: [] }));
+      .mockImplementationOnce(() =>
+        createOkResponse({ items: [] })
+      );
 
     const { result } = renderHook(() => useGithubProfile());
 
@@ -72,15 +71,14 @@ describe('useGithubProfile', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    expect(global.fetch).toHaveBeenCalledTimes(3);
-    expect(result.current.projects).toEqual([
-      { name: 'my-repo', url: 'https://github.com/testuser/my-repo' },
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(result.current.activity).toEqual([
+      { label: 'Pushed 1 commit to testuser/my-repo', href: 'https://github.com/testuser/my-repo/commit/abc123' },
     ]);
   });
 
   it('falls back gracefully on fetch failure', async () => {
     global.fetch = jest.fn()
-      .mockImplementationOnce(() => createErrorResponse())
       .mockImplementationOnce(() => createErrorResponse())
       .mockImplementationOnce(() => createErrorResponse());
 
@@ -91,7 +89,6 @@ describe('useGithubProfile', () => {
     });
 
     expect(result.current.activity).toEqual(fallbackActivity);
-    expect(result.current.projects).toEqual(fallbackProjects);
     expect(result.current.error).toBeTruthy();
   });
 
@@ -105,7 +102,6 @@ describe('useGithubProfile', () => {
     });
 
     expect(result.current.activity).toEqual(fallbackActivity);
-    expect(result.current.projects).toEqual(fallbackProjects);
     expect(result.current.contributions).toEqual(fallbackContributions);
     expect(result.current.error).toBeTruthy();
   });
