@@ -82,32 +82,6 @@ export const createComponentStyleMap = (theme: Theme) => {
     mb: marginBottom,
   });
 
-  const getGitHubChipSx = (layout: GitHubChipLayout): SxProps<Theme> => ({
-    border: subtleBorder,
-    backgroundColor: subtleSurface,
-    fontWeight: 600,
-    color: 'text.primary',
-    width: layout === 'stack' ? '100%' : 'auto',
-    height: 'auto',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    '& .MuiChip-icon': {
-      alignSelf: 'center',
-      ml: 0.5,
-      mr: 0.5,
-      fontSize: 18,
-      color: 'text.secondary',
-    },
-    '& .MuiChip-label': {
-      whiteSpace: 'normal',
-      textOverflow: 'clip',
-      lineHeight: 1.4,
-      px: 1,
-      py: 0.25,
-      overflowWrap: 'anywhere',
-    },
-  });
-
   const getWrapListSx = (gap: number): SxProps<Theme> => ({
     display: 'flex',
     flexWrap: 'wrap',
@@ -215,33 +189,14 @@ export const createComponentStyleMap = (theme: Theme) => {
     justifyContent: 'center',
     textAlign: 'left',
     ...interactiveAccentTextSx,
-    position: 'relative',
-    zIndex: 0,
     borderRadius: 0,
-    overflow: 'hidden',
-    ...(motion.tabHoverShimmerMs !== null ? {
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        inset: 0,
-        background: shimmerGradient,
-        transform: 'translateX(-100%)',
-        opacity: 0,
-        transition: 'opacity 0.3s ease',
-        pointerEvents: 'none',
-      },
-      '&:hover::after': {
-        opacity: 1,
-        animation: `${shimmerSweep} ${motion.tabHoverShimmerMs}ms linear`,
-      },
-    } : {}),
+    ...hoverShimmerSx,
     '&.Mui-selected': {
       ...interactiveAccentTextSx,
       backgroundColor: selectedTabSurface,
       boxShadow: interactiveSurfaceHoverShadow,
       zIndex: 1,
     },
-    ...reducedMotionSx,
   }) satisfies SxProps<Theme>;
 
   const getTabPanelBodySx = (dense: boolean, hasTabs: boolean) => ({
@@ -269,6 +224,31 @@ export const createComponentStyleMap = (theme: Theme) => {
   const cvSectionBorderGradient = `linear-gradient(100deg, ${alpha(accentColor, 0)} 0%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.12 : 0.18))} 18%, ${alpha(theme.palette.primary.light, scaleGlowAlpha(isLight ? 0.52 : 0.4))} 50%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.14 : 0.22))} 82%, ${alpha(accentColor, 0)} 100%)`;
   const cvSectionBottomGlowGradient = `radial-gradient(80% 140% at 50% 100%, ${alpha(theme.palette.primary.light, scaleGlowAlpha(isLight ? 0.32 : 0.26))} 0%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.2 : 0.24))} 38%, ${alpha(accentColor, 0)} 100%)`;
   const cvSectionSupportWash = `radial-gradient(130% 130% at 0% 0%, ${alpha(supportAccentLight, Math.min(surface.secondaryTintAlpha + (isLight ? 0.08 : 0.06), 0.24))} 0%, ${alpha(supportAccentColor, Math.min(surface.secondaryTintAlpha + 0.02, 0.18))} 24%, ${alpha(supportAccentColor, 0)} 70%)`;
+  const sectionNavigatorSurface = alpha(
+    theme.palette.background.paper,
+    Math.min(surface.panelSurfaceAlpha + (isLight ? 0.08 : 0.14), 0.9)
+  );
+  const sectionNavigatorActiveShadow = `0 0 0 1px ${alpha(theme.palette.primary.light, isLight ? 0.32 : 0.42)}, 0 0 18px ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.16 : 0.24))}`;
+  const hoverShimmerSx = motion.tabHoverShimmerMs !== null ? {
+    position: 'relative' as const,
+    zIndex: 0,
+    overflow: 'hidden' as const,
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      inset: 0,
+      background: shimmerGradient,
+      transform: 'translateX(-100%)',
+      opacity: 0,
+      transition: 'opacity 0.3s ease',
+      pointerEvents: 'none',
+    },
+    '&:hover::after': {
+      opacity: 1,
+      animation: `${shimmerSweep} ${motion.tabHoverShimmerMs}ms linear`,
+    },
+    ...reducedMotionSx,
+  } : {};
 
   const sharedPillChipSx = {
     border: subtleBorder,
@@ -378,6 +358,37 @@ export const createComponentStyleMap = (theme: Theme) => {
     } : {}
   );
 
+  const getGitHubChipSx = (layout: GitHubChipLayout): SxProps<Theme> => ({
+    border: subtleBorder,
+    backgroundColor: subtleSurface,
+    fontWeight: 600,
+    color: 'text.primary',
+    width: layout === 'stack' ? '100%' : 'auto',
+    height: 'auto',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    ...hoverShimmerSx,
+    '& .MuiChip-icon': {
+      alignSelf: 'center',
+      ml: 0.5,
+      mr: 0.5,
+      fontSize: 18,
+      color: supportAccentColor,
+      position: 'relative',
+      zIndex: 1,
+    },
+    '& .MuiChip-label': {
+      whiteSpace: 'normal',
+      textOverflow: 'clip',
+      lineHeight: 1.4,
+      px: 1,
+      py: 0.25,
+      overflowWrap: 'anywhere',
+      position: 'relative',
+      zIndex: 1,
+    },
+  });
+
   return {
     motionTokens,
     contentListStackSpacing,
@@ -451,39 +462,76 @@ export const createComponentStyleMap = (theme: Theme) => {
       display: 'flex',
       flexDirection: 'row',
       flexWrap: 'wrap',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       columnGap: 1,
       rowGap: 0.75,
       width: '100%',
-      borderRadius: 1.5,
+      minWidth: 0,
+      position: 'relative',
+      borderRadius: 999,
       border: subtleBorder,
-      backgroundColor: subtleSurface,
-      p: 1,
+      backgroundColor: sectionNavigatorSurface,
+      boxShadow: theme.shadows[4],
+      backdropFilter: `blur(${Math.max(surface.cardBlurPx - 2, 8)}px)`,
+      WebkitBackdropFilter: `blur(${Math.max(surface.cardBlurPx - 2, 8)}px)`,
+      px: { xs: 1.25, md: 1.5 },
+      py: 0.875,
     } satisfies SxProps<Theme>,
     sectionNavigatorLeadSx: {
       color: accentColor,
       display: 'inline-flex',
       alignItems: 'center',
-      minHeight: 32,
+      minHeight: 30,
       flexShrink: 0,
       whiteSpace: 'nowrap',
       lineHeight: 1,
+      textTransform: 'none',
     } satisfies SxProps<Theme>,
     sectionNavigatorRailSx: {
       display: 'flex',
       flexWrap: 'wrap',
-      gap: 0.75,
+      gap: 0.5,
       alignItems: 'center',
       minWidth: 0,
       flex: '1 1 0',
     } satisfies SxProps<Theme>,
     sectionNavigatorChipSx: {
       ...sharedPillChipSx,
-      height: 32,
+      ...interactiveSurfaceSx,
+      ...hoverShimmerSx,
+      minHeight: 30,
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 999,
       cursor: 'pointer',
-      '& .MuiChip-label': {
-        px: 1.25,
+      appearance: 'none',
+      px: 1.125,
+      py: 0,
+      borderColor: alpha(accentColor, isLight ? 0.14 : 0.26),
+      backgroundColor: alpha(accentColor, isLight ? 0.035 : 0.12),
+      boxShadow: 'none',
+      overflow: 'hidden',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        inset: -1,
+        borderRadius: 'inherit',
+        boxShadow: glowShadow,
+        opacity: 0,
+        transition: 'opacity 0.2s ease',
+        pointerEvents: 'none',
+      },
+      '& > span': {
         whiteSpace: 'nowrap',
+      },
+      '&[aria-pressed="true"]': {
+        backgroundColor: selectedTabSurface,
+        borderColor: alpha(theme.palette.primary.light, isLight ? 0.26 : 0.38),
+        boxShadow: sectionNavigatorActiveShadow,
+        '&::before': {
+          opacity: isLight ? 0.3 : 0.38,
+        },
       },
       '&:hover': {
         backgroundColor: alpha(accentColor, isLight ? 0.1 : 0.16),
@@ -666,7 +714,7 @@ export const createComponentStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     contributionInlineMetaSx: {
       fontWeight: 600,
-      color: 'text.secondary',
+      color: supportAccentColor,
     } satisfies SxProps<Theme>,
     contributionCardSx: {
       display: 'flex',
@@ -688,7 +736,7 @@ export const createComponentStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     contributionCardMetaSx: {
       fontWeight: 600,
-      color: 'text.secondary',
+      color: supportAccentColor,
     } satisfies SxProps<Theme>,
     contributionCardBodySx: {
       flex: 1,

@@ -16,6 +16,21 @@ export const createAppStyleMap = (theme: Theme) => {
   const homeHeroShellShadow = `0 18px 40px ${alpha(theme.palette.common.black, theme.palette.mode === 'light' ? 0.22 : 0.34)}`;
   const photoPlaceholderColor = alpha(theme.palette.text.primary, isLight ? 0.08 : 0.18);
   const photoDownloadShadow = alpha(theme.palette.common.black, isLight ? 0.18 : 0.42);
+  const floatingActionBackgroundColor = alpha(
+    theme.palette.background.paper,
+    Math.min(surface.panelSurfaceAlpha + (isLight ? 0.18 : 0.24), 0.96)
+  );
+  const floatingActionHoverBackgroundColor = alpha(
+    theme.palette.background.paper,
+    Math.min(surface.panelSurfaceAlpha + (isLight ? 0.22 : 0.3), 1)
+  );
+  const floatingActionBorder = `1px solid ${alpha(
+    theme.palette.primary.main,
+    Math.min(surface.panelBorderAlpha + 0.08, 0.58)
+  )}`;
+  const floatingActionShadow = isLight
+    ? `0 12px 28px ${alpha(theme.palette.common.black, surface.cardShadowAlpha + 0.02)}`
+    : `0 14px 30px ${alpha(theme.palette.common.black, surface.cardShadowAlpha)}`;
 
   const getBackgroundImageSx = (resolvedImage: string): SxProps<Theme> => ({
     backgroundImage: `url('${resolvedImage}')`,
@@ -321,6 +336,31 @@ export const createAppStyleMap = (theme: Theme) => {
     compactSectionHeadingSx: { mb: 0 } satisfies SxProps<Theme>,
     sectionHeadingOffsetSx: { mt: 2 } satisfies SxProps<Theme>,
     sectionLoadingSx: { mt: 1 } satisfies SxProps<Theme>,
+    backToTopFabSx: {
+      position: 'fixed',
+      right: {
+        xs: 'calc(env(safe-area-inset-right, 0px) + 16px)',
+        md: 'calc(env(safe-area-inset-right, 0px) + 24px)',
+      },
+      bottom: {
+        xs: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+        md: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
+      },
+      zIndex: theme.zIndex.appBar - 1,
+      color: theme.palette.text.primary,
+      backgroundColor: floatingActionBackgroundColor,
+      border: floatingActionBorder,
+      boxShadow: floatingActionShadow,
+      backdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+      WebkitBackdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+      '&:hover': {
+        backgroundColor: floatingActionHoverBackgroundColor,
+      },
+      '&:focus-visible': {
+        outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
+        outlineOffset: 3,
+      },
+    } satisfies SxProps<Theme>,
     primaryTextSx,
     secondaryTextSx,
     footerTextSx: {

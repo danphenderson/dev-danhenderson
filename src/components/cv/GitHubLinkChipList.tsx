@@ -33,7 +33,7 @@ export const GitHubLinkChipList = ({
   stackSpacing = 0.5,
   wrapGap = 0.75,
 }: GitHubLinkChipListProps) => {
-  const { chipWaveSx, getChipWaveDelaySx, getGitHubChipSx, getWrapListSx } = useComponentStyles();
+  const { getGitHubChipSx, getWrapListSx } = useComponentStyles();
   const customChipSx = normalizeSxProp(chipSx);
   const baseChipSx: SxProps<Theme> = getGitHubChipSx(layout);
   const animatedContainerSx: SxProps<Theme> = layout === 'wrap'
@@ -44,7 +44,7 @@ export const GitHubLinkChipList = ({
       gap: stackSpacing,
     };
 
-  const renderChip = (item: GitHubLinkChipItem, index: number) => {
+  const renderChip = (item: GitHubLinkChipItem) => {
     const isLink = Boolean(item.href);
 
     return (
@@ -59,7 +59,7 @@ export const GitHubLinkChipList = ({
         clickable={isLink}
         variant="outlined"
         size="small"
-        sx={[baseChipSx, chipWaveSx, getChipWaveDelaySx(index), ...customChipSx]}
+        sx={[baseChipSx, ...customChipSx]}
       />
     );
   };

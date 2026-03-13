@@ -9,6 +9,7 @@ describe('createComponentStyleMap', () => {
     const styleMap = createComponentStyleMap(theme);
     const surface = theme.appearanceTreatment.surface;
     const tabSx = styleMap.getTabSx(false) as Record<string, unknown>;
+    const gitHubChipSx = styleMap.getGitHubChipSx('stack') as Record<string, unknown>;
     const contentCardSx = styleMap.contentCardSx as Record<string, unknown>;
     const sectionCardSx = styleMap.cvSectionCardSx as Record<string, unknown>;
     const sectionPanelSx = styleMap.sectionPanelSx as Record<string, unknown>;
@@ -24,7 +25,10 @@ describe('createComponentStyleMap', () => {
     expect((styleMap.supportAccentInteractiveSurfaceSx as Record<string, unknown>).color).toBe(
       theme.palette.secondary.main
     );
+    expect((gitHubChipSx['& .MuiChip-icon'] as Record<string, unknown>).color).toBe(theme.palette.secondary.main);
     expect((styleMap.cvEntryChipSx as Record<string, unknown>).borderColor).toBe(theme.palette.secondary.main);
+    expect((styleMap.contributionInlineMetaSx as Record<string, unknown>).color).toBe(theme.palette.secondary.main);
+    expect((styleMap.contributionCardMetaSx as Record<string, unknown>).color).toBe(theme.palette.secondary.main);
     expect(contentCardSx.background).toEqual(
       expect.stringContaining(alpha(theme.palette.secondary.main, Math.min(surface.secondaryTintAlpha + 0.02, 0.22)))
     );
@@ -37,6 +41,8 @@ describe('createComponentStyleMap', () => {
     expect(tabSx.color).toBe(theme.palette.primary.main);
     expect(tabSx['&::after']).toBeUndefined();
     expect(tabSx['&:hover::after']).toBeUndefined();
+    expect(gitHubChipSx['&::after']).toBeUndefined();
+    expect(gitHubChipSx['&:hover::after']).toBeUndefined();
     expect((styleMap.chipWaveSx as Record<string, unknown>).animation).toBeUndefined();
     expect(styleMap.getChipWaveDelaySx(2)).toEqual({});
     expect((styleMap.statusBreatheSx as Record<string, unknown>).animation).toBeUndefined();
@@ -53,6 +59,8 @@ describe('createComponentStyleMap', () => {
     const styleMap = createComponentStyleMap(theme);
     const tabSx = styleMap.getTabSx(false) as Record<string, unknown>;
     const tabHoverAfterSx = tabSx['&:hover::after'] as Record<string, unknown>;
+    const gitHubChipSx = styleMap.getGitHubChipSx('stack') as Record<string, unknown>;
+    const gitHubChipHoverAfterSx = gitHubChipSx['&:hover::after'] as Record<string, unknown>;
     const contentCardSx = styleMap.contentCardSx as Record<string, unknown>;
     const contentCardGlowSx = contentCardSx['&::after'] as Record<string, unknown>;
     const sectionCardSx = styleMap.cvSectionCardSx as Record<string, unknown>;
@@ -61,6 +69,8 @@ describe('createComponentStyleMap', () => {
 
     expect((tabSx['&::after'] as Record<string, unknown>).background).toEqual(expect.stringContaining('linear-gradient'));
     expect(tabHoverAfterSx.animation).toEqual(expect.stringContaining('450ms linear'));
+    expect((gitHubChipSx['&::after'] as Record<string, unknown>).background).toEqual(expect.stringContaining('linear-gradient'));
+    expect(gitHubChipHoverAfterSx.animation).toEqual(expect.stringContaining('450ms linear'));
     expect((styleMap.supportAccentTitleSx as Record<string, unknown>).color).toBe(theme.palette.secondary.main);
     expect(tabSx.color).toBe(theme.palette.primary.main);
     expect((styleMap.chipWaveSx as Record<string, unknown>).animation).toBeUndefined();
@@ -80,6 +90,8 @@ describe('createComponentStyleMap', () => {
     const styleMap = createComponentStyleMap(theme);
     const tabSx = styleMap.getTabSx(false) as Record<string, unknown>;
     const tabHoverAfterSx = tabSx['&:hover::after'] as Record<string, unknown>;
+    const gitHubChipSx = styleMap.getGitHubChipSx('wrap') as Record<string, unknown>;
+    const gitHubChipHoverAfterSx = gitHubChipSx['&:hover::after'] as Record<string, unknown>;
     const chipWaveSx = styleMap.chipWaveSx as Record<string, unknown>;
     const contentCardSx = styleMap.contentCardSx as Record<string, unknown>;
     const contentCardGlowSx = contentCardSx['&::after'] as Record<string, unknown>;
@@ -91,6 +103,8 @@ describe('createComponentStyleMap', () => {
     const entryChipPulseSx = entryChipSx['&::after'] as Record<string, unknown>;
 
     expect(tabHoverAfterSx.animation).toEqual(expect.stringContaining('500ms linear'));
+    expect((gitHubChipSx['&::after'] as Record<string, unknown>).background).toEqual(expect.stringContaining('linear-gradient'));
+    expect(gitHubChipHoverAfterSx.animation).toEqual(expect.stringContaining('500ms linear'));
     expect((styleMap.supportAccentInteractiveSurfaceSx as Record<string, unknown>).color).toBe(
       theme.palette.secondary.main
     );

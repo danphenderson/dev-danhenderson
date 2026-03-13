@@ -11,6 +11,7 @@ import { cvPageSectionLayout } from './cvPageLayout';
 import CV from './CV';
 
 const legacyCvAppearanceStorageKey = 'danhenderson-cv-appearance';
+const mockAppSpeedDial = jest.fn();
 
 jest.mock('@mui/material/useMediaQuery', () => jest.fn());
 
@@ -56,6 +57,7 @@ jest.mock('../components/AppSpeedDial', () => ({
   AppSpeedDial: ({
     ariaLabel,
     actions,
+    sx,
   }: {
     ariaLabel: string;
     actions: Array<{
@@ -65,7 +67,9 @@ jest.mock('../components/AppSpeedDial', () => ({
       download?: string | boolean;
       onClick?: () => void;
     }>;
+    sx?: unknown;
   }) => (
+    mockAppSpeedDial({ ariaLabel, actions, sx }),
     <section data-testid={`speed-dial-${ariaLabel.toLowerCase().replace(/\s+/g, '-')}`}>
       {actions.map((action) =>
         action.href ? (
@@ -92,6 +96,10 @@ jest.mock('../components/AppSpeedDial', () => ({
       )}
     </section>
   ),
+}));
+
+jest.mock('../components/BackToTopButton', () => ({
+  BackToTopButton: () => <div data-testid="back-to-top-button" />,
 }));
 
 const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQuery>;
@@ -158,7 +166,7 @@ describe('CV page section navigation', () => {
     });
   });
 
-  it('renders ABOUT actions and keeps the section navigator in the ABOUT section on desktop', () => {
+  it('renders ABOUT actions and docks the section navigator below the ABOUT section on desktop', () => {
     render(
       <ThemeProvider>
         <CV />
@@ -187,16 +195,26 @@ describe('CV page section navigation', () => {
       'download',
       'Daniel-Henderson-Resume.pdf'
     );
+    expect(mockAppSpeedDial).toHaveBeenCalledWith(expect.objectContaining({
+      ariaLabel: 'Open about actions',
+      sx: expect.objectContaining({
+        position: 'static',
+      }),
+    }));
     expect(aboutSection).not.toBeNull();
 
-    const navigator = within(aboutSection!).getByTestId('cv-section-navigator');
+    const stickyNavigator = screen.getByTestId('cv-sticky-section-navigator');
+    const navigator = within(stickyNavigator).getByTestId('cv-section-navigator');
     const navigationActions = within(navigator).getAllByRole('button');
 
-    expect(aboutDial.compareDocumentPosition(navigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(aboutSection!).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
+    expect(aboutSection!.compareDocumentPosition(stickyNavigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(stickyNavigator.compareDocumentPosition(screen.getByTestId('cv-desktop-sidebar-region')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(navigationActions.map((action) => action.textContent)).toEqual(
       cvSectionNavigationOrder.map((sectionKey) => cvSectionMetadata[sectionKey].navLabel)
     );
     expect(within(navigator).queryByRole('button', { name: 'About' })).not.toBeInTheDocument();
+    expect(within(navigator).getByText('Sections')).toBeInTheDocument();
 
     navigationActions.forEach((action, index) => {
       const expectedSectionId = cvSectionMetadata[cvSectionNavigationOrder[index]].id;
@@ -206,6 +224,16 @@ describe('CV page section navigation', () => {
       expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
       expect(getElementByIdSpy).toHaveBeenLastCalledWith(expectedSectionId);
     });
+  });
+
+  it('renders the shared back-to-top control on the cv route', () => {
+    render(
+      <ThemeProvider>
+        <CV />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('back-to-top-button')).toBeInTheDocument();
   });
 
   it('ignores the legacy CV appearance key and uses the global default appearance key', () => {
@@ -266,14 +294,18 @@ describe('CV page section navigation', () => {
     const aboutSection = document.getElementById(cvSectionMetadata.about.id);
     const experienceSection = document.getElementById(cvSectionMetadata.experience.id);
     const aboutDial = screen.getByTestId('speed-dial-open-about-actions');
-    const navigator = within(aboutSection!).getByTestId('cv-section-navigator');
+    const stickyNavigator = screen.getByTestId('cv-sticky-section-navigator');
+    const navigator = within(stickyNavigator).getByTestId('cv-section-navigator');
 
     expect(aboutSection).not.toBeNull();
     expect(experienceSection).not.toBeNull();
     expect(aboutSection!.compareDocumentPosition(experienceSection!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(aboutDial.compareDocumentPosition(navigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(within(aboutSection!).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
+    expect(aboutDial.compareDocumentPosition(stickyNavigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(stickyNavigator.compareDocumentPosition(experienceSection!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(
       within(navigator).getAllByRole('button').map((action) => action.textContent)
     ).toEqual(cvSectionNavigationOrder.map((sectionKey) => cvSectionMetadata[sectionKey].navLabel));
+    expect(within(navigator).getByText('Sections')).toBeInTheDocument();
   });
 });

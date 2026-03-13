@@ -8,6 +8,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { AppSpeedDial, AppSpeedDialAction } from '../components/AppSpeedDial';
+import { BackToTopButton } from '../components/BackToTopButton';
 import { CVAboutSection } from '../components/cv/CVAboutSection';
 import { CVCertificatesSection } from '../components/cv/CVCertificatesSection';
 import { CVCodingSection } from '../components/cv/CVCodingSection';
@@ -21,6 +22,7 @@ import {
   cvSectionNavigationOrder,
   CVSectionKey,
   cvSectionMetadata,
+  cvStickySectionNavMetrics,
 } from '../components/cv/cvSectionMetadata';
 import { CVGitHubSection } from '../components/cv/CVGitHubSection';
 import { PageFrame } from '../components/layout/PageFrame';
@@ -120,11 +122,27 @@ const CVRouteContent = () => {
         FabProps={{ size: 'small' }}
         direction="left"
         actionTooltipPlacement="top"
+        sx={{ position: 'static' }}
       />
     </Box>
   );
 
   const sectionNavigator = <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator" />;
+  const stickySectionNavigator = (
+    <Box
+      data-testid="cv-sticky-section-navigator"
+      sx={{
+        position: 'sticky',
+        top: {
+          xs: cvStickySectionNavMetrics.mobile.topOffsetPx,
+          md: cvStickySectionNavMetrics.desktop.topOffsetPx,
+        },
+        zIndex: (theme) => theme.zIndex.appBar - 1,
+      }}
+    >
+      {sectionNavigator}
+    </Box>
+  );
   const sectionDefinitions: CVSectionDefinition[] = [
     {
       key: 'about',
@@ -132,11 +150,6 @@ const CVRouteContent = () => {
         <CVAboutSection
           about={aboutMe}
           actions={aboutSpeedDial}
-          footer={
-            <>
-              {sectionNavigator}
-            </>
-          }
           delayMs={layout.delayMs}
           triggerOnView={layout.triggerOnView}
           sectionId={cvSectionMetadata.about.id}
@@ -252,58 +265,76 @@ const CVRouteContent = () => {
     };
   });
 
+  const renderSectionDescriptor = (descriptor: CVResolvedSectionDescriptor) => (
+    <Box
+      key={descriptor.key}
+      data-testid={`cv-section-region-item-${descriptor.placement.region}-${descriptor.key}`}
+      data-section-delay-ms={descriptor.delayMs}
+      data-section-trigger-on-view={String(descriptor.triggerOnView)}
+    >
+      {descriptor.node}
+    </Box>
+  );
+
   const getSectionNodesForRegion = (region: CVSectionRegion) =>
     sectionDescriptors
       .filter((descriptor) => descriptor.placement.region === region)
       .sort((left, right) => left.placement.order - right.placement.order)
-      .map((descriptor) => (
-        <Box
-          key={descriptor.key}
-          data-testid={`cv-section-region-item-${region}-${descriptor.key}`}
-          data-section-delay-ms={descriptor.delayMs}
-          data-section-trigger-on-view={String(descriptor.triggerOnView)}
-        >
-          {descriptor.node}
-        </Box>
-      ));
+      .map(renderSectionDescriptor);
 
   if (isMobile) {
+    const mobileSections = sectionDescriptors
+      .filter((descriptor) => descriptor.placement.region === 'stack')
+      .sort((left, right) => left.placement.order - right.placement.order);
+    const mobileAboutSection = mobileSections.find((descriptor) => descriptor.key === 'about');
+    const mobileBodySections = mobileSections.filter((descriptor) => descriptor.key !== 'about');
+
     return (
       <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
-        <CVSectionStack spacing={2.5}>
-          {getSectionNodesForRegion('stack')}
-        </CVSectionStack>
+        <>
+          <CVSectionStack spacing={2.5}>
+            {mobileAboutSection && renderSectionDescriptor(mobileAboutSection)}
+            {mobileAboutSection && stickySectionNavigator}
+            {mobileBodySections.map(renderSectionDescriptor)}
+          </CVSectionStack>
+          <BackToTopButton />
+        </>
       </PageFrame>
     );
   }
 
   return (
     <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
-      <Grid container spacing={3} alignItems="stretch">
-        <Grid item xs={12}>
+      <>
+        <CVSectionStack spacing={3}>
           <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-top-region">
             <CVSectionStack spacing={2.5}>
               {getSectionNodesForRegion('top')}
             </CVSectionStack>
           </Box>
-        </Grid>
 
-        <Grid item xs={12} md={5} lg={4} sx={appStyles.cvDesktopAsideGridItemSx}>
-          <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-sidebar-region">
-            <CVSectionStack spacing={2.5}>
-              {getSectionNodesForRegion('sidebar')}
-            </CVSectionStack>
-          </Box>
-        </Grid>
+          {stickySectionNavigator}
 
-        <Grid item xs={12} md={7} lg={8} sx={appStyles.cvDesktopMainGridItemSx}>
-          <Box sx={appStyles.cvPagePrimaryPaneSx} data-testid="cv-desktop-main-region">
-            <CVSectionStack spacing={3.5}>
-              {getSectionNodesForRegion('main')}
-            </CVSectionStack>
-          </Box>
-        </Grid>
-      </Grid>
+          <Grid container spacing={3} alignItems="stretch">
+            <Grid item xs={12} md={5} lg={4} sx={appStyles.cvDesktopAsideGridItemSx}>
+              <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-sidebar-region">
+                <CVSectionStack spacing={2.5}>
+                  {getSectionNodesForRegion('sidebar')}
+                </CVSectionStack>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12} md={7} lg={8} sx={appStyles.cvDesktopMainGridItemSx}>
+              <Box sx={appStyles.cvPagePrimaryPaneSx} data-testid="cv-desktop-main-region">
+                <CVSectionStack spacing={3.5}>
+                  {getSectionNodesForRegion('main')}
+                </CVSectionStack>
+              </Box>
+            </Grid>
+          </Grid>
+        </CVSectionStack>
+        <BackToTopButton />
+      </>
     </PageFrame>
   );
 };

@@ -6,6 +6,12 @@ import { COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import type { AboutMe } from '../../types/cv';
 import { createAppTheme } from '../../theme/createAppTheme';
 
+let mockPrefersReducedMotion = true;
+
+jest.mock('../../hooks/usePrefersReducedMotion', () => ({
+  usePrefersReducedMotion: () => mockPrefersReducedMotion,
+}));
+
 const baseAbout: AboutMe = {
   name: 'Test User',
   title: 'Software Engineer',
@@ -16,6 +22,10 @@ const baseAbout: AboutMe = {
 };
 
 describe('ProfileCard', () => {
+  beforeEach(() => {
+    mockPrefersReducedMotion = true;
+  });
+
   it('renders name, title, and location', () => {
     render(
       <ThemeProvider>

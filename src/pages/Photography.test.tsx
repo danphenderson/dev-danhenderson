@@ -36,6 +36,10 @@ jest.mock('../components/AnimatedContentCard', () => ({
   AnimatedContentCard: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
+jest.mock('../components/BackToTopButton', () => ({
+  BackToTopButton: () => <div data-testid="back-to-top-button" />,
+}));
+
 describe('Photography', () => {
   it('renders the photography page with album count and category cards', () => {
     render(
@@ -53,5 +57,6 @@ describe('Photography', () => {
     expect(screen.getByText('Landscape photos')).toBeInTheDocument();
     expect(screen.getByText('Night sky photos')).toBeInTheDocument();
     expect(screen.getAllByText('View album')).toHaveLength(2);
+    expect(screen.queryByTestId('back-to-top-button')).not.toBeInTheDocument();
   });
 });

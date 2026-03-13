@@ -2,24 +2,22 @@ import { Avatar, Box, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { AboutMe } from '../../types/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
-import { HeaderTitle, StatusInlineText, StrongMetaText, MetaText, BodyText } from '../text';
+import { HeaderTitle, StrongMetaText, MetaText, BodyText } from '../text';
+import { CVAboutBioTypewriter } from './CVAboutBioTypewriter';
 
 type ProfileCardProps = {
   about: AboutMe;
   avatarSrc?: string;
   actions?: ReactNode;
+  bioAnimationStartDelayMs?: number;
 };
 
-const STATUS_MARKER = 'Open to opportunities';
-
-/** Return the index of the line start containing `markerIndex`. */
-const getLineStart = (text: string, markerIndex: number): number => {
-  const lastNewline = text.lastIndexOf('\n', markerIndex);
-  return lastNewline >= 0 ? lastNewline + 1 : markerIndex;
-};
-
-export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => {
+export const ProfileCard = ({
+  about,
+  avatarSrc,
+  actions,
+  bioAnimationStartDelayMs = 0,
+}: ProfileCardProps) => {
   const {
     profileHeaderContentSx,
     profileHeaderRowSx,
@@ -31,73 +29,6 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
     profileBioSx,
     profileNameRowSx,
   } = useComponentStyles();
-  const bioLink = about.bioLink;
-  const bioText = about.bio;
-  const bioLinkIndex = bioLink ? bioText.indexOf(bioLink.text) : -1;
-  const bioLinkTooltipProps = bioLink?.tooltip
-    ? {
-        'data-tooltip-id': COMMON_LINK_TOOLTIP_ID,
-        'data-tooltip-content': bioLink.tooltip,
-        'data-tooltip-place': 'top-start' as const,
-      }
-    : {};
-  let bioContent: ReactNode = bioText;
-
-  if (bioLink && bioLinkIndex >= 0) {
-    const beforeLink = bioText.slice(0, bioLinkIndex);
-    const afterLink = bioText.slice(bioLinkIndex + bioLink.text.length);
-    const statusIdx = afterLink.indexOf(STATUS_MARKER);
-
-    if (statusIdx >= 0) {
-      const lineStart = getLineStart(afterLink, statusIdx);
-      const beforeStatus = afterLink.slice(0, lineStart);
-      const statusLine = afterLink.slice(lineStart);
-
-      bioContent = (
-        <>
-          {beforeLink}
-          <CommonLink
-            href={bioLink.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            underline="hover"
-            {...bioLinkTooltipProps}
-          >
-            {bioLink.text}
-          </CommonLink>
-          {beforeStatus}
-          <StatusInlineText>{statusLine}</StatusInlineText>
-        </>
-      );
-    } else {
-      bioContent = (
-        <>
-          {beforeLink}
-          <CommonLink
-            href={bioLink.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            underline="hover"
-            {...bioLinkTooltipProps}
-          >
-            {bioLink.text}
-          </CommonLink>
-          {afterLink}
-        </>
-      );
-    }
-  } else {
-    const statusIdx = bioText.indexOf(STATUS_MARKER);
-    if (statusIdx >= 0) {
-      const lineStart = getLineStart(bioText, statusIdx);
-      bioContent = (
-        <>
-          {bioText.slice(0, lineStart)}
-          <StatusInlineText>{bioText.slice(lineStart)}</StatusInlineText>
-        </>
-      );
-    }
-  }
 
   return (
     <Stack spacing={1.5} alignItems="flex-start">
@@ -138,7 +69,10 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
       </Box>
       {about.bio && (
         <BodyText sx={[primaryTextSx, profileBioSx]}>
-          {bioContent}
+          <CVAboutBioTypewriter
+            about={about}
+            startDelayMs={bioAnimationStartDelayMs}
+          />
         </BodyText>
       )}
     </Stack>

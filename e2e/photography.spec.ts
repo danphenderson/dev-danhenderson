@@ -40,5 +40,12 @@ test.describe('Photography page', () => {
     await page.goto('/photography/landscape');
     await expect(page.getByRole('heading', { name: 'Landscape', exact: true })).toBeVisible();
     await expect(page.getByText('Landscape photo collection')).toBeVisible();
+
+    await page.evaluate(() => window.scrollTo({ top: 1200, behavior: 'auto' }));
+    await expect(page.getByRole('button', { name: 'Back to top' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Back to top' }).click();
+    await page.waitForFunction(() => window.scrollY === 0);
+    await expect(page.getByRole('button', { name: 'Back to top' })).toHaveCount(0);
   });
 });

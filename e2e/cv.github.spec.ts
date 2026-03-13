@@ -1,9 +1,25 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 import { mockGitHubAPISuccess, mockGitHubAPIFailure } from './helpers/github';
 
 test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
 });
+
+const COMMON_LINK_TOOLTIP_ID = 'common-link-tooltip';
+
+const expectCommonLinkTooltip = async (
+  page: Page,
+  link: Locator,
+  content: string,
+) => {
+  const tooltip = page.locator(`#${COMMON_LINK_TOOLTIP_ID}`);
+
+  await expect(link).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
+  await expect(link).toHaveAttribute('data-tooltip-content', content);
+  await link.focus();
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip).toContainText(content);
+};
 
 test.describe('CV page – GitHub integration', () => {
   test('renders the CV page with core sections', async ({ page }) => {
@@ -17,11 +33,20 @@ test.describe('CV page – GitHub integration', () => {
     const advisorLink = page.getByRole('link', { name: 'Jiguang Sun' });
 
     await expect(programLink).toHaveAttribute('href', 'https://www.mtu.edu/math/graduate/students/');
-    await programLink.hover();
-    await expect(page.getByText('View the Michigan Tech graduate mathematics student page.')).toBeVisible();
+    await expectCommonLinkTooltip(
+      page,
+      programLink,
+      'View the Michigan Tech graduate mathematics student page.',
+    );
     await advisorLink.scrollIntoViewIfNeeded();
-    await advisorLink.hover();
-    await expect(page.getByText('View faculty page')).toBeVisible();
+    await expectCommonLinkTooltip(page, advisorLink, 'View faculty page');
+
+    await page.evaluate(() => window.scrollTo({ top: 1000, behavior: 'auto' }));
+    await expect(page.getByRole('button', { name: 'Back to top' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Back to top' }).click();
+    await page.waitForFunction(() => window.scrollY === 0);
+    await expect(page.getByRole('button', { name: 'Back to top' })).toHaveCount(0);
   });
 
   test('displays mocked GitHub activity when API succeeds', async ({ page }) => {

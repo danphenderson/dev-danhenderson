@@ -38,6 +38,10 @@ jest.mock('../components/PhotoAlbum', () => ({
   ),
 }));
 
+jest.mock('../components/BackToTopButton', () => ({
+  BackToTopButton: () => <div data-testid="back-to-top-button" />,
+}));
+
 const renderWithSlug = (slug: string) =>
   render(
     <ThemeProvider>
@@ -58,6 +62,7 @@ describe('PhotographyCategory', () => {
     expect(screen.getByText('2 photos')).toBeInTheDocument();
     expect(screen.getByTestId('quilted-image-list')).toBeInTheDocument();
     expect(screen.getByText('Back to photography')).toBeInTheDocument();
+    expect(screen.getByTestId('back-to-top-button')).toBeInTheDocument();
   });
 
   it('shows not-found message for an unknown slug', () => {

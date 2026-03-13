@@ -18,6 +18,7 @@ import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
 import type { AppSpeedDialAction } from './AppSpeedDial';
 import { HeaderActions } from './header/HeaderActions';
+import { HEADER_HIDE_SCROLL_TRIGGER_OPTIONS } from './header/headerScroll';
 import { HeaderNav } from './header/HeaderNav';
 import { HeaderPageDial } from './header/HeaderPageDial';
 import { HintPopover } from './header/HintPopover';
@@ -122,7 +123,7 @@ const pulseRing = keyframes`
 `;
 
 const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
-  const trigger = useScrollTrigger({ disableHysteresis: true, threshold: 80 });
+  const trigger = useScrollTrigger(HEADER_HIDE_SCROLL_TRIGGER_OPTIONS);
 
   return (
     <Slide appear={false} direction="down" in={!trigger}>

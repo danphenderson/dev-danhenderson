@@ -6,6 +6,33 @@ import { formatIsoDateAsUtcCalendar, getIsoDateUtcTimestamp } from '../utils/dat
 export type TickRow = Tick & { id: string };
 export type TodoRow = Todo & { id: string };
 
+const CLIMBING_LOCATION_SEPARATOR = '>';
+const CLIMBING_LOCATION_INDEX_PREFIX = /^\([^)]+\)\s*/;
+
+function cleanClimbingLocationSegment(segment: string) {
+  return segment.replace(CLIMBING_LOCATION_INDEX_PREFIX, '').trim();
+}
+
+export function formatClimbingLocation(location: string) {
+  const parts = location
+    .split(CLIMBING_LOCATION_SEPARATOR)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (parts.length === 0) {
+    return location.trim();
+  }
+
+  const state = cleanClimbingLocationSegment(parts[0]);
+  const area = cleanClimbingLocationSegment(parts[parts.length - 1]);
+
+  if (parts.length === 1 || area.length === 0 || area === state) {
+    return area || state || location.trim();
+  }
+
+  return `${area}, ${state}`;
+}
+
 export function useClimbingData() {
   const ticks = useMemo<TickRow[]>(() => {
     return tickData
@@ -19,6 +46,7 @@ export function useClimbingData() {
         ...tick,
         id: `${tick.date}-${tick.route}-${idx}`,
         date: formatIsoDateAsUtcCalendar(tick.date),
+        location: formatClimbingLocation(tick.location),
       }));
   }, []);
 
@@ -29,6 +57,7 @@ export function useClimbingData() {
       .map((todo, idx) => ({
         ...todo,
         id: `${todo.route}-${idx}`,
+        location: formatClimbingLocation(todo.location),
       }));
   }, []);
 
