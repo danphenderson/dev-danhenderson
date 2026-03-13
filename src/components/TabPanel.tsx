@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { Box, Tab, Tabs } from '@mui/material';
+import { Box, Collapse, Tab, Tabs } from '@mui/material';
 import type { ReactNode, SyntheticEvent } from 'react';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { InteractiveLabel } from './text';
 
@@ -44,9 +45,6 @@ const getInitialValue = (
   items.find((item) => item.value === defaultValue)?.value ??
   (autoSelectFirst ? items[0]?.value ?? false : false);
 
-const getTabContent = (item: TabPanelItem, selected: boolean, context: TabPanelRenderContext) =>
-  item.renderContent ? item.renderContent(selected, context) : item.content ?? null;
-
 export const TabPanel = ({
   id: idProp,
   items,
@@ -60,6 +58,7 @@ export const TabPanel = ({
   tabsVariant = 'standard',
 }: TabPanelProps) => {
   const { getTabListSx, getTabPanelBodySx, getTabPanelSx, getTabSx, interactiveSurfaceSx } = useComponentStyles();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const fallbackId = useId();
   const tabPanelId = idProp ?? fallbackId;
   const enabledItems = useMemo(() => items.filter((item) => !item.disabled), [items]);
@@ -154,8 +153,9 @@ export const TabPanel = ({
           dense,
           hasTabs: shouldRenderTabs,
         };
+        const shouldRenderPanel = keepMounted || isSelected || !!item.renderContent;
 
-        if (!keepMounted && !isSelected) {
+        if (!shouldRenderPanel) {
           return null;
         }
 
@@ -172,7 +172,17 @@ export const TabPanel = ({
             hidden={!isSelected}
             sx={getTabPanelBodySx(dense, shouldRenderTabs)}
           >
-            {getTabContent(item, isSelected, renderContext)}
+            {item.renderContent
+              ? prefersReducedMotion
+                ? item.renderContent(isSelected, renderContext)
+                : (
+                    <Collapse in={isSelected} appear={false} timeout="auto" sx={{ width: '100%' }}>
+                      {item.renderContent(isSelected, renderContext)}
+                    </Collapse>
+                  )
+              : isSelected || keepMounted
+                ? (item.content ?? null)
+                : null}
           </Box>
         );
       })}

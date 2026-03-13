@@ -303,4 +303,59 @@ describe('TabPanel', () => {
       expect(screen.queryByText('Details body')).not.toBeInTheDocument();
     }
   );
+
+  it('keeps renderContent panels mounted while inactive even when keepMounted is false', () => {
+    const renderDetails = jest.fn((selected: boolean) => (
+      <div data-testid="details-body" data-selected={String(selected)}>Details body</div>
+    ));
+    const renderSkills = jest.fn((selected: boolean) => (
+      <div data-testid="skills-body" data-selected={String(selected)}>Skills body</div>
+    ));
+
+    render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel="Render content panels"
+          defaultValue="details"
+          items={[
+            { value: 'details', label: 'Details', renderContent: renderDetails },
+            { value: 'skills', label: 'Skills', renderContent: renderSkills },
+          ]}
+          tabsVariant="fullWidth"
+        />
+      </ThemeProvider>
+    );
+
+    expect(renderDetails).toHaveBeenCalled();
+    expect(renderSkills).toHaveBeenCalled();
+
+    expect(renderDetails).toHaveBeenCalledWith(true, expect.anything());
+    expect(renderSkills).toHaveBeenCalledWith(false, expect.anything());
+
+    expect(screen.getByTestId('details-body')).toHaveAttribute('data-selected', 'true');
+    expect(screen.getByTestId('skills-body')).toHaveAttribute('data-selected', 'false');
+
+    const inactivePanel = screen.getByTestId('skills-body').closest('[role="tabpanel"]');
+
+    expect(inactivePanel).toHaveAttribute('hidden');
+  });
+
+  it('unmounts plain content panels when inactive and keepMounted is false', () => {
+    render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel="Plain content panels"
+          defaultValue="details"
+          items={[
+            { value: 'details', label: 'Details', content: <div>Details body</div> },
+            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+          ]}
+          tabsVariant="fullWidth"
+        />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText('Details body')).toBeVisible();
+    expect(screen.queryByText('Skills body')).not.toBeInTheDocument();
+  });
 });

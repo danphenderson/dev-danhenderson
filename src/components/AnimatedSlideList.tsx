@@ -1,9 +1,8 @@
-import { createRef, useRef } from 'react';
+import { createRef, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Slide } from '@mui/material';
 import type { ElementType, ReactNode, RefObject } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { SlideProps } from '@mui/material/Slide';
-import { TransitionGroup } from 'react-transition-group';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { normalizeSxProp } from '../utils/sx';
@@ -45,13 +44,16 @@ export const AnimatedSlideList = <Item,>({
 }: AnimatedSlideListProps<Item>) => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const {
-    getAnimatedSlideItemSx,
-    getSectionDelayMs,
     motionTokens,
   } = useComponentStyles();
+  const [enteredKeys, setEnteredKeys] = useState<Set<string>>(() => new Set());
   const nodeRefs = useRef(new Map<string, RefObject<HTMLElement>>());
+  const enterTimerIdsRef = useRef<number[]>([]);
   const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.accordionChipStaggerMs;
-  const visibleItems = inProp ? items : [];
+  const itemKeys = useMemo(
+    () => items.map((item, index) => getItemKey(item, index)),
+    [getItemKey, items]
+  );
   const baseContainerSx: SxProps<Theme> = layout === 'wrap'
       ? {
         display: 'flex',
@@ -79,10 +81,50 @@ export const AnimatedSlideList = <Item,>({
     return nextNodeRef;
   };
 
+  useEffect(() => {
+    enterTimerIdsRef.current.forEach((timerId) => {
+      window.clearTimeout(timerId);
+    });
+    enterTimerIdsRef.current = [];
+
+    if (!inProp || prefersReducedMotion) {
+      setEnteredKeys(new Set());
+      return undefined;
+    }
+
+    setEnteredKeys(new Set());
+
+    itemKeys.forEach((key, index) => {
+      const delayMs = startDelayMs + index * resolvedItemStaggerMs;
+      const timerId = window.setTimeout(() => {
+        setEnteredKeys((currentKeys) => {
+          const nextKeys = new Set(currentKeys);
+
+          nextKeys.add(key);
+
+          return nextKeys;
+        });
+      }, delayMs);
+
+      enterTimerIdsRef.current.push(timerId);
+    });
+
+    return () => {
+      enterTimerIdsRef.current.forEach((timerId) => {
+        window.clearTimeout(timerId);
+      });
+      enterTimerIdsRef.current = [];
+    };
+  }, [inProp, itemKeys, prefersReducedMotion, resolvedItemStaggerMs, startDelayMs]);
+
   if (prefersReducedMotion) {
+    if (!inProp) {
+      return null;
+    }
+
     return (
       <Box component={containerComponent} sx={resolvedContainerSx}>
-        {visibleItems.map((item, index) => (
+        {items.map((item, index) => (
           <Box
             key={getItemKey(item, index)}
             component={itemComponent}
@@ -97,36 +139,31 @@ export const AnimatedSlideList = <Item,>({
 
   return (
     <Box component={containerComponent} sx={resolvedContainerSx}>
-      <TransitionGroup component={null}>
-        {visibleItems.map((item, index) => {
-          const key = getItemKey(item, index);
-          const nodeRef = getNodeRef(key);
-          const slideItemSx: SxProps<Theme> = [
-            getAnimatedSlideItemSx(getSectionDelayMs(index, startDelayMs, resolvedItemStaggerMs)),
-            ...normalizeSxProp(itemSx),
-          ];
+      {items.map((item, index) => {
+        const key = getItemKey(item, index);
+        const nodeRef = getNodeRef(key);
 
-          return (
-            <SlideWithNodeRef
-              key={key}
-              appear={false}
-              direction="up"
-              mountOnEnter
-              unmountOnExit
-              container={container ? (() => container() ?? document.body) : undefined}
-              nodeRef={nodeRef}
+        return (
+          <SlideWithNodeRef
+            key={key}
+            in={enteredKeys.has(key)}
+            appear={false}
+            direction="up"
+            mountOnEnter
+            unmountOnExit
+            container={container ? (() => container() ?? document.body) : undefined}
+            nodeRef={nodeRef}
+          >
+            <Box
+              ref={nodeRef}
+              component={itemComponent}
+              sx={itemSx}
             >
-              <Box
-                ref={nodeRef}
-                component={itemComponent}
-                sx={slideItemSx}
-              >
-                {renderItem(item, index)}
-              </Box>
-            </SlideWithNodeRef>
-          );
-        })}
-      </TransitionGroup>
+              {renderItem(item, index)}
+            </Box>
+          </SlideWithNodeRef>
+        );
+      })}
     </Box>
   );
 };

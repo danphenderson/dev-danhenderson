@@ -26,7 +26,6 @@ export const AnimatedZoomList = <Item,>({
 }: AnimatedZoomListProps<Item>) => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const {
-    getAnimatedZoomItemSx,
     getSectionDelayMs,
     motionTokens,
   } = useComponentStyles();
@@ -51,8 +50,9 @@ export const AnimatedZoomList = <Item,>({
           key={getItemKey(item, index)}
           in={inProp}
           appear={false}
+          style={{ transitionDelay: `${getSectionDelayMs(index, startDelayMs, resolvedItemStaggerMs)}ms` }}
         >
-          <Box sx={getAnimatedZoomItemSx(getSectionDelayMs(index, startDelayMs, resolvedItemStaggerMs))}>
+          <Box>
             {renderItem(item, index)}
           </Box>
         </Zoom>

@@ -100,14 +100,6 @@ export const createComponentStyleMap = (theme: Theme) => {
     staggerMs: number = motionTokens.itemStaggerMs
   ) => startDelayMs + index * staggerMs;
 
-  const getAnimatedZoomItemSx = (delayMs: number): SxProps<Theme> => ({
-    transitionDelay: `${delayMs}ms`,
-  });
-
-  const getAnimatedSlideItemSx = (delayMs: number): SxProps<Theme> => ({
-    transitionDelay: `${delayMs}ms`,
-  });
-
   const interactiveAccentTextSx = {
     color: accentColor,
   } satisfies SxProps<Theme>;
@@ -604,7 +596,6 @@ export const createComponentStyleMap = (theme: Theme) => {
     supportAccentInteractiveSurfaceSx,
     getSectionDelayMs,
     getItemDelayMs,
-    getAnimatedZoomItemSx,
     getGitHubChipSx,
     getWrapListSx,
     profileHeaderRowSx: {
@@ -774,7 +765,6 @@ export const createComponentStyleMap = (theme: Theme) => {
     githubCalendarColorScheme: theme.palette.mode,
     githubCalendarTheme,
     githubCalendarSizeSx: { width: '100%', minHeight: 140 } satisfies SxProps<Theme>,
-    getAnimatedSlideItemSx,
     getTabPanelSx,
     getTabListSx,
     getTabSx,

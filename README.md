@@ -74,7 +74,7 @@ Animation behavior is intentionally centralized for the CV route instead of bein
     - `sectionStaggerMs = 120`
     - `githubSubsectionStaggerMs = 120`
     - `accordionChipStaggerMs = 120`
-  - exposes helpers such as `getSectionDelayMs(...)`, `getItemDelayMs(...)`, and `getAnimatedZoomItemSx(...)` so feature components avoid hardcoding delay math
+  - exposes helpers such as `getSectionDelayMs(...)` and `getItemDelayMs(...)` so feature components avoid hardcoding delay math
 
 Current `/cv` sequencing rules:
 

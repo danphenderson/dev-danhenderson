@@ -1,10 +1,7 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { AnimatedZoomList } from './AnimatedZoomList';
-
-const mockGetAnimatedZoomItemSx = jest.fn((delayMs: number) => ({
-  transitionDelay: `${delayMs}ms`,
-}));
 
 jest.mock('@mui/material', () => {
   const actual = jest.requireActual('@mui/material');
@@ -15,12 +12,19 @@ jest.mock('@mui/material', () => {
       children,
       in: inProp,
       appear,
+      style,
     }: {
       children: ReactNode;
       in: boolean;
       appear?: boolean;
+      style?: React.CSSProperties;
     }) => (
-      <div data-testid="zoom-item" data-in={String(inProp)} data-appear={String(appear ?? true)}>
+      <div
+        data-testid="zoom-item"
+        data-in={String(inProp)}
+        data-appear={String(appear ?? true)}
+        data-transition-delay={style?.transitionDelay ?? ''}
+      >
         {children}
       </div>
     ),
@@ -33,7 +37,6 @@ jest.mock('../styles/componentStyles', () => ({
       accordionChipStaggerMs: 20,
     },
     getSectionDelayMs: (index: number, startDelayMs = 0, staggerMs = 80) => startDelayMs + index * staggerMs,
-    getAnimatedZoomItemSx: mockGetAnimatedZoomItemSx,
   }),
 }));
 
@@ -55,7 +58,6 @@ const setReducedMotionPreference = (matches: boolean) => {
 describe('AnimatedZoomList', () => {
   afterEach(() => {
     window.matchMedia = defaultMatchMedia;
-    mockGetAnimatedZoomItemSx.mockClear();
   });
 
   it('uses the shared stagger token for animated zoom items', () => {
@@ -73,8 +75,8 @@ describe('AnimatedZoomList', () => {
 
     expect(screen.getAllByTestId('zoom-item')).toHaveLength(2);
     expect(screen.getAllByTestId('zoom-item')[0]).toHaveAttribute('data-appear', 'false');
-    expect(mockGetAnimatedZoomItemSx).toHaveBeenNthCalledWith(1, 40);
-    expect(mockGetAnimatedZoomItemSx).toHaveBeenNthCalledWith(2, 60);
+    expect(screen.getAllByTestId('zoom-item')[0]).toHaveAttribute('data-transition-delay', '40ms');
+    expect(screen.getAllByTestId('zoom-item')[1]).toHaveAttribute('data-transition-delay', '60ms');
   });
 
   it('renders static items without zoom wrappers for reduced motion', () => {
@@ -90,7 +92,6 @@ describe('AnimatedZoomList', () => {
     );
 
     expect(screen.queryByTestId('zoom-item')).not.toBeInTheDocument();
-    expect(mockGetAnimatedZoomItemSx).not.toHaveBeenCalled();
     expect(screen.getByText('React')).toBeInTheDocument();
     expect(screen.getByText('TypeScript')).toBeInTheDocument();
   });
