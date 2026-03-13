@@ -1,11 +1,46 @@
 import { act, render, screen } from '@testing-library/react';
+import useScrollTrigger from '@mui/material/useScrollTrigger';
 import ThemeProvider from '../../ThemeProvider';
-import { cvSectionMetadata, cvSectionViewportMetrics } from './cvSectionMetadata';
+import { cvSectionMetadata, cvSectionViewportMetrics, cvSectionNavigationOrder } from './cvSectionMetadata';
 import { CVSectionNavigator } from './CVSectionNavigator';
+
+jest.mock('@mui/material/useScrollTrigger', () => jest.fn());
+
+jest.mock('../AppSpeedDial', () => ({
+  AppSpeedDial: ({
+    ariaLabel,
+    actions,
+  }: {
+    ariaLabel: string;
+    actions: Array<{
+      id: string;
+      label: string;
+      onClick?: () => void;
+    }>;
+  }) => (
+    <section data-testid={`speed-dial-${ariaLabel.toLowerCase().replace(/\s+/g, '-')}`}>
+      {actions.map((action) => (
+        <button
+          key={action.id}
+          type="button"
+          data-testid={`dial-action-${action.id}`}
+          aria-label={action.label}
+          onClick={() => action.onClick?.()}
+        >
+          {action.label}
+        </button>
+      ))}
+    </section>
+  ),
+}));
+
+const mockUseScrollTrigger = useScrollTrigger as jest.MockedFunction<typeof useScrollTrigger>;
 
 describe('CVSectionNavigator', () => {
   const appendedSections: HTMLElement[] = [];
   const sectionRects = new Map<string, { top: number; height: number }>();
+  const scrollIntoViewMock = jest.fn();
+  let getElementByIdSpy: jest.SpyInstance;
 
   const appendSection = (
     sectionId: string,
@@ -28,19 +63,38 @@ describe('CVSectionNavigator', () => {
         toJSON: () => undefined,
       }),
     });
+    Object.defineProperty(section, 'scrollIntoView', {
+      configurable: true,
+      value: scrollIntoViewMock,
+    });
     document.body.appendChild(section);
     appendedSections.push(section);
     return section;
   };
+
+  beforeAll(() => {
+    Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+      configurable: true,
+      value: scrollIntoViewMock,
+    });
+  });
+
+  beforeEach(() => {
+    mockUseScrollTrigger.mockReturnValue(true);
+    scrollIntoViewMock.mockClear();
+    getElementByIdSpy = jest.spyOn(document, 'getElementById');
+  });
 
   afterEach(() => {
     sectionRects.clear();
     while (appendedSections.length > 0) {
       appendedSections.pop()?.remove();
     }
+    jest.clearAllMocks();
+    getElementByIdSpy.mockRestore();
   });
 
-  it('keeps the sections label and pills in a shared wrapping row', () => {
+  it('renders the floating dial with back-to-top and section actions when scrolled past threshold', () => {
     render(
       <ThemeProvider>
         <CVSectionNavigator sections={['experience', 'education', 'github']} testId="cv-section-navigator" />
@@ -48,21 +102,89 @@ describe('CVSectionNavigator', () => {
     );
 
     const navigator = screen.getByTestId('cv-section-navigator');
-    const chipRail = navigator.querySelector('.MuiStack-root');
-    const label = screen.getByText('Sections');
+    const dial = screen.getByTestId('speed-dial-cv-section-navigation');
 
-    expect(chipRail).not.toBeNull();
-    expect(window.getComputedStyle(navigator).flexDirection).toBe('row');
-    expect(window.getComputedStyle(navigator).flexWrap).toBe('wrap');
-    expect(window.getComputedStyle(navigator).alignItems).toBe('center');
-    expect(window.getComputedStyle(label).display).toBe('inline-flex');
-    expect(window.getComputedStyle(label).alignItems).toBe('center');
-    expect(window.getComputedStyle(label).minHeight).toBe('30px');
-    expect(window.getComputedStyle(chipRail as HTMLElement).flexWrap).toBe('wrap');
-    expect(window.getComputedStyle(chipRail as HTMLElement).flexGrow).toBe('1');
+    expect(navigator).toBeInTheDocument();
+    expect(dial).toBeInTheDocument();
+    expect(screen.getByTestId('dial-action-back-to-top')).toBeInTheDocument();
+    expect(screen.getByTestId('dial-action-section-experience')).toBeInTheDocument();
+    expect(screen.getByTestId('dial-action-section-education')).toBeInTheDocument();
+    expect(screen.getByTestId('dial-action-section-github')).toBeInTheDocument();
   });
 
-  it('highlights the section whose card is closest to the header guide while scrolling', () => {
+  it('is not visible when scroll threshold is not met', () => {
+    mockUseScrollTrigger.mockReturnValue(false);
+
+    render(
+      <ThemeProvider>
+        <CVSectionNavigator sections={['experience', 'education']} testId="cv-section-navigator" />
+      </ThemeProvider>
+    );
+
+    expect(screen.queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
+  });
+
+  it('includes a back-to-top action as the first action and section jump actions in order', () => {
+    render(
+      <ThemeProvider>
+        <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator" />
+      </ThemeProvider>
+    );
+
+    const actions = screen.getAllByRole('button');
+    const actionLabels = actions.map((action) => action.getAttribute('aria-label'));
+
+    expect(actionLabels[0]).toBe('Back to top');
+    expect(actionLabels.slice(1)).toEqual(
+      cvSectionNavigationOrder.map((key) => cvSectionMetadata[key].navLabel)
+    );
+  });
+
+  it('jumps to the correct section when a section action is clicked', () => {
+    appendSection(cvSectionMetadata.experience.id, { top: 200, height: 400 });
+    appendSection(cvSectionMetadata.education.id, { top: 700, height: 300 });
+
+    render(
+      <ThemeProvider>
+        <CVSectionNavigator sections={['experience', 'education']} testId="cv-section-navigator" />
+      </ThemeProvider>
+    );
+
+    const educationAction = screen.getByTestId('dial-action-section-education');
+
+    act(() => {
+      educationAction.click();
+    });
+
+    expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'smooth', block: 'start' });
+    expect(getElementByIdSpy).toHaveBeenCalledWith(cvSectionMetadata.education.id);
+  });
+
+  it('scrolls to top when back-to-top action is clicked', () => {
+    const scrollToMock = jest.fn();
+    Object.defineProperty(window, 'scrollTo', {
+      configurable: true,
+      value: scrollToMock,
+    });
+
+    render(
+      <ThemeProvider>
+        <CVSectionNavigator sections={['experience']} testId="cv-section-navigator" />
+      </ThemeProvider>
+    );
+
+    const backToTopAction = screen.getByTestId('dial-action-back-to-top');
+
+    act(() => {
+      backToTopAction.click();
+    });
+
+    expect(scrollToMock).toHaveBeenCalledWith(
+      expect.objectContaining({ top: 0 })
+    );
+  });
+
+  it('updates active section based on scroll position', () => {
     Object.defineProperty(window, 'innerHeight', {
       configurable: true,
       value: 900,
@@ -71,32 +193,22 @@ describe('CVSectionNavigator', () => {
 
     appendSection(cvSectionMetadata.experience.id, { top: activeLinePx - 16, height: 420 });
     appendSection(cvSectionMetadata.education.id, { top: activeLinePx + 360, height: 320 });
-    appendSection(cvSectionMetadata.github.id, { top: activeLinePx + 244, height: 260 });
 
     render(
       <ThemeProvider>
-        <CVSectionNavigator sections={['experience', 'education', 'github']} testId="cv-section-navigator" />
+        <CVSectionNavigator sections={['experience', 'education']} testId="cv-section-navigator" />
       </ThemeProvider>
     );
 
-    const experienceButton = screen.getByRole('button', { name: 'Experience' });
-    const educationButton = screen.getByRole('button', { name: 'Education' });
-    const githubButton = screen.getByRole('button', { name: 'GitHub' });
-
-    expect(experienceButton).toHaveAttribute('aria-pressed', 'true');
-    expect(educationButton).toHaveAttribute('aria-pressed', 'false');
-    expect(githubButton).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByTestId('cv-section-navigator')).toBeInTheDocument();
 
     sectionRects.set(cvSectionMetadata.experience.id, { top: -340, height: 420 });
     sectionRects.set(cvSectionMetadata.education.id, { top: activeLinePx - 8, height: 320 });
-    sectionRects.set(cvSectionMetadata.github.id, { top: activeLinePx + 220, height: 260 });
 
     act(() => {
       window.dispatchEvent(new Event('scroll'));
     });
 
-    expect(experienceButton).toHaveAttribute('aria-pressed', 'false');
-    expect(educationButton).toHaveAttribute('aria-pressed', 'true');
-    expect(githubButton).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByTestId('cv-section-navigator')).toBeInTheDocument();
   });
 });

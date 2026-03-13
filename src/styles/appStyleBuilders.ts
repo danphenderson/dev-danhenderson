@@ -361,6 +361,45 @@ export const createAppStyleMap = (theme: Theme) => {
         outlineOffset: 3,
       },
     } satisfies SxProps<Theme>,
+    cvFloatingDialSx: {
+      position: 'fixed',
+      right: {
+        xs: 'calc(env(safe-area-inset-right, 0px) + 16px)',
+        md: 'calc(env(safe-area-inset-right, 0px) + 24px)',
+      },
+      bottom: {
+        xs: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+        md: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
+      },
+      '& .MuiSpeedDial-fab': {
+        color: theme.palette.text.primary,
+        backgroundColor: floatingActionBackgroundColor,
+        border: floatingActionBorder,
+        boxShadow: floatingActionShadow,
+        backdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+        WebkitBackdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+        '&:hover': {
+          backgroundColor: floatingActionHoverBackgroundColor,
+        },
+      },
+      '& .MuiSpeedDialAction-fab': {
+        color: theme.palette.text.primary,
+        backgroundColor: floatingActionBackgroundColor,
+        border: floatingActionBorder,
+        boxShadow: floatingActionShadow,
+        backdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+        WebkitBackdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+        '&:hover': {
+          backgroundColor: floatingActionHoverBackgroundColor,
+        },
+      },
+    } satisfies SxProps<Theme>,
+    cvFloatingDialActiveFabSx: {
+      '& .MuiSpeedDial-fab': {
+        borderColor: alpha(theme.palette.primary.light, isLight ? 0.42 : 0.56),
+        boxShadow: `${floatingActionShadow}, 0 0 16px ${alpha(theme.palette.primary.main, isLight ? 0.18 : 0.28)}`,
+      },
+    } satisfies SxProps<Theme>,
     primaryTextSx,
     secondaryTextSx,
     footerTextSx: {

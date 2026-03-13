@@ -8,7 +8,6 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { AppSpeedDial, AppSpeedDialAction } from '../components/AppSpeedDial';
-import { BackToTopButton } from '../components/BackToTopButton';
 import { CVAboutSection } from '../components/cv/CVAboutSection';
 import { CVCertificatesSection } from '../components/cv/CVCertificatesSection';
 import { CVCodingSection } from '../components/cv/CVCodingSection';
@@ -126,7 +125,6 @@ const CVRouteContent = () => {
     </Box>
   );
 
-  const sectionNavigator = <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator" />;
   const sectionDefinitions: CVSectionDefinition[] = [
     {
       key: 'about',
@@ -278,10 +276,9 @@ const CVRouteContent = () => {
         <>
           <CVSectionStack spacing={2.5}>
             {mobileAboutSection && renderSectionDescriptor(mobileAboutSection)}
-            {mobileAboutSection && sectionNavigator}
             {mobileBodySections.map(renderSectionDescriptor)}
           </CVSectionStack>
-          <BackToTopButton />
+          <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator" />
         </>
       </PageFrame>
     );
@@ -301,7 +298,6 @@ const CVRouteContent = () => {
             <Grid item xs={12} md={5} lg={4} sx={appStyles.cvDesktopAsideGridItemSx}>
               <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-sidebar-region">
                 <CVSectionStack spacing={2.5}>
-                  {sectionNavigator}
                   {getSectionNodesForRegion('sidebar')}
                 </CVSectionStack>
               </Box>
@@ -316,7 +312,7 @@ const CVRouteContent = () => {
             </Grid>
           </Grid>
         </CVSectionStack>
-        <BackToTopButton />
+        <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator" />
       </>
     </PageFrame>
   );
