@@ -3,6 +3,52 @@ import type { ReactNode } from 'react';
 import ThemeProvider from '../../ThemeProvider';
 import { GitHubLinkChipList } from './GitHubLinkChipList';
 
+jest.mock('@mui/material', () => {
+  const React = require('react');
+  const actual = jest.requireActual('@mui/material');
+
+  const getSxValue = (
+    sx: Record<string, unknown> | Array<Record<string, unknown>> | undefined,
+    key: string
+  ) => {
+    if (Array.isArray(sx)) {
+      return sx.find((entry) => entry && key in entry)?.[key];
+    }
+
+    return sx?.[key];
+  };
+
+  return {
+    ...actual,
+    Chip: ({
+      component,
+      href,
+      target,
+      rel,
+      label,
+      sx,
+    }: {
+      component?: string;
+      href?: string;
+      target?: string;
+      rel?: string;
+      label: ReactNode;
+      sx?: Record<string, unknown> | Array<Record<string, unknown>>;
+    }) => React.createElement(
+      component === 'a' ? 'a' : 'div',
+      {
+        href,
+        target,
+        rel,
+        'data-animation': String(getSxValue(sx, 'animation') ?? ''),
+        'data-animation-delay': String(getSxValue(sx, 'animationDelay') ?? ''),
+        'data-background-size': String(getSxValue(sx, 'backgroundSize') ?? ''),
+      },
+      label
+    ),
+  };
+});
+
 const getSxValue = (
   sx: Record<string, unknown> | Array<Record<string, unknown>> | undefined,
   key: string
@@ -73,6 +119,13 @@ describe('GitHubLinkChipList', () => {
       'href',
       'https://github.com/example/repo-two'
     );
+    expect(screen.getByRole('link', { name: 'repo-one' })).toHaveAttribute(
+      'data-animation',
+      expect.stringContaining('8600ms linear infinite')
+    );
+    expect(screen.getByRole('link', { name: 'repo-one' })).toHaveAttribute('data-animation-delay', '0s');
+    expect(screen.getByRole('link', { name: 'repo-two' })).toHaveAttribute('data-animation-delay', '0.75s');
+    expect(screen.getByRole('link', { name: 'repo-one' })).toHaveAttribute('data-background-size', '240% 100%');
   });
 
   it('animates stacked chips in a compact vertical container', () => {

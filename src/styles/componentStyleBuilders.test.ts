@@ -4,7 +4,7 @@ import { createAppTheme } from '../theme/createAppTheme';
 import { createComponentStyleMap } from './componentStyleBuilders';
 
 describe('createComponentStyleMap', () => {
-  it('uses the secondary accent for CV support roles while keeping evergreen motion calm', () => {
+  it('uses the secondary accent for CV support roles while applying ember-consistent evergreen motion', () => {
     const theme = createAppTheme('light', 'evergreen');
     const styleMap = createComponentStyleMap(theme);
     const surface = theme.appearanceTreatment.surface;
@@ -39,22 +39,28 @@ describe('createComponentStyleMap', () => {
       expect.stringContaining(alpha(theme.palette.secondary.main, Math.min(surface.secondaryTintAlpha + 0.02, 0.18)))
     );
     expect(tabSx.color).toBe(theme.palette.primary.main);
-    expect(tabSx['&::after']).toBeUndefined();
-    expect(tabSx['&:hover::after']).toBeUndefined();
-    expect(gitHubChipSx['&::after']).toBeUndefined();
-    expect(gitHubChipSx['&:hover::after']).toBeUndefined();
-    expect((styleMap.chipWaveSx as Record<string, unknown>).animation).toBeUndefined();
-    expect(styleMap.getChipWaveDelaySx(2)).toEqual({});
-    expect((styleMap.statusBreatheSx as Record<string, unknown>).animation).toBeUndefined();
-    expect((styleMap.sectionHeadingTitleTextSx as Record<string, unknown>).animation).toBeUndefined();
+    expect((tabSx['&::after'] as Record<string, unknown>).background).toEqual(expect.stringContaining('linear-gradient'));
+    expect((tabSx['&:hover::after'] as Record<string, unknown>).animation).toEqual(expect.stringContaining('500ms linear'));
+    expect((gitHubChipSx['&::after'] as Record<string, unknown>).background).toEqual(expect.stringContaining('linear-gradient'));
+    expect((gitHubChipSx['&:hover::after'] as Record<string, unknown>).animation).toEqual(expect.stringContaining('500ms linear'));
+    expect((styleMap.chipWaveSx as Record<string, unknown>).animation).toEqual(expect.stringContaining('8600ms linear infinite'));
+    expect((styleMap.getChipWaveDelaySx(2) as Record<string, unknown>).animationDelay).toBe('1.5s');
+    expect((styleMap.statusBreatheSx as Record<string, unknown>).animation).toEqual(
+      expect.stringContaining('3600ms ease-in-out infinite')
+    );
+    expect((styleMap.sectionHeadingTitleTextSx as Record<string, unknown>).animation).toEqual(
+      expect.stringContaining('3800ms ease-in-out infinite')
+    );
     expect(contentCardSx.backdropFilter).toBe('blur(6px)');
-    expect(contentCardSx['&::after']).toBeUndefined();
+    expect((contentCardSx['&::after'] as Record<string, unknown>).animation).toEqual(
+      expect.stringContaining('8200ms ease-in-out infinite')
+    );
     expect(sectionGlowSx.opacity).toBe(0.16);
-    expect(sectionGlowSx.animation).toBeUndefined();
+    expect(sectionGlowSx.animation).toEqual(expect.stringContaining('5600ms ease-in-out infinite'));
     expect(sectionCardSx['&::after']).toBeUndefined();
   });
 
-  it('keeps atlas restrained hover and section treatments without chip or text motion', () => {
+  it('keeps atlas surface treatment while applying ember-consistent ambient motion', () => {
     const theme = createAppTheme('light', 'atlas');
     const styleMap = createComponentStyleMap(theme);
     const tabSx = styleMap.getTabSx(false) as Record<string, unknown>;
@@ -68,21 +74,25 @@ describe('createComponentStyleMap', () => {
     const sectionSweepSx = sectionCardSx['&::after'] as Record<string, unknown>;
 
     expect((tabSx['&::after'] as Record<string, unknown>).background).toEqual(expect.stringContaining('linear-gradient'));
-    expect(tabHoverAfterSx.animation).toEqual(expect.stringContaining('450ms linear'));
+    expect(tabHoverAfterSx.animation).toEqual(expect.stringContaining('500ms linear'));
     expect((gitHubChipSx['&::after'] as Record<string, unknown>).background).toEqual(expect.stringContaining('linear-gradient'));
-    expect(gitHubChipHoverAfterSx.animation).toEqual(expect.stringContaining('450ms linear'));
+    expect(gitHubChipHoverAfterSx.animation).toEqual(expect.stringContaining('500ms linear'));
     expect((styleMap.supportAccentTitleSx as Record<string, unknown>).color).toBe(theme.palette.secondary.main);
     expect(tabSx.color).toBe(theme.palette.primary.main);
-    expect((styleMap.chipWaveSx as Record<string, unknown>).animation).toBeUndefined();
-    expect(styleMap.getChipWaveDelaySx(2)).toEqual({});
-    expect((styleMap.statusBreatheSx as Record<string, unknown>).animation).toBeUndefined();
-    expect((styleMap.sectionHeadingTitleTextSx as Record<string, unknown>).animation).toBeUndefined();
+    expect((styleMap.chipWaveSx as Record<string, unknown>).animation).toEqual(expect.stringContaining('8600ms linear infinite'));
+    expect((styleMap.getChipWaveDelaySx(2) as Record<string, unknown>).animationDelay).toBe('1.5s');
+    expect((styleMap.statusBreatheSx as Record<string, unknown>).animation).toEqual(
+      expect.stringContaining('3600ms ease-in-out infinite')
+    );
+    expect((styleMap.sectionHeadingTitleTextSx as Record<string, unknown>).animation).toEqual(
+      expect.stringContaining('3800ms ease-in-out infinite')
+    );
     expect(contentCardSx.backdropFilter).toBe('blur(8px)');
-    expect(contentCardGlowSx.animation).toEqual(expect.stringContaining('9200ms ease-in-out infinite'));
+    expect(contentCardGlowSx.animation).toEqual(expect.stringContaining('8200ms ease-in-out infinite'));
     expect(sectionGlowSx.opacity).toBe(0.3);
-    expect(sectionGlowSx.animation).toEqual(expect.stringContaining('6200ms ease-in-out infinite'));
+    expect(sectionGlowSx.animation).toEqual(expect.stringContaining('5600ms ease-in-out infinite'));
     expect(sectionSweepSx.opacity).toBe(0.46);
-    expect(sectionSweepSx.animation).toEqual(expect.stringContaining('7200ms linear infinite'));
+    expect(sectionSweepSx.animation).toEqual(expect.stringContaining('6800ms linear infinite'));
   });
 
   it('keeps ember as the most expressive preset across chips, headings, and cards', () => {
@@ -133,7 +143,7 @@ describe('createComponentStyleMap', () => {
 
     expect(theme.appearanceTreatment.key).toBe(defaultAppAppearanceKey);
     expect(styleMap.supportOverlineSx).toMatchObject({ color: theme.palette.secondary.main });
-    expect(tabSx['&::after']).toBeUndefined();
+    expect((tabSx['&::after'] as Record<string, unknown>).background).toEqual(expect.stringContaining('linear-gradient'));
     expect(contentCardSx.background).toEqual(
       expect.stringContaining(alpha(theme.palette.secondary.main, Math.min(theme.appearanceTreatment.surface.secondaryTintAlpha + 0.02, 0.22)))
     );
