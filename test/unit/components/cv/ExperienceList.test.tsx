@@ -147,16 +147,16 @@ describe('ExperienceList', () => {
     );
 
     expect(screen.getByRole('tab', { name: 'Skills' })).toBeInTheDocument();
-    expect(screen.queryByText('Teaching')).not.toBeInTheDocument();
-    expect(screen.queryByText('Mathematica')).not.toBeInTheDocument();
+    expect(screen.getByText('Teaching').closest('.MuiChip-root')).not.toBeNull();
+    expect(screen.getByText('Mathematica').closest('.MuiChip-root')).not.toBeNull();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
 
-    expect(screen.getByText('Teaching')).toBeVisible();
-    expect(screen.getByText('Mathematica')).toBeVisible();
+    expect(screen.getAllByText('Teaching')).toHaveLength(2);
+    expect(screen.getAllByText('Mathematica')).toHaveLength(2);
   });
 
-  it('places the date range in the title row and the industry chip in the organization row', () => {
+  it('places the date range in the title row and surfaces industry plus leading skills as header chips', () => {
     const hemodynamicsExperience = experiences.find(
       (experience) => experience.title === 'Graduate Research Assistant'
     );
@@ -184,10 +184,17 @@ describe('ExperienceList', () => {
 
     expect(orgRow).not.toBeNull();
     expect(orgRow).toHaveTextContent('Higher Education');
+    expect(orgRow).toHaveTextContent('Research');
+    expect(orgRow).toHaveTextContent('Computational Fluid Dynamics');
 
     const industryChip = screen.getByText('Higher Education').closest('.MuiChip-root');
+    const researchChip = screen.getByText('Research').closest('.MuiChip-root');
+    const cfdChip = screen.getByText('Computational Fluid Dynamics').closest('.MuiChip-root');
 
     expect(industryChip).not.toBeNull();
+    expect(researchChip).not.toBeNull();
+    expect(cfdChip).not.toBeNull();
+    expect(screen.queryByText('Julia')).not.toBeInTheDocument();
   });
 
   it('forwards organization links and tooltip copy for Michigan Tech and Lucerna entries', () => {

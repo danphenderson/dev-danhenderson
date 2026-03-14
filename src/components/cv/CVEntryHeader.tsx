@@ -1,4 +1,3 @@
-import { Fragment } from 'react';
 import { Box, Chip, Stack } from '@mui/material';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
@@ -34,11 +33,12 @@ export const CVEntryHeader = ({
     cvEntryOrganizationRowSx,
     cvEntryChipGroupSx,
     cvEntryChipSx,
-    cvEntrySupportingMetaSx,
     minWidthResetSx,
     supportAccentStrongTextSx,
   } = useComponentStyles();
-  const renderedChips = chips?.length ? chips : chip ? [chip] : [];
+  const renderedChips = [...(chips?.length ? chips : chip ? [chip] : []), ...(
+    (supportingMeta ?? []).map((label) => ({ label }))
+  )].filter(({ label }) => label.trim().length > 0);
 
   return (
     <Stack spacing={0.75} width="100%">
@@ -84,16 +84,6 @@ export const CVEntryHeader = ({
         )}
       </Box>
 
-      {supportingMeta && supportingMeta.length > 0 && (
-        <Stack direction="row" spacing={1} flexWrap="wrap" sx={cvEntrySupportingMetaSx}>
-          {supportingMeta.map((meta, index) => (
-            <Fragment key={`${meta}-${index}`}>
-              {index > 0 && <MetaText>•</MetaText>}
-              <MetaText>{meta}</MetaText>
-            </Fragment>
-          ))}
-        </Stack>
-      )}
     </Stack>
   );
 };

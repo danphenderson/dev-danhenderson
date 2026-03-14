@@ -99,7 +99,7 @@ describe('VolunteeringList', () => {
     expect(titleRow).toHaveTextContent('May 2019 – Present');
 
     expect(screen.getByText('Access Fund')).toBeInTheDocument();
-    expect(screen.getByText('Index, WA')).toBeInTheDocument();
+    expect(screen.getByText('Index, WA').closest('.MuiChip-root')).not.toBeNull();
     expect(
       screen.getByText(
         'Stewardship volunteer work supporting access, trail durability, and maintenance at major climbing areas.'

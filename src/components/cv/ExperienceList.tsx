@@ -21,6 +21,15 @@ type ExperienceListProps = {
   startDelayMs?: number;
 };
 
+const EXPERIENCE_HEADER_CHIP_LIMIT = 3;
+
+const getExperienceHeaderChips = (experience: Experience) =>
+  [experience.industry, ...(experience.skills ?? [])]
+    .map((label) => label?.trim() ?? '')
+    .filter((label, index, labels) => label.length > 0 && labels.indexOf(label) === index)
+    .slice(0, EXPERIENCE_HEADER_CHIP_LIMIT)
+    .map((label) => ({ label }));
+
 const renderInlineSegments = (segments: ExperienceProjectSegment[]) =>
   segments.map((segment, segmentIndex) => {
     const content = segment.link ? (
@@ -161,7 +170,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
               organizationUrl={experience.companyUrl}
               organizationTooltip={experience.companyTooltip}
               dateRange={`${experience.startDate} – ${experience.endDate}`}
-              chip={experience.industry ? { label: experience.industry } : undefined}
+              chips={getExperienceHeaderChips(experience)}
             />
             {experience.description && (
               <BodyText sx={experienceDescriptionSx}>

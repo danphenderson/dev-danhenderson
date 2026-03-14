@@ -123,7 +123,7 @@ describe('EducationSection', () => {
     expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
   });
 
-  it('renders the program as title and university as secondary label with explicit metadata', () => {
+  it('renders the program as title and university as secondary label with explicit metadata chips', () => {
     render(
       <ThemeProvider>
         <EducationSection education={{ entries: [educationInfo.entries[0]] }} />
@@ -141,13 +141,13 @@ describe('EducationSection', () => {
     expect(titleRow).toHaveTextContent('Fall 2024 – Present');
 
     expect(screen.getByText('Michigan Technological University')).toBeInTheDocument();
-    expect(screen.getByText('Expected Summer 2026')).toBeInTheDocument();
+    expect(screen.getByText('Expected Summer 2026').closest('.MuiChip-root')).not.toBeNull();
     const gpaChip = screen.getByText('Cumulative: 3.44').closest('.MuiChip-root');
 
     expect(gpaChip).not.toBeNull();
   });
 
-  it('renders separate GPA chips while keeping minor as supporting metadata for the BS entry', () => {
+  it('renders GPA and minor metadata as chips for the BS entry', () => {
     render(
       <ThemeProvider>
         <EducationSection education={{ entries: [educationInfo.entries[1]] }} />
@@ -164,7 +164,7 @@ describe('EducationSection', () => {
     expect(organizationRow).toHaveTextContent('Departmental: 3.71');
     expect(screen.getByText('Cumulative: 3.56').closest('.MuiChip-root')).not.toBeNull();
     expect(screen.getByText('Departmental: 3.71').closest('.MuiChip-root')).not.toBeNull();
-    expect(screen.getByText('Minor in Computer Science')).toBeInTheDocument();
+    expect(screen.getByText('Minor in Computer Science').closest('.MuiChip-root')).not.toBeNull();
     expect(screen.queryByText('Cumulative: 3.56 | Departmental: 3.71')).not.toBeInTheDocument();
   });
 });

@@ -33,7 +33,7 @@ describe('CVEntryHeader', () => {
     expect(organizationLink).toHaveAttribute('data-tooltip-place', 'top');
   });
 
-  it('renders multiple chips in the organization row while leaving supporting metadata separate', () => {
+  it('renders primary chips and supporting metadata together as chips in the organization row', () => {
     render(
       <ThemeProvider>
         <CVEntryHeader
@@ -47,15 +47,13 @@ describe('CVEntryHeader', () => {
     );
 
     const organizationRow = screen.getByText('Michigan Technological University').parentElement;
-    const supportingMetaRow = screen.getByText('Minor in Computer Science').parentElement;
 
     expect(organizationRow).not.toBeNull();
     expect(organizationRow).toHaveTextContent('Cumulative: 3.56');
     expect(organizationRow).toHaveTextContent('Departmental: 3.71');
+    expect(organizationRow).toHaveTextContent('Minor in Computer Science');
     expect(screen.getByText('Cumulative: 3.56').closest('.MuiChip-root')).not.toBeNull();
     expect(screen.getByText('Departmental: 3.71').closest('.MuiChip-root')).not.toBeNull();
-    expect(supportingMetaRow).not.toBeNull();
-    expect(supportingMetaRow).toHaveTextContent('Minor in Computer Science');
-    expect(supportingMetaRow).not.toHaveTextContent('Cumulative: 3.56');
+    expect(screen.getByText('Minor in Computer Science').closest('.MuiChip-root')).not.toBeNull();
   });
 });
