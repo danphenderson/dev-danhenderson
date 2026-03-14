@@ -42,7 +42,12 @@ const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
   const trigger = useScrollTrigger(HEADER_HIDE_SCROLL_TRIGGER_OPTIONS);
 
   return (
-    <Slide appear={false} direction="down" in={!trigger} easing={{ enter: SPRING_EASING_CSS, exit: undefined }}>
+    <Slide
+      appear={false}
+      direction="down"
+      in={!trigger}
+      easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
+    >
       {children}
     </Slide>
   );
@@ -63,11 +68,9 @@ export default function Header() {
   const mobileMenuOpen = Boolean(mobileMenuAnchor);
   const pauseButtonRef = React.useRef<HTMLButtonElement | null>(null);
   const appearanceDialRef = React.useRef<HTMLElement | null>(null);
-  const themeHintTitle = mode === 'dark' ? 'Try light mode' : 'Try dark mode';
+  const themeHintTitle = 'Try an alternative theme';
   const themeHintBody =
-    mode === 'dark'
-      ? 'Open this palette menu to switch back to light mode.'
-      : 'Open this palette menu to switch to dark mode.';
+    'Open this palette menu to switch theme and toggle between light and dark mode.';
   const pauseHighlightSx = showPauseHint
     ? appStyles.getHeaderHighlightSx('secondary', `${pulseRing} 1.6s ease-out infinite`)
     : {};
