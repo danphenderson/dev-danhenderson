@@ -1,8 +1,24 @@
 import { Chip } from '@mui/material';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { useComponentStyles } from '../../../src/styles/componentStyles';
 import { TabPanel } from '../../../src/components/TabPanel';
+
+jest.mock('@mui/material', () => {
+  const actual = jest.requireActual('@mui/material');
+
+  return {
+    ...actual,
+    Collapse: ({
+      children,
+      in: _in,
+      appear: _appear,
+      timeout: _timeout,
+      onEntered: _onEntered,
+      ...props
+    }: any) => <div {...props}>{children}</div>,
+  };
+});
 
 const IndustryChip = () => {
   const { cvEntryChipSx } = useComponentStyles();
@@ -11,6 +27,10 @@ const IndustryChip = () => {
 };
 
 describe('TabPanel', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('starts with no selected tab and preserves full labels for accessibility when short labels are displayed', () => {
     render(
       <ThemeProvider>
@@ -108,11 +128,11 @@ describe('TabPanel', () => {
     const renderContext = renderContent.mock.calls[0][1];
 
     expect(renderContent).toHaveBeenCalledWith(
-      true,
+      false,
       expect.objectContaining({ panelId: 'context-test-panel-details' })
     );
     expect(renderContext.getDrawerContainer()).toHaveAttribute('id', 'context-test-panel-details');
-    expect(screen.getByText('Details body')).toHaveAttribute('data-selected', 'true');
+    expect(screen.getByText('Details body')).toHaveAttribute('data-selected', 'false');
     expect(screen.getByText('Details body')).toHaveAttribute(
       'data-panel-id',
       'context-test-panel-details'
@@ -358,10 +378,10 @@ describe('TabPanel', () => {
     expect(renderDetails).toHaveBeenCalled();
     expect(renderSkills).toHaveBeenCalled();
 
-    expect(renderDetails).toHaveBeenCalledWith(true, expect.anything());
+    expect(renderDetails).toHaveBeenCalledWith(false, expect.anything());
     expect(renderSkills).toHaveBeenCalledWith(false, expect.anything());
 
-    expect(screen.getByTestId('details-body')).toHaveAttribute('data-selected', 'true');
+    expect(screen.getByTestId('details-body')).toHaveAttribute('data-selected', 'false');
     expect(screen.getByTestId('skills-body')).toHaveAttribute('data-selected', 'false');
 
     const inactivePanel = screen.getByTestId('skills-body').closest('[role="tabpanel"]');
@@ -467,5 +487,159 @@ describe('TabPanel', () => {
 
     expect(panel).not.toHaveAttribute('aria-labelledby');
     expect(panel).toHaveAttribute('aria-label', 'Only Panel');
+  });
+
+  it('keeps renderContent visible while closing and only clears selection after the configured delay', () => {
+    jest.useFakeTimers();
+
+    const handleChange = jest.fn();
+
+    render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel="Animated sections"
+          onChange={handleChange}
+          items={[
+            {
+              value: 'details',
+              label: 'Details',
+              closeDelayMs: 500,
+              renderContent: (selected) => (
+                <div data-testid="details-body" data-selected={String(selected)}>
+                  Details body
+                </div>
+              ),
+            },
+            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+          ]}
+          tabsVariant="fullWidth"
+        />
+      </ThemeProvider>
+    );
+
+    const detailsTab = screen.getByRole('tab', { name: 'Details' });
+
+    expect(screen.getByTestId('details-body').closest('[role="tabpanel"]')).toHaveAttribute(
+      'hidden'
+    );
+
+    fireEvent.click(detailsTab);
+
+    handleChange.mockClear();
+
+    const detailsPanel = screen.getByTestId('details-body').closest('[role="tabpanel"]');
+
+    expect(detailsPanel).not.toHaveAttribute('hidden');
+
+    fireEvent.click(detailsTab);
+
+    expect(screen.getByTestId('details-body')).toBeInTheDocument();
+    expect(detailsTab).toHaveAttribute('aria-selected', 'true');
+    expect(handleChange).not.toHaveBeenCalled();
+
+    act(() => {
+      jest.advanceTimersByTime(499);
+    });
+
+    expect(screen.getByTestId('details-body')).toBeInTheDocument();
+    expect(detailsTab).toHaveAttribute('aria-selected', 'true');
+    expect(handleChange).not.toHaveBeenCalled();
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(handleChange).toHaveBeenCalledWith(false);
+    expect(screen.getByTestId('details-body').closest('[role="tabpanel"]')).toHaveAttribute(
+      'hidden'
+    );
+  });
+
+  it('cancels a pending renderContent close when another tab is selected before the delay elapses', () => {
+    jest.useFakeTimers();
+
+    const handleChange = jest.fn();
+
+    render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel="Animated sections"
+          defaultValue="details"
+          onChange={handleChange}
+          items={[
+            {
+              value: 'details',
+              label: 'Details',
+              closeDelayMs: 500,
+              renderContent: (selected) => (
+                <div data-testid="details-body" data-selected={String(selected)}>
+                  Details body
+                </div>
+              ),
+            },
+            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+          ]}
+          tabsVariant="fullWidth"
+        />
+      </ThemeProvider>
+    );
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Details' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
+
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
+
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(handleChange).toHaveBeenCalledWith('skills');
+    expect(screen.getByRole('tab', { name: 'Skills' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByText('Skills body')).toBeVisible();
+  });
+
+  it('enforces the minimum close delay for renderContent panels when a shorter delay is provided', () => {
+    jest.useFakeTimers();
+
+    const handleChange = jest.fn();
+
+    render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel="Animated sections"
+          value="details"
+          onChange={handleChange}
+          items={[
+            {
+              value: 'details',
+              label: 'Details',
+              closeDelayMs: 50,
+              renderContent: (selected) => (
+                <div data-testid="details-body" data-selected={String(selected)}>
+                  Details body
+                </div>
+              ),
+            },
+            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+          ]}
+          tabsVariant="fullWidth"
+        />
+      </ThemeProvider>
+    );
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Details' }));
+
+    act(() => {
+      jest.advanceTimersByTime(219);
+    });
+
+    expect(handleChange).not.toHaveBeenCalled();
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+
+    expect(handleChange).toHaveBeenCalledTimes(1);
+    expect(handleChange).toHaveBeenCalledWith(false);
   });
 });
