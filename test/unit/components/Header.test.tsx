@@ -140,6 +140,15 @@ describe('Header controls', () => {
     expect(pause).toHaveBeenCalledTimes(1);
   });
 
+  it('hides the audio control when welcome audio consent was declined', () => {
+    mockUseWelcomeAudio.mockReturnValue(createAudioState({ audioConsent: 'declined' }));
+
+    renderHeader('/cv');
+
+    expect(screen.queryByRole('button', { name: 'Play welcome audio' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Pause welcome audio' })).not.toBeInTheDocument();
+  });
+
   it('toggles theme and dismisses dark mode hint when the theme dial action is clicked', () => {
     const toggleTheme = jest.fn();
     const setAppearance = jest.fn();
