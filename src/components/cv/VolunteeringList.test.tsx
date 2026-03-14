@@ -1,10 +1,11 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../ThemeProvider';
 import { COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { VolunteeringList } from './VolunteeringList';
 
 const mockAnimatedContentList = jest.fn();
+const mockAnimatedSlideList = jest.fn();
 
 jest.mock('../AnimatedContentList', () => ({
   AnimatedContentList: (props: {
@@ -29,12 +30,45 @@ jest.mock('../AnimatedContentList', () => ({
   },
 }));
 
+jest.mock('../AnimatedSlideList', () => ({
+  AnimatedSlideList: (props: {
+    items: unknown[];
+    getItemKey: (item: unknown, index: number) => string;
+    renderItem: (item: unknown, index: number) => ReactNode;
+    in: boolean;
+    containerComponent?: React.ElementType;
+    itemComponent?: React.ElementType;
+  }) => {
+    mockAnimatedSlideList(props);
+
+    const React = require('react');
+
+    const ContainerComponent = props.containerComponent ?? 'div';
+    const ItemComponent = props.itemComponent ?? 'div';
+
+    return React.createElement(
+      ContainerComponent,
+      { 'data-testid': 'animated-slide-list' },
+      props.in
+        ? props.items.map((item, index) =>
+            React.createElement(
+              ItemComponent,
+              { key: props.getItemKey(item, index) },
+              props.renderItem(item, index)
+            )
+          )
+        : null
+    );
+  },
+}));
+
 describe('VolunteeringList', () => {
   afterEach(() => {
     mockAnimatedContentList.mockClear();
+    mockAnimatedSlideList.mockClear();
   });
 
-  it('renders volunteering entries with role as title, organization as secondary label, and date in the title row', () => {
+  it('renders volunteering entries with role as title, organization as secondary label, and details in a shared tab panel', () => {
     render(
       <ThemeProvider>
         <VolunteeringList
@@ -71,11 +105,25 @@ describe('VolunteeringList', () => {
         'Stewardship volunteer work supporting access, trail durability, and maintenance at major climbing areas.'
       )
     ).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Details' })).toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        'Supported trail construction and maintenance projects with the Access Fund conservation team.'
+      )
+    ).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Details' }));
+
     expect(
       screen.getByText(
         'Supported trail construction and maintenance projects with the Access Fund conservation team.'
       )
-    ).toBeInTheDocument();
+    ).toBeVisible();
+    expect(
+      mockAnimatedSlideList.mock.calls.some(
+        ([props]) => props.containerComponent === 'ul' && props.itemComponent === 'li'
+      )
+    ).toBe(true);
     expect(screen.getByRole('link', { name: 'Access Fund' })).toHaveAttribute(
       'href',
       'https://www.accessfund.org'
