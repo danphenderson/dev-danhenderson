@@ -1,26 +1,26 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { HeaderAppearanceDial } from '../../../../src/components/header/HeaderAppearanceDial';
-
-jest.mock('@mui/material/useMediaQuery', () => jest.fn());
 
 jest.mock('../../../../src/components/AppSpeedDial', () => ({
   AppSpeedDial: ({
     ariaLabel,
     actions,
     direction,
+    actionTooltipPlacement,
     FabProps,
   }: {
     ariaLabel: string;
     actions: Array<{ id: string; label: string; onClick?: () => void }>;
     direction?: string;
+    actionTooltipPlacement?: string;
     FabProps?: { 'aria-describedby'?: string };
   }) => (
     <div
       data-testid="header-appearance-dial"
       data-aria-label={ariaLabel}
       data-direction={direction}
+      data-action-tooltip-placement={actionTooltipPlacement}
       data-fab-aria-describedby={FabProps?.['aria-describedby'] ?? ''}
     >
       <button type="button" aria-label={ariaLabel}>
@@ -40,8 +40,6 @@ jest.mock('../../../../src/components/AppSpeedDial', () => ({
   ),
 }));
 
-const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQuery>;
-
 const renderDial = (props: Partial<React.ComponentProps<typeof HeaderAppearanceDial>> = {}) =>
   render(
     <ThemeProvider>
@@ -57,10 +55,6 @@ const renderDial = (props: Partial<React.ComponentProps<typeof HeaderAppearanceD
   );
 
 describe('HeaderAppearanceDial', () => {
-  beforeEach(() => {
-    mockUseMediaQuery.mockReturnValue(false);
-  });
-
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -69,6 +63,10 @@ describe('HeaderAppearanceDial', () => {
     renderDial();
 
     expect(screen.getByTestId('header-appearance-dial')).toHaveAttribute('data-direction', 'down');
+    expect(screen.getByTestId('header-appearance-dial')).toHaveAttribute(
+      'data-action-tooltip-placement',
+      'left'
+    );
     expect(screen.getByRole('button', { name: 'Open appearance presets' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Switch to dark mode' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use Atlas appearance' })).toBeInTheDocument();
@@ -79,12 +77,14 @@ describe('HeaderAppearanceDial', () => {
     expect(screen.getByRole('button', { name: 'Use Graphite appearance' })).toBeInTheDocument();
   });
 
-  it('uses a down-opening dial on mobile', () => {
-    mockUseMediaQuery.mockReturnValue(true);
-
+  it('keeps the same down-opening direction and tooltip placement across viewports', () => {
     renderDial();
 
     expect(screen.getByTestId('header-appearance-dial')).toHaveAttribute('data-direction', 'down');
+    expect(screen.getByTestId('header-appearance-dial')).toHaveAttribute(
+      'data-action-tooltip-placement',
+      'left'
+    );
   });
 
   it('calls onChangeAppearance with the chosen preset', () => {

@@ -3,10 +3,8 @@ import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined';
 import { Box } from '@mui/material';
 import type { PaletteMode } from '@mui/material';
-import type { SpeedDialProps } from '@mui/material/SpeedDial';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { alpha, useTheme as useMuiTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
 import type { MutableRefObject } from 'react';
 import { type AppAppearanceKey, appAppearanceOptions } from '../../theme/appAppearance';
 import { useAppStyles } from '../../styles/appStyles';
@@ -70,8 +68,6 @@ export const HeaderAppearanceDial = ({
 }: HeaderAppearanceDialProps) => {
   const theme = useMuiTheme();
   const appStyles = useAppStyles();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const direction: SpeedDialProps['direction'] = 'down';
   const handleContainerRef = (node: HTMLDivElement | null) => {
     if (controlRef) {
       controlRef.current = node;
@@ -113,9 +109,9 @@ export const HeaderAppearanceDial = ({
         ariaLabel="Open appearance presets"
         icon={<PaletteOutlinedIcon />}
         actions={actions}
-        direction={direction}
+        direction="down"
         layer="header"
-        actionTooltipPlacement={isMobile ? 'left' : 'bottom'}
+        actionTooltipPlacement="left"
         FabProps={{
           size: iconButtonSize,
           'aria-describedby': triggerDescriptionId,
