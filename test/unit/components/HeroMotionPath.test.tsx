@@ -126,7 +126,8 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    expect(screen.getAllByTestId('motion-div')).toHaveLength(2);
+    expect(screen.getByTestId('hero-motion-path')).toBeInTheDocument();
+    expect(screen.getByTestId('hero-motion-shell')).toBeInTheDocument();
     expect(screen.getByTestId('child')).toBeInTheDocument();
 
     await waitFor(() => expect(getPathMotionDivProps()?.initial).toBeDefined());

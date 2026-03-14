@@ -43,6 +43,7 @@ export const TypewriterText = ({
     timingPreset,
     typingBaseMs,
   });
+  const isPlaying = playing ?? true;
 
   if (!text) {
     return null;
@@ -52,6 +53,8 @@ export const TypewriterText = ({
     <Box
       component="span"
       aria-label={text}
+      data-testid="typewriter-text"
+      data-playing={String(isPlaying)}
       sx={mergeSx(
         {
           position: 'relative',

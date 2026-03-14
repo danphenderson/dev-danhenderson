@@ -42,6 +42,7 @@ describe('TypewriterText', () => {
     const animatedText = getAnimatedTextNode(container);
 
     expect(screen.getByRole('heading', { name: 'Hi' })).toBeInTheDocument();
+    expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'true');
     expect(animatedText).toHaveTextContent('|');
 
     act(() => {
@@ -139,6 +140,15 @@ describe('TypewriterText', () => {
     const animatedText = getAnimatedTextNode(container);
 
     expect(animatedText).toHaveTextContent('Reduced motion');
+    expect(animatedText).not.toHaveTextContent('|');
+  });
+
+  it('exposes a paused state when playing is false', () => {
+    const { container } = render(<TypewriterText text="Paused" playing={false} />, { wrapper });
+    const animatedText = getAnimatedTextNode(container);
+
+    expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'false');
+    expect(animatedText).toHaveTextContent('');
     expect(animatedText).not.toHaveTextContent('|');
   });
 });

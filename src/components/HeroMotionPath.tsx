@@ -164,6 +164,7 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
 
   return (
     <motion.div
+      data-testid="hero-motion-path"
       ref={ref}
       initial={keyframes ? { x: keyframes.x[0], y: keyframes.y[0] } : false}
       animate={keyframes ? { x: keyframes.x, y: keyframes.y } : undefined}
@@ -180,6 +181,7 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
       style={!keyframes ? { visibility: 'hidden' } : undefined}
     >
       <motion.div
+        data-testid="hero-motion-shell"
         initial={{
           scale: SHELL_SCALE_KEYFRAMES[0],
           rotate: SHELL_ROTATE_KEYFRAMES[0],

@@ -242,7 +242,7 @@ test/
 └── e2e/                           # Playwright end-to-end tests
     ├── helpers/
     │   └── github.ts              # Reusable GitHub API mock handlers (success + failure)
-    ├── home.spec.ts               # Home hero render and welcome audio prompt dismissal
+├── home.spec.ts               # Home reduced-motion render plus full-motion hero entrance assertions
     ├── cv.github.spec.ts          # CV render, mocked GitHub API success, and graceful fallback
     ├── climbing.spec.ts           # Climbing route tables render
     ├── photography.spec.ts        # Photography category cards and direct slug navigation
@@ -252,7 +252,7 @@ test/
 #### Configuration highlights
 
 - **Browser**: Chromium only (initial rollout).
-- **Reduced motion**: Tests call `page.emulateMedia({ reducedMotion: 'reduce' })` before navigation so animated content renders immediately without waiting for `IntersectionObserver`-driven `Zoom` transitions.
+- **Reduced motion**: Route specs can opt into `page.emulateMedia({ reducedMotion: 'reduce' })` when they need immediate rendering, while `/home` also includes a full-motion assertion path for the in-flight hero animation.
 - **CI behavior**: Single worker, retries twice, uses the `github` reporter, and traces/screenshots/video are captured on first retry or failure.
 - **Artifacts**: Test output goes to `e2e-results/` and the HTML report to `playwright-report/`; both are git-ignored.
 
