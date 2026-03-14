@@ -64,29 +64,34 @@ jest.mock('../../../../src/components/SkillsChipList', () => ({
   ),
 }));
 
-jest.mock('../../../../src/components/text', () => ({
-  SubsectionTitle: ({ children, sx }: { children: ReactNode; sx?: unknown }) => (
-    <div data-testid="workflow-title" data-has-sx={String(Boolean(sx))}>
-      {children}
-    </div>
-  ),
-  TypewriterText: ({
-    text,
-    playing = true,
-    onComplete,
-  }: {
-    text: string;
-    playing?: boolean;
-    onComplete?: () => void;
-  }) => (
-    <div data-testid={`typewriter-${text}`} data-playing={String(playing)}>
-      <span>{text}</span>
-      <button type="button" onClick={onComplete}>
-        Complete {text}
-      </button>
-    </div>
-  ),
-}));
+jest.mock('../../../../src/components/text', () => {
+  const actual = jest.requireActual('../../../../src/components/text');
+
+  return {
+    ...actual,
+    SubsectionTitle: ({ children, sx }: { children: ReactNode; sx?: unknown }) => (
+      <div data-testid="workflow-title" data-has-sx={String(Boolean(sx))}>
+        {children}
+      </div>
+    ),
+    TypewriterText: ({
+      text,
+      playing = true,
+      onComplete,
+    }: {
+      text: string;
+      playing?: boolean;
+      onComplete?: () => void;
+    }) => (
+      <div data-testid={`typewriter-${text}`} data-playing={String(playing)}>
+        <span>{text}</span>
+        <button type="button" onClick={onComplete}>
+          Complete {text}
+        </button>
+      </div>
+    ),
+  };
+});
 
 const opportunitiesTestId = 'skills-chip-list-Scientific computing|Data platforms';
 const workflowToolsTestId = 'skills-chip-list-Python|React';
@@ -148,7 +153,7 @@ describe('CVAboutSection', () => {
     });
 
     expect(screen.getByTestId(workflowHeadingTestId)).toHaveAttribute('data-playing', 'true');
-    expect(screen.getByTestId(workflow-title)).toHaveAttribute('data-has-sx', 'true');
+    expect(screen.getByTestId('workflow-title')).toHaveAttribute('data-has-sx', 'true');
 
     fireEvent.click(screen.getByRole('button', { name: 'Complete Current workflow:' }));
 
