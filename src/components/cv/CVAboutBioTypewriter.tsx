@@ -2,12 +2,12 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { AboutMe } from '../../types/cv';
+import { DEFAULT_INTERSECTION_ROOT_MARGIN } from '../../constants/animation';
 import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { mergeSx, StatusInlineText } from '../text';
 import { useTypewriterProgress, type TypewriterTimingPreset } from '../text/useTypewriterProgress';
 
 const STATUS_MARKER = 'Open to opportunities';
-const DEFAULT_ROOT_MARGIN = '0px 0px -10% 0px';
 
 type BioSegment = {
   kind: 'text' | 'link' | 'status';
@@ -223,7 +223,7 @@ export const CVAboutBioTypewriter = ({
           startTimeoutRef.current = undefined;
         }, startDelayMs);
       },
-      { threshold: 0, rootMargin: DEFAULT_ROOT_MARGIN }
+      { threshold: 0, rootMargin: DEFAULT_INTERSECTION_ROOT_MARGIN }
     );
 
     observer.observe(node);

@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Stack } from '@mui/material';
 import { GitHubCalendar } from 'react-github-calendar';
+import { DEFAULT_INTERSECTION_ROOT_MARGIN } from '../../constants/animation';
 import { ContentCard } from '../ContentCard';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { BodyText, SubsectionTitle } from '../text';
+import { getMaxScrollLeft, isElementInViewport } from '../../utils/dom';
+import { easeOutCubic } from '../../utils/easing';
 
 type GitHubContributionCalendarProps = {
   username: string;
@@ -12,15 +15,6 @@ type GitHubContributionCalendarProps = {
 
 const CALENDAR_SCROLL_CONTAINER_SELECTOR = '.react-activity-calendar__scroll-container';
 const CALENDAR_SCROLL_DURATION_MS = 900;
-const CALENDAR_SCROLL_ROOT_MARGIN = '0px 0px -10% 0px';
-
-const getMaxScrollLeft = (node: HTMLElement) => Math.max(node.scrollWidth - node.clientWidth, 0);
-const easeOutCubic = (progress: number) => 1 - (1 - progress) ** 3;
-const isElementInViewport = (node: HTMLElement) => {
-  const rect = node.getBoundingClientRect();
-
-  return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight;
-};
 
 export const GitHubContributionCalendar = ({
   username,
@@ -119,7 +113,7 @@ export const GitHubContributionCalendar = ({
           observer.disconnect();
         }
       },
-      { threshold: 0, rootMargin: CALENDAR_SCROLL_ROOT_MARGIN }
+      { threshold: 0, rootMargin: DEFAULT_INTERSECTION_ROOT_MARGIN }
     );
 
     observer.observe(wrapper);

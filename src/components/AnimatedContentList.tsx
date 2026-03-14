@@ -2,14 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import { Box, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
+import {
+  DEFAULT_INTERSECTION_ROOT_MARGIN,
+  DEFAULT_INTERSECTION_THRESHOLD,
+} from '../constants/animation';
 import { useComponentStyles } from '../styles/componentStyles';
 import { normalizeSxProp } from '../utils/sx';
 import { AnimatedContentCard } from './AnimatedContentCard';
 
 type AnimatedContentListLayout = 'stack' | 'wrap';
 type AnimatedContentItemSurface = 'card' | 'panel' | 'plain';
-const DEFAULT_THRESHOLD = 0;
-const DEFAULT_ROOT_MARGIN = '0px 0px -10% 0px';
 
 type AnimatedContentListProps<Item> = {
   items: Item[];
@@ -43,8 +45,8 @@ export const AnimatedContentList = <Item,>({
   itemContainerSx,
   itemSurface = 'card',
   mountItemsOnView = false,
-  mountThreshold = DEFAULT_THRESHOLD,
-  mountRootMargin = DEFAULT_ROOT_MARGIN,
+  mountThreshold = DEFAULT_INTERSECTION_THRESHOLD,
+  mountRootMargin = DEFAULT_INTERSECTION_ROOT_MARGIN,
 }: AnimatedContentListProps<Item>) => {
   const {
     cardResetSx,

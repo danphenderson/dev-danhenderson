@@ -65,7 +65,7 @@ export const AnimatedSlideList = <Item,>({
   const [enteredKeys, setEnteredKeys] = useState<Set<string>>(() => new Set());
   const nodeRefs = useRef(new Map<string, RefObject<HTMLElement>>());
   const enterTimerIdsRef = useRef<number[]>([]);
-  const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.accordionChipStaggerMs;
+  const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.itemStaggerMs;
   const itemKeys = useMemo(
     () => items.map((item, index) => getItemKey(item, index)),
     [getItemKey, items]

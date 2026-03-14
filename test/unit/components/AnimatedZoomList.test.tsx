@@ -34,7 +34,7 @@ jest.mock('@mui/material', () => {
 jest.mock('../../../src/styles/componentStyles', () => ({
   useComponentStyles: () => ({
     motionTokens: {
-      accordionChipStaggerMs: 20,
+      itemStaggerMs: 20,
     },
     getSectionDelayMs: (index: number, startDelayMs = 0, staggerMs = 80) =>
       startDelayMs + index * staggerMs,
