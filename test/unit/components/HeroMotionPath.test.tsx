@@ -1,5 +1,5 @@
 import type { CSSProperties, HTMLAttributes, ReactNode, Ref } from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { HeroMotionPath } from '../../../src/components/HeroMotionPath';
 
 const mockMotionDivProps = {
@@ -188,8 +188,20 @@ describe('HeroMotionPath', () => {
     await waitFor(() => expect(mockMotionDivProps.transition).toBeDefined());
     expect(onComplete).not.toHaveBeenCalled();
 
-    screen.getByTestId('trigger-complete').click();
+    // overflow:hidden is set during the animation for borderRadius clipping
+    expect(mockMotionDivProps.style).toEqual(expect.objectContaining({ overflow: 'hidden' }));
+
+    act(() => {
+      screen.getByTestId('trigger-complete').click();
+    });
     expect(onComplete).toHaveBeenCalledTimes(1);
+
+    // After animation completes, overflow:hidden is removed
+    await waitFor(() =>
+      expect(mockMotionDivProps.style).not.toEqual(
+        expect.objectContaining({ overflow: 'hidden' }),
+      ),
+    );
   });
 
   it('measures the shell position and builds measured spiral keyframes', async () => {
@@ -212,6 +224,9 @@ describe('HeroMotionPath', () => {
     expect(initial).toEqual({
       x: expectedStartX,
       y: expectedStartY,
+      scale: 1,
+      rotate: 0,
+      borderRadius: 28,
     });
     expect(animate.x[0]).toBe(expectedStartX);
     expect(animate.y[0]).toBe(expectedStartY);
@@ -221,6 +236,33 @@ describe('HeroMotionPath', () => {
     expect(animate.y[animate.y.length - 1]).toBe(0);
     expect(animate.x).toHaveLength(50);
     expect(animate.y).toHaveLength(50);
+
+    // In-flight keyframed transforms
+    expect(animate.scale).toHaveLength(50);
+    expect(animate.rotate).toHaveLength(50);
+    expect(animate.borderRadius).toHaveLength(50);
+
+    // Hold entries stay at resting values
+    expect(animate.scale[0]).toBe(1);
+    expect(animate.scale[1]).toBe(1);
+    expect(animate.rotate[0]).toBe(0);
+    expect(animate.rotate[1]).toBe(0);
+    expect(animate.borderRadius[0]).toBe(28);
+    expect(animate.borderRadius[1]).toBe(28);
+
+    // Travel entries vary from resting values
+    const travelScales = animate.scale.slice(2, -1) as number[];
+    expect(travelScales.some((v: number) => v !== 1)).toBe(true);
+    const travelRotations = animate.rotate.slice(2, -1) as number[];
+    expect(travelRotations.some((v: number) => v !== 0)).toBe(true);
+    const travelRadii = animate.borderRadius.slice(2, -1) as number[];
+    expect(travelRadii.some((v: number) => v !== 28)).toBe(true);
+
+    // Final settle values
+    expect(animate.scale[animate.scale.length - 1]).toBe(1);
+    expect(animate.rotate[animate.rotate.length - 1]).toBe(0);
+    expect(animate.borderRadius[animate.borderRadius.length - 1]).toBe(28);
+
     expect(transition).toMatchObject({
       duration: 3.6,
       ease: 'easeInOut',
@@ -242,7 +284,13 @@ describe('HeroMotionPath', () => {
     );
 
     await waitFor(() => expect(mockMotionDivProps.initial).toBeDefined());
-    expect(mockMotionDivProps.initial).toEqual({ x: -280, y: -220 });
+    expect(mockMotionDivProps.initial).toEqual({
+      x: -280,
+      y: -220,
+      scale: 1,
+      rotate: 0,
+      borderRadius: 28,
+    });
 
     rerender(
       <HeroMotionPath active={false} onComplete={jest.fn()}>
@@ -270,6 +318,14 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    await waitFor(() => expect(mockMotionDivProps.initial).toEqual({ x: -220, y: -180 }));
+    await waitFor(() =>
+      expect(mockMotionDivProps.initial).toEqual({
+        x: -220,
+        y: -180,
+        scale: 1,
+        rotate: 0,
+        borderRadius: 28,
+      }),
+    );
   });
 });
