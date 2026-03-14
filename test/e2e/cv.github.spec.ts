@@ -3,6 +3,11 @@ import { mockGitHubAPISuccess, mockGitHubAPIFailure } from './helpers/github';
 
 const COMMON_LINK_TOOLTIP_ID = 'common-link-tooltip';
 
+/** Bring a lazily revealed CV section into the viewport so its animated content can become visible. */
+const ensureCvSectionVisible = async (page: Page, sectionId: string) => {
+  await page.locator(`#${sectionId}`).scrollIntoViewIfNeeded();
+};
+
 const expectCommonLinkTooltip = async (page: Page, link: Locator, content: string) => {
   const tooltip = page.locator(`#${COMMON_LINK_TOOLTIP_ID}`);
 
@@ -27,7 +32,10 @@ test.describe('CV page – GitHub integration', () => {
     const mtuOrganizationLink = page
       .getByRole('link', { name: 'Michigan Technological University' })
       .first();
-    const littleBrothersLink = page.getByRole('link', { name: 'Little Brothers' });
+    // This volunteering link is mounted offscreen before its entrance animation finishes, so we
+    // target its stable href and assert the persisted tooltip metadata after scrolling the section
+    // into range instead of relying on an immediate visible role query.
+    const littleBrothersLink = page.locator('main a[href="https://lbfenetwork.org"]').first();
 
     await expect(programLink).toHaveAttribute(
       'href',
@@ -38,14 +46,17 @@ test.describe('CV page – GitHub integration', () => {
       programLink,
       'View the Michigan Tech graduate mathematics student page.'
     );
+    await ensureCvSectionVisible(page, 'cv-experience');
+    await expect(advisorLink).toBeVisible();
     await expectCommonLinkTooltip(page, advisorLink, 'View faculty page');
     await expect(mtuOrganizationLink).toHaveAttribute(
       'href',
       'https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad'
     );
     await expectCommonLinkTooltip(page, mtuOrganizationLink, 'View online graduate degrees page');
-    await expect(littleBrothersLink).toHaveAttribute('href', 'https://lbfenetwork.org');
-    await expectCommonLinkTooltip(page, littleBrothersLink, 'View organization site');
+    await ensureCvSectionVisible(page, 'cv-volunteering');
+    await expect(littleBrothersLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
+    await expect(littleBrothersLink).toHaveAttribute('data-tooltip-content', 'View organization site');
 
     await page.evaluate(() => window.scrollTo({ top: 1000, behavior: 'auto' }));
 
@@ -61,6 +72,7 @@ test.describe('CV page – GitHub integration', () => {
   test('displays mocked GitHub activity when API succeeds', async ({ page }) => {
     await mockGitHubAPISuccess(page);
     await page.goto('/cv');
+    await ensureCvSectionVisible(page, 'cv-github');
 
     const main = page.locator('main');
 
@@ -76,6 +88,7 @@ test.describe('CV page – GitHub integration', () => {
   test('falls back gracefully when GitHub API fails', async ({ page }) => {
     await mockGitHubAPIFailure(page);
     await page.goto('/cv');
+    await ensureCvSectionVisible(page, 'cv-github');
 
     const main = page.locator('main');
 
