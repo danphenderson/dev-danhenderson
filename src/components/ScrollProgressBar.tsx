@@ -1,6 +1,5 @@
 import { motion, useScroll, useSpring } from 'motion/react';
 import { useTheme } from '@mui/material/styles';
-import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 
 /**
  * Thin accent-coloured progress bar fixed to the top of the viewport.
@@ -14,15 +13,12 @@ import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
  */
 export const ScrollProgressBar = () => {
   const theme = useTheme();
-  const prefersReducedMotion = usePrefersReducedMotion();
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 120,
     damping: 28,
     restDelta: 0.001,
   });
-
-  if (prefersReducedMotion) return null;
 
   return (
     <motion.div

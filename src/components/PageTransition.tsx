@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useLocation } from 'react-router-dom';
-import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { SPRING_EASING_MOTION } from '../styles/springEasing';
 
 /** Duration in seconds for the page crossfade transition. */
@@ -23,11 +22,6 @@ interface PageTransitionProps {
  */
 export const PageTransition = ({ children }: PageTransitionProps) => {
   const location = useLocation();
-  const prefersReducedMotion = usePrefersReducedMotion();
-
-  if (prefersReducedMotion) {
-    return <>{children}</>;
-  }
 
   return (
     <AnimatePresence mode="wait">
