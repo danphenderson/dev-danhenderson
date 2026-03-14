@@ -70,4 +70,3 @@ export const HeroMotionPath = ({
     </motion.div>
   );
 };
-
