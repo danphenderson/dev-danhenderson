@@ -4,7 +4,7 @@
 [![Build](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml)
 [![Node 20.x](https://img.shields.io/badge/node-20.x-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
 
-Source for [danhenderson.dev](https://www.danhenderson.dev), a client-side portfolio site built with React, TypeScript, and MUI. The app stays fully static-hostable: content is stored in local TypeScript modules, routes are handled in the browser, and the CV enhances itself with public GitHub data when it is available.
+Source for [danhenderson.dev](https://www.danhenderson.dev), a client-side React + TypeScript portfolio site for the home page, CV, climbing log, and photography galleries. The app stays fully static-hostable: content lives in local TypeScript modules, routing stays in the browser, and the CV enhances itself with public GitHub data when it is available.
 
 ## Overview
 
@@ -16,6 +16,14 @@ This repository powers four main areas:
 - `/photography` for gallery browsing and album detail pages
 
 The site is a React Router single-page app. Keep unknown-route rewrites, `PUBLIC_URL` compatibility, and shipped static assets intact when making changes.
+
+## Project Signals
+
+- **CI**: pull requests are expected to keep both GitHub Actions workflows green:
+  - `tests.yml` runs `npm ci` and `CI=true npm test -- --watch=false --passWithNoTests --coverage`
+  - `build.yml` runs `npm ci` and `npm run build`
+- **Coverage**: coverage is collected from the Jest run in `tests.yml` and uploaded as a GitHub Actions artifact named `coverage-report-<sha>`. There is no separate coverage SaaS configuration required for contributors right now.
+- **Deployment**: this repo produces a static `build/` output. Deployments must ship `public/assets/`, preserve SPA rewrites to `index.html`, and set `PUBLIC_URL` correctly when serving from a subpath.
 
 ## Routes
 
@@ -160,8 +168,24 @@ PORT=3000 npm start
 
 GitHub Actions workflows live in `.github/workflows/`:
 
-- `tests.yml` runs `CI=true npm test -- --watch=false --passWithNoTests --coverage`
-- `build.yml` runs `npm run build`
+- `tests.yml`
+  - installs dependencies with `npm ci`
+  - runs `CI=true npm test -- --watch=false --passWithNoTests --coverage`
+  - uploads the generated `coverage/` directory as a `coverage-report-<sha>` artifact for review in GitHub Actions
+- `build.yml`
+  - installs dependencies with `npm ci`
+  - runs `npm run build`
+  - uploads the production `build/` directory as a `build-output-<sha>` artifact
+
+### Coverage reporting for contributors
+
+If you need a local coverage report that matches CI, run:
+
+```bash
+CI=true npm test -- --watch=false --coverage
+```
+
+This writes the report to `coverage/`, which is already git-ignored. No additional token, secret, or third-party uploader setup is currently required for contributor pull requests because GitHub Actions handles artifact upload automatically.
 
 ### End-to-end testing
 
