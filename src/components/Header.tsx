@@ -10,6 +10,7 @@ import { useLocation } from 'react-router-dom';
 import { useAppTheme } from '../ThemeProvider';
 import { avatar as avatarSrc } from '../data/cv';
 import { useAppStyles } from '../styles/appStyles';
+import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
 import { HeaderActions } from './header/HeaderActions';
@@ -41,7 +42,7 @@ const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
   const trigger = useScrollTrigger(HEADER_HIDE_SCROLL_TRIGGER_OPTIONS);
 
   return (
-    <Slide appear={false} direction="down" in={!trigger}>
+    <Slide appear={false} direction="down" in={!trigger} easing={{ enter: SPRING_EASING_CSS, exit: undefined }}>
       {children}
     </Slide>
   );

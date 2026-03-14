@@ -54,6 +54,10 @@ The site is a React Router single-page app. Keep unknown-route rewrites, `PUBLIC
 
 Animation behavior is intentionally centralized for the CV route instead of being hardcoded in individual feature components.
 
+- `src/styles/springEasing.ts`
+  - single source of truth for the spring-physics landing easing curve used across all entry and hover animations
+  - exports `SPRING_EASING_CSS` (CSS `cubic-bezier()`) for MUI transition props and CSS `transition` shorthand
+  - exports `SPRING_EASING_MOTION` (numeric tuple) for the Motion library's `ease` option
 - `src/components/AnimatedContentCard.tsx`
   - shared wrapper for card-style entry animation
   - uses `IntersectionObserver` to trigger near viewport entry

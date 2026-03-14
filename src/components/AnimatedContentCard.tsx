@@ -4,6 +4,7 @@ import type { ElementType } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useAppStyles } from '../styles/appStyles';
+import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { normalizeSxProp } from '../utils/sx';
 import { ContentCard } from './ContentCard';
 import type { ContentCardProps } from './ContentCard';
@@ -132,7 +133,7 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
   }
 
   return (
-    <Zoom in={isVisible} timeout={ANIMATED_CARD_DURATION_MS}>
+    <Zoom in={isVisible} timeout={ANIMATED_CARD_DURATION_MS} easing={{ enter: SPRING_EASING_CSS, exit: undefined }}>
       <Box ref={containerRef} sx={[appStyles.animatedCardContainerSx, ...containerSxArray]}>
         {content}
       </Box>
