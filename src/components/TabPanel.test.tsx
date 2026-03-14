@@ -1,8 +1,47 @@
 import { Button, Chip } from '@mui/material';
 import { fireEvent, render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import ThemeProvider from '../ThemeProvider';
 import { useComponentStyles } from '../styles/componentStyles';
-import { TabPanel } from './TabPanel';
+import { TAB_PANEL_TRANSITION_DURATION_MS, TabPanel } from './TabPanel';
+
+jest.mock('@mui/material', () => {
+  const actual = jest.requireActual('@mui/material');
+  const React = jest.requireActual('react');
+
+  return {
+    ...actual,
+    Collapse: ({
+      children,
+      in: inProp,
+      mountOnEnter,
+      unmountOnExit,
+      timeout,
+    }: {
+      children: ReactNode;
+      in: boolean;
+      mountOnEnter?: boolean;
+      unmountOnExit?: boolean;
+      timeout?: number;
+    }) => {
+      const child = React.Children.only(children);
+      const testId = React.isValidElement(child) && child.props.id ? `collapse-${child.props.id}` : 'collapse';
+      const shouldRenderChildren = inProp || !mountOnEnter || !unmountOnExit;
+
+      return (
+        <div
+          data-testid={testId}
+          data-in={String(inProp)}
+          data-mount-on-enter={String(Boolean(mountOnEnter))}
+          data-unmount-on-exit={String(Boolean(unmountOnExit))}
+          data-timeout={String(timeout ?? '')}
+        >
+          {shouldRenderChildren ? children : null}
+        </div>
+      );
+    },
+  };
+});
 
 const IndustryChip = () => {
   const { cvEntryChipSx } = useComponentStyles();
@@ -15,6 +54,7 @@ describe('TabPanel', () => {
     render(
       <ThemeProvider>
         <TabPanel
+          id="supplemental-sections"
           ariaLabel="Supplemental sections"
           items={[
             { value: 'details', label: 'Details', content: <div>Details body</div> },
@@ -39,16 +79,25 @@ describe('TabPanel', () => {
 
     expect(screen.getByText('Details body')).toBeVisible();
     expect(screen.queryByText('Stack body')).not.toBeInTheDocument();
+    expect(screen.getByTestId('collapse-supplemental-sections-panel-details')).toHaveAttribute('data-in', 'true');
+    expect(screen.getByTestId('collapse-supplemental-sections-panel-stack')).toHaveAttribute('data-in', 'false');
+    expect(screen.getByTestId('collapse-supplemental-sections-panel-details')).toHaveAttribute(
+      'data-timeout',
+      String(TAB_PANEL_TRANSITION_DURATION_MS)
+    );
 
     fireEvent.click(screen.getByRole('tab', { name: 'Development Stack and Tools' }));
 
     expect(screen.getByText('Stack body')).toBeVisible();
     expect(screen.queryByText('Details body')).not.toBeInTheDocument();
+    expect(screen.getByTestId('collapse-supplemental-sections-panel-details')).toHaveAttribute('data-in', 'false');
+    expect(screen.getByTestId('collapse-supplemental-sections-panel-stack')).toHaveAttribute('data-in', 'true');
 
     fireEvent.click(screen.getByRole('tab', { name: 'Development Stack and Tools' }));
 
     expect(screen.queryByText('Stack body')).not.toBeInTheDocument();
     expect(screen.queryByText('Details body')).not.toBeInTheDocument();
+    expect(screen.getByTestId('collapse-supplemental-sections-panel-stack')).toHaveAttribute('data-in', 'false');
   });
 
   it('can hide the tab strip when only one item is provided', () => {
@@ -66,7 +115,7 @@ describe('TabPanel', () => {
     expect(screen.getByRole('tabpanel', { name: 'Skills' })).toBeVisible();
   });
 
-  it('matches the resume button typography and outline treatment', () => {
+  it('matches the resume button typography while using the shared tab panel surface styling', () => {
     render(
       <ThemeProvider>
         <>
@@ -96,10 +145,8 @@ describe('TabPanel', () => {
 
     expect(tabPanelRoot).not.toBeNull();
     expect(window.getComputedStyle(detailsTab).fontWeight).toBe(window.getComputedStyle(resumeButton).fontWeight);
-    expect(window.getComputedStyle(tabPanelRoot as HTMLElement).backgroundColor)
-      .toBe(window.getComputedStyle(resumeButton).backgroundColor);
-    expect(window.getComputedStyle(tabPanelRoot as HTMLElement).borderTopColor)
-      .toBe(window.getComputedStyle(resumeButton).borderTopColor);
+    expect(window.getComputedStyle(tabPanelRoot as HTMLElement).backgroundColor).toBe('rgba(27, 168, 224, 0.04)');
+    expect(window.getComputedStyle(tabPanelRoot as HTMLElement).borderTopColor).toMatch(/#1ba8e0|rgb\(27, 168, 224\)/);
   });
 
   it.each(['fullWidth', 'scrollable'] as const)('left-aligns tab labels for %s tabs', (tabsVariant) => {

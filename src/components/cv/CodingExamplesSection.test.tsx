@@ -70,12 +70,11 @@ describe('CodingExamplesSection', () => {
 
     expect(screen.getByText('Python')).toBeVisible();
     expect(screen.getByText('Typer')).toBeVisible();
-    expect(screen.queryByText('Normalize `None`-related annotations across a codebase.')).not.toBeInTheDocument();
+    expect(screen.queryByRole('tabpanel', { name: 'Purpose' })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Stack' }));
 
-    expect(screen.queryByText('Python')).not.toBeInTheDocument();
-    expect(screen.queryByText('Typer')).not.toBeInTheDocument();
+    expect(screen.queryByRole('tabpanel', { name: 'Stack' })).not.toBeInTheDocument();
   });
 
   it('falls back to title and description only when tabs are empty or missing', () => {

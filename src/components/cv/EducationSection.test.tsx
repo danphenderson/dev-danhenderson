@@ -60,14 +60,12 @@ describe('EducationSection', () => {
 
     expect(screen.getByText('Linear Algebra')).toBeVisible();
     expect(screen.getByText('Numerical Optimization')).toBeVisible();
-    expect(
-      screen.queryByText('Pedagogical training in curriculum design, assessment, and evidence-based instruction.')
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('tabpanel', { name: 'Highlights' })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
 
     expect(screen.getByText('LaTeX')).toBeVisible();
-    expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
+    expect(screen.queryByRole('tabpanel', { name: 'Coursework' })).not.toBeInTheDocument();
   });
 
   it('renders the program as title and university as secondary label with explicit metadata', () => {

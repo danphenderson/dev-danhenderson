@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useState } from 'react';
-import { Box, Tab, Tabs } from '@mui/material';
+import { Box, Collapse, Tab, Tabs } from '@mui/material';
 import type { ReactNode, SyntheticEvent } from 'react';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { InteractiveLabel } from './text';
 
@@ -28,6 +29,8 @@ type TabPanelProps = {
   tabsVariant?: 'standard' | 'scrollable' | 'fullWidth';
 };
 
+export const TAB_PANEL_TRANSITION_DURATION_MS = 200;
+
 const getInitialValue = (
   items: TabPanelItem[],
   defaultValue?: string,
@@ -52,6 +55,7 @@ export const TabPanel = ({
   tabsVariant = 'standard',
 }: TabPanelProps) => {
   const { getTabListSx, getTabPanelBodySx, getTabPanelSx, getTabSx, interactiveSurfaceSx } = useComponentStyles();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const fallbackId = useId();
   const tabPanelId = idProp ?? fallbackId;
   const enabledItems = useMemo(() => items.filter((item) => !item.disabled), [items]);
@@ -139,22 +143,30 @@ export const TabPanel = ({
         const tabId = `${tabPanelId}-tab-${item.value}`;
         const panelId = `${tabPanelId}-panel-${item.value}`;
 
-        if (!keepMounted && !isSelected) {
+        if (prefersReducedMotion && !keepMounted && !isSelected) {
           return null;
         }
 
         return (
-          <Box
+          <Collapse
             key={item.value}
-            role="tabpanel"
-            id={panelId}
-            aria-labelledby={shouldRenderTabs ? tabId : undefined}
-            aria-label={shouldRenderTabs ? undefined : item.label}
-            hidden={!isSelected}
-            sx={getTabPanelBodySx(dense, shouldRenderTabs)}
+            in={isSelected}
+            mountOnEnter={!keepMounted}
+            unmountOnExit={!keepMounted}
+            timeout={prefersReducedMotion ? 0 : TAB_PANEL_TRANSITION_DURATION_MS}
           >
-            {getTabContent(item, isSelected)}
-          </Box>
+            <Box
+              role="tabpanel"
+              id={panelId}
+              aria-labelledby={shouldRenderTabs ? tabId : undefined}
+              aria-label={shouldRenderTabs ? undefined : item.label}
+              aria-hidden={!isSelected}
+              hidden={prefersReducedMotion ? !isSelected : undefined}
+              sx={getTabPanelBodySx(dense, shouldRenderTabs)}
+            >
+              {getTabContent(item, isSelected)}
+            </Box>
+          </Collapse>
         );
       })}
     </Box>

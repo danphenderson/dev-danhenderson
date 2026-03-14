@@ -24,7 +24,7 @@ test.describe('CV page – GitHub integration', () => {
     ).toBeVisible();
 
     // The GitHub section headings should render
-    await expect(main.getByText('Recent Activity')).toBeVisible();
+    await expect(main.getByRole('heading', { name: 'Recent Activity' })).toBeVisible();
   });
 
   test('falls back gracefully when GitHub API fails', async ({ page }) => {
@@ -42,7 +42,7 @@ test.describe('CV page – GitHub integration', () => {
     await expect(main.getByText(/dbt-labs\/dbt-core/)).toBeVisible();
 
     // The GitHub section headings should render
-    await expect(main.getByText('Recent Activity')).toBeVisible();
+    await expect(main.getByRole('heading', { name: 'Recent Activity' })).toBeVisible();
     await expect(main.getByRole('heading', { name: 'Contributions' })).toBeVisible();
   });
 });

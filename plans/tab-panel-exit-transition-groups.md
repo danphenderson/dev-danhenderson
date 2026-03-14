@@ -41,3 +41,6 @@ Wrap each rendered panel body in a lightweight MUI transition that supports exit
 
 ## Progress notes
 - Baseline after `npm install`: `npm run build` passes, while the full Jest suite has a pre-existing failure in `src/components/TabPanel.test.tsx` asserting the panel background matches the resume button.
+- Implemented the transition in `TabPanel` with MUI `Collapse`, using reduced-motion detection to preserve immediate mount/unmount behavior when motion should be minimized.
+- Updated the shared `TabPanel` test and the directly coupled `EducationSection`, `CodingExamplesSection`, and `/cv` Playwright spec assertions so they reflect transition-aware behavior and current shared surface styling.
+- Validation completed: `npm run build`, targeted Jest for the touched component/consumers, full Jest (`198` tests), `CI= npx playwright test e2e/cv.github.spec.ts`, and manual `/cv` browser checks at desktop (`1440x1200`) and mobile (`390x844`) with local screenshots captured for the Experience tab panel open/collapsed states.
