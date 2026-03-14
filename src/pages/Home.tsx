@@ -36,22 +36,25 @@ export default function Home() {
       contentSx={appStyles.homeHeroContentSx}
       showShell={isHeroAnimationReady}
       shellSx={appStyles.homeHeroShellSx}
+      shellWrapper={(shell) => (
+        <HeroMotionPath active={isHeroAnimationReady} onComplete={handleMotionComplete}>
+          {shell}
+        </HeroMotionPath>
+      )}
     >
-      <HeroMotionPath active={isHeroAnimationReady} onComplete={handleMotionComplete}>
-        <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
-          <Stack spacing={2} alignItems="center">
-            <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
-              {isHeroAnimationReady ? (
-                <TypewriterText
-                  text={homeHeroHeadline}
-                  timingPreset="headline"
-                  playing={isTypewriterPlaying}
-                />
-              ) : null}
-            </DisplayTitle>
-          </Stack>
-        </AnimatedContentCard>
-      </HeroMotionPath>
+      <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
+        <Stack spacing={2} alignItems="center">
+          <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
+            {isHeroAnimationReady ? (
+              <TypewriterText
+                text={homeHeroHeadline}
+                timingPreset="headline"
+                playing={isTypewriterPlaying}
+              />
+            ) : null}
+          </DisplayTitle>
+        </Stack>
+      </AnimatedContentCard>
 
       <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
         <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>

@@ -16,19 +16,19 @@ import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
  * transition already handles the zoom-in entrance, so adding scale here would
  * cause a double-scale effect.
  */
-const PATH_X = [0, 0, -80, -130, -60, 15, 0];
-const PATH_Y = [-250, -250, -180, -20, 50, 10, 0];
+const PATH_X = [0, 0, -120, -210, -95, 28, 0];
+const PATH_Y = [-320, -320, -250, -40, 90, 18, 0];
 
 /**
  * Normalised time stops for each keyframe (0 → 1).
  *
- *   0.00 → 0.12 : hold at centre while the inner Zoom entrance plays (~280 ms)
- *   0.12 → 1.00 : circular travel to resting position
+ *   0.00 → 0.08 : hold at centre while the inner Zoom entrance plays (~280 ms)
+ *   0.08 → 1.00 : circular travel to resting position
  */
-const PATH_TIMES = [0, 0.12, 0.3, 0.52, 0.72, 0.9, 1];
+const PATH_TIMES = [0, 0.08, 0.28, 0.5, 0.74, 0.9, 1];
 
 /** Total entrance duration in seconds (hold + travel). */
-const ENTRANCE_DURATION_S = 2.5;
+const ENTRANCE_DURATION_S = 3.6;
 
 interface HeroMotionPathProps {
   /** When true the entrance animation sequence begins. */
@@ -38,11 +38,7 @@ interface HeroMotionPathProps {
   onComplete?: () => void;
 }
 
-export const HeroMotionPath = ({
-  active,
-  children,
-  onComplete,
-}: HeroMotionPathProps) => {
+export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathProps) => {
   const prefersReducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {

@@ -70,7 +70,7 @@ Animation behavior is intentionally centralized for the CV route instead of bein
   - coordinates the home-page intro so the hero shell and title stay hidden until the welcome dialog and follow-up hints have been dismissed
 - `src/components/HeroMotionPath.tsx`
   - Motion-powered wrapper that drives the `/home` hero card circular entrance
-  - staged sequence: hold at viewport centre while the nested Zoom plays (~280 ms), then travel along a counter-clockwise arc to the card's resting position (~2.2 s)
+  - staged sequence: hold at viewport centre while the nested Zoom plays (~280 ms), then travel along a larger counter-clockwise arc to the card's resting position (~3.3 s)
   - uses transform-based keyframes (x / y offsets relative to the element's natural position) so the element returns to its normal flex layout at (0, 0)
   - fires `onComplete` when the travel finishes; Home.tsx uses this to start the typewriter
   - respects `prefers-reduced-motion`: skips the arc, renders children at rest, and fires `onComplete` immediately
@@ -156,16 +156,16 @@ PORT=3000 npm start
 
 ### Available scripts
 
-| Script                    | Command                                  | Purpose                                         |
-| ------------------------- | ---------------------------------------- | ----------------------------------------------- |
-| `npm start`               | `PORT=${PORT:-3001} react-scripts start` | Start the local dev server                      |
-| `npm run build`           | `react-scripts build`                    | Create the production build in `build/`         |
-| `npm test`                | `react-scripts test --roots test/unit src`| Start the Jest runner                           |
-| `npm run eject`           | `react-scripts eject`                    | Eject CRA configuration                         |
-| `npm run test:e2e`        | `playwright test`                        | Run Playwright end-to-end tests (headless)      |
-| `npm run test:e2e:headed` | `playwright test --headed`               | Run E2E tests in a visible browser              |
-| `npm run test:e2e:ui`     | `playwright test --ui`                   | Open the Playwright interactive UI runner       |
-| `npm run serve:e2e`       | `serve -s build -l 3100`                 | Serve the production build locally on port 3100 |
+| Script                    | Command                                    | Purpose                                         |
+| ------------------------- | ------------------------------------------ | ----------------------------------------------- |
+| `npm start`               | `PORT=${PORT:-3001} react-scripts start`   | Start the local dev server                      |
+| `npm run build`           | `react-scripts build`                      | Create the production build in `build/`         |
+| `npm test`                | `react-scripts test --roots test/unit src` | Start the Jest runner                           |
+| `npm run eject`           | `react-scripts eject`                      | Eject CRA configuration                         |
+| `npm run test:e2e`        | `playwright test`                          | Run Playwright end-to-end tests (headless)      |
+| `npm run test:e2e:headed` | `playwright test --headed`                 | Run E2E tests in a visible browser              |
+| `npm run test:e2e:ui`     | `playwright test --ui`                     | Open the Playwright interactive UI runner       |
+| `npm run serve:e2e`       | `serve -s build -l 3100`                   | Serve the production build locally on port 3100 |
 
 ### CI workflows
 
