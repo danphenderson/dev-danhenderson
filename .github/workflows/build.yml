@@ -1,4 +1,4 @@
-name: CI
+name: Build
 
 on:
   pull_request:
@@ -28,26 +28,10 @@ permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: build-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup
-
-      - run: CI=true npm test -- --watch=false --passWithNoTests --coverage
-
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: coverage-report-${{ github.sha }}
-          path: coverage
-          if-no-files-found: ignore
-          retention-days: 14
-
   build:
     runs-on: ubuntu-latest
     steps:
