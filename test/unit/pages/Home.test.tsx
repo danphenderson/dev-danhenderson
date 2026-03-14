@@ -65,8 +65,6 @@ jest.mock('../../../src/components/text', () => {
 });
 
 jest.mock('../../../src/components/HeroMotionPath', () => {
-  const React = require('react');
-
   return {
     HeroMotionPath: ({
       children,
@@ -76,17 +74,18 @@ jest.mock('../../../src/components/HeroMotionPath', () => {
       children: React.ReactNode;
       active: boolean;
       onComplete?: () => void;
-    }) => {
-      React.useEffect(() => {
-        if (active) onComplete?.();
-      }, [active, onComplete]);
-
-      return (
-        <div data-testid="hero-motion-path" data-active={String(active)}>
-          {children}
-        </div>
-      );
-    },
+    }) => (
+      <div data-testid="hero-motion-path" data-active={String(active)}>
+        {children}
+        <button
+          type="button"
+          data-testid="complete-hero-motion"
+          onClick={() => onComplete?.()}
+        >
+          Complete hero motion
+        </button>
+      </div>
+    ),
   };
 });
 
@@ -106,11 +105,23 @@ jest.mock('../../../src/components/AnimatedContentCard', () => ({
 
 jest.mock('../../../src/components/BackgroundPaper', () => ({
   __esModule: true,
-  default: ({ children, showShell }: { children: React.ReactNode; showShell?: boolean }) => (
-    <div data-testid="background-paper" data-show-shell={String(Boolean(showShell))}>
-      {children}
-    </div>
-  ),
+  default: ({
+    children,
+    showShell,
+    shellWrapper,
+  }: {
+    children: React.ReactNode;
+    showShell?: boolean;
+    shellWrapper?: (shell: React.ReactNode) => React.ReactNode;
+  }) => {
+    const shell = <div data-testid="background-shell">{children}</div>;
+
+    return (
+      <div data-testid="background-paper" data-show-shell={String(Boolean(showShell))}>
+        {showShell ? (shellWrapper ? shellWrapper(shell) : shell) : children}
+      </div>
+    );
+  },
 }));
 
 const OnboardingStateProbe = () => {
@@ -225,10 +236,18 @@ describe('Home welcome flow', () => {
       expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
     );
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
+    expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-active', 'true');
+    expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'false');
     expect(screen.getByTestId('typewriter-text')).toHaveTextContent(
       'Hi, my passions are mathematics, computers, and adventures'
     );
     expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-timing-preset', 'headline');
+
+    fireEvent.click(screen.getByTestId('complete-hero-motion'));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'true')
+    );
   });
 
   it('waits for the theme hint to close before showing the hero card after opting out of audio', async () => {
@@ -252,10 +271,18 @@ describe('Home welcome flow', () => {
       expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
     );
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
+    expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-active', 'true');
+    expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'false');
     expect(screen.getByTestId('typewriter-text')).toHaveTextContent(
       'Hi, my passions are mathematics, computers, and adventures'
     );
     expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-timing-preset', 'headline');
+
+    fireEvent.click(screen.getByTestId('complete-hero-motion'));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'true')
+    );
   });
 
   it('skips the dialog when audio consent is already declined and shows hero after dark mode hint', async () => {
@@ -272,8 +299,16 @@ describe('Home welcome flow', () => {
     await waitFor(() =>
       expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
     );
+    expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-active', 'true');
+    expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'false');
     expect(screen.getByTestId('typewriter-text')).toHaveTextContent(
       'Hi, my passions are mathematics, computers, and adventures'
+    );
+
+    fireEvent.click(screen.getByTestId('complete-hero-motion'));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'true')
     );
   });
 });
