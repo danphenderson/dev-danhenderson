@@ -30,4 +30,42 @@ describe('CV runtime render', () => {
     expect(screen.getAllByText('Experience').length).toBeGreaterThan(0);
     expect(screen.getAllByText('GitHub').length).toBeGreaterThan(0);
   });
+
+  it('renders all primary CV section headings', () => {
+    render(
+      <ThemeProvider>
+        <CV />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText('About')).toBeInTheDocument();
+    expect(screen.getAllByText('Experience').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Education').length).toBeGreaterThan(0);
+    expect(screen.getByText('Volunteering')).toBeInTheDocument();
+    expect(screen.getAllByText('GitHub').length).toBeGreaterThan(0);
+    expect(screen.getByText('Certificates')).toBeInTheDocument();
+  });
+
+  it('renders the profile card with name, title, and program link', () => {
+    render(
+      <ThemeProvider>
+        <CV />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText('Daniel Henderson')).toBeInTheDocument();
+    expect(screen.getByText('Software Engineer')).toBeInTheDocument();
+  });
+
+  it('renders GitHub section content from mock data', () => {
+    render(
+      <ThemeProvider>
+        <CV />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
+    expect(screen.getByText('microsoft/playwright')).toBeInTheDocument();
+    expect(screen.getByTestId('github-calendar')).toBeInTheDocument();
+  });
 });

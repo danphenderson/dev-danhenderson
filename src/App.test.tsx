@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
 import ThemeProvider from './ThemeProvider';
 import App from './App';
 
@@ -48,7 +47,7 @@ jest.mock('./components/CommonLinkTooltip', () => ({
 }));
 
 describe('App', () => {
-  it('renders the Header and Footer on every route', () => {
+  it('renders the Header, Footer, and CommonLinkTooltip on every route', () => {
     render(
       <ThemeProvider>
         <App />
@@ -57,5 +56,16 @@ describe('App', () => {
 
     expect(screen.getByTestId('header')).toBeInTheDocument();
     expect(screen.getByTestId('footer')).toBeInTheDocument();
+    expect(screen.getByTestId('common-link-tooltip')).toBeInTheDocument();
+  });
+
+  it('renders the Home page by default', () => {
+    render(
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('home-page')).toBeInTheDocument();
   });
 });

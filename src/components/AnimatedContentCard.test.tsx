@@ -156,4 +156,64 @@ describe('AnimatedContentCard', () => {
 
     expect(screen.getByText('Reduced Motion Controlled Card')).toBeInTheDocument();
   });
+
+  it('does not flash content when visibility is toggled off before the delay completes', () => {
+    jest.useFakeTimers();
+    setReducedMotionPreference(false);
+
+    const { rerender } = render(
+      <ThemeProvider>
+        <AnimatedContentCard delayMs={200} visible={false}>
+          <div>Flash Guard Card</div>
+        </AnimatedContentCard>
+      </ThemeProvider>
+    );
+
+    rerender(
+      <ThemeProvider>
+        <AnimatedContentCard delayMs={200} visible>
+          <div>Flash Guard Card</div>
+        </AnimatedContentCard>
+      </ThemeProvider>
+    );
+
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+
+    expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'false');
+
+    rerender(
+      <ThemeProvider>
+        <AnimatedContentCard delayMs={200} visible={false}>
+          <div>Flash Guard Card</div>
+        </AnimatedContentCard>
+      </ThemeProvider>
+    );
+
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
+
+    expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'false');
+  });
+
+  it('renders children immediately when delayMs is zero and animation is enabled', () => {
+    jest.useFakeTimers();
+    setReducedMotionPreference(false);
+
+    render(
+      <ThemeProvider>
+        <AnimatedContentCard delayMs={0} triggerOnView={false}>
+          <div>Zero Delay Card</div>
+        </AnimatedContentCard>
+      </ThemeProvider>
+    );
+
+    act(() => {
+      jest.advanceTimersByTime(0);
+    });
+
+    expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'true');
+  });
 });

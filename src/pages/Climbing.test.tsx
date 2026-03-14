@@ -69,4 +69,35 @@ describe('Climbing', () => {
     expect(todoLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
     expect(todoLink).toHaveAttribute('data-tooltip-content', 'Open The Tooth on Mountain Project.');
   });
+
+  it('opens route links in a new tab with noopener noreferrer', () => {
+    render(
+      <ThemeProvider>
+        <Climbing />
+      </ThemeProvider>
+    );
+
+    const tickLink = screen.getByRole('link', { name: 'Hyperspace' });
+    const todoLink = screen.getByRole('link', { name: 'The Tooth' });
+
+    expect(tickLink).toHaveAttribute('target', '_blank');
+    expect(tickLink).toHaveAttribute('rel', expect.stringContaining('noopener'));
+    expect(todoLink).toHaveAttribute('target', '_blank');
+    expect(todoLink).toHaveAttribute('rel', expect.stringContaining('noopener'));
+  });
+
+  it('renders data grids with expected column headers', () => {
+    render(
+      <ThemeProvider>
+        <Climbing />
+      </ThemeProvider>
+    );
+
+    const routeHeaders = screen.getAllByRole('columnheader', { name: 'Route' });
+    const gradeHeaders = screen.getAllByRole('columnheader', { name: 'Grade' });
+
+    expect(routeHeaders.length).toBeGreaterThanOrEqual(1);
+    expect(gradeHeaders.length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole('columnheader', { name: 'Date' })).toBeInTheDocument();
+  });
 });

@@ -136,6 +136,30 @@ const HomeHarness = ({
   );
 };
 
+describe('Home audio prompt', () => {
+  it('renders the welcome audio dialog with prompt text and action buttons', async () => {
+    render(<HomeHarness />);
+
+    const dialog = await screen.findByRole('dialog');
+
+    expect(dialog).toBeInTheDocument();
+    expect(screen.getByText('Play welcome audio?')).toBeInTheDocument();
+    expect(
+      screen.getByText(/Would you like to hear a short verse while browsing the site\?/)
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'No thanks' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Play welcome audio' })).toBeInTheDocument();
+  });
+
+  it('hides the hero card and background shell while the prompt is open', () => {
+    render(<HomeHarness />);
+
+    expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
+    expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
+    expect(screen.queryByTestId('typewriter-text')).not.toBeInTheDocument();
+  });
+});
+
 describe('Home welcome flow', () => {
   it('waits for the pause and theme hints to close before showing the hero card after audio starts', async () => {
     render(<HomeHarness />);
@@ -194,5 +218,24 @@ describe('Home welcome flow', () => {
       'Hi, my passions are mathematics, computers, and adventures'
     );
     expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-timing-preset', 'headline');
+  });
+
+  it('skips the dialog when audio consent is already declined and shows hero after dark mode hint', async () => {
+    render(<HomeHarness initialAudioConsent="declined" />);
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await waitFor(() =>
+      expect(screen.getByTestId('dark-mode-hint-open')).toHaveTextContent('true')
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
+    );
+    expect(screen.getByTestId('typewriter-text')).toHaveTextContent(
+      'Hi, my passions are mathematics, computers, and adventures'
+    );
   });
 });

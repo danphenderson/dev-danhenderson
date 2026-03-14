@@ -50,4 +50,32 @@ describe('CVGitHubSection', () => {
     expect(screen.getByText('Recent Activity').tagName).toBe('H6');
     expect(screen.getByText('Recent Activity')).toHaveClass('MuiTypography-subtitle2');
   });
+
+  it('renders the section structure even when loading is true', () => {
+    render(
+      <ThemeProvider>
+        <CVGitHubSection activity={[]} contributions={[]} loading={true} error={null} />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText('GitHub')).toBeInTheDocument();
+    expect(screen.getByText('Recent Activity')).toBeInTheDocument();
+    expect(screen.getByText('Contributions')).toBeInTheDocument();
+  });
+
+  it('renders the section without the lead text when lead prop is omitted', () => {
+    render(
+      <ThemeProvider>
+        <CVGitHubSection
+          activity={[{ label: 'activity', href: '#' }]}
+          contributions={[]}
+          loading={false}
+          error={null}
+        />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText('GitHub')).toBeInTheDocument();
+    expect(screen.queryByText(/activity.*contributions.*history/)).not.toBeInTheDocument();
+  });
 });
