@@ -57,11 +57,22 @@ jest.mock('../../../../src/components/SkillsChipList', () => ({
   }: {
     skills?: string[];
     in?: boolean;
-  }) => (
-    <div data-testid={`skills-chip-list-${skills?.join('|') ?? 'empty'}`} data-in={String(inProp)}>
-      {skills?.join(', ')}
-    </div>
-  ),
+  }) => {
+    const label = skills?.join(', ') ?? '';
+    const testIdByLabel: Record<string, 'opportunities-chip-list' | 'workflow-skills-chip-list'> = {
+      'Scientific computing, Data platforms': 'opportunities-chip-list',
+      'Distributed systems': 'opportunities-chip-list',
+      'Python, React': 'workflow-skills-chip-list',
+      Julia: 'workflow-skills-chip-list',
+    };
+    const testId = testIdByLabel[label] ?? 'workflow-skills-chip-list';
+
+    return (
+      <div data-testid={testId} data-in={String(inProp)}>
+        {label}
+      </div>
+    );
+  },
 }));
 
 jest.mock('../../../../src/components/text', () => {
@@ -93,9 +104,17 @@ jest.mock('../../../../src/components/text', () => {
   };
 });
 
-const opportunitiesTestId = 'skills-chip-list-Scientific computing|Data platforms';
-const workflowToolsTestId = 'skills-chip-list-Python|React';
-const workflowHeadingTestId = 'typewriter-Current workflow:';
+const currentWorkflowTypewriterTestId = 'typewriter-Current workflow:';
+
+const getSkillsChipListByText = (text: string, testId: 'opportunities-chip-list' | 'workflow-skills-chip-list') => {
+  const list = screen.getByText(text).closest(`[data-testid="${testId}"]`);
+
+  if (!(list instanceof HTMLElement)) {
+    throw new Error(`Missing skills chip list for "${text}".`);
+  }
+
+  return list;
+};
 
 const renderAboutSection = (overrides?: Partial<Parameters<typeof CVAboutSection>[0]>) =>
   render(
@@ -139,25 +158,37 @@ describe('CVAboutSection', () => {
 
     expect(profileCard).toBeInTheDocument();
     expect(profileCard).toContainElement(screen.getByTestId('about-actions'));
-    expect(screen.getByTestId(opportunitiesTestId)).toHaveAttribute('data-in', 'false');
-    expect(screen.getByTestId(workflowHeadingTestId)).toHaveAttribute('data-playing', 'false');
-    expect(screen.getByTestId(workflowToolsTestId)).toHaveAttribute('data-in', 'false');
+    expect(getSkillsChipListByText('Scientific computing, Data platforms', 'opportunities-chip-list')).toHaveAttribute(
+      'data-in',
+      'false'
+    );
+    expect(screen.getByTestId(currentWorkflowTypewriterTestId)).toHaveAttribute('data-playing', 'false');
+    expect(getSkillsChipListByText('Python, React', 'workflow-skills-chip-list')).toHaveAttribute(
+      'data-in',
+      'false'
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'Complete bio animation' }));
 
-    expect(screen.getByTestId(opportunitiesTestId)).toHaveAttribute('data-in', 'true');
-    expect(screen.getByTestId(workflowHeadingTestId)).toHaveAttribute('data-playing', 'false');
+    expect(getSkillsChipListByText('Scientific computing, Data platforms', 'opportunities-chip-list')).toHaveAttribute(
+      'data-in',
+      'true'
+    );
+    expect(screen.getByTestId(currentWorkflowTypewriterTestId)).toHaveAttribute('data-playing', 'false');
 
     act(() => {
       jest.runOnlyPendingTimers();
     });
 
-    expect(screen.getByTestId(workflowHeadingTestId)).toHaveAttribute('data-playing', 'true');
+    expect(screen.getByTestId(currentWorkflowTypewriterTestId)).toHaveAttribute('data-playing', 'true');
     expect(screen.getByTestId('workflow-title')).toHaveAttribute('data-has-sx', 'true');
 
     fireEvent.click(screen.getByRole('button', { name: 'Complete Current workflow:' }));
 
-    expect(screen.getByTestId(workflowToolsTestId)).toHaveAttribute('data-in', 'true');
+    expect(getSkillsChipListByText('Python, React', 'workflow-skills-chip-list')).toHaveAttribute(
+      'data-in',
+      'true'
+    );
     expect(screen.getByTestId(`section-card-${cvSectionMetadata.about.id}`)).toHaveAttribute(
       'data-delay-ms',
       '120'
@@ -181,16 +212,19 @@ describe('CVAboutSection', () => {
       },
     });
 
-    expect(screen.queryByTestId(opportunitiesTestId)).not.toBeInTheDocument();
-    expect(screen.getByTestId(workflowHeadingTestId)).toHaveAttribute('data-playing', 'false');
+    expect(screen.queryByText('Scientific computing, Data platforms')).not.toBeInTheDocument();
+    expect(screen.getByTestId(currentWorkflowTypewriterTestId)).toHaveAttribute('data-playing', 'false');
 
     fireEvent.click(screen.getByRole('button', { name: 'Complete bio animation' }));
 
-    expect(screen.getByTestId(workflowHeadingTestId)).toHaveAttribute('data-playing', 'true');
+    expect(screen.getByTestId(currentWorkflowTypewriterTestId)).toHaveAttribute('data-playing', 'true');
 
     fireEvent.click(screen.getByRole('button', { name: 'Complete Current workflow:' }));
 
-    expect(screen.getByTestId(workflowToolsTestId)).toHaveAttribute('data-in', 'true');
+    expect(getSkillsChipListByText('Python, React', 'workflow-skills-chip-list')).toHaveAttribute(
+      'data-in',
+      'true'
+    );
   });
 
   it('shows opportunities immediately when the bio is empty and resets reveal state when the content changes', () => {
@@ -208,13 +242,19 @@ describe('CVAboutSection', () => {
       },
     });
 
-    expect(screen.getByTestId(opportunitiesTestId)).toHaveAttribute('data-in', 'true');
+    expect(getSkillsChipListByText('Scientific computing, Data platforms', 'opportunities-chip-list')).toHaveAttribute(
+      'data-in',
+      'true'
+    );
 
     act(() => {
       jest.runOnlyPendingTimers();
     });
 
-    expect(screen.getByTestId(workflowHeadingTestId)).toHaveAttribute('data-playing', 'true');
+    expect(screen.getByTestId(currentWorkflowTypewriterTestId)).toHaveAttribute(
+      'data-playing',
+      'true'
+    );
 
     rerender(
       <ThemeProvider>
@@ -237,14 +277,17 @@ describe('CVAboutSection', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('skills-chip-list-Distributed systems')).toHaveAttribute(
+    expect(getSkillsChipListByText('Distributed systems', 'opportunities-chip-list')).toHaveAttribute(
       'data-in',
       'false'
     );
-    expect(screen.getByTestId('typewriter-Current workflow:')).toHaveAttribute(
+    expect(screen.getByTestId(currentWorkflowTypewriterTestId)).toHaveAttribute(
       'data-playing',
       'false'
     );
-    expect(screen.getByTestId('skills-chip-list-Julia')).toHaveAttribute('data-in', 'false');
+    expect(getSkillsChipListByText('Julia', 'workflow-skills-chip-list')).toHaveAttribute(
+      'data-in',
+      'false'
+    );
   });
 });
