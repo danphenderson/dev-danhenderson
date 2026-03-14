@@ -23,7 +23,6 @@ const renderRouteLink = (label: string, href: string) => (
 );
 
 const columns: GridColDef<TickRow>[] = [
-  { field: 'date', headerName: 'Date', flex: 0.7, minWidth: 120 },
   {
     field: 'route',
     headerName: 'Route',
@@ -31,6 +30,7 @@ const columns: GridColDef<TickRow>[] = [
     minWidth: 200,
     renderCell: (params) => renderRouteLink(String(params.value), params.row.url),
   },
+  { field: 'date', headerName: 'Date', flex: 0.7, minWidth: 120 },
   { field: 'grade', headerName: 'Grade', flex: 0.6, minWidth: 100 },
   { field: 'location', headerName: 'Location', flex: 1, minWidth: 150 },
 ];

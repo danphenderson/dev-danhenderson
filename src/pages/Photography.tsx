@@ -39,7 +39,6 @@ export default function Photography() {
           <Stack spacing={1}>
             <SectionHeading
               overline="Photography"
-              title="Collections"
               subtitle="A selection of field work, climbing days, and stargazing nights."
               sx={appStyles.compactSectionHeadingSx}
             />
