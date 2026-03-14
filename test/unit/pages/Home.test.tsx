@@ -80,7 +80,12 @@ jest.mock('../../../src/components/HeroMotionPath', () => {
         <button
           type="button"
           data-testid="complete-hero-motion"
-          onClick={() => onComplete?.()}
+          disabled={!active}
+          onClick={() => {
+            if (active) {
+              onComplete?.();
+            }
+          }}
         >
           Complete hero motion
         </button>
