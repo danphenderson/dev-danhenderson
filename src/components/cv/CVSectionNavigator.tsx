@@ -35,7 +35,7 @@ type CVSectionNavigatorProps = {
 
 const IDLE_TIMEOUT_MS = 2500;
 const IDLE_OPACITY = 0.32;
-const GENIE_TRANSITION = 'transform 260ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease, filter 260ms ease, box-shadow 260ms ease';
+const GENIE_TRANSITION = 'transform 260ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease, box-shadow 260ms ease';
 
 export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps) => {
   const muiTheme = useMuiTheme();
@@ -231,7 +231,7 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
         zIndex: 1,
         transition: genieTransition,
       },
-      '& .MuiSpeedDialAction-root:hover .MuiSpeedDialAction-fab, & .MuiSpeedDialAction-root:focus-within .MuiSpeedDialAction-fab': {
+      '& .MuiSpeedDialAction-root:hover .MuiSpeedDialAction-fab, & .MuiSpeedDialAction-root:focus-within .MuiSpeedDialAction-fab, & .MuiSpeedDialAction-fab:focus-visible': {
         transform: 'translateX(-3px) scale(1.1)',
         boxShadow: `0 0 0 2.5px ${genieGlowColor}, 0 0 14px ${genieGlowSpread}`,
       },
