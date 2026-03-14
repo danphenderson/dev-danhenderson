@@ -1,6 +1,17 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  cloneElement,
+  isValidElement,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import type { ReactElement } from 'react';
+import type { SxProps, Theme } from '@mui/material/styles';
 import { motion } from 'motion/react';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
+import { normalizeSxProp } from '../utils/sx';
 
 /**
  * Total entrance duration in seconds:
@@ -21,6 +32,18 @@ const HOLD_FRACTION = 0.08;
 const SPIRAL_TURNS = 1.35;
 const RADIUS_FALLOFF = 1.15;
 const SAMPLE_COUNT = 48;
+const SETTLED_BORDER_RADIUS = '16px';
+const SHELL_KEYFRAME_TIMES = [0, HOLD_FRACTION, 0.34, 0.6, 0.82, 1];
+const SHELL_SCALE_KEYFRAMES = [1, 1, 0.94, 1.03, 0.985, 1];
+const SHELL_ROTATE_KEYFRAMES = [0, 0, -7, 5, -2, 0];
+const SHELL_BORDER_RADIUS_KEYFRAMES = [
+  SETTLED_BORDER_RADIUS,
+  SETTLED_BORDER_RADIUS,
+  '28px 18px 30px 20px',
+  '20px 30px 18px 28px',
+  '18px 22px 16px 20px',
+  SETTLED_BORDER_RADIUS,
+];
 
 interface HeroMotionPathProps {
   /** When true the entrance animation sequence begins. */
@@ -35,6 +58,10 @@ interface SpiralKeyframes {
   y: number[];
   times: number[];
 }
+
+type SxCapableElementProps = {
+  sx?: SxProps<Theme>;
+};
 
 /**
  * Build a smooth spiral from the measured start offset (viewport centre)
@@ -74,6 +101,18 @@ function buildSpiralKeyframes(startX: number, startY: number): SpiralKeyframes {
   times[times.length - 1] = 1;
 
   return { x, y, times };
+}
+
+function inheritChildBorderRadius(children: React.ReactNode) {
+  if (!isValidElement(children) || typeof children.type === 'string') {
+    return children;
+  }
+
+  const child = children as ReactElement<SxCapableElementProps>;
+
+  return cloneElement(child, {
+    sx: [...normalizeSxProp(child.props.sx), { borderRadius: 'inherit' }],
+  });
 }
 
 export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathProps) => {
@@ -140,7 +179,31 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
       onAnimationComplete={() => onComplete?.()}
       style={!keyframes ? { visibility: 'hidden' } : undefined}
     >
-      {children}
+      <motion.div
+        initial={{
+          scale: SHELL_SCALE_KEYFRAMES[0],
+          rotate: SHELL_ROTATE_KEYFRAMES[0],
+          borderRadius: SHELL_BORDER_RADIUS_KEYFRAMES[0],
+        }}
+        animate={{
+          scale: SHELL_SCALE_KEYFRAMES,
+          rotate: SHELL_ROTATE_KEYFRAMES,
+          borderRadius: SHELL_BORDER_RADIUS_KEYFRAMES,
+        }}
+        transition={{
+          duration: ENTRANCE_DURATION_S,
+          times: SHELL_KEYFRAME_TIMES,
+          ease: 'easeInOut',
+        }}
+        style={{
+          display: 'block',
+          transformOrigin: 'center center',
+          borderRadius: SETTLED_BORDER_RADIUS,
+          willChange: 'transform, border-radius',
+        }}
+      >
+        {inheritChildBorderRadius(children)}
+      </motion.div>
     </motion.div>
   );
 };

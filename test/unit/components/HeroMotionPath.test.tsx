@@ -2,12 +2,14 @@ import type { CSSProperties, HTMLAttributes, ReactNode, Ref } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { HeroMotionPath } from '../../../src/components/HeroMotionPath';
 
-const mockMotionDivProps = {
-  initial: undefined as Record<string, unknown> | false | undefined,
-  animate: undefined as Record<string, unknown> | undefined,
-  transition: undefined as Record<string, unknown> | undefined,
-  style: undefined as CSSProperties | undefined,
+type MockMotionDivProps = {
+  initial: Record<string, unknown> | false | undefined;
+  animate: Record<string, unknown> | undefined;
+  transition: Record<string, unknown> | undefined;
+  style: CSSProperties | undefined;
 };
+
+const mockMotionDivProps: MockMotionDivProps[] = [];
 
 jest.mock('motion/react', () => {
   const React = require('react');
@@ -34,13 +36,15 @@ jest.mock('motion/react', () => {
           } & HTMLAttributes<HTMLDivElement>,
           ref: Ref<HTMLDivElement>,
         ) => {
-          mockMotionDivProps.initial = initial;
-          mockMotionDivProps.animate = animate;
-          mockMotionDivProps.transition = transition;
-          mockMotionDivProps.style = style;
+          const motionIndex = mockMotionDivProps.push({
+            initial,
+            animate,
+            transition,
+            style,
+          });
 
           return (
-            <div ref={ref} data-testid="motion-div" {...rest}>
+            <div ref={ref} data-testid={`motion-div-${motionIndex - 1}`} {...rest}>
               {children}
               {onAnimationComplete && (
                 <button
@@ -77,12 +81,15 @@ const setReducedMotionPreference = (matches: boolean) => {
   }));
 };
 
+const getPathMotionDivProps = () =>
+  mockMotionDivProps.find((props) => Array.isArray(props.animate?.x as unknown));
+
+const getShellMotionDivProps = () =>
+  mockMotionDivProps.find((props) => Array.isArray(props.animate?.scale as unknown));
+
 describe('HeroMotionPath', () => {
   beforeEach(() => {
-    mockMotionDivProps.initial = undefined;
-    mockMotionDivProps.animate = undefined;
-    mockMotionDivProps.transition = undefined;
-    mockMotionDivProps.style = undefined;
+    mockMotionDivProps.length = 0;
 
     window.innerWidth = 1200;
     window.innerHeight = 900;
@@ -117,10 +124,11 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    expect(screen.getByTestId('motion-div')).toBeInTheDocument();
+    expect(screen.getByTestId('motion-div-0')).toBeInTheDocument();
     expect(screen.getByTestId('child')).toBeInTheDocument();
 
-    await waitFor(() => expect(mockMotionDivProps.initial).toBeDefined());
+    await waitFor(() => expect(getPathMotionDivProps()?.initial).toBeDefined());
+    expect(getShellMotionDivProps()).toBeDefined();
   });
 
   it('does not render a motion div when not active', () => {
@@ -132,7 +140,7 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    expect(screen.queryByTestId('motion-div')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('motion-div-0')).not.toBeInTheDocument();
     expect(screen.getByTestId('child')).toBeInTheDocument();
   });
 
@@ -145,7 +153,7 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    expect(screen.queryByTestId('motion-div')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('motion-div-0')).not.toBeInTheDocument();
     expect(screen.getByTestId('child')).toBeInTheDocument();
   });
 
@@ -185,7 +193,7 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    await waitFor(() => expect(mockMotionDivProps.transition).toBeDefined());
+    await waitFor(() => expect(getPathMotionDivProps()?.transition).toBeDefined());
     expect(onComplete).not.toHaveBeenCalled();
 
     screen.getByTestId('trigger-complete').click();
@@ -201,11 +209,15 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    await waitFor(() => expect(mockMotionDivProps.initial).toBeDefined());
+    await waitFor(() => expect(getPathMotionDivProps()?.initial).toBeDefined());
 
-    const initial = mockMotionDivProps.initial as Record<string, number>;
-    const animate = mockMotionDivProps.animate as Record<string, number[]>;
-    const transition = mockMotionDivProps.transition as Record<string, unknown>;
+    const pathMotionDivProps = getPathMotionDivProps() as MockMotionDivProps;
+    const shellMotionDivProps = getShellMotionDivProps() as MockMotionDivProps;
+    const initial = pathMotionDivProps.initial as Record<string, number>;
+    const animate = pathMotionDivProps.animate as Record<string, number[]>;
+    const transition = pathMotionDivProps.transition as Record<string, unknown>;
+    const shellAnimate = shellMotionDivProps.animate as Record<string, Array<number | string>>;
+    const shellTransition = shellMotionDivProps.transition as Record<string, unknown>;
     const expectedStartX = 1200 / 2 - (760 + 240 / 2);
     const expectedStartY = 900 / 2 - (610 + 120 / 2);
 
@@ -230,6 +242,22 @@ describe('HeroMotionPath', () => {
     expect(times[0]).toBe(0);
     expect(times[1]).toBeCloseTo(0.08, 5);
     expect(times[times.length - 1]).toBe(1);
+
+    expect(shellAnimate.scale).toEqual([1, 1, 0.94, 1.03, 0.985, 1]);
+    expect(shellAnimate.rotate).toEqual([0, 0, -7, 5, -2, 0]);
+    expect(shellAnimate.borderRadius).toEqual([
+      '16px',
+      '16px',
+      '28px 18px 30px 20px',
+      '20px 30px 18px 28px',
+      '18px 22px 16px 20px',
+      '16px',
+    ]);
+    expect(shellTransition).toMatchObject({
+      duration: 3.6,
+      ease: 'easeInOut',
+      times: [0, 0.08, 0.34, 0.6, 0.82, 1],
+    });
   });
 
   it('remeasures the shell when the motion path is reactivated', async () => {
@@ -241,8 +269,8 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    await waitFor(() => expect(mockMotionDivProps.initial).toBeDefined());
-    expect(mockMotionDivProps.initial).toEqual({ x: -280, y: -220 });
+    await waitFor(() => expect(getPathMotionDivProps()?.initial).toBeDefined());
+    expect(getPathMotionDivProps()?.initial).toEqual({ x: -280, y: -220 });
 
     rerender(
       <HeroMotionPath active={false} onComplete={jest.fn()}>
@@ -250,7 +278,7 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    expect(screen.queryByTestId('motion-div')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('motion-div-0')).not.toBeInTheDocument();
 
     HTMLElement.prototype.getBoundingClientRect = jest.fn(() => ({
       x: 680,
@@ -270,6 +298,6 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    await waitFor(() => expect(mockMotionDivProps.initial).toEqual({ x: -220, y: -180 }));
+    await waitFor(() => expect(getPathMotionDivProps()?.initial).toEqual({ x: -220, y: -180 }));
   });
 });
