@@ -1,7 +1,15 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { PaletteMode } from '@mui/material';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
-import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   APP_APPEARANCE_STORAGE_KEY,
   defaultAppAppearanceKey,
@@ -59,14 +67,17 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     window.localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, appearance);
   }, [appearance]);
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
-  };
+  }, []);
 
-  if (!children) return null;
+  const value = useMemo(
+    () => ({ mode, appearance, setAppearance, toggleTheme }),
+    [mode, appearance, setAppearance, toggleTheme]
+  );
 
   return (
-    <ThemeContext.Provider value={{ mode, appearance, setAppearance, toggleTheme }}>
+    <ThemeContext.Provider value={value}>
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
         {children}

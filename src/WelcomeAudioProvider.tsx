@@ -4,6 +4,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -446,20 +447,23 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
     widgetRef.current.pause();
   }, []);
 
+  const contextValue = useMemo(
+    () => ({
+      play,
+      pause,
+      isPlaying,
+      ready,
+      error,
+      audioConsent,
+      grantAudioConsent,
+      declineAudioConsent,
+    }),
+    [play, pause, isPlaying, ready, error, audioConsent, grantAudioConsent, declineAudioConsent]
+  );
+
   return (
     <>
-      <WelcomeAudioContext.Provider
-        value={{
-          play,
-          pause,
-          isPlaying,
-          ready,
-          error,
-          audioConsent,
-          grantAudioConsent,
-          declineAudioConsent,
-        }}
-      >
+      <WelcomeAudioContext.Provider value={contextValue}>
         {children}
       </WelcomeAudioContext.Provider>
       {audioConsent === 'granted' && (
