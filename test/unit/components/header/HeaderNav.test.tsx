@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { routerFuture } from '../../../../src/routerFuture';
@@ -31,6 +31,15 @@ const renderNav = (overrides: Partial<typeof defaultProps> = {}) =>
       </MemoryRouter>
     </ThemeProvider>
   );
+
+const renderOpenMobileMenu = (currentPath: string, overrides: Partial<typeof defaultProps> = {}) =>
+  renderNav({
+    currentPath,
+    isMobile: true,
+    mobileMenuOpen: true,
+    mobileMenuAnchor: document.body,
+    ...overrides,
+  });
 
 describe('HeaderNav', () => {
   it('renders desktop navigation buttons for each page', () => {
@@ -101,31 +110,64 @@ describe('HeaderNav', () => {
   });
 
   it('shows the mobile menu links for the non-current pages including home', () => {
-    renderNav({
-      currentPath: '/cv',
-      isMobile: true,
-      mobileMenuOpen: true,
-      mobileMenuAnchor: document.body,
-    });
+    renderOpenMobileMenu('/cv');
 
+    const menuItems = screen.getAllByRole('menuitem');
+    expect(menuItems.map((item) => item.textContent)).toEqual(['Climbing', 'Photography', 'Home']);
     expect(screen.queryByRole('menuitem', { name: 'CV' })).not.toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Climbing' })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Photography' })).toBeInTheDocument();
-    expect(screen.getByRole('menuitem', { name: 'Home' })).toBeInTheDocument();
-    expect(screen.getByAltText('Daniel Henderson')).toBeInTheDocument();
+
+    const climbingItem = screen.getByRole('menuitem', { name: 'Climbing' });
+    expect(within(climbingItem).getByTestId('TerrainIcon')).toBeInTheDocument();
+
+    const photographyItem = screen.getByRole('menuitem', { name: 'Photography' });
+    expect(within(photographyItem).getByTestId('CameraAltIcon')).toBeInTheDocument();
+
+    const homeItem = screen.getByRole('menuitem', { name: 'Daniel Henderson Home' });
+    expect(within(homeItem).getByAltText('Daniel Henderson')).toBeInTheDocument();
+    expect(within(homeItem).getByText('Home')).toBeInTheDocument();
   });
 
   it('shows the mobile menu links for the non-home pages when on the home route', () => {
-    renderNav({
-      currentPath: '/',
-      isMobile: true,
-      mobileMenuOpen: true,
-      mobileMenuAnchor: document.body,
-    });
+    renderOpenMobileMenu('/');
 
     expect(screen.getByRole('menuitem', { name: 'CV' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Climbing' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Photography' })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Home' })).not.toBeInTheDocument();
+  });
+
+  it('uses the correct mobile menu icons for the home route destinations', () => {
+    renderOpenMobileMenu('/');
+
+    expect(
+      within(screen.getByRole('menuitem', { name: 'CV' })).getByTestId('DescriptionIcon')
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('menuitem', { name: 'Climbing' })).getByTestId('TerrainIcon')
+    ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('menuitem', { name: 'Photography' })).getByTestId('CameraAltIcon')
+    ).toBeInTheDocument();
+  });
+
+  it('excludes the current photography route from the mobile menu on detail pages', () => {
+    renderOpenMobileMenu('/photography/landscape');
+
+    const menuItems = screen.getAllByRole('menuitem');
+    expect(menuItems.map((item) => item.textContent)).toEqual(['CV', 'Climbing', 'Home']);
+    expect(screen.queryByRole('menuitem', { name: 'Photography' })).not.toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'CV' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Climbing' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Daniel Henderson Home' })).toBeInTheDocument();
+  });
+
+  it('closes the mobile menu when a destination is selected', () => {
+    const onMobileMenuClose = jest.fn();
+
+    renderOpenMobileMenu('/cv', { onMobileMenuClose });
+
+    fireEvent.click(screen.getByRole('menuitem', { name: 'Photography' }));
+
+    expect(onMobileMenuClose).toHaveBeenCalledTimes(1);
   });
 });

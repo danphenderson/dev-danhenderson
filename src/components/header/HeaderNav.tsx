@@ -2,12 +2,12 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import DescriptionIcon from '@mui/icons-material/Description';
 import MenuIcon from '@mui/icons-material/Menu';
 import TerrainIcon from '@mui/icons-material/Terrain';
-import { Avatar, Box, Button, Chip, IconButton, Menu, MenuItem, Stack } from '@mui/material';
+import { Avatar, Box, Button, IconButton, Menu, MenuItem, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { MouseEvent, ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStyles } from '../../styles/appStyles';
-import { ChipLabel, NavigationLabel } from '../text';
+import { NavigationLabel } from '../text';
 
 export type HeaderPage = {
   name: string;
