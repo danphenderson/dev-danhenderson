@@ -42,7 +42,7 @@ describe('NotFound', () => {
     );
   });
 
-  it('renders the Home link as a contained button and others as outlined', () => {
+  it('renders the Home link as a primary action distinct from other navigation links', () => {
     render(
       <MemoryRouter future={routerFuture}>
         <ThemeProvider>
@@ -53,8 +53,10 @@ describe('NotFound', () => {
 
     const homeLink = screen.getByRole('link', { name: 'Home' });
     const cvLink = screen.getByRole('link', { name: 'CV' });
+    const photographyLink = screen.getByRole('link', { name: 'Photography' });
 
-    expect(homeLink.className).toContain('contained');
-    expect(cvLink.className).toContain('outlined');
+    expect(homeLink).toHaveClass('MuiButton-contained');
+    expect(cvLink).toHaveClass('MuiButton-outlined');
+    expect(photographyLink).toHaveClass('MuiButton-outlined');
   });
 });
