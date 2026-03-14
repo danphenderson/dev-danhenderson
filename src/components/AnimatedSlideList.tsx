@@ -27,6 +27,20 @@ type AnimatedSlideListProps<Item> = {
   stackSpacing?: number;
   wrapGap?: number;
   keepMountedWhenExited?: boolean;
+  reverseExitStagger?: boolean;
+};
+
+export const getAnimatedSlideListCloseDelayMs = (
+  itemCount: number,
+  itemStaggerMs: number,
+  startDelayMs: number = 0,
+  exitDurationMs: number = 220
+) => {
+  if (itemCount <= 0) {
+    return 0;
+  }
+
+  return startDelayMs + Math.max(itemCount - 1, 0) * itemStaggerMs + exitDurationMs;
 };
 
 export const AnimatedSlideList = <Item,>({
@@ -45,6 +59,7 @@ export const AnimatedSlideList = <Item,>({
   stackSpacing = 0.75,
   wrapGap = 0.75,
   keepMountedWhenExited = false,
+  reverseExitStagger = false,
 }: AnimatedSlideListProps<Item>) => {
   const { motionTokens } = useComponentStyles();
   const [enteredKeys, setEnteredKeys] = useState<Set<string>>(() => new Set());
@@ -90,7 +105,26 @@ export const AnimatedSlideList = <Item,>({
     enterTimerIdsRef.current = [];
 
     if (!inProp) {
-      setEnteredKeys(new Set());
+      if (!reverseExitStagger) {
+        setEnteredKeys(new Set());
+        return undefined;
+      }
+
+      [...itemKeys].reverse().forEach((key, index) => {
+        const delayMs = startDelayMs + index * resolvedItemStaggerMs;
+        const timerId = window.setTimeout(() => {
+          setEnteredKeys((currentKeys) => {
+            const nextKeys = new Set(currentKeys);
+
+            nextKeys.delete(key);
+
+            return nextKeys;
+          });
+        }, delayMs);
+
+        enterTimerIdsRef.current.push(timerId);
+      });
+
       return undefined;
     }
 
@@ -117,7 +151,7 @@ export const AnimatedSlideList = <Item,>({
       });
       enterTimerIdsRef.current = [];
     };
-  }, [inProp, itemKeys, resolvedItemStaggerMs, startDelayMs]);
+  }, [inProp, itemKeys, resolvedItemStaggerMs, reverseExitStagger, startDelayMs]);
 
   return (
     <Box component={containerComponent} sx={resolvedContainerSx}>

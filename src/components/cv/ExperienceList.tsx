@@ -6,7 +6,7 @@ import type {
   ExperienceProject,
   ExperienceProjectSegment,
 } from '../../types/cv';
-import { AnimatedSlideList } from '../AnimatedSlideList';
+import { AnimatedSlideList, getAnimatedSlideListCloseDelayMs } from '../AnimatedSlideList';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
@@ -72,6 +72,7 @@ const ExperienceProjects = ({
       in={selected}
       container={renderContext.getDrawerContainer}
       keepMountedWhenExited
+      reverseExitStagger
       containerComponent="ul"
       containerSx={getDetailListSx(0, 0)}
       itemComponent="li"
@@ -108,7 +109,8 @@ const ExperienceProjects = ({
 };
 
 export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceListProps) => {
-  const { contentListStackSpacing, detailBlockSx, experienceDescriptionSx } = useComponentStyles();
+  const { contentListStackSpacing, detailBlockSx, experienceDescriptionSx, motionTokens } =
+    useComponentStyles();
 
   return (
     <AnimatedContentList
@@ -125,6 +127,10 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
           experienceTabs.push({
             value: 'details',
             label: 'Highlights',
+            closeDelayMs: getAnimatedSlideListCloseDelayMs(
+              experience.projects.length,
+              motionTokens.accordionChipStaggerMs
+            ),
             renderContent: (selected, renderContext) => (
               <ExperienceProjects
                 projects={experience.projects}
@@ -139,6 +145,10 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
           experienceTabs.push({
             value: 'skills',
             label: 'Skills',
+            closeDelayMs: getAnimatedSlideListCloseDelayMs(
+              filteredSkills.length,
+              motionTokens.accordionChipStaggerMs
+            ),
             renderContent: (selected, renderContext) => (
               <SkillsChipList
                 skills={filteredSkills}
@@ -146,6 +156,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                 in={selected}
                 animation="slide"
                 keepMountedWhenExited
+                reverseExitStagger
                 drawerContainer={renderContext.getDrawerContainer}
               />
             ),

@@ -62,6 +62,10 @@ Current behavior starts inner content animation while the drawer is still openin
 - Added short opacity fade wrapper in TabPanel for post-open content reveal polish.
 - Added opt-in keep-mounted behavior to AnimatedSlideList and threaded it through SkillsChipList.
 - Enabled keep-mounted behavior in tabpanel CV consumers for smoother drawer opening.
+- Added close sequencing in TabPanel: content exits first, then drawer collapse closes.
+- Added reverse-order exit staggering support in AnimatedSlideList and enabled it for tabpanel CV consumers.
+- Kept closing tab content visible during the exit phase and aligned drawer close delays with staggered slide-list exit duration.
+- Validated with `npm run build` and `npx playwright test test/e2e/cv.github.spec.ts`.
 
 ## Completion Status
 

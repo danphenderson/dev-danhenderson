@@ -19,6 +19,7 @@ export type TabPanelItem = {
   shortLabel?: string;
   content?: ReactNode;
   renderContent?: (selected: boolean, context: TabPanelRenderContext) => ReactNode;
+  closeDelayMs?: number;
   disabled?: boolean;
 };
 
@@ -36,6 +37,8 @@ type TabPanelProps = {
   hideTabsWhenSingle?: boolean;
   tabsVariant?: 'standard' | 'scrollable' | 'fullWidth';
 };
+
+const TAB_PANEL_CLOSE_DELAY_MS = 220;
 
 const getInitialValue = (
   items: TabPanelItem[],
@@ -69,7 +72,19 @@ export const TabPanel = ({
   );
   const [internalValue, setInternalValue] = useState<TabPanelValue>(resolvedDefaultValue);
   const [enteredPanels, setEnteredPanels] = useState<Record<string, boolean>>({});
+  const [closingPanelValue, setClosingPanelValue] = useState<string | null>(null);
   const panelBodyRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const closeTimerIdRef = useRef<number | null>(null);
+  const pendingCloseValueRef = useRef<string | null>(null);
+
+  const clearCloseTimer = () => {
+    if (closeTimerIdRef.current === null) {
+      return;
+    }
+
+    window.clearTimeout(closeTimerIdRef.current);
+    closeTimerIdRef.current = null;
+  };
 
   useEffect(() => {
     if (valueProp !== undefined) {
@@ -91,10 +106,30 @@ export const TabPanel = ({
     );
   }, [enabledItems]);
 
+  useEffect(
+    () => () => {
+      clearCloseTimer();
+    },
+    []
+  );
+
   const candidateValue = valueProp === undefined ? internalValue : valueProp;
   const resolvedValue = enabledItems.some((item) => item.value === candidateValue)
     ? candidateValue
     : resolvedDefaultValue;
+
+  useEffect(() => {
+    if (pendingCloseValueRef.current && resolvedValue !== pendingCloseValueRef.current) {
+      pendingCloseValueRef.current = null;
+      clearCloseTimer();
+      setClosingPanelValue(null);
+      return;
+    }
+
+    if (!resolvedValue) {
+      setClosingPanelValue(null);
+    }
+  }, [resolvedValue]);
 
   useEffect(() => {
     if (!resolvedValue) {
@@ -120,6 +155,9 @@ export const TabPanel = ({
   };
 
   const handleChange = (_event: SyntheticEvent, nextValue: string) => {
+    pendingCloseValueRef.current = null;
+    clearCloseTimer();
+    setClosingPanelValue(null);
     setValue(nextValue);
   };
 
@@ -153,7 +191,42 @@ export const TabPanel = ({
 
                   event.preventDefault();
                   event.stopPropagation();
-                  setValue(false);
+
+                  if (!item.renderContent) {
+                    pendingCloseValueRef.current = null;
+                    clearCloseTimer();
+                    setClosingPanelValue(null);
+                    setValue(false);
+                    return;
+                  }
+
+                  pendingCloseValueRef.current = item.value;
+                  clearCloseTimer();
+                  setClosingPanelValue(item.value);
+                  setEnteredPanels((currentEnteredPanels) => ({
+                    ...currentEnteredPanels,
+                    [item.value]: false,
+                  }));
+
+                  closeTimerIdRef.current = window.setTimeout(
+                    () => {
+                      const pendingCloseValue = pendingCloseValueRef.current;
+
+                      closeTimerIdRef.current = null;
+
+                      if (pendingCloseValue !== item.value) {
+                        return;
+                      }
+
+                      pendingCloseValueRef.current = null;
+                      setClosingPanelValue(null);
+                      setValue(false);
+                    },
+                    Math.max(
+                      item.closeDelayMs ?? TAB_PANEL_CLOSE_DELAY_MS,
+                      TAB_PANEL_CLOSE_DELAY_MS
+                    )
+                  );
                 }}
                 label={<InteractiveLabel>{visibleLabel}</InteractiveLabel>}
                 value={item.value}
@@ -166,7 +239,9 @@ export const TabPanel = ({
 
       {enabledItems.map((item) => {
         const isSelected = item.value === resolvedValue;
+        const isClosing = closingPanelValue === item.value;
         const isContentReady = isSelected && (enteredPanels[item.value] ?? true);
+        const isContentVisible = isClosing || isContentReady;
         const tabId = `${tabPanelId}-tab-${item.value}`;
         const panelId = `${tabPanelId}-panel-${item.value}`;
         const renderContext: TabPanelRenderContext = {
@@ -210,7 +285,7 @@ export const TabPanel = ({
               >
                 <Box
                   sx={{
-                    opacity: isContentReady ? 1 : 0,
+                    opacity: isContentVisible ? 1 : 0,
                     transition: `opacity 180ms ${SPRING_EASING_CSS}`,
                   }}
                 >

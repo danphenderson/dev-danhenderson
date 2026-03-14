@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import type { VolunteeringEntry } from '../../types/cv';
-import { AnimatedSlideList } from '../AnimatedSlideList';
+import { AnimatedSlideList, getAnimatedSlideListCloseDelayMs } from '../AnimatedSlideList';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem, TabPanelRenderContext } from '../TabPanel';
@@ -31,6 +31,7 @@ const VolunteeringDetailList = ({
       in={selected}
       container={renderContext.getDrawerContainer}
       keepMountedWhenExited
+      reverseExitStagger
       containerComponent="ul"
       containerSx={getDetailListSx(0, 0)}
       itemComponent="li"
@@ -40,7 +41,7 @@ const VolunteeringDetailList = ({
 };
 
 export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: VolunteeringListProps) => {
-  const { contentListStackSpacing, detailBlockSx } = useComponentStyles();
+  const { contentListStackSpacing, detailBlockSx, motionTokens } = useComponentStyles();
 
   if (volunteering.length === 0) {
     return null;
@@ -60,6 +61,10 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
               {
                 value: 'details',
                 label: 'Details',
+                closeDelayMs: getAnimatedSlideListCloseDelayMs(
+                  entry.highlights.length,
+                  motionTokens.accordionChipStaggerMs
+                ),
                 renderContent: (selected, renderContext) => (
                   <VolunteeringDetailList
                     items={entry.highlights}

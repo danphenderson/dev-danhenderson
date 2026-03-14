@@ -1,6 +1,6 @@
 import { Box, Stack } from '@mui/material';
 import type { CodingExample } from '../../types/cv';
-import { AnimatedSlideList } from '../AnimatedSlideList';
+import { AnimatedSlideList, getAnimatedSlideListCloseDelayMs } from '../AnimatedSlideList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem, TabPanelRenderContext } from '../TabPanel';
@@ -32,6 +32,7 @@ const CodingExampleDetailList = ({
       in={selected}
       container={renderContext.getDrawerContainer}
       keepMountedWhenExited
+      reverseExitStagger
       containerComponent="ul"
       containerSx={getDetailListSx(0, 0)}
       itemComponent="li"
@@ -44,7 +45,8 @@ export const CodingExamplesSection = ({
   examples,
   startDelayMs = 0,
 }: CodingExamplesSectionProps) => {
-  const { codingExampleLinkSx, contentListStackSpacing, detailBlockSx } = useComponentStyles();
+  const { codingExampleLinkSx, contentListStackSpacing, detailBlockSx, motionTokens } =
+    useComponentStyles();
 
   return (
     <AnimatedContentList
@@ -67,6 +69,10 @@ export const CodingExamplesSection = ({
             tabs.push({
               value: tab.value,
               label: tab.label,
+              closeDelayMs: getAnimatedSlideListCloseDelayMs(
+                items.length,
+                motionTokens.accordionChipStaggerMs
+              ),
               renderContent: (selected, renderContext) => (
                 <CodingExampleDetailList
                   items={items}
@@ -88,6 +94,10 @@ export const CodingExamplesSection = ({
           tabs.push({
             value: tab.value,
             label: tab.label,
+            closeDelayMs: getAnimatedSlideListCloseDelayMs(
+              skills.length,
+              motionTokens.accordionChipStaggerMs
+            ),
             renderContent: (selected, renderContext) => (
               <SkillsChipList
                 skills={skills}
@@ -95,6 +105,7 @@ export const CodingExamplesSection = ({
                 in={selected}
                 animation="slide"
                 keepMountedWhenExited
+                reverseExitStagger
                 drawerContainer={renderContext.getDrawerContainer}
               />
             ),

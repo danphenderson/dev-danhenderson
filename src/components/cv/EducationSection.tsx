@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import type { EducationGpaEntry, EducationInfo } from '../../types/cv';
-import { AnimatedSlideList } from '../AnimatedSlideList';
+import { AnimatedSlideList, getAnimatedSlideListCloseDelayMs } from '../AnimatedSlideList';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
@@ -63,6 +63,7 @@ const EducationDetailList = ({
       in={selected}
       container={renderContext.getDrawerContainer}
       keepMountedWhenExited
+      reverseExitStagger
       containerComponent="ul"
       containerSx={getDetailListSx(0, 0)}
       itemComponent="li"
@@ -72,7 +73,7 @@ const EducationDetailList = ({
 };
 
 export const EducationSection = ({ education, startDelayMs = 0 }: EducationSectionProps) => {
-  const { contentListStackSpacing, detailBlockSx } = useComponentStyles();
+  const { contentListStackSpacing, detailBlockSx, motionTokens } = useComponentStyles();
 
   if (!education.entries || education.entries.length === 0) {
     return null;
@@ -97,6 +98,10 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
           educationTabs.push({
             value: 'highlights',
             label: 'Highlights',
+            closeDelayMs: getAnimatedSlideListCloseDelayMs(
+              filteredHighlights.length,
+              motionTokens.accordionChipStaggerMs
+            ),
             renderContent: (selected, renderContext) => (
               <EducationDetailList
                 items={filteredHighlights}
@@ -111,6 +116,10 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
           educationTabs.push({
             value: 'coursework',
             label: 'Coursework',
+            closeDelayMs: getAnimatedSlideListCloseDelayMs(
+              filteredCoursework.length,
+              motionTokens.accordionChipStaggerMs
+            ),
             renderContent: (selected, renderContext) => (
               <EducationDetailList
                 items={filteredCoursework}
@@ -125,6 +134,10 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
           educationTabs.push({
             value: 'skills',
             label: 'Skills',
+            closeDelayMs: getAnimatedSlideListCloseDelayMs(
+              filteredSkills.length,
+              motionTokens.accordionChipStaggerMs
+            ),
             renderContent: (selected, renderContext) => (
               <SkillsChipList
                 skills={filteredSkills}
@@ -132,6 +145,7 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
                 in={selected}
                 animation="slide"
                 keepMountedWhenExited
+                reverseExitStagger
                 drawerContainer={renderContext.getDrawerContainer}
               />
             ),
