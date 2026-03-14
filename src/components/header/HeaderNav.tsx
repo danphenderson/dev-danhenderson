@@ -33,9 +33,7 @@ type HeaderNavProps = {
 };
 
 const isActivePage = (currentPath: string, pagePath: string): boolean =>
-  pagePath === '/'
-    ? currentPath === '/'
-    : currentPath.startsWith(pagePath);
+  pagePath === '/' ? currentPath === '/' : currentPath.startsWith(pagePath);
 
 export const HeaderNav = ({
   pages,
@@ -135,30 +133,18 @@ export const HeaderNav = ({
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}
       >
         {mobilePages.map(({ name, path }) => (
-          <MenuItem
-            key={name}
-            component={Link}
-            to={path}
-            onClick={onMobileMenuClose}
-            sx={{ minWidth: 260 }}
-          >
+          <MenuItem key={name} component={Link} to={path} onClick={onMobileMenuClose}>
             <Box
               sx={{
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'space-between',
+                justifyContent: 'flex-start',
                 gap: 1.5,
                 width: '100%',
               }}
             >
-              <NavigationLabel>{name}</NavigationLabel>
-              <Chip
-                aria-hidden="true"
-                icon={getPageChipIcon(path)}
-                label={<ChipLabel>{name}</ChipLabel>}
-                size="small"
-                variant="outlined"
-              />
+              {getPageChipIcon(path)}
+              <NavigationLabel sx={{ flex: 1, textAlign: 'left' }}>{name}</NavigationLabel>
             </Box>
           </MenuItem>
         ))}
