@@ -152,7 +152,7 @@ PORT=3000 npm start
 | ------------------------- | ---------------------------------------- | ----------------------------------------------- |
 | `npm start`               | `PORT=${PORT:-3001} react-scripts start` | Start the local dev server                      |
 | `npm run build`           | `react-scripts build`                    | Create the production build in `build/`         |
-| `npm test`                | `react-scripts test`                     | Start the Jest runner                           |
+| `npm test`                | `react-scripts test --roots test/unit src`| Start the Jest runner                           |
 | `npm run eject`           | `react-scripts eject`                    | Eject CRA configuration                         |
 | `npm run test:e2e`        | `playwright test`                        | Run Playwright end-to-end tests (headless)      |
 | `npm run test:e2e:headed` | `playwright test --headed`               | Run E2E tests in a visible browser              |
@@ -174,14 +174,14 @@ GitHub Actions workflows live in `.github/workflows/`:
 ### CI/CD integration stack
 
 - **GitHub Actions** orchestrates CI in `.github/workflows/`
-- **Playwright** provides browser-level E2E coverage in CI and locally from `e2e/`
+- **Playwright** provides browser-level E2E coverage in CI and locally from `test/e2e/`
 - **GitHub Artifacts** store the production build, coverage report, and Playwright failure output
 - **CodeQL** provides repository security analysis for the JavaScript/TypeScript codebase
 - **Dependabot** (`.github/dependabot.yml`) opens weekly npm and GitHub Actions dependency update PRs
 
 ### End-to-end testing
 
-[Playwright](https://playwright.dev/) provides browser-level E2E coverage that complements the Jest unit/integration suite. Tests live in `e2e/` and run against a production build served on port `3100`.
+[Playwright](https://playwright.dev/) provides browser-level E2E coverage that complements the Jest unit/integration suite. Tests live in `test/e2e/` and run against a production build served on port `3100`.
 
 #### Prerequisites
 
@@ -211,15 +211,31 @@ npm run test:e2e:ui        # Open the Playwright interactive UI runner
 
 #### Test structure
 
+All tests are centralized under `test/`:
+
 ```text
-e2e/
-├── helpers/
-│   └── github.ts          # Reusable GitHub API mock handlers (success + failure)
-├── home.spec.ts            # Home hero render and welcome audio prompt dismissal
-├── cv.github.spec.ts       # CV render, mocked GitHub API success, and graceful fallback
-├── climbing.spec.ts        # Climbing route tables render
-├── photography.spec.ts     # Photography category cards and direct slug navigation
-└── not-found.spec.ts       # 404 page for unknown routes
+test/
+├── unit/                          # Jest unit and integration tests
+│   ├── App.test.tsx
+│   ├── ThemeProvider.test.tsx
+│   ├── WelcomeAudioProvider.test.tsx
+│   ├── components/
+│   │   ├── cv/                    # CV section component tests
+│   │   ├── header/                # Header component tests
+│   │   ├── layout/                # Layout primitive tests
+│   │   └── text/                  # Text primitive tests
+│   ├── hooks/                     # Data adapter hook tests
+│   ├── pages/                     # Route-level page tests
+│   ├── styles/                    # Style builder tests
+│   └── utils/                     # Utility tests
+└── e2e/                           # Playwright end-to-end tests
+    ├── helpers/
+    │   └── github.ts              # Reusable GitHub API mock handlers (success + failure)
+    ├── home.spec.ts               # Home hero render and welcome audio prompt dismissal
+    ├── cv.github.spec.ts          # CV render, mocked GitHub API success, and graceful fallback
+    ├── climbing.spec.ts           # Climbing route tables render
+    ├── photography.spec.ts        # Photography category cards and direct slug navigation
+    └── not-found.spec.ts          # 404 page for unknown routes
 ```
 
 #### Configuration highlights
@@ -268,7 +284,6 @@ e2e/
 ```text
 .
 ├── .github/workflows/   # CI, E2E, and security automation
-├── e2e/                 # Playwright end-to-end tests
 ├── public/assets/       # Shipped images, certificates, media, and resume PDF
 ├── resume/              # LaTeX resume source
 ├── src/components/      # Shared UI and CV-specific components
@@ -278,6 +293,8 @@ e2e/
 ├── src/styles/          # Shared animation, layout, and component style tokens
 ├── src/types/           # Shared TypeScript models
 ├── src/utils/           # Asset/date helpers and similar utilities
+├── test/unit/           # Jest unit and integration tests (mirrors src/ structure)
+├── test/e2e/            # Playwright end-to-end tests
 └── README.md
 ```
 

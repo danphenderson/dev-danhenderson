@@ -24,7 +24,7 @@
   "scripts": {
     "start": "PORT=${PORT:-3001} react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --roots test/unit src",
     "eject": "react-scripts eject",
     "serve:e2e": "serve -s build -l 3100",
     "test:e2e": "playwright test",
@@ -37,6 +37,11 @@
     "@testing-library/react": "^14.2.1",
     "@types/jest": "^29.5.12",
     "serve": "^14.2.6"
+  },
+  "jest": {
+    "testMatch": [
+      "<rootDir>/test/unit/**/*.test.{ts,tsx}"
+    ]
   },
   "eslintConfig": {
     "extends": [
