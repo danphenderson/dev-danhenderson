@@ -163,6 +163,39 @@ GitHub Actions workflows live in `.github/workflows/`:
 - `tests.yml` runs `CI=true npm test -- --watch=false --passWithNoTests --coverage`
 - `build.yml` runs `npm run build`
 
+#### CI/CD audit findings
+
+Current strengths:
+
+- Both workflows use `actions/setup-node@v4` with Node 20 and npm caching.
+- `npm ci` keeps dependency installs reproducible.
+- Workflow concurrency cancels superseded runs on the same ref.
+- Build and coverage artifacts are uploaded for later inspection.
+
+Primary improvement opportunities to accelerate dev velocity:
+
+| Priority | Opportunity | Why it helps |
+| --- | --- | --- |
+| High | Add a Playwright E2E workflow that runs `npm run build` + `npm run test:e2e` and uploads traces/screenshots/reports on failure | The repository already has maintained E2E coverage in `e2e/`, but those checks are not enforced in CI today, so browser regressions can still reach review late. |
+| High | Collapse `build.yml` and `tests.yml` into a single `ci.yml` with parallel jobs, or move the shared setup into a reusable workflow/composite action | The current split duplicates checkout, Node setup, npm install, and cache warmup on every PR/push. Centralizing orchestration reduces maintenance and makes required status checks easier to understand. |
+| High | Add a preview deployment service for pull requests (Cloudflare Pages, Netlify, or Vercel) | This is a static React SPA, so PR previews are low-friction and let reviewers validate route behavior, assets, and responsive UI without pulling the branch locally. |
+| Medium | Add Lighthouse CI against the production build artifact | The site is user-facing and static, so automated performance/accessibility regressions can be caught cheaply before merge. |
+| Medium | Add CodeQL plus Dependabot security/version update automation with grouped updates and optional auto-merge for low-risk patches | Local install currently reports transitive vulnerabilities and deprecated CRA-era packages. Automated security feedback keeps dependency maintenance from turning into larger, slower cleanup work later. |
+| Medium | Add `paths-ignore` / job filtering so docs-only changes do not run the full workflow set, and reserve heavier jobs for PRs plus protected branches | This reduces queue time and CI spend for low-risk edits while keeping high-signal checks on code changes. |
+
+Recommended rollout order:
+
+1. Add a single orchestrated CI workflow with unit tests, build, and Playwright E2E jobs.
+2. Publish PR preview deploys from that workflow using a static hosting service.
+3. Layer in Lighthouse CI and CodeQL after the preview pipeline is stable.
+
+Services worth evaluating first:
+
+- **Cloudflare Pages**, **Netlify**, or **Vercel** for static preview deployments
+- **Lighthouse CI** for performance and accessibility budgets
+- **GitHub CodeQL**, **Dependabot grouped updates**, and repository-level secret scanning for security hygiene
+- **Percy** (or another visual diff service) if UI regression review becomes a bottleneck after previews are in place
+
 ### End-to-end testing
 
 [Playwright](https://playwright.dev/) provides browser-level E2E coverage that complements the Jest unit/integration suite. Tests live in `e2e/` and run against a production build served on port `3100`.
