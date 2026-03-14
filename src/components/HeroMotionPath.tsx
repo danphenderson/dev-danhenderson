@@ -5,9 +5,13 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import { Box } from '@mui/material';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useAppStyles } from '../styles/appStyles';
+import { normalizeSxProp } from '../utils/sx';
 
 const MOTION_PATH_DURATION_S = 2;
 const MOTION_PATH_RADIUS = 40;
+
+/** Opacity stays 0 through 75 % of travel, fading in only during the final quarter when the element is near its resting position. */
+const OPACITY_KEYFRAMES = [0, 0, 0, 0, 1];
 
 const getCirclePath = (r: number) =>
   `path("M 0 0 A ${r} ${r} 0 0 1 0 ${-2 * r} A ${r} ${r} 0 0 1 0 0")`;
@@ -23,6 +27,7 @@ export const HeroMotionPath = ({ children, playing, onComplete, sx }: HeroMotion
   const prefersReducedMotion = usePrefersReducedMotion();
   const appStyles = useAppStyles();
   const [arrived, setArrived] = useState(false);
+  const sxArray = normalizeSxProp(sx);
 
   const handleComplete = useCallback(() => {
     setArrived(true);
@@ -37,14 +42,14 @@ export const HeroMotionPath = ({ children, playing, onComplete, sx }: HeroMotion
 
   if (prefersReducedMotion) {
     return (
-      <Box sx={[appStyles.heroMotionStageSx, ...(Array.isArray(sx) ? sx : sx ? [sx] : [])]}>
+      <Box data-testid="hero-motion-path" sx={[appStyles.heroMotionStageSx, ...sxArray]}>
         {playing ? children : null}
       </Box>
     );
   }
 
   return (
-    <Box sx={[appStyles.heroMotionStageSx, ...(Array.isArray(sx) ? sx : sx ? [sx] : [])]}>
+    <Box sx={[appStyles.heroMotionStageSx, ...sxArray]}>
       <motion.div
         data-testid="hero-motion-path"
         style={{
@@ -57,7 +62,7 @@ export const HeroMotionPath = ({ children, playing, onComplete, sx }: HeroMotion
           playing
             ? {
                 offsetDistance: '100%',
-                opacity: [0, 0, 0, 0, 1],
+                opacity: OPACITY_KEYFRAMES,
               }
             : { offsetDistance: '0%', opacity: 0 }
         }
