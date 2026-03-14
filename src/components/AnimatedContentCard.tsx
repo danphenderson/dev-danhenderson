@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Box, Zoom } from '@mui/material';
 import type { ElementType } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
+import {
+  DEFAULT_INTERSECTION_ROOT_MARGIN,
+  DEFAULT_INTERSECTION_THRESHOLD,
+} from '../constants/animation';
 import { useAppStyles } from '../styles/appStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { normalizeSxProp } from '../utils/sx';
@@ -9,8 +13,6 @@ import { ContentCard } from './ContentCard';
 import type { ContentCardProps } from './ContentCard';
 
 export const ANIMATED_CARD_DURATION_MS = 280;
-const DEFAULT_THRESHOLD = 0;
-const DEFAULT_ROOT_MARGIN = '0px 0px -10% 0px';
 
 type AnimatedContentCardProps<RootComponent extends ElementType = 'div'> =
   ContentCardProps<RootComponent> & {
@@ -26,8 +28,8 @@ export const AnimatedContentCard = <RootComponent extends ElementType = 'div'>({
   delayMs = 0,
   triggerOnView = true,
   visible,
-  threshold = DEFAULT_THRESHOLD,
-  rootMargin = DEFAULT_ROOT_MARGIN,
+  threshold = DEFAULT_INTERSECTION_THRESHOLD,
+  rootMargin = DEFAULT_INTERSECTION_ROOT_MARGIN,
   ...props
 }: AnimatedContentCardProps<RootComponent>) => (
   <AnimatedCard
@@ -44,8 +46,8 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
   delayMs = 0,
   triggerOnView = true,
   visible,
-  threshold = DEFAULT_THRESHOLD,
-  rootMargin = DEFAULT_ROOT_MARGIN,
+  threshold = DEFAULT_INTERSECTION_THRESHOLD,
+  rootMargin = DEFAULT_INTERSECTION_ROOT_MARGIN,
   containerSx,
   ...props
 }: AnimatedContentCardProps<RootComponent>) => {

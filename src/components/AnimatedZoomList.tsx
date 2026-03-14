@@ -24,7 +24,7 @@ export const AnimatedZoomList = <Item,>({
   itemStaggerMs,
 }: AnimatedZoomListProps<Item>) => {
   const { getSectionDelayMs, motionTokens } = useComponentStyles();
-  const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.accordionChipStaggerMs;
+  const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.itemStaggerMs;
 
   return (
     <Box sx={containerSx}>
