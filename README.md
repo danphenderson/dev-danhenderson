@@ -68,6 +68,12 @@ Animation behavior is intentionally centralized for the CV route instead of bein
   - used by the CV tools accordion so chip timing is not defined inline
 - `src/hooks/useHomeWelcomeSequence.ts`
   - coordinates the home-page intro so the hero shell and title stay hidden until the welcome dialog and follow-up hints have been dismissed
+- `src/components/HeroMotionPath.tsx`
+  - Motion-powered wrapper that drives the `/home` hero card circular entrance
+  - staged sequence: hold at viewport centre while the nested Zoom plays (~280 ms), then travel along a counter-clockwise arc to the card's resting position (~2.2 s)
+  - uses transform-based keyframes (x / y offsets relative to the element's natural position) so the element returns to its normal flex layout at (0, 0)
+  - fires `onComplete` when the travel finishes; Home.tsx uses this to start the typewriter
+  - respects `prefers-reduced-motion`: skips the arc, renders children at rest, and fires `onComplete` immediately
 - `src/styles/componentStyles.ts`
   - source of truth for shared motion tokens and delay helpers used by CV animation wrappers and sections
   - current motion tokens are:

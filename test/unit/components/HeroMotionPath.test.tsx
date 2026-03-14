@@ -153,7 +153,7 @@ describe('HeroMotionPath', () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('sets initial and animate properties for offset-distance on the motion div', () => {
+  it('sets initial and animate properties for the circular keyframes on the motion div', () => {
     setReducedMotionPreference(false);
 
     render(
@@ -163,11 +163,9 @@ describe('HeroMotionPath', () => {
     );
 
     const motionDiv = screen.getByTestId('motion-div');
-    expect(JSON.parse(motionDiv.getAttribute('data-initial')!)).toEqual({
-      offsetDistance: '0%',
-    });
-    expect(JSON.parse(motionDiv.getAttribute('data-animate')!)).toEqual({
-      offsetDistance: '100%',
-    });
+    const initial = JSON.parse(motionDiv.getAttribute('data-initial')!);
+    expect(initial).toHaveProperty('x', 0);
+    expect(initial).toHaveProperty('y', -250);
+    expect(initial).not.toHaveProperty('scale');
   });
 });

@@ -1,28 +1,34 @@
 import { useEffect } from 'react';
 import { motion } from 'motion/react';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
-import { ANIMATED_CARD_DURATION_MS } from './AnimatedContentCard';
 
 /**
- * SVG path describing the circular motion-path entrance.
+ * Keyframes that define the circular / spiral entrance path.
  *
- * Coordinates are relative to the element's natural (resting) position:
- *   Start (0, -250) — approximately the vertical center of the viewport above
- *                      the hero's resting spot near the bottom of the page.
- *   End   (0, 0)    — the element's natural layout position.
+ * Coordinates are **transform offsets** relative to the element's natural
+ * (resting) layout position, so (0, 0) = final resting spot.
  *
- * The two cubic-bézier segments create a single sweeping arc that curves to
- * the left and down, then loops back to the origin, giving a circular /
- * spiral feel.
+ * The sequence traces a counter-clockwise arc:
+ *   center → left-and-down → far-left at resting height → swing right
+ *   below resting → slight overshoot right → settle at origin.
+ *
+ * Scale is intentionally omitted — the nested AnimatedContentCard's MUI Zoom
+ * transition already handles the zoom-in entrance, so adding scale here would
+ * cause a double-scale effect.
  */
-const HERO_MOTION_PATH =
-  'M 0 -250 C -180 -280 -240 0 -100 80 C 40 160 60 30 0 0';
+const PATH_X = [0, 0, -80, -130, -60, 15, 0];
+const PATH_Y = [-250, -250, -180, -20, 50, 10, 0];
 
-/** How long (seconds) the card travels along the circular path. */
-const TRAVEL_DURATION_S = 2;
+/**
+ * Normalised time stops for each keyframe (0 → 1).
+ *
+ *   0.00 → 0.12 : hold at centre while the inner Zoom entrance plays (~280 ms)
+ *   0.12 → 1.00 : circular travel to resting position
+ */
+const PATH_TIMES = [0, 0.12, 0.3, 0.52, 0.72, 0.9, 1];
 
-/** Delay (seconds) before the path travel starts — matches the Zoom entrance. */
-const ZOOM_DELAY_S = ANIMATED_CARD_DURATION_MS / 1000;
+/** Total entrance duration in seconds (hold + travel). */
+const ENTRANCE_DURATION_S = 2.5;
 
 interface HeroMotionPathProps {
   /** When true the entrance animation sequence begins. */
@@ -51,15 +57,11 @@ export const HeroMotionPath = ({
 
   return (
     <motion.div
-      style={{
-        offsetPath: `path("${HERO_MOTION_PATH}")`,
-        offsetRotate: '0deg',
-      }}
-      initial={{ offsetDistance: '0%' }}
-      animate={{ offsetDistance: '100%' }}
+      initial={{ x: PATH_X[0], y: PATH_Y[0] }}
+      animate={{ x: PATH_X, y: PATH_Y }}
       transition={{
-        delay: ZOOM_DELAY_S,
-        duration: TRAVEL_DURATION_S,
+        duration: ENTRANCE_DURATION_S,
+        times: PATH_TIMES,
         ease: [0.4, 0, 0.2, 1],
       }}
       onAnimationComplete={() => onComplete?.()}
@@ -68,3 +70,4 @@ export const HeroMotionPath = ({
     </motion.div>
   );
 };
+
