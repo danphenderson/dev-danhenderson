@@ -65,10 +65,10 @@ describe('HeaderAppearanceDial', () => {
     jest.clearAllMocks();
   });
 
-  it('uses a left-opening dial on desktop with the theme action and one action per preset', () => {
+  it('uses a down-opening dial on desktop with the theme action and one action per preset', () => {
     renderDial();
 
-    expect(screen.getByTestId('header-appearance-dial')).toHaveAttribute('data-direction', 'left');
+    expect(screen.getByTestId('header-appearance-dial')).toHaveAttribute('data-direction', 'down');
     expect(screen.getByRole('button', { name: 'Open appearance presets' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Switch to dark mode' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use Atlas appearance' })).toBeInTheDocument();

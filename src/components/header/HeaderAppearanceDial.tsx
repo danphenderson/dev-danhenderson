@@ -71,7 +71,7 @@ export const HeaderAppearanceDial = ({
   const theme = useMuiTheme();
   const appStyles = useAppStyles();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-  const direction: SpeedDialProps['direction'] = isMobile ? 'down' : 'left';
+  const direction: SpeedDialProps['direction'] = 'down';
   const handleContainerRef = (node: HTMLDivElement | null) => {
     if (controlRef) {
       controlRef.current = node;
