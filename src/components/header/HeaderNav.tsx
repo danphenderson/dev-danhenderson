@@ -1,14 +1,22 @@
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import DescriptionIcon from '@mui/icons-material/Description';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Avatar, Box, Button, IconButton, Menu, MenuItem, Stack } from '@mui/material';
+import TerrainIcon from '@mui/icons-material/Terrain';
+import { Avatar, Box, Button, Chip, IconButton, Menu, MenuItem, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { MouseEvent } from 'react';
+import { MouseEvent, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStyles } from '../../styles/appStyles';
-import { NavigationLabel } from '../text';
+import { ChipLabel, NavigationLabel } from '../text';
 
 export type HeaderPage = {
   name: string;
   path: string;
+};
+
+const HOME_PAGE: HeaderPage = {
+  name: 'Home',
+  path: '/',
 };
 
 type HeaderNavProps = {
@@ -42,7 +50,23 @@ export const HeaderNav = ({
   onMobileMenuClose,
 }: HeaderNavProps) => {
   const appStyles = useAppStyles();
-  const showHomeAvatar = !isActivePage(currentPath, '/');
+  const showHomeAvatar = !isMobile && !isActivePage(currentPath, '/');
+  const mobilePages = [...pages, HOME_PAGE].filter(({ path }) => !isActivePage(currentPath, path));
+
+  const getPageChipIcon = (path: string): ReactNode => {
+    switch (path) {
+      case '/cv':
+        return <DescriptionIcon fontSize="small" />;
+      case '/climbing':
+        return <TerrainIcon fontSize="small" />;
+      case '/photography':
+        return <CameraAltIcon fontSize="small" />;
+      case '/':
+        return <Avatar src={avatarSrc} alt="Daniel Henderson" sx={appStyles.headerAvatarSx} />;
+      default:
+        return undefined;
+    }
+  };
 
   return (
     <>
@@ -100,15 +124,32 @@ export const HeaderNav = ({
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}
       >
-        {pages.map(({ name, path }) => (
+        {mobilePages.map(({ name, path }) => (
           <MenuItem
             key={name}
             component={Link}
             to={path}
             onClick={onMobileMenuClose}
-            selected={isActivePage(currentPath, path)}
+            sx={{ minWidth: 260 }}
           >
-            <NavigationLabel>{name}</NavigationLabel>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 1.5,
+                width: '100%',
+              }}
+            >
+              <NavigationLabel>{name}</NavigationLabel>
+              <Chip
+                aria-hidden="true"
+                icon={getPageChipIcon(path)}
+                label={<ChipLabel>{name}</ChipLabel>}
+                size="small"
+                variant="outlined"
+              />
+            </Box>
           </MenuItem>
         ))}
       </Menu>

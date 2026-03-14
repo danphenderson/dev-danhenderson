@@ -7,6 +7,7 @@ import { HeaderNav } from '../../../../src/components/header/HeaderNav';
 const pages = [
   { name: 'CV', path: '/cv' },
   { name: 'Climbing', path: '/climbing' },
+  { name: 'Photography', path: '/photography' },
 ];
 
 const defaultProps = {
@@ -37,6 +38,7 @@ describe('HeaderNav', () => {
 
     expect(screen.getByRole('link', { name: 'Go to CV' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Go to Climbing' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Go to Photography' })).toBeInTheDocument();
   });
 
   it('renders the avatar home link away from the home route', () => {
@@ -86,15 +88,44 @@ describe('HeaderNav', () => {
     expect(climbingLink).not.toHaveAttribute('aria-current');
   });
 
-  it('shows the avatar home link on mobile away from the home route', () => {
+  it('does not show the avatar home link on mobile away from the home route', () => {
     renderNav({ currentPath: '/cv', isMobile: true });
 
-    expect(screen.getByRole('link', { name: 'Go to Home' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to Home' })).not.toBeInTheDocument();
   });
 
   it('hides the avatar home link on mobile for the home route', () => {
     renderNav({ isMobile: true });
 
     expect(screen.queryByRole('link', { name: 'Go to Home' })).not.toBeInTheDocument();
+  });
+
+  it('shows the mobile menu links for the non-current pages including home', () => {
+    renderNav({
+      currentPath: '/cv',
+      isMobile: true,
+      mobileMenuOpen: true,
+      mobileMenuAnchor: document.body,
+    });
+
+    expect(screen.queryByRole('link', { name: 'CV' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Climbing' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Photography' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Daniel Henderson' })).toBeInTheDocument();
+  });
+
+  it('keeps the home route mobile menu focused on the non-home pages', () => {
+    renderNav({
+      currentPath: '/',
+      isMobile: true,
+      mobileMenuOpen: true,
+      mobileMenuAnchor: document.body,
+    });
+
+    expect(screen.getByRole('link', { name: 'CV' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Climbing' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Photography' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Home' })).not.toBeInTheDocument();
   });
 });
