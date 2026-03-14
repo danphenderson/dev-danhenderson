@@ -44,7 +44,7 @@ jest.mock('motion/react', () => {
           });
 
           return (
-            <div ref={ref} data-testid={`motion-div-${motionIndex - 1}`} {...rest}>
+            <div ref={ref} data-testid="motion-div" data-motion-index={motionIndex - 1} {...rest}>
               {children}
               {onAnimationComplete && (
                 <button
@@ -82,10 +82,12 @@ const setReducedMotionPreference = (matches: boolean) => {
 };
 
 const getPathMotionDivProps = () =>
-  mockMotionDivProps.find((props) => Array.isArray(props.animate?.x as unknown));
+  [...mockMotionDivProps].reverse().find((props) => Array.isArray(props.animate?.x as unknown));
 
 const getShellMotionDivProps = () =>
-  mockMotionDivProps.find((props) => Array.isArray(props.animate?.scale as unknown));
+  [...mockMotionDivProps]
+    .reverse()
+    .find((props) => Array.isArray(props.animate?.scale as unknown));
 
 describe('HeroMotionPath', () => {
   beforeEach(() => {
@@ -124,7 +126,7 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    expect(screen.getByTestId('motion-div-0')).toBeInTheDocument();
+    expect(screen.getAllByTestId('motion-div')).toHaveLength(2);
     expect(screen.getByTestId('child')).toBeInTheDocument();
 
     await waitFor(() => expect(getPathMotionDivProps()?.initial).toBeDefined());
@@ -140,7 +142,7 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    expect(screen.queryByTestId('motion-div-0')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('motion-div')).not.toBeInTheDocument();
     expect(screen.getByTestId('child')).toBeInTheDocument();
   });
 
@@ -153,7 +155,7 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    expect(screen.queryByTestId('motion-div-0')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('motion-div')).not.toBeInTheDocument();
     expect(screen.getByTestId('child')).toBeInTheDocument();
   });
 
@@ -278,7 +280,7 @@ describe('HeroMotionPath', () => {
       </HeroMotionPath>,
     );
 
-    expect(screen.queryByTestId('motion-div-0')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('motion-div')).not.toBeInTheDocument();
 
     HTMLElement.prototype.getBoundingClientRect = jest.fn(() => ({
       x: 680,
