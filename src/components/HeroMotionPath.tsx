@@ -193,6 +193,12 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
     return <>{children}</>;
   }
 
+  const motionStyle: React.CSSProperties | undefined = !keyframes
+    ? { visibility: 'hidden' }
+    : !settled
+      ? { overflow: 'hidden' }
+      : undefined;
+
   return (
     <motion.div
       ref={ref}
@@ -231,10 +237,7 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
         setSettled(true);
         onComplete?.();
       }}
-      style={{
-        ...(keyframes && !settled ? { overflow: 'hidden' } : {}),
-        ...(!keyframes ? { visibility: 'hidden' } : {}),
-      }}
+      style={motionStyle}
     >
       {children}
     </motion.div>
