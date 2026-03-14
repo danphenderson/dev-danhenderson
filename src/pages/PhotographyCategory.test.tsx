@@ -70,5 +70,34 @@ describe('PhotographyCategory', () => {
 
     expect(screen.getByText('Album not found')).toBeInTheDocument();
     expect(screen.getByText('This album does not exist or has been moved.')).toBeInTheDocument();
+    expect(screen.queryByTestId('quilted-image-list')).not.toBeInTheDocument();
+  });
+
+  it('renders a back-to-photography link that navigates to /photography', () => {
+    renderWithSlug('landscape');
+
+    const backLink = screen.getByRole('link', { name: /Back to photography/i });
+
+    expect(backLink).toHaveAttribute('href', '/photography');
+  });
+
+  it('renders the photography overline on the category page', () => {
+    renderWithSlug('landscape');
+
+    expect(screen.getByText('Photography')).toBeInTheDocument();
+  });
+
+  it('passes the category album label to the quilted image list', () => {
+    renderWithSlug('landscape');
+
+    expect(screen.getByTestId('quilted-image-list')).toHaveTextContent('Landscape');
+  });
+
+  it('renders the back-to-photography link even for an unknown slug', () => {
+    renderWithSlug('nonexistent');
+
+    const backLink = screen.getByRole('link', { name: /Back to photography/i });
+
+    expect(backLink).toHaveAttribute('href', '/photography');
   });
 });

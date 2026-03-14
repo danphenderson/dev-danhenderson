@@ -12,7 +12,7 @@ jest.mock('../components/BackgroundPaper', () => ({
 }));
 
 describe('NotFound', () => {
-  it('renders 404 Not Found message', () => {
+  it('renders 404 Not Found message with descriptive text', () => {
     render(
       <MemoryRouter future={routerFuture}>
         <ThemeProvider>
@@ -22,9 +22,10 @@ describe('NotFound', () => {
     );
 
     expect(screen.getByText('404 Not Found')).toBeInTheDocument();
+    expect(screen.getByText("The page you're looking for doesn't exist.")).toBeInTheDocument();
   });
 
-  it('renders navigation links', () => {
+  it('renders navigation links to Home, CV, and Photography', () => {
     render(
       <MemoryRouter future={routerFuture}>
         <ThemeProvider>
@@ -39,5 +40,21 @@ describe('NotFound', () => {
       'href',
       '/photography'
     );
+  });
+
+  it('renders the Home link as a contained button and others as outlined', () => {
+    render(
+      <MemoryRouter future={routerFuture}>
+        <ThemeProvider>
+          <NotFound />
+        </ThemeProvider>
+      </MemoryRouter>
+    );
+
+    const homeLink = screen.getByRole('link', { name: 'Home' });
+    const cvLink = screen.getByRole('link', { name: 'CV' });
+
+    expect(homeLink.className).toContain('contained');
+    expect(cvLink.className).toContain('outlined');
   });
 });

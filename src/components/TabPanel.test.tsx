@@ -387,4 +387,85 @@ describe('TabPanel', () => {
     expect(screen.getByText('Details body')).toBeVisible();
     expect(screen.queryByText('Skills body')).not.toBeInTheDocument();
   });
+
+  it('renders nothing when items array is empty', () => {
+    const { container } = render(
+      <ThemeProvider>
+        <TabPanel ariaLabel="Empty section" items={[]} tabsVariant="fullWidth" />
+      </ThemeProvider>
+    );
+
+    expect(container.querySelector('[role="tabpanel"]')).not.toBeInTheDocument();
+    expect(container.querySelector('[role="tablist"]')).not.toBeInTheDocument();
+  });
+
+  it('renders nothing when all items are disabled', () => {
+    const { container } = render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel="Disabled section"
+          items={[
+            {
+              value: 'details',
+              label: 'Details',
+              content: <div>Details body</div>,
+              disabled: true,
+            },
+            {
+              value: 'skills',
+              label: 'Skills',
+              content: <div>Skills body</div>,
+              disabled: true,
+            },
+          ]}
+          tabsVariant="fullWidth"
+        />
+      </ThemeProvider>
+    );
+
+    expect(container.querySelector('[role="tabpanel"]')).not.toBeInTheDocument();
+    expect(screen.queryByText('Details body')).not.toBeInTheDocument();
+    expect(screen.queryByText('Skills body')).not.toBeInTheDocument();
+  });
+
+  it('connects tab ids to their panels via aria-controls and aria-labelledby', () => {
+    render(
+      <ThemeProvider>
+        <TabPanel
+          id="aria-test"
+          ariaLabel="Aria sections"
+          defaultValue="details"
+          items={[
+            { value: 'details', label: 'Details', content: <div>Details body</div> },
+            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+          ]}
+          tabsVariant="fullWidth"
+        />
+      </ThemeProvider>
+    );
+
+    const detailsTab = screen.getByRole('tab', { name: 'Details' });
+    const visiblePanel = screen.getByRole('tabpanel');
+
+    expect(detailsTab).toHaveAttribute('aria-controls', 'aria-test-panel-details');
+    expect(visiblePanel).toHaveAttribute('aria-labelledby', 'aria-test-tab-details');
+    expect(visiblePanel).toHaveAttribute('id', 'aria-test-panel-details');
+  });
+
+  it('uses aria-label instead of aria-labelledby when tabs are hidden for a single item', () => {
+    render(
+      <ThemeProvider>
+        <TabPanel
+          ariaLabel="Single section"
+          items={[{ value: 'only', label: 'Only Panel', content: <div>Only content</div> }]}
+          hideTabsWhenSingle
+        />
+      </ThemeProvider>
+    );
+
+    const panel = screen.getByRole('tabpanel', { name: 'Only Panel' });
+
+    expect(panel).not.toHaveAttribute('aria-labelledby');
+    expect(panel).toHaveAttribute('aria-label', 'Only Panel');
+  });
 });

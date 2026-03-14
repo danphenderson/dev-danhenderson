@@ -59,4 +59,35 @@ describe('Photography', () => {
     expect(screen.getAllByText('View album')).toHaveLength(2);
     expect(screen.queryByTestId('back-to-top-button')).not.toBeInTheDocument();
   });
+
+  it('renders category cards with links to their slug routes', () => {
+    render(
+      <ThemeProvider>
+        <MemoryRouter future={routerFuture}>
+          <Photography />
+        </MemoryRouter>
+      </ThemeProvider>
+    );
+
+    const viewAlbumLinks = screen.getAllByRole('link', { name: 'View album' });
+
+    expect(viewAlbumLinks).toHaveLength(2);
+    expect(viewAlbumLinks[0]).toHaveAttribute('href', '/photography/landscape');
+    expect(viewAlbumLinks[1]).toHaveAttribute('href', '/photography/astro');
+  });
+
+  it('renders the photography overline heading', () => {
+    render(
+      <ThemeProvider>
+        <MemoryRouter future={routerFuture}>
+          <Photography />
+        </MemoryRouter>
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText('Photography')).toBeInTheDocument();
+    expect(
+      screen.getByText('A selection of field work, climbing days, and stargazing nights.')
+    ).toBeInTheDocument();
+  });
 });
