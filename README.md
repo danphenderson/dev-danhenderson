@@ -2,7 +2,9 @@
 
 [![Tests](https://github.com/danphenderson/dev-danhenderson/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/tests.yml)
 [![Build](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml)
-[![Node 20.x](https://img.shields.io/badge/node-20.x-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![codecov](https://codecov.io/gh/danphenderson/dev-danhenderson/graph/badge.svg)](https://codecov.io/gh/danphenderson/dev-danhenderson)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/danphenderson/dev-danhenderson/blob/main/LICENSE)
+[![Live Site](https://img.shields.io/website?url=https%3A%2F%2Fwww.danhenderson.dev&label=danhenderson.dev)](https://www.danhenderson.dev)
 
 Source for [danhenderson.dev](https://www.danhenderson.dev), a client-side portfolio site built with React, TypeScript, and MUI. The app stays fully static-hostable: content is stored in local TypeScript modules, routes are handled in the browser, and the CV enhances itself with public GitHub data when it is available.
 
@@ -19,14 +21,14 @@ The site is a React Router single-page app. Keep unknown-route rewrites, `PUBLIC
 
 ## Routes
 
-| Route | Page | Purpose |
-| --- | --- | --- |
-| `/` | `Home` | Intro page with optional welcome audio prompt |
-| `/cv` | `CV` | Resume-style experience, education, certificates, tools, code samples, and GitHub sections |
-| `/climbing` | `Climbing` | Tick list and route wish list in MUI X DataGrid tables |
-| `/photography` | `Photography` | Photography collection index |
-| `/photography/:slug` | `PhotographyCategory` | Album view for a selected collection |
-| `*` | `NotFound` | Fallback page |
+| Route                | Page                  | Purpose                                                                                    |
+| -------------------- | --------------------- | ------------------------------------------------------------------------------------------ |
+| `/`                  | `Home`                | Intro page with optional welcome audio prompt                                              |
+| `/cv`                | `CV`                  | Resume-style experience, education, certificates, tools, code samples, and GitHub sections |
+| `/climbing`          | `Climbing`            | Tick list and route wish list in MUI X DataGrid tables                                     |
+| `/photography`       | `Photography`         | Photography collection index                                                               |
+| `/photography/:slug` | `PhotographyCategory` | Album view for a selected collection                                                       |
+| `*`                  | `NotFound`            | Fallback page                                                                              |
 
 ## Stack
 
@@ -66,6 +68,12 @@ Animation behavior is intentionally centralized for the CV route instead of bein
   - used by the CV tools accordion so chip timing is not defined inline
 - `src/hooks/useHomeWelcomeSequence.ts`
   - coordinates the home-page intro so the hero shell and title stay hidden until the welcome dialog and follow-up hints have been dismissed
+- `src/components/HeroMotionPath.tsx`
+  - Motion-powered wrapper that drives the `/home` hero card circular entrance
+  - staged sequence: hold at viewport centre while the nested Zoom plays (~280 ms), then travel along a larger counter-clockwise arc to the card's resting position (~3.3 s)
+  - uses transform-based keyframes (x / y offsets relative to the element's natural position) so the element returns to its normal flex layout at (0, 0)
+  - fires `onComplete` when the travel finishes; Home.tsx uses this to start the typewriter
+  - respects `prefers-reduced-motion`: skips the arc, renders children at rest, and fires `onComplete` immediately
 - `src/styles/componentStyles.ts`
   - source of truth for shared motion tokens and delay helpers used by CV animation wrappers and sections
   - current motion tokens are:
@@ -74,7 +82,7 @@ Animation behavior is intentionally centralized for the CV route instead of bein
     - `sectionStaggerMs = 120`
     - `githubSubsectionStaggerMs = 120`
     - `accordionChipStaggerMs = 120`
-  - exposes helpers such as `getSectionDelayMs(...)`, `getItemDelayMs(...)`, and `getAnimatedZoomItemSx(...)` so feature components avoid hardcoding delay math
+  - exposes helpers such as `getSectionDelayMs(...)` and `getItemDelayMs(...)` so feature components avoid hardcoding delay math
 
 Current `/cv` sequencing rules:
 
@@ -92,6 +100,7 @@ When changing CV motion:
 ## Data Model and Content Sources
 
 ### Local data modules
+
 - `src/data/cv.ts`
   - Profile/contact info
   - Experience entries
@@ -108,7 +117,9 @@ When changing CV motion:
   - Current dataset size: 4 categories, 43 photos
 
 ### Runtime API data
+
 `src/hooks/useGithubProfile.ts` fetches from GitHub:
+
 - User events: `GET /users/:username/events/public`
 - User repos: `GET /users/:username/repos`
 - Public PR contribution search: `GET /search/issues`
@@ -145,27 +156,43 @@ PORT=3000 npm start
 
 ### Available scripts
 
-| Script | Command | Purpose |
-| --- | --- | --- |
-| `npm start` | `PORT=${PORT:-3001} react-scripts start` | Start the local dev server |
-| `npm run build` | `react-scripts build` | Create the production build in `build/` |
-| `npm test` | `react-scripts test` | Start the Jest runner |
-| `npm run eject` | `react-scripts eject` | Eject CRA configuration |
-| `npm run test:e2e` | `playwright test` | Run Playwright end-to-end tests (headless) |
-| `npm run test:e2e:headed` | `playwright test --headed` | Run E2E tests in a visible browser |
-| `npm run test:e2e:ui` | `playwright test --ui` | Open the Playwright interactive UI runner |
-| `npm run serve:e2e` | `serve -s build -l 3100` | Serve the production build locally on port 3100 |
+| Script                    | Command                                    | Purpose                                         |
+| ------------------------- | ------------------------------------------ | ----------------------------------------------- |
+| `npm start`               | `PORT=${PORT:-3001} react-scripts start`   | Start the local dev server                      |
+| `npm run build`           | `react-scripts build`                      | Create the production build in `build/`         |
+| `npm test`                | `react-scripts test --roots test/unit src` | Start the Jest runner                           |
+| `npm run eject`           | `react-scripts eject`                      | Eject CRA configuration                         |
+| `npm run test:e2e`        | `playwright test`                          | Run Playwright end-to-end tests (headless)      |
+| `npm run test:e2e:headed` | `playwright test --headed`                 | Run E2E tests in a visible browser              |
+| `npm run test:e2e:ui`     | `playwright test --ui`                     | Open the Playwright interactive UI runner       |
+| `npm run serve:e2e`       | `serve -s build -l 3100`                   | Serve the production build locally on port 3100 |
 
 ### CI workflows
 
 GitHub Actions workflows live in `.github/workflows/`:
 
-- `tests.yml` runs `CI=true npm test -- --watch=false --passWithNoTests --coverage`
-- `build.yml` runs `npm run build`
+- `tests.yml` runs unit tests on pull requests and pushes to `main`
+  - runs `CI=true npm test -- --watch=false --passWithNoTests --coverage` and uploads the coverage artifact
+  - uploads coverage results to [Codecov](https://codecov.io/gh/danphenderson/dev-danhenderson)
+- `build.yml` builds the app and runs E2E tests on pull requests and pushes to `main`
+  - **`build`**: runs `npm run build` and uploads the production build artifact
+  - **`e2e`**: downloads the build artifact, restores cached Playwright browsers, installs Chromium/system dependencies as needed, and runs `npx playwright test`
+- shared runner setup is centralized in `.github/actions/setup/action.yml` (`actions/setup-node@v4`, npm cache, `npm ci`)
+- docs-only changes are skipped via `paths-ignore` rules for markdown, selected repo config files, `resume/**`, and `plans/**`
+- `codeql.yml` runs GitHub CodeQL analysis for JavaScript/TypeScript on pull requests, pushes to `main`, and a weekly schedule
+
+### CI/CD integration stack
+
+- **GitHub Actions** orchestrates CI in `.github/workflows/`
+- **Playwright** provides browser-level E2E coverage in CI and locally from `test/e2e/`
+- **Codecov** reports test coverage from CI runs via the [Codecov dashboard](https://codecov.io/gh/danphenderson/dev-danhenderson)
+- **GitHub Artifacts** store the production build, coverage report, and Playwright failure output
+- **CodeQL** provides repository security analysis for the JavaScript/TypeScript codebase
+- **Dependabot** (`.github/dependabot.yml`) opens weekly npm and GitHub Actions dependency update PRs
 
 ### End-to-end testing
 
-[Playwright](https://playwright.dev/) provides browser-level E2E coverage that complements the Jest unit/integration suite. Tests live in `e2e/` and run against a production build served on port `3100`.
+[Playwright](https://playwright.dev/) provides browser-level E2E coverage that complements the Jest unit/integration suite. Tests live in `test/e2e/` and run against a production build served on port `3100`.
 
 #### Prerequisites
 
@@ -195,15 +222,31 @@ npm run test:e2e:ui        # Open the Playwright interactive UI runner
 
 #### Test structure
 
+All tests are centralized under `test/`:
+
 ```text
-e2e/
-├── helpers/
-│   └── github.ts          # Reusable GitHub API mock handlers (success + failure)
-├── home.spec.ts            # Home hero render and welcome audio prompt dismissal
-├── cv.github.spec.ts       # CV render, mocked GitHub API success, and graceful fallback
-├── climbing.spec.ts        # Climbing route tables render
-├── photography.spec.ts     # Photography category cards and direct slug navigation
-└── not-found.spec.ts       # 404 page for unknown routes
+test/
+├── unit/                          # Jest unit and integration tests
+│   ├── App.test.tsx
+│   ├── ThemeProvider.test.tsx
+│   ├── WelcomeAudioProvider.test.tsx
+│   ├── components/
+│   │   ├── cv/                    # CV section component tests
+│   │   ├── header/                # Header component tests
+│   │   ├── layout/                # Layout primitive tests
+│   │   └── text/                  # Text primitive tests
+│   ├── hooks/                     # Data adapter hook tests
+│   ├── pages/                     # Route-level page tests
+│   ├── styles/                    # Style builder tests
+│   └── utils/                     # Utility tests
+└── e2e/                           # Playwright end-to-end tests
+    ├── helpers/
+    │   └── github.ts              # Reusable GitHub API mock handlers (success + failure)
+    ├── home.spec.ts               # Home hero render and welcome audio prompt dismissal
+    ├── cv.github.spec.ts          # CV render, mocked GitHub API success, and graceful fallback
+    ├── climbing.spec.ts           # Climbing route tables render
+    ├── photography.spec.ts        # Photography category cards and direct slug navigation
+    └── not-found.spec.ts          # 404 page for unknown routes
 ```
 
 #### Configuration highlights
@@ -234,8 +277,10 @@ e2e/
   - photography collections, album images, and route slugs consumed by `usePhotographyData`
   - preserve slug stability so existing album URLs continue to resolve
 - `src/ThemeProvider.tsx`
-  - application palette, typography, and component theme overrides
-  - persisted theme key: `danhenderson-theme`
+  - global light/dark mode and appearance preset state
+  - persisted keys: `danhenderson-theme`, `danhenderson-appearance`
+- `src/theme/appAppearance.ts`
+  - application appearance presets, typography directions, and surface/motion treatment tokens
 - `src/WelcomeAudioProvider.tsx`
   - SoundCloud embed URL and welcome-audio behavior
   - persisted audio consent key: `danhenderson-welcome-audio-consent`
@@ -249,8 +294,7 @@ e2e/
 
 ```text
 .
-├── .github/workflows/   # Build and test automation
-├── e2e/                 # Playwright end-to-end tests
+├── .github/workflows/   # CI, E2E, and security automation
 ├── public/assets/       # Shipped images, certificates, media, and resume PDF
 ├── resume/              # LaTeX resume source
 ├── src/components/      # Shared UI and CV-specific components
@@ -260,6 +304,8 @@ e2e/
 ├── src/styles/          # Shared animation, layout, and component style tokens
 ├── src/types/           # Shared TypeScript models
 ├── src/utils/           # Asset/date helpers and similar utilities
+├── test/unit/           # Jest unit and integration tests (mirrors src/ structure)
+├── test/e2e/            # Playwright end-to-end tests
 └── README.md
 ```
 
@@ -267,7 +313,7 @@ e2e/
 
 - Update CV copy, certificates, code examples, and GitHub fallback content in `src/data/cv.ts`.
 - Replace the downloadable resume PDF at `public/assets/daniel-henderson-resume.pdf` and keep related metadata in `src/data/cv.ts` aligned with it.
-- Update app theme tokens and MUI component overrides in `src/ThemeProvider.tsx`.
+- Update global appearance presets in `src/theme/appAppearance.ts`, theme assembly in `src/theme/createAppTheme.ts`, and persisted theme state in `src/ThemeProvider.tsx`.
 - Keep reusable page and CV styling centralized in `src/styles/appStyles.ts` and `src/styles/componentStyles.ts` rather than reintroducing component-local `sx` fragments.
 - Update welcome-audio behavior or track configuration in `src/WelcomeAudioProvider.tsx`.
 - Use `resolvePublicAssetPath(...)` from `src/utils/assets.ts` when adding new local asset paths to keep `PUBLIC_URL` behavior stable.

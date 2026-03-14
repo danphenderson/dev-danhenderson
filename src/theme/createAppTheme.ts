@@ -1,69 +1,70 @@
 import { PaletteMode } from '@mui/material';
-import { deepOrange } from '@mui/material/colors';
 import { alpha, createTheme } from '@mui/material/styles';
+import {
+  appAppearancePresets,
+  resolveAppearanceTreatment,
+  type AppAppearanceKey,
+} from './appAppearance';
 
-export const createAppTheme = (mode: PaletteMode) =>
-  createTheme({
+export const createAppTheme = (mode: PaletteMode, appearanceKey: AppAppearanceKey) => {
+  const appearancePreset = appAppearancePresets[appearanceKey];
+  const appearanceTreatment = resolveAppearanceTreatment(mode, appearanceKey);
+  const bodyFontFamily = appearancePreset.typography.bodyFontFamily;
+  const headingFontFamily = appearancePreset.typography.headingFontFamily;
+  const resolvedPalette = appearancePreset.palette[mode];
+  const textPrimary = resolvedPalette.text.primary;
+  const textSecondary = resolvedPalette.text.secondary;
+
+  return createTheme({
+    appearanceTreatment,
     palette: {
       mode,
-      primary: {
-        light: '#61cef5',
-        main: '#1ba8e0',
-        dark: '#067daf',
-        contrastText: '#061426',
-      },
-      secondary: {
-        light: '#ffbf9d',
-        main: deepOrange[500],
-        dark: deepOrange[700],
-      },
+      primary: resolvedPalette.primary,
+      secondary: resolvedPalette.secondary,
       text: {
-        primary: mode === 'light' ? '#102238' : '#e6eef9',
-        secondary: mode === 'light' ? '#3b516d' : '#b7c7de',
+        primary: textPrimary,
+        secondary: textSecondary,
       },
-      background: {
-        default: mode === 'light' ? '#dbe6f1' : '#0a1525',
-        paper: mode === 'light' ? '#f6fbff' : '#0f1f35',
-      },
-      divider: mode === 'light' ? alpha('#102238', 0.14) : alpha('#e6eef9', 0.2),
+      background: resolvedPalette.background,
+      divider: alpha(textPrimary, mode === 'light' ? 0.14 : 0.2),
     },
     shape: {
       borderRadius: 14,
     },
     typography: {
-      fontFamily: ['Source Sans 3', 'Helvetica Neue', 'Arial', 'sans-serif'].join(','),
+      fontFamily: bodyFontFamily.join(','),
       h1: {
-        fontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'].join(','),
+        fontFamily: headingFontFamily.join(','),
         fontWeight: 700,
         fontSize: 'clamp(2rem, 4vw, 3rem)',
         lineHeight: 1.1,
       },
       h2: {
-        fontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'].join(','),
+        fontFamily: headingFontFamily.join(','),
         fontWeight: 700,
         fontSize: 'clamp(1.65rem, 3vw, 2.25rem)',
         lineHeight: 1.15,
       },
       h3: {
-        fontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'].join(','),
+        fontFamily: headingFontFamily.join(','),
         fontWeight: 700,
         fontSize: 'clamp(1.4rem, 2.5vw, 1.8rem)',
         lineHeight: 1.2,
       },
       h4: {
-        fontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'].join(','),
+        fontFamily: headingFontFamily.join(','),
         fontWeight: 600,
         fontSize: 'clamp(1.3rem, 2.1vw, 1.65rem)',
         lineHeight: 1.2,
       },
       h5: {
-        fontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'].join(','),
+        fontFamily: headingFontFamily.join(','),
         fontWeight: 600,
         fontSize: '1.22rem',
         lineHeight: 1.25,
       },
       h6: {
-        fontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'].join(','),
+        fontFamily: headingFontFamily.join(','),
         fontWeight: 600,
         fontSize: '1.06rem',
         lineHeight: 1.3,
@@ -87,7 +88,7 @@ export const createAppTheme = (mode: PaletteMode) =>
         lineHeight: 1.58,
       },
       overline: {
-        fontFamily: ['Space Grotesk', 'Source Sans 3', 'sans-serif'].join(','),
+        fontFamily: headingFontFamily.join(','),
         fontWeight: 700,
         letterSpacing: '0.12em',
       },
@@ -130,11 +131,20 @@ export const createAppTheme = (mode: PaletteMode) =>
         styleOverrides: {
           root: ({ theme }) => ({
             backgroundColor: alpha(
-              theme.palette.primary.contrastText,
-              theme.palette.mode === 'light' ? 0.88 : 0.86
+              resolvedPalette.appBar.background,
+              theme.palette.mode === 'light' ? 0.92 : 0.88
             ),
-            borderBottom: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.24 : 0.36)}`,
-            backdropFilter: 'blur(10px)',
+            border: 'none',
+            borderBottom: `1px solid ${alpha(
+              theme.palette.primary.main,
+              theme.palette.mode === 'light' ? 0.2 : 0.28
+            )}`,
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            boxShadow:
+              theme.palette.mode === 'light'
+                ? `0 1px 3px ${alpha(theme.palette.common.black, 0.06)}, 0 4px 14px ${alpha(theme.palette.common.black, 0.04)}`
+                : `0 1px 4px ${alpha(theme.palette.common.black, 0.18)}, 0 6px 18px ${alpha(theme.palette.common.black, 0.1)}`,
           }),
         },
       },
@@ -167,7 +177,10 @@ export const createAppTheme = (mode: PaletteMode) =>
         styleOverrides: {
           root: ({ theme }) => ({
             borderRadius: 999,
-            borderColor: alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.25 : 0.45),
+            borderColor: alpha(
+              theme.palette.primary.main,
+              theme.palette.mode === 'light' ? 0.25 : 0.45
+            ),
           }),
         },
       },
@@ -178,19 +191,40 @@ export const createAppTheme = (mode: PaletteMode) =>
           },
         },
         styleOverrides: {
-          root: ({ theme }) => ({
-            zIndex: theme.zIndex.appBar - 1,
-          }),
           fab: ({ theme }) => ({
             color: theme.palette.text.primary,
-            backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.94 : 0.82),
-            border: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.28 : 0.52)}`,
-            boxShadow: theme.palette.mode === 'light'
-              ? `0 12px 28px ${alpha(theme.palette.common.black, 0.18)}`
-              : `0 14px 30px ${alpha(theme.palette.common.black, 0.34)}`,
-            backdropFilter: 'blur(12px)',
+            backgroundColor: alpha(
+              theme.palette.background.paper,
+              Math.min(
+                theme.appearanceTreatment.surface.panelSurfaceAlpha +
+                  (theme.palette.mode === 'light' ? 0.18 : 0.24),
+                0.96
+              )
+            ),
+            border: `1px solid ${alpha(
+              theme.palette.primary.main,
+              Math.min(theme.appearanceTreatment.surface.panelBorderAlpha + 0.08, 0.58)
+            )}`,
+            boxShadow:
+              theme.palette.mode === 'light'
+                ? `0 12px 28px ${alpha(
+                    theme.palette.common.black,
+                    theme.appearanceTreatment.surface.cardShadowAlpha + 0.02
+                  )}`
+                : `0 14px 30px ${alpha(
+                    theme.palette.common.black,
+                    theme.appearanceTreatment.surface.cardShadowAlpha
+                  )}`,
+            backdropFilter: `blur(${theme.appearanceTreatment.surface.cardBlurPx + 2}px)`,
             '&:hover': {
-              backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.98 : 0.9),
+              backgroundColor: alpha(
+                theme.palette.background.paper,
+                Math.min(
+                  theme.appearanceTreatment.surface.panelSurfaceAlpha +
+                    (theme.palette.mode === 'light' ? 0.22 : 0.3),
+                  1
+                )
+              ),
             },
             '&:focus-visible': {
               outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
@@ -210,13 +244,37 @@ export const createAppTheme = (mode: PaletteMode) =>
         styleOverrides: {
           fab: ({ theme }) => ({
             color: theme.palette.text.primary,
-            backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.95 : 0.86),
-            border: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.22 : 0.46)}`,
-            boxShadow: theme.palette.mode === 'light'
-              ? `0 10px 22px ${alpha(theme.palette.common.black, 0.14)}`
-              : `0 12px 24px ${alpha(theme.palette.common.black, 0.3)}`,
+            backgroundColor: alpha(
+              theme.palette.background.paper,
+              Math.min(
+                theme.appearanceTreatment.surface.panelSurfaceAlpha +
+                  (theme.palette.mode === 'light' ? 0.2 : 0.28),
+                0.98
+              )
+            ),
+            border: `1px solid ${alpha(
+              theme.palette.primary.main,
+              Math.min(theme.appearanceTreatment.surface.panelBorderAlpha + 0.04, 0.52)
+            )}`,
+            boxShadow:
+              theme.palette.mode === 'light'
+                ? `0 10px 22px ${alpha(
+                    theme.palette.common.black,
+                    Math.max(theme.appearanceTreatment.surface.cardShadowAlpha - 0.02, 0.1)
+                  )}`
+                : `0 12px 24px ${alpha(
+                    theme.palette.common.black,
+                    Math.max(theme.appearanceTreatment.surface.cardShadowAlpha - 0.05, 0.22)
+                  )}`,
             '&:hover': {
-              backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 1 : 0.92),
+              backgroundColor: alpha(
+                theme.palette.background.paper,
+                Math.min(
+                  theme.appearanceTreatment.surface.panelSurfaceAlpha +
+                    (theme.palette.mode === 'light' ? 0.24 : 0.32),
+                  1
+                )
+              ),
             },
             '&:focus-visible': {
               outline: `2px solid ${alpha(theme.palette.primary.light, 0.7)}`,
@@ -226,14 +284,31 @@ export const createAppTheme = (mode: PaletteMode) =>
           staticTooltipLabel: ({ theme }) => ({
             ...theme.typography.button,
             color: theme.palette.text.primary,
-            backgroundColor: alpha(theme.palette.background.paper, theme.palette.mode === 'light' ? 0.96 : 0.88),
-            border: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.18 : 0.38)}`,
+            backgroundColor: alpha(
+              theme.palette.background.paper,
+              Math.min(
+                theme.appearanceTreatment.surface.panelSurfaceAlpha +
+                  (theme.palette.mode === 'light' ? 0.22 : 0.3),
+                0.98
+              )
+            ),
+            border: `1px solid ${alpha(
+              theme.palette.primary.main,
+              theme.appearanceTreatment.surface.panelBorderAlpha
+            )}`,
             borderRadius: 999,
-            boxShadow: theme.palette.mode === 'light'
-              ? `0 10px 22px ${alpha(theme.palette.common.black, 0.12)}`
-              : `0 12px 24px ${alpha(theme.palette.common.black, 0.28)}`,
+            boxShadow:
+              theme.palette.mode === 'light'
+                ? `0 10px 22px ${alpha(
+                    theme.palette.common.black,
+                    Math.max(theme.appearanceTreatment.surface.cardShadowAlpha - 0.04, 0.08)
+                  )}`
+                : `0 12px 24px ${alpha(
+                    theme.palette.common.black,
+                    Math.max(theme.appearanceTreatment.surface.cardShadowAlpha - 0.07, 0.18)
+                  )}`,
             padding: '6px 12px',
-            backdropFilter: 'blur(12px)',
+            backdropFilter: `blur(${theme.appearanceTreatment.surface.cardBlurPx + 2}px)`,
           }),
         },
       },
@@ -265,3 +340,4 @@ export const createAppTheme = (mode: PaletteMode) =>
       },
     },
   });
+};

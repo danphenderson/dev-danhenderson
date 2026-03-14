@@ -6,6 +6,7 @@ import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { ProfileCard } from './ProfileCard';
 import { SectionHeading } from '../layout/SectionHeading';
 import { CVSectionCard } from './CVSectionCard';
+import { ANIMATED_CARD_DURATION_MS } from '../AnimatedContentCard';
 
 type CVAboutSectionProps = {
   about: AboutMe;
@@ -25,6 +26,7 @@ export const CVAboutSection = ({
   sectionId,
 }: CVAboutSectionProps) => {
   const { compactSidebarSectionSpacing, sectionHeadingCompactSx } = useComponentStyles();
+  const bioAnimationStartDelayMs = delayMs + ANIMATED_CARD_DURATION_MS;
 
   return (
     <CVSectionCard
@@ -36,13 +38,13 @@ export const CVAboutSection = ({
       <Stack spacing={2}>
         <Stack spacing={compactSidebarSectionSpacing}>
           <SectionHeading overline="About" sx={sectionHeadingCompactSx} />
-          <ProfileCard about={about} actions={actions} />
+          <ProfileCard
+            about={about}
+            actions={actions}
+            bioAnimationStartDelayMs={bioAnimationStartDelayMs}
+          />
         </Stack>
-        {footer && (
-          <Stack spacing={1.5}>
-            {footer}
-          </Stack>
-        )}
+        {footer && <Stack spacing={1.5}>{footer}</Stack>}
       </Stack>
     </CVSectionCard>
   );

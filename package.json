@@ -13,17 +13,19 @@
     "@types/node": "^16.18.39",
     "@types/react": "^18.2.17",
     "@types/react-dom": "^18.2.7",
+    "motion": "^12.36.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-github-calendar": "^5.0.3",
     "react-router-dom": "^6.30.3",
     "react-scripts": "5.0.1",
+    "react-tooltip": "^5.30.0",
     "typescript": "^4.9.5"
   },
   "scripts": {
     "start": "PORT=${PORT:-3001} react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "react-scripts test --roots test/unit src",
     "eject": "react-scripts eject",
     "serve:e2e": "serve -s build -l 3100",
     "test:e2e": "playwright test",
@@ -36,6 +38,11 @@
     "@testing-library/react": "^14.2.1",
     "@types/jest": "^29.5.12",
     "serve": "^14.2.6"
+  },
+  "jest": {
+    "testMatch": [
+      "<rootDir>/test/unit/**/*.test.{ts,tsx}"
+    ]
   },
   "eslintConfig": {
     "extends": [

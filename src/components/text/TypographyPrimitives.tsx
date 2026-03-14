@@ -17,10 +17,14 @@ type TextPrimitiveProps = Omit<TypographyProps, 'variant'> & {
  * Renders as a `<span>` with `variant="overline"`.
  */
 export const HeaderLabel = ({ children, sx, ...rest }: TextPrimitiveProps) => {
-  const { overlineSx, sectionHeadingOverlineTextSx } = useComponentStyles();
+  const { overlineSx, supportOverlineSx, sectionHeadingOverlineTextSx } = useComponentStyles();
 
   return (
-    <Typography variant="overline" sx={mergeSx([overlineSx, sectionHeadingOverlineTextSx], sx)} {...rest}>
+    <Typography
+      variant="overline"
+      sx={mergeSx([overlineSx, supportOverlineSx, sectionHeadingOverlineTextSx], sx)}
+      {...rest}
+    >
       {children}
     </Typography>
   );
@@ -96,10 +100,14 @@ export const EntrySubtitle = ({ children, sx, ...rest }: TextPrimitiveProps) => 
 
 /** GitHub subsection / nav overline label – `variant="overline"`, accent text. */
 export const SectionLabel = ({ children, sx, ...rest }: TextPrimitiveProps) => {
-  const { sectionNavigatorLeadSx } = useComponentStyles();
+  const { sectionNavigatorLeadSx, supportOverlineSx } = useComponentStyles();
 
   return (
-    <Typography variant="overline" sx={mergeSx([sectionNavigatorLeadSx], sx)} {...rest}>
+    <Typography
+      variant="overline"
+      sx={mergeSx([sectionNavigatorLeadSx, supportOverlineSx], sx)}
+      {...rest}
+    >
       {children}
     </Typography>
   );

@@ -6,11 +6,43 @@ type LoadingBarTone = 'primary' | 'secondary' | 'success';
 
 export const createAppStyleMap = (theme: Theme) => {
   const isLight = theme.palette.mode === 'light';
-  const backgroundOverlayColor = alpha(theme.palette.common.black, isLight ? 0.4 : 0.6);
-  const shellBackgroundColor = alpha(theme.palette.background.paper, isLight ? 0.72 : 0.6);
-  const shellBorder = `1px solid ${alpha(theme.palette.divider, 0.5)}`;
+  const surface = theme.appearanceTreatment.surface;
+  const backgroundOverlayColor = alpha(
+    theme.palette.common.black,
+    surface.backgroundOverlayOpacity
+  );
+  const shellBackgroundColor = alpha(theme.palette.background.paper, surface.panelSurfaceAlpha);
+  const shellBorder = `1px solid ${alpha(theme.palette.divider, surface.panelBorderAlpha)}`;
+  const homeHeroShellBackgroundColor = alpha(
+    theme.palette.primary.contrastText,
+    theme.palette.mode === 'light' ? 0.76 : 0.72
+  );
+  const homeHeroShellBorder = `1px solid ${alpha(
+    theme.palette.common.white,
+    theme.palette.mode === 'light' ? 0.38 : 0.24
+  )}`;
+  const homeHeroShellBlurPx = Math.max(surface.cardBlurPx + 2, 12);
+  const homeHeroShellShadow = `0 18px 40px ${alpha(
+    theme.palette.common.black,
+    theme.palette.mode === 'light' ? 0.22 : 0.34
+  )}`;
   const photoPlaceholderColor = alpha(theme.palette.text.primary, isLight ? 0.08 : 0.18);
   const photoDownloadShadow = alpha(theme.palette.common.black, isLight ? 0.18 : 0.42);
+  const floatingActionBackgroundColor = alpha(
+    theme.palette.background.paper,
+    Math.min(surface.panelSurfaceAlpha + (isLight ? 0.18 : 0.24), 0.96)
+  );
+  const floatingActionHoverBackgroundColor = alpha(
+    theme.palette.background.paper,
+    Math.min(surface.panelSurfaceAlpha + (isLight ? 0.22 : 0.3), 1)
+  );
+  const floatingActionBorder = `1px solid ${alpha(
+    theme.palette.primary.main,
+    Math.min(surface.panelBorderAlpha + 0.08, 0.58)
+  )}`;
+  const floatingActionShadow = isLight
+    ? `0 12px 28px ${alpha(theme.palette.common.black, surface.cardShadowAlpha + 0.02)}`
+    : `0 14px 30px ${alpha(theme.palette.common.black, surface.cardShadowAlpha)}`;
 
   const getBackgroundImageSx = (resolvedImage: string): SxProps<Theme> => ({
     backgroundImage: `url('${resolvedImage}')`,
@@ -37,10 +69,7 @@ export const createAppStyleMap = (theme: Theme) => {
     py: 6.25,
   });
 
-  const getHeaderHighlightSx = (
-    tone: HeaderHighlightTone,
-    animation: string
-  ): SxProps<Theme> => {
+  const getHeaderHighlightSx = (tone: HeaderHighlightTone, animation: string): SxProps<Theme> => {
     const palette = tone === 'primary' ? theme.palette.primary : theme.palette.secondary;
     const ringColor = alpha(palette.light, tone === 'secondary' ? 0.95 : 0.9);
     const glowColor = alpha(palette.main, 0.35);
@@ -116,11 +145,32 @@ export const createAppStyleMap = (theme: Theme) => {
     fontSize: { xs: 26, md: 30 },
   };
 
+  const headerSpeedDialSx = {
+    position: 'relative',
+    overflow: 'visible',
+    flexShrink: 0,
+  } satisfies SxProps<Theme>;
+
   const photographyCardSx: SxProps<Theme> = {
     height: '100%',
     display: 'flex',
     flexDirection: 'column',
     gap: 1.5,
+  };
+
+  const photographyGridSx: SxProps<Theme> = {
+    display: 'grid',
+    gap: 2.5,
+    gridTemplateColumns: {
+      xs: 'minmax(0, 1fr)',
+      sm: 'repeat(2, minmax(0, 1fr))',
+      md: 'repeat(3, minmax(0, 1fr))',
+    },
+    alignItems: 'stretch',
+  };
+
+  const photographyGridItemSx: SxProps<Theme> = {
+    minWidth: 0,
   };
 
   const photographyCardContentSx: SxProps<Theme> = {
@@ -150,7 +200,10 @@ export const createAppStyleMap = (theme: Theme) => {
       content: '""',
       position: 'absolute',
       inset: 0,
-      background: `linear-gradient(180deg, ${alpha(theme.palette.common.black, 0.58)} 0%, ${alpha(theme.palette.common.black, 0.18)} 34%, ${alpha(theme.palette.common.black, 0)} 64%)`,
+      background: `linear-gradient(180deg, ${alpha(theme.palette.common.black, 0.58)} 0%, ${alpha(
+        theme.palette.common.black,
+        0.18
+      )} 34%, ${alpha(theme.palette.common.black, 0)} 64%)`,
       opacity: 0,
       pointerEvents: 'none',
       transition: 'opacity 180ms ease',
@@ -218,13 +271,24 @@ export const createAppStyleMap = (theme: Theme) => {
       order: { xs: 1, md: 2 },
     } satisfies SxProps<Theme>,
     homeHeroContentSx: { pb: 24.25 } satisfies SxProps<Theme>,
-    homeHeroShellSx: { p: 1.5, pb: 0.5 } satisfies SxProps<Theme>,
+    homeHeroShellSx: {
+      p: 1.5,
+      pb: 0.5,
+      backgroundColor: homeHeroShellBackgroundColor,
+      backgroundImage: 'none',
+      border: homeHeroShellBorder,
+      boxShadow: homeHeroShellShadow,
+      backdropFilter: `blur(${homeHeroShellBlurPx}px)`,
+      WebkitBackdropFilter: `blur(${homeHeroShellBlurPx}px)`,
+    } satisfies SxProps<Theme>,
     homeHeroTitleSx: {
       color: theme.palette.common.white,
       fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
       lineHeight: 1.5,
     } satisfies SxProps<Theme>,
     headerIconSx,
+    photographyGridSx,
+    photographyGridItemSx,
     headerToolbarSx: {
       px: { xs: 1.5, md: 2.5 },
       gap: { xs: 1.5, md: 2.5 },
@@ -240,6 +304,29 @@ export const createAppStyleMap = (theme: Theme) => {
       flexShrink: 0,
       ml: 'auto',
     } satisfies SxProps<Theme>,
+    headerAppearanceDialSx: {
+      ...headerSpeedDialSx,
+      '& .MuiSpeedDial-actions': {
+        position: 'absolute',
+        [theme.breakpoints.down('md')]: {
+          // direction="down" on mobile: drop actions below the FAB
+          top: '100%',
+          right: 0,
+          marginTop: 0,
+          paddingTop: theme.spacing(1),
+          flexDirection: 'column',
+        },
+        [theme.breakpoints.up('md')]: {
+          // direction="left" on desktop: place actions to the left of the FAB
+          right: '100%',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          marginRight: 0,
+          paddingRight: theme.spacing(1.5),
+          flexDirection: 'row-reverse',
+        },
+      },
+    } satisfies SxProps<Theme>,
     headerNavLeadSx: {
       display: 'flex',
       alignItems: 'center',
@@ -253,28 +340,54 @@ export const createAppStyleMap = (theme: Theme) => {
       minWidth: 0,
     } satisfies SxProps<Theme>,
     headerNavButtonSx: {
+      color: alpha(theme.palette.common.white, 0.78),
+      fontSize: { md: '1.5rem' },
+      position: 'relative',
+      transition: 'color 180ms ease',
+      '&:hover': {
+        color: theme.palette.common.white,
+        backgroundColor: alpha(theme.palette.common.white, 0.08),
+      },
+    } satisfies SxProps<Theme>,
+    headerNavButtonActiveSx: {
       color: theme.palette.common.white,
       fontSize: { md: '1.5rem' },
+      position: 'relative',
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        bottom: 4,
+        left: '20%',
+        right: '20%',
+        height: 2,
+        borderRadius: 1,
+        backgroundColor: alpha(theme.palette.primary.light, 0.85),
+      },
     } satisfies SxProps<Theme>,
-    headerAvatarButtonSx: {
-      p: { xs: 0.5, md: 0.625 },
+    headerAvatarLinkSx: {
+      display: 'flex',
+      alignItems: 'center',
+      borderRadius: '50%',
+      transition: 'box-shadow 180ms ease',
+      '&:hover': {
+        boxShadow: `0 0 0 2px ${alpha(theme.palette.common.white, 0.3)}`,
+      },
+      '&:focus-visible': {
+        outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
+        outlineOffset: 2,
+      },
     } satisfies SxProps<Theme>,
     headerAvatarSx: {
-      width: { xs: 40, md: 50 },
-      height: { xs: 40, md: 50 },
-      border: `2.5px solid ${alpha(theme.palette.common.white, 0.8)}`,
+      width: { xs: 36, md: 44 },
+      height: { xs: 36, md: 44 },
+      border: `2px solid ${alpha(theme.palette.common.white, 0.7)}`,
     } satisfies SxProps<Theme>,
-    headerPageDialSx: {
-      position: 'relative',
-      overflow: 'visible',
-      flexShrink: 0,
-      '& .MuiSpeedDial-actions': {
-        position: 'absolute',
-        left: '100%',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        marginLeft: 0,
-        paddingLeft: 1.5,
+    headerIconButtonSx: {
+      color: alpha(theme.palette.common.white, 0.82),
+      transition: 'color 180ms ease, background-color 180ms ease',
+      '&:hover': {
+        color: theme.palette.common.white,
+        backgroundColor: alpha(theme.palette.common.white, 0.1),
       },
     } satisfies SxProps<Theme>,
     headerAudioControlSx: {
@@ -285,6 +398,73 @@ export const createAppStyleMap = (theme: Theme) => {
     compactSectionHeadingSx: { mb: 0 } satisfies SxProps<Theme>,
     sectionHeadingOffsetSx: { mt: 2 } satisfies SxProps<Theme>,
     sectionLoadingSx: { mt: 1 } satisfies SxProps<Theme>,
+    backToTopFabSx: {
+      position: 'fixed',
+      right: {
+        xs: 'calc(env(safe-area-inset-right, 0px) + 16px)',
+        md: 'calc(env(safe-area-inset-right, 0px) + 24px)',
+      },
+      bottom: {
+        xs: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+        md: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
+      },
+      zIndex: theme.zIndex.appBar - 1,
+      color: theme.palette.text.primary,
+      backgroundColor: floatingActionBackgroundColor,
+      border: floatingActionBorder,
+      boxShadow: floatingActionShadow,
+      backdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+      WebkitBackdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+      '&:hover': {
+        backgroundColor: floatingActionHoverBackgroundColor,
+      },
+      '&:focus-visible': {
+        outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
+        outlineOffset: 3,
+      },
+    } satisfies SxProps<Theme>,
+    cvFloatingDialSx: {
+      position: 'fixed',
+      right: {
+        xs: 'calc(env(safe-area-inset-right, 0px) + 16px)',
+        md: 'calc(env(safe-area-inset-right, 0px) + 24px)',
+      },
+      bottom: {
+        xs: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+        md: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
+      },
+      '& .MuiSpeedDial-fab': {
+        color: theme.palette.text.primary,
+        backgroundColor: floatingActionBackgroundColor,
+        border: floatingActionBorder,
+        boxShadow: floatingActionShadow,
+        backdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+        WebkitBackdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+        '&:hover': {
+          backgroundColor: floatingActionHoverBackgroundColor,
+        },
+      },
+      '& .MuiSpeedDialAction-fab': {
+        color: theme.palette.text.primary,
+        backgroundColor: floatingActionBackgroundColor,
+        border: floatingActionBorder,
+        boxShadow: floatingActionShadow,
+        backdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+        WebkitBackdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+        '&:hover': {
+          backgroundColor: floatingActionHoverBackgroundColor,
+        },
+      },
+    } satisfies SxProps<Theme>,
+    cvFloatingDialActiveFabSx: {
+      '& .MuiSpeedDial-fab': {
+        borderColor: alpha(theme.palette.primary.light, isLight ? 0.42 : 0.56),
+        boxShadow: `${floatingActionShadow}, 0 0 16px ${alpha(
+          theme.palette.primary.main,
+          isLight ? 0.18 : 0.28
+        )}`,
+      },
+    } satisfies SxProps<Theme>,
     primaryTextSx,
     secondaryTextSx,
     footerTextSx: {

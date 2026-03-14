@@ -1,16 +1,10 @@
-import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
-import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import {
-  IconButton,
-  Stack,
-  Tooltip,
-} from '@mui/material';
-import type { PaletteMode } from '@mui/material';
+import { Stack, Tooltip, IconButton } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { MutableRefObject } from 'react';
 import { useAppStyles } from '../../styles/appStyles';
+import { HeaderAppearanceDial, type HeaderAppearanceDialProps } from './HeaderAppearanceDial';
 
 type HeaderActionsProps = {
   iconButtonSize: 'small' | 'medium' | 'large';
@@ -21,12 +15,7 @@ type HeaderActionsProps = {
   pauseButtonRef?: MutableRefObject<HTMLButtonElement | null>;
   showPauseHint?: boolean;
   pauseHighlightSx?: SxProps<Theme>;
-  showThemeControl?: boolean;
-  mode?: PaletteMode;
-  onToggleTheme?: () => void;
-  themeButtonRef?: MutableRefObject<HTMLButtonElement | null>;
-  showDarkModeHint?: boolean;
-  themeHighlightSx?: SxProps<Theme>;
+  appearanceDial?: Omit<HeaderAppearanceDialProps, 'iconButtonSize'>;
 };
 
 export const HeaderActions = ({
@@ -38,17 +27,14 @@ export const HeaderActions = ({
   pauseButtonRef,
   showPauseHint = false,
   pauseHighlightSx,
-  showThemeControl = false,
-  mode = 'light',
-  onToggleTheme,
-  themeButtonRef,
-  showDarkModeHint = false,
-  themeHighlightSx,
+  appearanceDial,
 }: HeaderActionsProps) => {
   const appStyles = useAppStyles();
-  const pauseButtonSx = (pauseHighlightSx
-    ? [appStyles.headerAudioControlSx, pauseHighlightSx]
-    : appStyles.headerAudioControlSx) as SxProps<Theme>;
+  const pauseButtonSx = (
+    pauseHighlightSx
+      ? [appStyles.headerIconButtonSx, appStyles.headerAudioControlSx, pauseHighlightSx]
+      : [appStyles.headerIconButtonSx, appStyles.headerAudioControlSx]
+  ) as SxProps<Theme>;
 
   return (
     <Stack direction="row" spacing={{ xs: 1, md: 2 }} alignItems="center">
@@ -74,24 +60,8 @@ export const HeaderActions = ({
         </Tooltip>
       )}
 
-      {showThemeControl && (
-        <Tooltip title={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}>
-          <IconButton
-            color="inherit"
-            size={iconButtonSize}
-            ref={themeButtonRef}
-            onClick={onToggleTheme}
-            aria-label="Toggle color theme"
-            aria-describedby={showDarkModeHint ? 'dark-mode-popover' : undefined}
-            sx={themeHighlightSx}
-          >
-            {mode === 'light' ? (
-              <DarkModeOutlinedIcon sx={headerIconSx} />
-            ) : (
-              <LightModeOutlinedIcon sx={headerIconSx} />
-            )}
-          </IconButton>
-        </Tooltip>
+      {appearanceDial && (
+        <HeaderAppearanceDial iconButtonSize={iconButtonSize} {...appearanceDial} />
       )}
     </Stack>
   );

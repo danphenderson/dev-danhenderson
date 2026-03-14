@@ -12,23 +12,12 @@ type PageFrameProps = {
   containerSx?: SxProps<Theme>;
 };
 
-export const PageFrame = ({
-  image,
-  children,
-  maxWidth = 1400,
-  containerSx,
-}: PageFrameProps) => {
+export const PageFrame = ({ image, children, maxWidth = 1400, containerSx }: PageFrameProps) => {
   const appStyles = useAppStyles();
 
   return (
     <BackgroundPaper image={image} showShell={false}>
-      <Box
-        sx={[
-          appStyles.pageFrameContainerSx,
-          { maxWidth },
-          ...normalizeSxProp(containerSx),
-        ]}
-      >
+      <Box sx={[appStyles.pageFrameContainerSx, { maxWidth }, ...normalizeSxProp(containerSx)]}>
         {children}
       </Box>
     </BackgroundPaper>

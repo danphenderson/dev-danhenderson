@@ -1,14 +1,21 @@
 import { Fragment } from 'react';
-import { Box, Chip, Link, Stack } from '@mui/material';
+import { Box, Chip, Stack } from '@mui/material';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { EntryTitle, MetaText, StrongMetaText, ChipLabel } from '../text';
+
+type CVEntryChip = {
+  label: string;
+};
 
 type CVEntryHeaderProps = {
   title: string;
   organization: string;
   organizationUrl?: string;
+  organizationTooltip?: string;
   dateRange?: string;
-  chip?: { label: string };
+  chip?: CVEntryChip;
+  chips?: CVEntryChip[];
   supportingMeta?: string[];
 };
 
@@ -16,48 +23,64 @@ export const CVEntryHeader = ({
   title,
   organization,
   organizationUrl,
+  organizationTooltip,
   dateRange,
   chip,
+  chips,
   supportingMeta,
 }: CVEntryHeaderProps) => {
   const {
-    cvEntryHeaderRowSx,
+    cvEntryTitleRowSx,
+    cvEntryOrganizationRowSx,
+    cvEntryChipGroupSx,
     cvEntryChipSx,
     cvEntrySupportingMetaSx,
     minWidthResetSx,
-    secondaryStrongSx,
+    supportAccentStrongTextSx,
   } = useComponentStyles();
+  const renderedChips = chips?.length ? chips : chip ? [chip] : [];
 
   return (
     <Stack spacing={0.75} width="100%">
-      <Box sx={cvEntryHeaderRowSx}>
+      <Box sx={cvEntryTitleRowSx}>
         <EntryTitle sx={minWidthResetSx}>{title}</EntryTitle>
         {dateRange && <MetaText>{dateRange}</MetaText>}
       </Box>
 
-      <Box sx={cvEntryHeaderRowSx}>
+      <Box sx={cvEntryOrganizationRowSx}>
         {organizationUrl ? (
-          <Link
+          <CommonLink
             href={organizationUrl}
             target="_blank"
             rel="noopener noreferrer"
             color="inherit"
             underline="hover"
             variant="subtitle2"
-            sx={secondaryStrongSx}
+            data-tooltip-id={organizationTooltip ? COMMON_LINK_TOOLTIP_ID : undefined}
+            data-tooltip-content={organizationTooltip}
+            data-tooltip-place={organizationTooltip ? 'top' : undefined}
+            sx={[supportAccentStrongTextSx, minWidthResetSx]}
           >
             {organization}
-          </Link>
+          </CommonLink>
         ) : (
-          <StrongMetaText>{organization}</StrongMetaText>
+          <StrongMetaText sx={[supportAccentStrongTextSx, minWidthResetSx]}>
+            {organization}
+          </StrongMetaText>
         )}
-        {chip && (
-          <Chip
-            size="small"
-            label={<ChipLabel>{chip.label}</ChipLabel>}
-            variant="outlined"
-            sx={cvEntryChipSx}
-          />
+
+        {renderedChips.length > 0 && (
+          <Box sx={cvEntryChipGroupSx}>
+            {renderedChips.map((entryChip, index) => (
+              <Chip
+                key={`${entryChip.label}-${index}`}
+                size="small"
+                label={<ChipLabel>{entryChip.label}</ChipLabel>}
+                variant="outlined"
+                sx={cvEntryChipSx}
+              />
+            ))}
+          </Box>
         )}
       </Box>
 

@@ -17,6 +17,8 @@ export {
   SubsectionTitle,
 } from './TypographyPrimitives';
 
+export { TypewriterText } from './TypewriterText';
+
 export {
   InteractiveLabel,
   NavigationLabel,

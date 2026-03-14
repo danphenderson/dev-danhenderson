@@ -12,13 +12,7 @@ type HomeWelcomeSequence = {
 };
 
 export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
-  const {
-    play,
-    isPlaying,
-    error,
-    audioConsent,
-    declineAudioConsent,
-  } = useWelcomeAudio();
+  const { play, isPlaying, error, audioConsent, declineAudioConsent } = useWelcomeAudio();
   const {
     showPauseHint,
     showDarkModeHint,
@@ -48,14 +42,20 @@ export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
     () => () => {
       resetHints();
     },
-    [resetHints],
+    [resetHints]
   );
 
   useEffect(() => {
     if (hasShownDarkModePrompt || !hasHandledAudioPrompt || showPauseHint || isPromptOpen) return;
     openDarkModeHint();
     setHasShownDarkModePrompt(true);
-  }, [hasHandledAudioPrompt, hasShownDarkModePrompt, showPauseHint, isPromptOpen, openDarkModeHint]);
+  }, [
+    hasHandledAudioPrompt,
+    hasShownDarkModePrompt,
+    showPauseHint,
+    isPromptOpen,
+    openDarkModeHint,
+  ]);
 
   const handleOptOut = () => {
     declineAudioConsent();

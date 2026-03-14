@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Container from '@mui/material/Container';
-import Link from '@mui/material/Link';
 import { useAppStyles } from '../styles/appStyles';
+import { CommonLink } from './CommonLink';
 import { BodyText } from './text';
 
 export default function Footer() {
@@ -11,9 +11,9 @@ export default function Footer() {
     <Container maxWidth="xl">
       <BodyText align="center" sx={appStyles.footerTextSx}>
         {'Copyright © '}
-        <Link color="inherit" href="https://danhenderson.dev/">
+        <CommonLink color="inherit" href="https://danhenderson.dev/">
           danhenderson.dev
-        </Link>{' '}
+        </CommonLink>{' '}
         {new Date().getFullYear()}.
       </BodyText>
     </Container>

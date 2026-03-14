@@ -37,7 +37,7 @@ export const GitHubContributionCalendar = ({
     githubCalendarContainerSx,
     githubCalendarSizeSx,
     githubCalendarTheme,
-    sectionTitleSx,
+    supportAccentTitleSx,
     secondaryTextSx,
   } = useComponentStyles();
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(null);
@@ -72,9 +72,13 @@ export const GitHubContributionCalendar = ({
       );
 
       if (nextScrollContainer) {
-        nextScrollContainer.scrollLeft = hasCompletedEntrance ? getMaxScrollLeft(nextScrollContainer) : 0;
+        nextScrollContainer.scrollLeft = hasCompletedEntrance
+          ? getMaxScrollLeft(nextScrollContainer)
+          : 0;
         setScrollContainer((currentScrollContainer) =>
-          currentScrollContainer === nextScrollContainer ? currentScrollContainer : nextScrollContainer
+          currentScrollContainer === nextScrollContainer
+            ? currentScrollContainer
+            : nextScrollContainer
         );
         return;
       }
@@ -326,12 +330,8 @@ export const GitHubContributionCalendar = ({
 
   const calendarContent = (
     <Stack spacing={1}>
-      <SubsectionTitle sx={sectionTitleSx}>
-        Contribution calendar
-      </SubsectionTitle>
-      <BodyText sx={secondaryTextSx}>
-        Yearly GitHub activity at a glance.
-      </BodyText>
+      <SubsectionTitle sx={supportAccentTitleSx}>Contribution calendar</SubsectionTitle>
+      <BodyText sx={secondaryTextSx}>Yearly GitHub activity at a glance.</BodyText>
       <Box sx={githubCalendarContainerSx}>
         <Box ref={calendarWrapperRef} sx={githubCalendarSizeSx}>
           <GitHubCalendar
@@ -350,5 +350,9 @@ export const GitHubContributionCalendar = ({
     </Stack>
   );
 
-  return contained ? <ContentCard sx={contentCardInsetSx}>{calendarContent}</ContentCard> : calendarContent;
+  return contained ? (
+    <ContentCard sx={contentCardInsetSx}>{calendarContent}</ContentCard>
+  ) : (
+    calendarContent
+  );
 };

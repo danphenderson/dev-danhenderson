@@ -8,7 +8,10 @@ const normalizeAssetPath = (value: string): string => {
   return sanitized.startsWith('/') ? sanitized : `/${sanitized.replace(/^\/+/, '')}`;
 };
 
-export const resolvePublicAssetPath = (src: string, publicUrl: string = process.env.PUBLIC_URL || ''): string => {
+export const resolvePublicAssetPath = (
+  src: string,
+  publicUrl: string = process.env.PUBLIC_URL || ''
+): string => {
   if (!src || ABSOLUTE_OR_PROTOCOL_RELATIVE_URL_REGEX.test(src) || INLINE_DATA_REGEX.test(src)) {
     return src;
   }

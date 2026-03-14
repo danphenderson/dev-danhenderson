@@ -11,14 +11,7 @@ type HintPopoverProps = {
   onClose: () => void;
 };
 
-export const HintPopover = ({
-  id,
-  open,
-  anchorEl,
-  title,
-  body,
-  onClose,
-}: HintPopoverProps) => {
+export const HintPopover = ({ id, open, anchorEl, title, body, onClose }: HintPopoverProps) => {
   const appStyles = useAppStyles();
 
   return (
@@ -37,9 +30,7 @@ export const HintPopover = ({
       <Typography variant="subtitle1" sx={appStyles.hintPopoverTitleSx}>
         {title}
       </Typography>
-      <BodyText sx={appStyles.hintPopoverBodySx}>
-        {body}
-      </BodyText>
+      <BodyText sx={appStyles.hintPopoverBodySx}>{body}</BodyText>
       <Button onClick={onClose} variant="contained" size="small">
         Okay
       </Button>

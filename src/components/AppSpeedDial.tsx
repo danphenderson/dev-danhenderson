@@ -10,6 +10,8 @@ import type { SpeedDialProps } from '@mui/material/SpeedDial';
 import { Link } from 'react-router-dom';
 import { InteractiveLabel } from './text';
 
+export type AppSpeedDialLayer = 'content' | 'header';
+
 export type AppSpeedDialAction = {
   id: string;
   label: string;
@@ -30,7 +32,27 @@ type AppSpeedDialProps = {
   actionTooltipPlacement?: SpeedDialActionProps['tooltipPlacement'];
   FabProps?: SpeedDialProps['FabProps'];
   direction?: SpeedDialProps['direction'];
+  layer?: AppSpeedDialLayer;
   sx?: SxProps<Theme>;
+};
+
+const getLayerSx =
+  (layer: AppSpeedDialLayer): SxProps<Theme> =>
+  (theme) => ({
+    zIndex: layer === 'header' ? theme.zIndex.appBar + 1 : theme.zIndex.appBar - 1,
+    '& .MuiSpeedDial-fab, & .MuiSpeedDial-actions': {
+      zIndex: 'inherit',
+    },
+  });
+
+const mergeLayerSx = (layer: AppSpeedDialLayer, sx?: SxProps<Theme>): SxProps<Theme> => {
+  const layerSx = getLayerSx(layer);
+
+  if (!sx) {
+    return layerSx;
+  }
+
+  return [layerSx, ...(Array.isArray(sx) ? sx : [sx])] as SxProps<Theme>;
 };
 
 export const AppSpeedDial = ({
@@ -42,6 +64,7 @@ export const AppSpeedDial = ({
   actionTooltipPlacement,
   FabProps,
   direction = 'up',
+  layer = 'content',
   sx,
 }: AppSpeedDialProps) => {
   const [open, setOpen] = useState(false);
@@ -92,7 +115,7 @@ export const AppSpeedDial = ({
       onClose={handleClose}
       icon={openIcon ? <SpeedDialIcon icon={icon} openIcon={openIcon} /> : icon}
       FabProps={FabProps}
-      sx={sx}
+      sx={mergeLayerSx(layer, sx)}
     >
       {actions.map((action) => (
         <SpeedDialAction

@@ -1,10 +1,6 @@
 import { Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
-import type {
-  GitHubActivityItem,
-  GitHubContribution,
-  GitHubProject,
-} from '../../types/cv';
+import type { GitHubActivityItem, GitHubContribution } from '../../types/cv';
 import { githubUsername } from '../../data/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { CVSectionCard } from './CVSectionCard';
@@ -13,7 +9,6 @@ import { SectionPanel } from '../layout/SectionPanel';
 import { GitHubActivityList } from './GitHubActivityList';
 import { GitHubContributionCalendar } from './GitHubContributionCalendar';
 import { GitHubContributions } from './GitHubContributions';
-import { GitHubProjects } from './GitHubProjects';
 import { SectionHeading } from '../layout/SectionHeading';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { SectionLeadText, SubsectionTitle } from '../text';
@@ -21,13 +16,11 @@ import { SectionLeadText, SubsectionTitle } from '../text';
 type CVGitHubSectionProps = {
   activity: GitHubActivityItem[];
   contributions: GitHubContribution[];
-  projects: GitHubProject[];
   loading: boolean;
   error?: string | null;
   sectionDelayMs?: number;
   nestedDelayOffsetMs?: number;
   itemOffsetMs?: number;
-  projectTitle?: string;
   lead?: string;
   overlineSx?: SxProps<Theme>;
   sectionId?: string;
@@ -36,13 +29,11 @@ type CVGitHubSectionProps = {
 export const CVGitHubSection = ({
   activity,
   contributions,
-  projects,
   loading,
   error,
   sectionDelayMs = 0,
   nestedDelayOffsetMs = 0,
   itemOffsetMs,
-  projectTitle = 'Public Projects',
   lead,
   overlineSx,
   sectionId,
@@ -53,13 +44,24 @@ export const CVGitHubSection = ({
     getSectionDelayMs,
     motionTokens,
     sectionHeadingCompactSx,
-    sectionTitleSx,
+    supportAccentTitleSx,
   } = useComponentStyles();
   const resolvedItemOffsetMs = itemOffsetMs ?? motionTokens.itemOffsetMs;
-  const githubActivityDelayMs = getSectionDelayMs(0, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
-  const githubContributionsDelayMs = getSectionDelayMs(1, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
-  const githubCalendarDelayMs = getSectionDelayMs(2, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
-  const githubProjectsDelayMs = getSectionDelayMs(3, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
+  const githubActivityDelayMs = getSectionDelayMs(
+    0,
+    nestedDelayOffsetMs,
+    motionTokens.githubSubsectionStaggerMs
+  );
+  const githubContributionsDelayMs = getSectionDelayMs(
+    1,
+    nestedDelayOffsetMs,
+    motionTokens.githubSubsectionStaggerMs
+  );
+  const githubCalendarDelayMs = getSectionDelayMs(
+    2,
+    nestedDelayOffsetMs,
+    motionTokens.githubSubsectionStaggerMs
+  );
   const resolvedOverlineSx = overlineSx ?? sectionHeadingCompactSx;
   const githubSubsectionCardSx: SxProps<Theme> = [
     cardResetSx,
@@ -80,9 +82,7 @@ export const CVGitHubSection = ({
 
         <SectionCard delayMs={githubActivityDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={sectionTitleSx}>
-              Recent Activity
-            </SubsectionTitle>
+            <SubsectionTitle sx={supportAccentTitleSx}>Recent Activity</SubsectionTitle>
             <SectionPanel>
               <GitHubActivityList
                 activity={activity}
@@ -96,9 +96,7 @@ export const CVGitHubSection = ({
 
         <SectionCard delayMs={githubContributionsDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={sectionTitleSx}>
-              Contributions
-            </SubsectionTitle>
+            <SubsectionTitle sx={supportAccentTitleSx}>Contributions</SubsectionTitle>
             <SectionPanel>
               <GitHubContributions
                 contributions={contributions}
@@ -113,21 +111,6 @@ export const CVGitHubSection = ({
         <SectionCard delayMs={githubCalendarDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
             <GitHubContributionCalendar username={githubUsername} contained={false} />
-          </Stack>
-        </SectionCard>
-
-        <SectionCard delayMs={githubProjectsDelayMs} sx={githubSubsectionCardSx}>
-          <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={sectionTitleSx}>
-              {projectTitle}
-            </SubsectionTitle>
-            <SectionPanel>
-              <GitHubProjects
-                projects={projects}
-                animateItems
-                startDelayMs={resolvedItemOffsetMs}
-              />
-            </SectionPanel>
           </Stack>
         </SectionCard>
       </Stack>

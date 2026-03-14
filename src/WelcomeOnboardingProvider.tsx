@@ -1,4 +1,11 @@
-import { createContext, PropsWithChildren, useCallback, useContext, useMemo, useState } from 'react';
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 
 type WelcomeOnboardingContextValue = {
   showPauseHint: boolean;
@@ -55,13 +62,19 @@ export const WelcomeOnboardingProvider = ({ children }: PropsWithChildren) => {
       dismissDarkModeHint,
       resetHints,
     }),
-    [dismissDarkModeHint, dismissPauseHint, openDarkModeHint, openPauseHint, resetHints, showDarkModeHint, showPauseHint]
+    [
+      dismissDarkModeHint,
+      dismissPauseHint,
+      openDarkModeHint,
+      openPauseHint,
+      resetHints,
+      showDarkModeHint,
+      showPauseHint,
+    ]
   );
 
   return (
-    <WelcomeOnboardingContext.Provider value={value}>
-      {children}
-    </WelcomeOnboardingContext.Provider>
+    <WelcomeOnboardingContext.Provider value={value}>{children}</WelcomeOnboardingContext.Provider>
   );
 };
 

@@ -1,16 +1,33 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import { useCallback, useState } from 'react';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
+import { HeroMotionPath } from '../components/HeroMotionPath';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
-import { DisplayTitle } from '../components/text';
+import { DisplayTitle, TypewriterText } from '../components/text';
+
+const homeHeroHeadline = 'Hi, my passions are mathematics, computers, and adventures';
 
 export default function Home() {
   const appStyles = useAppStyles();
   const { cardResetSx } = useComponentStyles();
   const { error, isHeroAnimationReady, isLoading, isPromptOpen, handleOptOut, handlePlay } =
     useHomeWelcomeSequence();
+  const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);
+
+  const handleMotionComplete = useCallback(() => {
+    setIsTypewriterPlaying(true);
+  }, []);
 
   return (
     <BackgroundPaper
@@ -19,11 +36,22 @@ export default function Home() {
       contentSx={appStyles.homeHeroContentSx}
       showShell={isHeroAnimationReady}
       shellSx={appStyles.homeHeroShellSx}
+      shellWrapper={(shell) => (
+        <HeroMotionPath active={isHeroAnimationReady} onComplete={handleMotionComplete}>
+          {shell}
+        </HeroMotionPath>
+      )}
     >
       <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
         <Stack spacing={2} alignItems="center">
           <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
-            Hi, my passions are mathematics, computers, and adventures
+            {isHeroAnimationReady ? (
+              <TypewriterText
+                text={homeHeroHeadline}
+                timingPreset="headline"
+                playing={isTypewriterPlaying}
+              />
+            ) : null}
           </DisplayTitle>
         </Stack>
       </AnimatedContentCard>
@@ -32,7 +60,8 @@ export default function Home() {
         <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
         <DialogContent>
           <Typography variant="body1">
-            Would you like to hear a short verse while browsing the site? Use the pause button in the header to stop it anytime.
+            Would you like to hear a short verse while browsing the site? Use the pause button in
+            the header to stop it anytime.
           </Typography>
           {error && (
             <Typography variant="caption" color="error">
@@ -44,7 +73,12 @@ export default function Home() {
           <Button onClick={handleOptOut} autoFocus>
             No thanks
           </Button>
-          <Button onClick={handlePlay} variant="contained" disabled={isLoading} aria-label="Play welcome audio">
+          <Button
+            onClick={handlePlay}
+            variant="contained"
+            disabled={isLoading}
+            aria-label="Play welcome audio"
+          >
             {isLoading ? 'Loading…' : 'Play audio'}
           </Button>
         </DialogActions>

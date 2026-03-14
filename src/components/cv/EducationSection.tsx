@@ -1,9 +1,10 @@
 import { Box } from '@mui/material';
-import type { EducationInfo } from '../../types/cv';
+import type { EducationGpaEntry, EducationInfo } from '../../types/cv';
+import { AnimatedSlideList } from '../AnimatedSlideList';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
-import type { TabPanelItem } from '../TabPanel';
+import type { TabPanelItem, TabPanelRenderContext } from '../TabPanel';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { BodyText, ListItemText } from '../text';
 import { CVEntryHeader } from './CVEntryHeader';
@@ -14,6 +15,9 @@ type EducationSectionProps = {
 };
 
 const courseworkPrefixPattern = /^(?:Relevant\s+)?Coursework:\s*/i;
+
+const getEducationGpaChipLabels = (gpa?: EducationGpaEntry[]) =>
+  (gpa ?? []).map(({ label, value }) => `${label}: ${value}`);
 
 const splitEducationHighlights = (highlights?: string[]) =>
   (highlights ?? []).reduce<{ highlights: string[]; coursework: string[] }>(
@@ -41,12 +45,33 @@ const splitEducationHighlights = (highlights?: string[]) =>
     { highlights: [], coursework: [] }
   );
 
+const EducationDetailList = ({
+  items,
+  selected,
+  renderContext,
+}: {
+  items: string[];
+  selected: boolean;
+  renderContext: TabPanelRenderContext;
+}) => {
+  const { getDetailListSx } = useComponentStyles();
+
+  return (
+    <AnimatedSlideList
+      items={items}
+      getItemKey={(item, index) => `${item}-${index}`}
+      in={selected}
+      container={renderContext.getDrawerContainer}
+      containerComponent="ul"
+      containerSx={getDetailListSx(0, 0)}
+      itemComponent="li"
+      renderItem={(item) => <ListItemText component="span">{item}</ListItemText>}
+    />
+  );
+};
+
 export const EducationSection = ({ education, startDelayMs = 0 }: EducationSectionProps) => {
-  const {
-    contentListStackSpacing,
-    detailBlockSx,
-    getDetailListSx,
-  } = useComponentStyles();
+  const { contentListStackSpacing, detailBlockSx } = useComponentStyles();
 
   if (!education.entries || education.entries.length === 0) {
     return null;
@@ -61,9 +86,9 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
       renderItem={(entry, index) => {
-        const { highlights: filteredHighlights, coursework: filteredCoursework } = splitEducationHighlights(
-          entry.highlights
-        );
+        const { highlights: filteredHighlights, coursework: filteredCoursework } =
+          splitEducationHighlights(entry.highlights);
+        const gpaChipLabels = getEducationGpaChipLabels(entry.gpa);
         const filteredSkills = entry.skills?.filter((tool) => tool.trim().length > 0) ?? [];
         const educationTabs: TabPanelItem[] = [];
 
@@ -71,14 +96,12 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
           educationTabs.push({
             value: 'highlights',
             label: 'Highlights',
-            content: (
-              <Box component="ul" sx={getDetailListSx(0, 0)}>
-                {filteredHighlights.map((highlight, highlightIndex) => (
-                  <ListItemText key={`${highlight}-${highlightIndex}`}>
-                    {highlight}
-                  </ListItemText>
-                ))}
-              </Box>
+            renderContent: (selected, renderContext) => (
+              <EducationDetailList
+                items={filteredHighlights}
+                selected={selected}
+                renderContext={renderContext}
+              />
             ),
           });
         }
@@ -87,14 +110,12 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
           educationTabs.push({
             value: 'coursework',
             label: 'Coursework',
-            content: (
-              <Box component="ul" sx={getDetailListSx(0, 0)}>
-                {filteredCoursework.map((course, courseIndex) => (
-                  <ListItemText key={`${course}-${courseIndex}`}>
-                    {course}
-                  </ListItemText>
-                ))}
-              </Box>
+            renderContent: (selected, renderContext) => (
+              <EducationDetailList
+                items={filteredCoursework}
+                selected={selected}
+                renderContext={renderContext}
+              />
             ),
           });
         }
@@ -103,8 +124,14 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
           educationTabs.push({
             value: 'skills',
             label: 'Skills',
-            renderContent: (selected) => (
-              <SkillsChipList skills={filteredSkills} dense in={selected} />
+            renderContent: (selected, renderContext) => (
+              <SkillsChipList
+                skills={filteredSkills}
+                dense
+                in={selected}
+                animation="slide"
+                drawerContainer={renderContext.getDrawerContainer}
+              />
             ),
           });
         }
@@ -115,10 +142,10 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
               title={entry.program}
               organization={entry.university}
               dateRange={entry.dateRange}
+              chips={gpaChipLabels.map((label) => ({ label }))}
               supportingMeta={[
                 ...(entry.expectedCompletion ? [entry.expectedCompletion] : []),
                 ...(entry.minor ? [`Minor in ${entry.minor}`] : []),
-                ...(entry.gpa ? [entry.gpa] : []),
               ].filter(Boolean)}
             />
 

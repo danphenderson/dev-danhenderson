@@ -1,9 +1,20 @@
 import type { SxProps, Theme } from '@mui/material/styles';
 
+export const cvSectionViewportMetrics = {
+  mobile: {
+    anchorOffsetPx: 88,
+    activeLinePx: 88,
+  },
+  desktop: {
+    anchorOffsetPx: 112,
+    activeLinePx: 112,
+  },
+} as const;
+
 export const cvSectionAnchorSx: SxProps<Theme> = {
   scrollMarginTop: {
-    xs: 80,
-    md: 96,
+    xs: cvSectionViewportMetrics.mobile.anchorOffsetPx,
+    md: cvSectionViewportMetrics.desktop.anchorOffsetPx,
   },
 };
 
@@ -38,11 +49,6 @@ export const cvSectionMetadata = {
     label: 'CERTIFICATES',
     navLabel: 'Certificates',
   },
-  tools: {
-    id: 'cv-tools',
-    label: 'STACK & TOOLS',
-    navLabel: 'Tools',
-  },
   coding: {
     id: 'cv-coding',
     label: 'CODING EXAMPLES',
@@ -58,6 +64,5 @@ export const cvSectionNavigationOrder: CVSectionKey[] = [
   'volunteering',
   'github',
   'certificates',
-  'tools',
   'coding',
 ];

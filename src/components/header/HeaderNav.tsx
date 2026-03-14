@@ -1,7 +1,7 @@
 import MenuIcon from '@mui/icons-material/Menu';
-import { Box, Button, IconButton, Menu, MenuItem, Stack } from '@mui/material';
+import { Avatar, Box, Button, IconButton, Menu, MenuItem, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { MouseEvent, ReactNode } from 'react';
+import { MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStyles } from '../../styles/appStyles';
 import { NavigationLabel } from '../text';
@@ -13,35 +13,46 @@ export type HeaderPage = {
 
 type HeaderNavProps = {
   pages: HeaderPage[];
-  showNavigationLinks: boolean;
+  currentPath: string;
   isMobile: boolean;
   iconButtonSize: 'small' | 'medium' | 'large';
   headerIconSx: SxProps<Theme>;
+  avatarSrc: string;
   mobileMenuOpen: boolean;
   mobileMenuAnchor: HTMLElement | null;
   onMobileMenuOpen: (event: MouseEvent<HTMLButtonElement>) => void;
   onMobileMenuClose: () => void;
-  leftContent?: ReactNode;
 };
+
+const isActivePage = (currentPath: string, pagePath: string): boolean =>
+  pagePath === '/'
+    ? currentPath === '/'
+    : currentPath.startsWith(pagePath);
 
 export const HeaderNav = ({
   pages,
-  showNavigationLinks,
+  currentPath,
   isMobile,
   iconButtonSize,
   headerIconSx,
+  avatarSrc,
   mobileMenuOpen,
   mobileMenuAnchor,
   onMobileMenuOpen,
   onMobileMenuClose,
-  leftContent,
 }: HeaderNavProps) => {
   const appStyles = useAppStyles();
+  const showHomeAvatar = !isActivePage(currentPath, '/');
 
   return (
     <>
       <Box sx={appStyles.headerNavLeadSx}>
-        {showNavigationLinks && isMobile && (
+        {showHomeAvatar ? (
+          <Box component={Link} to="/" sx={appStyles.headerAvatarLinkSx} aria-label="Go to Home">
+            <Avatar src={avatarSrc} alt="Daniel Henderson" sx={appStyles.headerAvatarSx} />
+          </Box>
+        ) : null}
+        {isMobile && (
           <IconButton
             id="mobile-nav-button"
             color="inherit"
@@ -51,23 +62,28 @@ export const HeaderNav = ({
             aria-controls={mobileMenuOpen ? 'mobile-nav-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={mobileMenuOpen ? 'true' : undefined}
+            sx={appStyles.headerIconButtonSx}
           >
             <MenuIcon sx={headerIconSx} />
           </IconButton>
         )}
-        {leftContent}
       </Box>
-      {showNavigationLinks && (
+      {!isMobile && (
         <Box sx={appStyles.headerNavDesktopSx}>
           <Stack direction="row" spacing={{ md: 5 }}>
             {pages.map(({ name, path }) => (
               <Button
                 key={name}
                 size="large"
-                sx={appStyles.headerNavButtonSx}
+                sx={
+                  isActivePage(currentPath, path)
+                    ? appStyles.headerNavButtonActiveSx
+                    : appStyles.headerNavButtonSx
+                }
                 component={Link}
                 to={path}
                 aria-label={`Go to ${name}`}
+                aria-current={isActivePage(currentPath, path) ? 'page' : undefined}
               >
                 <NavigationLabel>{name}</NavigationLabel>
               </Button>
@@ -75,23 +91,27 @@ export const HeaderNav = ({
           </Stack>
         </Box>
       )}
-      {showNavigationLinks && (
-        <Menu
-          id="mobile-nav-menu"
-          anchorEl={mobileMenuAnchor}
-          open={mobileMenuOpen}
-          onClose={onMobileMenuClose}
-          MenuListProps={{ 'aria-labelledby': 'mobile-nav-button' }}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-        >
-          {pages.map(({ name, path }) => (
-            <MenuItem key={name} component={Link} to={path} onClick={onMobileMenuClose}>
-              <NavigationLabel>{name}</NavigationLabel>
-            </MenuItem>
-          ))}
-        </Menu>
-      )}
+      <Menu
+        id="mobile-nav-menu"
+        anchorEl={mobileMenuAnchor}
+        open={mobileMenuOpen}
+        onClose={onMobileMenuClose}
+        MenuListProps={{ 'aria-labelledby': 'mobile-nav-button' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+      >
+        {pages.map(({ name, path }) => (
+          <MenuItem
+            key={name}
+            component={Link}
+            to={path}
+            onClick={onMobileMenuClose}
+            selected={isActivePage(currentPath, path)}
+          >
+            <NavigationLabel>{name}</NavigationLabel>
+          </MenuItem>
+        ))}
+      </Menu>
     </>
   );
 };

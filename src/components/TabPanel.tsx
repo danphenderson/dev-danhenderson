@@ -1,15 +1,24 @@
-import { useEffect, useId, useMemo, useState } from 'react';
-import { Box, Tab, Tabs } from '@mui/material';
+import { useEffect, useId, useMemo, useRef, useState } from 'react';
+import { Box, Collapse, Tab, Tabs } from '@mui/material';
 import type { ReactNode, SyntheticEvent } from 'react';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { InteractiveLabel } from './text';
+
+export type TabPanelRenderContext = {
+  getDrawerContainer: () => HTMLDivElement | null;
+  panelId: string;
+  tabId?: string;
+  dense: boolean;
+  hasTabs: boolean;
+};
 
 export type TabPanelItem = {
   value: string;
   label: string;
   shortLabel?: string;
   content?: ReactNode;
-  renderContent?: (selected: boolean) => ReactNode;
+  renderContent?: (selected: boolean, context: TabPanelRenderContext) => ReactNode;
   disabled?: boolean;
 };
 
@@ -36,9 +45,6 @@ const getInitialValue = (
   items.find((item) => item.value === defaultValue)?.value ??
   (autoSelectFirst ? items[0]?.value ?? false : false);
 
-const getTabContent = (item: TabPanelItem, selected: boolean) =>
-  item.renderContent ? item.renderContent(selected) : item.content ?? null;
-
 export const TabPanel = ({
   id: idProp,
   items,
@@ -51,7 +57,9 @@ export const TabPanel = ({
   hideTabsWhenSingle = false,
   tabsVariant = 'standard',
 }: TabPanelProps) => {
-  const { getTabListSx, getTabPanelBodySx, getTabPanelSx, getTabSx, interactiveSurfaceSx } = useComponentStyles();
+  const { getTabListSx, getTabPanelBodySx, getTabPanelSx, getTabSx, interactiveSurfaceSx } =
+    useComponentStyles();
+  const prefersReducedMotion = usePrefersReducedMotion();
   const fallbackId = useId();
   const tabPanelId = idProp ?? fallbackId;
   const enabledItems = useMemo(() => items.filter((item) => !item.disabled), [items]);
@@ -61,6 +69,7 @@ export const TabPanel = ({
     [defaultValue, enabledItems, shouldRenderTabs]
   );
   const [internalValue, setInternalValue] = useState<TabPanelValue>(resolvedDefaultValue);
+  const panelBodyRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
     if (valueProp !== undefined) {
@@ -138,14 +147,25 @@ export const TabPanel = ({
         const isSelected = item.value === resolvedValue;
         const tabId = `${tabPanelId}-tab-${item.value}`;
         const panelId = `${tabPanelId}-panel-${item.value}`;
+        const renderContext: TabPanelRenderContext = {
+          getDrawerContainer: () => panelBodyRefs.current[item.value] ?? null,
+          panelId,
+          tabId: shouldRenderTabs ? tabId : undefined,
+          dense,
+          hasTabs: shouldRenderTabs,
+        };
+        const shouldRenderPanel = keepMounted || isSelected || !!item.renderContent;
 
-        if (!keepMounted && !isSelected) {
+        if (!shouldRenderPanel) {
           return null;
         }
 
         return (
           <Box
             key={item.value}
+            ref={(node: HTMLDivElement | null) => {
+              panelBodyRefs.current[item.value] = node;
+            }}
             role="tabpanel"
             id={panelId}
             aria-labelledby={shouldRenderTabs ? tabId : undefined}
@@ -153,7 +173,17 @@ export const TabPanel = ({
             hidden={!isSelected}
             sx={getTabPanelBodySx(dense, shouldRenderTabs)}
           >
-            {getTabContent(item, isSelected)}
+            {item.renderContent ? (
+              prefersReducedMotion ? (
+                item.renderContent(isSelected, renderContext)
+              ) : (
+                <Collapse in={isSelected} appear={false} timeout="auto" sx={{ width: '100%' }}>
+                  {item.renderContent(isSelected, renderContext)}
+                </Collapse>
+              )
+            ) : isSelected || keepMounted ? (
+              item.content ?? null
+            ) : null}
           </Box>
         );
       })}
