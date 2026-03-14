@@ -11,6 +11,7 @@ interface BackgroundPaperProps {
   contentAlign?: 'flex-start' | 'center' | 'flex-end';
   contentSx?: SxProps<Theme>;
   shellSx?: SxProps<Theme>;
+  shellWrapper?: (shell: React.ReactNode) => React.ReactNode;
 }
 
 const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
@@ -20,18 +21,24 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
   contentAlign = 'flex-start',
   contentSx,
   shellSx,
+  shellWrapper,
 }) => {
   const resolvedImage = resolvePublicAssetPath(image);
   const appStyles = useAppStyles();
+  const shell = (
+    <Paper sx={[appStyles.backgroundShellSx, ...normalizeSxProp(shellSx)]}>{children}</Paper>
+  );
 
   return (
     <Grid container component="main" sx={appStyles.backgroundRootSx}>
       <Grid item xs={12} sm={12} md={12} sx={appStyles.getBackgroundImageSx(resolvedImage)}>
         <Box sx={[appStyles.getBackgroundContentSx(contentAlign), ...normalizeSxProp(contentSx)]}>
           {showShell ? (
-            <Paper sx={[appStyles.backgroundShellSx, ...normalizeSxProp(shellSx)]}>
-              {children}
-            </Paper>
+            shellWrapper ? (
+              shellWrapper(shell)
+            ) : (
+              shell
+            )
           ) : (
             <Box sx={appStyles.backgroundChildrenSx}>{children}</Box>
           )}

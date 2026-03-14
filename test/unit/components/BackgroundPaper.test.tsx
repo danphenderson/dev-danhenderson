@@ -27,4 +27,40 @@ describe('BackgroundPaper', () => {
 
     expect(screen.getByText('Bare content')).toBeInTheDocument();
   });
+
+  it('wraps the Paper shell with shellWrapper when showShell is true', () => {
+    const shellWrapper = jest.fn((shell: React.ReactNode) => (
+      <div data-testid="wrapped-shell">{shell}</div>
+    ));
+
+    render(
+      <ThemeProvider>
+        <BackgroundPaper image="assets/test.jpg" shellWrapper={shellWrapper}>
+          <span>Wrapped shell content</span>
+        </BackgroundPaper>
+      </ThemeProvider>
+    );
+
+    expect(shellWrapper).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('wrapped-shell')).toBeInTheDocument();
+    expect(screen.getByText('Wrapped shell content')).toBeInTheDocument();
+  });
+
+  it('does not call shellWrapper when showShell is false', () => {
+    const shellWrapper = jest.fn((shell: React.ReactNode) => (
+      <div data-testid="wrapped-shell">{shell}</div>
+    ));
+
+    render(
+      <ThemeProvider>
+        <BackgroundPaper image="assets/test.jpg" showShell={false} shellWrapper={shellWrapper}>
+          <span>Unwrapped content</span>
+        </BackgroundPaper>
+      </ThemeProvider>
+    );
+
+    expect(shellWrapper).not.toHaveBeenCalled();
+    expect(screen.queryByTestId('wrapped-shell')).not.toBeInTheDocument();
+    expect(screen.getByText('Unwrapped content')).toBeInTheDocument();
+  });
 });

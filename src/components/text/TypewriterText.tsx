@@ -18,6 +18,7 @@ const sharedTextSx: SxProps<Theme> = {
 
 export interface TypewriterTextProps {
   text: string;
+  playing?: boolean;
   timingPreset?: TypewriterTimingPreset;
   typingBaseMs?: number;
   cursorChar?: React.ReactNode;
@@ -28,6 +29,7 @@ export interface TypewriterTextProps {
 
 export const TypewriterText = ({
   text,
+  playing,
   timingPreset = 'default',
   typingBaseMs,
   cursorChar = '|',
@@ -37,6 +39,7 @@ export const TypewriterText = ({
 }: TypewriterTextProps) => {
   const { visibleText, showCursor } = useTypewriterProgress({
     text,
+    playing,
     timingPreset,
     typingBaseMs,
   });
