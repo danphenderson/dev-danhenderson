@@ -1,7 +1,9 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Footer from './components/Footer';
 import Header from './components/Header';
 import { CommonLinkTooltip } from './components/CommonLinkTooltip';
+import { PageTransition } from './components/PageTransition';
+import { ScrollProgressBar } from './components/ScrollProgressBar';
 import Home from './pages/Home';
 import Photography from './pages/Photography';
 import PhotographyCategory from './pages/PhotographyCategory';
@@ -12,12 +14,15 @@ import NotFound from './pages/NotFound';
 import { Box } from '@mui/material';
 import { routerFuture } from './routerFuture';
 
-export default function App() {
+function AppContent() {
+  const location = useLocation();
+
   return (
-    <BrowserRouter basename={process.env.PUBLIC_URL} future={routerFuture}>
-      <Box>
-        <Header />
-        <Routes>
+    <Box>
+      <ScrollProgressBar />
+      <Header />
+      <PageTransition>
+        <Routes location={location}>
           <Route path="/" element={<Home />} />
           <Route path="/cv" element={<CV />} />
           <Route path="/climbing" element={<Climbing />} />
@@ -25,9 +30,17 @@ export default function App() {
           <Route path="/photography/:slug" element={<PhotographyCategory />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
-        <Footer />
-        <CommonLinkTooltip />
-      </Box>
+      </PageTransition>
+      <Footer />
+      <CommonLinkTooltip />
+    </Box>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter basename={process.env.PUBLIC_URL} future={routerFuture}>
+      <AppContent />
     </BrowserRouter>
   );
 }
