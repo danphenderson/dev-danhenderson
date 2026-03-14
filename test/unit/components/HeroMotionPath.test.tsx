@@ -265,7 +265,7 @@ describe('HeroMotionPath', () => {
 
     expect(transition).toMatchObject({
       duration: 3.6,
-      ease: 'easeInOut',
+      ease: [0.175, 0.885, 0.32, 1.275],
     });
     const times = transition.times as number[];
     expect(times).toHaveLength(50);

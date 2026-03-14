@@ -6,6 +6,7 @@ import {
   reducedMotionSx,
   shimmerSweep,
 } from './animations';
+import { SPRING_EASING_CSS } from './springEasing';
 
 type GitHubChipLayout = 'stack' | 'wrap';
 
@@ -156,7 +157,7 @@ export const createComponentStyleMap = (theme: Theme) => {
     ...interactiveAccentTextSx,
     textTransform: 'none',
     transition:
-      'color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+      `color 0.2s ${SPRING_EASING_CSS}, background-color 0.2s ${SPRING_EASING_CSS}, border-color 0.2s ${SPRING_EASING_CSS}, box-shadow 0.2s ${SPRING_EASING_CSS}`,
     '&:hover': {
       backgroundColor: alpha(
         accentColor,
@@ -180,7 +181,7 @@ export const createComponentStyleMap = (theme: Theme) => {
       Math.max(surface.secondaryTintAlpha - 0.04, isLight ? 0.06 : 0.12)
     ),
     transition:
-      'color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+      `color 0.2s ${SPRING_EASING_CSS}, background-color 0.2s ${SPRING_EASING_CSS}, border-color 0.2s ${SPRING_EASING_CSS}, box-shadow 0.2s ${SPRING_EASING_CSS}`,
     '&:hover': {
       backgroundColor: alpha(
         supportAccentColor,
@@ -326,7 +327,7 @@ export const createComponentStyleMap = (theme: Theme) => {
             background: shimmerGradient,
             transform: 'translateX(-100%)',
             opacity: 0,
-            transition: 'opacity 0.3s ease',
+            transition: `opacity 0.3s ${SPRING_EASING_CSS}`,
             pointerEvents: 'none',
           },
           '&:hover::after': {
@@ -515,7 +516,7 @@ export const createComponentStyleMap = (theme: Theme) => {
         : `0 12px 32px ${alpha(theme.palette.common.black, surface.cardShadowAlpha)}`,
       backdropFilter: `blur(${surface.cardBlurPx}px)`,
       p: { xs: 2, md: 2.5 },
-      transition: 'border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease',
+      transition: `border-color 0.2s ${SPRING_EASING_CSS}, transform 0.2s ${SPRING_EASING_CSS}, box-shadow 0.2s ${SPRING_EASING_CSS}`,
       ...borderGlowOverlaySx,
     } satisfies SxProps<Theme>,
     cvSectionCardSx: {
@@ -639,7 +640,7 @@ export const createComponentStyleMap = (theme: Theme) => {
         borderRadius: 'inherit',
         boxShadow: glowShadow,
         opacity: 0,
-        transition: 'opacity 0.2s ease',
+        transition: `opacity 0.2s ${SPRING_EASING_CSS}`,
         pointerEvents: 'none',
       },
       '& > span': {
@@ -842,7 +843,7 @@ export const createComponentStyleMap = (theme: Theme) => {
       justifyContent: 'space-between',
       gap: 1.5,
       textDecoration: 'none',
-      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+      transition: `transform 0.2s ${SPRING_EASING_CSS}, box-shadow 0.2s ${SPRING_EASING_CSS}`,
       p: 1.5,
       '&:hover': {
         transform: 'translateY(-2px)',

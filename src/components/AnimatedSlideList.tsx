@@ -5,6 +5,7 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import type { SlideProps } from '@mui/material/Slide';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
+import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { normalizeSxProp } from '../utils/sx';
 
 const SlideWithNodeRef = Slide as unknown as (
@@ -148,6 +149,7 @@ export const AnimatedSlideList = <Item,>({
             direction="up"
             mountOnEnter
             unmountOnExit
+            easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
             container={container ? () => container() ?? document.body : undefined}
             nodeRef={nodeRef}
           >

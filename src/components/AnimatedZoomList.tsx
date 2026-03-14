@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
+import { SPRING_EASING_CSS } from '../styles/springEasing';
 
 type AnimatedZoomListProps<Item> = {
   items: Item[];
@@ -45,6 +46,7 @@ export const AnimatedZoomList = <Item,>({
           key={getItemKey(item, index)}
           in={inProp}
           appear={false}
+          easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
           style={{
             transitionDelay: `${getSectionDelayMs(index, startDelayMs, resolvedItemStaggerMs)}ms`,
           }}

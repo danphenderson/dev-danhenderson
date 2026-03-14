@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
+import { SPRING_EASING_MOTION } from '../styles/springEasing';
 
 /**
  * Total entrance duration in seconds:
@@ -229,7 +230,7 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
           ? {
               duration: ENTRANCE_DURATION_S,
               times: keyframes.times,
-              ease: 'easeInOut',
+              ease: SPRING_EASING_MOTION,
             }
           : undefined
       }
