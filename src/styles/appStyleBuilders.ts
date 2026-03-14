@@ -292,7 +292,29 @@ export const createAppStyleMap = (theme: Theme) => {
       flexShrink: 0,
       ml: 'auto',
     } satisfies SxProps<Theme>,
-    headerAppearanceDialSx: headerSpeedDialSx,
+    headerAppearanceDialSx: {
+      ...headerSpeedDialSx,
+      '& .MuiSpeedDial-actions': {
+        position: 'absolute',
+        [theme.breakpoints.down('md')]: {
+          // direction="down" on mobile: drop actions below the FAB
+          top: '100%',
+          right: 0,
+          marginTop: 0,
+          paddingTop: theme.spacing(1),
+          flexDirection: 'column',
+        },
+        [theme.breakpoints.up('md')]: {
+          // direction="left" on desktop: place actions to the left of the FAB
+          right: '100%',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          marginRight: 0,
+          paddingRight: theme.spacing(1.5),
+          flexDirection: 'row-reverse',
+        },
+      },
+    } satisfies SxProps<Theme>,
     headerNavLeadSx: {
       display: 'flex',
       alignItems: 'center',
