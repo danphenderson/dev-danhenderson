@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { CVAboutSection } from '../../../../src/components/cv/CVAboutSection';
@@ -28,13 +29,40 @@ jest.mock('../../../../src/components/cv/CVSectionCard', () => ({
 }));
 
 jest.mock('../../../../src/components/cv/ProfileCard', () => ({
-  ProfileCard: ({ actions }: { actions?: ReactNode }) => (
-    <div data-testid="profile-card">{actions}</div>
+  ProfileCard: ({
+    actions,
+    onBioAnimationComplete,
+  }: {
+    actions?: ReactNode;
+    onBioAnimationComplete?: () => void;
+  }) => (
+    <div data-testid="profile-card">
+      {actions}
+      <button type="button" onClick={onBioAnimationComplete}>
+        Complete bio animation
+      </button>
+    </div>
+  ),
+}));
+
+jest.mock('../../../../src/components/SkillsChipList', () => ({
+  SkillsChipList: ({
+    skills,
+    in: inProp = true,
+  }: {
+    skills?: string[];
+    in?: boolean;
+  }) => (
+    <div data-testid="opportunities-chip-list" data-in={String(inProp)}>
+      {skills?.join(', ')}
+    </div>
   ),
 }));
 
 describe('CVAboutSection', () => {
-  it('forwards actions into the profile card, renders footer, and keeps section card motion props', () => {
+  it('forwards actions into the profile card, reveals opportunities after the bio completes, renders footer, and keeps section card motion props', async () => {
+    const user = userEvent.setup();
+
     render(
       <ThemeProvider>
         <CVAboutSection
@@ -42,6 +70,7 @@ describe('CVAboutSection', () => {
             name: 'Dan',
             title: 'Engineer',
             bio: 'Bio',
+            opportunities: ['Scientific computing', 'Data platforms'],
             email: 'dan@example.com',
             phone: '',
             location: 'Seattle, WA',
@@ -60,6 +89,14 @@ describe('CVAboutSection', () => {
     expect(profileCard).toBeInTheDocument();
     expect(profileCard).toContainElement(screen.getByTestId('about-actions'));
     expect(screen.getByTestId('about-footer')).toBeInTheDocument();
+    expect(screen.getByTestId('opportunities-chip-list')).toHaveAttribute('data-in', 'false');
+    expect(screen.getByTestId('opportunities-chip-list')).toHaveTextContent(
+      'Scientific computing, Data platforms'
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Complete bio animation' }));
+
+    expect(screen.getByTestId('opportunities-chip-list')).toHaveAttribute('data-in', 'true');
     expect(screen.getByTestId(`section-card-${cvSectionMetadata.about.id}`)).toHaveAttribute(
       'data-delay-ms',
       '120'

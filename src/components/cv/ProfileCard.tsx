@@ -10,6 +10,7 @@ type ProfileCardProps = {
   avatarSrc?: string;
   actions?: ReactNode;
   bioAnimationStartDelayMs?: number;
+  onBioAnimationComplete?: () => void;
 };
 
 export const ProfileCard = ({
@@ -17,6 +18,7 @@ export const ProfileCard = ({
   avatarSrc,
   actions,
   bioAnimationStartDelayMs = 0,
+  onBioAnimationComplete,
 }: ProfileCardProps) => {
   const {
     profileHeaderContentSx,
@@ -61,7 +63,11 @@ export const ProfileCard = ({
       </Box>
       {about.bio && (
         <BodyText sx={[primaryTextSx, profileBioSx]}>
-          <CVAboutBioTypewriter about={about} startDelayMs={bioAnimationStartDelayMs} />
+          <CVAboutBioTypewriter
+            about={about}
+            startDelayMs={bioAnimationStartDelayMs}
+            onComplete={onBioAnimationComplete}
+          />
         </BodyText>
       )}
     </Stack>

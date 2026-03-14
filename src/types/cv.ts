@@ -5,6 +5,7 @@ export type AboutMe = {
   phone: string;
   location: string;
   bio: string;
+  opportunities?: string[];
   bioLink?: {
     text: string;
     url: string;

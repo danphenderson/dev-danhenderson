@@ -61,6 +61,7 @@ export const aboutMe: AboutMe = {
   email: 'me@danhenderson.dev',
   phone: '',
   location: 'Seattle, WA',
+  opportunities: ['Scientific computing', 'Data platforms', 'ML/AI engineering'],
   bioLink: {
     text: 'M.S. Mathematics student in the applied/computational track (expected Aug 2026)',
     url: mtuMathGraduateBioUrl,
@@ -72,7 +73,7 @@ Former data scientist and data pipeline engineer who built ingestion, analytics,
 
 Open-source contributions spanning Julia documentation, Microsoft Playwright, Data Build Tool community plugins, and scientific-computing libraries.
 
-Open to opportunities at the intersection of systems and production software (scientific computing, data platforms, ML/AI engineering).`,
+Open to opportunities:`,
 };
 
 export const codingExamples: CodingExample[] = [
