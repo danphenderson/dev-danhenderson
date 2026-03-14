@@ -45,7 +45,7 @@ describe('HeaderNav', () => {
     renderNav({ currentPath: '/cv' });
 
     expect(screen.getByRole('link', { name: 'Go to Home' })).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'Daniel Henderson' })).toBeInTheDocument();
+    expect(screen.getByAltText('Daniel Henderson')).toBeInTheDocument();
   });
 
   it('hides the avatar home link on the home route', () => {
@@ -108,14 +108,14 @@ describe('HeaderNav', () => {
       mobileMenuAnchor: document.body,
     });
 
-    expect(screen.queryByRole('link', { name: 'CV' })).not.toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Climbing' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Photography' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'Daniel Henderson' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'CV' })).not.toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Climbing' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Photography' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Home' })).toBeInTheDocument();
+    expect(screen.getByAltText('Daniel Henderson')).toBeInTheDocument();
   });
 
-  it('keeps the home route mobile menu focused on the non-home pages', () => {
+  it('shows the mobile menu links for the non-home pages when on the home route', () => {
     renderNav({
       currentPath: '/',
       isMobile: true,
@@ -123,9 +123,9 @@ describe('HeaderNav', () => {
       mobileMenuAnchor: document.body,
     });
 
-    expect(screen.getByRole('link', { name: 'CV' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Climbing' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Photography' })).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Home' })).not.toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'CV' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Climbing' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Photography' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Home' })).not.toBeInTheDocument();
   });
 });

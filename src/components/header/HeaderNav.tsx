@@ -4,7 +4,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import TerrainIcon from '@mui/icons-material/Terrain';
 import { Avatar, Box, Button, Chip, IconButton, Menu, MenuItem, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { MouseEvent, ReactNode } from 'react';
+import { MouseEvent, ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStyles } from '../../styles/appStyles';
 import { ChipLabel, NavigationLabel } from '../text';
@@ -53,7 +53,7 @@ export const HeaderNav = ({
   const showHomeAvatar = !isMobile && !isActivePage(currentPath, '/');
   const mobilePages = [...pages, HOME_PAGE].filter(({ path }) => !isActivePage(currentPath, path));
 
-  const getPageChipIcon = (path: string): ReactNode => {
+  const getPageChipIcon = (path: string): ReactElement | undefined => {
     switch (path) {
       case '/cv':
         return <DescriptionIcon fontSize="small" />;
@@ -62,7 +62,17 @@ export const HeaderNav = ({
       case '/photography':
         return <CameraAltIcon fontSize="small" />;
       case '/':
-        return <Avatar src={avatarSrc} alt="Daniel Henderson" sx={appStyles.headerAvatarSx} />;
+        return (
+          <Avatar
+            src={avatarSrc}
+            alt="Daniel Henderson"
+            sx={{
+              width: 24,
+              height: 24,
+              border: (theme) => `1px solid ${theme.palette.common.white}`,
+            }}
+          />
+        );
       default:
         return undefined;
     }
