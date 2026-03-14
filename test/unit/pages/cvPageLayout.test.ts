@@ -13,7 +13,6 @@ describe('cvPageSectionLayout', () => {
       'volunteering',
       'github',
       'certificates',
-      'tools',
       'coding',
     ]);
     expect(cvPageSectionLayout.about.mobile).toEqual(
@@ -39,9 +38,6 @@ describe('cvPageSectionLayout', () => {
     );
     expect(cvPageSectionLayout.certificates.desktop).toEqual(
       expect.objectContaining({ region: 'sidebar', order: 1, delayMs: 240, triggerOnView: true })
-    );
-    expect(cvPageSectionLayout.tools.desktop).toEqual(
-      expect.objectContaining({ region: 'sidebar', order: 2, delayMs: 360, triggerOnView: true })
     );
     expect(cvPageSectionLayout.experience.desktop).toEqual(
       expect.objectContaining({ region: 'main', order: 0, delayMs: 120, triggerOnView: true })

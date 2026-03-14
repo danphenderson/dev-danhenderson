@@ -11,7 +11,6 @@ import SchoolIcon from '@mui/icons-material/School';
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
-import BuildIcon from '@mui/icons-material/Build';
 import CodeIcon from '@mui/icons-material/Code';
 import { AppSpeedDial, AppSpeedDialAction } from '../AppSpeedDial';
 import { CVSectionKey, cvSectionMetadata, cvSectionViewportMetrics } from './cvSectionMetadata';
@@ -26,7 +25,6 @@ const cvSectionIcons: Record<CVSectionKey, ReactNode> = {
   volunteering: <VolunteerActivismIcon fontSize="small" />,
   github: <GitHubIcon fontSize="small" />,
   certificates: <CardMembershipIcon fontSize="small" />,
-  tools: <BuildIcon fontSize="small" />,
   coding: <CodeIcon fontSize="small" />,
 };
 

@@ -49,11 +49,6 @@ export const cvSectionMetadata = {
     label: 'CERTIFICATES',
     navLabel: 'Certificates',
   },
-  tools: {
-    id: 'cv-tools',
-    label: 'STACK & TOOLS',
-    navLabel: 'Tools',
-  },
   coding: {
     id: 'cv-coding',
     label: 'CODING EXAMPLES',
@@ -69,6 +64,5 @@ export const cvSectionNavigationOrder: CVSectionKey[] = [
   'volunteering',
   'github',
   'certificates',
-  'tools',
   'coding',
 ];
