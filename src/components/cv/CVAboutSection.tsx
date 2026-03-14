@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Stack } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material/styles';
 import type { AboutMe } from '../../types/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
@@ -13,8 +14,48 @@ import { SubsectionTitle, TypewriterText } from '../text';
 const ABOUT_CONTENT_DELIMITER = '|bio|';
 const OPPORTUNITY_DELIMITER = '|opportunity|';
 const WORKFLOW_CONTENT_DELIMITER = '|workflow|';
+const OPPORTUNITIES_HEADING = 'Open to opportunities:';
 const WORKFLOW_HEADING = 'Current workflow:';
 const CHIP_REVEAL_BUFFER_MS = 240;
+
+type InlineAnimatedSkillsRowProps = {
+  heading: string;
+  playing: boolean;
+  visible: boolean;
+  onHeadingComplete: () => void;
+  skills: string[];
+  showSkills: boolean;
+  titleSx: SxProps<Theme>;
+};
+
+const InlineAnimatedSkillsRow = ({
+  heading,
+  playing,
+  visible,
+  onHeadingComplete,
+  skills,
+  showSkills,
+  titleSx,
+}: InlineAnimatedSkillsRowProps) => (
+  <Stack
+    spacing={1}
+    aria-hidden={!visible}
+    direction="row"
+    flexWrap="wrap"
+    alignItems="center"
+    sx={{ visibility: visible ? 'visible' : 'hidden' }}
+  >
+    <SubsectionTitle sx={titleSx}>
+      <TypewriterText
+        text={heading}
+        playing={playing}
+        timingPreset="body"
+        onComplete={onHeadingComplete}
+      />
+    </SubsectionTitle>
+    <SkillsChipList skills={skills} dense in={showSkills} />
+  </Stack>
+);
 
 type CVAboutSectionProps = {
   about: AboutMe;
@@ -58,22 +99,28 @@ export const CVAboutSection = ({
   );
   const previousAboutContentKeyRef = useRef<string | null>(null);
   const workflowStartTimerRef = useRef<number | null>(null);
-  const [showOpportunities, setShowOpportunities] = useState(
-    opportunities.length > 0 && trimmedBio.length === 0
+  const [playOpportunitiesHeading, setPlayOpportunitiesHeading] = useState(
+    trimmedBio.length === 0 && opportunities.length > 0
   );
+  const [showOpportunities, setShowOpportunities] = useState(false);
   const [playWorkflowHeading, setPlayWorkflowHeading] = useState(
     trimmedBio.length === 0 && opportunities.length === 0
   );
   const [showWorkflowTools, setShowWorkflowTools] = useState(false);
-  const isWorkflowSectionVisible = playWorkflowHeading;
+  const isOpportunitiesSectionVisible = playOpportunitiesHeading || showOpportunities;
+  const isWorkflowSectionVisible = playWorkflowHeading || showWorkflowTools;
   const handleBioAnimationComplete = useCallback(() => {
     if (opportunities.length > 0) {
-      setShowOpportunities(true);
+      setPlayOpportunitiesHeading(true);
       return;
     }
 
     setPlayWorkflowHeading(true);
   }, [opportunities.length]);
+
+  const handleOpportunitiesHeadingComplete = useCallback(() => {
+    setShowOpportunities(true);
+  }, []);
 
   const handleWorkflowHeadingComplete = useCallback(() => {
     setShowWorkflowTools(true);
@@ -99,7 +146,8 @@ export const CVAboutSection = ({
       workflowStartTimerRef.current = null;
     }
 
-    setShowOpportunities(opportunities.length > 0 && trimmedBio.length === 0);
+    setPlayOpportunitiesHeading(trimmedBio.length === 0 && opportunities.length > 0);
+    setShowOpportunities(false);
     setPlayWorkflowHeading(trimmedBio.length === 0 && opportunities.length === 0);
     setShowWorkflowTools(false);
   }, [aboutContentKey, opportunities.length, trimmedBio.length]);
@@ -148,25 +196,27 @@ export const CVAboutSection = ({
             onBioAnimationComplete={handleBioAnimationComplete}
           />
           {opportunities.length > 0 && (
-            <SkillsChipList skills={opportunities} dense in={showOpportunities} />
+            <InlineAnimatedSkillsRow
+              heading={OPPORTUNITIES_HEADING}
+              playing={playOpportunitiesHeading}
+              visible={isOpportunitiesSectionVisible}
+              onHeadingComplete={handleOpportunitiesHeadingComplete}
+              skills={opportunities}
+              showSkills={showOpportunities}
+              titleSx={supportAccentTitleSx}
+            />
           )}
         </Stack>
         {workflowTools.length > 0 && (
-          <Stack
-            spacing={1}
-            aria-hidden={!isWorkflowSectionVisible}
-            sx={{ visibility: isWorkflowSectionVisible ? 'visible' : 'hidden' }}
-          >
-            <SubsectionTitle sx={supportAccentTitleSx}>
-              <TypewriterText
-                text={WORKFLOW_HEADING}
-                playing={playWorkflowHeading}
-                timingPreset="body"
-                onComplete={handleWorkflowHeadingComplete}
-              />
-            </SubsectionTitle>
-            <SkillsChipList skills={workflowTools} dense in={showWorkflowTools} />
-          </Stack>
+          <InlineAnimatedSkillsRow
+            heading={WORKFLOW_HEADING}
+            playing={playWorkflowHeading}
+            visible={isWorkflowSectionVisible}
+            onHeadingComplete={handleWorkflowHeadingComplete}
+            skills={workflowTools}
+            showSkills={showWorkflowTools}
+            titleSx={supportAccentTitleSx}
+          />
         )}
       </Stack>
     </CVSectionCard>

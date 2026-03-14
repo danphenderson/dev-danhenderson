@@ -69,9 +69,7 @@ export const aboutMe: AboutMe = {
 
 Former data scientist and data pipeline engineer who built ingestion, analytics, and machine-learning solutions for a healthcare data platform.
 
-Open-source contributions spanning Julia documentation, Microsoft Playwright, Data Build Tool community plugins, and scientific-computing libraries.
-
-Open to opportunities:`,
+Open-source contributions spanning Julia documentation, Microsoft Playwright, Data Build Tool community plugins, and scientific-computing libraries.`,
 };
 
 export const codingExamples: CodingExample[] = [
