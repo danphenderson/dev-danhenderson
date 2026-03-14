@@ -128,8 +128,9 @@ describe('CVAboutBioTypewriter', () => {
 
   it('starts after entering view, preserves link and status styling while typing, and does not replay', () => {
     jest.useFakeTimers();
+    const handleComplete = jest.fn();
 
-    const { container } = renderTypewriter({ startDelayMs: 30 });
+    const { container } = renderTypewriter({ startDelayMs: 30, onComplete: handleComplete });
     const animatedLayer = getLayer(container, 'animated');
 
     triggerEnterView();
@@ -163,6 +164,7 @@ describe('CVAboutBioTypewriter', () => {
     probe.remove();
 
     expect(getComputedStyle(statusText).color).toBe(expectedColor);
+    expect(handleComplete).not.toHaveBeenCalled();
 
     advanceUntil(
       () =>
@@ -175,6 +177,7 @@ describe('CVAboutBioTypewriter', () => {
     expect(animatedLayer).toHaveTextContent('Mathematics cohort building systems.');
     expect(animatedLayer).toHaveTextContent('Open to opportunities in platform engineering.');
     expect(animatedLayer).not.toHaveTextContent('|');
+    expect(handleComplete).toHaveBeenCalledTimes(1);
 
     const finalLink = within(animatedLayer).getByRole('link', { name: 'Mathematics cohort' });
     expect(finalLink).not.toHaveAttribute('tabindex', '-1');
@@ -187,11 +190,13 @@ describe('CVAboutBioTypewriter', () => {
 
     expect(animatedLayer).toHaveTextContent('Open to opportunities in platform engineering.');
     expect(animatedLayer).not.toHaveTextContent('|');
+    expect(handleComplete).toHaveBeenCalledTimes(1);
   });
 
   it('renders the full bio immediately and skips observers when reduced motion is enabled', () => {
     mockPrefersReducedMotion = true;
     const observe = jest.fn();
+    const handleComplete = jest.fn();
 
     Object.defineProperty(window, 'IntersectionObserver', {
       writable: true,
@@ -206,7 +211,7 @@ describe('CVAboutBioTypewriter', () => {
       })),
     });
 
-    const { container } = renderTypewriter();
+    const { container } = renderTypewriter({ onComplete: handleComplete });
     const animatedLayer = getLayer(container, 'animated');
 
     expect(animatedLayer).toHaveTextContent('Mathematics cohort building systems.');
@@ -214,5 +219,6 @@ describe('CVAboutBioTypewriter', () => {
     expect(animatedLayer).not.toHaveTextContent('|');
     expect(observe).not.toHaveBeenCalled();
     expect(container.querySelector('[data-typewriter-layer="accessible"]')).toBeNull();
+    expect(handleComplete).toHaveBeenCalledTimes(1);
   });
 });

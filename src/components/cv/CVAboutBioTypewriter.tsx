@@ -30,6 +30,7 @@ export type CVAboutBioTypewriterProps = {
   reserveWidth?: boolean;
   startDelayMs?: number;
   cursorSx?: SxProps<Theme>;
+  onComplete?: () => void;
 };
 
 const layerSx: SxProps<Theme> = {
@@ -182,10 +183,12 @@ export const CVAboutBioTypewriter = ({
   reserveWidth = true,
   startDelayMs = 0,
   cursorSx,
+  onComplete,
 }: CVAboutBioTypewriterProps) => {
   const prefersReducedMotion = usePrefersReducedMotion();
   const rootRef = React.useRef<HTMLSpanElement | null>(null);
   const startTimeoutRef = React.useRef<number | undefined>(undefined);
+  const hasNotifiedCompletionRef = React.useRef(false);
   const [shouldPlay, setShouldPlay] = React.useState(prefersReducedMotion);
   const segments = React.useMemo(() => buildBioSegments(about), [about]);
   const fullText = React.useMemo(
@@ -248,6 +251,19 @@ export const CVAboutBioTypewriter = ({
     timingPreset,
     typingBaseMs,
   });
+
+  React.useEffect(() => {
+    if (!onComplete || !fullText || hasNotifiedCompletionRef.current) {
+      return;
+    }
+
+    if (!prefersReducedMotion && !isComplete) {
+      return;
+    }
+
+    hasNotifiedCompletionRef.current = true;
+    onComplete();
+  }, [fullText, isComplete, onComplete, prefersReducedMotion]);
 
   const visibleChars = prefersReducedMotion || isComplete ? fullText.length : charIndex;
   const renderStaticVisibleLayer = prefersReducedMotion || isComplete;
