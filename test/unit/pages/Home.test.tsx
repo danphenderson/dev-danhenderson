@@ -325,6 +325,10 @@ describe('Home welcome flow', () => {
       'data-prefix',
       'Hi, my passion is '
     );
+    expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute(
+      'data-words',
+      'mathematics!,computers!,adventures!'
+    );
 
     fireEvent.click(screen.getByTestId('complete-hero-motion'));
 
