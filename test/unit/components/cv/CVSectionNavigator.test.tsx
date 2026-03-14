@@ -215,7 +215,7 @@ describe('CVSectionNavigator', () => {
     expect(screen.getByTestId('cv-section-navigator')).toBeInTheDocument();
   });
 
-  it('keeps the hover state active while focus stays within the navigator and clears it on exit', () => {
+  it('maintains hover state during keyboard navigation within the navigator', () => {
     render(
       <ThemeProvider>
         <CVSectionNavigator sections={['experience', 'education']} testId="cv-section-navigator" />
