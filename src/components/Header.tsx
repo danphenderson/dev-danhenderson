@@ -209,7 +209,7 @@ export default function Header() {
   return (
     <>
       <HideOnScroll>
-        <AppBar position="fixed" elevation={6}>
+        <AppBar position="fixed" elevation={0}>
           <Toolbar sx={appStyles.headerToolbarSx}>
             <HeaderNav
               pages={pages}

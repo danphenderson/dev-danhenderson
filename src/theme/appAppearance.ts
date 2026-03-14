@@ -22,6 +22,9 @@ type AppAppearancePalette = {
     default: string;
     paper: string;
   };
+  appBar: {
+    background: string;
+  };
 };
 
 type AppAppearanceTypography = {
@@ -140,6 +143,9 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
           default: '#d3dee6',
           paper: '#f6fbfc',
         },
+        appBar: {
+          background: '#0a1e2c',
+        },
       },
       dark: {
         primary: {
@@ -160,6 +166,9 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         background: {
           default: '#0b1820',
           paper: '#12242e',
+        },
+        appBar: {
+          background: '#060f18',
         },
       },
     },
@@ -234,6 +243,9 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
           default: '#e8e0d5',
           paper: '#faf6ef',
         },
+        appBar: {
+          background: '#1c2c26',
+        },
       },
       dark: {
         primary: {
@@ -254,6 +266,9 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         background: {
           default: '#101917',
           paper: '#172421',
+        },
+        appBar: {
+          background: '#0a1412',
         },
       },
     },
@@ -328,6 +343,9 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
           default: '#e8e3db',
           paper: '#f8f4ef',
         },
+        appBar: {
+          background: '#1c1614',
+        },
       },
       dark: {
         primary: {
@@ -348,6 +366,9 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         background: {
           default: '#111722',
           paper: '#1a2433',
+        },
+        appBar: {
+          background: '#0e0c10',
         },
       },
     },
@@ -422,6 +443,9 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
           default: '#ede4d4',
           paper: '#faf5ea',
         },
+        appBar: {
+          background: '#201a10',
+        },
       },
       dark: {
         primary: {
@@ -442,6 +466,9 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         background: {
           default: '#141018',
           paper: '#1e1824',
+        },
+        appBar: {
+          background: '#100c16',
         },
       },
     },
@@ -516,6 +543,9 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
           default: '#dbe8ee',
           paper: '#f4f9fb',
         },
+        appBar: {
+          background: '#0e2232',
+        },
       },
       dark: {
         primary: {
@@ -536,6 +566,9 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         background: {
           default: '#0c161c',
           paper: '#142028',
+        },
+        appBar: {
+          background: '#08121a',
         },
       },
     },
@@ -610,6 +643,9 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
           default: '#e2e4e8',
           paper: '#f6f6f8',
         },
+        appBar: {
+          background: '#1e2228',
+        },
       },
       dark: {
         primary: {
@@ -630,6 +666,9 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         background: {
           default: '#101216',
           paper: '#181c22',
+        },
+        appBar: {
+          background: '#0a0e14',
         },
       },
     },
