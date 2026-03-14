@@ -6,7 +6,6 @@ import type {
   Experience,
   GitHubActivityItem,
   GitHubContribution,
-  StackSection,
   VolunteeringEntry,
 } from '../types/cv';
 import { resolvePublicAssetPath } from '../utils/assets';
@@ -24,7 +23,6 @@ export type {
   ExperienceProjectSegment,
   GitHubActivityItem,
   GitHubContribution,
-  StackSection,
   VolunteeringEntry,
 } from '../types/cv';
 
@@ -45,8 +43,17 @@ const mtuGlobalCampusOrganizationUrl =
   'https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad';
 export const githubSectionLead =
   'Recent activity, open-source contributions, and contribution history from GitHub.';
-export const stackAndToolsLead =
-  'Daily development environment, languages, platform tooling, and services used across software, research, and data work.';
+export const currentWorkflowLead =
+  'Current workflow across application, data-platform, and scientific-computing work.';
+export const currentWorkflowTools = [
+  'Python',
+  'TypeScript',
+  'Julia',
+  'AWS',
+  'React',
+  'Docker',
+  'GitHub Actions',
+];
 
 export const aboutMe: AboutMe = {
   name: 'Daniel Henderson',
@@ -342,7 +349,8 @@ export const experiences: Experience[] = [
       'LaTeX',
       'Overleaf + GitHub',
       'Visual Studio Code',
-      'Shells, REPLs, and Notebooks',
+      'Jupyter',
+      'Shell scripting',
     ],
   },
   {
@@ -410,18 +418,19 @@ export const experiences: Experience[] = [
     ],
     skills: [
       'AWS: EC2, S3, SNS, SQS, Cloudformation, Cloudtrail, Cloudwatch, Lambda, Glue (& Glue Data Catalog), EMR, Redshift, RDS, Athena, Quicksight',
+      'AWS CDK',
       'Python',
       'PySpark',
       'Jupyter',
       'DBT (Data Build Tool)',
       'GitHub Enterprise',
+      'GitHub Actions',
       'Docker',
       'Sentry',
       'Slack',
       'SonarCloud',
       'Django',
       'OpenAPI/Swagger',
-      'Jupyter',
       'DBeaver',
       'Postman',
       'Visual Studio Code',
@@ -447,17 +456,18 @@ export const experiences: Experience[] = [
     ],
     skills: [
       'AWS',
+      'AWS CDK',
       'Python',
       'Jupyter',
       'DBT (Data Build Tool)',
       'Bitbucket',
+      'Bitbucket Pipelines',
       'SciPy',
       'PySpark',
       'Visual Studio Code',
       'DBeaver',
       'Slack',
       'Sentry',
-      'Slack',
       'Jira',
       'Confluence',
       'Lucidchart',
@@ -618,85 +628,6 @@ export const volunteering: VolunteeringEntry[] = [
       'Co-founded regional youth cycling development team.',
       'Earned a $1,500 Keweenaw Community Foundation grant to build a pump track and skills area.',
       'Recruited athletes, secured grassroots sponsorships and supported five athletes to attend USA Cycling mountain bike nationals.',
-    ],
-  },
-];
-
-export const stackAndTools: StackSection[] = [
-  {
-    title: 'Development Stack and Tools',
-    tabLabel: 'Dev Stack',
-    items: [
-      'macOS',
-      'Homebrew package manager',
-      'Vim & Visual Studio Code for Editor & IDE',
-      'Zsh (also Bash)',
-      'Python (general purpose goto language)',
-      'TypeScript',
-      'AWS',
-      'pre-commit',
-      'github CLI (`gh`)',
-      'Docker & docker-compose',
-      'GitHub Actions (CI/CD)',
-      'AWS CDK (IaC)',
-      'REPLs',
-      'Mermaid',
-      'jq',
-      'juliaup',
-      'pipenv',
-      '.editorconfig',
-      'prettier',
-      'pre-commit',
-    ],
-  },
-  {
-    title: 'Programming & Scripting Languages',
-    tabLabel: 'Languages',
-    items: [
-      'Python',
-      'Java',
-      'Julia',
-      'C/C++',
-      'SQL',
-      'Zsh',
-      'Bash',
-      'LaTeX',
-      'HTML',
-      'JavaScript',
-      'TypeScript',
-    ],
-  },
-  {
-    title: 'ETL & API Frameworks',
-    tabLabel: 'ETL/API',
-    items: ['Data Build Tool (DBT)', 'Django', 'FastAPI', 'Apache Spark (PySpark)'],
-  },
-  {
-    title: 'Databases',
-    tabLabel: 'DBs',
-    items: ['Redshift', 'PostgreSQL', 'Neo4j'],
-  },
-  {
-    title: 'Services',
-    tabLabel: 'Services',
-    items: [
-      'Amazon Management Console',
-      'Sentry',
-      'SonarCloud',
-      'Slack',
-      'GitHub',
-      'Notion',
-      'GitBook',
-      'Bitbucket',
-      'Visual Studio Code',
-      'Jira',
-      'Confluence',
-      'Lucid',
-      'OpenAPI/Swagger',
-      'Docker',
-      'Jupyter',
-      'DBeaver',
-      'Spark UI',
     ],
   },
 ];

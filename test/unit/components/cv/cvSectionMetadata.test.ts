@@ -1,4 +1,7 @@
-import { cvSectionMetadata, cvSectionNavigationOrder } from '../../../../src/components/cv/cvSectionMetadata';
+import {
+  cvSectionMetadata,
+  cvSectionNavigationOrder,
+} from '../../../../src/components/cv/cvSectionMetadata';
 import type { CVSectionKey } from '../../../../src/components/cv/cvSectionMetadata';
 
 describe('cvSectionMetadata', () => {
@@ -10,7 +13,6 @@ describe('cvSectionMetadata', () => {
       'volunteering',
       'github',
       'certificates',
-      'tools',
       'coding',
     ];
 

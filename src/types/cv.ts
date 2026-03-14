@@ -95,11 +95,5 @@ export type VolunteeringEntry = {
   highlights: string[];
 };
 
-export type StackSection = {
-  title: string;
-  tabLabel?: string;
-  items: string[];
-};
-
 export type GitHubActivityItem = { label: string; href?: string };
 export type GitHubContribution = { name: string; url: string; stars?: number };

@@ -7,7 +7,10 @@ import {
   cvSectionMetadata,
   cvSectionNavigationOrder,
 } from '../../../src/components/cv/cvSectionMetadata';
-import { APP_APPEARANCE_STORAGE_KEY, defaultAppAppearanceKey } from '../../../src/theme/appAppearance';
+import {
+  APP_APPEARANCE_STORAGE_KEY,
+  defaultAppAppearanceKey,
+} from '../../../src/theme/appAppearance';
 import { cvPageSectionLayout } from '../../../src/pages/cvPageLayout';
 import CV from '../../../src/pages/CV';
 
@@ -147,9 +150,6 @@ describe('CV page section navigation', () => {
       within(desktopSidebarRegion).getByTestId(`animated-card-${cvSectionMetadata.certificates.id}`)
     ).toBeInTheDocument();
     expect(
-      within(desktopSidebarRegion).getByTestId(`animated-card-${cvSectionMetadata.tools.id}`)
-    ).toBeInTheDocument();
-    expect(
       within(desktopMainRegion).getByTestId(`animated-card-${cvSectionMetadata.experience.id}`)
     ).toBeInTheDocument();
     expect(
@@ -203,6 +203,17 @@ describe('CV page section navigation', () => {
     expect(within(aboutDial).getByRole('link', { name: 'Download Resume' })).toHaveAttribute(
       'download',
       'Daniel-Henderson-Resume.pdf'
+    );
+    expect(within(aboutSection!).getByText('Current workflow')).toBeInTheDocument();
+    expect(
+      within(aboutSection!).getByText(
+        'Current workflow across application, data-platform, and scientific-computing work.'
+      )
+    ).toBeVisible();
+    ['Python', 'TypeScript', 'Julia', 'AWS', 'React', 'Docker', 'GitHub Actions'].forEach(
+      (label) => {
+        expect(within(aboutSection!).getByText(label)).toBeVisible();
+      }
     );
     expect(mockAppSpeedDial).toHaveBeenCalledWith(
       expect.objectContaining({
