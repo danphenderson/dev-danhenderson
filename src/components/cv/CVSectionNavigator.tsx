@@ -35,13 +35,7 @@ type CVSectionNavigatorProps = {
 
 const IDLE_TIMEOUT_MS = 2500;
 const IDLE_OPACITY = 0.32;
-const GENIE_TRANSITION = 'transform 280ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease';
-const GENIE_TRAIL_SCALE_REST = 0.22;
-const GENIE_RAIL_SCALE_REST = 0.72;
-const GENIE_TRAIL_TRANSLATE_X_PX = -4;
-const GENIE_TRAIL_GRADIENT_MIDPOINT = '62%';
-const GENIE_TRAIL_GRADIENT_START = '0%';
-const GENIE_TRAIL_GRADIENT_END = '100%';
+const GENIE_TRANSITION = 'transform 260ms cubic-bezier(0.22, 1, 0.36, 1), opacity 200ms ease, filter 260ms ease, box-shadow 260ms ease';
 
 export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps) => {
   const muiTheme = useMuiTheme();
@@ -173,21 +167,16 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
   const dimmed = idle && !hovered;
   const activeSectionSx = activeSection ? appStyles.cvFloatingDialActiveFabSx : undefined;
   const genieDialSx = useMemo(() => {
+    const isLight = muiTheme.palette.mode === 'light';
     const surface = muiTheme.appearanceTreatment.surface;
-    const genieRailColor = alpha(muiTheme.palette.primary.light, muiTheme.palette.mode === 'light' ? 0.34 : 0.46);
-    const genieTrailColor = alpha(muiTheme.palette.primary.main, muiTheme.palette.mode === 'light' ? 0.1 : 0.18);
+    const genieRailColor = alpha(muiTheme.palette.primary.light, isLight ? 0.2 : 0.3);
+    const genieTrailColor = alpha(muiTheme.palette.primary.main, isLight ? 0.06 : 0.12);
     const genieTrailBorderColor = alpha(
       muiTheme.palette.primary.main,
-      Math.min(surface.panelBorderAlpha + 0.12, 0.6)
+      Math.min(surface.panelBorderAlpha + 0.1, 0.5)
     );
-    const genieTrailShadow = `0 14px 28px ${alpha(
-      muiTheme.palette.common.black,
-      muiTheme.palette.mode === 'light' ? 0.14 : 0.26
-    )}`;
-    const genieSurfaceAlpha = Math.min(
-      surface.panelSurfaceAlpha + (muiTheme.palette.mode === 'light' ? 0.14 : 0.2),
-      0.94
-    );
+    const genieGlowColor = alpha(muiTheme.palette.primary.light, isLight ? 0.28 : 0.42);
+    const genieGlowSpread = alpha(muiTheme.palette.primary.main, isLight ? 0.16 : 0.28);
     const genieTransition = prefersReducedMotion ? 'none' : GENIE_TRANSITION;
 
     return {
@@ -195,24 +184,17 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
         position: 'relative',
         overflow: 'visible',
         alignItems: 'center',
-        gap: {
-          xs: 2,
-          md: 2.5,
-        },
+        gap: { xs: 1.5, md: 2 },
         py: 1.5,
         '&::before': {
           content: '""',
           position: 'absolute',
-          top: 12,
-          bottom: 12,
-          right: 'calc(50% - 1px)',
-          width: 2,
+          top: 8,
+          bottom: 8,
+          right: 'calc(50% - 0.5px)',
+          width: 1,
           borderRadius: 999,
           backgroundColor: genieRailColor,
-          opacity: hovered ? 0.88 : 0.3,
-          transform: hovered ? 'scaleY(1)' : `scaleY(${GENIE_RAIL_SCALE_REST})`,
-          transformOrigin: 'bottom center',
-          transition: genieTransition,
           pointerEvents: 'none',
         },
       },
@@ -223,40 +205,38 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
           content: '""',
           position: 'absolute',
           top: '50%',
-          right: {
-            xs: 20,
-            md: 22,
-          },
-          width: {
-            xs: 88,
-            md: 132,
-          },
-          height: {
-            xs: 42,
-            md: 48,
-          },
+          right: { xs: 18, md: 20 },
+          width: { xs: 72, md: 104 },
+          height: { xs: 38, md: 42 },
           borderRadius: 999,
           border: `1px solid ${genieTrailBorderColor}`,
-          background: `linear-gradient(90deg, ${alpha(genieTrailColor, 0)} ${GENIE_TRAIL_GRADIENT_START}, ${genieTrailColor} ${GENIE_TRAIL_GRADIENT_MIDPOINT}, ${alpha(
+          background: `linear-gradient(90deg, ${alpha(genieTrailColor, 0)} 0%, ${genieTrailColor} 50%, ${alpha(
             muiTheme.palette.background.paper,
-            genieSurfaceAlpha
-          )} ${GENIE_TRAIL_GRADIENT_END})`,
-          boxShadow: genieTrailShadow,
-          opacity: hovered ? 1 : 0,
-          transform: `translateY(-50%) scaleX(${hovered ? 1 : GENIE_TRAIL_SCALE_REST})`,
+            Math.min(surface.panelSurfaceAlpha + (isLight ? 0.12 : 0.16), 0.92)
+          )} 100%)`,
+          backdropFilter: `blur(${Math.max(surface.cardBlurPx - 2, 4)}px)`,
+          opacity: 0,
+          transform: 'translateY(-50%) scaleX(0.3)',
           transformOrigin: 'right center',
           transition: genieTransition,
           pointerEvents: 'none',
+        },
+        '&:hover::before, &:focus-within::before': {
+          opacity: 1,
+          transform: 'translateY(-50%) scaleX(1)',
         },
       },
       '& .MuiSpeedDialAction-fab': {
         position: 'relative',
         zIndex: 1,
-        transform: hovered ? `translateX(${GENIE_TRAIL_TRANSLATE_X_PX}px)` : 'translateX(0)',
         transition: genieTransition,
       },
+      '& .MuiSpeedDialAction-root:hover .MuiSpeedDialAction-fab, & .MuiSpeedDialAction-root:focus-within .MuiSpeedDialAction-fab': {
+        transform: 'translateX(-3px) scale(1.1)',
+        boxShadow: `0 0 0 2.5px ${genieGlowColor}, 0 0 14px ${genieGlowSpread}`,
+      },
     } as const;
-  }, [hovered, muiTheme, prefersReducedMotion]);
+  }, [muiTheme, prefersReducedMotion]);
 
   return (
     <Zoom
