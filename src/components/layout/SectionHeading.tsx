@@ -8,7 +8,13 @@ type SectionHeadingProps = BoxProps & {
   subtitle?: string;
 };
 
-export const SectionHeading = ({ overline, title, subtitle, sx, ...props }: SectionHeadingProps) => (
+export const SectionHeading = ({
+  overline,
+  title,
+  subtitle,
+  sx,
+  ...props
+}: SectionHeadingProps) => (
   <Box sx={sx} {...props}>
     <HeaderLabel>{overline}</HeaderLabel>
     {title && <HeaderTitle subtitle={subtitle}>{title}</HeaderTitle>}

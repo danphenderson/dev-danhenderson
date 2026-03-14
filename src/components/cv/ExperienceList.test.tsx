@@ -14,7 +14,13 @@ jest.mock('../AnimatedContentList', () => ({
   }: {
     items: unknown[];
     renderItem: (item: unknown, index: number) => ReactNode;
-  }) => <div>{items.map((item, index) => <div key={index}>{renderItem(item, index)}</div>)}</div>,
+  }) => (
+    <div>
+      {items.map((item, index) => (
+        <div key={index}>{renderItem(item, index)}</div>
+      ))}
+    </div>
+  ),
 }));
 
 jest.mock('../AnimatedSlideList', () => ({
@@ -39,8 +45,12 @@ jest.mock('../AnimatedSlideList', () => ({
       { 'data-testid': 'animated-slide-list', 'data-layout': props.layout ?? 'stack' },
       props.in
         ? props.items.map((item, index) =>
-          React.createElement(ItemComponent, { key: props.getItemKey(item, index) }, props.renderItem(item, index))
-        )
+            React.createElement(
+              ItemComponent,
+              { key: props.getItemKey(item, index) },
+              props.renderItem(item, index)
+            )
+          )
         : null
     );
   },
@@ -96,7 +106,9 @@ describe('ExperienceList', () => {
     );
 
     expect(
-      screen.queryByText('Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).')
+      screen.queryByText(
+        'Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).'
+      )
     ).not.toBeInTheDocument();
     expect(screen.queryByText('PyTorch')).not.toBeInTheDocument();
     expect(
@@ -110,7 +122,9 @@ describe('ExperienceList', () => {
     expect(screen.getByText('PyTorch')).toBeVisible();
     expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.layout === 'wrap')).toBe(true);
     expect(
-      screen.queryByText('Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).')
+      screen.queryByText(
+        'Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).'
+      )
     ).not.toBeInTheDocument();
     expect(
       screen.getByText(
@@ -155,9 +169,9 @@ describe('ExperienceList', () => {
       </ThemeProvider>
     );
 
-    const titleRow = screen
-      .getByRole('heading', { name: 'Graduate Research Assistant' })
-      .parentElement;
+    const titleRow = screen.getByRole('heading', {
+      name: 'Graduate Research Assistant',
+    }).parentElement;
 
     expect(titleRow).not.toBeNull();
     expect(titleRow).not.toHaveTextContent('Michigan Technological University');
@@ -225,7 +239,11 @@ describe('ExperienceList', () => {
 
     const detailList = screen.getByRole('list');
 
-    expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.containerComponent === 'ul' && props.itemComponent === 'li')).toBe(true);
+    expect(
+      mockAnimatedSlideList.mock.calls.some(
+        ([props]) => props.containerComponent === 'ul' && props.itemComponent === 'li'
+      )
+    ).toBe(true);
     expect(within(detailList).getAllByRole('listitem')).toHaveLength(3);
     expect(
       screen.getByRole('link', { name: 'Quasi-Newton Optimization with Hessian Samples' })

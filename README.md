@@ -19,14 +19,14 @@ The site is a React Router single-page app. Keep unknown-route rewrites, `PUBLIC
 
 ## Routes
 
-| Route | Page | Purpose |
-| --- | --- | --- |
-| `/` | `Home` | Intro page with optional welcome audio prompt |
-| `/cv` | `CV` | Resume-style experience, education, certificates, tools, code samples, and GitHub sections |
-| `/climbing` | `Climbing` | Tick list and route wish list in MUI X DataGrid tables |
-| `/photography` | `Photography` | Photography collection index |
-| `/photography/:slug` | `PhotographyCategory` | Album view for a selected collection |
-| `*` | `NotFound` | Fallback page |
+| Route                | Page                  | Purpose                                                                                    |
+| -------------------- | --------------------- | ------------------------------------------------------------------------------------------ |
+| `/`                  | `Home`                | Intro page with optional welcome audio prompt                                              |
+| `/cv`                | `CV`                  | Resume-style experience, education, certificates, tools, code samples, and GitHub sections |
+| `/climbing`          | `Climbing`            | Tick list and route wish list in MUI X DataGrid tables                                     |
+| `/photography`       | `Photography`         | Photography collection index                                                               |
+| `/photography/:slug` | `PhotographyCategory` | Album view for a selected collection                                                       |
+| `*`                  | `NotFound`            | Fallback page                                                                              |
 
 ## Stack
 
@@ -92,6 +92,7 @@ When changing CV motion:
 ## Data Model and Content Sources
 
 ### Local data modules
+
 - `src/data/cv.ts`
   - Profile/contact info
   - Experience entries
@@ -108,7 +109,9 @@ When changing CV motion:
   - Current dataset size: 4 categories, 43 photos
 
 ### Runtime API data
+
 `src/hooks/useGithubProfile.ts` fetches from GitHub:
+
 - User events: `GET /users/:username/events/public`
 - User repos: `GET /users/:username/repos`
 - Public PR contribution search: `GET /search/issues`
@@ -145,16 +148,16 @@ PORT=3000 npm start
 
 ### Available scripts
 
-| Script | Command | Purpose |
-| --- | --- | --- |
-| `npm start` | `PORT=${PORT:-3001} react-scripts start` | Start the local dev server |
-| `npm run build` | `react-scripts build` | Create the production build in `build/` |
-| `npm test` | `react-scripts test` | Start the Jest runner |
-| `npm run eject` | `react-scripts eject` | Eject CRA configuration |
-| `npm run test:e2e` | `playwright test` | Run Playwright end-to-end tests (headless) |
-| `npm run test:e2e:headed` | `playwright test --headed` | Run E2E tests in a visible browser |
-| `npm run test:e2e:ui` | `playwright test --ui` | Open the Playwright interactive UI runner |
-| `npm run serve:e2e` | `serve -s build -l 3100` | Serve the production build locally on port 3100 |
+| Script                    | Command                                  | Purpose                                         |
+| ------------------------- | ---------------------------------------- | ----------------------------------------------- |
+| `npm start`               | `PORT=${PORT:-3001} react-scripts start` | Start the local dev server                      |
+| `npm run build`           | `react-scripts build`                    | Create the production build in `build/`         |
+| `npm test`                | `react-scripts test`                     | Start the Jest runner                           |
+| `npm run eject`           | `react-scripts eject`                    | Eject CRA configuration                         |
+| `npm run test:e2e`        | `playwright test`                        | Run Playwright end-to-end tests (headless)      |
+| `npm run test:e2e:headed` | `playwright test --headed`               | Run E2E tests in a visible browser              |
+| `npm run test:e2e:ui`     | `playwright test --ui`                   | Open the Playwright interactive UI runner       |
+| `npm run serve:e2e`       | `serve -s build -l 3100`                 | Serve the production build locally on port 3100 |
 
 ### CI workflows
 

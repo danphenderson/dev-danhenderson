@@ -25,11 +25,7 @@ jest.mock('../WelcomeOnboardingProvider', () => ({
 }));
 
 jest.mock('./header/HeaderPageDial', () => ({
-  HeaderPageDial: ({
-    actions,
-  }: {
-    actions: Array<{ id: string; label: string; to?: string }>;
-  }) => (
+  HeaderPageDial: ({ actions }: { actions: Array<{ id: string; label: string; to?: string }> }) => (
     <div data-testid="header-page-dial">
       <button type="button" aria-label="Open page navigation">
         Open page navigation
@@ -87,7 +83,9 @@ jest.mock('./header/HeaderAppearanceDial', () => ({
 const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQuery>;
 const mockUseAppTheme = useAppTheme as jest.MockedFunction<typeof useAppTheme>;
 const mockUseWelcomeAudio = useWelcomeAudio as jest.MockedFunction<typeof useWelcomeAudio>;
-const mockUseWelcomeOnboarding = useWelcomeOnboarding as jest.MockedFunction<typeof useWelcomeOnboarding>;
+const mockUseWelcomeOnboarding = useWelcomeOnboarding as jest.MockedFunction<
+  typeof useWelcomeOnboarding
+>;
 
 const createAudioState = (
   overrides: Partial<ReturnType<typeof useWelcomeAudio>> = {}

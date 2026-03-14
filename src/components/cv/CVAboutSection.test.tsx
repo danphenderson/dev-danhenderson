@@ -29,9 +29,7 @@ jest.mock('./CVSectionCard', () => ({
 
 jest.mock('./ProfileCard', () => ({
   ProfileCard: ({ actions }: { actions?: ReactNode }) => (
-    <div data-testid="profile-card">
-      {actions}
-    </div>
+    <div data-testid="profile-card">{actions}</div>
   ),
 }));
 

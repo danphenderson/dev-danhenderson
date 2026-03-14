@@ -39,11 +39,7 @@ export const GitHubActivityList = ({
           itemStaggerMs={itemStaggerMs}
         />
       )}
-      {error && (
-        <CaptionText sx={secondaryTextSx}>
-          {error}
-        </CaptionText>
-      )}
+      {error && <CaptionText sx={secondaryTextSx}>{error}</CaptionText>}
     </Box>
   );
 };

@@ -17,14 +17,19 @@ describe('CVEntryHeader', () => {
       </ThemeProvider>
     );
 
-    const organizationLink = screen.getByRole('link', { name: 'Michigan Technological University' });
+    const organizationLink = screen.getByRole('link', {
+      name: 'Michigan Technological University',
+    });
 
     expect(organizationLink).toHaveAttribute(
       'href',
       'https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad'
     );
     expect(organizationLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
-    expect(organizationLink).toHaveAttribute('data-tooltip-content', 'View online graduate degrees page');
+    expect(organizationLink).toHaveAttribute(
+      'data-tooltip-content',
+      'View online graduate degrees page'
+    );
     expect(organizationLink).toHaveAttribute('data-tooltip-place', 'top');
   });
 
@@ -35,10 +40,7 @@ describe('CVEntryHeader', () => {
           title="B.S. Cum Laude, Mathematics, Applied/Computational"
           organization="Michigan Technological University"
           dateRange="2017 – 2021"
-          chips={[
-            { label: 'Cumulative: 3.56' },
-            { label: 'Departmental: 3.71' },
-          ]}
+          chips={[{ label: 'Cumulative: 3.56' }, { label: 'Departmental: 3.71' }]}
           supportingMeta={['Minor in Computer Science']}
         />
       </ThemeProvider>

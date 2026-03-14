@@ -103,7 +103,11 @@ export const SectionLabel = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { sectionNavigatorLeadSx, supportOverlineSx } = useComponentStyles();
 
   return (
-    <Typography variant="overline" sx={mergeSx([sectionNavigatorLeadSx, supportOverlineSx], sx)} {...rest}>
+    <Typography
+      variant="overline"
+      sx={mergeSx([sectionNavigatorLeadSx, supportOverlineSx], sx)}
+      {...rest}
+    >
       {children}
     </Typography>
   );

@@ -17,7 +17,13 @@ jest.mock('../AnimatedContentList', () => ({
   }) => {
     mockAnimatedContentList(props);
 
-    return <div>{props.items.map((item, index) => <div key={index}>{props.renderItem(item, index)}</div>)}</div>;
+    return (
+      <div>
+        {props.items.map((item, index) => (
+          <div key={index}>{props.renderItem(item, index)}</div>
+        ))}
+      </div>
+    );
   },
 }));
 
@@ -43,8 +49,12 @@ jest.mock('../AnimatedSlideList', () => ({
       { 'data-testid': 'animated-slide-list', 'data-layout': props.layout ?? 'stack' },
       props.in
         ? props.items.map((item, index) =>
-          React.createElement(ItemComponent, { key: props.getItemKey(item, index) }, props.renderItem(item, index))
-        )
+            React.createElement(
+              ItemComponent,
+              { key: props.getItemKey(item, index) },
+              props.renderItem(item, index)
+            )
+          )
         : null
     );
   },
@@ -63,10 +73,12 @@ describe('CodingExamplesSection', () => {
       </ThemeProvider>
     );
 
-    expect(mockAnimatedContentList.mock.calls[0][0]).toEqual(expect.objectContaining({
-      mountItemsOnView: true,
-      startDelayMs: 120,
-    }));
+    expect(mockAnimatedContentList.mock.calls[0][0]).toEqual(
+      expect.objectContaining({
+        mountItemsOnView: true,
+        startDelayMs: 120,
+      })
+    );
   });
 
   it('renders project tabs from data, shows the summary immediately, and toggles between list and stack content', () => {
@@ -88,14 +100,30 @@ describe('CodingExamplesSection', () => {
         'Typewriter is a pip-installable CLI built on Typer and LibCST to normalize None-related type annotations while preserving formatting and comments.'
       )
     ).toBeVisible();
-    expect(screen.queryByText('Normalize `Union[..., None]` and default-`None` annotations across Python source files.')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        'Normalize `Union[..., None]` and default-`None` annotations across Python source files.'
+      )
+    ).not.toBeInTheDocument();
     expect(screen.queryByText('Python')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Purpose' }));
 
-    expect(screen.getByText('Normalize `Union[..., None]` and default-`None` annotations across Python source files.')).toBeVisible();
-    expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.containerComponent === 'ul' && props.itemComponent === 'li')).toBe(true);
-    expect(screen.getByText('Support dry-run auditing with unified diffs through `typewriter run ... --check`.')).toBeVisible();
+    expect(
+      screen.getByText(
+        'Normalize `Union[..., None]` and default-`None` annotations across Python source files.'
+      )
+    ).toBeVisible();
+    expect(
+      mockAnimatedSlideList.mock.calls.some(
+        ([props]) => props.containerComponent === 'ul' && props.itemComponent === 'li'
+      )
+    ).toBe(true);
+    expect(
+      screen.getByText(
+        'Support dry-run auditing with unified diffs through `typewriter run ... --check`.'
+      )
+    ).toBeVisible();
     expect(screen.queryByText('Python')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Stack' }));
@@ -103,7 +131,11 @@ describe('CodingExamplesSection', () => {
     expect(screen.getByText('Python')).toBeVisible();
     expect(screen.getByText('Typer')).toBeVisible();
     expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.layout === 'wrap')).toBe(true);
-    expect(screen.queryByText('Normalize `Union[..., None]` and default-`None` annotations across Python source files.')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        'Normalize `Union[..., None]` and default-`None` annotations across Python source files.'
+      )
+    ).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Stack' }));
 

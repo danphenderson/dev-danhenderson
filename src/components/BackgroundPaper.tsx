@@ -26,26 +26,10 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
 
   return (
     <Grid container component="main" sx={appStyles.backgroundRootSx}>
-      <Grid
-        item
-        xs={12}
-        sm={12}
-        md={12}
-        sx={appStyles.getBackgroundImageSx(resolvedImage)}
-      >
-        <Box
-          sx={[
-            appStyles.getBackgroundContentSx(contentAlign),
-            ...normalizeSxProp(contentSx),
-          ]}
-        >
+      <Grid item xs={12} sm={12} md={12} sx={appStyles.getBackgroundImageSx(resolvedImage)}>
+        <Box sx={[appStyles.getBackgroundContentSx(contentAlign), ...normalizeSxProp(contentSx)]}>
           {showShell ? (
-            <Paper
-              sx={[
-                appStyles.backgroundShellSx,
-                ...normalizeSxProp(shellSx),
-              ]}
-            >
+            <Paper sx={[appStyles.backgroundShellSx, ...normalizeSxProp(shellSx)]}>
               {children}
             </Paper>
           ) : (

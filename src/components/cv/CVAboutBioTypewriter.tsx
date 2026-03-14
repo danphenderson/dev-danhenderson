@@ -5,10 +5,7 @@ import type { AboutMe } from '../../types/cv';
 import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { mergeSx, StatusInlineText } from '../text';
-import {
-  useTypewriterProgress,
-  type TypewriterTimingPreset,
-} from '../text/useTypewriterProgress';
+import { useTypewriterProgress, type TypewriterTimingPreset } from '../text/useTypewriterProgress';
 
 const STATUS_MARKER = 'Open to opportunities';
 const DEFAULT_ROOT_MARGIN = '0px 0px -10% 0px';
@@ -106,9 +103,8 @@ const buildBioSegments = (about: AboutMe): BioSegment[] => {
   return segments;
 };
 
-const getVisibleSegmentText = (segment: BioSegment, visibleCharsRemaining: number) => (
-  segment.text.slice(0, Math.max(0, Math.min(segment.text.length, visibleCharsRemaining)))
-);
+const getVisibleSegmentText = (segment: BioSegment, visibleCharsRemaining: number) =>
+  segment.text.slice(0, Math.max(0, Math.min(segment.text.length, visibleCharsRemaining)));
 
 const renderSegment = (
   segment: BioSegment,
@@ -127,13 +123,14 @@ const renderSegment = (
   }
 
   if (segment.kind === 'link' && about.bioLink) {
-    const bioLinkTooltipProps = includeTooltipProps && about.bioLink.tooltip
-      ? {
-          'data-tooltip-id': COMMON_LINK_TOOLTIP_ID,
-          'data-tooltip-content': about.bioLink.tooltip,
-          'data-tooltip-place': 'top-start' as const,
-        }
-      : {};
+    const bioLinkTooltipProps =
+      includeTooltipProps && about.bioLink.tooltip
+        ? {
+            'data-tooltip-id': COMMON_LINK_TOOLTIP_ID,
+            'data-tooltip-content': about.bioLink.tooltip,
+            'data-tooltip-place': 'top-start' as const,
+          }
+        : {};
 
     return (
       <CommonLink
@@ -158,11 +155,7 @@ const renderSegment = (
     );
   }
 
-  return (
-    <React.Fragment key={key}>
-      {text}
-    </React.Fragment>
-  );
+  return <React.Fragment key={key}>{text}</React.Fragment>;
 };
 
 const renderSegments = (
@@ -195,7 +188,10 @@ export const CVAboutBioTypewriter = ({
   const startTimeoutRef = React.useRef<number | undefined>(undefined);
   const [shouldPlay, setShouldPlay] = React.useState(prefersReducedMotion);
   const segments = React.useMemo(() => buildBioSegments(about), [about]);
-  const fullText = React.useMemo(() => segments.map((segment) => segment.text).join(''), [segments]);
+  const fullText = React.useMemo(
+    () => segments.map((segment) => segment.text).join(''),
+    [segments]
+  );
 
   React.useEffect(() => {
     if (prefersReducedMotion) {

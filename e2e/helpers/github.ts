@@ -33,7 +33,7 @@ export async function mockGitHubAPISuccess(page: Page) {
           },
         },
       ]),
-    }),
+    })
   );
 
   await page.route('**/api.github.com/users/*/repos**', (route) =>
@@ -60,7 +60,7 @@ export async function mockGitHubAPISuccess(page: Page) {
           archived: false,
         },
       ]),
-    }),
+    })
   );
 
   await page.route('**/api.github.com/search/issues**', (route) =>
@@ -75,7 +75,7 @@ export async function mockGitHubAPISuccess(page: Page) {
           },
         ],
       }),
-    }),
+    })
   );
 
   await page.route('**/api.github.com/repos/**', (route) =>
@@ -91,13 +91,13 @@ export async function mockGitHubAPISuccess(page: Page) {
         fork: false,
         archived: false,
       }),
-    }),
+    })
   );
 }
 
 /** Mock all GitHub API routes to return server errors so fallback content appears. */
 export async function mockGitHubAPIFailure(page: Page) {
   await page.route(GITHUB_API, (route) =>
-    route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
+    route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })
   );
 }

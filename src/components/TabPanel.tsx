@@ -57,7 +57,8 @@ export const TabPanel = ({
   hideTabsWhenSingle = false,
   tabsVariant = 'standard',
 }: TabPanelProps) => {
-  const { getTabListSx, getTabPanelBodySx, getTabPanelSx, getTabSx, interactiveSurfaceSx } = useComponentStyles();
+  const { getTabListSx, getTabPanelBodySx, getTabPanelSx, getTabSx, interactiveSurfaceSx } =
+    useComponentStyles();
   const prefersReducedMotion = usePrefersReducedMotion();
   const fallbackId = useId();
   const tabPanelId = idProp ?? fallbackId;
@@ -172,17 +173,17 @@ export const TabPanel = ({
             hidden={!isSelected}
             sx={getTabPanelBodySx(dense, shouldRenderTabs)}
           >
-            {item.renderContent
-              ? prefersReducedMotion
-                ? item.renderContent(isSelected, renderContext)
-                : (
-                    <Collapse in={isSelected} appear={false} timeout="auto" sx={{ width: '100%' }}>
-                      {item.renderContent(isSelected, renderContext)}
-                    </Collapse>
-                  )
-              : isSelected || keepMounted
-                ? (item.content ?? null)
-                : null}
+            {item.renderContent ? (
+              prefersReducedMotion ? (
+                item.renderContent(isSelected, renderContext)
+              ) : (
+                <Collapse in={isSelected} appear={false} timeout="auto" sx={{ width: '100%' }}>
+                  {item.renderContent(isSelected, renderContext)}
+                </Collapse>
+              )
+            ) : isSelected || keepMounted ? (
+              item.content ?? null
+            ) : null}
           </Box>
         );
       })}

@@ -32,34 +32,26 @@ export const ProfileCard = ({
 
   return (
     <Stack spacing={1.5} alignItems="flex-start">
-      {avatarSrc && (
-        <Avatar
-          src={avatarSrc}
-          alt={about.name}
-          sx={profileAvatarSx}
-        />
-      )}
+      {avatarSrc && <Avatar src={avatarSrc} alt={about.name} sx={profileAvatarSx} />}
       <Box sx={profileHeaderRowSx}>
         <Stack spacing={0.75} sx={profileHeaderContentSx}>
           <Stack direction="row" sx={profileNameRowSx}>
-            <HeaderTitle sx={[primaryTextSx, { mb: 0 }]}>
-              {about.name}
-            </HeaderTitle>
+            <HeaderTitle sx={[primaryTextSx, { mb: 0 }]}>{about.name}</HeaderTitle>
           </Stack>
 
           <Stack direction="row" sx={profileMetaRowSx}>
-            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={profileMetaContentSx}>
-              <StrongMetaText>
-                {about.title}
-              </StrongMetaText>
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              flexWrap="wrap"
+              sx={profileMetaContentSx}
+            >
+              <StrongMetaText>{about.title}</StrongMetaText>
               {about.location && (
                 <>
-                  <MetaText>
-                    •
-                  </MetaText>
-                  <MetaText>
-                    {about.location}
-                  </MetaText>
+                  <MetaText>•</MetaText>
+                  <MetaText>{about.location}</MetaText>
                 </>
               )}
             </Stack>
@@ -69,10 +61,7 @@ export const ProfileCard = ({
       </Box>
       {about.bio && (
         <BodyText sx={[primaryTextSx, profileBioSx]}>
-          <CVAboutBioTypewriter
-            about={about}
-            startDelayMs={bioAnimationStartDelayMs}
-          />
+          <CVAboutBioTypewriter about={about} startDelayMs={bioAnimationStartDelayMs} />
         </BodyText>
       )}
     </Stack>

@@ -72,7 +72,11 @@ describe('StackAndToolsSection', () => {
       <ThemeProvider>
         <StackAndToolsSection
           sections={[
-            { title: 'Programming Languages', tabLabel: 'Languages', items: ['TypeScript', 'Python'] },
+            {
+              title: 'Programming Languages',
+              tabLabel: 'Languages',
+              items: ['TypeScript', 'Python'],
+            },
             { title: 'Cloud Services', tabLabel: 'Cloud', items: ['AWS'] },
           ]}
           lead="Daily development environment, languages, platform tooling, and services used across software, research, and data work."
@@ -88,8 +92,14 @@ describe('StackAndToolsSection', () => {
       )
     ).toBeVisible();
     expect(screen.getAllByTestId('animated-content-item')[0]).toHaveAttribute('data-delay', '120');
-    expect(screen.getAllByTestId('animated-content-item')[0]).toHaveAttribute('data-has-card-reset', 'true');
-    expect(screen.getAllByTestId('animated-content-item')[0]).toHaveAttribute('data-has-panel-surface', 'false');
+    expect(screen.getAllByTestId('animated-content-item')[0]).toHaveAttribute(
+      'data-has-card-reset',
+      'true'
+    );
+    expect(screen.getAllByTestId('animated-content-item')[0]).toHaveAttribute(
+      'data-has-panel-surface',
+      'false'
+    );
     expect(screen.getByRole('tab', { name: 'Programming Languages' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Cloud Services' })).toBeInTheDocument();
     expect(screen.queryByText('TypeScript')).not.toBeInTheDocument();

@@ -64,7 +64,9 @@ export const CVEntryHeader = ({
             {organization}
           </CommonLink>
         ) : (
-          <StrongMetaText sx={[supportAccentStrongTextSx, minWidthResetSx]}>{organization}</StrongMetaText>
+          <StrongMetaText sx={[supportAccentStrongTextSx, minWidthResetSx]}>
+            {organization}
+          </StrongMetaText>
         )}
 
         {renderedChips.length > 0 && (

@@ -1,12 +1,15 @@
 # TabPanel Transition-Group Slide Support
 
 ## Goal
+
 Add a reusable slide-up transition path for shared `TabPanel` drawer content on `/cv` so list and chip content animates into the selected drawer with staggered timing, while preserving existing tab semantics and keeping the app fully client-side.
 
 ## Why
+
 The current `TabPanel` swaps panel bodies abruptly, which makes the Education, Experience, Coding Examples, and Stack & Tools drawers feel disconnected from the tab interaction. The baseline test coverage also has tab-panel-specific debt: `src/components/TabPanel.test.tsx` contains a brittle style-equality assertion and `src/components/cv/CodingExamplesSection.test.tsx` still asserts stale content that no longer matches `src/data/cv.ts`.
 
 ## Constraints
+
 - Keep the app fully client-side and preserve SPA routing and `/cv` behavior.
 - Keep the change narrowly scoped to shared tab-panel behavior and its `/cv` consumers.
 - Preserve current tab semantics, including clicking the selected tab to close its content.
@@ -16,6 +19,7 @@ The current `TabPanel` swaps panel bodies abruptly, which makes the Education, E
 - Work safely on top of unrelated in-flight GitHub section edits already present in the shared branch.
 
 ## Affected files and responsibilities
+
 - `package.json` and `package-lock.json`: remove direct `react-transition-group` dependency ownership now that no local code imports from it.
 - `src/components/TabPanel.tsx`: keep `renderContent` panels mounted while inactive (with `hidden` attribute) so the drawer container exists before selection, while preserving unmount behavior for plain `content` panels.
 - `src/components/TabPanel.test.tsx`: replace brittle style comparison with stable behavioral coverage for controlled/uncontrolled state, deselection, `defaultValue`, `keepMounted`, disabled-item handling, and the new `renderContent` mounted-while-inactive lifecycle.
@@ -29,9 +33,11 @@ The current `TabPanel` swaps panel bodies abruptly, which makes the Education, E
 - `src/components/cv/*.test.tsx` for those consumers plus `src/components/SkillsChipList.test.tsx`: align stale expectations and verify the animated drawer rendering path.
 
 ## Proposed approach
+
 First stabilize the failing tests so the new animation work starts from a clean baseline. Then add a shared slide-list component that composes MUI `Slide` directly, using stable node refs to avoid strict-mode `findDOMNode` warnings, supporting both stack and wrap layouts, and falling back to immediate rendering under reduced motion. Each `Slide` is driven by the parent `selected` state through the `in` prop rather than relying on `TransitionGroup` mount/unmount transitions. Extend `TabPanel` so that `renderContent` panels remain mounted while inactive (hidden via the `hidden` attribute), ensuring the drawer container DOM node exists before the slide transition fires. The drawer container is treated only as slide-origin context (the `container` prop on `Slide`), not as a portal or mount host. Plain `content` panels retain the existing unmount-when-inactive behavior unless `keepMounted` is enabled. The four `/cv` tab consumers already thread `selected` and `renderContext` through `renderContent`, so no consumer rewrites are needed. The direct dependency on `react-transition-group` is removed since no local code imports from it; MUI's internal usage does not require app-level ownership.
 
 ## Execution steps
+
 1. Stabilize `TabPanel` and `CodingExamplesSection` tests, and broaden `TabPanel` coverage to its controlled, uncontrolled, deselect, disabled, and mount-state branches.
 2. Add explicit transition-group dependency ownership and implement the shared slide-group primitive.
 3. Extend `TabPanel` with drawer-container render context and update drawer-body clipping/positioning styles.
@@ -39,6 +45,7 @@ First stabilize the failing tests so the new animation work starts from a clean 
 5. Re-run targeted tests, build the app, run the `/cv` Playwright coverage, and validate `/cv` manually at desktop and mobile widths with normal and reduced motion.
 
 ## Validation plan
+
 - `CI=true npm test -- --watch=false --runTestsByPath src/components/TabPanel.test.tsx src/components/SkillsChipList.test.tsx src/components/cv/ExperienceList.test.tsx src/components/cv/EducationSection.test.tsx src/components/cv/CodingExamplesSection.test.tsx src/components/cv/StackAndToolsSection.test.tsx`
 - `npm run build`
 - `npx playwright test e2e/cv.github.spec.ts`
@@ -46,12 +53,14 @@ First stabilize the failing tests so the new animation work starts from a clean 
 - Browser validation on `/cv` with reduced motion to confirm immediate rendering without animation regressions
 
 ## Risks and rollback
+
 - Controlled/uncontrolled selection logic is easy to regress while threading new render context through `TabPanel`.
 - Drawer overflow and positioning changes could clip static content incorrectly if the body styles are widened too far.
 - Transition-group integrations can trigger strict-mode warnings if refs are not stable.
 - Rollback is localized: remove the slide-group primitive and consumer opt-ins while leaving the base `TabPanel` selection behavior intact.
 
 ## Progress notes
+
 - Initial inspection confirmed the `renderContent` callback is currently used only by the four `/cv` consumers named in the request.
 - The baseline `TabPanel` failure comes from a style-equality test against an unrelated button surface rather than from tab behavior.
 - `CodingExamplesSection.test.tsx` still asserts older typewriter-purpose copy and needs to be aligned to the current `src/data/cv.ts` values before feature work can be validated cleanly.

@@ -14,14 +14,16 @@ jest.mock('../data/climbs', () => ({
       date: '2024-06-20',
       route: 'Beta Crack',
       grade: '5.11b',
-      location: 'Nevada > Southern Nevada > Red Rocks > Calico Basin > Red Spring > Moderate Mecca > Upper Tier',
+      location:
+        'Nevada > Southern Nevada > Red Rocks > Calico Basin > Red Spring > Moderate Mecca > Upper Tier',
       url: 'https://example.com/beta',
     },
     {
       date: '2024-03-10',
       route: 'Gamma Slab',
       grade: '5.9',
-      location: 'Washington > Central-West Cascades & Seattle > Skykomish Valley > Index > The Cheeks > (2) Lower Cheeks',
+      location:
+        'Washington > Central-West Cascades & Seattle > Skykomish Valley > Index > The Cheeks > (2) Lower Cheeks',
       url: 'https://example.com/gamma',
     },
   ],
@@ -35,7 +37,8 @@ jest.mock('../data/climbs', () => ({
     {
       route: 'Apple Arete',
       grade: '5.10c',
-      location: 'Utah > South Central Utah > San Rafael Swell > San Rafael Swell - South > Eastern Reef Area.. AKA The Sandstone Alps > O Crags (Three Finger Canyon)',
+      location:
+        'Utah > South Central Utah > San Rafael Swell > San Rafael Swell - South > Eastern Reef Area.. AKA The Sandstone Alps > O Crags (Three Finger Canyon)',
       url: 'https://example.com/apple',
     },
     {
@@ -51,21 +54,21 @@ describe('useClimbingData', () => {
   it('formats Mountain Project area paths into concise labels', () => {
     expect(
       formatClimbingLocation(
-        'Utah > South Central Utah > San Rafael Swell > San Rafael Swell - South > Eastern Reef Area.. AKA The Sandstone Alps > O Crags (Three Finger Canyon)',
-      ),
+        'Utah > South Central Utah > San Rafael Swell > San Rafael Swell - South > Eastern Reef Area.. AKA The Sandstone Alps > O Crags (Three Finger Canyon)'
+      )
     ).toBe('O Crags (Three Finger Canyon), Utah');
-    expect(
-      formatClimbingLocation('Utah > Southeast Utah > Indian Creek > Cat Wall'),
-    ).toBe('Cat Wall, Utah');
+    expect(formatClimbingLocation('Utah > Southeast Utah > Indian Creek > Cat Wall')).toBe(
+      'Cat Wall, Utah'
+    );
     expect(
       formatClimbingLocation(
-        'Nevada > Southern Nevada > Red Rocks > Calico Basin > Red Spring > Moderate Mecca > Upper Tier',
-      ),
+        'Nevada > Southern Nevada > Red Rocks > Calico Basin > Red Spring > Moderate Mecca > Upper Tier'
+      )
     ).toBe('Upper Tier, Nevada');
     expect(
       formatClimbingLocation(
-        'Washington > Central-West Cascades & Seattle > Skykomish Valley > Index > The Cheeks > (2) Lower Cheeks',
-      ),
+        'Washington > Central-West Cascades & Seattle > Skykomish Valley > Index > The Cheeks > (2) Lower Cheeks'
+      )
     ).toBe('Lower Cheeks, Washington');
     expect(formatClimbingLocation('Leavenworth')).toBe('Leavenworth');
   });

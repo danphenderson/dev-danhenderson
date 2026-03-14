@@ -4,10 +4,14 @@ import { COMMON_LINK_TOOLTIP_ID } from './CommonLink';
 
 export const CommonLinkTooltip = () => {
   const theme = useTheme();
-  const backgroundColor = theme.palette.mode === 'light'
-    ? alpha(theme.palette.common.black, 0.92)
-    : alpha(theme.palette.background.paper, 0.96);
-  const borderColor = alpha(theme.palette.secondary.main, theme.palette.mode === 'light' ? 0.2 : 0.34);
+  const backgroundColor =
+    theme.palette.mode === 'light'
+      ? alpha(theme.palette.common.black, 0.92)
+      : alpha(theme.palette.background.paper, 0.96);
+  const borderColor = alpha(
+    theme.palette.secondary.main,
+    theme.palette.mode === 'light' ? 0.2 : 0.34
+  );
 
   return (
     <Tooltip

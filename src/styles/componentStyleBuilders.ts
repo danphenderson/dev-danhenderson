@@ -28,8 +28,10 @@ export const createComponentStyleMap = (theme: Theme) => {
   const { surface, motion } = theme.appearanceTreatment;
   const scaleGlowAlpha = (value: number, strength: number = surface.glowStrength) =>
     Math.min(value * strength, 1);
-  const scaleSecondaryGlowAlpha = (value: number, strength: number = surface.secondaryGlowStrength) =>
-    Math.min(value * strength, 1);
+  const scaleSecondaryGlowAlpha = (
+    value: number,
+    strength: number = surface.secondaryGlowStrength
+  ) => Math.min(value * strength, 1);
   const scaleTextGlowAlpha = (value: number) => Math.min(value * surface.textGlowStrength, 1);
   const cardGradientStart = alpha(
     isLight ? theme.palette.common.white : theme.palette.background.paper,
@@ -40,24 +42,54 @@ export const createComponentStyleMap = (theme: Theme) => {
     surface.cardGradientEndAlpha
   );
   const baseCardBackground = `linear-gradient(145deg, ${cardGradientStart} 0%, ${cardGradientEnd} 100%)`;
-  const cardSupportWash = `radial-gradient(120% 120% at 0% 0%, ${alpha(supportAccentLight, Math.min(surface.secondaryTintAlpha + (isLight ? 0.08 : 0.06), 0.28))} 0%, ${alpha(supportAccentColor, Math.min(surface.secondaryTintAlpha + (isLight ? 0.02 : 0.04), 0.22))} 30%, ${alpha(supportAccentColor, 0)} 72%)`;
+  const cardSupportWash = `radial-gradient(120% 120% at 0% 0%, ${alpha(
+    supportAccentLight,
+    Math.min(surface.secondaryTintAlpha + (isLight ? 0.08 : 0.06), 0.28)
+  )} 0%, ${alpha(
+    supportAccentColor,
+    Math.min(surface.secondaryTintAlpha + (isLight ? 0.02 : 0.04), 0.22)
+  )} 30%, ${alpha(supportAccentColor, 0)} 72%)`;
   const cardBackground = `${cardSupportWash}, ${baseCardBackground}`;
-  const panelSupportWash = `radial-gradient(140% 140% at 0% 0%, ${alpha(supportAccentLight, Math.min(surface.secondaryTintAlpha + (isLight ? 0.06 : 0.04), 0.2))} 0%, ${alpha(supportAccentColor, Math.min(surface.secondaryTintAlpha, 0.16))} 26%, ${alpha(supportAccentColor, 0)} 72%)`;
+  const panelSupportWash = `radial-gradient(140% 140% at 0% 0%, ${alpha(
+    supportAccentLight,
+    Math.min(surface.secondaryTintAlpha + (isLight ? 0.06 : 0.04), 0.2)
+  )} 0%, ${alpha(supportAccentColor, Math.min(surface.secondaryTintAlpha, 0.16))} 26%, ${alpha(
+    supportAccentColor,
+    0
+  )} 72%)`;
   const subtleBorder = `1px solid ${alpha(accentColor, surface.panelBorderAlpha)}`;
   const subtleSurface = alpha(theme.palette.background.paper, surface.panelSurfaceAlpha);
-  const subtlePanelBackground = `${panelSupportWash}, linear-gradient(145deg, ${subtleSurface} 0%, ${alpha(isLight ? theme.palette.common.white : theme.palette.background.default, Math.max(surface.panelSurfaceAlpha - 0.08, 0.18))} 100%)`;
+  const subtlePanelBackground = `${panelSupportWash}, linear-gradient(145deg, ${subtleSurface} 0%, ${alpha(
+    isLight ? theme.palette.common.white : theme.palette.background.default,
+    Math.max(surface.panelSurfaceAlpha - 0.08, 0.18)
+  )} 100%)`;
   const accentTint = alpha(accentColor, surface.accentTintAlpha);
   const supportAccentTint = alpha(supportAccentColor, surface.secondaryTintAlpha);
-  const interactiveOutlineColor = alpha(accentColor, Math.min(surface.panelBorderAlpha + 0.24, 0.9));
+  const interactiveOutlineColor = alpha(
+    accentColor,
+    Math.min(surface.panelBorderAlpha + 0.24, 0.9)
+  );
   const selectedTabSurface = alpha(accentColor, surface.selectedSurfaceAlpha);
   const compactLabelFontSize = theme.typography.pxToRem(12);
   const compactLabelLineHeight = 1.1;
   const interactiveSurfaceHoverShadow = isLight
-    ? `0 0 0 1px ${alpha(accentColor, Math.min(surface.panelBorderAlpha + 0.12, 0.48))}, 0 8px 20px ${alpha(accentColor, scaleGlowAlpha(0.14))}`
-    : `0 0 0 1px ${alpha(accentColor, Math.min(surface.panelBorderAlpha + 0.16, 0.62))}, 0 10px 24px ${alpha(accentColor, scaleGlowAlpha(0.18))}`;
+    ? `0 0 0 1px ${alpha(
+        accentColor,
+        Math.min(surface.panelBorderAlpha + 0.12, 0.48)
+      )}, 0 8px 20px ${alpha(accentColor, scaleGlowAlpha(0.14))}`
+    : `0 0 0 1px ${alpha(
+        accentColor,
+        Math.min(surface.panelBorderAlpha + 0.16, 0.62)
+      )}, 0 10px 24px ${alpha(accentColor, scaleGlowAlpha(0.18))}`;
   const supportInteractiveSurfaceHoverShadow = isLight
-    ? `0 0 0 1px ${alpha(supportAccentColor, Math.min(surface.secondaryBorderAlpha + 0.1, 0.48))}, 0 8px 20px ${alpha(supportAccentColor, scaleSecondaryGlowAlpha(0.16))}`
-    : `0 0 0 1px ${alpha(supportAccentColor, Math.min(surface.secondaryBorderAlpha + 0.14, 0.62))}, 0 10px 24px ${alpha(supportAccentColor, scaleSecondaryGlowAlpha(0.2))}`;
+    ? `0 0 0 1px ${alpha(
+        supportAccentColor,
+        Math.min(surface.secondaryBorderAlpha + 0.1, 0.48)
+      )}, 0 8px 20px ${alpha(supportAccentColor, scaleSecondaryGlowAlpha(0.16))}`
+    : `0 0 0 1px ${alpha(
+        supportAccentColor,
+        Math.min(surface.secondaryBorderAlpha + 0.14, 0.62)
+      )}, 0 10px 24px ${alpha(supportAccentColor, scaleSecondaryGlowAlpha(0.2))}`;
   const githubCalendarBaseTone = alpha(theme.palette.text.primary, isLight ? 0.12 : 0.2);
   const githubCalendarTheme = {
     light: [
@@ -123,10 +155,17 @@ export const createComponentStyleMap = (theme: Theme) => {
     fontFamily: theme.typography.fontFamily,
     ...interactiveAccentTextSx,
     textTransform: 'none',
-    transition: 'color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+    transition:
+      'color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
     '&:hover': {
-      backgroundColor: alpha(accentColor, Math.max(surface.selectedSurfaceAlpha, isLight ? 0.06 : 0.12)),
-      borderColor: alpha(accentColor, Math.min(surface.cardBorderAlpha + (isLight ? 0.34 : 0.38), 0.84)),
+      backgroundColor: alpha(
+        accentColor,
+        Math.max(surface.selectedSurfaceAlpha, isLight ? 0.06 : 0.12)
+      ),
+      borderColor: alpha(
+        accentColor,
+        Math.min(surface.cardBorderAlpha + (isLight ? 0.34 : 0.38), 0.84)
+      ),
       boxShadow: interactiveSurfaceHoverShadow,
     },
   } satisfies SxProps<Theme>;
@@ -140,70 +179,78 @@ export const createComponentStyleMap = (theme: Theme) => {
       supportAccentColor,
       Math.max(surface.secondaryTintAlpha - 0.04, isLight ? 0.06 : 0.12)
     ),
-    transition: 'color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+    transition:
+      'color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
     '&:hover': {
-      backgroundColor: alpha(supportAccentColor, Math.max(surface.secondaryTintAlpha, isLight ? 0.1 : 0.16)),
+      backgroundColor: alpha(
+        supportAccentColor,
+        Math.max(surface.secondaryTintAlpha, isLight ? 0.1 : 0.16)
+      ),
       borderColor: alpha(supportAccentColor, Math.min(surface.secondaryBorderAlpha + 0.24, 0.82)),
       boxShadow: supportInteractiveSurfaceHoverShadow,
     },
   } satisfies SxProps<Theme>;
 
-  const getTabPanelSx = () => ({
-    border: `1px solid ${interactiveOutlineColor}`,
-    backgroundColor: alpha(accentColor, Math.max(surface.selectedSurfaceAlpha - 0.02, 0.04)),
-    borderRadius: 2,
-    overflow: 'hidden',
-  }) satisfies SxProps<Theme>;
+  const getTabPanelSx = () =>
+    ({
+      border: `1px solid ${interactiveOutlineColor}`,
+      backgroundColor: alpha(accentColor, Math.max(surface.selectedSurfaceAlpha - 0.02, 0.04)),
+      borderRadius: 2,
+      overflow: 'hidden',
+    }) satisfies SxProps<Theme>;
 
-  const getTabListSx = (dense: boolean) => ({
-    minHeight: dense ? 36 : 40,
-    px: 0,
-    backgroundColor: 'transparent',
-    '& .MuiTabs-flexContainer': {
-      gap: 0,
-    },
-    '& .MuiTabs-indicator': {
-      display: 'none',
-    },
-    '& .MuiTabs-scrollButtons': {
-      color: 'text.secondary',
-    },
-  }) satisfies SxProps<Theme>;
+  const getTabListSx = (dense: boolean) =>
+    ({
+      minHeight: dense ? 36 : 40,
+      px: 0,
+      backgroundColor: 'transparent',
+      '& .MuiTabs-flexContainer': {
+        gap: 0,
+      },
+      '& .MuiTabs-indicator': {
+        display: 'none',
+      },
+      '& .MuiTabs-scrollButtons': {
+        color: 'text.secondary',
+      },
+    }) satisfies SxProps<Theme>;
 
-  const getTabSx = (dense: boolean) => ({
-    minHeight: dense ? 36 : 40,
-    minWidth: 0,
-    maxWidth: 'none',
-    px: { xs: 1.25, sm: 1.5 },
-    py: dense ? 0.75 : 1,
-    fontFamily: 'inherit',
-    fontSize: compactLabelFontSize,
-    lineHeight: compactLabelLineHeight,
-    fontWeight: theme.typography.button.fontWeight,
-    letterSpacing: theme.typography.button.letterSpacing,
-    alignItems: 'flex-start',
-    justifyContent: 'center',
-    textAlign: 'left',
-    ...interactiveAccentTextSx,
-    borderRadius: 0,
-    ...hoverShimmerSx,
-    '&.Mui-selected': {
+  const getTabSx = (dense: boolean) =>
+    ({
+      minHeight: dense ? 36 : 40,
+      minWidth: 0,
+      maxWidth: 'none',
+      px: { xs: 1.25, sm: 1.5 },
+      py: dense ? 0.75 : 1,
+      fontFamily: 'inherit',
+      fontSize: compactLabelFontSize,
+      lineHeight: compactLabelLineHeight,
+      fontWeight: theme.typography.button.fontWeight,
+      letterSpacing: theme.typography.button.letterSpacing,
+      alignItems: 'flex-start',
+      justifyContent: 'center',
+      textAlign: 'left',
       ...interactiveAccentTextSx,
-      backgroundColor: selectedTabSurface,
-      boxShadow: interactiveSurfaceHoverShadow,
-      zIndex: 1,
-    },
-  }) satisfies SxProps<Theme>;
+      borderRadius: 0,
+      ...hoverShimmerSx,
+      '&.Mui-selected': {
+        ...interactiveAccentTextSx,
+        backgroundColor: selectedTabSurface,
+        boxShadow: interactiveSurfaceHoverShadow,
+        zIndex: 1,
+      },
+    }) satisfies SxProps<Theme>;
 
-  const getTabPanelBodySx = (dense: boolean, hasTabs: boolean) => ({
-    position: 'relative',
-    overflow: 'hidden',
-    minWidth: 0,
-    px: { xs: 1.25, sm: 1.5 },
-    pt: hasTabs ? (dense ? 1.25 : 1.5) : 0,
-    pb: dense ? 1.25 : 1.5,
-    borderTop: hasTabs ? `1px solid ${interactiveOutlineColor}` : 'none',
-  }) satisfies SxProps<Theme>;
+  const getTabPanelBodySx = (dense: boolean, hasTabs: boolean) =>
+    ({
+      position: 'relative',
+      overflow: 'hidden',
+      minWidth: 0,
+      px: { xs: 1.25, sm: 1.5 },
+      pt: hasTabs ? (dense ? 1.25 : 1.5) : 0,
+      pb: dense ? 1.25 : 1.5,
+      borderTop: hasTabs ? `1px solid ${interactiveOutlineColor}` : 'none',
+    }) satisfies SxProps<Theme>;
 
   const cardResetSx = {
     p: 0,
@@ -215,35 +262,80 @@ export const createComponentStyleMap = (theme: Theme) => {
     backdropFilter: 'none',
   };
 
-  const shimmerGradient = `linear-gradient(90deg, transparent 0%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.04 : 0.08))} 18%, ${alpha(theme.palette.primary.light, scaleGlowAlpha(isLight ? 0.24 : 0.2))} 50%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.12 : 0.16))} 82%, transparent 100%)`;
-  const glowShadow = `0 0 12px 2px ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.18 : 0.26))}, 0 0 24px 4px ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.1 : 0.18))}`;
-  const supportGlowShadow = `0 0 12px 2px ${alpha(supportAccentColor, scaleSecondaryGlowAlpha(isLight ? 0.18 : 0.26))}, 0 0 24px 4px ${alpha(supportAccentColor, scaleSecondaryGlowAlpha(isLight ? 0.1 : 0.18))}`;
-  const borderGlowShadow = `0 0 18px 2px ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.12 : 0.2))}, 0 0 28px 6px ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.06 : 0.12))}`;
-  const chipWaveGradient = `linear-gradient(90deg, transparent 0%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.04 : 0.08))} 18%, ${alpha(theme.palette.primary.light, scaleGlowAlpha(isLight ? 0.18 : 0.16))} 50%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.09 : 0.14))} 82%, transparent 100%)`;
-  const cvSectionBorderGradient = `linear-gradient(100deg, ${alpha(accentColor, 0)} 0%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.12 : 0.18))} 18%, ${alpha(theme.palette.primary.light, scaleGlowAlpha(isLight ? 0.52 : 0.4))} 50%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.14 : 0.22))} 82%, ${alpha(accentColor, 0)} 100%)`;
-  const cvSectionBottomGlowGradient = `radial-gradient(80% 140% at 50% 100%, ${alpha(theme.palette.primary.light, scaleGlowAlpha(isLight ? 0.32 : 0.26))} 0%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.2 : 0.24))} 38%, ${alpha(accentColor, 0)} 100%)`;
-  const cvSectionSupportWash = `radial-gradient(130% 130% at 0% 0%, ${alpha(supportAccentLight, Math.min(surface.secondaryTintAlpha + (isLight ? 0.08 : 0.06), 0.24))} 0%, ${alpha(supportAccentColor, Math.min(surface.secondaryTintAlpha + 0.02, 0.18))} 24%, ${alpha(supportAccentColor, 0)} 70%)`;
-  const sectionNavigatorActiveShadow = `0 0 0 1px ${alpha(theme.palette.primary.light, isLight ? 0.32 : 0.42)}, 0 0 18px ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.16 : 0.24))}`;
-  const hoverShimmerSx = motion.tabHoverShimmerMs !== null ? {
-    position: 'relative' as const,
-    zIndex: 0,
-    overflow: 'hidden' as const,
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      inset: 0,
-      background: shimmerGradient,
-      transform: 'translateX(-100%)',
-      opacity: 0,
-      transition: 'opacity 0.3s ease',
-      pointerEvents: 'none',
-    },
-    '&:hover::after': {
-      opacity: 1,
-      animation: `${shimmerSweep} ${motion.tabHoverShimmerMs}ms linear`,
-    },
-    ...reducedMotionSx,
-  } : {};
+  const shimmerGradient = `linear-gradient(90deg, transparent 0%, ${alpha(
+    accentColor,
+    scaleGlowAlpha(isLight ? 0.04 : 0.08)
+  )} 18%, ${alpha(theme.palette.primary.light, scaleGlowAlpha(isLight ? 0.24 : 0.2))} 50%, ${alpha(
+    accentColor,
+    scaleGlowAlpha(isLight ? 0.12 : 0.16)
+  )} 82%, transparent 100%)`;
+  const glowShadow = `0 0 12px 2px ${alpha(
+    accentColor,
+    scaleGlowAlpha(isLight ? 0.18 : 0.26)
+  )}, 0 0 24px 4px ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.1 : 0.18))}`;
+  const supportGlowShadow = `0 0 12px 2px ${alpha(
+    supportAccentColor,
+    scaleSecondaryGlowAlpha(isLight ? 0.18 : 0.26)
+  )}, 0 0 24px 4px ${alpha(supportAccentColor, scaleSecondaryGlowAlpha(isLight ? 0.1 : 0.18))}`;
+  const borderGlowShadow = `0 0 18px 2px ${alpha(
+    accentColor,
+    scaleGlowAlpha(isLight ? 0.12 : 0.2)
+  )}, 0 0 28px 6px ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.06 : 0.12))}`;
+  const chipWaveGradient = `linear-gradient(90deg, transparent 0%, ${alpha(
+    accentColor,
+    scaleGlowAlpha(isLight ? 0.04 : 0.08)
+  )} 18%, ${alpha(theme.palette.primary.light, scaleGlowAlpha(isLight ? 0.18 : 0.16))} 50%, ${alpha(
+    accentColor,
+    scaleGlowAlpha(isLight ? 0.09 : 0.14)
+  )} 82%, transparent 100%)`;
+  const cvSectionBorderGradient = `linear-gradient(100deg, ${alpha(accentColor, 0)} 0%, ${alpha(
+    accentColor,
+    scaleGlowAlpha(isLight ? 0.12 : 0.18)
+  )} 18%, ${alpha(theme.palette.primary.light, scaleGlowAlpha(isLight ? 0.52 : 0.4))} 50%, ${alpha(
+    accentColor,
+    scaleGlowAlpha(isLight ? 0.14 : 0.22)
+  )} 82%, ${alpha(accentColor, 0)} 100%)`;
+  const cvSectionBottomGlowGradient = `radial-gradient(80% 140% at 50% 100%, ${alpha(
+    theme.palette.primary.light,
+    scaleGlowAlpha(isLight ? 0.32 : 0.26)
+  )} 0%, ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.2 : 0.24))} 38%, ${alpha(
+    accentColor,
+    0
+  )} 100%)`;
+  const cvSectionSupportWash = `radial-gradient(130% 130% at 0% 0%, ${alpha(
+    supportAccentLight,
+    Math.min(surface.secondaryTintAlpha + (isLight ? 0.08 : 0.06), 0.24)
+  )} 0%, ${alpha(
+    supportAccentColor,
+    Math.min(surface.secondaryTintAlpha + 0.02, 0.18)
+  )} 24%, ${alpha(supportAccentColor, 0)} 70%)`;
+  const sectionNavigatorActiveShadow = `0 0 0 1px ${alpha(
+    theme.palette.primary.light,
+    isLight ? 0.32 : 0.42
+  )}, 0 0 18px ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.16 : 0.24))}`;
+  const hoverShimmerSx =
+    motion.tabHoverShimmerMs !== null
+      ? {
+          position: 'relative' as const,
+          zIndex: 0,
+          overflow: 'hidden' as const,
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            background: shimmerGradient,
+            transform: 'translateX(-100%)',
+            opacity: 0,
+            transition: 'opacity 0.3s ease',
+            pointerEvents: 'none',
+          },
+          '&:hover::after': {
+            opacity: 1,
+            animation: `${shimmerSweep} ${motion.tabHoverShimmerMs}ms linear`,
+          },
+          ...reducedMotionSx,
+        }
+      : {};
 
   const sharedPillChipSx = {
     border: subtleBorder,
@@ -252,106 +344,128 @@ export const createComponentStyleMap = (theme: Theme) => {
     color: 'text.primary',
   } satisfies SxProps<Theme>;
 
-  const pillPulseOverlaySx = motion.pillPulseEnabled ? {
-    position: 'relative' as const,
-    overflow: 'visible' as const,
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      inset: -2,
-      borderRadius: 'inherit',
-      boxShadow: glowShadow,
-      opacity: 0,
-      animation: `${ambientPulse} ${motion.pillPulseMs}ms ease-in-out infinite`,
-      pointerEvents: 'none',
-    },
-    ...reducedMotionSx,
-  } : {};
-  const supportPillPulseOverlaySx = motion.pillPulseEnabled ? {
-    position: 'relative' as const,
-    overflow: 'visible' as const,
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      inset: -2,
-      borderRadius: 'inherit',
-      boxShadow: supportGlowShadow,
-      opacity: 0,
-      animation: `${ambientPulse} ${motion.pillPulseMs}ms ease-in-out infinite`,
-      pointerEvents: 'none',
-    },
-    ...reducedMotionSx,
-  } : {};
+  const pillPulseOverlaySx = motion.pillPulseEnabled
+    ? {
+        position: 'relative' as const,
+        overflow: 'visible' as const,
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          inset: -2,
+          borderRadius: 'inherit',
+          boxShadow: glowShadow,
+          opacity: 0,
+          animation: `${ambientPulse} ${motion.pillPulseMs}ms ease-in-out infinite`,
+          pointerEvents: 'none',
+        },
+        ...reducedMotionSx,
+      }
+    : {};
+  const supportPillPulseOverlaySx = motion.pillPulseEnabled
+    ? {
+        position: 'relative' as const,
+        overflow: 'visible' as const,
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          inset: -2,
+          borderRadius: 'inherit',
+          boxShadow: supportGlowShadow,
+          opacity: 0,
+          animation: `${ambientPulse} ${motion.pillPulseMs}ms ease-in-out infinite`,
+          pointerEvents: 'none',
+        },
+        ...reducedMotionSx,
+      }
+    : {};
 
-  const chipWaveSx = motion.chipWaveEnabled ? {
-    backgroundImage: chipWaveGradient,
-    backgroundSize: '240% 100%',
-    backgroundRepeat: 'no-repeat' as const,
-    backgroundPosition: '200% center',
-    animation: `${backgroundSweep} ${motion.chipWaveMs}ms linear infinite`,
-    ...reducedMotionSx,
-  } : {};
+  const chipWaveSx = motion.chipWaveEnabled
+    ? {
+        backgroundImage: chipWaveGradient,
+        backgroundSize: '240% 100%',
+        backgroundRepeat: 'no-repeat' as const,
+        backgroundPosition: '200% center',
+        animation: `${backgroundSweep} ${motion.chipWaveMs}ms linear infinite`,
+        ...reducedMotionSx,
+      }
+    : {};
 
-  const borderGlowOverlaySx = motion.borderGlowEnabled ? {
-    position: 'relative' as const,
-    '&::after': {
-      content: '""',
-      position: 'absolute',
-      inset: -1,
-      borderRadius: 'inherit',
-      boxShadow: borderGlowShadow,
-      opacity: 0,
-      animation: `${ambientPulse} ${motion.borderGlowMs}ms ease-in-out infinite`,
-      pointerEvents: 'none',
-      zIndex: 0,
-    },
-    ...reducedMotionSx,
-  } : {};
+  const borderGlowOverlaySx = motion.borderGlowEnabled
+    ? {
+        position: 'relative' as const,
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          inset: -1,
+          borderRadius: 'inherit',
+          boxShadow: borderGlowShadow,
+          opacity: 0,
+          animation: `${ambientPulse} ${motion.borderGlowMs}ms ease-in-out infinite`,
+          pointerEvents: 'none',
+          zIndex: 0,
+        },
+        ...reducedMotionSx,
+      }
+    : {};
 
   const textBreatheBaseSx = {
     display: 'inline-block' as const,
     transformOrigin: 'left center',
   } satisfies SxProps<Theme>;
 
-  const statusBreatheSx = motion.statusBreatheEnabled ? {
-    ...textBreatheBaseSx,
-    fontWeight: 600,
-    color: supportAccentColor,
-    textShadow: `0 0 10px ${alpha(supportAccentColor, scaleSecondaryGlowAlpha(isLight ? 0.12 : 0.22))}`,
-    animation: `${breathe} ${motion.statusBreatheMs}ms ease-in-out infinite`,
-    ...reducedMotionSx,
-  } : {
-    fontWeight: 600,
-    color: supportAccentColor,
-  };
+  const statusBreatheSx = motion.statusBreatheEnabled
+    ? {
+        ...textBreatheBaseSx,
+        fontWeight: 600,
+        color: supportAccentColor,
+        textShadow: `0 0 10px ${alpha(
+          supportAccentColor,
+          scaleSecondaryGlowAlpha(isLight ? 0.12 : 0.22)
+        )}`,
+        animation: `${breathe} ${motion.statusBreatheMs}ms ease-in-out infinite`,
+        ...reducedMotionSx,
+      }
+    : {
+        fontWeight: 600,
+        color: supportAccentColor,
+      };
 
-  const sectionHeadingTextBreatheSx = motion.headingBreatheEnabled ? {
-    ...textBreatheBaseSx,
-    textShadow: `0 0 8px ${alpha(accentColor, scaleTextGlowAlpha(isLight ? 0.08 : 0.16))}`,
-    animation: `${breathe} ${motion.headingBreatheMs}ms ease-in-out infinite`,
-    ...reducedMotionSx,
-  } : {};
+  const sectionHeadingTextBreatheSx = motion.headingBreatheEnabled
+    ? {
+        ...textBreatheBaseSx,
+        textShadow: `0 0 8px ${alpha(accentColor, scaleTextGlowAlpha(isLight ? 0.08 : 0.16))}`,
+        animation: `${breathe} ${motion.headingBreatheMs}ms ease-in-out infinite`,
+        ...reducedMotionSx,
+      }
+    : {};
 
-  const sectionHeadingOverlineTextSx = motion.headingBreatheEnabled ? {
-    ...sectionHeadingTextBreatheSx,
-    animationDelay: '0ms',
-  } : {};
+  const sectionHeadingOverlineTextSx = motion.headingBreatheEnabled
+    ? {
+        ...sectionHeadingTextBreatheSx,
+        animationDelay: '0ms',
+      }
+    : {};
 
-  const sectionHeadingTitleTextSx = motion.headingBreatheEnabled ? {
-    ...sectionHeadingTextBreatheSx,
-    animationDelay: '120ms',
-  } : {};
+  const sectionHeadingTitleTextSx = motion.headingBreatheEnabled
+    ? {
+        ...sectionHeadingTextBreatheSx,
+        animationDelay: '120ms',
+      }
+    : {};
 
-  const sectionHeadingSubtitleTextSx = motion.headingBreatheEnabled ? {
-    ...sectionHeadingTextBreatheSx,
-    animationDelay: '240ms',
-  } : {};
+  const sectionHeadingSubtitleTextSx = motion.headingBreatheEnabled
+    ? {
+        ...sectionHeadingTextBreatheSx,
+        animationDelay: '240ms',
+      }
+    : {};
 
-  const getChipWaveDelaySx = (index: number, interval = motion.chipWaveDelaySeconds) => (
-    motion.chipWaveEnabled ? {
-      animationDelay: `${index * interval}s`,
-    } : {}
-  );
+  const getChipWaveDelaySx = (index: number, interval = motion.chipWaveDelaySeconds) =>
+    motion.chipWaveEnabled
+      ? {
+          animationDelay: `${index * interval}s`,
+        }
+      : {};
 
   const getGitHubChipSx = (layout: GitHubChipLayout): SxProps<Theme> => ({
     border: subtleBorder,
@@ -394,7 +508,10 @@ export const createComponentStyleMap = (theme: Theme) => {
       border: `1px solid ${alpha(accentColor, surface.cardBorderAlpha)}`,
       background: cardBackground,
       boxShadow: isLight
-        ? `0 10px 28px ${alpha(theme.palette.text.primary, Math.max(surface.cardShadowAlpha, 0.08))}`
+        ? `0 10px 28px ${alpha(
+            theme.palette.text.primary,
+            Math.max(surface.cardShadowAlpha, 0.08)
+          )}`
         : `0 12px 32px ${alpha(theme.palette.common.black, surface.cardShadowAlpha)}`,
       backdropFilter: `blur(${surface.cardBlurPx}px)`,
       p: { xs: 2, md: 2.5 },
@@ -410,47 +527,55 @@ export const createComponentStyleMap = (theme: Theme) => {
         position: 'relative',
         zIndex: 1,
       },
-      ...(surface.sectionBottomGlowOpacity > 0 ? {
-        '&::before': {
-          content: '""',
-          position: 'absolute',
-          left: '10%',
-          right: '10%',
-          bottom: -14,
-          height: 56,
-          borderRadius: '999px',
-          background: cvSectionBottomGlowGradient,
-          filter: `blur(${surface.cardBlurPx + 2}px)`,
-          opacity: surface.sectionBottomGlowOpacity,
-          ...(motion.sectionBottomGlowAnimated ? {
-            animation: `${ambientPulse} ${motion.sectionBottomGlowMs}ms ease-in-out infinite`,
-          } : {}),
-          pointerEvents: 'none',
-          zIndex: 0,
-        },
-      } : {}),
-      ...(surface.sectionBorderSweepOpacity > 0 ? {
-        '&::after': {
-          content: '""',
-          position: 'absolute',
-          inset: 0,
-          padding: '1px',
-          borderRadius: 'inherit',
-          background: cvSectionBorderGradient,
-          ...(motion.sectionBorderSweepEnabled ? {
-            backgroundSize: '220% 100%',
-            backgroundPosition: '200% center',
-            animation: `${backgroundSweep} ${motion.sectionBorderSweepMs}ms linear infinite`,
-          } : {}),
-          WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-          WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude',
-          opacity: surface.sectionBorderSweepOpacity,
-          boxShadow: 'none',
-          pointerEvents: 'none',
-          zIndex: 0,
-        },
-      } : {}),
+      ...(surface.sectionBottomGlowOpacity > 0
+        ? {
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              left: '10%',
+              right: '10%',
+              bottom: -14,
+              height: 56,
+              borderRadius: '999px',
+              background: cvSectionBottomGlowGradient,
+              filter: `blur(${surface.cardBlurPx + 2}px)`,
+              opacity: surface.sectionBottomGlowOpacity,
+              ...(motion.sectionBottomGlowAnimated
+                ? {
+                    animation: `${ambientPulse} ${motion.sectionBottomGlowMs}ms ease-in-out infinite`,
+                  }
+                : {}),
+              pointerEvents: 'none',
+              zIndex: 0,
+            },
+          }
+        : {}),
+      ...(surface.sectionBorderSweepOpacity > 0
+        ? {
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              inset: 0,
+              padding: '1px',
+              borderRadius: 'inherit',
+              background: cvSectionBorderGradient,
+              ...(motion.sectionBorderSweepEnabled
+                ? {
+                    backgroundSize: '220% 100%',
+                    backgroundPosition: '200% center',
+                    animation: `${backgroundSweep} ${motion.sectionBorderSweepMs}ms linear infinite`,
+                  }
+                : {}),
+              WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+              WebkitMaskComposite: 'xor',
+              maskComposite: 'exclude',
+              opacity: surface.sectionBorderSweepOpacity,
+              boxShadow: 'none',
+              pointerEvents: 'none',
+              zIndex: 0,
+            },
+          }
+        : {}),
       ...reducedMotionSx,
     } satisfies SxProps<Theme>,
     sectionNavigatorRootSx: {
@@ -563,10 +688,11 @@ export const createComponentStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     secondaryTextSx: { color: 'text.secondary' } satisfies SxProps<Theme>,
     primaryTextSx: { color: 'text.primary' } satisfies SxProps<Theme>,
-    sectionHeadingTitleSx: (subtitle?: string) => ({
-      mb: subtitle ? 1 : 2,
-      color: 'text.primary',
-    } satisfies SxProps<Theme>),
+    sectionHeadingTitleSx: (subtitle?: string) =>
+      ({
+        mb: subtitle ? 1 : 2,
+        color: 'text.primary',
+      }) satisfies SxProps<Theme>,
     sectionHeadingTitleTextSx: sectionHeadingTitleTextSx satisfies SxProps<Theme>,
     sectionHeadingSubtitleSx: {
       mb: 2,

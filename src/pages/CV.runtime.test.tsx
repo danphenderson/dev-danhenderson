@@ -5,7 +5,9 @@ import CV from './CV';
 jest.mock('../hooks/useGithubProfile', () => ({
   useGithubProfile: () => ({
     activity: [{ label: 'Pushed 2 commits to owner/repo', href: 'https://github.com/owner/repo' }],
-    contributions: [{ name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright', stars: 999 }],
+    contributions: [
+      { name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright', stars: 999 },
+    ],
     loading: false,
     error: null,
   }),

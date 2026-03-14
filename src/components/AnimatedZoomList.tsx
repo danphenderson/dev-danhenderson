@@ -25,19 +25,14 @@ export const AnimatedZoomList = <Item,>({
   itemStaggerMs,
 }: AnimatedZoomListProps<Item>) => {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const {
-    getSectionDelayMs,
-    motionTokens,
-  } = useComponentStyles();
+  const { getSectionDelayMs, motionTokens } = useComponentStyles();
   const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.accordionChipStaggerMs;
 
   if (prefersReducedMotion) {
     return (
       <Box sx={containerSx}>
         {items.map((item, index) => (
-          <Fragment key={getItemKey(item, index)}>
-            {renderItem(item, index)}
-          </Fragment>
+          <Fragment key={getItemKey(item, index)}>{renderItem(item, index)}</Fragment>
         ))}
       </Box>
     );
@@ -50,11 +45,11 @@ export const AnimatedZoomList = <Item,>({
           key={getItemKey(item, index)}
           in={inProp}
           appear={false}
-          style={{ transitionDelay: `${getSectionDelayMs(index, startDelayMs, resolvedItemStaggerMs)}ms` }}
+          style={{
+            transitionDelay: `${getSectionDelayMs(index, startDelayMs, resolvedItemStaggerMs)}ms`,
+          }}
         >
-          <Box>
-            {renderItem(item, index)}
-          </Box>
+          <Box>{renderItem(item, index)}</Box>
         </Zoom>
       ))}
     </Box>

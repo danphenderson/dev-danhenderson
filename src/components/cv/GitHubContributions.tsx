@@ -33,22 +33,16 @@ export const GitHubContributions = ({
   } = useComponentStyles();
 
   if (loading) {
-    return (
-      <LoadingBars label="Loading GitHub contributions" compact />
-    );
+    return <LoadingBars label="Loading GitHub contributions" compact />;
   }
 
   if (!contributions.length) {
     return (
-      <BodyText sx={secondaryTextSx}>
-        No recent community contributions found right now.
-      </BodyText>
+      <BodyText sx={secondaryTextSx}>No recent community contributions found right now.</BodyText>
     );
   }
 
-  const sortedContributions = [...contributions].sort(
-    (a, b) => (b.stars ?? 0) - (a.stars ?? 0)
-  );
+  const sortedContributions = [...contributions].sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0));
 
   if (variant === 'list') {
     return (
@@ -87,14 +81,10 @@ export const GitHubContributions = ({
           sx={contributionCardSx}
         >
           <Box sx={contributionCardBodySx}>
-            <EntryTitle sx={contributionCardNameSx}>
-              {project.name}
-            </EntryTitle>
+            <EntryTitle sx={contributionCardNameSx}>{project.name}</EntryTitle>
           </Box>
           <Stack direction="row" spacing={0.5} alignItems="center" sx={contributionCardMetaRowSx}>
-            <MetaText sx={contributionCardMetaSx}>
-              ★ {project.stars ?? 0}
-            </MetaText>
+            <MetaText sx={contributionCardMetaSx}>★ {project.stars ?? 0}</MetaText>
           </Stack>
         </ContentCard>
       ))}

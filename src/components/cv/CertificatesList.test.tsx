@@ -20,7 +20,9 @@ jest.mock('../AnimatedContentList', () => ({
         data-item-surface={props.itemSurface ?? ''}
         data-mount-items-on-view={String(Boolean(props.mountItemsOnView))}
       >
-        {props.items.map((item, index) => <div key={index}>{props.renderItem(item, index)}</div>)}
+        {props.items.map((item, index) => (
+          <div key={index}>{props.renderItem(item, index)}</div>
+        ))}
       </div>
     );
   },
@@ -54,6 +56,9 @@ describe('CertificatesList', () => {
       'https://example.com/certificate'
     );
     expect(screen.getByTestId('certificates-list')).toHaveAttribute('data-item-surface', 'panel');
-    expect(screen.getByTestId('certificates-list')).toHaveAttribute('data-mount-items-on-view', 'true');
+    expect(screen.getByTestId('certificates-list')).toHaveAttribute(
+      'data-mount-items-on-view',
+      'true'
+    );
   });
 });

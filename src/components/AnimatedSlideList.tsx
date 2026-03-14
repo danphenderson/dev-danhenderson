@@ -7,7 +7,9 @@ import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { normalizeSxProp } from '../utils/sx';
 
-const SlideWithNodeRef = Slide as unknown as (props: SlideProps & { nodeRef?: RefObject<HTMLElement> }) => JSX.Element;
+const SlideWithNodeRef = Slide as unknown as (
+  props: SlideProps & { nodeRef?: RefObject<HTMLElement> }
+) => JSX.Element;
 
 type AnimatedSlideListProps<Item> = {
   items: Item[];
@@ -43,9 +45,7 @@ export const AnimatedSlideList = <Item,>({
   wrapGap = 0.75,
 }: AnimatedSlideListProps<Item>) => {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const {
-    motionTokens,
-  } = useComponentStyles();
+  const { motionTokens } = useComponentStyles();
   const [enteredKeys, setEnteredKeys] = useState<Set<string>>(() => new Set());
   const nodeRefs = useRef(new Map<string, RefObject<HTMLElement>>());
   const enterTimerIdsRef = useRef<number[]>([]);
@@ -54,17 +54,18 @@ export const AnimatedSlideList = <Item,>({
     () => items.map((item, index) => getItemKey(item, index)),
     [getItemKey, items]
   );
-  const baseContainerSx: SxProps<Theme> = layout === 'wrap'
+  const baseContainerSx: SxProps<Theme> =
+    layout === 'wrap'
       ? {
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: wrapGap,
-      }
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: wrapGap,
+        }
       : {
-        '& > * + *': {
-          mt: stackSpacing,
-        },
-      };
+          '& > * + *': {
+            mt: stackSpacing,
+          },
+        };
   const resolvedContainerSx: SxProps<Theme> = [baseContainerSx, ...normalizeSxProp(containerSx)];
 
   const getNodeRef = (key: string) => {
@@ -125,11 +126,7 @@ export const AnimatedSlideList = <Item,>({
     return (
       <Box component={containerComponent} sx={resolvedContainerSx}>
         {items.map((item, index) => (
-          <Box
-            key={getItemKey(item, index)}
-            component={itemComponent}
-            sx={itemSx}
-          >
+          <Box key={getItemKey(item, index)} component={itemComponent} sx={itemSx}>
             {renderItem(item, index)}
           </Box>
         ))}
@@ -151,14 +148,10 @@ export const AnimatedSlideList = <Item,>({
             direction="up"
             mountOnEnter
             unmountOnExit
-            container={container ? (() => container() ?? document.body) : undefined}
+            container={container ? () => container() ?? document.body : undefined}
             nodeRef={nodeRef}
           >
-            <Box
-              ref={nodeRef}
-              component={itemComponent}
-              sx={itemSx}
-            >
+            <Box ref={nodeRef} component={itemComponent} sx={itemSx}>
               {renderItem(item, index)}
             </Box>
           </SlideWithNodeRef>

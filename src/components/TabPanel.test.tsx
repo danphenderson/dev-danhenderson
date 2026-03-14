@@ -79,11 +79,16 @@ describe('TabPanel', () => {
   });
 
   it('passes drawer render context to renderContent callbacks', () => {
-    const renderContent = jest.fn((selected: boolean, context: { panelId: string; getDrawerContainer: () => HTMLDivElement | null }) => (
-      <div data-selected={String(selected)} data-panel-id={context.panelId}>
-        Details body
-      </div>
-    ));
+    const renderContent = jest.fn(
+      (
+        selected: boolean,
+        context: { panelId: string; getDrawerContainer: () => HTMLDivElement | null }
+      ) => (
+        <div data-selected={String(selected)} data-panel-id={context.panelId}>
+          Details body
+        </div>
+      )
+    );
 
     render(
       <ThemeProvider>
@@ -102,10 +107,16 @@ describe('TabPanel', () => {
 
     const renderContext = renderContent.mock.calls[0][1];
 
-    expect(renderContent).toHaveBeenCalledWith(true, expect.objectContaining({ panelId: 'context-test-panel-details' }));
+    expect(renderContent).toHaveBeenCalledWith(
+      true,
+      expect.objectContaining({ panelId: 'context-test-panel-details' })
+    );
     expect(renderContext.getDrawerContainer()).toHaveAttribute('id', 'context-test-panel-details');
     expect(screen.getByText('Details body')).toHaveAttribute('data-selected', 'true');
-    expect(screen.getByText('Details body')).toHaveAttribute('data-panel-id', 'context-test-panel-details');
+    expect(screen.getByText('Details body')).toHaveAttribute(
+      'data-panel-id',
+      'context-test-panel-details'
+    );
   });
 
   it('can hide the tab strip when only one item is provided', () => {
@@ -130,7 +141,12 @@ describe('TabPanel', () => {
           ariaLabel="Supplemental section"
           hideTabsWhenSingle
           items={[
-            { value: 'details', label: 'Details', content: <div>Details body</div>, disabled: true },
+            {
+              value: 'details',
+              label: 'Details',
+              content: <div>Details body</div>,
+              disabled: true,
+            },
             { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
           ]}
         />
@@ -143,30 +159,33 @@ describe('TabPanel', () => {
     expect(screen.queryByText('Details body')).not.toBeInTheDocument();
   });
 
-  it.each(['fullWidth', 'scrollable'] as const)('left-aligns tab labels for %s tabs', (tabsVariant) => {
-    render(
-      <ThemeProvider>
-        <TabPanel
-          ariaLabel={`${tabsVariant} alignment sections`}
-          items={[
-            { value: 'details', label: 'Details', content: <div>Details body</div> },
-            { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
-          ]}
-          tabsVariant={tabsVariant}
-        />
-      </ThemeProvider>
-    );
+  it.each(['fullWidth', 'scrollable'] as const)(
+    'left-aligns tab labels for %s tabs',
+    (tabsVariant) => {
+      render(
+        <ThemeProvider>
+          <TabPanel
+            ariaLabel={`${tabsVariant} alignment sections`}
+            items={[
+              { value: 'details', label: 'Details', content: <div>Details body</div> },
+              { value: 'skills', label: 'Skills', content: <div>Skills body</div> },
+            ]}
+            tabsVariant={tabsVariant}
+          />
+        </ThemeProvider>
+      );
 
-    const detailsTab = screen.getByRole('tab', { name: 'Details' });
-    const skillsTab = screen.getByRole('tab', { name: 'Skills' });
+      const detailsTab = screen.getByRole('tab', { name: 'Details' });
+      const skillsTab = screen.getByRole('tab', { name: 'Skills' });
 
-    expect(window.getComputedStyle(detailsTab).alignItems).toBe('flex-start');
-    expect(window.getComputedStyle(detailsTab).justifyContent).toBe('center');
-    expect(window.getComputedStyle(detailsTab).textAlign).toBe('left');
-    expect(window.getComputedStyle(skillsTab).alignItems).toBe('flex-start');
-    expect(window.getComputedStyle(skillsTab).justifyContent).toBe('center');
-    expect(window.getComputedStyle(skillsTab).textAlign).toBe('left');
-  });
+      expect(window.getComputedStyle(detailsTab).alignItems).toBe('flex-start');
+      expect(window.getComputedStyle(detailsTab).justifyContent).toBe('center');
+      expect(window.getComputedStyle(detailsTab).textAlign).toBe('left');
+      expect(window.getComputedStyle(skillsTab).alignItems).toBe('flex-start');
+      expect(window.getComputedStyle(skillsTab).justifyContent).toBe('center');
+      expect(window.getComputedStyle(skillsTab).textAlign).toBe('left');
+    }
+  );
 
   it('matches the industry chip label size and uses the compact dense tab height', () => {
     render(
@@ -188,11 +207,15 @@ describe('TabPanel', () => {
 
     const industryChipLabel = screen.getByText('Industry').closest('.MuiChip-label');
     const detailsTab = screen.getByRole('tab', { name: 'Details' });
-    const tabsRoot = screen.getByRole('tablist', { name: 'Dense experience sections' }).closest('.MuiTabs-root');
+    const tabsRoot = screen
+      .getByRole('tablist', { name: 'Dense experience sections' })
+      .closest('.MuiTabs-root');
 
     expect(industryChipLabel).not.toBeNull();
     expect(tabsRoot).not.toBeNull();
-    expect(window.getComputedStyle(detailsTab).fontSize).toBe(window.getComputedStyle(industryChipLabel as HTMLElement).fontSize);
+    expect(window.getComputedStyle(detailsTab).fontSize).toBe(
+      window.getComputedStyle(industryChipLabel as HTMLElement).fontSize
+    );
     expect(window.getComputedStyle(detailsTab).lineHeight).toBe(
       window.getComputedStyle(industryChipLabel as HTMLElement).lineHeight
     );
@@ -220,7 +243,9 @@ describe('TabPanel', () => {
 
     expect(screen.getByText('Details body')).toBeInTheDocument();
     expect(screen.getByText('Details body').closest('[role="tabpanel"]')).toHaveAttribute('hidden');
-    expect(screen.getByText('Skills body').closest('[role="tabpanel"]')).not.toHaveAttribute('hidden');
+    expect(screen.getByText('Skills body').closest('[role="tabpanel"]')).not.toHaveAttribute(
+      'hidden'
+    );
   });
 
   it('treats value as controlled and reports false when the selected tab is clicked again', () => {
@@ -306,10 +331,14 @@ describe('TabPanel', () => {
 
   it('keeps renderContent panels mounted while inactive even when keepMounted is false', () => {
     const renderDetails = jest.fn((selected: boolean) => (
-      <div data-testid="details-body" data-selected={String(selected)}>Details body</div>
+      <div data-testid="details-body" data-selected={String(selected)}>
+        Details body
+      </div>
     ));
     const renderSkills = jest.fn((selected: boolean) => (
-      <div data-testid="skills-body" data-selected={String(selected)}>Skills body</div>
+      <div data-testid="skills-body" data-selected={String(selected)}>
+        Skills body
+      </div>
     ));
 
     render(

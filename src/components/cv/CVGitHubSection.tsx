@@ -1,9 +1,6 @@
 import { Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
-import type {
-  GitHubActivityItem,
-  GitHubContribution,
-} from '../../types/cv';
+import type { GitHubActivityItem, GitHubContribution } from '../../types/cv';
 import { githubUsername } from '../../data/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { CVSectionCard } from './CVSectionCard';
@@ -50,9 +47,21 @@ export const CVGitHubSection = ({
     supportAccentTitleSx,
   } = useComponentStyles();
   const resolvedItemOffsetMs = itemOffsetMs ?? motionTokens.itemOffsetMs;
-  const githubActivityDelayMs = getSectionDelayMs(0, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
-  const githubContributionsDelayMs = getSectionDelayMs(1, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
-  const githubCalendarDelayMs = getSectionDelayMs(2, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
+  const githubActivityDelayMs = getSectionDelayMs(
+    0,
+    nestedDelayOffsetMs,
+    motionTokens.githubSubsectionStaggerMs
+  );
+  const githubContributionsDelayMs = getSectionDelayMs(
+    1,
+    nestedDelayOffsetMs,
+    motionTokens.githubSubsectionStaggerMs
+  );
+  const githubCalendarDelayMs = getSectionDelayMs(
+    2,
+    nestedDelayOffsetMs,
+    motionTokens.githubSubsectionStaggerMs
+  );
   const resolvedOverlineSx = overlineSx ?? sectionHeadingCompactSx;
   const githubSubsectionCardSx: SxProps<Theme> = [
     cardResetSx,
@@ -73,9 +82,7 @@ export const CVGitHubSection = ({
 
         <SectionCard delayMs={githubActivityDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={supportAccentTitleSx}>
-              Recent Activity
-            </SubsectionTitle>
+            <SubsectionTitle sx={supportAccentTitleSx}>Recent Activity</SubsectionTitle>
             <SectionPanel>
               <GitHubActivityList
                 activity={activity}
@@ -89,9 +96,7 @@ export const CVGitHubSection = ({
 
         <SectionCard delayMs={githubContributionsDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={supportAccentTitleSx}>
-              Contributions
-            </SubsectionTitle>
+            <SubsectionTitle sx={supportAccentTitleSx}>Contributions</SubsectionTitle>
             <SectionPanel>
               <GitHubContributions
                 contributions={contributions}

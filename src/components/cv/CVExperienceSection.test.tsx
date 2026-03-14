@@ -4,7 +4,9 @@ import ThemeProvider from '../../ThemeProvider';
 import { CVExperienceSection } from './CVExperienceSection';
 import { cvSectionMetadata } from './cvSectionMetadata';
 
-const mockExperienceList = jest.fn((_: { startDelayMs?: number }) => <div data-testid="experience-list" />);
+const mockExperienceList = jest.fn((_: { startDelayMs?: number }) => (
+  <div data-testid="experience-list" />
+));
 
 jest.mock('../layout/SectionCard', () => ({
   SectionCard: ({
@@ -51,6 +53,8 @@ describe('CVExperienceSection', () => {
       </ThemeProvider>
     );
 
-    expect(mockExperienceList.mock.calls[0][0]).toEqual(expect.objectContaining({ startDelayMs: 240 }));
+    expect(mockExperienceList.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ startDelayMs: 240 })
+    );
   });
 });

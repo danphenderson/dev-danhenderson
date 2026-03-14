@@ -10,7 +10,8 @@ type CertificatesListProps = {
 };
 
 export const CertificatesList = ({ certificates, startDelayMs = 0 }: CertificatesListProps) => {
-  const { certificateActionSx, contentListStackSpacing, supportAccentInteractiveSurfaceSx } = useComponentStyles();
+  const { certificateActionSx, contentListStackSpacing, supportAccentInteractiveSurfaceSx } =
+    useComponentStyles();
 
   return (
     <AnimatedContentList

@@ -10,7 +10,9 @@ describe('Footer', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText(String(new Date().getFullYear()), { exact: false })).toBeInTheDocument();
+    expect(
+      screen.getByText(String(new Date().getFullYear()), { exact: false })
+    ).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'danhenderson.dev' })).toHaveAttribute(
       'href',
       'https://danhenderson.dev/'

@@ -17,8 +17,16 @@ describe('CVGitHubSection', () => {
     render(
       <ThemeProvider>
         <CVGitHubSection
-          activity={[{ label: 'Pushed 2 commits to owner/repo', href: 'https://github.com/owner/repo' }]}
-          contributions={[{ name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright', stars: 999 }]}
+          activity={[
+            { label: 'Pushed 2 commits to owner/repo', href: 'https://github.com/owner/repo' },
+          ]}
+          contributions={[
+            {
+              name: 'microsoft/playwright',
+              url: 'https://github.com/microsoft/playwright',
+              stars: 999,
+            },
+          ]}
           loading={false}
           error={null}
           lead="Recent activity, open-source contributions, and contribution history from GitHub."
@@ -28,7 +36,9 @@ describe('CVGitHubSection', () => {
 
     expect(screen.getByText('GitHub')).toBeInTheDocument();
     expect(
-      screen.getByText('Recent activity, open-source contributions, and contribution history from GitHub.')
+      screen.getByText(
+        'Recent activity, open-source contributions, and contribution history from GitHub.'
+      )
     ).toBeVisible();
     expect(screen.getByText('Recent Activity')).toBeInTheDocument();
     expect(screen.getByText('Contributions')).toBeInTheDocument();

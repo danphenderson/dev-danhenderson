@@ -1,10 +1,13 @@
 # Broad `src/` Maintainability Patch
 
 ## Goal
+
 Reduce concentrated complexity in the client app without changing routes, content schemas, or the current visual intent.
 
 ## Why
+
 The strongest debt is clustered in a few orchestration-heavy modules:
+
 - welcome audio startup can stall indefinitely
 - onboarding hint state is coupled to audio state
 - GitHub/CV page composition is overly manual
@@ -13,6 +16,7 @@ The strongest debt is clustered in a few orchestration-heavy modules:
 - one test suite is currently brittle and failing
 
 ## Constraints
+
 - Keep the app fully client-side.
 - Preserve SPA routing and `PUBLIC_URL` asset compatibility.
 - Do not change route paths or stable data schemas.
@@ -20,6 +24,7 @@ The strongest debt is clustered in a few orchestration-heavy modules:
 - Keep the change narrowly scoped to the maintainability patch.
 
 ## Affected files and responsibilities
+
 - `src/WelcomeAudioProvider.tsx`: split durable audio concerns from onboarding hint state and harden widget bootstrap.
 - `src/hooks/useHomeWelcomeSequence.ts`, `src/pages/Home.tsx`, `src/components/Header.tsx`: rewire onboarding interactions to the new hint state boundary.
 - `src/hooks/useGithubProfile.ts`, `src/pages/CV.tsx`, `src/pages/cvPageLayout.ts`: simplify GitHub loading and CV section composition.
@@ -28,6 +33,7 @@ The strongest debt is clustered in a few orchestration-heavy modules:
 - `src/components/TabPanel.test.tsx` and shared route tests: replace brittle style assertions and remove router warning noise.
 
 ## Proposed approach
+
 1. Extract SoundCloud startup into a timeout-aware helper and keep `useWelcomeAudio` focused on consent/playback/error state.
 2. Add a dedicated onboarding provider/hook for pause/theme hints used by Home and Header.
 3. Split `useGithubProfile` into pure helpers plus a small fetch coordinator with in-memory caching and request deduplication.
@@ -37,6 +43,7 @@ The strongest debt is clustered in a few orchestration-heavy modules:
 7. Replace brittle jsdom-computed-style assertions with stable behavioral assertions and opt tests into React Router future flags.
 
 ## Execution steps
+
 1. Add the onboarding provider and harden the audio bootstrap path.
 2. Rewire Home/Header to the new onboarding state and keep current UX behavior.
 3. Refactor GitHub loading helpers and normalize CV section composition.
@@ -46,6 +53,7 @@ The strongest debt is clustered in a few orchestration-heavy modules:
 7. Validate with build, tests, and browser checks.
 
 ## Validation plan
+
 - `npm run build`
 - `CI=true npm test -- --watch=false`
 - Browser validation for `/` on mobile and desktop
@@ -53,12 +61,14 @@ The strongest debt is clustered in a few orchestration-heavy modules:
 - Browser smoke checks for `/climbing`, `/photography`, and `/photography/:slug`
 
 ## Risks and rollback
+
 - Audio and onboarding state changes can introduce subtle UX regressions. Keep playback consent and hint state separate and preserve the existing user-visible sequence.
 - CV section refactors can alter ordering or layout. Keep existing layout config as the source of truth and assert current section order in tests.
 - Style module extraction can change spacing or motion unintentionally. Preserve existing `sx` output and verify affected routes in the browser.
 - If a slice regresses, revert that slice independently because the work is organized by subsystem.
 
 ## Progress notes
+
 - Completed the welcome-audio/onboarding split: onboarding hints now live in `src/WelcomeOnboardingProvider.tsx`, while `src/WelcomeAudioProvider.tsx` focuses on consent, playback, and timeout-aware SoundCloud bootstrap.
 - Completed the GitHub/CV/static-data refactors: `src/hooks/useGithubProfile.ts` is now a thin coordinator over `src/hooks/githubProfileData.ts`, CV section composition is derived from typed definitions, and the climbing/photography hooks now match their synchronous local data sources.
 - Completed the style/theme extraction: `src/theme/createAppTheme.ts`, `src/styles/appStyleBuilders.ts`, and `src/styles/componentStyleBuilders.ts` now hold the construction logic, leaving the provider/hooks as thin wrappers.

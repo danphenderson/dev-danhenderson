@@ -5,7 +5,9 @@ import { loadGitHubProfileData } from './githubProfileData';
 
 export const useGithubProfile = () => {
   const [activity, setActivity] = useState<GitHubActivityItem[]>(fallbackGitHubActivity);
-  const [contributions, setContributions] = useState<GitHubContribution[]>(fallbackGitHubContributions);
+  const [contributions, setContributions] = useState<GitHubContribution[]>(
+    fallbackGitHubContributions
+  );
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,14 +19,19 @@ export const useGithubProfile = () => {
       setError(null);
 
       try {
-        const { activity: nextActivity, contributions: nextContributions, encounteredError } =
-          await loadGitHubProfileData();
+        const {
+          activity: nextActivity,
+          contributions: nextContributions,
+          encounteredError,
+        } = await loadGitHubProfileData();
 
         if (!cancelled) {
           setActivity(nextActivity);
           setContributions(nextContributions);
           if (encounteredError) {
-            setError('Unable to load all GitHub data right now. Showing recent highlights instead.');
+            setError(
+              'Unable to load all GitHub data right now. Showing recent highlights instead.'
+            );
           }
         }
       } catch (err) {

@@ -37,7 +37,8 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
       return stored;
     }
 
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const prefersDark =
+      window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
     return prefersDark ? 'dark' : 'light';
   });
   const [appearance, setAppearance] = useState<AppAppearanceKey>(() => {

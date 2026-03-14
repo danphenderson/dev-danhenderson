@@ -53,9 +53,7 @@ export default function PhotographyCategory() {
                 sx={appStyles.compactSectionHeadingSx}
               />
               {category ? (
-                <BodyText sx={appStyles.secondaryTextSx}>
-                  {category.album.length} photos
-                </BodyText>
+                <BodyText sx={appStyles.secondaryTextSx}>{category.album.length} photos</BodyText>
               ) : (
                 <BodyText sx={appStyles.secondaryTextSx}>
                   This album does not exist or has been moved.

@@ -5,8 +5,20 @@ import { PageFrame } from './PageFrame';
 
 jest.mock('../BackgroundPaper', () => ({
   __esModule: true,
-  default: ({ children, image, showShell }: { children: ReactNode; image: string; showShell?: boolean }) => (
-    <div data-testid="background-paper" data-image={image} data-show-shell={String(Boolean(showShell))}>
+  default: ({
+    children,
+    image,
+    showShell,
+  }: {
+    children: ReactNode;
+    image: string;
+    showShell?: boolean;
+  }) => (
+    <div
+      data-testid="background-paper"
+      data-image={image}
+      data-show-shell={String(Boolean(showShell))}
+    >
       {children}
     </div>
   ),

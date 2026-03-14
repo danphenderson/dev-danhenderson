@@ -34,18 +34,19 @@ jest.mock('@mui/material', () => {
       rel?: string;
       label: ReactNode;
       sx?: Record<string, unknown> | Array<Record<string, unknown>>;
-    }) => React.createElement(
-      component === 'a' ? 'a' : 'div',
-      {
-        href,
-        target,
-        rel,
-        'data-animation': String(getSxValue(sx, 'animation') ?? ''),
-        'data-animation-delay': String(getSxValue(sx, 'animationDelay') ?? ''),
-        'data-background-size': String(getSxValue(sx, 'backgroundSize') ?? ''),
-      },
-      label
-    ),
+    }) =>
+      React.createElement(
+        component === 'a' ? 'a' : 'div',
+        {
+          href,
+          target,
+          rel,
+          'data-animation': String(getSxValue(sx, 'animation') ?? ''),
+          'data-animation-delay': String(getSxValue(sx, 'animationDelay') ?? ''),
+          'data-background-size': String(getSxValue(sx, 'backgroundSize') ?? ''),
+        },
+        label
+      ),
   };
 });
 
@@ -123,9 +124,18 @@ describe('GitHubLinkChipList', () => {
       'data-animation',
       expect.stringContaining('8600ms linear infinite')
     );
-    expect(screen.getByRole('link', { name: 'repo-one' })).toHaveAttribute('data-animation-delay', '0s');
-    expect(screen.getByRole('link', { name: 'repo-two' })).toHaveAttribute('data-animation-delay', '0.75s');
-    expect(screen.getByRole('link', { name: 'repo-one' })).toHaveAttribute('data-background-size', '240% 100%');
+    expect(screen.getByRole('link', { name: 'repo-one' })).toHaveAttribute(
+      'data-animation-delay',
+      '0s'
+    );
+    expect(screen.getByRole('link', { name: 'repo-two' })).toHaveAttribute(
+      'data-animation-delay',
+      '0.75s'
+    );
+    expect(screen.getByRole('link', { name: 'repo-one' })).toHaveAttribute(
+      'data-background-size',
+      '240% 100%'
+    );
   });
 
   it('animates stacked chips in a compact vertical container', () => {
@@ -147,6 +157,9 @@ describe('GitHubLinkChipList', () => {
     expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-start-delay', '120');
     expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-stagger', '30');
     expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-display', 'flex');
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-flex-direction', 'column');
+    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute(
+      'data-flex-direction',
+      'column'
+    );
   });
 });

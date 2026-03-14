@@ -71,10 +71,7 @@ const EducationDetailList = ({
 };
 
 export const EducationSection = ({ education, startDelayMs = 0 }: EducationSectionProps) => {
-  const {
-    contentListStackSpacing,
-    detailBlockSx,
-  } = useComponentStyles();
+  const { contentListStackSpacing, detailBlockSx } = useComponentStyles();
 
   if (!education.entries || education.entries.length === 0) {
     return null;
@@ -89,9 +86,8 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
       renderItem={(entry, index) => {
-        const { highlights: filteredHighlights, coursework: filteredCoursework } = splitEducationHighlights(
-          entry.highlights
-        );
+        const { highlights: filteredHighlights, coursework: filteredCoursework } =
+          splitEducationHighlights(entry.highlights);
         const gpaChipLabels = getEducationGpaChipLabels(entry.gpa);
         const filteredSkills = entry.skills?.filter((tool) => tool.trim().length > 0) ?? [];
         const educationTabs: TabPanelItem[] = [];

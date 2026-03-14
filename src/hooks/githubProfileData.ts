@@ -73,11 +73,15 @@ const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
     case 'PushEvent': {
       const commits = event.payload?.commits ?? [];
       const commitCount = commits.length;
-      const commitShas = commits.map((commit) => commit.sha).filter((sha): sha is string => Boolean(sha));
+      const commitShas = commits
+        .map((commit) => commit.sha)
+        .filter((sha): sha is string => Boolean(sha));
       const headSha = event.payload?.head || commitShas[commitShas.length - 1];
 
       return {
-        label: `Pushed ${commitCount || 'new'} commit${commitCount === 1 ? '' : 's'} to ${repoName}`,
+        label: `Pushed ${commitCount || 'new'} commit${
+          commitCount === 1 ? '' : 's'
+        } to ${repoName}`,
         href: headSha ? `${repoUrl}/commit/${headSha}` : repoUrl,
       };
     }
@@ -87,7 +91,9 @@ const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
       const prUrl = event.payload?.pull_request?.html_url;
 
       return {
-        label: `${action.charAt(0).toUpperCase()}${action.slice(1)} PR${prNumber ? ` #${prNumber}` : ''} on ${repoName}`,
+        label: `${action.charAt(0).toUpperCase()}${action.slice(1)} PR${
+          prNumber ? ` #${prNumber}` : ''
+        } on ${repoName}`,
         href: prUrl || (prNumber ? `${repoUrl}/pull/${prNumber}` : repoUrl),
       };
     }
@@ -97,7 +103,9 @@ const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
       const issueUrl = event.payload?.issue?.html_url;
 
       return {
-        label: `${action.charAt(0).toUpperCase()}${action.slice(1)} issue${issueNumber ? ` #${issueNumber}` : ''} on ${repoName}`,
+        label: `${action.charAt(0).toUpperCase()}${action.slice(1)} issue${
+          issueNumber ? ` #${issueNumber}` : ''
+        } on ${repoName}`,
         href: issueUrl || (issueNumber ? `${repoUrl}/issues/${issueNumber}` : repoUrl),
       };
     }
@@ -112,7 +120,9 @@ const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
     }
     case 'CreateEvent':
       return {
-        label: `Created ${event.payload?.ref_type ?? 'a resource'}${event.payload?.ref ? ` ${event.payload.ref}` : ''} in ${repoName}`,
+        label: `Created ${event.payload?.ref_type ?? 'a resource'}${
+          event.payload?.ref ? ` ${event.payload.ref}` : ''
+        } in ${repoName}`,
         href:
           event.payload?.ref_type === 'branch' && event.payload?.ref
             ? `${repoUrl}/tree/${event.payload.ref}`
@@ -134,7 +144,7 @@ const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
   }
 };
 
-const fetchJson = async <T,>(url: string) => {
+const fetchJson = async <T>(url: string) => {
   const response = await fetch(url, { headers: { Accept: 'application/vnd.github+json' } });
 
   if (!response.ok) {
@@ -162,7 +172,14 @@ const getExternalContributionRepos = (events: GitHubEvent[]) => {
 const buildActivity = (events: GitHubEvent[]) => {
   const activity = events
     .filter((event) =>
-      ['PushEvent', 'PullRequestEvent', 'IssuesEvent', 'PullRequestReviewEvent', 'CreateEvent', 'ReleaseEvent'].includes(event.type)
+      [
+        'PushEvent',
+        'PullRequestEvent',
+        'IssuesEvent',
+        'PullRequestReviewEvent',
+        'CreateEvent',
+        'ReleaseEvent',
+      ].includes(event.type)
     )
     .map(formatGitHubEvent)
     .filter((item): item is GitHubActivityItem => Boolean(item))
@@ -224,7 +241,9 @@ const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
   let encounteredError = false;
 
   const [eventsResult, contributionsResult] = await Promise.allSettled([
-    fetchJson<GitHubEvent[]>(`https://api.github.com/users/${githubUsername}/events/public?per_page=20`),
+    fetchJson<GitHubEvent[]>(
+      `https://api.github.com/users/${githubUsername}/events/public?per_page=20`
+    ),
     fetchJson<GitHubSearchIssues>(
       `https://api.github.com/search/issues?q=author:${githubUsername}+is:public+is:pr+-user:${githubUsername}&sort=updated&order=desc&per_page=30`
     ),
@@ -235,10 +254,12 @@ const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
   const activity =
     eventsResult.status === 'fulfilled'
       ? buildActivity(eventsResult.value)
-      : (encounteredError = true, fallbackGitHubActivity);
+      : ((encounteredError = true), fallbackGitHubActivity);
 
   if (eventsResult.status === 'fulfilled') {
-    getExternalContributionRepos(eventsResult.value).forEach((repoName) => externalRepos.add(repoName));
+    getExternalContributionRepos(eventsResult.value).forEach((repoName) =>
+      externalRepos.add(repoName)
+    );
   }
 
   if (contributionsResult.status === 'fulfilled') {
@@ -253,7 +274,9 @@ const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
     encounteredError = true;
   }
 
-  const enrichedContributions = await enrichContributions(buildContributionCandidates(externalRepos));
+  const enrichedContributions = await enrichContributions(
+    buildContributionCandidates(externalRepos)
+  );
   encounteredError = encounteredError || enrichedContributions.encounteredError;
 
   return {

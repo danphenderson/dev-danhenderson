@@ -39,7 +39,9 @@ describe('GitHubContributions', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText('No recent community contributions found right now.')).toBeInTheDocument();
+    expect(
+      screen.getByText('No recent community contributions found right now.')
+    ).toBeInTheDocument();
   });
 
   it('renders contribution cards sorted by stars in default cards variant', () => {
@@ -64,9 +66,7 @@ describe('GitHubContributions', () => {
     render(
       <ThemeProvider>
         <GitHubContributions
-          contributions={[
-            { name: 'contrib-a', url: 'https://github.com/a', stars: 50 },
-          ]}
+          contributions={[{ name: 'contrib-a', url: 'https://github.com/a', stars: 50 }]}
           loading={false}
           variant="list"
         />

@@ -55,7 +55,7 @@ export default function Climbing() {
     <PageFrame image="assets/climbing/climbing-locations.png" maxWidth={1200}>
       <SectionCard sx={appStyles.climbingCardSx}>
         <Stack spacing={2}>
-          <SectionHeading overline="Climbing"/>
+          <SectionHeading overline="Climbing" />
           <SectionLeadText sx={appStyles.sectionLeadSx}>
             A collection of routes I've remembered to tick on Mountain Project.
           </SectionLeadText>

@@ -16,13 +16,7 @@ jest.mock('@mui/material', () => {
 
   return {
     ...actual,
-    Slide: ({
-      children,
-      direction,
-      appear,
-      in: inProp,
-      container,
-    }: MockSlideProps) => (
+    Slide: ({ children, direction, appear, in: inProp, container }: MockSlideProps) => (
       <div
         data-testid="slide-item"
         data-direction={direction}
@@ -41,7 +35,8 @@ jest.mock('../styles/componentStyles', () => ({
     motionTokens: {
       accordionChipStaggerMs: 20,
     },
-    getSectionDelayMs: (index: number, startDelayMs = 0, staggerMs = 80) => startDelayMs + index * staggerMs,
+    getSectionDelayMs: (index: number, startDelayMs = 0, staggerMs = 80) =>
+      startDelayMs + index * staggerMs,
   }),
 }));
 

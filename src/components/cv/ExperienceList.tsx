@@ -88,7 +88,12 @@ const ExperienceProjects = ({
         return (
           <ListItemText component="span">
             {project.link ? (
-              <CommonLink href={project.link} target="_blank" rel="noopener noreferrer" underline="hover">
+              <CommonLink
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                underline="hover"
+              >
                 {linkLabel}
               </CommonLink>
             ) : (
@@ -102,11 +107,7 @@ const ExperienceProjects = ({
 };
 
 export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceListProps) => {
-  const {
-    contentListStackSpacing,
-    detailBlockSx,
-    experienceDescriptionSx,
-  } = useComponentStyles();
+  const { contentListStackSpacing, detailBlockSx, experienceDescriptionSx } = useComponentStyles();
 
   return (
     <AnimatedContentList
