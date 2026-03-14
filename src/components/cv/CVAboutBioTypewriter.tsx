@@ -253,10 +253,6 @@ export const CVAboutBioTypewriter = ({
   });
 
   React.useEffect(() => {
-    hasNotifiedCompletionRef.current = false;
-  }, [fullText]);
-
-  React.useEffect(() => {
     if (!onComplete || !fullText || hasNotifiedCompletionRef.current) {
       return;
     }

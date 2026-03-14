@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Stack } from '@mui/material';
 import type { AboutMe } from '../../types/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
@@ -8,6 +8,9 @@ import { SectionHeading } from '../layout/SectionHeading';
 import { CVSectionCard } from './CVSectionCard';
 import { ANIMATED_CARD_DURATION_MS } from '../AnimatedContentCard';
 import { SkillsChipList } from '../SkillsChipList';
+
+const ABOUT_CONTENT_DELIMITER = '|bio|';
+const OPPORTUNITY_DELIMITER = '|opportunity|';
 
 type CVAboutSectionProps = {
   about: AboutMe;
@@ -28,17 +31,31 @@ export const CVAboutSection = ({
 }: CVAboutSectionProps) => {
   const { compactSidebarSectionSpacing, sectionHeadingCompactSx } = useComponentStyles();
   const bioAnimationStartDelayMs = delayMs + ANIMATED_CARD_DURATION_MS;
+  const trimmedBio = about.bio.trim();
   const opportunities = useMemo(
     () => about.opportunities?.filter((opportunity) => opportunity.trim().length > 0) ?? [],
     [about.opportunities]
   );
-  const [showOpportunities, setShowOpportunities] = useState(
-    opportunities.length > 0 && about.bio.trim().length === 0
+  const aboutContentKey = useMemo(
+    () => `${trimmedBio}${ABOUT_CONTENT_DELIMITER}${opportunities.join(OPPORTUNITY_DELIMITER)}`,
+    [opportunities, trimmedBio]
   );
+  const previousAboutContentKeyRef = useRef<string | null>(null);
+  const [showOpportunities, setShowOpportunities] = useState(
+    opportunities.length > 0 && trimmedBio.length === 0
+  );
+  const handleBioAnimationComplete = useCallback(() => {
+    setShowOpportunities(true);
+  }, []);
 
   useEffect(() => {
-    setShowOpportunities(opportunities.length > 0 && about.bio.trim().length === 0);
-  }, [about.bio, opportunities]);
+    if (previousAboutContentKeyRef.current === aboutContentKey) {
+      return;
+    }
+
+    previousAboutContentKeyRef.current = aboutContentKey;
+    setShowOpportunities(opportunities.length > 0 && trimmedBio.length === 0);
+  }, [aboutContentKey, opportunities.length, trimmedBio.length]);
 
   return (
     <CVSectionCard
@@ -54,7 +71,7 @@ export const CVAboutSection = ({
             about={about}
             actions={actions}
             bioAnimationStartDelayMs={bioAnimationStartDelayMs}
-            onBioAnimationComplete={() => setShowOpportunities(true)}
+            onBioAnimationComplete={handleBioAnimationComplete}
           />
           {opportunities.length > 0 && <SkillsChipList skills={opportunities} dense in={showOpportunities} />}
         </Stack>
