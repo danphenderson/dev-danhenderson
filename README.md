@@ -1,8 +1,10 @@
 # [danhenderson.dev](https://www.danhenderson.dev)
 
-[![CI](https://github.com/danphenderson/dev-danhenderson/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/danphenderson/dev-danhenderson/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/codeql.yml)
-[![Node 20.x](https://img.shields.io/badge/node-20.x-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Tests](https://github.com/danphenderson/dev-danhenderson/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/tests.yml)
+[![Build](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/danphenderson/dev-danhenderson/graph/badge.svg)](https://codecov.io/gh/danphenderson/dev-danhenderson)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/danphenderson/dev-danhenderson/blob/main/LICENSE)
+[![Live Site](https://img.shields.io/website?url=https%3A%2F%2Fwww.danhenderson.dev&label=danhenderson.dev)](https://www.danhenderson.dev)
 
 Source for [danhenderson.dev](https://www.danhenderson.dev), a client-side portfolio site built with React, TypeScript, and MUI. The app stays fully static-hostable: content is stored in local TypeScript modules, routes are handled in the browser, and the CV enhances itself with public GitHub data when it is available.
 
@@ -163,18 +165,21 @@ PORT=3000 npm start
 
 GitHub Actions workflows live in `.github/workflows/`:
 
-- `ci.yml` is the primary workflow for pull requests and pushes to `main`
-  - **`test`**: runs `CI=true npm test -- --watch=false --passWithNoTests --coverage` and uploads the coverage artifact
+- `tests.yml` runs unit tests on pull requests and pushes to `main`
+  - runs `CI=true npm test -- --watch=false --passWithNoTests --coverage` and uploads the coverage artifact
+  - uploads coverage results to [Codecov](https://codecov.io/gh/danphenderson/dev-danhenderson)
+- `build.yml` builds the app and runs E2E tests on pull requests and pushes to `main`
   - **`build`**: runs `npm run build` and uploads the production build artifact
   - **`e2e`**: downloads the build artifact, restores cached Playwright browsers, installs Chromium/system dependencies as needed, and runs `npx playwright test`
-  - shared runner setup is centralized in `.github/actions/setup/action.yml` (`actions/setup-node@v4`, npm cache, `npm ci`)
-  - docs-only changes are skipped via `paths-ignore` rules for markdown, selected repo config files, `resume/**`, and `plans/**`
+- shared runner setup is centralized in `.github/actions/setup/action.yml` (`actions/setup-node@v4`, npm cache, `npm ci`)
+- docs-only changes are skipped via `paths-ignore` rules for markdown, selected repo config files, `resume/**`, and `plans/**`
 - `codeql.yml` runs GitHub CodeQL analysis for JavaScript/TypeScript on pull requests, pushes to `main`, and a weekly schedule
 
 ### CI/CD integration stack
 
 - **GitHub Actions** orchestrates CI in `.github/workflows/`
 - **Playwright** provides browser-level E2E coverage in CI and locally from `test/e2e/`
+- **Codecov** reports test coverage from CI runs via the [Codecov dashboard](https://codecov.io/gh/danphenderson/dev-danhenderson)
 - **GitHub Artifacts** store the production build, coverage report, and Playwright failure output
 - **CodeQL** provides repository security analysis for the JavaScript/TypeScript codebase
 - **Dependabot** (`.github/dependabot.yml`) opens weekly npm and GitHub Actions dependency update PRs
