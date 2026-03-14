@@ -14,9 +14,10 @@ import { HeroMotionPath } from '../components/HeroMotionPath';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
-import { DisplayTitle, TypewriterText } from '../components/text';
+import { DisplayTitle, TypewriterLoopText } from '../components/text';
 
-const homeHeroHeadline = 'Hi, my passions are mathematics, computers, and adventures';
+const heroPrefix = 'Hi, my passion is ';
+const heroPassions = ['mathematics!', 'computers!', 'adventures!'];
 
 export default function Home() {
   const appStyles = useAppStyles();
@@ -46,8 +47,9 @@ export default function Home() {
         <Stack spacing={2} alignItems="center">
           <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
             {isHeroAnimationReady ? (
-              <TypewriterText
-                text={homeHeroHeadline}
+              <TypewriterLoopText
+                prefix={heroPrefix}
+                words={heroPassions}
                 timingPreset="headline"
                 playing={isTypewriterPlaying}
               />

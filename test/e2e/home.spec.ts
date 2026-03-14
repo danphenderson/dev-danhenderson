@@ -16,10 +16,13 @@ test.describe('Home page', () => {
     await page.keyboard.press('Escape');
     await expect(darkModeHint).toBeHidden();
 
-    // Hero text should appear after the full welcome sequence completes
+    // The hero should show the fixed prefix as part of the looping typewriter
+    await expect(page.getByText(/Hi, my passion is/)).toBeVisible();
+
+    // At least one passion word should appear as the typewriter loops
     await expect(
-      page.getByText('Hi, my passions are mathematics, computers, and adventures')
-    ).toBeVisible();
+      page.getByText(/mathematics!|computers!|adventures!/)
+    ).toBeVisible({ timeout: 15000 });
   });
 
   test('welcome audio prompt can be dismissed', async ({ page }) => {
