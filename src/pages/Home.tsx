@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
 import { AnimatedContentCard, ANIMATED_CARD_DURATION_MS } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
@@ -6,7 +6,9 @@ import { HeroMotionPath } from '../components/HeroMotionPath';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
-import { DisplayTitle } from '../components/text';
+import { DisplayTitle, TypewriterText } from '../components/text';
+
+const HERO_TEXT = 'Hi, my passions are mathematics, computers, and adventures';
 
 export default function Home() {
   const appStyles = useAppStyles();
@@ -15,12 +17,15 @@ export default function Home() {
     useHomeWelcomeSequence();
 
   const [isMotionPathPlaying, setIsMotionPathPlaying] = useState(false);
+  const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);
 
   useEffect(() => {
     if (!isHeroAnimationReady) return undefined;
     const id = window.setTimeout(() => setIsMotionPathPlaying(true), ANIMATED_CARD_DURATION_MS);
     return () => window.clearTimeout(id);
   }, [isHeroAnimationReady]);
+
+  const handleMotionComplete = useCallback(() => setIsTypewriterPlaying(true), []);
 
   return (
     <BackgroundPaper
@@ -30,15 +35,15 @@ export default function Home() {
       showShell={isHeroAnimationReady}
       shellSx={appStyles.homeHeroShellSx}
     >
-      <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
-        <Stack spacing={2} alignItems="center">
-          <HeroMotionPath playing={isMotionPathPlaying}>
+      <HeroMotionPath playing={isMotionPathPlaying} onComplete={handleMotionComplete}>
+        <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
+          <Stack spacing={2} alignItems="center">
             <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
-              Hi, my passions are mathematics, computers, and adventures
+              <TypewriterText text={HERO_TEXT} playing={isTypewriterPlaying} />
             </DisplayTitle>
-          </HeroMotionPath>
-        </Stack>
-      </AnimatedContentCard>
+          </Stack>
+        </AnimatedContentCard>
+      </HeroMotionPath>
 
       <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
         <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>

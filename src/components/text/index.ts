@@ -1,5 +1,7 @@
 export { mergeSx } from './textFactory';
 
+export { TypewriterText } from './TypewriterText';
+
 export {
   HeaderLabel,
   HeaderTitle,

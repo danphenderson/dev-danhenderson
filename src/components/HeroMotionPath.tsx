@@ -1,17 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import type { ReactNode } from 'react';
-import type { SxProps, Theme } from '@mui/material/styles';
-import { Box } from '@mui/material';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
-import { useAppStyles } from '../styles/appStyles';
-import { normalizeSxProp } from '../utils/sx';
 
 const MOTION_PATH_DURATION_S = 2;
 const MOTION_PATH_RADIUS = 40;
-
-/** Opacity stays 0 through 75 % of travel, fading in only during the final quarter when the element is near its resting position. */
-const OPACITY_KEYFRAMES = [0, 0, 0, 0, 1];
 
 const getCirclePath = (r: number) =>
   `path("M 0 0 A ${r} ${r} 0 0 1 0 ${-2 * r} A ${r} ${r} 0 0 1 0 0")`;
@@ -20,14 +13,11 @@ type HeroMotionPathProps = {
   children: ReactNode;
   playing: boolean;
   onComplete?: () => void;
-  sx?: SxProps<Theme>;
 };
 
-export const HeroMotionPath = ({ children, playing, onComplete, sx }: HeroMotionPathProps) => {
+export const HeroMotionPath = ({ children, playing, onComplete }: HeroMotionPathProps) => {
   const prefersReducedMotion = usePrefersReducedMotion();
-  const appStyles = useAppStyles();
   const [arrived, setArrived] = useState(false);
-  const sxArray = normalizeSxProp(sx);
 
   const handleComplete = useCallback(() => {
     setArrived(true);
@@ -41,44 +31,35 @@ export const HeroMotionPath = ({ children, playing, onComplete, sx }: HeroMotion
   }, [playing, prefersReducedMotion, handleComplete]);
 
   if (prefersReducedMotion) {
-    return (
-      <Box data-testid="hero-motion-path" sx={[appStyles.heroMotionStageSx, ...sxArray]}>
-        {playing ? children : null}
-      </Box>
-    );
+    return <div data-testid="hero-motion-path">{children}</div>;
   }
 
   return (
-    <Box sx={[appStyles.heroMotionStageSx, ...sxArray]}>
-      <motion.div
-        data-testid="hero-motion-path"
-        style={{
-          offsetPath: getCirclePath(MOTION_PATH_RADIUS),
-          offsetRotate: '0deg',
-          width: '100%',
-        }}
-        initial={{ offsetDistance: '0%', opacity: 0 }}
-        animate={
-          playing
-            ? {
-                offsetDistance: '100%',
-                opacity: OPACITY_KEYFRAMES,
-              }
-            : { offsetDistance: '0%', opacity: 0 }
+    <motion.div
+      data-testid="hero-motion-path"
+      style={{
+        offsetPath: getCirclePath(MOTION_PATH_RADIUS),
+        offsetRotate: '0deg',
+        width: '100%',
+      }}
+      initial={{ offsetDistance: '0%' }}
+      animate={
+        playing
+          ? { offsetDistance: '100%' }
+          : { offsetDistance: '0%' }
+      }
+      transition={{
+        duration: MOTION_PATH_DURATION_S,
+        ease: 'easeInOut',
+      }}
+      onAnimationComplete={() => {
+        if (playing && !arrived) {
+          handleComplete();
         }
-        transition={{
-          duration: MOTION_PATH_DURATION_S,
-          ease: 'easeInOut',
-        }}
-        onAnimationComplete={() => {
-          if (playing && !arrived) {
-            handleComplete();
-          }
-        }}
-      >
-        {children}
-      </motion.div>
-    </Box>
+      }}
+    >
+      {children}
+    </motion.div>
   );
 };
 

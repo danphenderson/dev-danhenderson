@@ -72,10 +72,30 @@ jest.mock('../components/HeroMotionPath', () => {
       }, [playing, onComplete]);
       return (
         <div data-testid="hero-motion-path" data-playing={String(Boolean(playing))}>
-          {playing ? children : null}
+          {children}
         </div>
       );
     },
+  };
+});
+
+jest.mock('../components/text', () => {
+  const React = require('react');
+  const actual = jest.requireActual('../components/text');
+
+  return {
+    ...actual,
+    TypewriterText: ({
+      text,
+      playing,
+    }: {
+      text: string;
+      playing: boolean;
+    }) => (
+      <span data-testid="typewriter" data-playing={String(Boolean(playing))}>
+        {playing ? text : null}
+      </span>
+    ),
   };
 });
 
@@ -197,15 +217,15 @@ describe('Home welcome flow', () => {
   });
 });
 
-describe('Home hero motion path', () => {
-  it('does not play the motion path before the hero card is visible', () => {
+describe('Home hero motion path and typewriter', () => {
+  it('does not play the motion path or typewriter before the hero card is visible', () => {
     render(<HomeHarness />);
 
     expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-playing', 'false');
-    expect(screen.queryByText('Hi, my passions are mathematics, computers, and adventures')).not.toBeInTheDocument();
+    expect(screen.getByTestId('typewriter')).toHaveAttribute('data-playing', 'false');
   });
 
-  it('plays the motion path once the welcome sequence completes and the card zoom finishes', async () => {
+  it('starts the typewriter only after the container motion path completes', async () => {
     render(<HomeHarness />);
 
     fireEvent.click(await screen.findByRole('button', { name: 'No thanks' }));
@@ -216,6 +236,10 @@ describe('Home hero motion path', () => {
 
     await waitFor(() =>
       expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-playing', 'true'),
+    );
+
+    await waitFor(() =>
+      expect(screen.getByTestId('typewriter')).toHaveAttribute('data-playing', 'true'),
     );
     expect(
       screen.getByText('Hi, my passions are mathematics, computers, and adventures'),

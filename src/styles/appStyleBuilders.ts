@@ -224,10 +224,6 @@ export const createAppStyleMap = (theme: Theme) => {
       fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
       lineHeight: 1.5,
     } satisfies SxProps<Theme>,
-    heroMotionStageSx: {
-      position: 'relative',
-      width: '100%',
-    } satisfies SxProps<Theme>,
     headerIconSx,
     headerToolbarSx: {
       px: { xs: 1.5, md: 2.5 },
