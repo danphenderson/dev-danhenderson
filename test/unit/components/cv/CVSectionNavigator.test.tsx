@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import {
@@ -213,5 +213,34 @@ describe('CVSectionNavigator', () => {
     });
 
     expect(screen.getByTestId('cv-section-navigator')).toBeInTheDocument();
+  });
+
+  it('keeps the hover state active while focus stays within the navigator and clears it on exit', () => {
+    render(
+      <ThemeProvider>
+        <CVSectionNavigator sections={['experience', 'education']} testId="cv-section-navigator" />
+      </ThemeProvider>
+    );
+
+    const navigator = screen.getByTestId('cv-section-navigator');
+    const backToTopAction = screen.getByTestId('dial-action-back-to-top');
+    const experienceAction = screen.getByTestId('dial-action-section-experience');
+
+    expect(navigator).toHaveAttribute('data-hovered', 'false');
+
+    fireEvent.mouseEnter(navigator);
+    expect(navigator).toHaveAttribute('data-hovered', 'true');
+
+    fireEvent.mouseLeave(navigator);
+    expect(navigator).toHaveAttribute('data-hovered', 'false');
+
+    fireEvent.focus(backToTopAction);
+    expect(navigator).toHaveAttribute('data-hovered', 'true');
+
+    fireEvent.blur(backToTopAction, { relatedTarget: experienceAction });
+    expect(navigator).toHaveAttribute('data-hovered', 'true');
+
+    fireEvent.blur(experienceAction, { relatedTarget: document.body });
+    expect(navigator).toHaveAttribute('data-hovered', 'false');
   });
 });

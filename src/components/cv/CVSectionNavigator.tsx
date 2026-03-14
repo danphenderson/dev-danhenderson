@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { Box, Zoom } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTheme as useMuiTheme } from '@mui/material/styles';
+import { alpha, useTheme as useMuiTheme } from '@mui/material/styles';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
 import ListIcon from '@mui/icons-material/List';
@@ -165,6 +165,86 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
 
   const dimmed = idle && !hovered;
   const activeSectionSx = activeSection ? appStyles.cvFloatingDialActiveFabSx : undefined;
+  const surface = muiTheme.appearanceTreatment.surface;
+  const genieRailColor = alpha(muiTheme.palette.primary.light, muiTheme.palette.mode === 'light' ? 0.34 : 0.46);
+  const genieTrailColor = alpha(muiTheme.palette.primary.main, muiTheme.palette.mode === 'light' ? 0.1 : 0.18);
+  const genieTrailBorderColor = alpha(
+    muiTheme.palette.primary.main,
+    Math.min(surface.panelBorderAlpha + 0.12, 0.6)
+  );
+  const genieTrailShadow = `0 14px 28px ${alpha(
+    muiTheme.palette.common.black,
+    muiTheme.palette.mode === 'light' ? 0.14 : 0.26
+  )}`;
+  const genieTransition = prefersReducedMotion
+    ? 'none'
+    : 'transform 280ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease';
+  const genieDialSx = {
+    '& .MuiSpeedDial-actions': {
+      position: 'relative',
+      overflow: 'visible',
+      alignItems: 'center',
+      gap: {
+        xs: 2,
+        md: 2.5,
+      },
+      py: 1.5,
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 12,
+        bottom: 12,
+        right: 'calc(50% - 1px)',
+        width: 2,
+        borderRadius: 999,
+        backgroundColor: genieRailColor,
+        opacity: hovered ? 0.88 : 0.3,
+        transform: hovered ? 'scaleY(1)' : 'scaleY(0.72)',
+        transformOrigin: 'bottom center',
+        transition: genieTransition,
+        pointerEvents: 'none',
+      },
+    },
+    '& .MuiSpeedDialAction-root': {
+      position: 'relative',
+      overflow: 'visible',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: '50%',
+        right: {
+          xs: 20,
+          md: 22,
+        },
+        width: {
+          xs: 88,
+          md: 132,
+        },
+        height: {
+          xs: 42,
+          md: 48,
+        },
+        borderRadius: 999,
+        border: `1px solid ${genieTrailBorderColor}`,
+        background: `linear-gradient(90deg, ${alpha(genieTrailColor, 0)} 0%, ${genieTrailColor} 62%, ${alpha(
+          muiTheme.palette.background.paper,
+          Math.min(surface.panelSurfaceAlpha + (muiTheme.palette.mode === 'light' ? 0.14 : 0.2), 0.94)
+        )} 100%)`,
+        boxShadow: genieTrailShadow,
+        opacity: hovered ? 1 : 0,
+        transform: `translateY(-50%) scaleX(${hovered ? 1 : 0.22})`,
+        transformOrigin: 'right center',
+        transition: genieTransition,
+        pointerEvents: 'none',
+      },
+    },
+    '& .MuiSpeedDialAction-fab': {
+      position: 'relative',
+      zIndex: 1,
+      transform: hovered ? 'translateX(-4px)' : 'translateX(0)',
+      transition: genieTransition,
+    },
+  } as const;
 
   return (
     <Zoom
@@ -176,6 +256,7 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
         component="nav"
         aria-label="CV section navigation"
         data-testid={testId}
+        data-hovered={hovered}
         onMouseEnter={() => {
           setHovered(true);
           setIdle(false);
@@ -185,7 +266,11 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
           setHovered(true);
           setIdle(false);
         }}
-        onBlur={() => setHovered(false)}
+        onBlur={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget)) {
+            setHovered(false);
+          }
+        }}
         sx={{
           opacity: dimmed ? IDLE_OPACITY : 1,
           transition: prefersReducedMotion ? 'none' : 'opacity 300ms ease',
@@ -199,7 +284,7 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
           layer="content"
           direction="up"
           actionTooltipPlacement="left"
-          sx={[appStyles.cvFloatingDialSx, ...(activeSectionSx ? [activeSectionSx] : [])]}
+          sx={[appStyles.cvFloatingDialSx, genieDialSx, ...(activeSectionSx ? [activeSectionSx] : [])]}
         />
       </Box>
     </Zoom>
