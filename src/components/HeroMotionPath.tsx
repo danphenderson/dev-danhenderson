@@ -1,34 +1,26 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 
 /**
- * Keyframes that define the circular / spiral entrance path.
- *
- * Coordinates are **transform offsets** relative to the element's natural
- * (resting) layout position, so (0, 0) = final resting spot.
- *
- * The sequence traces a counter-clockwise arc:
- *   center → left-and-down → far-left at resting height → swing right
- *   below resting → slight overshoot right → settle at origin.
- *
- * Scale is intentionally omitted — the nested AnimatedContentCard's MUI Zoom
- * transition already handles the zoom-in entrance, so adding scale here would
- * cause a double-scale effect.
+ * Total entrance duration in seconds:
+ * - initial hold so the nested MUI Zoom can play
+ * - spiral travel to resting position
  */
-const PATH_X = [0, 0, -120, -210, -95, 28, 0];
-const PATH_Y = [-320, -320, -250, -40, 90, 18, 0];
+const ENTRANCE_DURATION_S = 3.6;
+
+/** Hold at the starting position while the inner Zoom entrance completes. */
+const HOLD_FRACTION = 0.08;
 
 /**
- * Normalised time stops for each keyframe (0 → 1).
- *
- *   0.00 → 0.08 : hold at centre while the inner Zoom entrance plays (~280 ms)
- *   0.08 → 1.00 : circular travel to resting position
+ * Spiral tuning:
+ * - more turns => tighter / more obviously circular
+ * - higher falloff => radius collapses faster near the end
+ * - more samples => smoother motion
  */
-const PATH_TIMES = [0, 0.08, 0.28, 0.5, 0.74, 0.9, 1];
-
-/** Total entrance duration in seconds (hold + travel). */
-const ENTRANCE_DURATION_S = 3.6;
+const SPIRAL_TURNS = 1.35;
+const RADIUS_FALLOFF = 1.15;
+const SAMPLE_COUNT = 48;
 
 interface HeroMotionPathProps {
   /** When true the entrance animation sequence begins. */
@@ -38,8 +30,83 @@ interface HeroMotionPathProps {
   onComplete?: () => void;
 }
 
+interface SpiralKeyframes {
+  x: number[];
+  y: number[];
+  times: number[];
+}
+
+/**
+ * Build a smooth spiral from the measured start offset (viewport centre)
+ * back to the element's natural resting position (0, 0).
+ *
+ * Coordinates are transform offsets relative to the element's final layout
+ * location, so:
+ *   - (startX, startY) = centred launch point
+ *   - (0, 0) = final resting spot on the page
+ */
+function buildSpiralKeyframes(startX: number, startY: number): SpiralKeyframes {
+  const startRadius = Math.hypot(startX, startY);
+  const startAngle = Math.atan2(startY, startX);
+
+  // Hold at the starting position while the inner Zoom plays.
+  const x = [startX, startX];
+  const y = [startY, startY];
+  const times = [0, HOLD_FRACTION];
+
+  for (let i = 1; i <= SAMPLE_COUNT; i += 1) {
+    const progress = i / SAMPLE_COUNT;
+
+    // Ease the spiral inward by collapsing radius over time.
+    const radius = startRadius * Math.pow(1 - progress, RADIUS_FALLOFF);
+
+    // Advance around the circle as the radius shrinks.
+    const angle = startAngle + SPIRAL_TURNS * Math.PI * 2 * progress;
+
+    x.push(radius * Math.cos(angle));
+    y.push(radius * Math.sin(angle));
+    times.push(HOLD_FRACTION + progress * (1 - HOLD_FRACTION));
+  }
+
+  // Force an exact final settle.
+  x[x.length - 1] = 0;
+  y[y.length - 1] = 0;
+  times[times.length - 1] = 1;
+
+  return { x, y, times };
+}
+
 export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathProps) => {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const [startOffset, setStartOffset] = useState<{ x: number; y: number } | null>(null);
+
+  /**
+   * Measure the element's final resting position and compute the transform
+   * needed to place it in the visual centre of the viewport.
+   */
+  useLayoutEffect(() => {
+    if (!active || prefersReducedMotion) {
+      setStartOffset(null);
+      return;
+    }
+
+    const node = ref.current;
+    if (!node) return;
+
+    const measure = () => {
+      const rect = node.getBoundingClientRect();
+      const finalCenterX = rect.left + rect.width / 2;
+      const finalCenterY = rect.top + rect.height / 2;
+
+      setStartOffset({
+        x: window.innerWidth / 2 - finalCenterX,
+        y: window.innerHeight / 2 - finalCenterY,
+      });
+    };
+
+    measure();
+  }, [active, prefersReducedMotion]);
 
   useEffect(() => {
     if (active && prefersReducedMotion) {
@@ -47,20 +114,31 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
     }
   }, [active, prefersReducedMotion, onComplete]);
 
+  const keyframes = useMemo(() => {
+    if (!startOffset) return null;
+    return buildSpiralKeyframes(startOffset.x, startOffset.y);
+  }, [startOffset]);
+
   if (!active || prefersReducedMotion) {
     return <>{children}</>;
   }
 
   return (
     <motion.div
-      initial={{ x: PATH_X[0], y: PATH_Y[0] }}
-      animate={{ x: PATH_X, y: PATH_Y }}
-      transition={{
-        duration: ENTRANCE_DURATION_S,
-        times: PATH_TIMES,
-        ease: [0.4, 0, 0.2, 1],
-      }}
+      ref={ref}
+      initial={keyframes ? { x: keyframes.x[0], y: keyframes.y[0] } : false}
+      animate={keyframes ? { x: keyframes.x, y: keyframes.y } : undefined}
+      transition={
+        keyframes
+          ? {
+              duration: ENTRANCE_DURATION_S,
+              times: keyframes.times,
+              ease: 'easeInOut',
+            }
+          : undefined
+      }
       onAnimationComplete={() => onComplete?.()}
+      style={!keyframes ? { visibility: 'hidden' } : undefined}
     >
       {children}
     </motion.div>
