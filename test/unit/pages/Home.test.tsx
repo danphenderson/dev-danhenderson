@@ -44,21 +44,26 @@ jest.mock('../../../src/components/text', () => {
 
   return {
     ...actual,
-    TypewriterText: ({
-      text,
+    TypewriterLoopText: ({
+      prefix,
+      words,
       timingPreset,
       playing,
     }: {
-      text: string;
+      prefix: string;
+      words: string[];
       timingPreset?: string;
       playing?: boolean;
     }) => (
       <span
-        data-testid="typewriter-text"
+        data-testid="typewriter-loop-text"
         data-timing-preset={timingPreset ?? ''}
         data-playing={String(Boolean(playing))}
+        data-prefix={prefix}
+        data-words={words.join(',')}
       >
-        {text}
+        {prefix}
+        {words.join(', ')}
       </span>
     ),
   };
@@ -210,7 +215,7 @@ describe('Home audio prompt', () => {
 
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
-    expect(screen.queryByTestId('typewriter-text')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('typewriter-loop-text')).not.toBeInTheDocument();
   });
 });
 
@@ -220,7 +225,7 @@ describe('Home welcome flow', () => {
 
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
-    expect(screen.queryByTestId('typewriter-text')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('typewriter-loop-text')).not.toBeInTheDocument();
 
     fireEvent.click(await screen.findByRole('button', { name: 'Play welcome audio' }));
 
@@ -242,16 +247,21 @@ describe('Home welcome flow', () => {
     );
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
     expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-active', 'true');
-    expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'false');
-    expect(screen.getByTestId('typewriter-text')).toHaveTextContent(
-      'Hi, my passions are mathematics, computers, and adventures'
+    expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute('data-playing', 'false');
+    expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute(
+      'data-prefix',
+      'Hi, my passion is '
     );
-    expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-timing-preset', 'headline');
+    expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute(
+      'data-words',
+      'mathematics!,computers!,adventures!'
+    );
+    expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute('data-timing-preset', 'headline');
 
     fireEvent.click(screen.getByTestId('complete-hero-motion'));
 
     await waitFor(() =>
-      expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'true')
+      expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute('data-playing', 'true')
     );
   });
 
@@ -260,7 +270,7 @@ describe('Home welcome flow', () => {
 
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
-    expect(screen.queryByTestId('typewriter-text')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('typewriter-loop-text')).not.toBeInTheDocument();
 
     fireEvent.click(await screen.findByRole('button', { name: 'No thanks' }));
 
@@ -277,16 +287,21 @@ describe('Home welcome flow', () => {
     );
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
     expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-active', 'true');
-    expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'false');
-    expect(screen.getByTestId('typewriter-text')).toHaveTextContent(
-      'Hi, my passions are mathematics, computers, and adventures'
+    expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute('data-playing', 'false');
+    expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute(
+      'data-prefix',
+      'Hi, my passion is '
     );
-    expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-timing-preset', 'headline');
+    expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute(
+      'data-words',
+      'mathematics!,computers!,adventures!'
+    );
+    expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute('data-timing-preset', 'headline');
 
     fireEvent.click(screen.getByTestId('complete-hero-motion'));
 
     await waitFor(() =>
-      expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'true')
+      expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute('data-playing', 'true')
     );
   });
 
@@ -305,15 +320,16 @@ describe('Home welcome flow', () => {
       expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
     );
     expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-active', 'true');
-    expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'false');
-    expect(screen.getByTestId('typewriter-text')).toHaveTextContent(
-      'Hi, my passions are mathematics, computers, and adventures'
+    expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute('data-playing', 'false');
+    expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute(
+      'data-prefix',
+      'Hi, my passion is '
     );
 
     fireEvent.click(screen.getByTestId('complete-hero-motion'));
 
     await waitFor(() =>
-      expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'true')
+      expect(screen.getByTestId('typewriter-loop-text')).toHaveAttribute('data-playing', 'true')
     );
   });
 });

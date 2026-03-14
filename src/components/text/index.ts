@@ -18,6 +18,7 @@ export {
 } from './TypographyPrimitives';
 
 export { TypewriterText } from './TypewriterText';
+export { TypewriterLoopText } from './TypewriterLoopText';
 
 export {
   InteractiveLabel,
