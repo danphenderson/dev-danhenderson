@@ -9,71 +9,52 @@ const pages = [
   { name: 'Climbing', path: '/climbing' },
 ];
 
+const defaultProps = {
+  pages,
+  currentPath: '/',
+  isMobile: false,
+  iconButtonSize: 'medium' as const,
+  headerIconSx: { fontSize: 24 },
+  avatarSrc: '/test-avatar.jpg',
+  mobileMenuOpen: false,
+  mobileMenuAnchor: null as HTMLElement | null,
+  onMobileMenuOpen: jest.fn(),
+  onMobileMenuClose: jest.fn(),
+};
+
+const renderNav = (overrides: Partial<typeof defaultProps> = {}) =>
+  render(
+    <ThemeProvider>
+      <MemoryRouter future={routerFuture}>
+        <HeaderNav {...defaultProps} {...overrides} />
+      </MemoryRouter>
+    </ThemeProvider>
+  );
+
 describe('HeaderNav', () => {
   it('renders desktop navigation buttons for each page', () => {
-    render(
-      <ThemeProvider>
-        <MemoryRouter future={routerFuture}>
-          <HeaderNav
-            pages={pages}
-            showNavigationLinks={true}
-            isMobile={false}
-            iconButtonSize="medium"
-            headerIconSx={{ fontSize: 24 }}
-            mobileMenuOpen={false}
-            mobileMenuAnchor={null}
-            onMobileMenuOpen={jest.fn()}
-            onMobileMenuClose={jest.fn()}
-          />
-        </MemoryRouter>
-      </ThemeProvider>
-    );
+    renderNav();
 
     expect(screen.getByRole('link', { name: 'Go to CV' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Go to Climbing' })).toBeInTheDocument();
   });
 
-  it('hides navigation links when showNavigationLinks is false', () => {
-    render(
-      <ThemeProvider>
-        <MemoryRouter future={routerFuture}>
-          <HeaderNav
-            pages={pages}
-            showNavigationLinks={false}
-            isMobile={false}
-            iconButtonSize="medium"
-            headerIconSx={{ fontSize: 24 }}
-            mobileMenuOpen={false}
-            mobileMenuAnchor={null}
-            onMobileMenuOpen={jest.fn()}
-            onMobileMenuClose={jest.fn()}
-          />
-        </MemoryRouter>
-      </ThemeProvider>
-    );
+  it('always renders the avatar home link', () => {
+    renderNav();
+
+    expect(screen.getByRole('link', { name: 'Go to Home' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Daniel Henderson' })).toBeInTheDocument();
+  });
+
+  it('hides desktop navigation links on mobile', () => {
+    renderNav({ isMobile: true });
 
     expect(screen.queryByRole('link', { name: 'Go to CV' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Go to Climbing' })).not.toBeInTheDocument();
   });
 
   it('renders the mobile menu button when isMobile is true', () => {
-    render(
-      <ThemeProvider>
-        <MemoryRouter future={routerFuture}>
-          <HeaderNav
-            pages={pages}
-            showNavigationLinks={true}
-            isMobile={true}
-            iconButtonSize="medium"
-            headerIconSx={{ fontSize: 24 }}
-            mobileMenuOpen={false}
-            mobileMenuAnchor={null}
-            onMobileMenuOpen={jest.fn()}
-            onMobileMenuClose={jest.fn()}
-          />
-        </MemoryRouter>
-      </ThemeProvider>
-    );
+    renderNav({ isMobile: true });
 
     expect(screen.getByRole('button', { name: 'Open navigation menu' })).toBeInTheDocument();
   });
@@ -81,49 +62,26 @@ describe('HeaderNav', () => {
   it('calls onMobileMenuOpen when the mobile menu button is clicked', () => {
     const onMobileMenuOpen = jest.fn();
 
-    render(
-      <ThemeProvider>
-        <MemoryRouter future={routerFuture}>
-          <HeaderNav
-            pages={pages}
-            showNavigationLinks={true}
-            isMobile={true}
-            iconButtonSize="medium"
-            headerIconSx={{ fontSize: 24 }}
-            mobileMenuOpen={false}
-            mobileMenuAnchor={null}
-            onMobileMenuOpen={onMobileMenuOpen}
-            onMobileMenuClose={jest.fn()}
-          />
-        </MemoryRouter>
-      </ThemeProvider>
-    );
+    renderNav({ isMobile: true, onMobileMenuOpen });
 
     fireEvent.click(screen.getByRole('button', { name: 'Open navigation menu' }));
 
     expect(onMobileMenuOpen).toHaveBeenCalledTimes(1);
   });
 
-  it('renders leftContent when provided', () => {
-    render(
-      <ThemeProvider>
-        <MemoryRouter future={routerFuture}>
-          <HeaderNav
-            pages={pages}
-            showNavigationLinks={true}
-            isMobile={false}
-            iconButtonSize="medium"
-            headerIconSx={{ fontSize: 24 }}
-            mobileMenuOpen={false}
-            mobileMenuAnchor={null}
-            onMobileMenuOpen={jest.fn()}
-            onMobileMenuClose={jest.fn()}
-            leftContent={<span data-testid="left-content">Logo</span>}
-          />
-        </MemoryRouter>
-      </ThemeProvider>
-    );
+  it('applies active styling to the current page link', () => {
+    renderNav({ currentPath: '/cv' });
 
-    expect(screen.getByTestId('left-content')).toBeInTheDocument();
+    const cvLink = screen.getByRole('link', { name: 'Go to CV' });
+    expect(cvLink).toHaveAttribute('aria-current', 'page');
+
+    const climbingLink = screen.getByRole('link', { name: 'Go to Climbing' });
+    expect(climbingLink).not.toHaveAttribute('aria-current');
+  });
+
+  it('shows the avatar home link on mobile', () => {
+    renderNav({ isMobile: true });
+
+    expect(screen.getByRole('link', { name: 'Go to Home' })).toBeInTheDocument();
   });
 });

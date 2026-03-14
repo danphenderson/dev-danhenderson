@@ -24,26 +24,6 @@ jest.mock('../WelcomeOnboardingProvider', () => ({
   useWelcomeOnboarding: jest.fn(),
 }));
 
-jest.mock('./header/HeaderPageDial', () => ({
-  HeaderPageDial: ({ actions }: { actions: Array<{ id: string; label: string; to?: string }> }) => (
-    <div data-testid="header-page-dial">
-      <button type="button" aria-label="Open page navigation">
-        Open page navigation
-      </button>
-      {actions.map((action) => (
-        <span
-          key={action.id}
-          data-testid="header-page-dial-action"
-          data-label={action.label}
-          data-path={action.to ?? ''}
-        >
-          {action.label}
-        </span>
-      ))}
-    </div>
-  ),
-}));
-
 jest.mock('./header/HeaderAppearanceDial', () => ({
   HeaderAppearanceDial: ({
     onChangeAppearance,
@@ -122,12 +102,6 @@ const renderHeader = (initialEntry: string) =>
       </MemoryRouter>
     </MuiThemeProvider>
   );
-
-const getPageDialActions = () =>
-  screen.getAllByTestId('header-page-dial-action').map((action) => ({
-    label: action.getAttribute('data-label'),
-    path: action.getAttribute('data-path'),
-  }));
 
 describe('Header controls', () => {
   beforeEach(() => {
@@ -209,10 +183,10 @@ describe('Header controls', () => {
     expect(setAppearance).toHaveBeenCalledWith('ember');
   });
 
-  it('keeps the current desktop navigation links on the home route', () => {
-    renderHeader('/');
+  it('always shows navigation links on desktop with avatar home link', () => {
+    renderHeader('/cv');
 
-    expect(screen.queryByTestId('header-page-dial')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Go to Home' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Go to CV' })).toHaveAttribute('href', '/cv');
     expect(screen.getByRole('link', { name: 'Go to Climbing' })).toHaveAttribute(
       'href',
@@ -224,56 +198,48 @@ describe('Header controls', () => {
     );
   });
 
-  it('keeps the current mobile menu trigger on the home route', () => {
+  it('marks the active page with aria-current on desktop', () => {
+    renderHeader('/cv');
+
+    expect(screen.getByRole('link', { name: 'Go to CV' })).toHaveAttribute(
+      'aria-current',
+      'page'
+    );
+    expect(screen.getByRole('link', { name: 'Go to Climbing' })).not.toHaveAttribute(
+      'aria-current'
+    );
+  });
+
+  it('shows avatar and mobile menu on mobile for all routes', () => {
+    mockUseMediaQuery.mockReturnValue(true);
+
+    renderHeader('/cv');
+
+    expect(screen.getByRole('link', { name: 'Go to Home' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Open navigation menu' })).toBeInTheDocument();
+  });
+
+  it('shows navigation links on the home route with the avatar', () => {
+    renderHeader('/');
+
+    expect(screen.getByRole('link', { name: 'Go to Home' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Go to CV' })).toHaveAttribute('href', '/cv');
+    expect(screen.getByRole('link', { name: 'Go to Climbing' })).toHaveAttribute(
+      'href',
+      '/climbing'
+    );
+    expect(screen.getByRole('link', { name: 'Go to Photography' })).toHaveAttribute(
+      'href',
+      '/photography'
+    );
+  });
+
+  it('shows the mobile menu trigger on the home route', () => {
     mockUseMediaQuery.mockReturnValue(true);
 
     renderHeader('/');
 
     expect(screen.getByRole('button', { name: 'Open navigation menu' })).toBeInTheDocument();
-    expect(screen.queryByTestId('header-page-dial')).not.toBeInTheDocument();
-  });
-
-  it('shows the cv page dial actions and hides the desktop nav links', () => {
-    renderHeader('/cv');
-
-    expect(screen.getByRole('button', { name: 'Open page navigation' })).toBeInTheDocument();
-    expect(screen.getByTestId('header-appearance-dial')).toBeInTheDocument();
-    expect(getPageDialActions()).toEqual([
-      { label: 'Climbing', path: '/climbing' },
-      { label: 'Photography', path: '/photography' },
-      { label: 'Home', path: '/' },
-    ]);
-    expect(screen.queryByRole('link', { name: 'Go to CV' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Go to Climbing' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: 'Go to Photography' })).not.toBeInTheDocument();
-  });
-
-  it('hides the mobile hamburger when the page dial is active', () => {
-    mockUseMediaQuery.mockReturnValue(true);
-
-    renderHeader('/cv');
-
-    expect(screen.getByRole('button', { name: 'Open page navigation' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Open navigation menu' })).not.toBeInTheDocument();
-  });
-
-  it('uses the climbing page dial target set on the climbing route', () => {
-    renderHeader('/climbing');
-
-    expect(getPageDialActions()).toEqual([
-      { label: 'CV', path: '/cv' },
-      { label: 'Photography', path: '/photography' },
-      { label: 'Home', path: '/' },
-    ]);
-  });
-
-  it('uses the photography page dial target set on photography detail routes', () => {
-    renderHeader('/photography/landscape');
-
-    expect(getPageDialActions()).toEqual([
-      { label: 'CV', path: '/cv' },
-      { label: 'Climbing', path: '/climbing' },
-      { label: 'Home', path: '/' },
-    ]);
+    expect(screen.getByRole('link', { name: 'Go to Home' })).toBeInTheDocument();
   });
 });

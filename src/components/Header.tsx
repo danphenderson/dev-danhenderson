@@ -1,9 +1,5 @@
 import * as React from 'react';
 import { keyframes } from '@emotion/react';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import PhotoCameraOutlinedIcon from '@mui/icons-material/PhotoCameraOutlined';
-import TerrainIcon from '@mui/icons-material/Terrain';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Box, Slide } from '@mui/material';
@@ -16,11 +12,9 @@ import { avatar as avatarSrc } from '../data/cv';
 import { useAppStyles } from '../styles/appStyles';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
-import type { AppSpeedDialAction } from './AppSpeedDial';
 import { HeaderActions } from './header/HeaderActions';
 import { HEADER_HIDE_SCROLL_TRIGGER_OPTIONS } from './header/headerScroll';
 import { HeaderNav } from './header/HeaderNav';
-import { HeaderPageDial } from './header/HeaderPageDial';
 import { HintPopover } from './header/HintPopover';
 
 const pages = [
@@ -28,85 +22,6 @@ const pages = [
   { name: 'Climbing', path: '/climbing' },
   { name: 'Photography', path: '/photography' },
 ];
-
-type HeaderPageDialMode = 'cv' | 'climbing' | 'photography';
-
-const pageDialActionsByMode: Record<HeaderPageDialMode, AppSpeedDialAction[]> = {
-  cv: [
-    {
-      id: 'climbing',
-      label: 'Climbing',
-      icon: <TerrainIcon fontSize="small" />,
-      to: '/climbing',
-    },
-    {
-      id: 'photography',
-      label: 'Photography',
-      icon: <PhotoCameraOutlinedIcon fontSize="small" />,
-      to: '/photography',
-    },
-    {
-      id: 'home',
-      label: 'Home',
-      icon: <HomeOutlinedIcon fontSize="small" />,
-      to: '/',
-    },
-  ],
-  climbing: [
-    {
-      id: 'cv',
-      label: 'CV',
-      icon: <DescriptionOutlinedIcon fontSize="small" />,
-      to: '/cv',
-    },
-    {
-      id: 'photography',
-      label: 'Photography',
-      icon: <PhotoCameraOutlinedIcon fontSize="small" />,
-      to: '/photography',
-    },
-    {
-      id: 'home',
-      label: 'Home',
-      icon: <HomeOutlinedIcon fontSize="small" />,
-      to: '/',
-    },
-  ],
-  photography: [
-    {
-      id: 'cv',
-      label: 'CV',
-      icon: <DescriptionOutlinedIcon fontSize="small" />,
-      to: '/cv',
-    },
-    {
-      id: 'climbing',
-      label: 'Climbing',
-      icon: <TerrainIcon fontSize="small" />,
-      to: '/climbing',
-    },
-    {
-      id: 'home',
-      label: 'Home',
-      icon: <HomeOutlinedIcon fontSize="small" />,
-      to: '/',
-    },
-  ],
-};
-
-const getHeaderPageDialMode = (path: string): HeaderPageDialMode | null => {
-  if (path.startsWith('/cv')) {
-    return 'cv';
-  }
-  if (path.startsWith('/climbing')) {
-    return 'climbing';
-  }
-  if (path.startsWith('/photography')) {
-    return 'photography';
-  }
-
-  return null;
-};
 
 const pulseRing = keyframes`
   0% {
@@ -141,10 +56,6 @@ export default function Header() {
   const { showPauseHint, dismissPauseHint, showDarkModeHint, dismissDarkModeHint } =
     useWelcomeOnboarding();
   const path = location.pathname.toLowerCase();
-  const pageDialMode = getHeaderPageDialMode(path);
-  const showPageDial = Boolean(pageDialMode);
-  const pageDialActions = pageDialMode ? pageDialActionsByMode[pageDialMode] : [];
-  const showNavigationLinks = !showPageDial;
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const iconButtonSize = isMobile ? 'medium' : ('large' as const);
   const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState<null | HTMLElement>(null);
@@ -164,10 +75,10 @@ export default function Header() {
     : {};
 
   React.useEffect(() => {
-    if ((!isMobile || !showNavigationLinks) && mobileMenuOpen) {
+    if (!isMobile && mobileMenuOpen) {
       setMobileMenuAnchor(null);
     }
-  }, [isMobile, mobileMenuOpen, showNavigationLinks]);
+  }, [isMobile, mobileMenuOpen]);
 
   const handleMobileMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMobileMenuAnchor(event.currentTarget);
@@ -213,23 +124,15 @@ export default function Header() {
           <Toolbar sx={appStyles.headerToolbarSx}>
             <HeaderNav
               pages={pages}
-              showNavigationLinks={showNavigationLinks}
+              currentPath={path}
               isMobile={isMobile}
               iconButtonSize={iconButtonSize}
               headerIconSx={appStyles.headerIconSx}
+              avatarSrc={avatarSrc}
               mobileMenuOpen={mobileMenuOpen}
               mobileMenuAnchor={mobileMenuAnchor}
               onMobileMenuOpen={handleMobileMenuOpen}
               onMobileMenuClose={handleMobileMenuClose}
-              leftContent={
-                showPageDial ? (
-                  <HeaderPageDial
-                    iconButtonSize={iconButtonSize}
-                    avatarSrc={avatarSrc}
-                    actions={pageDialActions}
-                  />
-                ) : null
-              }
             />
             <Box sx={appStyles.headerActionsContainerSx}>
               <HeaderActions

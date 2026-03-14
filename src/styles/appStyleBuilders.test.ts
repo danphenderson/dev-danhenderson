@@ -86,15 +86,7 @@ describe('createAppStyleMap', () => {
     const theme = createAppTheme('dark', 'ember');
     const styleMap = createAppStyleMap(theme);
     const headerAppearanceDialSx = styleMap.headerAppearanceDialSx as Record<string, unknown>;
-    const headerPageDialSx = styleMap.headerPageDialSx as Record<string, unknown>;
-    const headerPageDialActionsSx = headerPageDialSx['& .MuiSpeedDial-actions'] as Record<
-      string,
-      unknown
-    >;
 
     expect(headerAppearanceDialSx.overflow).toBe('visible');
-    expect(headerPageDialSx.overflow).toBe('visible');
-    expect(headerPageDialActionsSx.position).toBe('absolute');
-    expect(headerPageDialActionsSx.transform).toBe('translateY(-50%)');
   });
 });
