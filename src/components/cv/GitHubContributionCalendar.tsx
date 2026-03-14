@@ -3,7 +3,6 @@ import { Box, Stack } from '@mui/material';
 import { GitHubCalendar } from 'react-github-calendar';
 import { ContentCard } from '../ContentCard';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { BodyText, SubsectionTitle } from '../text';
 
 type GitHubContributionCalendarProps = {
@@ -27,7 +26,6 @@ export const GitHubContributionCalendar = ({
   username,
   contained = true,
 }: GitHubContributionCalendarProps) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
   const calendarWrapperRef = useRef<HTMLDivElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const containerLookupFrameRef = useRef<number | null>(null);
@@ -109,7 +107,7 @@ export const GitHubContributionCalendar = ({
       return undefined;
     }
 
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+    if (typeof window === 'undefined' || typeof window.IntersectionObserver !== 'function') {
       setHasEnteredView(true);
       return undefined;
     }
@@ -197,11 +195,7 @@ export const GitHubContributionCalendar = ({
       setHasCompletedEntrance(true);
     };
 
-    if (
-      prefersReducedMotion ||
-      typeof window === 'undefined' ||
-      typeof window.requestAnimationFrame !== 'function'
-    ) {
+    if (typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') {
       completeEntrance();
       return undefined;
     }
@@ -234,7 +228,7 @@ export const GitHubContributionCalendar = ({
         animationFrameRef.current = null;
       }
     };
-  }, [hasCompletedEntrance, hasEnteredView, prefersReducedMotion, scrollContainer]);
+  }, [hasCompletedEntrance, hasEnteredView, scrollContainer]);
 
   useEffect(() => {
     if (!scrollContainer || !hasCompletedEntrance || typeof window === 'undefined') {

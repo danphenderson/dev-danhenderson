@@ -121,7 +121,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
   atlas: {
     key: 'atlas',
     label: 'Atlas',
-    shortDescription: 'Balanced technical surfaces with restrained motion.',
+    shortDescription: 'Balanced technical surfaces with expressive motion.',
     palette: {
       light: {
         primary: {
@@ -221,7 +221,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
   evergreen: {
     key: 'evergreen',
     label: 'Evergreen',
-    shortDescription: 'Calm editorial surfaces with minimal ambient motion.',
+    shortDescription: 'Calm editorial surfaces with expressive motion.',
     palette: {
       light: {
         primary: {
@@ -321,7 +321,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
   ember: {
     key: 'ember',
     label: 'Ember',
-    shortDescription: 'Richer copper surfaces with the most expressive motion.',
+    shortDescription: 'Richer copper surfaces with expressive motion.',
     palette: {
       light: {
         primary: {

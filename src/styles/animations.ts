@@ -50,13 +50,3 @@ export const breathe = keyframes`
     transform: translateY(-1px);
   }
 `;
-
-/** Disable all ambient animations when the user prefers reduced motion. */
-export const reducedMotionSx = {
-  '@media (prefers-reduced-motion: reduce)': {
-    animation: 'none !important',
-    '&::before, &::after': {
-      animation: 'none !important',
-    },
-  },
-} as const;

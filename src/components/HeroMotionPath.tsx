@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { SPRING_EASING_MOTION } from '../styles/springEasing';
 
 /**
@@ -142,7 +141,6 @@ function buildSpiralKeyframes(startX: number, startY: number): SpiralKeyframes {
 }
 
 export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathProps) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const [startOffset, setStartOffset] = useState<{ x: number; y: number } | null>(null);
   const [settled, setSettled] = useState(false);
@@ -157,7 +155,7 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
    * needed to place it in the visual centre of the viewport.
    */
   useLayoutEffect(() => {
-    if (!active || prefersReducedMotion) {
+    if (!active) {
       setStartOffset(null);
       return;
     }
@@ -177,20 +175,14 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
     };
 
     measure();
-  }, [active, prefersReducedMotion]);
-
-  useEffect(() => {
-    if (active && prefersReducedMotion) {
-      onComplete?.();
-    }
-  }, [active, prefersReducedMotion, onComplete]);
+  }, [active]);
 
   const keyframes = useMemo(() => {
     if (!startOffset) return null;
     return buildSpiralKeyframes(startOffset.x, startOffset.y);
   }, [startOffset]);
 
-  if (!active || prefersReducedMotion) {
+  if (!active) {
     return <>{children}</>;
   }
 

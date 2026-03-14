@@ -40,21 +40,6 @@ jest.mock('../../../src/styles/componentStyles', () => ({
   }),
 }));
 
-const defaultMatchMedia = window.matchMedia;
-
-const setReducedMotionPreference = (matches: boolean) => {
-  window.matchMedia = jest.fn().mockImplementation((query: string) => ({
-    matches,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  }));
-};
-
 describe('AnimatedSlideList', () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -63,12 +48,9 @@ describe('AnimatedSlideList', () => {
   afterEach(() => {
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
-    window.matchMedia = defaultMatchMedia;
   });
 
   it('enters slide items sequentially when selected and resets them when closed', () => {
-    setReducedMotionPreference(false);
-
     const { rerender } = render(
       <AnimatedSlideList
         items={['React', 'TypeScript', 'MUI']}
@@ -152,39 +134,5 @@ describe('AnimatedSlideList', () => {
     screen.getAllByTestId('slide-item').forEach((slide) => {
       expect(slide).toHaveAttribute('data-in', 'false');
     });
-  });
-
-  it('renders static items without slide wrappers under reduced motion', () => {
-    setReducedMotionPreference(true);
-
-    render(
-      <AnimatedSlideList
-        items={['React', 'TypeScript']}
-        getItemKey={(item) => item}
-        in
-        containerComponent="ul"
-        itemComponent="li"
-        renderItem={(item) => <span>{item}</span>}
-      />
-    );
-
-    expect(screen.queryByTestId('slide-item')).not.toBeInTheDocument();
-    expect(screen.getByRole('list')).toBeInTheDocument();
-    expect(screen.getAllByRole('listitem')).toHaveLength(2);
-  });
-
-  it('renders nothing under reduced motion when inactive', () => {
-    setReducedMotionPreference(true);
-
-    const { container } = render(
-      <AnimatedSlideList
-        items={['React', 'TypeScript']}
-        getItemKey={(item) => item}
-        in={false}
-        renderItem={(item) => <span>{item}</span>}
-      />
-    );
-
-    expect(container.innerHTML).toBe('');
   });
 });

@@ -16,54 +16,17 @@ jest.mock('@mui/material', () => {
   };
 });
 
-const defaultMatchMedia = window.matchMedia;
 const defaultIntersectionObserver = window.IntersectionObserver;
-
-const setReducedMotionPreference = (matches: boolean) => {
-  window.matchMedia = jest.fn().mockImplementation((query: string) => ({
-    matches,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  }));
-};
 
 describe('AnimatedContentCard', () => {
   afterEach(() => {
-    window.matchMedia = defaultMatchMedia;
     window.IntersectionObserver = defaultIntersectionObserver;
     jest.useRealTimers();
     jest.clearAllMocks();
   });
 
-  it('renders immediately and skips animation wrappers under reduced motion', () => {
-    setReducedMotionPreference(true);
-    const intersectionObserver = jest.fn();
-    Object.defineProperty(window, 'IntersectionObserver', {
-      writable: true,
-      value: intersectionObserver,
-    });
-
-    render(
-      <ThemeProvider>
-        <AnimatedContentCard delayMs={200}>
-          <div>Reduced Motion Card</div>
-        </AnimatedContentCard>
-      </ThemeProvider>
-    );
-
-    expect(screen.getByText('Reduced Motion Card')).toBeInTheDocument();
-    expect(screen.queryByTestId('zoom')).not.toBeInTheDocument();
-    expect(intersectionObserver).not.toHaveBeenCalled();
-  });
-
   it('uses the provided delay literally when animation is enabled', () => {
     jest.useFakeTimers();
-    setReducedMotionPreference(false);
 
     render(
       <ThemeProvider>
@@ -90,7 +53,6 @@ describe('AnimatedContentCard', () => {
 
   it('supports externally controlled visibility', () => {
     jest.useFakeTimers();
-    setReducedMotionPreference(false);
 
     const { rerender } = render(
       <ThemeProvider>
@@ -133,33 +95,8 @@ describe('AnimatedContentCard', () => {
     expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'false');
   });
 
-  it('keeps controlled content hidden under reduced motion until it is shown', () => {
-    setReducedMotionPreference(true);
-
-    const { rerender } = render(
-      <ThemeProvider>
-        <AnimatedContentCard visible={false}>
-          <div>Reduced Motion Controlled Card</div>
-        </AnimatedContentCard>
-      </ThemeProvider>
-    );
-
-    expect(screen.queryByText('Reduced Motion Controlled Card')).not.toBeInTheDocument();
-
-    rerender(
-      <ThemeProvider>
-        <AnimatedContentCard visible>
-          <div>Reduced Motion Controlled Card</div>
-        </AnimatedContentCard>
-      </ThemeProvider>
-    );
-
-    expect(screen.getByText('Reduced Motion Controlled Card')).toBeInTheDocument();
-  });
-
   it('does not flash content when visibility is toggled off before the delay completes', () => {
     jest.useFakeTimers();
-    setReducedMotionPreference(false);
 
     const { rerender } = render(
       <ThemeProvider>
@@ -200,7 +137,6 @@ describe('AnimatedContentCard', () => {
 
   it('renders children immediately when delayMs is zero and animation is enabled', () => {
     jest.useFakeTimers();
-    setReducedMotionPreference(false);
 
     render(
       <ThemeProvider>

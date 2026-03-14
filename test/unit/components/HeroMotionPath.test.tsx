@@ -59,23 +59,9 @@ jest.mock('motion/react', () => {
   };
 });
 
-const defaultMatchMedia = window.matchMedia;
 const defaultInnerWidth = window.innerWidth;
 const defaultInnerHeight = window.innerHeight;
 const defaultGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect;
-
-const setReducedMotionPreference = (matches: boolean) => {
-  window.matchMedia = jest.fn().mockImplementation((query: string) => ({
-    matches,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  }));
-};
 
 describe('HeroMotionPath', () => {
   beforeEach(() => {
@@ -101,16 +87,13 @@ describe('HeroMotionPath', () => {
   });
 
   afterEach(() => {
-    window.matchMedia = defaultMatchMedia;
     window.innerWidth = defaultInnerWidth;
     window.innerHeight = defaultInnerHeight;
     HTMLElement.prototype.getBoundingClientRect = defaultGetBoundingClientRect;
     jest.clearAllMocks();
   });
 
-  it('renders children inside a motion div when active and motion is not reduced', async () => {
-    setReducedMotionPreference(false);
-
+  it('renders children inside a motion div when active', async () => {
     render(
       <HeroMotionPath active onComplete={jest.fn()}>
         <span data-testid="child">content</span>
@@ -124,8 +107,6 @@ describe('HeroMotionPath', () => {
   });
 
   it('does not render a motion div when not active', () => {
-    setReducedMotionPreference(false);
-
     render(
       <HeroMotionPath active={false} onComplete={jest.fn()}>
         <span data-testid="child">content</span>
@@ -136,47 +117,7 @@ describe('HeroMotionPath', () => {
     expect(screen.getByTestId('child')).toBeInTheDocument();
   });
 
-  it('does not render a motion div when reduced motion is preferred', () => {
-    setReducedMotionPreference(true);
-
-    render(
-      <HeroMotionPath active onComplete={jest.fn()}>
-        <span data-testid="child">content</span>
-      </HeroMotionPath>,
-    );
-
-    expect(screen.queryByTestId('motion-div')).not.toBeInTheDocument();
-    expect(screen.getByTestId('child')).toBeInTheDocument();
-  });
-
-  it('calls onComplete immediately when reduced motion is preferred and active', () => {
-    setReducedMotionPreference(true);
-    const onComplete = jest.fn();
-
-    render(
-      <HeroMotionPath active onComplete={onComplete}>
-        <span>content</span>
-      </HeroMotionPath>,
-    );
-
-    expect(onComplete).toHaveBeenCalledTimes(1);
-  });
-
-  it('does not call onComplete when reduced motion is preferred but not active', () => {
-    setReducedMotionPreference(true);
-    const onComplete = jest.fn();
-
-    render(
-      <HeroMotionPath active={false} onComplete={onComplete}>
-        <span>content</span>
-      </HeroMotionPath>,
-    );
-
-    expect(onComplete).not.toHaveBeenCalled();
-  });
-
   it('calls onComplete when the motion animation completes', async () => {
-    setReducedMotionPreference(false);
     const onComplete = jest.fn();
 
     render(
@@ -205,8 +146,6 @@ describe('HeroMotionPath', () => {
   });
 
   it('measures the shell position and builds measured spiral keyframes', async () => {
-    setReducedMotionPreference(false);
-
     render(
       <HeroMotionPath active onComplete={jest.fn()}>
         <span>content</span>
@@ -275,8 +214,6 @@ describe('HeroMotionPath', () => {
   });
 
   it('remeasures the shell when the motion path is reactivated', async () => {
-    setReducedMotionPreference(false);
-
     const { rerender } = render(
       <HeroMotionPath active onComplete={jest.fn()}>
         <span>content</span>

@@ -1,9 +1,5 @@
 import { test, expect } from '@playwright/test';
 
-test.beforeEach(async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-});
-
 test.describe('Home page', () => {
   test('renders the hero content after completing the welcome sequence', async ({ page }) => {
     await page.goto('/');

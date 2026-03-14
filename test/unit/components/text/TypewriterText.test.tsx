@@ -2,12 +2,6 @@ import { act, render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { TypewriterText } from '../../../../src/components/text/TypewriterText';
 
-let mockPrefersReducedMotion = false;
-
-jest.mock('../../../../src/hooks/usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: () => mockPrefersReducedMotion,
-}));
-
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <ThemeProvider>{children}</ThemeProvider>
 );
@@ -19,7 +13,6 @@ const getAnimatedTextNode = (container: HTMLElement) => {
 
 describe('TypewriterText', () => {
   beforeEach(() => {
-    mockPrefersReducedMotion = false;
     jest.spyOn(Math, 'random').mockReturnValue(0);
   });
 
@@ -132,13 +125,11 @@ describe('TypewriterText', () => {
     expect(animatedText).toHaveTextContent('A|');
   });
 
-  it('renders the full text immediately when reduced motion is preferred', () => {
-    mockPrefersReducedMotion = true;
-
-    const { container } = render(<TypewriterText text="Reduced motion" />, { wrapper });
+  it('keeps the cursor hidden while typing is paused', () => {
+    const { container } = render(<TypewriterText text="Paused" playing={false} />, { wrapper });
     const animatedText = getAnimatedTextNode(container);
 
-    expect(animatedText).toHaveTextContent('Reduced motion');
+    expect(animatedText).toHaveTextContent('');
     expect(animatedText).not.toHaveTextContent('|');
   });
 });

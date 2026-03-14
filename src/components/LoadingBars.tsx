@@ -1,6 +1,5 @@
 import { keyframes } from '@emotion/react';
 import { LinearProgress, Stack } from '@mui/material';
-import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
 
@@ -16,14 +15,11 @@ const pulse = keyframes`
 `;
 
 export const LoadingBars = ({ label = 'Loading', compact = false }: LoadingBarsProps) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
   const appStyles = useAppStyles();
   const { motionTokens } = useComponentStyles();
   const barHeight = compact ? 4 : 6;
   const barSpacing = compact ? 0.75 : 1;
-  const pulseAnimation = prefersReducedMotion
-    ? 'none'
-    : `${pulse} ${motionTokens.loadingPulseDurationMs}ms ease-in-out infinite`;
+  const pulseAnimation = `${pulse} ${motionTokens.loadingPulseDurationMs}ms ease-in-out infinite`;
   const bars = [
     { tone: 'primary', delay: 0 },
     { tone: 'secondary', delay: motionTokens.loadingBarStaggerMs },
@@ -46,7 +42,7 @@ export const LoadingBars = ({ label = 'Loading', compact = false }: LoadingBarsP
               trackColor,
               barColor,
               animation: pulseAnimation,
-              animationDelay: prefersReducedMotion ? '0ms' : `${bar.delay}ms`,
+              animationDelay: `${bar.delay}ms`,
             })}
           />
         );

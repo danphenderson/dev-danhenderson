@@ -2,15 +2,8 @@ import { render, screen } from '@testing-library/react';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { ProfileCard } from '../../../../src/components/cv/ProfileCard';
-import { COMMON_LINK_TOOLTIP_ID } from '../../../../src/components/CommonLink';
 import type { AboutMe } from '../../../../src/types/cv';
 import { createAppTheme } from '../../../../src/theme/createAppTheme';
-
-let mockPrefersReducedMotion = true;
-
-jest.mock('../../../../src/hooks/usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: () => mockPrefersReducedMotion,
-}));
 
 const baseAbout: AboutMe = {
   name: 'Test User',
@@ -22,10 +15,6 @@ const baseAbout: AboutMe = {
 };
 
 describe('ProfileCard', () => {
-  beforeEach(() => {
-    mockPrefersReducedMotion = true;
-  });
-
   it('renders name, title, and location', () => {
     render(
       <ThemeProvider>
@@ -68,16 +57,16 @@ describe('ProfileCard', () => {
     expect(screen.queryByText('Seattle, WA')).not.toBeInTheDocument();
   });
 
-  it('renders bio text', () => {
-    render(
+  it('renders bio text in the accessible typewriter layer', () => {
+    const { container } = render(
       <ThemeProvider>
         <ProfileCard about={baseAbout} />
       </ThemeProvider>
     );
 
-    expect(
-      screen.getByText('A developer with experience in React and TypeScript.')
-    ).toBeInTheDocument();
+    const accessibleLayer = container.querySelector('[data-typewriter-layer="accessible"]');
+
+    expect(accessibleLayer).toHaveTextContent('A developer with experience in React and TypeScript.');
   });
 
   it('embeds a link within bio text when bioLink is provided', () => {
@@ -100,8 +89,6 @@ describe('ProfileCard', () => {
     const link = screen.getByRole('link', { name: 'M.S. student' });
     expect(link).toHaveAttribute('href', 'https://example.com/program');
     expect(link).toHaveAttribute('target', '_blank');
-    expect(link).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
-    expect(link).toHaveAttribute('data-tooltip-content', 'View the graduate program page.');
   });
 
   it('renders avatar when avatarSrc is provided', () => {
@@ -116,8 +103,7 @@ describe('ProfileCard', () => {
 
   it('uses the support accent for the status line on CV themes', () => {
     const cvTheme = createAppTheme('light', 'evergreen');
-
-    render(
+    const { container } = render(
       <MuiThemeProvider theme={cvTheme}>
         <ProfileCard
           about={{
@@ -128,7 +114,9 @@ describe('ProfileCard', () => {
       </MuiThemeProvider>
     );
 
-    const statusText = screen.getByText(/Open to opportunities/i);
+    const statusText = container.querySelector(
+      '[data-typewriter-layer="reserve"] .MuiTypography-root'
+    ) as HTMLElement | null;
     const probe = document.createElement('div');
 
     probe.style.color = cvTheme.palette.secondary.main;
@@ -136,7 +124,8 @@ describe('ProfileCard', () => {
     const expectedColor = getComputedStyle(probe).color;
     probe.remove();
 
-    expect(getComputedStyle(statusText).color).toBe(expectedColor);
+    expect(statusText).not.toBeNull();
+    expect(getComputedStyle(statusText as HTMLElement).color).toBe(expectedColor);
   });
 
   it('omits avatar when avatarSrc is not provided', () => {

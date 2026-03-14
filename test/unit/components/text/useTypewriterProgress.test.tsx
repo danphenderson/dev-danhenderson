@@ -1,23 +1,11 @@
 import { act, render, screen } from '@testing-library/react';
 import { useTypewriterProgress } from '../../../../src/components/text/useTypewriterProgress';
 
-let mockPrefersReducedMotion = false;
-
-jest.mock('../../../../src/hooks/usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: () => mockPrefersReducedMotion,
-}));
-
 type HookProbeProps = Parameters<typeof useTypewriterProgress>[0];
 
 const HookProbe = (props: HookProbeProps) => {
-  const {
-    charIndex,
-    visibleText,
-    isComplete,
-    showCursor,
-    prefersReducedMotion,
-    resolvedTimingProfile,
-  } = useTypewriterProgress(props);
+  const { charIndex, visibleText, isComplete, showCursor, resolvedTimingProfile } =
+    useTypewriterProgress(props);
 
   return (
     <output
@@ -26,7 +14,6 @@ const HookProbe = (props: HookProbeProps) => {
       data-visible-text={visibleText}
       data-is-complete={String(isComplete)}
       data-show-cursor={String(showCursor)}
-      data-prefers-reduced-motion={String(prefersReducedMotion)}
       data-base-ms={resolvedTimingProfile.baseMs}
       data-min-delay-ms={resolvedTimingProfile.minDelayMs}
     >
@@ -38,7 +25,6 @@ const HookProbe = (props: HookProbeProps) => {
 
 describe('useTypewriterProgress', () => {
   beforeEach(() => {
-    mockPrefersReducedMotion = false;
     jest.spyOn(Math, 'random').mockReturnValue(0);
   });
 
@@ -100,16 +86,20 @@ describe('useTypewriterProgress', () => {
     expect(progress).toHaveAttribute('data-min-delay-ms', '8');
   });
 
-  it('short-circuits to the full text immediately when reduced motion is preferred', () => {
-    mockPrefersReducedMotion = true;
+  it('stays at the start when playing is disabled', () => {
+    jest.useFakeTimers();
 
-    render(<HookProbe text="Reduced motion" />);
+    render(<HookProbe text="Paused" playing={false} />);
 
     const progress = screen.getByTestId('typewriter-progress');
 
-    expect(progress).toHaveAttribute('data-char-index', '14');
-    expect(progress).toHaveAttribute('data-is-complete', 'true');
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
+
+    expect(progress).toHaveAttribute('data-char-index', '0');
+    expect(progress).toHaveAttribute('data-is-complete', 'false');
     expect(progress).toHaveAttribute('data-show-cursor', 'false');
-    expect(progress).toHaveTextContent('Reduced motion');
+    expect(progress).toHaveTextContent('');
   });
 });

@@ -15,7 +15,6 @@ import CodeIcon from '@mui/icons-material/Code';
 import { SPRING_EASING_CSS } from '../../styles/springEasing';
 import { AppSpeedDial, AppSpeedDialAction } from '../AppSpeedDial';
 import { CVSectionKey, cvSectionMetadata, cvSectionViewportMetrics } from './cvSectionMetadata';
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { useAppStyles } from '../../styles/appStyles';
 import { HEADER_HIDE_SCROLL_TRIGGER_OPTIONS } from '../header/headerScroll';
 
@@ -41,7 +40,6 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const appStyles = useAppStyles();
-  const prefersReducedMotion = usePrefersReducedMotion();
   const [activeSection, setActiveSection] = useState<CVSectionKey | null>(sections[0] ?? null);
   const [idle, setIdle] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -137,7 +135,7 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
   const handleBackToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      behavior: 'smooth',
     });
   };
 
@@ -170,7 +168,7 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
   return (
     <Zoom
       in={scrolledPastThreshold}
-      timeout={prefersReducedMotion ? 0 : { enter: 180, exit: 140 }}
+      timeout={{ enter: 180, exit: 140 }}
       unmountOnExit
     >
       <Box
@@ -189,7 +187,7 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
         onBlur={() => setHovered(false)}
         sx={{
           opacity: dimmed ? IDLE_OPACITY : 1,
-          transition: prefersReducedMotion ? 'none' : `opacity 300ms ${SPRING_EASING_CSS}`,
+          transition: `opacity 300ms ${SPRING_EASING_CSS}`,
           '&:hover': { opacity: 1 },
         }}
       >

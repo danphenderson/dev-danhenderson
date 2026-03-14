@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Stack } from '@mui/material';
 import type { AboutMe } from '../../types/cv';
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { ProfileCard } from './ProfileCard';
@@ -40,7 +39,6 @@ export const CVAboutSection = ({
     sectionHeadingCompactSx,
     supportAccentTitleSx,
   } = useComponentStyles();
-  const prefersReducedMotion = usePrefersReducedMotion();
   const bioAnimationStartDelayMs = delayMs + ANIMATED_CARD_DURATION_MS;
   const trimmedBio = about.bio.trim();
   const opportunities = useMemo(
@@ -111,11 +109,6 @@ export const CVAboutSection = ({
       return;
     }
 
-    if (prefersReducedMotion) {
-      setPlayWorkflowHeading(true);
-      return;
-    }
-
     const workflowStartDelayMs =
       Math.max(opportunities.length - 1, 0) * motionTokens.accordionChipStaggerMs +
       CHIP_REVEAL_BUFFER_MS;
@@ -135,7 +128,6 @@ export const CVAboutSection = ({
     motionTokens.accordionChipStaggerMs,
     opportunities.length,
     playWorkflowHeading,
-    prefersReducedMotion,
     showOpportunities,
   ]);
 

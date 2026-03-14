@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 
 const COMMON_PAIRS = new Set([
   'th',
@@ -80,7 +79,6 @@ export type UseTypewriterProgressResult = {
   visibleText: string;
   isComplete: boolean;
   showCursor: boolean;
-  prefersReducedMotion: boolean;
   resolvedTimingProfile: TypewriterTimingProfile;
 };
 
@@ -155,19 +153,17 @@ export const useTypewriterProgress = ({
   timingPreset = 'default',
   typingBaseMs,
 }: UseTypewriterProgressOptions): UseTypewriterProgressResult => {
-  const prefersReducedMotion = usePrefersReducedMotion();
   const resolvedTimingProfile = React.useMemo(
     () => resolveTypewriterTimingProfile(timingPreset, typingBaseMs),
     [timingPreset, typingBaseMs]
   );
-  const [charIndex, setCharIndex] = React.useState(() => (prefersReducedMotion ? text.length : 0));
+  const [charIndex, setCharIndex] = React.useState(0);
 
   React.useEffect(() => {
-    setCharIndex(prefersReducedMotion ? text.length : 0);
-  }, [prefersReducedMotion, text]);
+    setCharIndex(0);
+  }, [text]);
 
   React.useEffect(() => {
-    if (prefersReducedMotion) return undefined;
     if (!playing) return undefined;
     if (charIndex >= text.length) return undefined;
 
@@ -181,14 +177,13 @@ export const useTypewriterProgress = ({
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [charIndex, playing, prefersReducedMotion, resolvedTimingProfile, text]);
+  }, [charIndex, playing, resolvedTimingProfile, text]);
 
   return {
     charIndex,
-    visibleText: prefersReducedMotion ? text : text.slice(0, charIndex),
+    visibleText: text.slice(0, charIndex),
     isComplete: charIndex >= text.length,
-    showCursor: !prefersReducedMotion && playing && charIndex < text.length,
-    prefersReducedMotion,
+    showCursor: playing && charIndex < text.length,
     resolvedTimingProfile,
   };
 };

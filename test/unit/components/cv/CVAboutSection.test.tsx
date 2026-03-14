@@ -4,12 +4,6 @@ import ThemeProvider from '../../../../src/ThemeProvider';
 import { CVAboutSection } from '../../../../src/components/cv/CVAboutSection';
 import { cvSectionMetadata } from '../../../../src/components/cv/cvSectionMetadata';
 
-let mockPrefersReducedMotion = false;
-
-jest.mock('../../../../src/hooks/usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: () => mockPrefersReducedMotion,
-}));
-
 jest.mock('../../../../src/components/cv/CVSectionCard', () => ({
   CVSectionCard: ({
     children,
@@ -141,10 +135,6 @@ const renderAboutSection = (overrides?: Partial<Parameters<typeof CVAboutSection
   );
 
 describe('CVAboutSection', () => {
-  beforeEach(() => {
-    mockPrefersReducedMotion = false;
-  });
-
   afterEach(() => {
     jest.useRealTimers();
   });

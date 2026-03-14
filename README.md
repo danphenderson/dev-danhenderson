@@ -62,7 +62,6 @@ Animation behavior is intentionally centralized for the CV route instead of bein
   - shared wrapper for card-style entry animation
   - uses `IntersectionObserver` to trigger near viewport entry
   - applies a literal `delayMs` before a short `Zoom` transition
-  - skips observer setup, timers, and transition effects when `prefers-reduced-motion` is enabled
 - `src/components/AnimatedContentList.tsx`
   - shared staggered list wrapper for repeatable CV content such as experience, education, volunteering, certificates, coding examples, and GitHub items
   - supports both stacked and wrapped layouts while keeping delay math out of feature components
@@ -77,7 +76,6 @@ Animation behavior is intentionally centralized for the CV route instead of bein
   - staged sequence: hold at viewport centre while the nested Zoom plays (~280 ms), then travel along a larger counter-clockwise arc to the card's resting position (~3.3 s)
   - uses transform-based keyframes (x / y offsets relative to the element's natural position) so the element returns to its normal flex layout at (0, 0)
   - fires `onComplete` when the travel finishes; Home.tsx uses this to start the typewriter
-  - respects `prefers-reduced-motion`: skips the arc, renders children at rest, and fires `onComplete` immediately
 - `src/styles/componentStyles.ts`
   - source of truth for shared motion tokens and delay helpers used by CV animation wrappers and sections
   - current motion tokens are:
@@ -93,7 +91,7 @@ Current `/cv` sequencing rules:
 - Section cards stagger from shared section timing.
 - Repeatable inner item groups wait for the same additional shared item offset before their own stagger starts.
 - GitHub activity, contributions, and project chips follow the same shared item-offset rule as experience and volunteering.
-- Reduced-motion users should receive the same content without stagger, delayed reveal, or decorative pulse behavior.
+- Shared ambient and entrance motion remains enabled across all appearance presets.
 
 When changing CV motion:
 
@@ -256,7 +254,6 @@ test/
 #### Configuration highlights
 
 - **Browser**: Chromium only (initial rollout).
-- **Reduced motion**: Tests call `page.emulateMedia({ reducedMotion: 'reduce' })` before navigation so animated content renders immediately without waiting for `IntersectionObserver`-driven `Zoom` transitions.
 - **CI behavior**: Single worker, retries twice, uses the `github` reporter, and traces/screenshots/video are captured on first retry or failure.
 - **Artifacts**: Test output goes to `e2e-results/` and the HTML report to `playwright-report/`; both are git-ignored.
 
