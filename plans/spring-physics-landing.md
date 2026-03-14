@@ -39,7 +39,7 @@ The current animations use `ease`, `ease-in-out`, or linear CSS easing. While sm
    - `SPRING_EASING_CSS` — a CSS `cubic-bezier(0.175, 0.885, 0.32, 1.275)` string (classic ease-out-back: slight overshoot, smooth settle) used in CSS `transition` shorthand and MUI `easing` props.
    - `SPRING_EASING_MOTION` — the same curve as a `[number, number, number, number]` tuple for use in the `motion` library's `ease` option.
 
-2. **MUI Zoom** (AnimatedContentCard, AnimatedZoomList) — pass the spring easing via the `easing` prop (enter only, keep default linear exit so cards don't bounce out).
+2. **MUI Zoom** (AnimatedContentCard, AnimatedZoomList) — pass the spring easing via the `easing` prop (enter only, keep default exit so cards don't bounce out).
 
 3. **MUI Slide** (AnimatedSlideList, Header HideOnScroll) — pass the spring easing via `easing.enter`.
 
@@ -53,7 +53,7 @@ The current animations use `ease`, `ease-in-out`, or linear CSS easing. While sm
 
 1. Create `src/styles/springEasing.ts` with the easing constants.
 2. Wire spring easing into `AnimatedContentCard.tsx` (`Zoom` `easing` prop).
-3. Wire spring easing into `AnimatedZoomList.tsx` (`Zoom` `style.transitionTimingFunction`).
+3. Wire spring easing into `AnimatedZoomList.tsx` (`Zoom` `easing` prop).
 4. Wire spring easing into `AnimatedSlideList.tsx` (`Slide` `easing` prop).
 5. Wire spring easing into `HeroMotionPath.tsx` (motion `transition.ease`).
 6. Wire spring easing into `Header.tsx` (`Slide` `easing` prop).
