@@ -44,11 +44,49 @@ jest.mock('../../../src/components/text', () => {
 
   return {
     ...actual,
-    TypewriterText: ({ text, timingPreset }: { text: string; timingPreset?: string }) => (
-      <span data-testid="typewriter-text" data-timing-preset={timingPreset ?? ''}>
+    TypewriterText: ({
+      text,
+      timingPreset,
+      playing,
+    }: {
+      text: string;
+      timingPreset?: string;
+      playing?: boolean;
+    }) => (
+      <span
+        data-testid="typewriter-text"
+        data-timing-preset={timingPreset ?? ''}
+        data-playing={String(Boolean(playing))}
+      >
         {text}
       </span>
     ),
+  };
+});
+
+jest.mock('../../../src/components/HeroMotionPath', () => {
+  const React = require('react');
+
+  return {
+    HeroMotionPath: ({
+      children,
+      active,
+      onComplete,
+    }: {
+      children: React.ReactNode;
+      active: boolean;
+      onComplete?: () => void;
+    }) => {
+      React.useEffect(() => {
+        if (active) onComplete?.();
+      }, [active, onComplete]);
+
+      return (
+        <div data-testid="hero-motion-path" data-active={String(active)}>
+          {children}
+        </div>
+      );
+    },
   };
 });
 

@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -9,6 +10,7 @@ import {
 } from '@mui/material';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
+import { HeroMotionPath } from '../components/HeroMotionPath';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
@@ -21,6 +23,11 @@ export default function Home() {
   const { cardResetSx } = useComponentStyles();
   const { error, isHeroAnimationReady, isLoading, isPromptOpen, handleOptOut, handlePlay } =
     useHomeWelcomeSequence();
+  const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);
+
+  const handleMotionComplete = useCallback(() => {
+    setIsTypewriterPlaying(true);
+  }, []);
 
   return (
     <BackgroundPaper
@@ -30,15 +37,21 @@ export default function Home() {
       showShell={isHeroAnimationReady}
       shellSx={appStyles.homeHeroShellSx}
     >
-      <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
-        <Stack spacing={2} alignItems="center">
-          <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
-            {isHeroAnimationReady ? (
-              <TypewriterText text={homeHeroHeadline} timingPreset="headline" />
-            ) : null}
-          </DisplayTitle>
-        </Stack>
-      </AnimatedContentCard>
+      <HeroMotionPath active={isHeroAnimationReady} onComplete={handleMotionComplete}>
+        <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
+          <Stack spacing={2} alignItems="center">
+            <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
+              {isHeroAnimationReady ? (
+                <TypewriterText
+                  text={homeHeroHeadline}
+                  timingPreset="headline"
+                  playing={isTypewriterPlaying}
+                />
+              ) : null}
+            </DisplayTitle>
+          </Stack>
+        </AnimatedContentCard>
+      </HeroMotionPath>
 
       <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
         <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
