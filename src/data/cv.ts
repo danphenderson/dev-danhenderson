@@ -43,8 +43,6 @@ const mtuGlobalCampusOrganizationUrl =
   'https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad';
 export const githubSectionLead =
   'Recent activity, open-source contributions, and contribution history from GitHub.';
-export const currentWorkflowLead =
-  'Current workflow across application, data-platform, and scientific-computing work.';
 export const currentWorkflowTools = [
   'Python',
   'TypeScript',

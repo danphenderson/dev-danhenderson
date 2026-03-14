@@ -25,6 +25,7 @@ export interface TypewriterTextProps {
   reserveWidth?: boolean;
   sx?: SxProps<Theme>;
   cursorSx?: SxProps<Theme>;
+  onComplete?: () => void;
 }
 
 export const TypewriterText = ({
@@ -36,13 +37,28 @@ export const TypewriterText = ({
   reserveWidth = true,
   sx,
   cursorSx,
+  onComplete,
 }: TypewriterTextProps) => {
-  const { visibleText, showCursor } = useTypewriterProgress({
+  const { visibleText, isComplete, showCursor } = useTypewriterProgress({
     text,
     playing,
     timingPreset,
     typingBaseMs,
   });
+  const hasNotifiedCompletionRef = React.useRef(false);
+
+  React.useEffect(() => {
+    hasNotifiedCompletionRef.current = false;
+  }, [text]);
+
+  React.useEffect(() => {
+    if (!onComplete || !text || hasNotifiedCompletionRef.current || !isComplete) {
+      return;
+    }
+
+    hasNotifiedCompletionRef.current = true;
+    onComplete();
+  }, [isComplete, onComplete, text]);
 
   if (!text) {
     return null;

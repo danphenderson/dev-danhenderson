@@ -1,4 +1,4 @@
-import { Box, Grid, Stack } from '@mui/material';
+import { Box, Grid } from '@mui/material';
 import type { ReactNode } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme as useMuiTheme } from '@mui/material/styles';
@@ -16,7 +16,6 @@ import { CVExperienceSection } from '../components/cv/CVExperienceSection';
 import { CVSectionNavigator } from '../components/cv/CVSectionNavigator';
 import { CVSectionStack } from '../components/cv/CVSectionStack';
 import { CVVolunteeringSection } from '../components/cv/CVVolunteeringSection';
-import { SkillsChipList } from '../components/SkillsChipList';
 import {
   cvSectionNavigationOrder,
   CVSectionKey,
@@ -24,12 +23,10 @@ import {
 } from '../components/cv/cvSectionMetadata';
 import { CVGitHubSection } from '../components/cv/CVGitHubSection';
 import { PageFrame } from '../components/layout/PageFrame';
-import { SectionLeadText, SubsectionTitle } from '../components/text';
 import {
   aboutMe,
   certificates,
   codingExamples,
-  currentWorkflowLead,
   currentWorkflowTools,
   cvBackgroundImage,
   educationInfo,
@@ -122,14 +119,6 @@ const CVRouteContent = () => {
     </Box>
   );
 
-  const aboutFooter = (
-    <Stack spacing={1}>
-      <SubsectionTitle>Current workflow</SubsectionTitle>
-      <SectionLeadText>{currentWorkflowLead}</SectionLeadText>
-      <SkillsChipList skills={currentWorkflowTools} dense />
-    </Stack>
-  );
-
   const sectionDefinitions: CVSectionDefinition[] = [
     {
       key: 'about',
@@ -137,7 +126,7 @@ const CVRouteContent = () => {
         <CVAboutSection
           about={aboutMe}
           actions={aboutSpeedDial}
-          footer={aboutFooter}
+          currentWorkflowTools={currentWorkflowTools}
           delayMs={layout.delayMs}
           triggerOnView={layout.triggerOnView}
           sectionId={cvSectionMetadata.about.id}
