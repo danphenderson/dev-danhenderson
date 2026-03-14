@@ -57,7 +57,7 @@ export const HeroMotionPath = ({ children, playing, onComplete, sx }: HeroMotion
           playing
             ? {
                 offsetDistance: '100%',
-                opacity: [0, 0, 0.15, 0.6, 1],
+                opacity: [0, 0, 0, 0, 1],
               }
             : { offsetDistance: '0%', opacity: 0 }
         }

@@ -227,7 +227,6 @@ export const createAppStyleMap = (theme: Theme) => {
     heroMotionStageSx: {
       position: 'relative',
       width: '100%',
-      overflow: 'hidden',
     } satisfies SxProps<Theme>,
     headerIconSx,
     headerToolbarSx: {
