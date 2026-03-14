@@ -43,7 +43,12 @@ export const ChipMetaLabel = ({ children, sx, ...rest }: InlineLabelProps) => {
   const { contributionInlineLabelSx } = useComponentStyles();
 
   return (
-    <Typography component="span" variant="inherit" sx={mergeSx([contributionInlineLabelSx], sx)} {...rest}>
+    <Typography
+      component="span"
+      variant="inherit"
+      sx={mergeSx([contributionInlineLabelSx], sx)}
+      {...rest}
+    >
       {children}
     </Typography>
   );

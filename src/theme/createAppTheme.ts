@@ -134,7 +134,10 @@ export const createAppTheme = (mode: PaletteMode, appearanceKey: AppAppearanceKe
               theme.palette.primary.contrastText,
               theme.palette.mode === 'light' ? 0.88 : 0.86
             ),
-            borderBottom: `1px solid ${alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.24 : 0.36)}`,
+            borderBottom: `1px solid ${alpha(
+              theme.palette.primary.main,
+              theme.palette.mode === 'light' ? 0.24 : 0.36
+            )}`,
             backdropFilter: 'blur(10px)',
           }),
         },
@@ -168,7 +171,10 @@ export const createAppTheme = (mode: PaletteMode, appearanceKey: AppAppearanceKe
         styleOverrides: {
           root: ({ theme }) => ({
             borderRadius: 999,
-            borderColor: alpha(theme.palette.primary.main, theme.palette.mode === 'light' ? 0.25 : 0.45),
+            borderColor: alpha(
+              theme.palette.primary.main,
+              theme.palette.mode === 'light' ? 0.25 : 0.45
+            ),
           }),
         },
       },
@@ -183,17 +189,35 @@ export const createAppTheme = (mode: PaletteMode, appearanceKey: AppAppearanceKe
             color: theme.palette.text.primary,
             backgroundColor: alpha(
               theme.palette.background.paper,
-              Math.min(theme.appearanceTreatment.surface.panelSurfaceAlpha + (theme.palette.mode === 'light' ? 0.18 : 0.24), 0.96)
+              Math.min(
+                theme.appearanceTreatment.surface.panelSurfaceAlpha +
+                  (theme.palette.mode === 'light' ? 0.18 : 0.24),
+                0.96
+              )
             ),
-            border: `1px solid ${alpha(theme.palette.primary.main, Math.min(theme.appearanceTreatment.surface.panelBorderAlpha + 0.08, 0.58))}`,
-            boxShadow: theme.palette.mode === 'light'
-              ? `0 12px 28px ${alpha(theme.palette.common.black, theme.appearanceTreatment.surface.cardShadowAlpha + 0.02)}`
-              : `0 14px 30px ${alpha(theme.palette.common.black, theme.appearanceTreatment.surface.cardShadowAlpha)}`,
+            border: `1px solid ${alpha(
+              theme.palette.primary.main,
+              Math.min(theme.appearanceTreatment.surface.panelBorderAlpha + 0.08, 0.58)
+            )}`,
+            boxShadow:
+              theme.palette.mode === 'light'
+                ? `0 12px 28px ${alpha(
+                    theme.palette.common.black,
+                    theme.appearanceTreatment.surface.cardShadowAlpha + 0.02
+                  )}`
+                : `0 14px 30px ${alpha(
+                    theme.palette.common.black,
+                    theme.appearanceTreatment.surface.cardShadowAlpha
+                  )}`,
             backdropFilter: `blur(${theme.appearanceTreatment.surface.cardBlurPx + 2}px)`,
             '&:hover': {
               backgroundColor: alpha(
                 theme.palette.background.paper,
-                Math.min(theme.appearanceTreatment.surface.panelSurfaceAlpha + (theme.palette.mode === 'light' ? 0.22 : 0.3), 1)
+                Math.min(
+                  theme.appearanceTreatment.surface.panelSurfaceAlpha +
+                    (theme.palette.mode === 'light' ? 0.22 : 0.3),
+                  1
+                )
               ),
             },
             '&:focus-visible': {
@@ -216,16 +240,34 @@ export const createAppTheme = (mode: PaletteMode, appearanceKey: AppAppearanceKe
             color: theme.palette.text.primary,
             backgroundColor: alpha(
               theme.palette.background.paper,
-              Math.min(theme.appearanceTreatment.surface.panelSurfaceAlpha + (theme.palette.mode === 'light' ? 0.2 : 0.28), 0.98)
+              Math.min(
+                theme.appearanceTreatment.surface.panelSurfaceAlpha +
+                  (theme.palette.mode === 'light' ? 0.2 : 0.28),
+                0.98
+              )
             ),
-            border: `1px solid ${alpha(theme.palette.primary.main, Math.min(theme.appearanceTreatment.surface.panelBorderAlpha + 0.04, 0.52))}`,
-            boxShadow: theme.palette.mode === 'light'
-              ? `0 10px 22px ${alpha(theme.palette.common.black, Math.max(theme.appearanceTreatment.surface.cardShadowAlpha - 0.02, 0.1))}`
-              : `0 12px 24px ${alpha(theme.palette.common.black, Math.max(theme.appearanceTreatment.surface.cardShadowAlpha - 0.05, 0.22))}`,
+            border: `1px solid ${alpha(
+              theme.palette.primary.main,
+              Math.min(theme.appearanceTreatment.surface.panelBorderAlpha + 0.04, 0.52)
+            )}`,
+            boxShadow:
+              theme.palette.mode === 'light'
+                ? `0 10px 22px ${alpha(
+                    theme.palette.common.black,
+                    Math.max(theme.appearanceTreatment.surface.cardShadowAlpha - 0.02, 0.1)
+                  )}`
+                : `0 12px 24px ${alpha(
+                    theme.palette.common.black,
+                    Math.max(theme.appearanceTreatment.surface.cardShadowAlpha - 0.05, 0.22)
+                  )}`,
             '&:hover': {
               backgroundColor: alpha(
                 theme.palette.background.paper,
-                Math.min(theme.appearanceTreatment.surface.panelSurfaceAlpha + (theme.palette.mode === 'light' ? 0.24 : 0.32), 1)
+                Math.min(
+                  theme.appearanceTreatment.surface.panelSurfaceAlpha +
+                    (theme.palette.mode === 'light' ? 0.24 : 0.32),
+                  1
+                )
               ),
             },
             '&:focus-visible': {
@@ -238,13 +280,27 @@ export const createAppTheme = (mode: PaletteMode, appearanceKey: AppAppearanceKe
             color: theme.palette.text.primary,
             backgroundColor: alpha(
               theme.palette.background.paper,
-              Math.min(theme.appearanceTreatment.surface.panelSurfaceAlpha + (theme.palette.mode === 'light' ? 0.22 : 0.3), 0.98)
+              Math.min(
+                theme.appearanceTreatment.surface.panelSurfaceAlpha +
+                  (theme.palette.mode === 'light' ? 0.22 : 0.3),
+                0.98
+              )
             ),
-            border: `1px solid ${alpha(theme.palette.primary.main, theme.appearanceTreatment.surface.panelBorderAlpha)}`,
+            border: `1px solid ${alpha(
+              theme.palette.primary.main,
+              theme.appearanceTreatment.surface.panelBorderAlpha
+            )}`,
             borderRadius: 999,
-            boxShadow: theme.palette.mode === 'light'
-              ? `0 10px 22px ${alpha(theme.palette.common.black, Math.max(theme.appearanceTreatment.surface.cardShadowAlpha - 0.04, 0.08))}`
-              : `0 12px 24px ${alpha(theme.palette.common.black, Math.max(theme.appearanceTreatment.surface.cardShadowAlpha - 0.07, 0.18))}`,
+            boxShadow:
+              theme.palette.mode === 'light'
+                ? `0 10px 22px ${alpha(
+                    theme.palette.common.black,
+                    Math.max(theme.appearanceTreatment.surface.cardShadowAlpha - 0.04, 0.08)
+                  )}`
+                : `0 12px 24px ${alpha(
+                    theme.palette.common.black,
+                    Math.max(theme.appearanceTreatment.surface.cardShadowAlpha - 0.07, 0.18)
+                  )}`,
             padding: '6px 12px',
             backdropFilter: `blur(${theme.appearanceTreatment.surface.cardBlurPx + 2}px)`,
           }),

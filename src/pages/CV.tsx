@@ -41,11 +41,7 @@ import {
   resumePdfUrl,
 } from '../data/cv';
 import { useGithubProfile } from '../hooks/useGithubProfile';
-import {
-  CVLayoutMode,
-  CVSectionRegion,
-  cvPageSectionLayout,
-} from './cvPageLayout';
+import { CVLayoutMode, CVSectionRegion, cvPageSectionLayout } from './cvPageLayout';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
 
@@ -229,21 +225,23 @@ const CVRouteContent = () => {
     },
   ];
 
-  const sectionDescriptors: CVResolvedSectionDescriptor[] = sectionDefinitions.map(({ key, render }) => {
-    const layout = cvPageSectionLayout[key][layoutMode];
+  const sectionDescriptors: CVResolvedSectionDescriptor[] = sectionDefinitions.map(
+    ({ key, render }) => {
+      const layout = cvPageSectionLayout[key][layoutMode];
 
-    return {
-      id: cvSectionMetadata[key].id,
-      key,
-      node: render(layout),
-      placement: {
-        order: layout.order,
-        region: layout.region,
-      },
-      delayMs: layout.delayMs,
-      triggerOnView: layout.triggerOnView,
-    };
-  });
+      return {
+        id: cvSectionMetadata[key].id,
+        key,
+        node: render(layout),
+        placement: {
+          order: layout.order,
+          region: layout.region,
+        },
+        delayMs: layout.delayMs,
+        triggerOnView: layout.triggerOnView,
+      };
+    }
+  );
 
   const renderSectionDescriptor = (descriptor: CVResolvedSectionDescriptor) => (
     <Box
@@ -270,7 +268,11 @@ const CVRouteContent = () => {
     const mobileBodySections = mobileSections.filter((descriptor) => descriptor.key !== 'about');
 
     return (
-      <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
+      <PageFrame
+        image={cvBackgroundImage}
+        maxWidth={1600}
+        containerSx={appStyles.cvPageContainerSx}
+      >
         <>
           <CVSectionStack spacing={2.5}>
             {mobileAboutSection && renderSectionDescriptor(mobileAboutSection)}
@@ -288,25 +290,19 @@ const CVRouteContent = () => {
         <Grid container spacing={3} alignItems="stretch">
           <Grid item xs={12}>
             <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-top-region">
-              <CVSectionStack spacing={2.5}>
-                {getSectionNodesForRegion('top')}
-              </CVSectionStack>
+              <CVSectionStack spacing={2.5}>{getSectionNodesForRegion('top')}</CVSectionStack>
             </Box>
           </Grid>
 
           <Grid item xs={12} md={5} lg={4} sx={appStyles.cvDesktopAsideGridItemSx}>
             <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-sidebar-region">
-              <CVSectionStack spacing={2.5}>
-                {getSectionNodesForRegion('sidebar')}
-              </CVSectionStack>
+              <CVSectionStack spacing={2.5}>{getSectionNodesForRegion('sidebar')}</CVSectionStack>
             </Box>
           </Grid>
 
           <Grid item xs={12} md={7} lg={8} sx={appStyles.cvDesktopMainGridItemSx}>
             <Box sx={appStyles.cvPagePrimaryPaneSx} data-testid="cv-desktop-main-region">
-              <CVSectionStack spacing={3.5}>
-                {getSectionNodesForRegion('main')}
-              </CVSectionStack>
+              <CVSectionStack spacing={3.5}>{getSectionNodesForRegion('main')}</CVSectionStack>
             </Box>
           </Grid>
         </Grid>

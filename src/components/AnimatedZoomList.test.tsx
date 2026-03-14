@@ -36,7 +36,8 @@ jest.mock('../styles/componentStyles', () => ({
     motionTokens: {
       accordionChipStaggerMs: 20,
     },
-    getSectionDelayMs: (index: number, startDelayMs = 0, staggerMs = 80) => startDelayMs + index * staggerMs,
+    getSectionDelayMs: (index: number, startDelayMs = 0, staggerMs = 80) =>
+      startDelayMs + index * staggerMs,
   }),
 }));
 

@@ -44,13 +44,7 @@ jest.mock('../components/text', () => {
 
   return {
     ...actual,
-    TypewriterText: ({
-      text,
-      timingPreset,
-    }: {
-      text: string;
-      timingPreset?: string;
-    }) => (
+    TypewriterText: ({ text, timingPreset }: { text: string; timingPreset?: string }) => (
       <span data-testid="typewriter-text" data-timing-preset={timingPreset ?? ''}>
         {text}
       </span>
@@ -74,13 +68,7 @@ jest.mock('../components/AnimatedContentCard', () => ({
 
 jest.mock('../components/BackgroundPaper', () => ({
   __esModule: true,
-  default: ({
-    children,
-    showShell,
-  }: {
-    children: React.ReactNode;
-    showShell?: boolean;
-  }) => (
+  default: ({ children, showShell }: { children: React.ReactNode; showShell?: boolean }) => (
     <div data-testid="background-paper" data-show-shell={String(Boolean(showShell))}>
       {children}
     </div>
@@ -88,12 +76,8 @@ jest.mock('../components/BackgroundPaper', () => ({
 }));
 
 const OnboardingStateProbe = () => {
-  const {
-    showPauseHint,
-    showDarkModeHint,
-    dismissPauseHint,
-    dismissDarkModeHint,
-  } = useWelcomeOnboarding();
+  const { showPauseHint, showDarkModeHint, dismissPauseHint, dismissDarkModeHint } =
+    useWelcomeOnboarding();
 
   return (
     <>
@@ -109,8 +93,13 @@ const OnboardingStateProbe = () => {
   );
 };
 
-const HomeHarness = ({ initialAudioConsent = 'unknown' }: { initialAudioConsent?: MockWelcomeAudioState['audioConsent'] }) => {
-  const [audioConsent, setAudioConsent] = React.useState<MockWelcomeAudioState['audioConsent']>(initialAudioConsent);
+const HomeHarness = ({
+  initialAudioConsent = 'unknown',
+}: {
+  initialAudioConsent?: MockWelcomeAudioState['audioConsent'];
+}) => {
+  const [audioConsent, setAudioConsent] =
+    React.useState<MockWelcomeAudioState['audioConsent']>(initialAudioConsent);
   const [isPlaying, setIsPlaying] = React.useState(initialAudioConsent === 'granted');
   const pause = React.useMemo(() => jest.fn(), []);
   const grantAudioConsent = React.useMemo(() => jest.fn(), []);
@@ -163,12 +152,16 @@ describe('Home welcome flow', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Dismiss pause hint' }));
 
-    await waitFor(() => expect(screen.getByTestId('dark-mode-hint-open')).toHaveTextContent('true'));
+    await waitFor(() =>
+      expect(screen.getByTestId('dark-mode-hint-open')).toHaveTextContent('true')
+    );
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
 
     fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
 
-    await waitFor(() => expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true'));
+    await waitFor(() =>
+      expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
+    );
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
     expect(screen.getByTestId('typewriter-text')).toHaveTextContent(
       'Hi, my passions are mathematics, computers, and adventures'
@@ -185,13 +178,17 @@ describe('Home welcome flow', () => {
 
     fireEvent.click(await screen.findByRole('button', { name: 'No thanks' }));
 
-    await waitFor(() => expect(screen.getByTestId('dark-mode-hint-open')).toHaveTextContent('true'));
+    await waitFor(() =>
+      expect(screen.getByTestId('dark-mode-hint-open')).toHaveTextContent('true')
+    );
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
 
     fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
 
-    await waitFor(() => expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true'));
+    await waitFor(() =>
+      expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
+    );
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
     expect(screen.getByTestId('typewriter-text')).toHaveTextContent(
       'Hi, my passions are mathematics, computers, and adventures'

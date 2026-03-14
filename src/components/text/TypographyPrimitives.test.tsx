@@ -118,7 +118,12 @@ describe('Typography primitives', () => {
   });
 
   it('renders ListItemText as a body2 li element', () => {
-    render(<ul><ListItemText>Item one</ListItemText></ul>, { wrapper });
+    render(
+      <ul>
+        <ListItemText>Item one</ListItemText>
+      </ul>,
+      { wrapper }
+    );
 
     const el = screen.getByText('Item one');
 

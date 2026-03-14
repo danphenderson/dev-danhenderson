@@ -6,7 +6,9 @@ import NotFound from './NotFound';
 
 jest.mock('../components/BackgroundPaper', () => ({
   __esModule: true,
-  default: ({ children }: { children: React.ReactNode }) => <div data-testid="background-paper">{children}</div>,
+  default: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="background-paper">{children}</div>
+  ),
 }));
 
 describe('NotFound', () => {
@@ -33,6 +35,9 @@ describe('NotFound', () => {
 
     expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
     expect(screen.getByRole('link', { name: 'CV' })).toHaveAttribute('href', '/cv');
-    expect(screen.getByRole('link', { name: 'Photography' })).toHaveAttribute('href', '/photography');
+    expect(screen.getByRole('link', { name: 'Photography' })).toHaveAttribute(
+      'href',
+      '/photography'
+    );
   });
 });

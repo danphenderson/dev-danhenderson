@@ -15,7 +15,13 @@ jest.mock('../AnimatedContentList', () => ({
   }) => {
     mockAnimatedContentList(props);
 
-    return <div>{props.items.map((item, index) => <div key={index}>{props.renderItem(item, index)}</div>)}</div>;
+    return (
+      <div>
+        {props.items.map((item, index) => (
+          <div key={index}>{props.renderItem(item, index)}</div>
+        ))}
+      </div>
+    );
   },
 }));
 
@@ -41,8 +47,12 @@ jest.mock('../AnimatedSlideList', () => ({
       { 'data-testid': 'animated-slide-list', 'data-layout': props.layout ?? 'stack' },
       props.in
         ? props.items.map((item, index) =>
-          React.createElement(ItemComponent, { key: props.getItemKey(item, index) }, props.renderItem(item, index))
-        )
+            React.createElement(
+              ItemComponent,
+              { key: props.getItemKey(item, index) },
+              props.renderItem(item, index)
+            )
+          )
         : null
     );
   },
@@ -75,7 +85,9 @@ describe('EducationSection', () => {
       )
     ).toBeVisible();
     expect(
-      screen.queryByText('Pedagogical training in curriculum design, assessment, and evidence-based instruction.')
+      screen.queryByText(
+        'Pedagogical training in curriculum design, assessment, and evidence-based instruction.'
+      )
     ).not.toBeInTheDocument();
     expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
     expect(screen.queryByText('LaTeX')).not.toBeInTheDocument();
@@ -83,9 +95,15 @@ describe('EducationSection', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Highlights' }));
 
     expect(
-      screen.getByText('Pedagogical training in curriculum design, assessment, and evidence-based instruction.')
+      screen.getByText(
+        'Pedagogical training in curriculum design, assessment, and evidence-based instruction.'
+      )
     ).toBeVisible();
-    expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.containerComponent === 'ul' && props.itemComponent === 'li')).toBe(true);
+    expect(
+      mockAnimatedSlideList.mock.calls.some(
+        ([props]) => props.containerComponent === 'ul' && props.itemComponent === 'li'
+      )
+    ).toBe(true);
     expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Coursework' }));
@@ -93,7 +111,9 @@ describe('EducationSection', () => {
     expect(screen.getByText('Linear Algebra')).toBeVisible();
     expect(screen.getByText('Numerical Optimization')).toBeVisible();
     expect(
-      screen.queryByText('Pedagogical training in curriculum design, assessment, and evidence-based instruction.')
+      screen.queryByText(
+        'Pedagogical training in curriculum design, assessment, and evidence-based instruction.'
+      )
     ).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
@@ -110,7 +130,9 @@ describe('EducationSection', () => {
       </ThemeProvider>
     );
 
-    const programHeading = screen.getByRole('heading', { name: 'MS Mathematics, Applied/Computational' });
+    const programHeading = screen.getByRole('heading', {
+      name: 'MS Mathematics, Applied/Computational',
+    });
 
     expect(programHeading).toBeInTheDocument();
 
@@ -132,7 +154,9 @@ describe('EducationSection', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByRole('heading', { name: 'B.S. Cum Laude, Mathematics, Applied/Computational' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'B.S. Cum Laude, Mathematics, Applied/Computational' })
+    ).toBeInTheDocument();
     const organizationRow = screen.getByText('Michigan Technological University').parentElement;
 
     expect(organizationRow).not.toBeNull();

@@ -1,12 +1,15 @@
 # Home Hero Typewriter Animation
 
 ## Goal
+
 Replace the static home hero headline on `/` with a one-way typewriter animation that starts only after the existing welcome/onboarding sequence reveals the hero card, while preserving the page's current structure and heading semantics.
 
 ## Why
+
 The home page currently swaps from hidden to fully rendered hero copy in one step. A typewriter entrance adds motion to the headline, but it needs to do so without changing the onboarding flow, causing layout shift, or degrading accessibility and reduced-motion behavior.
 
 ## Constraints
+
 - Keep the app fully client-side and preserve SPA routing behavior.
 - Keep the change narrowly scoped to the home hero headline and a focused shared text component.
 - Do not modify `DisplayTitle` or widen route-level orchestration logic in `Home`.
@@ -15,6 +18,7 @@ The home page currently swaps from hidden to fully rendered hero copy in one ste
 - Do not add dependencies or introduce a generalized rotating-typewriter API.
 
 ## Affected files and responsibilities
+
 - `src/components/text/TypewriterText.tsx`: own the one-line typing animation, width reservation, cursor rendering, and reduced-motion fallback.
 - `src/components/text/index.ts`: export the new component through the existing text barrel.
 - `src/pages/Home.tsx`: keep `DisplayTitle` as the `h1` wrapper and render the typewriter text only once `isHeroAnimationReady` is true.
@@ -22,11 +26,13 @@ The home page currently swaps from hidden to fully rendered hero copy in one ste
 - `src/pages/Home.test.tsx`: keep the welcome-sequence tests focused on orchestration by mocking the new typewriter component to static text.
 
 ## Proposed approach
+
 Add a narrow `TypewriterText` component under `src/components/text/` that is derived from the provided example but trimmed to the home-page need: a single string that types once and then stays visible. The component should expose the full sentence to assistive technology, reserve width using a hidden copy to avoid layout shift, render only the animated glyphs and cursor visually, and skip animation entirely when `prefers-reduced-motion` is enabled.
 
 Wire that component into `Home` inside the existing `DisplayTitle` so the route remains declarative and the `h1` ownership does not move. Mount the typewriter only when `isHeroAnimationReady` turns true so the sentence starts typing after the onboarding flow instead of behind it.
 
 ## Execution steps
+
 1. Add the ExecPlan and confirm the smallest file set for the component-local implementation.
 2. Implement `TypewriterText` with single-string typing behavior, humanized delays, width reservation, accessible full-text output, and reduced-motion fallback.
 3. Export `TypewriterText` from the text barrel and update `Home` to render it inside `DisplayTitle` only when the hero is ready.
@@ -34,6 +40,7 @@ Wire that component into `Home` inside the existing `DisplayTitle` so the route 
 5. Run targeted Jest coverage, `npm run build`, the home Playwright spec, and direct browser checks for desktop and mobile home-page rendering.
 
 ## Validation plan
+
 - `npm test -- --watch=false --runTestsByPath src/components/text/TypewriterText.test.tsx src/pages/Home.test.tsx`
 - `npm run build`
 - `npx playwright test e2e/home.spec.ts`
@@ -44,12 +51,14 @@ Wire that component into `Home` inside the existing `DisplayTitle` so the route 
 - confirm reduced-motion rendering remains immediate and stable where applicable
 
 ## Risks and rollback
+
 - Timer-driven typing behavior can make tests flaky unless timing randomness is fixed or stubbed; keep unit tests deterministic.
 - Accessibility can regress if the heading exposes partial text instead of the full sentence while animating; keep the animated text `aria-hidden` and expose one full accessible string.
 - Width reservation can cause styling drift if it does not inherit the same typography styles as the visible text; ensure both copies share the same styling hooks.
 - If the animation introduces regressions, rollback is isolated to `TypewriterText`, its barrel export, and the `Home` consumption point.
 
 ## Progress notes
+
 - Implemented `src/components/text/TypewriterText.tsx` as a focused inline animation component derived from the provided example’s delay logic, but trimmed to single-string, type-once behavior with reduced-motion fallback and width reservation.
 - Kept `DisplayTitle` unchanged and wired the new component into `src/pages/Home.tsx`, mounting it only when `isHeroAnimationReady` is true so the headline does not animate behind the welcome flow.
 - Used `aria-label` on the inline typewriter root plus `aria-hidden` visual text so the heading exposes the full sentence accessibly without duplicating DOM text in Playwright selectors.

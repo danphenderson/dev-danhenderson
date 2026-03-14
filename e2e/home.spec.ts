@@ -22,7 +22,7 @@ test.describe('Home page', () => {
 
     // Hero text should appear after the full welcome sequence completes
     await expect(
-      page.getByText('Hi, my passions are mathematics, computers, and adventures'),
+      page.getByText('Hi, my passions are mathematics, computers, and adventures')
     ).toBeVisible();
   });
 

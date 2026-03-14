@@ -2,11 +2,12 @@ import { render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import ThemeProvider from '../ThemeProvider';
-import { CVSectionKey, cvSectionMetadata, cvSectionNavigationOrder } from '../components/cv/cvSectionMetadata';
 import {
-  APP_APPEARANCE_STORAGE_KEY,
-  defaultAppAppearanceKey,
-} from '../theme/appAppearance';
+  CVSectionKey,
+  cvSectionMetadata,
+  cvSectionNavigationOrder,
+} from '../components/cv/cvSectionMetadata';
+import { APP_APPEARANCE_STORAGE_KEY, defaultAppAppearanceKey } from '../theme/appAppearance';
 import { cvPageSectionLayout } from './cvPageLayout';
 import CV from './CV';
 
@@ -18,7 +19,9 @@ jest.mock('@mui/material/useMediaQuery', () => jest.fn());
 jest.mock('../hooks/useGithubProfile', () => ({
   useGithubProfile: () => ({
     activity: [{ label: 'Pushed 2 commits to owner/repo', href: 'https://github.com/owner/repo' }],
-    contributions: [{ name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright', stars: 999 }],
+    contributions: [
+      { name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright', stars: 999 },
+    ],
     loading: false,
     error: null,
   }),
@@ -69,42 +72,38 @@ jest.mock('../components/AppSpeedDial', () => ({
     sx?: unknown;
   }) => (
     mockAppSpeedDial({ ariaLabel, actions, sx }),
-    <section data-testid={`speed-dial-${ariaLabel.toLowerCase().replace(/\s+/g, '-')}`}>
-      {actions.map((action) =>
-        action.href ? (
-          <a
-            key={action.id}
-            data-testid="speed-dial-action"
-            aria-label={action.label}
-            href={action.href}
-            download={typeof action.download === 'string' ? action.download : undefined}
-          >
-            {action.label}
-          </a>
-        ) : (
-          <button
-            key={action.id}
-            type="button"
-            data-testid="speed-dial-action"
-            aria-label={action.label}
-            onClick={() => action.onClick?.()}
-          >
-            {action.label}
-          </button>
-        )
-      )}
-    </section>
+    (
+      <section data-testid={`speed-dial-${ariaLabel.toLowerCase().replace(/\s+/g, '-')}`}>
+        {actions.map((action) =>
+          action.href ? (
+            <a
+              key={action.id}
+              data-testid="speed-dial-action"
+              aria-label={action.label}
+              href={action.href}
+              download={typeof action.download === 'string' ? action.download : undefined}
+            >
+              {action.label}
+            </a>
+          ) : (
+            <button
+              key={action.id}
+              type="button"
+              data-testid="speed-dial-action"
+              aria-label={action.label}
+              onClick={() => action.onClick?.()}
+            >
+              {action.label}
+            </button>
+          )
+        )}
+      </section>
+    )
   ),
 }));
 
 jest.mock('../components/cv/CVSectionNavigator', () => ({
-  CVSectionNavigator: ({
-    sections,
-    testId,
-  }: {
-    sections: string[];
-    testId?: string;
-  }) => (
+  CVSectionNavigator: ({ sections, testId }: { sections: string[]; testId?: string }) => (
     <nav data-testid={testId} aria-label="CV section navigation" data-sections={sections.join(',')}>
       <div data-testid="cv-floating-section-dial" />
     </nav>
@@ -138,18 +137,30 @@ describe('CV page section navigation', () => {
     const desktopSidebarRegion = screen.getByTestId('cv-desktop-sidebar-region');
     const desktopMainRegion = screen.getByTestId('cv-desktop-main-region');
 
-    expect(within(desktopTopRegion).getByTestId(`animated-card-${cvSectionMetadata.about.id}`)).toBeInTheDocument();
-    expect(within(desktopSidebarRegion).getByTestId(`animated-card-${cvSectionMetadata.github.id}`)).toBeInTheDocument();
+    expect(
+      within(desktopTopRegion).getByTestId(`animated-card-${cvSectionMetadata.about.id}`)
+    ).toBeInTheDocument();
+    expect(
+      within(desktopSidebarRegion).getByTestId(`animated-card-${cvSectionMetadata.github.id}`)
+    ).toBeInTheDocument();
     expect(
       within(desktopSidebarRegion).getByTestId(`animated-card-${cvSectionMetadata.certificates.id}`)
     ).toBeInTheDocument();
-    expect(within(desktopSidebarRegion).getByTestId(`animated-card-${cvSectionMetadata.tools.id}`)).toBeInTheDocument();
-    expect(within(desktopMainRegion).getByTestId(`animated-card-${cvSectionMetadata.experience.id}`)).toBeInTheDocument();
-    expect(within(desktopMainRegion).getByTestId(`animated-card-${cvSectionMetadata.education.id}`)).toBeInTheDocument();
+    expect(
+      within(desktopSidebarRegion).getByTestId(`animated-card-${cvSectionMetadata.tools.id}`)
+    ).toBeInTheDocument();
+    expect(
+      within(desktopMainRegion).getByTestId(`animated-card-${cvSectionMetadata.experience.id}`)
+    ).toBeInTheDocument();
+    expect(
+      within(desktopMainRegion).getByTestId(`animated-card-${cvSectionMetadata.education.id}`)
+    ).toBeInTheDocument();
     expect(
       within(desktopMainRegion).getByTestId(`animated-card-${cvSectionMetadata.volunteering.id}`)
     ).toBeInTheDocument();
-    expect(within(desktopMainRegion).getByTestId(`animated-card-${cvSectionMetadata.coding.id}`)).toBeInTheDocument();
+    expect(
+      within(desktopMainRegion).getByTestId(`animated-card-${cvSectionMetadata.coding.id}`)
+    ).toBeInTheDocument();
 
     (Object.keys(cvPageSectionLayout) as CVSectionKey[]).forEach((sectionKey) => {
       const { delayMs, triggerOnView } = cvPageSectionLayout[sectionKey].desktop;
@@ -173,7 +184,9 @@ describe('CV page section navigation', () => {
     const aboutSection = document.getElementById(cvSectionMetadata.about.id);
 
     expect(
-      within(aboutDial).getAllByTestId('speed-dial-action').map((action) => action.getAttribute('aria-label'))
+      within(aboutDial)
+        .getAllByTestId('speed-dial-action')
+        .map((action) => action.getAttribute('aria-label'))
     ).toEqual(['GitHub', 'LinkedIn', 'Email', 'Download Resume']);
     expect(within(aboutDial).getByRole('link', { name: 'GitHub' })).toHaveAttribute(
       'href',
@@ -191,12 +204,14 @@ describe('CV page section navigation', () => {
       'download',
       'Daniel-Henderson-Resume.pdf'
     );
-    expect(mockAppSpeedDial).toHaveBeenCalledWith(expect.objectContaining({
-      ariaLabel: 'Open about actions',
-      sx: expect.objectContaining({
-        position: 'static',
-      }),
-    }));
+    expect(mockAppSpeedDial).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ariaLabel: 'Open about actions',
+        sx: expect.objectContaining({
+          position: 'static',
+        }),
+      })
+    );
     expect(aboutSection).not.toBeNull();
 
     const navigator = screen.getByTestId('cv-section-navigator');
@@ -204,7 +219,9 @@ describe('CV page section navigation', () => {
 
     expect(screen.queryByTestId('cv-sticky-section-navigator')).not.toBeInTheDocument();
     expect(within(aboutSection!).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
-    expect(within(desktopSidebarRegion).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
+    expect(
+      within(desktopSidebarRegion).queryByTestId('cv-section-navigator')
+    ).not.toBeInTheDocument();
     expect(navigator.getAttribute('data-sections')).toBe(cvSectionNavigationOrder.join(','));
     expect(screen.getByTestId('cv-floating-section-dial')).toBeInTheDocument();
   });
@@ -310,10 +327,14 @@ describe('CV page section navigation', () => {
 
     expect(aboutSection).not.toBeNull();
     expect(experienceSection).not.toBeNull();
-    expect(aboutSection!.compareDocumentPosition(experienceSection!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(
+      aboutSection!.compareDocumentPosition(experienceSection!) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
     expect(screen.queryByTestId('cv-sticky-section-navigator')).not.toBeInTheDocument();
     expect(within(aboutSection!).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
-    expect(aboutDial.compareDocumentPosition(navigator) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(
+      aboutDial.compareDocumentPosition(navigator) & Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
     expect(navigator.getAttribute('data-sections')).toBe(cvSectionNavigationOrder.join(','));
   });
 });

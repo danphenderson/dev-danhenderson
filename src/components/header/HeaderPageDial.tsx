@@ -8,11 +8,7 @@ type HeaderPageDialProps = {
   iconButtonSize: 'small' | 'medium' | 'large';
 };
 
-export const HeaderPageDial = ({
-  actions,
-  avatarSrc,
-  iconButtonSize,
-}: HeaderPageDialProps) => {
+export const HeaderPageDial = ({ actions, avatarSrc, iconButtonSize }: HeaderPageDialProps) => {
   const appStyles = useAppStyles();
 
   return (

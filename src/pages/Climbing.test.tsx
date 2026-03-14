@@ -7,10 +7,23 @@ import Climbing from './Climbing';
 jest.mock('../hooks/useClimbingData', () => ({
   useClimbingData: () => ({
     ticks: [
-      { id: 'tick-1', date: '6/26/2025', route: 'Hyperspace', grade: '5.11a', location: 'Leavenworth', url: 'https://mp.com/route/1' },
+      {
+        id: 'tick-1',
+        date: '6/26/2025',
+        route: 'Hyperspace',
+        grade: '5.11a',
+        location: 'Leavenworth',
+        url: 'https://mp.com/route/1',
+      },
     ],
     todos: [
-      { id: 'todo-1', route: 'The Tooth', grade: '5.4', location: 'Alpental', url: 'https://mp.com/route/2' },
+      {
+        id: 'todo-1',
+        route: 'The Tooth',
+        grade: '5.4',
+        location: 'Alpental',
+        url: 'https://mp.com/route/2',
+      },
     ],
   }),
   TickRow: undefined,
@@ -37,21 +50,22 @@ describe('Climbing', () => {
 
     expect(screen.getByText('Climbing')).toBeInTheDocument();
     expect(screen.getByText('TODO Routes')).toBeInTheDocument();
-    expect(screen.getByText("A collection of routes I've remembered to tick on Mountain Project.")).toBeInTheDocument();
-    expect(screen.getByText("A collection of routes I'm interested in climbing.")).toBeInTheDocument();
+    expect(
+      screen.getByText("A collection of routes I've remembered to tick on Mountain Project.")
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("A collection of routes I'm interested in climbing.")
+    ).toBeInTheDocument();
     const tickLink = screen.getByRole('link', { name: 'Hyperspace' });
     const todoLink = screen.getByRole('link', { name: 'The Tooth' });
 
-    expect(tickLink).toHaveAttribute(
-      'href',
-      'https://mp.com/route/1'
-    );
+    expect(tickLink).toHaveAttribute('href', 'https://mp.com/route/1');
     expect(tickLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
-    expect(tickLink).toHaveAttribute('data-tooltip-content', 'Open Hyperspace on Mountain Project.');
-    expect(todoLink).toHaveAttribute(
-      'href',
-      'https://mp.com/route/2'
+    expect(tickLink).toHaveAttribute(
+      'data-tooltip-content',
+      'Open Hyperspace on Mountain Project.'
     );
+    expect(todoLink).toHaveAttribute('href', 'https://mp.com/route/2');
     expect(todoLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
     expect(todoLink).toHaveAttribute('data-tooltip-content', 'Open The Tooth on Mountain Project.');
   });

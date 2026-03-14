@@ -27,6 +27,8 @@ export type CommonLinkProps = MuiLinkProps<'a', ReactTooltipDataAttributes>;
  * Keeps MUI Link behavior intact while typing the data attributes
  * used by react-tooltip for hover-triggered tooltips.
  */
-export const CommonLink = forwardRef<HTMLAnchorElement, CommonLinkProps>(function CommonLink(props, ref) {
-  return <MuiLink ref={ref} {...props} />;
-});
+export const CommonLink = forwardRef<HTMLAnchorElement, CommonLinkProps>(
+  function CommonLink(props, ref) {
+    return <MuiLink ref={ref} {...props} />;
+  }
+);

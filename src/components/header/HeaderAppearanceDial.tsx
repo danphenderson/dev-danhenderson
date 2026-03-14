@@ -30,11 +30,18 @@ const AppearanceSwatchIcon = ({
       width: 22,
       height: 22,
       borderRadius: '50%',
-      border: (theme) => `1px solid ${alpha(theme.palette.common.white, theme.palette.mode === 'light' ? 0.7 : 0.34)}`,
+      border: (theme) =>
+        `1px solid ${alpha(
+          theme.palette.common.white,
+          theme.palette.mode === 'light' ? 0.7 : 0.34
+        )}`,
       background: `linear-gradient(135deg, ${primaryColor} 0%, ${primaryColor} 52%, ${secondaryColor} 52%, ${secondaryColor} 100%)`,
       boxShadow: (theme) =>
         selected
-          ? `0 0 0 2px ${alpha(theme.palette.common.white, theme.palette.mode === 'light' ? 0.82 : 0.42)}`
+          ? `0 0 0 2px ${alpha(
+              theme.palette.common.white,
+              theme.palette.mode === 'light' ? 0.82 : 0.42
+            )}`
           : 'none',
     }}
   />
@@ -74,9 +81,12 @@ export const HeaderAppearanceDial = ({
     {
       id: 'theme-toggle',
       label: `Switch to ${mode === 'light' ? 'dark' : 'light'} mode`,
-      icon: mode === 'light'
-        ? <DarkModeOutlinedIcon fontSize="small" />
-        : <LightModeOutlinedIcon fontSize="small" />,
+      icon:
+        mode === 'light' ? (
+          <DarkModeOutlinedIcon fontSize="small" />
+        ) : (
+          <LightModeOutlinedIcon fontSize="small" />
+        ),
       onClick: () => onToggleTheme(),
     },
     ...appAppearanceOptions.map((option) => {

@@ -20,7 +20,9 @@ export const SkillsChipList = ({
   drawerContainer,
 }: SkillsChipListProps) => {
   const { chipWaveSx, getChipWaveDelaySx, skillsChipSx, skillsWrapSx } = useComponentStyles();
-  const filteredSkills = skills.filter((skill): skill is string => typeof skill === 'string' && skill.trim().length > 0);
+  const filteredSkills = skills.filter(
+    (skill): skill is string => typeof skill === 'string' && skill.trim().length > 0
+  );
 
   if (filteredSkills.length === 0) {
     return null;

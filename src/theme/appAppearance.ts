@@ -1,12 +1,6 @@
 import { PaletteMode } from '@mui/material';
 
-export type AppAppearanceKey =
-  | 'atlas'
-  | 'evergreen'
-  | 'ember'
-  | 'solstice'
-  | 'drift'
-  | 'graphite';
+export type AppAppearanceKey = 'atlas' | 'evergreen' | 'ember' | 'solstice' | 'drift' | 'graphite';
 
 type AppAppearancePalette = {
   primary: {

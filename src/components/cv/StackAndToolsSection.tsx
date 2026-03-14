@@ -19,10 +19,7 @@ export const StackAndToolsSection = ({
   lead,
   startDelayMs = 0,
 }: StackAndToolsSectionProps) => {
-  const {
-    compactSidebarSectionSpacing,
-    sectionHeadingCompactSx,
-  } = useComponentStyles();
+  const { compactSidebarSectionSpacing, sectionHeadingCompactSx } = useComponentStyles();
   const stackTabs: TabPanelItem[] = sections.map((section, index) => ({
     value: `${index}`,
     label: section.title,

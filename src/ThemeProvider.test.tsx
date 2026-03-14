@@ -1,19 +1,11 @@
 import { render, screen, act } from '@testing-library/react';
 import ThemeProvider, { useAppTheme } from './ThemeProvider';
-import {
-  APP_APPEARANCE_STORAGE_KEY,
-  defaultAppAppearanceKey,
-} from './theme/appAppearance';
+import { APP_APPEARANCE_STORAGE_KEY, defaultAppAppearanceKey } from './theme/appAppearance';
 
 const legacyCvAppearanceStorageKey = 'danhenderson-cv-appearance';
 
 const ThemeConsumer = () => {
-  const {
-    mode,
-    appearance,
-    setAppearance,
-    toggleTheme,
-  } = useAppTheme();
+  const { mode, appearance, setAppearance, toggleTheme } = useAppTheme();
 
   return (
     <div>

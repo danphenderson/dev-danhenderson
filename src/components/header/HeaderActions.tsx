@@ -1,10 +1,6 @@
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
-import {
-  Stack,
-  Tooltip,
-  IconButton,
-} from '@mui/material';
+import { Stack, Tooltip, IconButton } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { MutableRefObject } from 'react';
 import { useAppStyles } from '../../styles/appStyles';
@@ -34,9 +30,11 @@ export const HeaderActions = ({
   appearanceDial,
 }: HeaderActionsProps) => {
   const appStyles = useAppStyles();
-  const pauseButtonSx = (pauseHighlightSx
-    ? [appStyles.headerAudioControlSx, pauseHighlightSx]
-    : appStyles.headerAudioControlSx) as SxProps<Theme>;
+  const pauseButtonSx = (
+    pauseHighlightSx
+      ? [appStyles.headerAudioControlSx, pauseHighlightSx]
+      : appStyles.headerAudioControlSx
+  ) as SxProps<Theme>;
 
   return (
     <Stack direction="row" spacing={{ xs: 1, md: 2 }} alignItems="center">
@@ -63,10 +61,7 @@ export const HeaderActions = ({
       )}
 
       {appearanceDial && (
-        <HeaderAppearanceDial
-          iconButtonSize={iconButtonSize}
-          {...appearanceDial}
-        />
+        <HeaderAppearanceDial iconButtonSize={iconButtonSize} {...appearanceDial} />
       )}
     </Stack>
   );

@@ -7,11 +7,7 @@ test.beforeEach(async ({ page }) => {
 
 const COMMON_LINK_TOOLTIP_ID = 'common-link-tooltip';
 
-const expectCommonLinkTooltip = async (
-  page: Page,
-  link: Locator,
-  content: string,
-) => {
+const expectCommonLinkTooltip = async (page: Page, link: Locator, content: string) => {
   const tooltip = page.locator(`#${COMMON_LINK_TOOLTIP_ID}`);
 
   await link.scrollIntoViewIfNeeded();
@@ -32,14 +28,19 @@ test.describe('CV page – GitHub integration', () => {
       name: 'M.S. Mathematics student in the applied/computational track (expected Aug 2026)',
     });
     const advisorLink = page.getByRole('link', { name: 'Jiguang Sun' });
-    const mtuOrganizationLink = page.getByRole('link', { name: 'Michigan Technological University' }).first();
+    const mtuOrganizationLink = page
+      .getByRole('link', { name: 'Michigan Technological University' })
+      .first();
     const littleBrothersLink = page.getByRole('link', { name: 'Little Brothers' });
 
-    await expect(programLink).toHaveAttribute('href', 'https://www.mtu.edu/math/graduate/students/');
+    await expect(programLink).toHaveAttribute(
+      'href',
+      'https://www.mtu.edu/math/graduate/students/'
+    );
     await expectCommonLinkTooltip(
       page,
       programLink,
-      'View the Michigan Tech graduate mathematics student page.',
+      'View the Michigan Tech graduate mathematics student page.'
     );
     await expectCommonLinkTooltip(page, advisorLink, 'View faculty page');
     await expect(mtuOrganizationLink).toHaveAttribute(
@@ -69,7 +70,7 @@ test.describe('CV page – GitHub integration', () => {
 
     // The mocked push event should render as formatted activity text
     await expect(
-      main.getByText(/Pushed 1 commit to danphenderson\/dev-danhenderson/),
+      main.getByText(/Pushed 1 commit to danphenderson\/dev-danhenderson/)
     ).toBeVisible();
 
     // The GitHub section headings should render
@@ -83,9 +84,7 @@ test.describe('CV page – GitHub integration', () => {
     const main = page.locator('main');
 
     // Fallback activity items should still appear
-    await expect(
-      main.getByText(/Maintaining BlockOpt\.jl/i),
-    ).toBeVisible();
+    await expect(main.getByText(/Maintaining BlockOpt\.jl/i)).toBeVisible();
 
     // Fallback contributions should appear (unique to contributions section)
     await expect(main.getByText(/dbt-labs\/dbt-core/)).toBeVisible();

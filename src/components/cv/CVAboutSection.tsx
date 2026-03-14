@@ -44,11 +44,7 @@ export const CVAboutSection = ({
             bioAnimationStartDelayMs={bioAnimationStartDelayMs}
           />
         </Stack>
-        {footer && (
-          <Stack spacing={1.5}>
-            {footer}
-          </Stack>
-        )}
+        {footer && <Stack spacing={1.5}>{footer}</Stack>}
       </Stack>
     </CVSectionCard>
   );

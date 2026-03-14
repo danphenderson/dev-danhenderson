@@ -37,7 +37,10 @@ describe('CVSectionCard', () => {
     );
 
     expect(screen.getByTestId('section-card-cv-about')).toHaveAttribute('data-delay-ms', '180');
-    expect(screen.getByTestId('section-card-cv-about')).toHaveAttribute('data-trigger-on-view', 'false');
+    expect(screen.getByTestId('section-card-cv-about')).toHaveAttribute(
+      'data-trigger-on-view',
+      'false'
+    );
     expect(screen.getByText('CV content')).toBeInTheDocument();
   });
 });

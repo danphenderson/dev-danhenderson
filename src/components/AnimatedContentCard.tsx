@@ -12,14 +12,15 @@ export const ANIMATED_CARD_DURATION_MS = 280;
 const DEFAULT_THRESHOLD = 0;
 const DEFAULT_ROOT_MARGIN = '0px 0px -10% 0px';
 
-type AnimatedContentCardProps<RootComponent extends ElementType = 'div'> = ContentCardProps<RootComponent> & {
-  delayMs?: number;
-  triggerOnView?: boolean;
-  visible?: boolean;
-  threshold?: number;
-  rootMargin?: string;
-  containerSx?: SxProps<Theme>;
-};
+type AnimatedContentCardProps<RootComponent extends ElementType = 'div'> =
+  ContentCardProps<RootComponent> & {
+    delayMs?: number;
+    triggerOnView?: boolean;
+    visible?: boolean;
+    threshold?: number;
+    rootMargin?: string;
+    containerSx?: SxProps<Theme>;
+  };
 
 export const AnimatedContentCard = <RootComponent extends ElementType = 'div'>({
   delayMs = 0,

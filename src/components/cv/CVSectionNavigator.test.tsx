@@ -1,7 +1,11 @@
 import { act, render, screen } from '@testing-library/react';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import ThemeProvider from '../../ThemeProvider';
-import { cvSectionMetadata, cvSectionViewportMetrics, cvSectionNavigationOrder } from './cvSectionMetadata';
+import {
+  cvSectionMetadata,
+  cvSectionViewportMetrics,
+  cvSectionNavigationOrder,
+} from './cvSectionMetadata';
 import { CVSectionNavigator } from './CVSectionNavigator';
 
 jest.mock('@mui/material/useScrollTrigger', () => jest.fn());
@@ -42,10 +46,7 @@ describe('CVSectionNavigator', () => {
   const scrollIntoViewMock = jest.fn();
   let getElementByIdSpy: jest.SpyInstance;
 
-  const appendSection = (
-    sectionId: string,
-    { top, height }: { top: number; height: number }
-  ) => {
+  const appendSection = (sectionId: string, { top, height }: { top: number; height: number }) => {
     sectionRects.set(sectionId, { top, height });
     const section = document.createElement('section');
     section.id = sectionId;
@@ -58,7 +59,8 @@ describe('CVSectionNavigator', () => {
         height: sectionRects.get(sectionId)?.height ?? 0,
         top: sectionRects.get(sectionId)?.top ?? 0,
         right: 320,
-        bottom: (sectionRects.get(sectionId)?.top ?? 0) + (sectionRects.get(sectionId)?.height ?? 0),
+        bottom:
+          (sectionRects.get(sectionId)?.top ?? 0) + (sectionRects.get(sectionId)?.height ?? 0),
         left: 0,
         toJSON: () => undefined,
       }),
@@ -97,7 +99,10 @@ describe('CVSectionNavigator', () => {
   it('renders the floating dial with back-to-top and section actions when scrolled past threshold', () => {
     render(
       <ThemeProvider>
-        <CVSectionNavigator sections={['experience', 'education', 'github']} testId="cv-section-navigator" />
+        <CVSectionNavigator
+          sections={['experience', 'education', 'github']}
+          testId="cv-section-navigator"
+        />
       </ThemeProvider>
     );
 
@@ -179,9 +184,7 @@ describe('CVSectionNavigator', () => {
       backToTopAction.click();
     });
 
-    expect(scrollToMock).toHaveBeenCalledWith(
-      expect.objectContaining({ top: 0 })
-    );
+    expect(scrollToMock).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }));
   });
 
   it('updates active section based on scroll position', () => {

@@ -7,13 +7,25 @@ type LoadingBarTone = 'primary' | 'secondary' | 'success';
 export const createAppStyleMap = (theme: Theme) => {
   const isLight = theme.palette.mode === 'light';
   const surface = theme.appearanceTreatment.surface;
-  const backgroundOverlayColor = alpha(theme.palette.common.black, surface.backgroundOverlayOpacity);
+  const backgroundOverlayColor = alpha(
+    theme.palette.common.black,
+    surface.backgroundOverlayOpacity
+  );
   const shellBackgroundColor = alpha(theme.palette.background.paper, surface.panelSurfaceAlpha);
   const shellBorder = `1px solid ${alpha(theme.palette.divider, surface.panelBorderAlpha)}`;
-  const homeHeroShellBackgroundColor = alpha(theme.palette.primary.contrastText, theme.palette.mode === 'light' ? 0.76 : 0.72);
-  const homeHeroShellBorder = `1px solid ${alpha(theme.palette.common.white, theme.palette.mode === 'light' ? 0.38 : 0.24)}`;
+  const homeHeroShellBackgroundColor = alpha(
+    theme.palette.primary.contrastText,
+    theme.palette.mode === 'light' ? 0.76 : 0.72
+  );
+  const homeHeroShellBorder = `1px solid ${alpha(
+    theme.palette.common.white,
+    theme.palette.mode === 'light' ? 0.38 : 0.24
+  )}`;
   const homeHeroShellBlurPx = Math.max(surface.cardBlurPx + 2, 12);
-  const homeHeroShellShadow = `0 18px 40px ${alpha(theme.palette.common.black, theme.palette.mode === 'light' ? 0.22 : 0.34)}`;
+  const homeHeroShellShadow = `0 18px 40px ${alpha(
+    theme.palette.common.black,
+    theme.palette.mode === 'light' ? 0.22 : 0.34
+  )}`;
   const photoPlaceholderColor = alpha(theme.palette.text.primary, isLight ? 0.08 : 0.18);
   const photoDownloadShadow = alpha(theme.palette.common.black, isLight ? 0.18 : 0.42);
   const floatingActionBackgroundColor = alpha(
@@ -57,10 +69,7 @@ export const createAppStyleMap = (theme: Theme) => {
     py: 6.25,
   });
 
-  const getHeaderHighlightSx = (
-    tone: HeaderHighlightTone,
-    animation: string
-  ): SxProps<Theme> => {
+  const getHeaderHighlightSx = (tone: HeaderHighlightTone, animation: string): SxProps<Theme> => {
     const palette = tone === 'primary' ? theme.palette.primary : theme.palette.secondary;
     const ringColor = alpha(palette.light, tone === 'secondary' ? 0.95 : 0.9);
     const glowColor = alpha(palette.main, 0.35);
@@ -191,7 +200,10 @@ export const createAppStyleMap = (theme: Theme) => {
       content: '""',
       position: 'absolute',
       inset: 0,
-      background: `linear-gradient(180deg, ${alpha(theme.palette.common.black, 0.58)} 0%, ${alpha(theme.palette.common.black, 0.18)} 34%, ${alpha(theme.palette.common.black, 0)} 64%)`,
+      background: `linear-gradient(180deg, ${alpha(theme.palette.common.black, 0.58)} 0%, ${alpha(
+        theme.palette.common.black,
+        0.18
+      )} 34%, ${alpha(theme.palette.common.black, 0)} 64%)`,
       opacity: 0,
       pointerEvents: 'none',
       transition: 'opacity 180ms ease',
@@ -419,7 +431,10 @@ export const createAppStyleMap = (theme: Theme) => {
     cvFloatingDialActiveFabSx: {
       '& .MuiSpeedDial-fab': {
         borderColor: alpha(theme.palette.primary.light, isLight ? 0.42 : 0.56),
-        boxShadow: `${floatingActionShadow}, 0 0 16px ${alpha(theme.palette.primary.main, isLight ? 0.18 : 0.28)}`,
+        boxShadow: `${floatingActionShadow}, 0 0 16px ${alpha(
+          theme.palette.primary.main,
+          isLight ? 0.18 : 0.28
+        )}`,
       },
     } satisfies SxProps<Theme>,
     primaryTextSx,

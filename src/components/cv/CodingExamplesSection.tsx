@@ -39,7 +39,10 @@ const CodingExampleDetailList = ({
   );
 };
 
-export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExamplesSectionProps) => {
+export const CodingExamplesSection = ({
+  examples,
+  startDelayMs = 0,
+}: CodingExamplesSectionProps) => {
   const { codingExampleLinkSx, contentListStackSpacing, detailBlockSx } = useComponentStyles();
 
   return (

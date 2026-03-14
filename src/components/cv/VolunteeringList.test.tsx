@@ -21,7 +21,9 @@ jest.mock('../AnimatedContentList', () => ({
         data-item-surface={props.itemSurface ?? ''}
         data-mount-items-on-view={String(Boolean(props.mountItemsOnView))}
       >
-        {props.items.map((item, index) => <div key={index}>{props.renderItem(item, index)}</div>)}
+        {props.items.map((item, index) => (
+          <div key={index}>{props.renderItem(item, index)}</div>
+        ))}
       </div>
     );
   },
@@ -41,10 +43,13 @@ describe('VolunteeringList', () => {
               organization: 'Access Fund',
               organizationUrl: 'https://www.accessfund.org',
               role: 'Conservation Team',
-              summary: 'Stewardship volunteer work supporting access, trail durability, and maintenance at major climbing areas.',
+              summary:
+                'Stewardship volunteer work supporting access, trail durability, and maintenance at major climbing areas.',
               dateRange: 'May 2019 – Present',
               location: 'Index, WA',
-              highlights: ['Supported trail construction and maintenance projects with the Access Fund conservation team.'],
+              highlights: [
+                'Supported trail construction and maintenance projects with the Access Fund conservation team.',
+              ],
             },
           ]}
         />
@@ -67,11 +72,19 @@ describe('VolunteeringList', () => {
       )
     ).toBeInTheDocument();
     expect(
-      screen.getByText('Supported trail construction and maintenance projects with the Access Fund conservation team.')
+      screen.getByText(
+        'Supported trail construction and maintenance projects with the Access Fund conservation team.'
+      )
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Access Fund' })).toHaveAttribute('href', 'https://www.accessfund.org');
+    expect(screen.getByRole('link', { name: 'Access Fund' })).toHaveAttribute(
+      'href',
+      'https://www.accessfund.org'
+    );
     expect(screen.getByTestId('volunteering-list')).toHaveAttribute('data-item-surface', 'panel');
-    expect(screen.getByTestId('volunteering-list')).toHaveAttribute('data-mount-items-on-view', 'true');
+    expect(screen.getByTestId('volunteering-list')).toHaveAttribute(
+      'data-mount-items-on-view',
+      'true'
+    );
   });
 
   it('renders tooltip-enabled organization links for Little Brothers and Access Fund', () => {

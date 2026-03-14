@@ -30,17 +30,14 @@ const aboutWithRichBio: AboutMe = {
 
 const theme = createAppTheme('light', 'evergreen');
 
-const renderTypewriter = (props?: Partial<ComponentProps<typeof CVAboutBioTypewriter>>) => render(
-  <MuiThemeProvider theme={theme}>
-    <p>
-      <CVAboutBioTypewriter
-        about={aboutWithRichBio}
-        typingBaseMs={1}
-        {...props}
-      />
-    </p>
-  </MuiThemeProvider>
-);
+const renderTypewriter = (props?: Partial<ComponentProps<typeof CVAboutBioTypewriter>>) =>
+  render(
+    <MuiThemeProvider theme={theme}>
+      <p>
+        <CVAboutBioTypewriter about={aboutWithRichBio} typingBaseMs={1} {...props} />
+      </p>
+    </MuiThemeProvider>
+  );
 
 const installIntersectionObserverMock = () => {
   const observe = jest.fn();
@@ -68,7 +65,10 @@ const installIntersectionObserverMock = () => {
 
 const triggerEnterView = () => {
   act(() => {
-    handleIntersection?.([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
+    handleIntersection?.(
+      [{ isIntersecting: true } as IntersectionObserverEntry],
+      {} as IntersectionObserver
+    );
   });
 };
 
@@ -164,10 +164,13 @@ describe('CVAboutBioTypewriter', () => {
 
     expect(getComputedStyle(statusText).color).toBe(expectedColor);
 
-    advanceUntil(() => (
-      (animatedLayer.textContent ?? '').includes('Open to opportunities in platform engineering.')
-      && !(animatedLayer.textContent ?? '').includes('|')
-    ), { maxMs: 3000 });
+    advanceUntil(
+      () =>
+        (animatedLayer.textContent ?? '').includes(
+          'Open to opportunities in platform engineering.'
+        ) && !(animatedLayer.textContent ?? '').includes('|'),
+      { maxMs: 3000 }
+    );
 
     expect(animatedLayer).toHaveTextContent('Mathematics cohort building systems.');
     expect(animatedLayer).toHaveTextContent('Open to opportunities in platform engineering.');

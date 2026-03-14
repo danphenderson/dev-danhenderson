@@ -36,17 +36,16 @@ type AppSpeedDialProps = {
   sx?: SxProps<Theme>;
 };
 
-const getLayerSx = (layer: AppSpeedDialLayer): SxProps<Theme> => (theme) => ({
-  zIndex: layer === 'header' ? theme.zIndex.appBar + 1 : theme.zIndex.appBar - 1,
-  '& .MuiSpeedDial-fab, & .MuiSpeedDial-actions': {
-    zIndex: 'inherit',
-  },
-});
+const getLayerSx =
+  (layer: AppSpeedDialLayer): SxProps<Theme> =>
+  (theme) => ({
+    zIndex: layer === 'header' ? theme.zIndex.appBar + 1 : theme.zIndex.appBar - 1,
+    '& .MuiSpeedDial-fab, & .MuiSpeedDial-actions': {
+      zIndex: 'inherit',
+    },
+  });
 
-const mergeLayerSx = (
-  layer: AppSpeedDialLayer,
-  sx?: SxProps<Theme>
-): SxProps<Theme> => {
+const mergeLayerSx = (layer: AppSpeedDialLayer, sx?: SxProps<Theme>): SxProps<Theme> => {
   const layerSx = getLayerSx(layer);
 
   if (!sx) {

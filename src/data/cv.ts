@@ -31,7 +31,9 @@ export type {
 const assetPath = (path: string) => resolvePublicAssetPath(path);
 
 export const avatar = assetPath('/assets/home.jpg');
-export const cvBackgroundImage = assetPath('/assets/photography/landscape/landscape-tieton-south-fork-3.jpg');
+export const cvBackgroundImage = assetPath(
+  '/assets/photography/landscape/landscape-tieton-south-fork-3.jpg'
+);
 export const resumePdfUrl = assetPath('/assets/daniel-henderson-resume.pdf');
 export const resumeDownloadFilename = 'Daniel-Henderson-Resume.pdf';
 
@@ -57,8 +59,7 @@ export const aboutMe: AboutMe = {
     url: mtuMathGraduateBioUrl,
     tooltip: 'View the Michigan Tech graduate mathematics student page.',
   },
-  bio:
-`M.S. Mathematics student in the applied/computational track (expected Aug 2026) researching macrocirculatory hemodynamics.
+  bio: `M.S. Mathematics student in the applied/computational track (expected Aug 2026) researching macrocirculatory hemodynamics.
 
 Former data scientist and data pipeline engineer who built ingestion, analytics, and machine-learning solutions for a healthcare data platform.
 
@@ -70,7 +71,8 @@ Open to opportunities at the intersection of systems and production software (sc
 export const codingExamples: CodingExample[] = [
   {
     title: 'typewriter CLI',
-    description: 'Typewriter is a pip-installable CLI built on Typer and LibCST to normalize None-related type annotations while preserving formatting and comments.',
+    description:
+      'Typewriter is a pip-installable CLI built on Typer and LibCST to normalize None-related type annotations while preserving formatting and comments.',
     links: ['https://github.com/danphenderson/python-typewriter'],
     tabs: [
       {
@@ -103,7 +105,8 @@ export const codingExamples: CodingExample[] = [
   },
   {
     title: 'chromex Python Library',
-    description: "An asynchronous interface for headless browser automation's that is built on bs4 and selenium.",
+    description:
+      "An asynchronous interface for headless browser automation's that is built on bs4 and selenium.",
     links: ['https://github.com/danphenderson/python-chromex'],
     tabs: [
       {
@@ -136,7 +139,8 @@ export const codingExamples: CodingExample[] = [
   },
   {
     title: 'Portfolio using React, TypeScript, and AWS',
-    description: 'An interactive CV, climbing log, and photography galleries built with React + TypeScript + MUI and deployed on AWS using S3, CloudFront, and Route53.',
+    description:
+      'An interactive CV, climbing log, and photography galleries built with React + TypeScript + MUI and deployed on AWS using S3, CloudFront, and Route53.',
     links: ['https://github.com/danphenderson/dev-danhenderson'],
     tabs: [
       {
@@ -169,7 +173,8 @@ export const codingExamples: CodingExample[] = [
   },
   {
     title: 'BlockOpt.jl Julia Package',
-    description: 'An optim-style Julia package built with ForwardDiff.jl and TRS.jl that presents a novel scheme for an unconstrained Quasi-Newton minimization of a smooth objective function.',
+    description:
+      'An optim-style Julia package built with ForwardDiff.jl and TRS.jl that presents a novel scheme for an unconstrained Quasi-Newton minimization of a smooth objective function.',
     links: ['https://github.com/danphenderson/BlockOpt.jl'],
     tabs: [
       {
@@ -196,13 +201,20 @@ export const codingExamples: CodingExample[] = [
         value: 'stack',
         label: 'Stack',
         kind: 'skills',
-        skills: ['Julia', 'ForwardDiff.jl', 'TRS.jl', 'Numerical optimization', 'Scientific computing'],
+        skills: [
+          'Julia',
+          'ForwardDiff.jl',
+          'TRS.jl',
+          'Numerical optimization',
+          'Scientific computing',
+        ],
       },
     ],
   },
   {
     title: 'UncNLPrograms.jl Julia Package',
-    description: 'A subset of high-dimensional, nonlinear, and unconstrained optimization problems from CUTEst in native Julia to test solvers using Automatic/Algorithmic Differentiation.',
+    description:
+      'A subset of high-dimensional, nonlinear, and unconstrained optimization problems from CUTEst in native Julia to test solvers using Automatic/Algorithmic Differentiation.',
     links: ['https://github.com/danphenderson/UncNLPrograms.jl'],
     tabs: [
       {
@@ -229,13 +241,20 @@ export const codingExamples: CodingExample[] = [
         value: 'stack',
         label: 'Stack',
         kind: 'skills',
-        skills: ['Julia', 'CUTEst-style benchmarks', 'Automatic differentiation', 'Nonlinear optimization', 'Scientific computing'],
+        skills: [
+          'Julia',
+          'CUTEst-style benchmarks',
+          'Automatic differentiation',
+          'Nonlinear optimization',
+          'Scientific computing',
+        ],
       },
     ],
   },
   {
     title: 'MasterPlan Java Application',
-    description: 'A Java application that allows users to create and manage a structure (directed acyclic graph) of tasks and corresponding subtasks.',
+    description:
+      'A Java application that allows users to create and manage a structure (directed acyclic graph) of tasks and corresponding subtasks.',
     links: ['https://github.com/danphenderson/masterplan-app'],
     tabs: [
       {
@@ -292,28 +311,39 @@ export const experiences: Experience[] = [
     title: 'Graduate Research Assistant',
     startDate: 'May 2025',
     endDate: 'Current',
-    description:
-      [
-        {
-          text:
-            'Researching blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.',
-        },
-        {
-          text: ' Advisor: ',
-          lineBreakBefore: false,
-        },
-        {
-          text: 'Jiguang Sun',
-          link: 'https://pages.mtu.edu/~jiguangs/Homepage_of_Jiguang_Sun/Welcome.html',
-          tooltip: 'View faculty page',
-        },
-      ],
+    description: [
+      {
+        text: 'Researching blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.',
+      },
+      {
+        text: ' Advisor: ',
+        lineBreakBefore: false,
+      },
+      {
+        text: 'Jiguang Sun',
+        link: 'https://pages.mtu.edu/~jiguangs/Homepage_of_Jiguang_Sun/Welcome.html',
+        tooltip: 'View faculty page',
+      },
+    ],
     projects: [
       'Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).',
       'Derived and analyzed Navier–Stokes formulations for blood (including Newtonian and generalized-Newtonian viscosity models), documenting the kinematic roles of Reynolds/Womersley numbers and related nondimensional parameters.',
       'Scoped numerical pathways from dimension-reduced 1D/2D flow simulations incorporating fluid-structure interaction models toward PINNs/DeepONets.',
     ],
-    skills: ['Research', 'Computational Fluid Dynamics', 'Julia', 'Python', 'PyTorch', 'DeepXDE', 'SciML', 'SciPy', 'LaTeX', 'Overleaf + GitHub', 'Visual Studio Code', 'Shells, REPLs, and Notebooks'],
+    skills: [
+      'Research',
+      'Computational Fluid Dynamics',
+      'Julia',
+      'Python',
+      'PyTorch',
+      'DeepXDE',
+      'SciML',
+      'SciPy',
+      'LaTeX',
+      'Overleaf + GitHub',
+      'Visual Studio Code',
+      'Shells, REPLs, and Notebooks',
+    ],
   },
   {
     company: 'Michigan Technological University',
@@ -323,7 +353,8 @@ export const experiences: Experience[] = [
     title: 'Instructor',
     startDate: 'Jan 2025',
     endDate: 'May 2025 (5 mos)',
-    description: 'Department of Mathematical Sciences Graduate Teaching Assistantship instructor of Calculus I with Technology',
+    description:
+      'Department of Mathematical Sciences Graduate Teaching Assistantship instructor of Calculus I with Technology',
     projects: [
       'Taught a 4-credit undergraduate mathematics section, delivering recorded lectures, proctoring exams, holding office hours, and managing grading and day-to-day course operations.',
       'Delivered lecture material consistently and on schedule, maintaining alignment with the course coordinator’s instructional plan.',
@@ -331,7 +362,15 @@ export const experiences: Experience[] = [
       'Developed Mathematica notebook walkthroughs that reinforced conceptual understanding and computational fluency.',
       'Earned a 4.8/5.0 average student evaluation score with a 58% response rate, above the university average.',
     ],
-    skills: ['University Teaching', 'Canvas', 'Gradescope', 'Panapto', 'Zoom', 'Mathematica', 'HTML'],
+    skills: [
+      'University Teaching',
+      'Canvas',
+      'Gradescope',
+      'Panapto',
+      'Zoom',
+      'Mathematica',
+      'HTML',
+    ],
   },
   {
     company: 'Michigan Technological University',
@@ -361,17 +400,31 @@ export const experiences: Experience[] = [
       'Contributor to entity-linking, recoding, and ingestion pipelines feeding a healthcare analytics lakehouse, implemented improvements that increased throughput and slashed cloud compute costs.',
     projects: [
       "Supported architectural design, releases, and deployments of data-engineering assets, including data governance, security, and integrity of the platform's data lakehouse.",
-      "Repartitioned 50TB datalake, yielding improved query performance to accelerate nightly DBT builds and support analytics and reporting.",
-      "Reduced AWS ETL cost by 50% from upgrading ETL jobs to Glue 3.0 and moving batch workloads to EMR on transient EC2 fleets, supported by an internal platform library for provisioning, networking, security, monitoring, and scaling EMR clusters.",
-      "Built a reconciliation service across PostgreSQL, AWS Glue Data Catalog, Redshift, and S3 to identify and resolve data inconsistencies, reducing tenant-state investigations from hours to minutes.",
-      "Centralized infrastructure delivery by building an internal CDK library through a major refactor that removed technical debt and git submodules, while introducing semantic versioning practices, enabling more reliable and efficient deployments.",
-      "Migrated data team’s software assets from Bitbucket to GitHub Enterprise, standardizing CI/CD into GitHub Actions and hooks.",
-      "Processed AWS CloudTrail logs into Parquet and built a dashboard to support security analytics and HITRUST compliance.",
-      "Supported hiring and onboarding during an organizational transition, including new engineering and data leadership and interns, and helped ensure continuity through a reorganization that included my departure.",
+      'Repartitioned 50TB datalake, yielding improved query performance to accelerate nightly DBT builds and support analytics and reporting.',
+      'Reduced AWS ETL cost by 50% from upgrading ETL jobs to Glue 3.0 and moving batch workloads to EMR on transient EC2 fleets, supported by an internal platform library for provisioning, networking, security, monitoring, and scaling EMR clusters.',
+      'Built a reconciliation service across PostgreSQL, AWS Glue Data Catalog, Redshift, and S3 to identify and resolve data inconsistencies, reducing tenant-state investigations from hours to minutes.',
+      'Centralized infrastructure delivery by building an internal CDK library through a major refactor that removed technical debt and git submodules, while introducing semantic versioning practices, enabling more reliable and efficient deployments.',
+      'Migrated data team’s software assets from Bitbucket to GitHub Enterprise, standardizing CI/CD into GitHub Actions and hooks.',
+      'Processed AWS CloudTrail logs into Parquet and built a dashboard to support security analytics and HITRUST compliance.',
+      'Supported hiring and onboarding during an organizational transition, including new engineering and data leadership and interns, and helped ensure continuity through a reorganization that included my departure.',
     ],
     skills: [
-      'AWS: EC2, S3, SNS, SQS, Cloudformation, Cloudtrail, Cloudwatch, Lambda, Glue (& Glue Data Catalog), EMR, Redshift, RDS, Athena, Quicksight', 'Python', 'PySpark', 'Jupyter', 'DBT (Data Build Tool)', 'GitHub Enterprise', 'Docker',
-      'Sentry', 'Slack', 'SonarCloud', 'Django', 'OpenAPI/Swagger', 'Jupyter', 'DBeaver', 'Postman', 'Visual Studio Code',
+      'AWS: EC2, S3, SNS, SQS, Cloudformation, Cloudtrail, Cloudwatch, Lambda, Glue (& Glue Data Catalog), EMR, Redshift, RDS, Athena, Quicksight',
+      'Python',
+      'PySpark',
+      'Jupyter',
+      'DBT (Data Build Tool)',
+      'GitHub Enterprise',
+      'Docker',
+      'Sentry',
+      'Slack',
+      'SonarCloud',
+      'Django',
+      'OpenAPI/Swagger',
+      'Jupyter',
+      'DBeaver',
+      'Postman',
+      'Visual Studio Code',
     ],
   },
   {
@@ -390,9 +443,25 @@ export const experiences: Experience[] = [
       'Built an internal ML library that standardized training, deployment, logging, and cloud configuration, enabling portable ML workflows.',
       'Contributed to a deduplication model with a human-in-the-loop training loop driven by platform user feedback.',
       'Supported restricted offshore data engineers with deployments, code review, ETL troubleshooting, and unit tests to accelerate delivery.',
-      'Migrated patient electronic medical record data from a client system into the platform, supporting schema mapping, ingestion, and validation.'
+      'Migrated patient electronic medical record data from a client system into the platform, supporting schema mapping, ingestion, and validation.',
     ],
-    skills: ['AWS', 'Python', 'Jupyter', 'DBT (Data Build Tool)', 'Bitbucket', 'SciPy', 'PySpark', 'Visual Studio Code', 'DBeaver', 'Slack', 'Sentry', 'Slack', 'Jira', 'Confluence', 'Lucidchart'],
+    skills: [
+      'AWS',
+      'Python',
+      'Jupyter',
+      'DBT (Data Build Tool)',
+      'Bitbucket',
+      'SciPy',
+      'PySpark',
+      'Visual Studio Code',
+      'DBeaver',
+      'Slack',
+      'Sentry',
+      'Slack',
+      'Jira',
+      'Confluence',
+      'Lucidchart',
+    ],
   },
   {
     company: 'Michigan Technological University',
@@ -402,24 +471,41 @@ export const experiences: Experience[] = [
     title: 'Research Assistant | Full Time',
     startDate: 'May 2021',
     endDate: 'Nov 2021 (7 mos)',
-    description: 'Contributor to quasi-Newton optimization research (Azzam, Henderson, Ong, Struthers; 2022), led numerical experiments.',
+    description:
+      'Contributor to quasi-Newton optimization research (Azzam, Henderson, Ong, Struthers; 2022), led numerical experiments.',
     projects: [
       [
         { text: '2022, Azzam J, Henderson D, Ong BW, and Struthers AA, ' },
-        { text: 'Quasi-Newton Optimization with Hessian Samples', link: 'https://lnkd.in/gfP39wZX' },
+        {
+          text: 'Quasi-Newton Optimization with Hessian Samples',
+          link: 'https://lnkd.in/gfP39wZX',
+        },
       ],
       [
         { text: 'Built ' },
         { text: 'BlockOpt.jl', link: 'https://github.com/danphenderson/BlockOpt.jl' },
-        { text: ', an open-source Julia implementation of the paper’s trust-region quasi-Newton methods.' },
+        {
+          text: ', an open-source Julia implementation of the paper’s trust-region quasi-Newton methods.',
+        },
       ],
       [
         { text: 'Built ' },
         { text: 'UncNLPrograms.jl', link: 'https://github.com/danphenderson/UncNLPrograms.jl' },
-        { text: ' to create an automatic-differentiation optimization benchmark suite to test paper’s methods.' },
+        {
+          text: ' to create an automatic-differentiation optimization benchmark suite to test paper’s methods.',
+        },
       ],
     ],
-    skills: ['Research', 'Julia', 'ForwardDiff.jl', 'CUTEst', 'LaTeX', 'TRS.jl', 'Mathematica', 'Overleaf'],
+    skills: [
+      'Research',
+      'Julia',
+      'ForwardDiff.jl',
+      'CUTEst',
+      'LaTeX',
+      'TRS.jl',
+      'Mathematica',
+      'Overleaf',
+    ],
   },
   {
     company: 'Michigan Technological University',
@@ -429,9 +515,10 @@ export const experiences: Experience[] = [
     title: 'Mathematics Tutor | Part Time',
     startDate: 'September 2015',
     endDate: 'May 2018 (2 yrs 9 mos)',
-    description: 'Tutor to NCAA student-athletes in calculus (I, II, & III), ordinary differential equations, and linear algebra.',
+    description:
+      'Tutor to NCAA student-athletes in calculus (I, II, & III), ordinary differential equations, and linear algebra.',
     projects: [],
-    skills: ['Teaching', 'Mathematica']
+    skills: ['Teaching', 'Mathematica'],
   },
   {
     company: 'Various Locations',
@@ -439,12 +526,14 @@ export const experiences: Experience[] = [
     title: 'Bike Mechanic & Service Technician',
     startDate: 'Various Periods Starting 2012',
     endDate: 'Aug 2024',
-    description: 'Worked full-time and part-time at bike and ski shops in Arizona, Michigan, Utah, & Washington.',
-    projects: ['Diagnosed and serviced mechanical issues across customer and rental bicycles with consistent turnaround and quality.',
+    description:
+      'Worked full-time and part-time at bike and ski shops in Arizona, Michigan, Utah, & Washington.',
+    projects: [
+      'Diagnosed and serviced mechanical issues across customer and rental bicycles with consistent turnaround and quality.',
       'Managed end-to-end service and sale workflows in retail and rental environments, including intake, triage, repair prioritization, point-of-sale transactions, rental check-in/check-out, and insurance claim support.',
-      'Applied structured troubleshooting and clear customer communication to recommend repairs, explain technical issues, and improve rider safety, equipment reliability, and overall service experience.'
+      'Applied structured troubleshooting and clear customer communication to recommend repairs, explain technical issues, and improve rider safety, equipment reliability, and overall service experience.',
     ],
-    skills: ['Lightspeed', 'Customer Service']
+    skills: ['Lightspeed', 'Customer Service'],
   },
 ];
 
@@ -461,7 +550,7 @@ export const educationInfo: EducationInfo = {
       highlights: [
         'Pedagogical training in curriculum design, assessment, and evidence-based instruction.',
         'Submissions to Numerical Analysis: A Graduate Course errata, improving correctness and clarity in the text.',
-        "Coursework: Linear Algebra, Numerical Optimization, Error-Correcting Codes, Theoretical Numerical Analysis, Ordinary Differential Equations, Partial Differential Equations, Numerical Methods for PDEs, Discontinuous Galerkin Methods, Teaching College Mathematics"
+        'Coursework: Linear Algebra, Numerical Optimization, Error-Correcting Codes, Theoretical Numerical Analysis, Ordinary Differential Equations, Partial Differential Equations, Numerical Methods for PDEs, Discontinuous Galerkin Methods, Teaching College Mathematics',
       ],
       skills: ['LaTeX', 'Julia', 'Python', 'Mathematica', 'Overleaf', 'Visual Studio Code'],
     },
@@ -484,7 +573,7 @@ export const educationInfo: EducationInfo = {
         'Junior Partner, Applied Portfolio Management Program ($1.8M AUM)',
         "Recipient of Dean's List award for six semesters (Spring 2015, Summer 2015, Fall 2019, Spring 2020, Fall 2020, & Spring 2021)",
         'Certificate of Merit for Outstanding Academic Achievement in Calculus II with Technology, Mathematical Sciences Department',
-        "Relevant Coursework: Scientific Computing, Programming at Software & Hardware interface, Data Structures, Formal Models of Computation, Artificial Intelligence, Concurrent Computing, Optimization & Graph Algorithms, Team Software Project, Real Analysis (I & II), Abstract Algebra, Complex Analysis, Linear Algebra, Numerical Linear Algebra, Ordinary Differential Equations, Partial Differential Equations (PDEs), Numerical Methods for PDEs, Nonlinear Dynamics and Chaos, Combinatorics, Probability, Statistics (I & II), Regression Analysis, History of Mathematics"
+        'Relevant Coursework: Scientific Computing, Programming at Software & Hardware interface, Data Structures, Formal Models of Computation, Artificial Intelligence, Concurrent Computing, Optimization & Graph Algorithms, Team Software Project, Real Analysis (I & II), Abstract Algebra, Complex Analysis, Linear Algebra, Numerical Linear Algebra, Ordinary Differential Equations, Partial Differential Equations (PDEs), Numerical Methods for PDEs, Nonlinear Dynamics and Chaos, Combinatorics, Probability, Statistics (I & II), Regression Analysis, History of Mathematics',
       ],
       skills: ['Java', 'C', 'C++', 'Python', 'Matlab', 'Mathematica', 'SQL', 'Assembly (MIPS)'],
     },
@@ -613,16 +702,28 @@ export const stackAndTools: StackSection[] = [
 ];
 
 export const fallbackGitHubActivity: GitHubActivityItem[] = [
-  { label: 'Maintaining BlockOpt.jl (trust-region quasi-Newton optimizer in Julia).', href: 'https://github.com/danphenderson/BlockOpt.jl' },
-  { label: 'Experimenting with data/ML pipelines on AWS Glue, EMR, and CDK.', href: 'https://github.com/danphenderson' },
-  { label: 'Shipping personal portfolio + CV site (React, TypeScript, AWS).', href: 'https://github.com/danphenderson/dev-danhenderson' },
+  {
+    label: 'Maintaining BlockOpt.jl (trust-region quasi-Newton optimizer in Julia).',
+    href: 'https://github.com/danphenderson/BlockOpt.jl',
+  },
+  {
+    label: 'Experimenting with data/ML pipelines on AWS Glue, EMR, and CDK.',
+    href: 'https://github.com/danphenderson',
+  },
+  {
+    label: 'Shipping personal portfolio + CV site (React, TypeScript, AWS).',
+    href: 'https://github.com/danphenderson/dev-danhenderson',
+  },
 ];
 
 export const fallbackGitHubContributions: GitHubContribution[] = [
   { name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright' },
   { name: 'JuliaLang/julia', url: 'https://github.com/JuliaLang/julia' },
   { name: 'dbt-labs/dbt-core', url: 'https://github.com/dbt-labs/dbt-core' },
-  { name: 'SciML/DifferentialEquations.jl', url: 'https://github.com/SciML/DifferentialEquations.jl' },
+  {
+    name: 'SciML/DifferentialEquations.jl',
+    url: 'https://github.com/SciML/DifferentialEquations.jl',
+  },
 ];
 
 export const MAX_VISIBLE_CONTRIBUTIONS = 20;

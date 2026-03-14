@@ -1,4 +1,12 @@
-import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 type SoundCloudWidget = {
   play: () => void;
@@ -67,7 +75,12 @@ const createAbortError = () => {
   return error;
 };
 
-const withTimeout = <T,>(promise: Promise<T>, message: string, timeoutMs: number, signal?: AbortSignal): Promise<T> =>
+const withTimeout = <T,>(
+  promise: Promise<T>,
+  message: string,
+  timeoutMs: number,
+  signal?: AbortSignal
+): Promise<T> =>
   new Promise<T>((resolve, reject) => {
     const timerId = window.setTimeout(() => {
       cleanup();
@@ -153,7 +166,9 @@ const loadWidgetScript = (signal: AbortSignal): Promise<void> => {
       reject(createAbortError());
     };
 
-    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${WIDGET_SCRIPT_SRC}"]`);
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      `script[src="${WIDGET_SCRIPT_SRC}"]`
+    );
     if (existingScript) {
       if (window.SC?.Widget) {
         resolve();
@@ -221,7 +236,12 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
       signal.addEventListener('abort', handleAbort, { once: true });
     });
 
-    return withTimeout(iframeMountPromise, 'Audio iframe did not mount in time.', WIDGET_BOOT_TIMEOUT_MS, signal);
+    return withTimeout(
+      iframeMountPromise,
+      'Audio iframe did not mount in time.',
+      WIDGET_BOOT_TIMEOUT_MS,
+      signal
+    );
   }, []);
 
   useEffect(() => {
@@ -370,19 +390,21 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
       });
 
       return widget;
-    })().catch((err) => {
-      setupPromiseRef.current = null;
-      widgetRef.current = null;
-      setupAbortControllerRef.current = null;
+    })()
+      .catch((err) => {
+        setupPromiseRef.current = null;
+        widgetRef.current = null;
+        setupAbortControllerRef.current = null;
 
-      if (!unmountedRef.current) {
-        setReady(false);
-      }
+        if (!unmountedRef.current) {
+          setReady(false);
+        }
 
-      throw err;
-    }).finally(() => {
-      setupAbortControllerRef.current = null;
-    });
+        throw err;
+      })
+      .finally(() => {
+        setupAbortControllerRef.current = null;
+      });
 
     return setupPromiseRef.current;
   }, [ready, waitForIframe]);

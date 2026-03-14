@@ -36,13 +36,14 @@ export const GitHubLinkChipList = ({
   const { chipWaveSx, getChipWaveDelaySx, getGitHubChipSx, getWrapListSx } = useComponentStyles();
   const customChipSx = normalizeSxProp(chipSx);
   const baseChipSx: SxProps<Theme> = getGitHubChipSx(layout);
-  const animatedContainerSx: SxProps<Theme> = layout === 'wrap'
-    ? getWrapListSx(wrapGap)
-    : {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: stackSpacing,
-    };
+  const animatedContainerSx: SxProps<Theme> =
+    layout === 'wrap'
+      ? getWrapListSx(wrapGap)
+      : {
+          display: 'flex',
+          flexDirection: 'column',
+          gap: stackSpacing,
+        };
 
   const renderChip = (item: GitHubLinkChipItem, index: number) => {
     const isLink = Boolean(item.href);
@@ -65,27 +66,7 @@ export const GitHubLinkChipList = ({
   };
 
   if (layout === 'wrap') {
-    return (
-      animateItems ? (
-        <AnimatedZoomList
-          items={items}
-          getItemKey={(item) => item.key}
-          in
-          startDelayMs={startDelayMs}
-          containerSx={animatedContainerSx}
-          itemStaggerMs={itemStaggerMs}
-          renderItem={renderChip}
-        />
-      ) : (
-        <Box sx={getWrapListSx(wrapGap)}>
-          {items.map(renderChip)}
-        </Box>
-      )
-    );
-  }
-
-  return (
-    animateItems ? (
+    return animateItems ? (
       <AnimatedZoomList
         items={items}
         getItemKey={(item) => item.key}
@@ -96,9 +77,21 @@ export const GitHubLinkChipList = ({
         renderItem={renderChip}
       />
     ) : (
-      <Stack spacing={stackSpacing}>
-        {items.map(renderChip)}
-      </Stack>
-    )
+      <Box sx={getWrapListSx(wrapGap)}>{items.map(renderChip)}</Box>
+    );
+  }
+
+  return animateItems ? (
+    <AnimatedZoomList
+      items={items}
+      getItemKey={(item) => item.key}
+      in
+      startDelayMs={startDelayMs}
+      containerSx={animatedContainerSx}
+      itemStaggerMs={itemStaggerMs}
+      renderItem={renderChip}
+    />
+  ) : (
+    <Stack spacing={stackSpacing}>{items.map(renderChip)}</Stack>
   );
 };

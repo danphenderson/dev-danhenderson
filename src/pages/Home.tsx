@@ -1,4 +1,12 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Stack,
+  Typography,
+} from '@mui/material';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
@@ -26,10 +34,7 @@ export default function Home() {
         <Stack spacing={2} alignItems="center">
           <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
             {isHeroAnimationReady ? (
-              <TypewriterText
-                text={homeHeroHeadline}
-                timingPreset="headline"
-              />
+              <TypewriterText text={homeHeroHeadline} timingPreset="headline" />
             ) : null}
           </DisplayTitle>
         </Stack>
@@ -39,7 +44,8 @@ export default function Home() {
         <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
         <DialogContent>
           <Typography variant="body1">
-            Would you like to hear a short verse while browsing the site? Use the pause button in the header to stop it anytime.
+            Would you like to hear a short verse while browsing the site? Use the pause button in
+            the header to stop it anytime.
           </Typography>
           {error && (
             <Typography variant="caption" color="error">
@@ -51,7 +57,12 @@ export default function Home() {
           <Button onClick={handleOptOut} autoFocus>
             No thanks
           </Button>
-          <Button onClick={handlePlay} variant="contained" disabled={isLoading} aria-label="Play welcome audio">
+          <Button
+            onClick={handlePlay}
+            variant="contained"
+            disabled={isLoading}
+            aria-label="Play welcome audio"
+          >
             {isLoading ? 'Loading…' : 'Play audio'}
           </Button>
         </DialogActions>

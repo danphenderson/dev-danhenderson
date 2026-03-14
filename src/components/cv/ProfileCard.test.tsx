@@ -75,7 +75,9 @@ describe('ProfileCard', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText('A developer with experience in React and TypeScript.')).toBeInTheDocument();
+    expect(
+      screen.getByText('A developer with experience in React and TypeScript.')
+    ).toBeInTheDocument();
   });
 
   it('embeds a link within bio text when bioLink is provided', () => {

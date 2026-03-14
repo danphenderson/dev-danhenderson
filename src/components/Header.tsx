@@ -133,26 +133,13 @@ const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
 };
 
 export default function Header() {
-  const {
-    mode,
-    appearance,
-    setAppearance,
-    toggleTheme,
-  } = useAppTheme();
+  const { mode, appearance, setAppearance, toggleTheme } = useAppTheme();
   const appStyles = useAppStyles();
   const muiTheme = useMuiTheme();
   const location = useLocation();
-  const {
-    isPlaying,
-    pause,
-    play,
-  } = useWelcomeAudio();
-  const {
-    showPauseHint,
-    dismissPauseHint,
-    showDarkModeHint,
-    dismissDarkModeHint,
-  } = useWelcomeOnboarding();
+  const { isPlaying, pause, play } = useWelcomeAudio();
+  const { showPauseHint, dismissPauseHint, showDarkModeHint, dismissDarkModeHint } =
+    useWelcomeOnboarding();
   const path = location.pathname.toLowerCase();
   const pageDialMode = getHeaderPageDialMode(path);
   const showPageDial = Boolean(pageDialMode);

@@ -7,7 +7,5 @@ type CVSectionStackProps = {
 };
 
 export const CVSectionStack = ({ children, spacing = 2.5 }: CVSectionStackProps) => (
-  <Stack spacing={spacing}>
-    {children}
-  </Stack>
+  <Stack spacing={spacing}>{children}</Stack>
 );

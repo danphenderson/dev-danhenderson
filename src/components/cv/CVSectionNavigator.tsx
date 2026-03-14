@@ -38,10 +38,7 @@ type CVSectionNavigatorProps = {
 const IDLE_TIMEOUT_MS = 2500;
 const IDLE_OPACITY = 0.32;
 
-export const CVSectionNavigator = ({
-  sections,
-  testId,
-}: CVSectionNavigatorProps) => {
+export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps) => {
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const appStyles = useAppStyles();
@@ -73,44 +70,49 @@ export const CVSectionNavigator = ({
     }
 
     const updateActiveSection = () => {
-      const nextActiveSection = sections.reduce<{
-        key: CVSectionKey;
-        priority: number;
-        distance: number;
-        order: number;
-      } | null>((bestMatch, sectionKey, order) => {
-        const sectionElement = document.getElementById(cvSectionMetadata[sectionKey].id);
+      const nextActiveSection =
+        sections.reduce<{
+          key: CVSectionKey;
+          priority: number;
+          distance: number;
+          order: number;
+        } | null>((bestMatch, sectionKey, order) => {
+          const sectionElement = document.getElementById(cvSectionMetadata[sectionKey].id);
 
-        if (!(sectionElement instanceof HTMLElement)) {
+          if (!(sectionElement instanceof HTMLElement)) {
+            return bestMatch;
+          }
+
+          const rect = sectionElement.getBoundingClientRect();
+          const coversActiveLine = rect.top <= activeLinePx && rect.bottom > activeLinePx;
+          const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+          const priority = coversActiveLine ? 2 : isVisible ? 1 : 0;
+          const distance = coversActiveLine
+            ? activeLinePx - rect.top
+            : Math.abs(rect.top - activeLinePx);
+
+          if (
+            !bestMatch ||
+            priority > bestMatch.priority ||
+            (priority === bestMatch.priority && distance < bestMatch.distance) ||
+            (priority === bestMatch.priority &&
+              distance === bestMatch.distance &&
+              order < bestMatch.order)
+          ) {
+            return {
+              key: sectionKey,
+              priority,
+              distance,
+              order,
+            };
+          }
+
           return bestMatch;
-        }
+        }, null)?.key ?? sections[0];
 
-        const rect = sectionElement.getBoundingClientRect();
-        const coversActiveLine = rect.top <= activeLinePx && rect.bottom > activeLinePx;
-        const isVisible = rect.bottom > 0 && rect.top < window.innerHeight;
-        const priority = coversActiveLine ? 2 : isVisible ? 1 : 0;
-        const distance = coversActiveLine
-          ? activeLinePx - rect.top
-          : Math.abs(rect.top - activeLinePx);
-
-        if (
-          !bestMatch ||
-          priority > bestMatch.priority ||
-          (priority === bestMatch.priority && distance < bestMatch.distance) ||
-          (priority === bestMatch.priority && distance === bestMatch.distance && order < bestMatch.order)
-        ) {
-          return {
-            key: sectionKey,
-            priority,
-            distance,
-            order,
-          };
-        }
-
-        return bestMatch;
-      }, null)?.key ?? sections[0];
-
-      setActiveSection((currentSection) => (currentSection === nextActiveSection ? currentSection : nextActiveSection));
+      setActiveSection((currentSection) =>
+        currentSection === nextActiveSection ? currentSection : nextActiveSection
+      );
     };
 
     const handleScroll = () => {
@@ -164,9 +166,7 @@ export const CVSectionNavigator = ({
   ];
 
   const dimmed = idle && !hovered;
-  const activeSectionSx = activeSection
-    ? appStyles.cvFloatingDialActiveFabSx
-    : undefined;
+  const activeSectionSx = activeSection ? appStyles.cvFloatingDialActiveFabSx : undefined;
 
   return (
     <Zoom
@@ -178,9 +178,15 @@ export const CVSectionNavigator = ({
         component="nav"
         aria-label="CV section navigation"
         data-testid={testId}
-        onMouseEnter={() => { setHovered(true); setIdle(false); }}
+        onMouseEnter={() => {
+          setHovered(true);
+          setIdle(false);
+        }}
         onMouseLeave={() => setHovered(false)}
-        onFocus={() => { setHovered(true); setIdle(false); }}
+        onFocus={() => {
+          setHovered(true);
+          setIdle(false);
+        }}
         onBlur={() => setHovered(false)}
         sx={{
           opacity: dimmed ? IDLE_OPACITY : 1,
@@ -195,10 +201,7 @@ export const CVSectionNavigator = ({
           layer="content"
           direction="up"
           actionTooltipPlacement="left"
-          sx={[
-            appStyles.cvFloatingDialSx,
-            ...(activeSectionSx ? [activeSectionSx] : []),
-          ]}
+          sx={[appStyles.cvFloatingDialSx, ...(activeSectionSx ? [activeSectionSx] : [])]}
         />
       </Box>
     </Zoom>

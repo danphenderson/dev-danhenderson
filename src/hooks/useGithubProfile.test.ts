@@ -3,7 +3,10 @@ import { useGithubProfile } from './useGithubProfile';
 import { resetGitHubProfileDataCacheForTests } from './githubProfileData';
 
 const fallbackActivity = [
-  { label: 'Maintaining BlockOpt.jl (trust-region quasi-Newton optimizer in Julia).', href: 'https://github.com/danphenderson/BlockOpt.jl' },
+  {
+    label: 'Maintaining BlockOpt.jl (trust-region quasi-Newton optimizer in Julia).',
+    href: 'https://github.com/danphenderson/BlockOpt.jl',
+  },
 ];
 const fallbackContributions = [
   { name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright' },
@@ -12,7 +15,10 @@ const fallbackContributions = [
 jest.mock('../data/cv', () => ({
   githubUsername: 'testuser',
   fallbackGitHubActivity: [
-    { label: 'Maintaining BlockOpt.jl (trust-region quasi-Newton optimizer in Julia).', href: 'https://github.com/danphenderson/BlockOpt.jl' },
+    {
+      label: 'Maintaining BlockOpt.jl (trust-region quasi-Newton optimizer in Julia).',
+      href: 'https://github.com/danphenderson/BlockOpt.jl',
+    },
   ],
   fallbackGitHubContributions: [
     { name: 'microsoft/playwright', url: 'https://github.com/microsoft/playwright' },
@@ -50,7 +56,8 @@ describe('useGithubProfile', () => {
   });
 
   it('fetches and updates activity on mount', async () => {
-    global.fetch = jest.fn()
+    global.fetch = jest
+      .fn()
       .mockImplementationOnce(() =>
         createOkResponse([
           {
@@ -61,9 +68,7 @@ describe('useGithubProfile', () => {
           },
         ])
       )
-      .mockImplementationOnce(() =>
-        createOkResponse({ items: [] })
-      );
+      .mockImplementationOnce(() => createOkResponse({ items: [] }));
 
     const { result } = renderHook(() => useGithubProfile());
 
@@ -73,12 +78,16 @@ describe('useGithubProfile', () => {
 
     expect(global.fetch).toHaveBeenCalledTimes(2);
     expect(result.current.activity).toEqual([
-      { label: 'Pushed 1 commit to testuser/my-repo', href: 'https://github.com/testuser/my-repo/commit/abc123' },
+      {
+        label: 'Pushed 1 commit to testuser/my-repo',
+        href: 'https://github.com/testuser/my-repo/commit/abc123',
+      },
     ]);
   });
 
   it('falls back gracefully on fetch failure', async () => {
-    global.fetch = jest.fn()
+    global.fetch = jest
+      .fn()
       .mockImplementationOnce(() => createErrorResponse())
       .mockImplementationOnce(() => createErrorResponse());
 

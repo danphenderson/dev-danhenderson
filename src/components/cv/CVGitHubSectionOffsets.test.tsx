@@ -3,8 +3,12 @@ import type { ReactNode } from 'react';
 import ThemeProvider from '../../ThemeProvider';
 import { CVGitHubSection } from './CVGitHubSection';
 
-const mockGitHubActivityList = jest.fn((_: { startDelayMs?: number }) => <div data-testid="github-activity-list" />);
-const mockGitHubContributions = jest.fn((_: { startDelayMs?: number }) => <div data-testid="github-contributions" />);
+const mockGitHubActivityList = jest.fn((_: { startDelayMs?: number }) => (
+  <div data-testid="github-activity-list" />
+));
+const mockGitHubContributions = jest.fn((_: { startDelayMs?: number }) => (
+  <div data-testid="github-contributions" />
+));
 
 jest.mock('../layout/SectionCard', () => ({
   SectionCard: ({ children }: { children: ReactNode }) => <div>{children}</div>,
@@ -41,8 +45,12 @@ describe('CVGitHubSection offsets', () => {
       </ThemeProvider>
     );
 
-    expect(mockGitHubActivityList.mock.calls[0][0]).toEqual(expect.objectContaining({ startDelayMs: 120 }));
-    expect(mockGitHubContributions.mock.calls[0][0]).toEqual(expect.objectContaining({ startDelayMs: 120 }));
+    expect(mockGitHubActivityList.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ startDelayMs: 120 })
+    );
+    expect(mockGitHubContributions.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ startDelayMs: 120 })
+    );
     expect(mockGitHubActivityList).toHaveBeenCalledTimes(1);
     expect(mockGitHubContributions).toHaveBeenCalledTimes(1);
   });

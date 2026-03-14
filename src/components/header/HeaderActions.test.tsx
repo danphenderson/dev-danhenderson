@@ -52,11 +52,7 @@ const createAppearanceDial = (
 const renderHeaderActions = (props: Partial<React.ComponentProps<typeof HeaderActions>> = {}) =>
   render(
     <ThemeProvider>
-      <HeaderActions
-        iconButtonSize="medium"
-        headerIconSx={{ fontSize: 24 }}
-        {...props}
-      />
+      <HeaderActions iconButtonSize="medium" headerIconSx={{ fontSize: 24 }} {...props} />
     </ThemeProvider>
   );
 

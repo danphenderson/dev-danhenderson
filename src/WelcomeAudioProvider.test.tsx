@@ -2,14 +2,8 @@ import { render, screen, act, waitFor } from '@testing-library/react';
 import { WelcomeAudioProvider, useWelcomeAudio } from './WelcomeAudioProvider';
 
 const AudioConsumer = () => {
-  const {
-    audioConsent,
-    isPlaying,
-    play,
-    pause,
-    grantAudioConsent,
-    declineAudioConsent,
-  } = useWelcomeAudio();
+  const { audioConsent, isPlaying, play, pause, grantAudioConsent, declineAudioConsent } =
+    useWelcomeAudio();
   return (
     <div>
       <span data-testid="consent">{audioConsent}</span>

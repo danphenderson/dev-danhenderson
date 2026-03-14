@@ -25,7 +25,7 @@ export const CVCertificatesSection = ({
     id={sectionId}
     sx={cvSectionAnchorSx}
   >
-    <SectionHeading overline="Certificates"/>
+    <SectionHeading overline="Certificates" />
     <CertificatesList certificates={certificates} startDelayMs={itemOffsetMs} />
   </CVSectionCard>
 );

@@ -171,9 +171,12 @@ export const useTypewriterProgress = ({
     if (!playing) return undefined;
     if (charIndex >= text.length) return undefined;
 
-    const timeoutId = window.setTimeout(() => {
-      setCharIndex((currentIndex) => Math.min(currentIndex + 1, text.length));
-    }, getTypewriterDelay(text, charIndex, resolvedTimingProfile));
+    const timeoutId = window.setTimeout(
+      () => {
+        setCharIndex((currentIndex) => Math.min(currentIndex + 1, text.length));
+      },
+      getTypewriterDelay(text, charIndex, resolvedTimingProfile)
+    );
 
     return () => {
       window.clearTimeout(timeoutId);

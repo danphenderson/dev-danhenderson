@@ -26,17 +26,19 @@ jest.mock('@mui/material/SpeedDial', () => ({
     sx?: unknown;
   }) => (
     mockSpeedDial({ ariaLabel, children, icon, onClose, onOpen, open, sx }),
-    <div data-testid="speed-dial-root" data-open={String(Boolean(open))}>
-      <button
-        type="button"
-        aria-label={ariaLabel}
-        aria-expanded={open ? 'true' : 'false'}
-        onClick={(event) => (open ? onClose?.(event, 'toggle') : onOpen?.(event, 'toggle'))}
-      >
-        {icon}
-      </button>
-      {open ? <div data-testid="speed-dial-actions">{children}</div> : null}
-    </div>
+    (
+      <div data-testid="speed-dial-root" data-open={String(Boolean(open))}>
+        <button
+          type="button"
+          aria-label={ariaLabel}
+          aria-expanded={open ? 'true' : 'false'}
+          onClick={(event) => (open ? onClose?.(event, 'toggle') : onOpen?.(event, 'toggle'))}
+        >
+          {icon}
+        </button>
+        {open ? <div data-testid="speed-dial-actions">{children}</div> : null}
+      </div>
+    )
   ),
 }));
 
@@ -221,16 +223,10 @@ describe('AppSpeedDial', () => {
   it('defaults content-layer speed dials below the app bar', () => {
     const theme = createAppTheme('light', 'evergreen');
 
-    render(
-      <AppSpeedDial
-        ariaLabel="Open shared actions"
-        icon={<span>Open</span>}
-        actions={[]}
-      />
-    );
+    render(<AppSpeedDial ariaLabel="Open shared actions" icon={<span>Open</span>} actions={[]} />);
 
     const speedDialProps = mockSpeedDial.mock.calls.at(-1)?.[0] as { sx: unknown };
-    const resolvedSx = speedDialProps.sx as ((theme: Theme) => Record<string, unknown>);
+    const resolvedSx = speedDialProps.sx as (theme: Theme) => Record<string, unknown>;
     const layerSx = resolvedSx(theme);
 
     expect(layerSx.zIndex).toBe(theme.zIndex.appBar - 1);

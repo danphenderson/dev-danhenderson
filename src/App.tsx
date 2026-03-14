@@ -16,16 +16,16 @@ export default function App() {
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL} future={routerFuture}>
       <Box>
-        <Header/>
+        <Header />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cv" element={<CV />} />
           <Route path="/climbing" element={<Climbing />} />
           <Route path="/photography" element={<Photography />} />
           <Route path="/photography/:slug" element={<PhotographyCategory />} />
-          <Route path="*" element={<NotFound/>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
-        <Footer/>
+        <Footer />
         <CommonLinkTooltip />
       </Box>
     </BrowserRouter>

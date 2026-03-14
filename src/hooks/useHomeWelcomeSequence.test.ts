@@ -89,7 +89,12 @@ describe('useHomeWelcomeSequence', () => {
   it('handlePlay sets isLoading during play', async () => {
     let resolvePlay: () => void = () => {};
     mockAudioState = createMockAudioState({
-      play: jest.fn(() => new Promise<void>((resolve) => { resolvePlay = resolve; })),
+      play: jest.fn(
+        () =>
+          new Promise<void>((resolve) => {
+            resolvePlay = resolve;
+          })
+      ),
     });
 
     const { result } = renderHook(() => useHomeWelcomeSequence());

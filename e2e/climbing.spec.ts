@@ -9,7 +9,7 @@ test.describe('Climbing page', () => {
     await page.goto('/climbing');
     const main = page.locator('main');
     await expect(
-      main.getByText("A collection of routes I've remembered to tick on Mountain Project."),
+      main.getByText("A collection of routes I've remembered to tick on Mountain Project.")
     ).toBeVisible();
     await expect(main.getByText('TODO Routes')).toBeVisible();
     await expect(main.getByRole('link', { name: 'Hyperspace' })).toHaveAttribute(

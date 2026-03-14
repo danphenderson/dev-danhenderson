@@ -100,7 +100,10 @@ const runNextAnimationFrame = (timestamp: number) => {
 
 const triggerEnterView = () => {
   act(() => {
-    handleIntersection?.([{ isIntersecting: true } as IntersectionObserverEntry], {} as IntersectionObserver);
+    handleIntersection?.(
+      [{ isIntersecting: true } as IntersectionObserverEntry],
+      {} as IntersectionObserver
+    );
   });
 };
 

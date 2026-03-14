@@ -100,7 +100,9 @@ describe('TypewriterText', () => {
     expect(defaultAnimatedText).toHaveTextContent('A|');
     defaultRender.unmount();
 
-    const headlineRender = render(<TypewriterText text="AB" timingPreset="headline" />, { wrapper });
+    const headlineRender = render(<TypewriterText text="AB" timingPreset="headline" />, {
+      wrapper,
+    });
     const headlineAnimatedText = getAnimatedTextNode(headlineRender.container);
 
     act(() => {

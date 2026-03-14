@@ -43,9 +43,7 @@ export default function Photography() {
               subtitle="A selection of field work, climbing days, and stargazing nights."
               sx={appStyles.compactSectionHeadingSx}
             />
-            <BodyText sx={appStyles.secondaryTextSx}>
-              {categories.length} albums
-            </BodyText>
+            <BodyText sx={appStyles.secondaryTextSx}>{categories.length} albums</BodyText>
             {isLoading && (
               <Box sx={appStyles.sectionLoadingSx}>
                 <LoadingBars label="Loading photography albums" compact />
@@ -78,9 +76,7 @@ export default function Photography() {
                   <Typography variant="h6" sx={appStyles.primaryTextSx}>
                     {card.name}
                   </Typography>
-                  <BodyText sx={appStyles.secondaryTextSx}>
-                    {card.description}
-                  </BodyText>
+                  <BodyText sx={appStyles.secondaryTextSx}>{card.description}</BodyText>
                 </Stack>
 
                 <Button

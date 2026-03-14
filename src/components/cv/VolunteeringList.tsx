@@ -11,10 +11,7 @@ type VolunteeringListProps = {
 };
 
 export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: VolunteeringListProps) => {
-  const {
-    contentListStackSpacing,
-    getDetailListSx,
-  } = useComponentStyles();
+  const { contentListStackSpacing, getDetailListSx } = useComponentStyles();
 
   if (volunteering.length === 0) {
     return null;
@@ -43,9 +40,7 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
 
           <Box component="ul" sx={getDetailListSx(0, 0)}>
             {entry.highlights.map((highlight, highlightIndex) => (
-              <ListItemText key={`${highlight}-${highlightIndex}`}>
-                {highlight}
-              </ListItemText>
+              <ListItemText key={`${highlight}-${highlightIndex}`}>{highlight}</ListItemText>
             ))}
           </Box>
         </>

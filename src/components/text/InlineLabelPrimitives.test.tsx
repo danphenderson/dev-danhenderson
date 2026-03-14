@@ -78,10 +78,7 @@ describe('Inline label primitives', () => {
   });
 
   it('can be nested inside a Chip as a label', () => {
-    render(
-      <Chip label={<ChipLabel>TypeScript</ChipLabel>} />,
-      { wrapper }
-    );
+    render(<Chip label={<ChipLabel>TypeScript</ChipLabel>} />, { wrapper });
 
     expect(screen.getByText('TypeScript')).toBeInTheDocument();
     expect(screen.getByText('TypeScript').tagName).toBe('SPAN');
