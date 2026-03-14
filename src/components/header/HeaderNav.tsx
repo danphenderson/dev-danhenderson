@@ -42,13 +42,16 @@ export const HeaderNav = ({
   onMobileMenuClose,
 }: HeaderNavProps) => {
   const appStyles = useAppStyles();
+  const showHomeAvatar = !isActivePage(currentPath, '/');
 
   return (
     <>
       <Box sx={appStyles.headerNavLeadSx}>
-        <Box component={Link} to="/" sx={appStyles.headerAvatarLinkSx} aria-label="Go to Home">
-          <Avatar src={avatarSrc} alt="Daniel Henderson" sx={appStyles.headerAvatarSx} />
-        </Box>
+        {showHomeAvatar ? (
+          <Box component={Link} to="/" sx={appStyles.headerAvatarLinkSx} aria-label="Go to Home">
+            <Avatar src={avatarSrc} alt="Daniel Henderson" sx={appStyles.headerAvatarSx} />
+          </Box>
+        ) : null}
         {isMobile && (
           <IconButton
             id="mobile-nav-button"

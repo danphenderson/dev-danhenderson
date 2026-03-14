@@ -39,11 +39,18 @@ describe('HeaderNav', () => {
     expect(screen.getByRole('link', { name: 'Go to Climbing' })).toBeInTheDocument();
   });
 
-  it('always renders the avatar home link', () => {
-    renderNav();
+  it('renders the avatar home link away from the home route', () => {
+    renderNav({ currentPath: '/cv' });
 
     expect(screen.getByRole('link', { name: 'Go to Home' })).toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'Daniel Henderson' })).toBeInTheDocument();
+  });
+
+  it('hides the avatar home link on the home route', () => {
+    renderNav();
+
+    expect(screen.queryByRole('link', { name: 'Go to Home' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: 'Daniel Henderson' })).not.toBeInTheDocument();
   });
 
   it('hides desktop navigation links on mobile', () => {
@@ -79,9 +86,15 @@ describe('HeaderNav', () => {
     expect(climbingLink).not.toHaveAttribute('aria-current');
   });
 
-  it('shows the avatar home link on mobile', () => {
-    renderNav({ isMobile: true });
+  it('shows the avatar home link on mobile away from the home route', () => {
+    renderNav({ currentPath: '/cv', isMobile: true });
 
     expect(screen.getByRole('link', { name: 'Go to Home' })).toBeInTheDocument();
+  });
+
+  it('hides the avatar home link on mobile for the home route', () => {
+    renderNav({ isMobile: true });
+
+    expect(screen.queryByRole('link', { name: 'Go to Home' })).not.toBeInTheDocument();
   });
 });
