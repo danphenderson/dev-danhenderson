@@ -219,10 +219,10 @@ describe('Header controls', () => {
     expect(screen.getByRole('button', { name: 'Open navigation menu' })).toBeInTheDocument();
   });
 
-  it('shows navigation links on the home route with the avatar', () => {
+  it('shows navigation links on the home route without the avatar', () => {
     renderHeader('/');
 
-    expect(screen.getByRole('link', { name: 'Go to Home' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to Home' })).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Go to CV' })).toHaveAttribute('href', '/cv');
     expect(screen.getByRole('link', { name: 'Go to Climbing' })).toHaveAttribute(
       'href',
@@ -240,6 +240,6 @@ describe('Header controls', () => {
     renderHeader('/');
 
     expect(screen.getByRole('button', { name: 'Open navigation menu' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Go to Home' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to Home' })).not.toBeInTheDocument();
   });
 });
