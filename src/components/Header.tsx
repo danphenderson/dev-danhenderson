@@ -52,7 +52,7 @@ export default function Header() {
   const appStyles = useAppStyles();
   const muiTheme = useMuiTheme();
   const location = useLocation();
-  const { isPlaying, pause, play } = useWelcomeAudio();
+  const { isPlaying, pause, play, audioConsent } = useWelcomeAudio();
   const { showPauseHint, dismissPauseHint, showDarkModeHint, dismissDarkModeHint } =
     useWelcomeOnboarding();
   const path = location.pathname.toLowerCase();
@@ -138,7 +138,7 @@ export default function Header() {
               <HeaderActions
                 iconButtonSize={iconButtonSize}
                 headerIconSx={appStyles.headerIconSx}
-                showAudioControl
+                showAudioControl={audioConsent !== 'declined'}
                 isPlaying={isPlaying}
                 onToggleAudio={handleAudioToggle}
                 pauseButtonRef={pauseButtonRef}
