@@ -219,13 +219,13 @@ describe('Header controls', () => {
     );
   });
 
-  it('shows avatar and mobile menu on mobile for all routes', () => {
+  it('shows only the mobile menu trigger on mobile away from the home route', () => {
     mockUseMediaQuery.mockReturnValue(true);
 
     renderHeader('/cv');
 
-    expect(screen.getByRole('link', { name: 'Go to Home' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Open navigation menu' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to Home' })).not.toBeInTheDocument();
   });
 
   it('shows navigation links on the home route without the avatar', () => {
@@ -250,5 +250,18 @@ describe('Header controls', () => {
 
     expect(screen.getByRole('button', { name: 'Open navigation menu' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Go to Home' })).not.toBeInTheDocument();
+  });
+
+  it('passes photography detail routes through to the mobile menu destination set', () => {
+    mockUseMediaQuery.mockReturnValue(true);
+
+    renderHeader('/photography/landscape');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open navigation menu' }));
+
+    expect(screen.getByRole('menuitem', { name: 'CV' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Climbing' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Daniel Henderson Home' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'Photography' })).not.toBeInTheDocument();
   });
 });

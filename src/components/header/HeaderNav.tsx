@@ -1,7 +1,10 @@
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import DescriptionIcon from '@mui/icons-material/Description';
 import MenuIcon from '@mui/icons-material/Menu';
+import TerrainIcon from '@mui/icons-material/Terrain';
 import { Avatar, Box, Button, IconButton, Menu, MenuItem, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { MouseEvent } from 'react';
+import { MouseEvent, ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStyles } from '../../styles/appStyles';
 import { NavigationLabel } from '../text';
@@ -9,6 +12,11 @@ import { NavigationLabel } from '../text';
 export type HeaderPage = {
   name: string;
   path: string;
+};
+
+const HOME_PAGE: HeaderPage = {
+  name: 'Home',
+  path: '/',
 };
 
 type HeaderNavProps = {
@@ -25,9 +33,7 @@ type HeaderNavProps = {
 };
 
 const isActivePage = (currentPath: string, pagePath: string): boolean =>
-  pagePath === '/'
-    ? currentPath === '/'
-    : currentPath.startsWith(pagePath);
+  pagePath === '/' ? currentPath === '/' : currentPath.startsWith(pagePath);
 
 export const HeaderNav = ({
   pages,
@@ -42,7 +48,33 @@ export const HeaderNav = ({
   onMobileMenuClose,
 }: HeaderNavProps) => {
   const appStyles = useAppStyles();
-  const showHomeAvatar = !isActivePage(currentPath, '/');
+  const showHomeAvatar = !isMobile && !isActivePage(currentPath, '/');
+  const mobilePages = [...pages, HOME_PAGE].filter(({ path }) => !isActivePage(currentPath, path));
+
+  const getPageChipIcon = (path: string): ReactElement | undefined => {
+    switch (path) {
+      case '/cv':
+        return <DescriptionIcon fontSize="small" />;
+      case '/climbing':
+        return <TerrainIcon fontSize="small" />;
+      case '/photography':
+        return <CameraAltIcon fontSize="small" />;
+      case '/':
+        return (
+          <Avatar
+            src={avatarSrc}
+            alt="Daniel Henderson"
+            sx={{
+              width: 24,
+              height: 24,
+              border: (theme) => `1px solid ${theme.palette.common.white}`,
+            }}
+          />
+        );
+      default:
+        return undefined;
+    }
+  };
 
   return (
     <>
@@ -100,15 +132,20 @@ export const HeaderNav = ({
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}
       >
-        {pages.map(({ name, path }) => (
-          <MenuItem
-            key={name}
-            component={Link}
-            to={path}
-            onClick={onMobileMenuClose}
-            selected={isActivePage(currentPath, path)}
-          >
-            <NavigationLabel>{name}</NavigationLabel>
+        {mobilePages.map(({ name, path }) => (
+          <MenuItem key={name} component={Link} to={path} onClick={onMobileMenuClose}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                gap: 1.5,
+                width: '100%',
+              }}
+            >
+              {getPageChipIcon(path)}
+              <NavigationLabel sx={{ flex: 1, textAlign: 'left' }}>{name}</NavigationLabel>
+            </Box>
           </MenuItem>
         ))}
       </Menu>
