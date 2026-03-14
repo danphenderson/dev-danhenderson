@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Footer from './components/Footer';
 import Header from './components/Header';
 import { CommonLinkTooltip } from './components/CommonLinkTooltip';
@@ -15,14 +15,12 @@ import { Box } from '@mui/material';
 import { routerFuture } from './routerFuture';
 
 function AppContent() {
-  const location = useLocation();
-
   return (
     <Box>
       <ScrollProgressBar />
       <Header />
       <PageTransition>
-        <Routes location={location}>
+        <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cv" element={<CV />} />
           <Route path="/climbing" element={<Climbing />} />
