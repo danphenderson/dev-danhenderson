@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Box, Collapse, Tab, Tabs } from '@mui/material';
 import type { ReactNode, SyntheticEvent } from 'react';
 import { useComponentStyles } from '../styles/componentStyles';
+import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { InteractiveLabel } from './text';
 
 export type TabPanelRenderContext = {
@@ -67,6 +68,7 @@ export const TabPanel = ({
     [defaultValue, enabledItems, shouldRenderTabs]
   );
   const [internalValue, setInternalValue] = useState<TabPanelValue>(resolvedDefaultValue);
+  const [enteredPanels, setEnteredPanels] = useState<Record<string, boolean>>({});
   const panelBodyRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   useEffect(() => {
@@ -79,14 +81,35 @@ export const TabPanel = ({
     );
   }, [enabledItems, resolvedDefaultValue, valueProp]);
 
-  if (enabledItems.length === 0) {
-    return null;
-  }
+  useEffect(() => {
+    const enabledValues = new Set(enabledItems.map((item) => item.value));
+
+    setEnteredPanels((currentEnteredPanels) =>
+      Object.fromEntries(
+        Object.entries(currentEnteredPanels).filter(([value]) => enabledValues.has(value))
+      )
+    );
+  }, [enabledItems]);
 
   const candidateValue = valueProp === undefined ? internalValue : valueProp;
   const resolvedValue = enabledItems.some((item) => item.value === candidateValue)
     ? candidateValue
     : resolvedDefaultValue;
+
+  useEffect(() => {
+    if (!resolvedValue) {
+      return;
+    }
+
+    setEnteredPanels((currentEnteredPanels) => ({
+      ...currentEnteredPanels,
+      [resolvedValue]: false,
+    }));
+  }, [resolvedValue]);
+
+  if (enabledItems.length === 0) {
+    return null;
+  }
 
   const setValue = (nextValue: TabPanelValue) => {
     if (valueProp === undefined) {
@@ -143,6 +166,7 @@ export const TabPanel = ({
 
       {enabledItems.map((item) => {
         const isSelected = item.value === resolvedValue;
+        const isContentReady = isSelected && (enteredPanels[item.value] ?? true);
         const tabId = `${tabPanelId}-tab-${item.value}`;
         const panelId = `${tabPanelId}-panel-${item.value}`;
         const renderContext: TabPanelRenderContext = {
@@ -172,8 +196,26 @@ export const TabPanel = ({
             sx={getTabPanelBodySx(dense, shouldRenderTabs)}
           >
             {item.renderContent ? (
-              <Collapse in={isSelected} appear={false} timeout="auto" sx={{ width: '100%' }}>
-                {item.renderContent(isSelected, renderContext)}
+              <Collapse
+                in={isSelected}
+                appear={false}
+                timeout="auto"
+                sx={{ width: '100%' }}
+                onEntered={() => {
+                  setEnteredPanels((currentEnteredPanels) => ({
+                    ...currentEnteredPanels,
+                    [item.value]: true,
+                  }));
+                }}
+              >
+                <Box
+                  sx={{
+                    opacity: isContentReady ? 1 : 0,
+                    transition: `opacity 180ms ${SPRING_EASING_CSS}`,
+                  }}
+                >
+                  {item.renderContent(isContentReady, renderContext)}
+                </Box>
               </Collapse>
             ) : isSelected || keepMounted ? (
               item.content ?? null

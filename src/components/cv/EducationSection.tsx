@@ -62,6 +62,7 @@ const EducationDetailList = ({
       getItemKey={(item, index) => `${item}-${index}`}
       in={selected}
       container={renderContext.getDrawerContainer}
+      keepMountedWhenExited
       containerComponent="ul"
       containerSx={getDetailListSx(0, 0)}
       itemComponent="li"
@@ -130,6 +131,7 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
                 dense
                 in={selected}
                 animation="slide"
+                keepMountedWhenExited
                 drawerContainer={renderContext.getDrawerContainer}
               />
             ),

@@ -31,6 +31,7 @@ const CodingExampleDetailList = ({
       getItemKey={(item, index) => `${item}-${index}`}
       in={selected}
       container={renderContext.getDrawerContainer}
+      keepMountedWhenExited
       containerComponent="ul"
       containerSx={getDetailListSx(0, 0)}
       itemComponent="li"
@@ -93,6 +94,7 @@ export const CodingExamplesSection = ({
                 dense
                 in={selected}
                 animation="slide"
+                keepMountedWhenExited
                 drawerContainer={renderContext.getDrawerContainer}
               />
             ),

@@ -10,6 +10,7 @@ type SkillsChipListProps = {
   in?: boolean;
   animation?: 'zoom' | 'slide';
   drawerContainer?: () => Element | null;
+  keepMountedWhenExited?: boolean;
 };
 
 export const SkillsChipList = ({
@@ -18,6 +19,7 @@ export const SkillsChipList = ({
   in: inProp = true,
   animation = 'zoom',
   drawerContainer,
+  keepMountedWhenExited = false,
 }: SkillsChipListProps) => {
   const { chipWaveSx, getChipWaveDelaySx, skillsChipSx, skillsWrapSx } = useComponentStyles();
   const filteredSkills = skills.filter(
@@ -36,6 +38,7 @@ export const SkillsChipList = ({
         in={inProp}
         layout="wrap"
         container={drawerContainer}
+        keepMountedWhenExited={keepMountedWhenExited}
         containerSx={skillsWrapSx}
         renderItem={(skill, index) => (
           <Chip

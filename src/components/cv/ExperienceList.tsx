@@ -71,6 +71,7 @@ const ExperienceProjects = ({
       getItemKey={(_project, projectIndex) => `experience-project-${projectIndex}`}
       in={selected}
       container={renderContext.getDrawerContainer}
+      keepMountedWhenExited
       containerComponent="ul"
       containerSx={getDetailListSx(0, 0)}
       itemComponent="li"
@@ -144,6 +145,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                 dense
                 in={selected}
                 animation="slide"
+                keepMountedWhenExited
                 drawerContainer={renderContext.getDrawerContainer}
               />
             ),

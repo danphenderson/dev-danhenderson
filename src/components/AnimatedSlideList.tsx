@@ -26,6 +26,7 @@ type AnimatedSlideListProps<Item> = {
   itemSx?: SxProps<Theme>;
   stackSpacing?: number;
   wrapGap?: number;
+  keepMountedWhenExited?: boolean;
 };
 
 export const AnimatedSlideList = <Item,>({
@@ -43,6 +44,7 @@ export const AnimatedSlideList = <Item,>({
   itemSx,
   stackSpacing = 0.75,
   wrapGap = 0.75,
+  keepMountedWhenExited = false,
 }: AnimatedSlideListProps<Item>) => {
   const { motionTokens } = useComponentStyles();
   const [enteredKeys, setEnteredKeys] = useState<Set<string>>(() => new Set());
@@ -129,8 +131,8 @@ export const AnimatedSlideList = <Item,>({
             in={enteredKeys.has(key)}
             appear={false}
             direction="up"
-            mountOnEnter
-            unmountOnExit
+            mountOnEnter={!keepMountedWhenExited}
+            unmountOnExit={!keepMountedWhenExited}
             easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
             container={container ? () => container() ?? document.body : undefined}
             nodeRef={nodeRef}

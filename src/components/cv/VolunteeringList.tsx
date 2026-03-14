@@ -30,6 +30,7 @@ const VolunteeringDetailList = ({
       getItemKey={(item, index) => `${item}-${index}`}
       in={selected}
       container={renderContext.getDrawerContainer}
+      keepMountedWhenExited
       containerComponent="ul"
       containerSx={getDetailListSx(0, 0)}
       itemComponent="li"
