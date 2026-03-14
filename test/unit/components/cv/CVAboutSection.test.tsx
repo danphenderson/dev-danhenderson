@@ -1,5 +1,4 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { CVAboutSection } from '../../../../src/components/cv/CVAboutSection';
@@ -60,9 +59,7 @@ jest.mock('../../../../src/components/SkillsChipList', () => ({
 }));
 
 describe('CVAboutSection', () => {
-  it('forwards actions into the profile card, reveals opportunities after the bio completes, renders footer, and keeps section card motion props', async () => {
-    const user = userEvent.setup();
-
+  it('forwards actions into the profile card, reveals opportunities after the bio completes, renders footer, and keeps section card motion props', () => {
     render(
       <ThemeProvider>
         <CVAboutSection
@@ -94,7 +91,7 @@ describe('CVAboutSection', () => {
       'Scientific computing, Data platforms'
     );
 
-    await user.click(screen.getByRole('button', { name: 'Complete bio animation' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Complete bio animation' }));
 
     expect(screen.getByTestId('opportunities-chip-list')).toHaveAttribute('data-in', 'true');
     expect(screen.getByTestId(`section-card-${cvSectionMetadata.about.id}`)).toHaveAttribute(
