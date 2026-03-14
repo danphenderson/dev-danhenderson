@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Box, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { normalizeSxProp } from '../utils/sx';
 import { AnimatedContentCard } from './AnimatedContentCard';
@@ -47,7 +46,6 @@ export const AnimatedContentList = <Item,>({
   mountThreshold = DEFAULT_THRESHOLD,
   mountRootMargin = DEFAULT_ROOT_MARGIN,
 }: AnimatedContentListProps<Item>) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
   const {
     cardResetSx,
     getItemDelayMs,
@@ -57,7 +55,7 @@ export const AnimatedContentList = <Item,>({
     wrapItemContainerSx,
   } = useComponentStyles();
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [hasEnteredView, setHasEnteredView] = useState(!mountItemsOnView || prefersReducedMotion);
+  const [hasEnteredView, setHasEnteredView] = useState(!mountItemsOnView);
   const containerSxArray = normalizeSxProp(containerSx);
   const itemSxArray = normalizeSxProp(itemSx);
   const itemContainerSxArray = normalizeSxProp(itemContainerSx);
@@ -73,7 +71,7 @@ export const AnimatedContentList = <Item,>({
   const shouldRenderItems = !mountItemsOnView || hasEnteredView;
 
   useEffect(() => {
-    if (!mountItemsOnView || prefersReducedMotion) {
+    if (!mountItemsOnView) {
       if (!hasEnteredView) {
         setHasEnteredView(true);
       }
@@ -85,7 +83,7 @@ export const AnimatedContentList = <Item,>({
       return undefined;
     }
 
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+    if (typeof window === 'undefined' || typeof window.IntersectionObserver !== 'function') {
       setHasEnteredView(true);
       return undefined;
     }
@@ -109,7 +107,7 @@ export const AnimatedContentList = <Item,>({
     observer.observe(node);
 
     return () => observer.disconnect();
-  }, [hasEnteredView, mountItemsOnView, mountRootMargin, mountThreshold, prefersReducedMotion]);
+  }, [hasEnteredView, mountItemsOnView, mountRootMargin, mountThreshold]);
 
   const animatedItems = shouldRenderItems
     ? items.map((item, index) => (

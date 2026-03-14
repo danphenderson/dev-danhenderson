@@ -3,7 +3,6 @@ import {
   ambientPulse,
   backgroundSweep,
   breathe,
-  reducedMotionSx,
   shimmerSweep,
 } from './animations';
 import { SPRING_EASING_CSS } from './springEasing';
@@ -334,7 +333,6 @@ export const createComponentStyleMap = (theme: Theme) => {
             opacity: 1,
             animation: `${shimmerSweep} ${motion.tabHoverShimmerMs}ms linear`,
           },
-          ...reducedMotionSx,
         }
       : {};
 
@@ -359,7 +357,6 @@ export const createComponentStyleMap = (theme: Theme) => {
           animation: `${ambientPulse} ${motion.pillPulseMs}ms ease-in-out infinite`,
           pointerEvents: 'none',
         },
-        ...reducedMotionSx,
       }
     : {};
   const supportPillPulseOverlaySx = motion.pillPulseEnabled
@@ -376,7 +373,6 @@ export const createComponentStyleMap = (theme: Theme) => {
           animation: `${ambientPulse} ${motion.pillPulseMs}ms ease-in-out infinite`,
           pointerEvents: 'none',
         },
-        ...reducedMotionSx,
       }
     : {};
 
@@ -387,7 +383,6 @@ export const createComponentStyleMap = (theme: Theme) => {
         backgroundRepeat: 'no-repeat' as const,
         backgroundPosition: '200% center',
         animation: `${backgroundSweep} ${motion.chipWaveMs}ms linear infinite`,
-        ...reducedMotionSx,
       }
     : {};
 
@@ -405,7 +400,6 @@ export const createComponentStyleMap = (theme: Theme) => {
           pointerEvents: 'none',
           zIndex: 0,
         },
-        ...reducedMotionSx,
       }
     : {};
 
@@ -424,7 +418,6 @@ export const createComponentStyleMap = (theme: Theme) => {
           scaleSecondaryGlowAlpha(isLight ? 0.12 : 0.22)
         )}`,
         animation: `${breathe} ${motion.statusBreatheMs}ms ease-in-out infinite`,
-        ...reducedMotionSx,
       }
     : {
         fontWeight: 600,
@@ -436,7 +429,6 @@ export const createComponentStyleMap = (theme: Theme) => {
         ...textBreatheBaseSx,
         textShadow: `0 0 8px ${alpha(accentColor, scaleTextGlowAlpha(isLight ? 0.08 : 0.16))}`,
         animation: `${breathe} ${motion.headingBreatheMs}ms ease-in-out infinite`,
-        ...reducedMotionSx,
       }
     : {};
 
@@ -577,7 +569,6 @@ export const createComponentStyleMap = (theme: Theme) => {
             },
           }
         : {}),
-      ...reducedMotionSx,
     } satisfies SxProps<Theme>,
     sectionNavigatorRootSx: {
       display: 'flex',

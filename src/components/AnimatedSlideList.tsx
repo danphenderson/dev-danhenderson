@@ -3,7 +3,6 @@ import { Box, Slide } from '@mui/material';
 import type { ElementType, ReactNode, RefObject } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { SlideProps } from '@mui/material/Slide';
-import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { normalizeSxProp } from '../utils/sx';
@@ -45,7 +44,6 @@ export const AnimatedSlideList = <Item,>({
   stackSpacing = 0.75,
   wrapGap = 0.75,
 }: AnimatedSlideListProps<Item>) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
   const { motionTokens } = useComponentStyles();
   const [enteredKeys, setEnteredKeys] = useState<Set<string>>(() => new Set());
   const nodeRefs = useRef(new Map<string, RefObject<HTMLElement>>());
@@ -89,7 +87,7 @@ export const AnimatedSlideList = <Item,>({
     });
     enterTimerIdsRef.current = [];
 
-    if (!inProp || prefersReducedMotion) {
+    if (!inProp) {
       setEnteredKeys(new Set());
       return undefined;
     }
@@ -117,23 +115,7 @@ export const AnimatedSlideList = <Item,>({
       });
       enterTimerIdsRef.current = [];
     };
-  }, [inProp, itemKeys, prefersReducedMotion, resolvedItemStaggerMs, startDelayMs]);
-
-  if (prefersReducedMotion) {
-    if (!inProp) {
-      return null;
-    }
-
-    return (
-      <Box component={containerComponent} sx={resolvedContainerSx}>
-        {items.map((item, index) => (
-          <Box key={getItemKey(item, index)} component={itemComponent} sx={itemSx}>
-            {renderItem(item, index)}
-          </Box>
-        ))}
-      </Box>
-    );
-  }
+  }, [inProp, itemKeys, resolvedItemStaggerMs, startDelayMs]);
 
   return (
     <Box component={containerComponent} sx={resolvedContainerSx}>

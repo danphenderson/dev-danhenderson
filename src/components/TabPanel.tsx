@@ -1,7 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Box, Collapse, Tab, Tabs } from '@mui/material';
 import type { ReactNode, SyntheticEvent } from 'react';
-import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { InteractiveLabel } from './text';
 
@@ -59,7 +58,6 @@ export const TabPanel = ({
 }: TabPanelProps) => {
   const { getTabListSx, getTabPanelBodySx, getTabPanelSx, getTabSx, interactiveSurfaceSx } =
     useComponentStyles();
-  const prefersReducedMotion = usePrefersReducedMotion();
   const fallbackId = useId();
   const tabPanelId = idProp ?? fallbackId;
   const enabledItems = useMemo(() => items.filter((item) => !item.disabled), [items]);
@@ -174,13 +172,9 @@ export const TabPanel = ({
             sx={getTabPanelBodySx(dense, shouldRenderTabs)}
           >
             {item.renderContent ? (
-              prefersReducedMotion ? (
-                item.renderContent(isSelected, renderContext)
-              ) : (
-                <Collapse in={isSelected} appear={false} timeout="auto" sx={{ width: '100%' }}>
-                  {item.renderContent(isSelected, renderContext)}
-                </Collapse>
-              )
+              <Collapse in={isSelected} appear={false} timeout="auto" sx={{ width: '100%' }}>
+                {item.renderContent(isSelected, renderContext)}
+              </Collapse>
             ) : isSelected || keepMounted ? (
               item.content ?? null
             ) : null}

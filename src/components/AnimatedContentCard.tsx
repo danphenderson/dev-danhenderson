@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Box, Zoom } from '@mui/material';
 import type { ElementType } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useAppStyles } from '../styles/appStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { normalizeSxProp } from '../utils/sx';
@@ -51,7 +50,6 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
   ...props
 }: AnimatedContentCardProps<RootComponent>) => {
   const appStyles = useAppStyles();
-  const prefersReducedMotion = usePrefersReducedMotion();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hasTriggered, setHasTriggered] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -59,9 +57,6 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
   const containerSxArray = normalizeSxProp(containerSx);
 
   useEffect(() => {
-    if (prefersReducedMotion) {
-      return undefined;
-    }
     if (isVisibilityControlled) {
       return undefined;
     }
@@ -73,7 +68,7 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
       setHasTriggered(true);
       return;
     }
-    if (!('IntersectionObserver' in window)) {
+    if (typeof window.IntersectionObserver !== 'function') {
       setHasTriggered(true);
       return;
     }
@@ -92,12 +87,9 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [prefersReducedMotion, isVisibilityControlled, triggerOnView, threshold, rootMargin]);
+  }, [isVisibilityControlled, triggerOnView, threshold, rootMargin]);
 
   useEffect(() => {
-    if (prefersReducedMotion) {
-      return undefined;
-    }
     if (isVisibilityControlled) {
       if (!visible) {
         if (isVisible) {
@@ -120,17 +112,9 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
     }
     const timeoutId = window.setTimeout(() => setIsVisible(true), Math.max(0, delayMs));
     return () => window.clearTimeout(timeoutId);
-  }, [delayMs, hasTriggered, isVisible, prefersReducedMotion, isVisibilityControlled, visible]);
+  }, [delayMs, hasTriggered, isVisible, isVisibilityControlled, visible]);
 
   const content = <ContentCard {...props} />;
-
-  if (prefersReducedMotion) {
-    return (
-      <Box sx={[appStyles.animatedCardContainerSx, ...containerSxArray]}>
-        {!isVisibilityControlled || visible ? content : null}
-      </Box>
-    );
-  }
 
   return (
     <Zoom in={isVisible} timeout={ANIMATED_CARD_DURATION_MS} easing={{ enter: SPRING_EASING_CSS, exit: undefined }}>

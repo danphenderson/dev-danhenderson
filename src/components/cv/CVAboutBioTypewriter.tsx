@@ -2,7 +2,6 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { AboutMe } from '../../types/cv';
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
 import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { mergeSx, StatusInlineText } from '../text';
 import { useTypewriterProgress, type TypewriterTimingPreset } from '../text/useTypewriterProgress';
@@ -185,11 +184,10 @@ export const CVAboutBioTypewriter = ({
   cursorSx,
   onComplete,
 }: CVAboutBioTypewriterProps) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
   const rootRef = React.useRef<HTMLSpanElement | null>(null);
   const startTimeoutRef = React.useRef<number | undefined>(undefined);
   const hasNotifiedCompletionRef = React.useRef(false);
-  const [shouldPlay, setShouldPlay] = React.useState(prefersReducedMotion);
+  const [shouldPlay, setShouldPlay] = React.useState(false);
   const segments = React.useMemo(() => buildBioSegments(about), [about]);
   const fullText = React.useMemo(
     () => segments.map((segment) => segment.text).join(''),
@@ -197,16 +195,11 @@ export const CVAboutBioTypewriter = ({
   );
 
   React.useEffect(() => {
-    if (prefersReducedMotion) {
-      setShouldPlay(true);
-      return undefined;
-    }
-
     if (shouldPlay) {
       return undefined;
     }
 
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+    if (typeof window === 'undefined' || typeof window.IntersectionObserver !== 'function') {
       setShouldPlay(true);
       return undefined;
     }
@@ -243,7 +236,7 @@ export const CVAboutBioTypewriter = ({
         startTimeoutRef.current = undefined;
       }
     };
-  }, [prefersReducedMotion, shouldPlay, startDelayMs]);
+  }, [shouldPlay, startDelayMs]);
 
   const { charIndex, isComplete, showCursor } = useTypewriterProgress({
     text: fullText,
@@ -257,16 +250,16 @@ export const CVAboutBioTypewriter = ({
       return;
     }
 
-    if (!prefersReducedMotion && !isComplete) {
+    if (!isComplete) {
       return;
     }
 
     hasNotifiedCompletionRef.current = true;
     onComplete();
-  }, [fullText, isComplete, onComplete, prefersReducedMotion]);
+  }, [fullText, isComplete, onComplete]);
 
-  const visibleChars = prefersReducedMotion || isComplete ? fullText.length : charIndex;
-  const renderStaticVisibleLayer = prefersReducedMotion || isComplete;
+  const visibleChars = isComplete ? fullText.length : charIndex;
+  const renderStaticVisibleLayer = isComplete;
   const renderAccessibleLayer = !renderStaticVisibleLayer;
 
   if (!fullText) {

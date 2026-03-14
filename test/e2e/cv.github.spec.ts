@@ -1,10 +1,6 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import { mockGitHubAPISuccess, mockGitHubAPIFailure } from './helpers/github';
 
-test.beforeEach(async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-});
-
 const COMMON_LINK_TOOLTIP_ID = 'common-link-tooltip';
 
 const expectCommonLinkTooltip = async (page: Page, link: Locator, content: string) => {

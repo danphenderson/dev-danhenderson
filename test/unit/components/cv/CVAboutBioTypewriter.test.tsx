@@ -5,12 +5,6 @@ import { createAppTheme } from '../../../../src/theme/createAppTheme';
 import { CVAboutBioTypewriter } from '../../../../src/components/cv/CVAboutBioTypewriter';
 import type { AboutMe } from '../../../../src/types/cv';
 
-let mockPrefersReducedMotion = false;
-
-jest.mock('../../../../src/hooks/usePrefersReducedMotion', () => ({
-  usePrefersReducedMotion: () => mockPrefersReducedMotion,
-}));
-
 const defaultIntersectionObserver = window.IntersectionObserver;
 let handleIntersection: IntersectionObserverCallback | undefined;
 
@@ -100,7 +94,6 @@ const getLayer = (container: HTMLElement, layer: string) => {
 
 describe('CVAboutBioTypewriter', () => {
   beforeEach(() => {
-    mockPrefersReducedMotion = false;
     jest.spyOn(Math, 'random').mockReturnValue(0);
     installIntersectionObserverMock();
   });
@@ -193,32 +186,4 @@ describe('CVAboutBioTypewriter', () => {
     expect(handleComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the full bio immediately and skips observers when reduced motion is enabled', () => {
-    mockPrefersReducedMotion = true;
-    const observe = jest.fn();
-    const handleComplete = jest.fn();
-
-    Object.defineProperty(window, 'IntersectionObserver', {
-      writable: true,
-      value: jest.fn().mockImplementation(() => ({
-        observe,
-        disconnect: jest.fn(),
-        unobserve: jest.fn(),
-        takeRecords: jest.fn(),
-        root: null,
-        rootMargin: '0px 0px -10% 0px',
-        thresholds: [0],
-      })),
-    });
-
-    const { container } = renderTypewriter({ onComplete: handleComplete });
-    const animatedLayer = getLayer(container, 'animated');
-
-    expect(animatedLayer).toHaveTextContent('Mathematics cohort building systems.');
-    expect(animatedLayer).toHaveTextContent('Open to opportunities in platform engineering.');
-    expect(animatedLayer).not.toHaveTextContent('|');
-    expect(observe).not.toHaveBeenCalled();
-    expect(container.querySelector('[data-typewriter-layer="accessible"]')).toBeNull();
-    expect(handleComplete).toHaveBeenCalledTimes(1);
-  });
 });

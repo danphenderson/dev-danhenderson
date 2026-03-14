@@ -1,8 +1,6 @@
-import { Fragment } from 'react';
 import { Box, Zoom } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 
@@ -25,19 +23,8 @@ export const AnimatedZoomList = <Item,>({
   containerSx,
   itemStaggerMs,
 }: AnimatedZoomListProps<Item>) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
   const { getSectionDelayMs, motionTokens } = useComponentStyles();
   const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.accordionChipStaggerMs;
-
-  if (prefersReducedMotion) {
-    return (
-      <Box sx={containerSx}>
-        {items.map((item, index) => (
-          <Fragment key={getItemKey(item, index)}>{renderItem(item, index)}</Fragment>
-        ))}
-      </Box>
-    );
-  }
 
   return (
     <Box sx={containerSx}>

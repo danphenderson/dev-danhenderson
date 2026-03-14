@@ -1,9 +1,5 @@
 import { test, expect } from '@playwright/test';
 
-test.beforeEach(async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-});
-
 test.describe('Not Found page', () => {
   test('renders 404 for unknown routes', async ({ page }) => {
     await page.goto('/this-route-does-not-exist');

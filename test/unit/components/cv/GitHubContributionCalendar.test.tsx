@@ -19,7 +19,6 @@ jest.mock('react-github-calendar', () => ({
   ),
 }));
 
-const defaultMatchMedia = window.matchMedia;
 const defaultIntersectionObserver = window.IntersectionObserver;
 const defaultRequestAnimationFrame = window.requestAnimationFrame;
 const defaultCancelAnimationFrame = window.cancelAnimationFrame;
@@ -29,19 +28,6 @@ let queuedAnimationFrames = new Map<number, FrameRequestCallback>();
 let nextAnimationFrameId = 1;
 let handleIntersection: IntersectionObserverCallback | undefined;
 let triggerResizeObserver: (() => void) | undefined;
-
-const setReducedMotionPreference = (matches: boolean) => {
-  window.matchMedia = jest.fn().mockImplementation((query: string) => ({
-    matches,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  }));
-};
 
 const installIntersectionObserverMock = () => {
   const observe = jest.fn();
@@ -176,7 +162,6 @@ const getCalendarWrapper = (scrollContainer: HTMLElement) => {
 
 describe('GitHubContributionCalendar', () => {
   beforeEach(() => {
-    setReducedMotionPreference(false);
     installAnimationFrameMock();
     installIntersectionObserverMock();
     Object.defineProperty(global, 'ResizeObserver', {
@@ -186,7 +171,6 @@ describe('GitHubContributionCalendar', () => {
   });
 
   afterEach(() => {
-    window.matchMedia = defaultMatchMedia;
     window.IntersectionObserver = defaultIntersectionObserver;
     window.requestAnimationFrame = defaultRequestAnimationFrame;
     window.cancelAnimationFrame = defaultCancelAnimationFrame;
@@ -262,28 +246,6 @@ describe('GitHubContributionCalendar', () => {
     triggerEnterView();
 
     expect(metrics.getScrollLeft()).toBe(96);
-    expect(queuedAnimationFrames.size).toBe(0);
-  });
-
-  it('snaps directly to the newest weeks when reduced motion is preferred', () => {
-    setReducedMotionPreference(true);
-
-    render(
-      <ThemeProvider>
-        <GitHubContributionCalendar username="testuser" />
-      </ThemeProvider>
-    );
-
-    const scrollContainer = screen.getByTestId('github-calendar-scroll-container');
-    const metrics = attachScrollMetrics(scrollContainer, { clientWidth: 200, scrollWidth: 500 });
-    const wrapper = getCalendarWrapper(scrollContainer);
-
-    setElementRect(wrapper, { top: 120, height: 120, width: 420 });
-
-    triggerEnterView();
-    runNextAnimationFrame(0);
-
-    expect(metrics.getScrollLeft()).toBe(300);
     expect(queuedAnimationFrames.size).toBe(0);
   });
 

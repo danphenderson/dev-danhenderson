@@ -1,9 +1,5 @@
 import { test, expect } from '@playwright/test';
 
-test.beforeEach(async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-});
-
 test.describe('Climbing page', () => {
   test('renders climbing route tables and inline route links', async ({ page }) => {
     await page.goto('/climbing');

@@ -6,10 +6,6 @@ const waitForPhotographyCards = async (page: Page) => {
   await expect(page.getByRole('status', { name: 'Loading photography albums' })).toHaveCount(0);
 };
 
-test.beforeEach(async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
-});
-
 test.describe('Photography page', () => {
   test('renders category cards', async ({ page }) => {
     await page.goto('/photography');
