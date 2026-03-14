@@ -131,14 +131,20 @@ export const createAppTheme = (mode: PaletteMode, appearanceKey: AppAppearanceKe
         styleOverrides: {
           root: ({ theme }) => ({
             backgroundColor: alpha(
-              theme.palette.primary.contrastText,
-              theme.palette.mode === 'light' ? 0.88 : 0.86
+              resolvedPalette.appBar.background,
+              theme.palette.mode === 'light' ? 0.92 : 0.88
             ),
+            border: 'none',
             borderBottom: `1px solid ${alpha(
               theme.palette.primary.main,
-              theme.palette.mode === 'light' ? 0.24 : 0.36
+              theme.palette.mode === 'light' ? 0.2 : 0.28
             )}`,
-            backdropFilter: 'blur(10px)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            boxShadow:
+              theme.palette.mode === 'light'
+                ? `0 1px 3px ${alpha(theme.palette.common.black, 0.06)}, 0 4px 14px ${alpha(theme.palette.common.black, 0.04)}`
+                : `0 1px 4px ${alpha(theme.palette.common.black, 0.18)}, 0 6px 18px ${alpha(theme.palette.common.black, 0.1)}`,
           }),
         },
       },

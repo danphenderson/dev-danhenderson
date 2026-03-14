@@ -32,8 +32,8 @@ export const HeaderActions = ({
   const appStyles = useAppStyles();
   const pauseButtonSx = (
     pauseHighlightSx
-      ? [appStyles.headerAudioControlSx, pauseHighlightSx]
-      : appStyles.headerAudioControlSx
+      ? [appStyles.headerIconButtonSx, appStyles.headerAudioControlSx, pauseHighlightSx]
+      : [appStyles.headerIconButtonSx, appStyles.headerAudioControlSx]
   ) as SxProps<Theme>;
 
   return (

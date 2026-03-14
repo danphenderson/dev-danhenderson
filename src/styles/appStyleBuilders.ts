@@ -340,26 +340,54 @@ export const createAppStyleMap = (theme: Theme) => {
       minWidth: 0,
     } satisfies SxProps<Theme>,
     headerNavButtonSx: {
+      color: alpha(theme.palette.common.white, 0.78),
+      fontSize: { md: '1.5rem' },
+      position: 'relative',
+      transition: 'color 180ms ease',
+      '&:hover': {
+        color: theme.palette.common.white,
+        backgroundColor: alpha(theme.palette.common.white, 0.08),
+      },
+    } satisfies SxProps<Theme>,
+    headerNavButtonActiveSx: {
       color: theme.palette.common.white,
       fontSize: { md: '1.5rem' },
+      position: 'relative',
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        bottom: 4,
+        left: '20%',
+        right: '20%',
+        height: 2,
+        borderRadius: 1,
+        backgroundColor: alpha(theme.palette.primary.light, 0.85),
+      },
     } satisfies SxProps<Theme>,
-    headerAvatarButtonSx: {
-      p: { xs: 0.5, md: 0.625 },
+    headerAvatarLinkSx: {
+      display: 'flex',
+      alignItems: 'center',
+      borderRadius: '50%',
+      transition: 'box-shadow 180ms ease',
+      '&:hover': {
+        boxShadow: `0 0 0 2px ${alpha(theme.palette.common.white, 0.3)}`,
+      },
+      '&:focus-visible': {
+        outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
+        outlineOffset: 2,
+      },
     } satisfies SxProps<Theme>,
     headerAvatarSx: {
-      width: { xs: 40, md: 50 },
-      height: { xs: 40, md: 50 },
-      border: `2.5px solid ${alpha(theme.palette.common.white, 0.8)}`,
+      width: { xs: 36, md: 44 },
+      height: { xs: 36, md: 44 },
+      border: `2px solid ${alpha(theme.palette.common.white, 0.7)}`,
     } satisfies SxProps<Theme>,
-    headerPageDialSx: {
-      ...headerSpeedDialSx,
-      '& .MuiSpeedDial-actions': {
-        position: 'absolute',
-        left: '100%',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        marginLeft: 0,
-        paddingLeft: 1.5,
+    headerIconButtonSx: {
+      color: alpha(theme.palette.common.white, 0.82),
+      transition: 'color 180ms ease, background-color 180ms ease',
+      '&:hover': {
+        color: theme.palette.common.white,
+        backgroundColor: alpha(theme.palette.common.white, 0.1),
       },
     } satisfies SxProps<Theme>,
     headerAudioControlSx: {
