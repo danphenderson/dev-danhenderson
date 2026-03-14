@@ -204,17 +204,7 @@ describe('CV page section navigation', () => {
       'download',
       'Daniel-Henderson-Resume.pdf'
     );
-    expect(within(aboutSection!).getByText('Current workflow')).toBeInTheDocument();
-    expect(
-      within(aboutSection!).getByText(
-        'Current workflow across application, data-platform, and scientific-computing work.'
-      )
-    ).toBeVisible();
-    ['Python', 'TypeScript', 'Julia', 'AWS', 'React', 'Docker', 'GitHub Actions'].forEach(
-      (label) => {
-        expect(within(aboutSection!).getByText(label)).toBeVisible();
-      }
-    );
+    expect(within(aboutSection!).getByText('Open to opportunities:')).toBeInTheDocument();
     expect(mockAppSpeedDial).toHaveBeenCalledWith(
       expect.objectContaining({
         ariaLabel: 'Open about actions',
