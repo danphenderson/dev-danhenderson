@@ -23,15 +23,12 @@ When any trigger is met, a written ExecPlan is required.
 
 ## Where ExecPlans live
 
-Store active plans in a predictable location such as:
-
-- `plans/`
-- or the repository root when explicitly requested
-
-Use descriptive filenames:
+Store active plans in the `plans/` directory with descriptive filenames, such as:
 
 - `plans/cv-loading-skeletons.md`
 - `plans/github-section-fallback-hardening.md`
+
+Use descriptive filenames:
 
 ## Core requirements
 
@@ -44,7 +41,8 @@ Every ExecPlan must:
 - state repository constraints that must not be violated
 - define validation steps
 - identify risks, coupling, and rollback considerations
-- be updated as understanding changes during execution
+- be updated as implementation progresses
+- a completion status that reflects the current state of the work
 
 An ExecPlan is a living document. If implementation reveals a better or safer path, update the plan before continuing.
 
@@ -185,3 +183,9 @@ A weak ExecPlan is:
 
 - <update as work proceeds>
 ```
+
+## Completion Status
+
+- [ ] Not started
+- [ ] In progress
+- [ ] Complete
