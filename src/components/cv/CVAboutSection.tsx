@@ -16,7 +16,7 @@ const OPPORTUNITY_DELIMITER = '|opportunity|';
 const WORKFLOW_CONTENT_DELIMITER = '|workflow|';
 const OPPORTUNITIES_HEADING = 'Open to opportunities:';
 const WORKFLOW_HEADING = 'Current workflow:';
-const INLINE_SKILLS_HEADING_COLUMN_WIDTH = '22ch';
+const INLINE_SKILLS_HEADING_COLUMN_WIDTH = '16rem';
 const CHIP_REVEAL_BUFFER_MS = 240;
 
 type InlineAnimatedSkillsRowProps = {
@@ -48,7 +48,7 @@ const InlineAnimatedSkillsRow = ({
     alignItems="center"
     sx={{ visibility: visible ? 'visible' : 'hidden' }}
   >
-    <Box sx={{ minWidth: { sm: headingColumnWidth } }}>
+    <Box sx={{ width: { sm: headingColumnWidth } }}>
       <SubsectionTitle sx={titleSx}>
         <TypewriterText
           text={heading}
