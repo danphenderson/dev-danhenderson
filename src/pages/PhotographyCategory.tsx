@@ -15,6 +15,7 @@ import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
 import { BodyText } from '../components/text';
+import { MotionSection, MotionScaleIn } from '../motion';
 
 const legacySlugMap: Record<string, string> = {
   'new mexico': 'new-mexico',
@@ -75,7 +76,8 @@ export default function PhotographyCategory() {
     <PageFrame image={backgroundImage}>
       <>
         <Stack spacing={2.5}>
-          <SectionCard delayMs={0} triggerOnView={false}>
+          <MotionSection>
+            <SectionCard delayMs={0} triggerOnView={false}>
             <Stack spacing={{ xs: 2, md: 2.5 }}>
               <Button
                 component={RouterLink}
@@ -195,11 +197,14 @@ export default function PhotographyCategory() {
               )}
             </Stack>
           </SectionCard>
+          </MotionSection>
 
           {category && (
-            <SectionCard delayMs={140} sx={appStyles.albumSectionSx}>
-              <QuiltedImageList imageData={category.album} albumLabel={category.name} />
-            </SectionCard>
+            <MotionScaleIn>
+              <SectionCard delayMs={0} triggerOnView={false} sx={appStyles.albumSectionSx}>
+                <QuiltedImageList imageData={category.album} albumLabel={category.name} />
+              </SectionCard>
+            </MotionScaleIn>
           )}
         </Stack>
         <BackToTopButton />

@@ -12,6 +12,7 @@ import { useClimbingData, TickRow, TodoRow } from '../hooks/useClimbingData';
 import { useFuzzySearch } from '../hooks/useFuzzySearch';
 import { useAppStyles } from '../styles/appStyles';
 import { SectionLeadText } from '../components/text';
+import { MotionSection, MotionFadeIn } from '../motion';
 
 const renderRouteLink = (label: string, href: string) => (
   <CommonLink
@@ -64,73 +65,77 @@ export default function Climbing() {
 
   return (
     <PageFrame image="assets/climbing/climbing-locations.png" maxWidth={1200}>
-      <SectionCard sx={appStyles.climbingCardSx}>
-        <Stack spacing={2}>
-          <SectionHeading overline="Climbing" />
-          <SectionLeadText sx={appStyles.sectionLeadSx}>
-            A collection of routes I've remembered to tick on Mountain Project.
-          </SectionLeadText>
-          <ClimbingAnalytics analytics={analytics} status={status} />
-          <TextField
-            size="small"
-            placeholder="Search climbed routes..."
-            value={tickSearch.search}
-            onChange={(e) => tickSearch.setSearch(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Box sx={appStyles.dataGridContainerSx}>
-            <DataGrid
-              rows={tickSearch.filtered}
-              columns={columns}
-              autoHeight
-              disableRowSelectionOnClick
-              pageSizeOptions={[5, 10, 25, 50]}
-              initialState={{
-                pagination: {
-                  paginationModel: { pageSize: 10, page: 0 },
-                },
+      <MotionSection>
+        <SectionCard sx={appStyles.climbingCardSx}>
+          <Stack spacing={2}>
+            <SectionHeading overline="Climbing" />
+            <SectionLeadText sx={appStyles.sectionLeadSx}>
+              A collection of routes I've remembered to tick on Mountain Project.
+            </SectionLeadText>
+            <ClimbingAnalytics analytics={analytics} status={status} />
+            <TextField
+              size="small"
+              placeholder="Search climbed routes..."
+              value={tickSearch.search}
+              onChange={(e) => tickSearch.setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" />
+                  </InputAdornment>
+                ),
               }}
             />
-          </Box>
-          <SectionHeading overline="TODO Routes" sx={appStyles.sectionHeadingOffsetSx} />
-          <SectionLeadText sx={appStyles.sectionLeadSx}>
-            A collection of routes I'm interested in climbing.
-          </SectionLeadText>
-          <TextField
-            size="small"
-            placeholder="Search TODO routes..."
-            value={todoSearch.search}
-            onChange={(e) => todoSearch.setSearch(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon fontSize="small" />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <Box sx={appStyles.dataGridContainerSx}>
-            <DataGrid
-              rows={todoSearch.filtered}
-              columns={todoColumns}
-              autoHeight
-              disableRowSelectionOnClick
-              pageSizeOptions={[5, 10, 25, 50]}
-              initialState={{
-                pagination: {
-                  paginationModel: { pageSize: 10, page: 0 },
-                },
+            <Box sx={appStyles.dataGridContainerSx}>
+              <DataGrid
+                rows={tickSearch.filtered}
+                columns={columns}
+                autoHeight
+                disableRowSelectionOnClick
+                pageSizeOptions={[5, 10, 25, 50]}
+                initialState={{
+                  pagination: {
+                    paginationModel: { pageSize: 10, page: 0 },
+                  },
+                }}
+              />
+            </Box>
+            <MotionFadeIn>
+              <SectionHeading overline="TODO Routes" sx={appStyles.sectionHeadingOffsetSx} />
+            </MotionFadeIn>
+            <SectionLeadText sx={appStyles.sectionLeadSx}>
+              A collection of routes I'm interested in climbing.
+            </SectionLeadText>
+            <TextField
+              size="small"
+              placeholder="Search TODO routes..."
+              value={todoSearch.search}
+              onChange={(e) => todoSearch.setSearch(e.target.value)}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchIcon fontSize="small" />
+                  </InputAdornment>
+                ),
               }}
             />
-          </Box>
-        </Stack>
-      </SectionCard>
+            <Box sx={appStyles.dataGridContainerSx}>
+              <DataGrid
+                rows={todoSearch.filtered}
+                columns={todoColumns}
+                autoHeight
+                disableRowSelectionOnClick
+                pageSizeOptions={[5, 10, 25, 50]}
+                initialState={{
+                  pagination: {
+                    paginationModel: { pageSize: 10, page: 0 },
+                  },
+                }}
+              />
+            </Box>
+          </Stack>
+        </SectionCard>
+      </MotionSection>
     </PageFrame>
   );
 }

@@ -11,6 +11,7 @@ import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
 import { BodyText } from '../components/text';
+import { MotionSection, StaggerChildren, MotionItem, MotionCard, MotionImage, scaleIn } from '../motion';
 
 export default function Photography() {
   const appStyles = useAppStyles();
@@ -22,8 +23,6 @@ export default function Photography() {
   const loadedImagesRef = useRef<Set<string>>(new Set());
   const [loadedImages, setLoadedImages] = useState(0);
   const totalImages = categories.length;
-  const baseDelay = 120;
-  const staggerDelay = 90;
 
   useEffect(() => {
     loadedImagesRef.current.clear();
@@ -41,62 +40,67 @@ export default function Photography() {
   return (
     <PageFrame image={fallbackBackgroundImage}>
       <Stack spacing={2.5}>
-        <SectionCard delayMs={0} triggerOnView={false}>
-          <Stack spacing={1}>
-            <SectionHeading
-              overline="Photography"
-              subtitle="A selection of field work, climbing days, and stargazing nights."
-              sx={appStyles.compactSectionHeadingSx}
-            />
-            <BodyText sx={appStyles.secondaryTextSx}>{categories.length} albums</BodyText>
-            {isLoading && (
-              <Box sx={appStyles.sectionLoadingSx}>
-                <LoadingBars label="Loading photography albums" compact />
-              </Box>
-            )}
-          </Stack>
-        </SectionCard>
-
-        <Box sx={appStyles.photographyGridSx}>
-          {categories.map((card, index) => (
-            <Box key={card.name} sx={appStyles.photographyGridItemSx}>
-              <SectionCard
-                delayMs={baseDelay + index * staggerDelay}
-                sx={appStyles.photographyCardSx}
-              >
-                <Box sx={appStyles.photographyMediaSx}>
-                  <Box
-                    component="img"
-                    src={card.src}
-                    alt={card.name}
-                    loading="lazy"
-                    decoding="async"
-                    onLoad={() => handleImageReady(card.src)}
-                    onError={() => handleImageReady(card.src)}
-                    sx={appStyles.photographyImageSx}
-                  />
+        <MotionSection>
+          <SectionCard delayMs={0} triggerOnView={false}>
+            <Stack spacing={1}>
+              <SectionHeading
+                overline="Photography"
+                subtitle="A selection of field work, climbing days, and stargazing nights."
+                sx={appStyles.compactSectionHeadingSx}
+              />
+              <BodyText sx={appStyles.secondaryTextSx}>{categories.length} albums</BodyText>
+              {isLoading && (
+                <Box sx={appStyles.sectionLoadingSx}>
+                  <LoadingBars label="Loading photography albums" compact />
                 </Box>
+              )}
+            </Stack>
+          </SectionCard>
+        </MotionSection>
 
-                <Stack spacing={0.5} sx={appStyles.photographyCardContentSx}>
-                  <Typography variant="h6" sx={appStyles.primaryTextSx}>
-                    {card.name}
-                  </Typography>
-                  <BodyText sx={appStyles.secondaryTextSx}>{card.description}</BodyText>
-                </Stack>
-
-                <Button
-                  component={RouterLink}
-                  to={`/photography/${card.slug}`}
-                  variant="outlined"
-                  size="small"
-                  sx={appStyles.inlineStartSx}
+        <StaggerChildren
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}
+        >
+          {categories.map((card) => (
+            <MotionItem key={card.name} variants={scaleIn}>
+              <MotionCard style={{ height: '100%' }}>
+                <SectionCard
+                  delayMs={0}
+                  triggerOnView={false}
+                  sx={appStyles.photographyCardSx}
                 >
-                  View album
-                </Button>
-              </SectionCard>
-            </Box>
+                  <Box sx={{ ...appStyles.photographyMediaSx, overflow: 'hidden' }}>
+                    <MotionImage
+                      src={card.src}
+                      alt={card.name}
+                      loading="lazy"
+                      decoding="async"
+                      onLoad={() => handleImageReady(card.src)}
+                      onError={() => handleImageReady(card.src)}
+                    />
+                  </Box>
+
+                  <Stack spacing={0.5} sx={appStyles.photographyCardContentSx}>
+                    <Typography variant="h6" sx={appStyles.primaryTextSx}>
+                      {card.name}
+                    </Typography>
+                    <BodyText sx={appStyles.secondaryTextSx}>{card.description}</BodyText>
+                  </Stack>
+
+                  <Button
+                    component={RouterLink}
+                    to={`/photography/${card.slug}`}
+                    variant="outlined"
+                    size="small"
+                    sx={appStyles.inlineStartSx}
+                  >
+                    View album
+                  </Button>
+                </SectionCard>
+              </MotionCard>
+            </MotionItem>
           ))}
-        </Box>
+        </StaggerChildren>
       </Stack>
     </PageFrame>
   );
