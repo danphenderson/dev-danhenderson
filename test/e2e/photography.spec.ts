@@ -1,21 +1,18 @@
 import { test, expect, type Page } from '@playwright/test';
+import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
 const waitForPhotographySection = async (page: Page) => {
-  await expect(
-    page.getByText('A selection of field work, climbing days, and stargazing nights.')
-  ).toBeVisible();
-};
-
-const waitForPhotographyCards = async (page: Page) => {
-  await waitForPhotographySection(page);
-  await expect(page.getByText('4 albums')).toBeVisible();
-  await expect(page.getByRole('status', { name: 'Loading photography albums' })).toHaveCount(0);
+  await waitForAnimatedSectionReadiness({
+    anchor: page.getByText('A selection of field work, climbing days, and stargazing nights.'),
+    readyLocators: [page.getByText('4 albums')],
+    hiddenLocators: [page.getByRole('status', { name: 'Loading photography albums' })],
+  });
 };
 
 test.describe('Photography page', () => {
   test('renders category cards', async ({ page }) => {
     await page.goto('/photography');
-    await waitForPhotographyCards(page);
+    await waitForPhotographySection(page);
     await expect(page.getByRole('heading', { name: 'Landscape' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Action' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Astronomy' })).toBeVisible();
@@ -26,7 +23,7 @@ test.describe('Photography page', () => {
   test('does not introduce horizontal overflow when resized below md', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1200 });
     await page.goto('/photography');
-    await waitForPhotographyCards(page);
+    await waitForPhotographySection(page);
 
     await page.setViewportSize({ width: 700, height: 1200 });
     await page.waitForFunction(() => document.documentElement.scrollWidth <= window.innerWidth);
