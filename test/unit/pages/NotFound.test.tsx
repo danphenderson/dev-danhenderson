@@ -74,7 +74,7 @@ describe('NotFound', () => {
     );
 
     expect(screen.getByText('Shared recovery routes')).toBeInTheDocument();
-    expect(screen.getAllByText('Return to the home hero route.')).not.toHaveLength(0);
-    expect(screen.getAllByText('Open climbing ticks, goals, and analytics.')).not.toHaveLength(0);
+    expect(screen.getAllByText('Return to the home hero route.').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Open climbing ticks, goals, and analytics.').length).toBeGreaterThan(0);
   });
 });

@@ -3,11 +3,15 @@ import { MemoryRouter } from 'react-router-dom';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { routerFuture } from '../../../../src/routerFuture';
 import { HeaderNav } from '../../../../src/components/header/HeaderNav';
+import type { SiteRouteDefinition } from '../../../../src/constants/siteRoutes';
+
+const makeNavRoute = (id: string, label: string, path: string): SiteRouteDefinition =>
+  ({ id, label, path, title: label, description: '', image: '', keywords: [], showInPrimaryNav: true } as SiteRouteDefinition);
 
 const pages = [
-  { id: 'cv', label: 'CV', path: '/cv', title: 'CV', description: '', image: '', keywords: [], showInPrimaryNav: true },
-  { id: 'climbing', label: 'Climbing', path: '/climbing', title: 'Climbing', description: '', image: '', keywords: [], showInPrimaryNav: true },
-  { id: 'photography', label: 'Photography', path: '/photography', title: 'Photography', description: '', image: '', keywords: [], showInPrimaryNav: true },
+  makeNavRoute('cv', 'CV', '/cv'),
+  makeNavRoute('climbing', 'Climbing', '/climbing'),
+  makeNavRoute('photography', 'Photography', '/photography'),
 ];
 
 const defaultProps = {
