@@ -52,9 +52,9 @@ const primaryRouteActions: CommandPaletteAction[] = commandPaletteRoutes.map((ro
   };
 });
 
-const commandPaletteCVSectionOrder: CVSectionKey[] = ['about', ...cvSectionNavigationOrder];
+const cvCommandPaletteSectionOrder: CVSectionKey[] = ['about', ...cvSectionNavigationOrder];
 
-const cvSectionActions: CommandPaletteAction[] = commandPaletteCVSectionOrder.map((sectionKey) => ({
+const cvSectionActions: CommandPaletteAction[] = cvCommandPaletteSectionOrder.map((sectionKey) => ({
   id: `cv-section-${sectionKey}`,
   label: `CV: ${cvSectionMetadata[sectionKey].navLabel}`,
   description: `Jump to the ${cvSectionMetadata[
