@@ -56,7 +56,10 @@ test.describe('CV page – GitHub integration', () => {
     await expectCommonLinkTooltip(page, mtuOrganizationLink, 'View online graduate degrees page');
     await ensureCvSectionVisible(page, 'cv-volunteering');
     await expect(littleBrothersLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
-    await expect(littleBrothersLink).toHaveAttribute('data-tooltip-content', 'View organization site');
+    await expect(littleBrothersLink).toHaveAttribute(
+      'data-tooltip-content',
+      'View organization site'
+    );
 
     await page.evaluate(() => window.scrollTo({ top: 1000, behavior: 'auto' }));
 
@@ -80,6 +83,10 @@ test.describe('CV page – GitHub integration', () => {
     await expect(
       main.getByText(/Pushed 1 commit to danphenderson\/dev-danhenderson/)
     ).toBeVisible();
+    await expect(main.getByText('Data status')).toBeVisible();
+    await expect(
+      main.getByText('Showing live GitHub activity from the latest successful fetch.')
+    ).toBeVisible();
 
     // The GitHub section headings should render
     await expect(main.getByRole('heading', { name: 'Recent Activity' })).toBeVisible();
@@ -97,6 +104,11 @@ test.describe('CV page – GitHub integration', () => {
 
     // Fallback contributions should appear (unique to contributions section)
     await expect(main.getByText(/dbt-labs\/dbt-core/)).toBeVisible();
+    await expect(
+      main.getByText(
+        'Showing bundled fallback highlights because the live GitHub response was incomplete or unavailable.'
+      )
+    ).toBeVisible();
 
     // The GitHub section headings should render
     await expect(main.getByRole('heading', { name: 'Recent Activity' })).toBeVisible();

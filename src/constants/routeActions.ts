@@ -1,7 +1,9 @@
 import { siteRoutes } from './siteRoutes';
+import type { SiteRouteId } from './siteRoutes';
 
 export type SharedRouteAction = {
   id: string;
+  routeId: SiteRouteId;
   label: string;
   description: string;
   path: string;
@@ -21,6 +23,7 @@ export const sharedRouteActions: SharedRouteAction[] = routesWithActions
   .filter((route) => route.action.includeInCommandPalette !== false)
   .map((route) => ({
     id: `route-${route.id}`,
+    routeId: route.id,
     label: route.label,
     description: route.action.description,
     path: route.path,

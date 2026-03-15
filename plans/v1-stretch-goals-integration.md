@@ -35,6 +35,7 @@ The requested stretch goals reinforce the same product objective: ship a more in
 - `src/components/Header.tsx`: global navigation shell
 - `src/components/header/HeaderNav.tsx`: header navigation consumer
 - `src/components/AppSpeedDial.tsx`: reusable action-launcher pattern
+- `src/constants/routeActions.ts`: shared route-action derivation for command palette and recovery consumers
 - `src/pages/CV.tsx`: CV story mode and route metadata integration
 - `src/components/cv/CVGitHubSection.tsx`: GitHub reliability indicators
 - `src/hooks/useGithubProfile.ts`: freshness and provenance state
@@ -51,6 +52,7 @@ The requested stretch goals reinforce the same product objective: ship a more in
 - `src/pages/NotFound.tsx`: contextual recovery UI
 - `public/index.html`: default metadata and PWA linkage
 - `package.json`: build metadata or PWA script wiring if needed
+- `plans/shared-status-primitives.md`: completed sub-plan for the shared action/freshness foundation
 - `test/e2e/*.spec.ts`: route-level validation coverage
 
 ## Proposed approach
@@ -66,10 +68,10 @@ Use a foundation-first execution model:
 ## Execution steps
 
 1. [x] Create a typed route/action registry and lightweight route metadata layer.
-2. [ ] Normalize shared action/freshness primitives so the remaining recovery, analytics, and installability work can reuse the same sources instead of adding route-local one-offs.
+2. [x] Normalize shared action/freshness primitives so the remaining recovery, analytics, and installability work can reuse the same sources instead of adding route-local one-offs.
 3. [x] Implement the global command palette and shell-level accessibility upgrades.
-4. [ ] Upgrade the not-found experience to use the shared route/action registry and command palette recovery paths, then validate direct navigation to an unknown route.
-5. [ ] Add CV story mode and GitHub reliability surfacing, keeping fallback provenance and freshness copy in the same slice so the route stays coherent.
+4. [ ] Extend the not-found recovery baseline with more contextual routing assistance on top of the shared route/action registry and command palette recovery paths, then validate direct navigation to an unknown route.
+5. [ ] Add CV story mode and deepen GitHub reliability surfacing on top of the shared freshness/provenance baseline so the route reads as one coherent slice.
 6. [ ] Add climbing analytics and freshness surfaces on top of `useClimbingData` without changing the source dataset shape.
 7. [ ] Expand photography metadata first, then add immersive mode, map view, and slug-aware sharing in that order so schema changes land before UI features.
 8. [ ] Add performance scorecard and PWA basics only after route metadata and build-info plumbing are stable.
@@ -101,10 +103,12 @@ Use a foundation-first execution model:
 - Completed the shared route registry and route metadata wiring for the current routes.
 - Completed the first global command palette implementation with keyboard shortcuts, route actions, album actions, and CV section jump actions.
 - Completed shell-level skip links while the top-level app structure was already being touched.
-- Started execution step 2 with a focused sub-plan in `plans/shared-status-primitives.md` so action derivation, freshness metadata, and fallback provenance can land without pulling route-specific UI work forward.
-- Step 2 should finish by extending the shared route registry and existing data hooks with reusable status primitives, while keeping not-found UI, CV story mode, climbing analytics cards, photography immersive/share work, and PWA behavior in their later slices.
+- Completed execution step 2 through `plans/shared-status-primitives.md`, adding shared data-status types, route-derived recovery actions, and normalized freshness/fallback metadata for GitHub, climbing, and photography.
+- The shared status slice also landed the first downstream consumers: `src/pages/NotFound.tsx` now derives recovery CTAs from the shared route-action source, and `src/components/cv/CVGitHubSection.tsx` now presents GitHub freshness, source, and fallback provenance from the normalized hook status.
+- Execution step 2 validation actually run: targeted unit coverage for the shared status and route-action consumers, `npx playwright test test/e2e/not-found.spec.ts`, `npx playwright test test/e2e/cv.github.spec.ts`, and `npm run build`.
+- Direct MCP browser inspection was partially blocked by a local Chrome session and the current integrated-browser tool permissions, so Playwright route coverage served as the browser-validation fallback for the shared-status slice.
 - Remaining work now depends on keeping shared registries authoritative: route actions should stay derived from the shared route model, and route-level follow-up work should extend those registries rather than reintroducing hardcoded route lists.
-- The next coding slices should proceed in this order: not-found recovery, CV reliability/story mode, climbing freshness surfaces, photography metadata plus immersive features, then performance/PWA work.
+- The next coding slices should proceed in this order: contextual not-found recovery polish, CV story mode and reliability refinement, climbing freshness surfaces, photography metadata plus immersive features, then performance/PWA work.
 - Each remaining slice should update this plan with the exact touched files and route-level validation actually run before moving on.
 
 ## Completion Status
