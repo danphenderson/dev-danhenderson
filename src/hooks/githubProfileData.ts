@@ -5,7 +5,7 @@ import {
   fallbackGitHubContributions,
   githubUsername,
 } from '../data/cv';
-import type { SharedDataStatus, SharedDataStatusReason } from '../types/data';
+import type { SharedDataSourceDetail, SharedDataStatus, SharedDataStatusReason } from '../types/data';
 import type { GitHubActivityItem, GitHubContribution } from '../types/cv';
 
 type GitHubEvent = {
@@ -71,6 +71,7 @@ const createGitHubStatus = ({
   reason,
   label,
   lastUpdated,
+  sourceDetail,
 }: {
   source: SharedDataStatus['source'];
   loading: boolean;
@@ -79,6 +80,7 @@ const createGitHubStatus = ({
   reason: SharedDataStatusReason;
   label: string;
   lastUpdated?: string;
+  sourceDetail?: SharedDataSourceDetail[];
 }): SharedDataStatus => ({
   source,
   loading,
@@ -89,8 +91,11 @@ const createGitHubStatus = ({
     label,
     lastUpdated,
     staleAfterMs: CACHE_TTL_MS,
-    isStale: false,
+    isStale: lastUpdated
+      ? Date.now() - new Date(lastUpdated).getTime() > CACHE_TTL_MS
+      : false,
   },
+  ...(sourceDetail ? { sourceDetail } : {}),
 });
 
 export const createInitialGitHubProfileStatus = (): SharedDataStatus =>
@@ -311,24 +316,25 @@ const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
     ),
   ]);
 
+  const eventsOk = eventsResult.status === 'fulfilled';
+  const contributionsOk = contributionsResult.status === 'fulfilled';
   const externalRepos = new Set<string>();
 
-  const activity =
-    eventsResult.status === 'fulfilled'
-      ? buildActivity(eventsResult.value)
-      : ((encounteredError = true), (usedFallbackActivity = true), fallbackGitHubActivity);
+  const activity = eventsOk
+    ? buildActivity(eventsResult.value)
+    : ((encounteredError = true), (usedFallbackActivity = true), fallbackGitHubActivity);
 
-  if (eventsResult.status === 'fulfilled' && activity === fallbackGitHubActivity) {
+  if (eventsOk && activity === fallbackGitHubActivity) {
     usedFallbackActivity = true;
   }
 
-  if (eventsResult.status === 'fulfilled') {
+  if (eventsOk) {
     getExternalContributionRepos(eventsResult.value).forEach((repoName) =>
       externalRepos.add(repoName)
     );
   }
 
-  if (contributionsResult.status === 'fulfilled') {
+  if (contributionsOk) {
     contributionsResult.value.items
       .map((item) => item.repository_url?.split('repos/')[1])
       .filter(
@@ -359,6 +365,24 @@ const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
     ? 'GitHub activity is partially or fully backed by bundled fallback highlights.'
     : 'GitHub activity was fetched live and cached for subsequent visits.';
 
+  const sourceDetail: SharedDataSourceDetail[] = [
+    {
+      id: 'events',
+      label: 'Public events',
+      ok: eventsOk,
+    },
+    {
+      id: 'contributions',
+      label: 'Contribution search',
+      ok: contributionsOk,
+    },
+    {
+      id: 'enrichment',
+      label: 'Repo enrichment',
+      ok: !enrichedContributions.encounteredError,
+    },
+  ];
+
   return {
     activity,
     contributions: enrichedContributions.contributions,
@@ -371,6 +395,7 @@ const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
       reason,
       label,
       lastUpdated,
+      sourceDetail,
     }),
   };
 };
@@ -389,6 +414,7 @@ export const loadGitHubProfileData = async () => {
         reason: 'cache-hit',
         label: 'GitHub activity is served from the recent in-memory cache.',
         lastUpdated: cacheEntry.data.status.freshness.lastUpdated,
+        sourceDetail: cacheEntry.data.status.sourceDetail,
       }),
     };
   }

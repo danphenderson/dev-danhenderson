@@ -71,7 +71,7 @@ Use a foundation-first execution model:
 2. [x] Normalize shared action/freshness primitives so the remaining recovery, analytics, and installability work can reuse the same sources instead of adding route-local one-offs.
 3. [x] Implement the global command palette and shell-level accessibility upgrades.
 4. [x] Extend the not-found recovery baseline with more contextual routing assistance on top of the shared route/action registry and command palette recovery paths, then validate direct navigation to an unknown route.
-5. [ ] Add CV story mode and deepen GitHub reliability surfacing on top of the shared freshness/provenance baseline so the route reads as one coherent slice.
+5. [x] Add CV story mode and deepen GitHub reliability surfacing on top of the shared freshness/provenance baseline so the route reads as one coherent slice. See `plans/cv-story-reliability-slice.md`.
 6. [ ] Add climbing analytics and freshness surfaces on top of `useClimbingData` without changing the source dataset shape.
 7. [ ] Expand photography metadata first, then add immersive mode, map view, and slug-aware sharing in that order so schema changes land before UI features.
 8. [ ] Add performance scorecard and PWA basics only after route metadata and build-info plumbing are stable.
@@ -116,6 +116,9 @@ Use a foundation-first execution model:
 - Execution step 4 validation actually run: `npm run build`, `npx playwright test test/e2e/not-found.spec.ts`, `npx playwright test test/e2e/photography.spec.ts`, and direct browser validation on `/unknown` and `/photography/landscap` at desktop `1440x1200` and mobile `390x844` with no console errors, one command palette dialog per recovery interaction, clean Escape close behavior, intact recovery-seeded queries, intact CV hash scrolling, and no horizontal overflow in the checked viewports.
 - The next coding slices should proceed in this order: CV story mode and reliability refinement, climbing freshness surfaces, photography metadata plus immersive features, then performance/PWA work.
 - Each remaining slice should update this plan with the exact touched files and route-level validation actually run before moving on.
+- Completed execution step 5 through `plans/cv-story-reliability-slice.md`: query-param-driven story mode on `/cv`, extended GitHub status model with per-source detail and stale computation, richer partial-fallback and freshness messaging in CVGitHubSection, command palette story-mode entry.
+- Step 5 touched files: `src/pages/CV.tsx`, `src/data/cv.ts`, `src/types/data.ts`, `src/hooks/githubProfileData.ts`, `src/hooks/useGithubProfile.ts`, `src/constants/siteRoutes.ts`, `src/constants/commandPaletteActions.ts`, `src/components/cv/CVGitHubSection.tsx`, `src/components/cv/CVStoryHeader.tsx` (new), `src/components/cv/CVStoryChapterHeading.tsx` (new).
+- Step 5 validation actually run: `npm run build`, `CI=true npm test` for useGithubProfile/CV/commandPaletteActions (29 tests), `npx playwright test test/e2e/cv.github.spec.ts` (6 tests including partial-failure and story-mode specs).
 
 ## Completion Status
 

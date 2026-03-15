@@ -40,6 +40,16 @@ const cvSectionActions: CommandPaletteAction[] = cvCommandPaletteSectionOrder.ma
   routeId: 'cv',
 }));
 
+const cvStoryModeAction: CommandPaletteAction = {
+  id: 'cv-story-mode',
+  label: 'CV: Story Mode',
+  description: 'View a guided narrative walk through the CV.',
+  path: `${siteRouteMap.cv.path}?mode=story`,
+  keywords: ['cv', 'story', 'narrative', 'guided'],
+  kind: 'route',
+  routeId: 'cv',
+};
+
 const photographyAlbumActions: CommandPaletteAction[] = photographyCategories.map((category) => ({
   id: `photo-album-${category.slug}`,
   label: `Album: ${category.name}`,
@@ -52,6 +62,7 @@ const photographyAlbumActions: CommandPaletteAction[] = photographyCategories.ma
 
 export const commandPaletteActions: CommandPaletteAction[] = [
   ...primaryRouteActions,
+  cvStoryModeAction,
   ...cvSectionActions,
   ...photographyAlbumActions,
 ];

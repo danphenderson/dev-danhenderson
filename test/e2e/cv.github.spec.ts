@@ -1,5 +1,5 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import { mockGitHubAPISuccess, mockGitHubAPIFailure } from './helpers/github';
+import { mockGitHubAPISuccess, mockGitHubAPIFailure, mockGitHubAPIPartialFailure } from './helpers/github';
 
 const COMMON_LINK_TOOLTIP_ID = 'common-link-tooltip';
 
@@ -113,5 +113,45 @@ test.describe('CV page – GitHub integration', () => {
     // The GitHub section headings should render
     await expect(main.getByRole('heading', { name: 'Recent Activity' })).toBeVisible();
     await expect(main.getByRole('heading', { name: 'Contributions' })).toBeVisible();
+  });
+
+  test('shows partial-failure messaging when some GitHub sources fail', async ({ page }) => {
+    await mockGitHubAPIPartialFailure(page);
+    await page.goto('/cv');
+    await ensureCvSectionVisible(page, 'cv-github');
+
+    const main = page.locator('main');
+
+    // Activity from the successful events endpoint should appear
+    await expect(
+      main.getByText(/Pushed 1 commit to danphenderson\/dev-danhenderson/)
+    ).toBeVisible();
+
+    // Partial-fallback status should be visible
+    await expect(
+      main.getByText('Some GitHub data sources responded while others fell back to bundled highlights.')
+    ).toBeVisible();
+  });
+
+  test('renders story mode layout when navigating with ?mode=story', async ({ page }) => {
+    await page.goto('/cv?mode=story');
+
+    // Story mode header and intro should be visible
+    await expect(page.getByText('Story Mode')).toBeVisible();
+    await expect(page.getByTestId('cv-story-header')).toBeVisible();
+
+    // Story chapters should render
+    await expect(page.getByText('The Starting Point')).toBeVisible();
+    await expect(page.getByText('Chapter 1')).toBeVisible();
+
+    // Section navigator should NOT be present in story mode
+    await expect(page.getByRole('button', { name: 'CV section navigation' })).toHaveCount(0);
+  });
+
+  test('default CV renders a story mode toggle', async ({ page }) => {
+    await page.goto('/cv');
+
+    await expect(page.getByText('Full CV')).toBeVisible();
+    await expect(page.getByTestId('cv-mode-toggle')).toContainText('Read my story');
   });
 });

@@ -170,4 +170,117 @@ describe('useGithubProfile', () => {
       isFallback: true,
     });
   });
+
+  it('reports partial-fallback when events succeed but contributions fail', async () => {
+    global.fetch = jest
+      .fn()
+      .mockImplementationOnce(() =>
+        createOkResponse([
+          {
+            id: 'event-1',
+            type: 'PushEvent',
+            repo: { name: 'testuser/my-repo' },
+            payload: { commits: [{ sha: 'abc123' }], head: 'abc123' },
+          },
+        ])
+      )
+      .mockImplementationOnce(() => createErrorResponse());
+
+    const { result } = renderHook(() => useGithubProfile());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.activity).toEqual([
+      {
+        label: 'Pushed 1 commit to testuser/my-repo',
+        href: 'https://github.com/testuser/my-repo/commit/abc123',
+      },
+    ]);
+    expect(result.current.error).toBeTruthy();
+    expect(result.current.status).toMatchObject({
+      source: 'remote',
+      isFallback: true,
+      reason: 'partial-fallback',
+    });
+  });
+
+  it('includes sourceDetail showing which sources succeeded or failed', async () => {
+    global.fetch = jest
+      .fn()
+      .mockImplementationOnce(() =>
+        createOkResponse([
+          {
+            id: 'event-1',
+            type: 'PushEvent',
+            repo: { name: 'testuser/my-repo' },
+            payload: { commits: [{ sha: 'abc123' }], head: 'abc123' },
+          },
+        ])
+      )
+      .mockImplementationOnce(() => createOkResponse({ items: [] }));
+
+    const { result } = renderHook(() => useGithubProfile());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.status.sourceDetail).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'events', ok: true }),
+        expect.objectContaining({ id: 'contributions', ok: true }),
+        expect.objectContaining({ id: 'enrichment', ok: true }),
+      ])
+    );
+  });
+
+  it('marks failed sources in sourceDetail on full failure', async () => {
+    global.fetch = jest
+      .fn()
+      .mockImplementationOnce(() => createErrorResponse())
+      .mockImplementationOnce(() => createErrorResponse());
+
+    const { result } = renderHook(() => useGithubProfile());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.status.sourceDetail).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'events', ok: false }),
+        expect.objectContaining({ id: 'contributions', ok: false }),
+      ])
+    );
+  });
+
+  it('provides freshness metadata with lastUpdated and staleAfterMs', async () => {
+    global.fetch = jest
+      .fn()
+      .mockImplementationOnce(() =>
+        createOkResponse([
+          {
+            id: 'event-1',
+            type: 'PushEvent',
+            repo: { name: 'testuser/my-repo' },
+            payload: { commits: [{ sha: 'abc123' }], head: 'abc123' },
+          },
+        ])
+      )
+      .mockImplementationOnce(() => createOkResponse({ items: [] }));
+
+    const { result } = renderHook(() => useGithubProfile());
+
+    await waitFor(() => {
+      expect(result.current.loading).toBe(false);
+    });
+
+    expect(result.current.status.freshness).toMatchObject({
+      lastUpdated: expect.any(String),
+      staleAfterMs: 5 * 60 * 1000,
+      isStale: false,
+    });
+  });
 });

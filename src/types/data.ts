@@ -25,6 +25,12 @@ export type SharedDataFreshness = {
   isStale: boolean;
 };
 
+export type SharedDataSourceDetail = {
+  id: string;
+  label: string;
+  ok: boolean;
+};
+
 export type SharedDataStatus = {
   source: SharedDataSourceKind;
   loading: boolean;
@@ -32,6 +38,7 @@ export type SharedDataStatus = {
   isFallback: boolean;
   reason: SharedDataStatusReason;
   freshness: SharedDataFreshness;
+  sourceDetail?: SharedDataSourceDetail[];
 };
 
 export type Todo = {
