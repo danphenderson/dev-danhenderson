@@ -255,8 +255,10 @@ describe('CV page section navigation', () => {
     renderCV();
 
     const githubSection = document.getElementById(cvSectionMetadata.github.id);
+    const storyHeader = screen.getByTestId('cv-story-header');
 
     expect(githubSection).not.toBeNull();
+    expect(within(storyHeader).getByRole('button', { name: 'Data status' })).toBeInTheDocument();
     expect(within(githubSection!).getByText('GitHub')).toBeInTheDocument();
     expect(
       within(githubSection!).getByText(
@@ -266,12 +268,7 @@ describe('CV page section navigation', () => {
     expect(within(githubSection!).getByText('Recent Activity')).toBeInTheDocument();
     expect(within(githubSection!).getByText('Contributions')).toBeInTheDocument();
     expect(within(githubSection!).getByText('Contribution calendar')).toBeInTheDocument();
-    expect(within(githubSection!).getByText('Data status')).toBeInTheDocument();
-    expect(
-      within(githubSection!).getByText(
-        'Showing live GitHub activity from the latest successful fetch.'
-      )
-    ).toBeInTheDocument();
+    expect(within(githubSection!).queryByText('Data status')).not.toBeInTheDocument();
     expect(within(githubSection!).getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
     expect(within(githubSection!).getByText('microsoft/playwright')).toBeInTheDocument();
     expect(within(githubSection!).queryByText('Projects')).not.toBeInTheDocument();
@@ -345,6 +342,9 @@ describe('CV page section navigation', () => {
     expect(screen.getByTestId('cv-story-layout')).toBeInTheDocument();
     expect(screen.getByTestId('cv-story-header')).toBeInTheDocument();
     expect(screen.getByText('Story Mode')).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('cv-story-header')).getByRole('button', { name: 'Data status' })
+    ).toBeInTheDocument();
     expect(screen.getByTestId('cv-mode-toggle')).toHaveTextContent('Switch to full CV');
     expect(screen.queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
     expect(screen.queryByTestId('cv-desktop-top-region')).not.toBeInTheDocument();
@@ -369,6 +369,9 @@ describe('CV page section navigation', () => {
 
     expect(screen.getByTestId('cv-story-header')).toBeInTheDocument();
     expect(screen.getByText('Full CV')).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('cv-story-header')).getByRole('button', { name: 'Data status' })
+    ).toBeInTheDocument();
     expect(screen.getByTestId('cv-mode-toggle')).toHaveTextContent('Read my story');
     expect(screen.queryByTestId('cv-story-layout')).not.toBeInTheDocument();
     expect(screen.getByTestId('cv-desktop-top-region')).toBeInTheDocument();
