@@ -12,7 +12,14 @@ import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
 import { BodyText } from '../components/text';
-import { MotionSection, StaggerChildren, MotionItem, MotionCard, MotionImage, scaleIn } from '../motion';
+import {
+  MotionSection,
+  StaggerChildren,
+  MotionItem,
+  MotionCard,
+  MotionImage,
+  scaleIn,
+} from '../motion';
 
 export default function Photography() {
   const appStyles = useAppStyles();
@@ -64,11 +71,7 @@ export default function Photography() {
             {categories.map((card) => (
               <MotionItem key={card.name} variants={scaleIn} style={{ minWidth: 0 }}>
                 <MotionCard style={{ height: '100%' }}>
-                  <SectionCard
-                    delayMs={0}
-                    triggerOnView={false}
-                    sx={appStyles.photographyCardSx}
-                  >
+                  <SectionCard delayMs={0} triggerOnView={false} sx={appStyles.photographyCardSx}>
                     <Box sx={appStyles.photographyMediaSx}>
                       <MotionImage
                         src={card.src}
@@ -103,9 +106,7 @@ export default function Photography() {
                           )}
                         </Stack>
                       )}
-                      <BodyText sx={appStyles.secondaryTextSx}>
-                        {card.album.length} photos
-                      </BodyText>
+                      <BodyText sx={appStyles.secondaryTextSx}>{card.album.length} photos</BodyText>
                     </Stack>
 
                     <Button
