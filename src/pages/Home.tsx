@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -30,26 +30,17 @@ export default function Home() {
     useHomeWelcomeSequence();
   const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);
 
-  const { scrollYProgress } = useScroll();
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.6]);
 
   const handleMotionComplete = useCallback(() => {
     setIsTypewriterPlaying(true);
   }, []);
 
   return (
-    <motion.div style={{ position: 'relative', overflow: 'hidden' }}>
-      <motion.div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: '-20%',
-          y: backgroundY,
-          zIndex: 0,
-        }}
-      />
+    <motion.div ref={heroRef} style={{ scale: heroScale, opacity: heroOpacity }}>
       <BackgroundPaper
         image="assets/home.jpg"
         contentAlign="flex-end"

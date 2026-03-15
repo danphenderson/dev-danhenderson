@@ -18,10 +18,12 @@ import {
 /*  Shared helper: margin type cast                                   */
 /* ------------------------------------------------------------------ */
 
-// motion/react's `useInView` expects a template-literal `MarginType`
-// but generic `string` props are more ergonomic for consumers.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const asMargin = (m: string): any => m;
+/**
+ * Casts a CSS margin string to the template-literal `MarginType` that
+ * motion/react's `useInView` expects.  The runtime value is identical;
+ * only the compile-time type changes.
+ */
+const asMargin = (m: string) => m as Parameters<typeof useInView>[1] extends { margin?: infer M } ? M : never;
 
 /* ------------------------------------------------------------------ */
 /*  MotionSection                                                     */

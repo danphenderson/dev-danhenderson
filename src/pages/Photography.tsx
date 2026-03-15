@@ -58,49 +58,50 @@ export default function Photography() {
           </SectionCard>
         </MotionSection>
 
-        <StaggerChildren
-          style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}
-        >
-          {categories.map((card) => (
-            <MotionItem key={card.name} variants={scaleIn}>
-              <MotionCard style={{ height: '100%' }}>
-                <SectionCard
-                  delayMs={0}
-                  triggerOnView={false}
-                  sx={appStyles.photographyCardSx}
-                >
-                  <Box sx={{ ...appStyles.photographyMediaSx, overflow: 'hidden' }}>
-                    <MotionImage
-                      src={card.src}
-                      alt={card.name}
-                      loading="lazy"
-                      decoding="async"
-                      onLoad={() => handleImageReady(card.src)}
-                      onError={() => handleImageReady(card.src)}
-                    />
-                  </Box>
-
-                  <Stack spacing={0.5} sx={appStyles.photographyCardContentSx}>
-                    <Typography variant="h6" sx={appStyles.primaryTextSx}>
-                      {card.name}
-                    </Typography>
-                    <BodyText sx={appStyles.secondaryTextSx}>{card.description}</BodyText>
-                  </Stack>
-
-                  <Button
-                    component={RouterLink}
-                    to={`/photography/${card.slug}`}
-                    variant="outlined"
-                    size="small"
-                    sx={appStyles.inlineStartSx}
+        <Box sx={appStyles.photographyGridSx}>
+          <StaggerChildren>
+            {categories.map((card) => (
+              <MotionItem key={card.name} variants={scaleIn} style={{ minWidth: 0 }}>
+                <MotionCard style={{ height: '100%' }}>
+                  <SectionCard
+                    delayMs={0}
+                    triggerOnView={false}
+                    sx={appStyles.photographyCardSx}
                   >
-                    View album
-                  </Button>
-                </SectionCard>
-              </MotionCard>
-            </MotionItem>
-          ))}
-        </StaggerChildren>
+                    <Box sx={appStyles.photographyMediaSx}>
+                      <MotionImage
+                        src={card.src}
+                        alt={card.name}
+                        loading="lazy"
+                        decoding="async"
+                        onLoad={() => handleImageReady(card.src)}
+                        onError={() => handleImageReady(card.src)}
+                        style={{ position: 'absolute', inset: 0 }}
+                      />
+                    </Box>
+
+                    <Stack spacing={0.5} sx={appStyles.photographyCardContentSx}>
+                      <Typography variant="h6" sx={appStyles.primaryTextSx}>
+                        {card.name}
+                      </Typography>
+                      <BodyText sx={appStyles.secondaryTextSx}>{card.description}</BodyText>
+                    </Stack>
+
+                    <Button
+                      component={RouterLink}
+                      to={`/photography/${card.slug}`}
+                      variant="outlined"
+                      size="small"
+                      sx={appStyles.inlineStartSx}
+                    >
+                      View album
+                    </Button>
+                  </SectionCard>
+                </MotionCard>
+              </MotionItem>
+            ))}
+          </StaggerChildren>
+        </Box>
       </Stack>
     </PageFrame>
   );
