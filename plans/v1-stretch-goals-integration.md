@@ -70,7 +70,7 @@ Use a foundation-first execution model:
 1. [x] Create a typed route/action registry and lightweight route metadata layer.
 2. [x] Normalize shared action/freshness primitives so the remaining recovery, analytics, and installability work can reuse the same sources instead of adding route-local one-offs.
 3. [x] Implement the global command palette and shell-level accessibility upgrades.
-4. [ ] Extend the not-found recovery baseline with more contextual routing assistance on top of the shared route/action registry and command palette recovery paths, then validate direct navigation to an unknown route.
+4. [x] Extend the not-found recovery baseline with more contextual routing assistance on top of the shared route/action registry and command palette recovery paths, then validate direct navigation to an unknown route.
 5. [ ] Add CV story mode and deepen GitHub reliability surfacing on top of the shared freshness/provenance baseline so the route reads as one coherent slice.
 6. [ ] Add climbing analytics and freshness surfaces on top of `useClimbingData` without changing the source dataset shape.
 7. [ ] Expand photography metadata first, then add immersive mode, map view, and slug-aware sharing in that order so schema changes land before UI features.
@@ -108,7 +108,13 @@ Use a foundation-first execution model:
 - Execution step 2 validation actually run: targeted unit coverage for the shared status and route-action consumers, `npx playwright test test/e2e/not-found.spec.ts`, `npx playwright test test/e2e/cv.github.spec.ts`, and `npm run build`.
 - Direct MCP browser inspection was partially blocked by a local Chrome session and the current integrated-browser tool permissions, so Playwright route coverage served as the browser-validation fallback for the shared-status slice.
 - Remaining work now depends on keeping shared registries authoritative: route actions should stay derived from the shared route model, and route-level follow-up work should extend those registries rather than reintroducing hardcoded route lists.
-- The next coding slices should proceed in this order: contextual not-found recovery polish, CV story mode and reliability refinement, climbing freshness surfaces, photography metadata plus immersive features, then performance/PWA work.
+- Completed execution step 4 through `plans/contextual-not-found-recovery.md`, adding `src/constants/recoveryContext.ts` for path-aware recovery ranking, `src/components/RouteRecoveryPanel.tsx` for shared recovery UI, and aligned invalid photography album slug handling in `src/pages/PhotographyCategory.tsx` with the catch-all `src/pages/NotFound.tsx` flow.
+- The step 4 slice also widened `src/constants/commandPaletteActions.ts` with action kinds and route ids, added `src/CommandPaletteProvider.tsx`, and kept `src/components/GlobalCommandPalette.tsx` route-aware for the global keyboard palette.
+- Direct recovery now uses an explicit seeded command-palette CTA from the recovery panel rather than an automatic dialog launch, because validation showed the route-transition and card-animation stack made auto-open unreliable across the affected routes.
+- Follow-up refactor `plans/unify-recovery-palette.md` removed the recovery panel's temporary local dialog so the provider-backed global command palette is again the single searchable surface for both keyboard and recovery entry points, with shared matching semantics in `src/utils/commandPaletteSearch.ts`.
+- `src/pages/Photography.tsx` and `src/pages/PhotographyCategory.tsx` now render their first above-the-fold section cards without waiting on intersection triggers so the photography flows remain stable in headless and browser validation.
+- Execution step 4 validation actually run: `npm run build`, `npx playwright test test/e2e/not-found.spec.ts`, `npx playwright test test/e2e/photography.spec.ts`, and direct browser validation on `/unknown` and `/photography/landscap` at desktop `1440x1200` and mobile `390x844` with no console errors, one command palette dialog per recovery interaction, clean Escape close behavior, intact recovery-seeded queries, intact CV hash scrolling, and no horizontal overflow in the checked viewports.
+- The next coding slices should proceed in this order: CV story mode and reliability refinement, climbing freshness surfaces, photography metadata plus immersive features, then performance/PWA work.
 - Each remaining slice should update this plan with the exact touched files and route-level validation actually run before moving on.
 
 ## Completion Status

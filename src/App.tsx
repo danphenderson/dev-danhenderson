@@ -13,6 +13,7 @@ import Climbing from './pages/Climbing';
 import NotFound from './pages/NotFound';
 
 import { Box } from '@mui/material';
+import { CommandPaletteProvider } from './CommandPaletteProvider';
 import { routerFuture } from './routerFuture';
 
 const skipLinkSx = {
@@ -35,31 +36,33 @@ const skipLinkSx = {
 
 function AppContent() {
   return (
-    <Box>
-      <Box component="a" href="#main-content" sx={skipLinkSx}>
-        Skip to main content
+    <CommandPaletteProvider>
+      <Box>
+        <Box component="a" href="#main-content" sx={skipLinkSx}>
+          Skip to main content
+        </Box>
+        <Box component="a" href="#site-navigation" sx={skipLinkSx}>
+          Skip to site navigation
+        </Box>
+        <ScrollProgressBar />
+        <Header />
+        <Box component="main" id="main-content" tabIndex={-1}>
+          <PageTransition>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/cv" element={<CV />} />
+              <Route path="/climbing" element={<Climbing />} />
+              <Route path="/photography" element={<Photography />} />
+              <Route path="/photography/:slug" element={<PhotographyCategory />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </PageTransition>
+        </Box>
+        <Footer />
+        <CommonLinkTooltip />
+        <GlobalCommandPalette />
       </Box>
-      <Box component="a" href="#site-navigation" sx={skipLinkSx}>
-        Skip to site navigation
-      </Box>
-      <ScrollProgressBar />
-      <Header />
-      <Box component="main" id="main-content" tabIndex={-1}>
-        <PageTransition>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/cv" element={<CV />} />
-            <Route path="/climbing" element={<Climbing />} />
-            <Route path="/photography" element={<Photography />} />
-            <Route path="/photography/:slug" element={<PhotographyCategory />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </PageTransition>
-      </Box>
-      <Footer />
-      <CommonLinkTooltip />
-      <GlobalCommandPalette />
-    </Box>
+    </CommandPaletteProvider>
   );
 }
 

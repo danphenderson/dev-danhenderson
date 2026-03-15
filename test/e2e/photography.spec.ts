@@ -1,8 +1,14 @@
 import { test, expect, type Page } from '@playwright/test';
 
+const waitForPhotographySection = async (page: Page) => {
+  await expect(
+    page.getByText('A selection of field work, climbing days, and stargazing nights.')
+  ).toBeVisible();
+};
+
 const waitForPhotographyCards = async (page: Page) => {
-  await expect(page.getByRole('heading', { name: 'Collections' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'View album' })).toHaveCount(4);
+  await waitForPhotographySection(page);
+  await expect(page.getByText('4 albums')).toBeVisible();
   await expect(page.getByRole('status', { name: 'Loading photography albums' })).toHaveCount(0);
 };
 
@@ -13,6 +19,7 @@ test.describe('Photography page', () => {
     await expect(page.getByRole('heading', { name: 'Landscape' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Action' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Astronomy' })).toBeVisible();
+    await page.mouse.wheel(0, 1200);
     await expect(page.getByRole('heading', { name: 'New Mexico' })).toBeVisible();
   });
 
@@ -43,5 +50,33 @@ test.describe('Photography page', () => {
     await page.getByRole('button', { name: 'Back to top' }).click();
     await page.waitForFunction(() => window.scrollY === 0);
     await expect(page.getByRole('button', { name: 'Back to top' })).toHaveCount(0);
+  });
+
+  test('offers contextual recovery for invalid album slugs', async ({ page }) => {
+    await page.goto('/photography/landscap');
+    await page.waitForTimeout(2200);
+
+    await expect(page.getByRole('link', { name: 'Back to photography' })).toBeVisible();
+    await expect(page.getByText('Album not found')).toBeVisible();
+    await page.getByRole('button', { name: 'Open command palette' }).click();
+
+    await expect(page.getByRole('dialog')).toHaveCount(1);
+    const dialog = page.getByRole('dialog', { name: 'Command palette' });
+    await expect(dialog).toBeVisible();
+    await expect(
+      dialog.getByRole('textbox', { name: 'Search routes, albums, and CV sections' })
+    ).toHaveValue('landscap');
+    const landscapeAction = dialog.getByRole('button', { name: /Album: Landscape/ });
+    await expect(landscapeAction).toBeVisible();
+
+    await landscapeAction.click();
+    await expect(page).toHaveURL(/\/photography\/landscape$/);
+    await expect(page.getByRole('heading', { name: 'Landscape', exact: true })).toBeVisible();
+  });
+
+  test('redirects legacy slugs to the canonical album path', async ({ page }) => {
+    await page.goto('/photography/new%20mexico');
+    await expect(page).toHaveURL(/\/photography\/new-mexico$/);
+    await expect(page.getByRole('heading', { name: 'New Mexico', exact: true })).toBeVisible();
   });
 });

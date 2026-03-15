@@ -1,11 +1,15 @@
-import { Link as RouterLink, Navigate, useParams } from 'react-router-dom';
+import { Link as RouterLink, Navigate, useLocation, useParams } from 'react-router-dom';
 import { Button, Stack } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useMemo } from 'react';
 import { BackToTopButton } from '../components/BackToTopButton';
+import { RouteRecoveryPanel } from '../components/RouteRecoveryPanel';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
 import { QuiltedImageList } from '../components/PhotoAlbum';
+import { getRecoveryContext } from '../constants/recoveryContext';
+import { recoveryRouteActions } from '../constants/routeActions';
 import { siteRouteMap } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { usePhotographyData } from '../hooks/usePhotographyData';
@@ -20,12 +24,22 @@ const legacySlugMap: Record<string, string> = {
 
 export default function PhotographyCategory() {
   const appStyles = useAppStyles();
+  const location = useLocation();
   const { slug } = useParams<{ slug?: string }>();
   const { categories } = usePhotographyData();
   const slugKey = slug?.toLowerCase();
   const canonicalSlug = slugKey ? legacySlugMap[slugKey] ?? slugKey : undefined;
   const shouldRedirect = Boolean(slugKey && legacySlugMap[slugKey]);
   const category = categories.find((item) => item.slug === canonicalSlug);
+  const recoveryContext = useMemo(() => getRecoveryContext(location.pathname), [location.pathname]);
+  const recoveryActions = useMemo(
+    () =>
+      recoveryRouteActions.map((action) => ({
+        ...action,
+        routeStatusLabel: siteRouteMap[action.routeId].status?.label,
+      })),
+    []
+  );
 
   useDocumentMetadata(
     shouldRedirect
@@ -62,7 +76,7 @@ export default function PhotographyCategory() {
     <PageFrame image={backgroundImage}>
       <>
         <Stack spacing={2.5}>
-          <SectionCard delayMs={0}>
+          <SectionCard delayMs={0} triggerOnView={false}>
             <Stack spacing={1.5}>
               <Button
                 component={RouterLink}
@@ -82,9 +96,19 @@ export default function PhotographyCategory() {
               {category ? (
                 <BodyText sx={appStyles.secondaryTextSx}>{category.album.length} photos</BodyText>
               ) : (
-                <BodyText sx={appStyles.secondaryTextSx}>
-                  This album does not exist or has been moved.
-                </BodyText>
+                <Stack spacing={2.5}>
+                  <BodyText sx={appStyles.secondaryTextSx}>
+                    This album does not exist or has been moved. The command palette opens with a
+                    recovery search so you can jump to another gallery or route quickly.
+                  </BodyText>
+                  <RouteRecoveryPanel
+                    attemptedPathLabel={recoveryContext.attemptedPathLabel}
+                    routeHintLabel={recoveryContext.routeHintLabel}
+                    contextualSuggestions={recoveryContext.contextualSuggestions}
+                    recoveryActions={recoveryActions}
+                    suggestedPaletteQuery={recoveryContext.suggestedPaletteQuery}
+                  />
+                </Stack>
               )}
             </Stack>
           </SectionCard>

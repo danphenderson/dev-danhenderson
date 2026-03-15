@@ -4,13 +4,26 @@ import {
   type CVSectionKey,
 } from '../components/cv/cvSectionMetadata';
 import { photographyCategories } from '../data/photography';
-import { sharedRouteActions, type SharedRouteAction } from './routeActions';
-import { siteRouteMap } from './siteRoutes';
+import { sharedRouteActions } from './routeActions';
+import { siteRouteMap, type SiteRouteId } from './siteRoutes';
 
-export type CommandPaletteAction = Omit<SharedRouteAction, 'recoveryPriority' | 'routeId'>;
+export type CommandPaletteActionKind = 'route' | 'cv-section' | 'photography-album';
+
+export type CommandPaletteAction = {
+  id: string;
+  label: string;
+  description: string;
+  path: string;
+  keywords: string[];
+  kind: CommandPaletteActionKind;
+  routeId: SiteRouteId;
+};
 
 const primaryRouteActions: CommandPaletteAction[] = sharedRouteActions.map(
-  ({ recoveryPriority: _recoveryPriority, ...action }) => action
+  ({ recoveryPriority: _recoveryPriority, ...action }) => ({
+    ...action,
+    kind: 'route',
+  })
 );
 
 const cvCommandPaletteSectionOrder: CVSectionKey[] = ['about', ...cvSectionNavigationOrder];
@@ -23,6 +36,8 @@ const cvSectionActions: CommandPaletteAction[] = cvCommandPaletteSectionOrder.ma
   ].navLabel.toLowerCase()} section on the CV route.`,
   path: `${siteRouteMap.cv.path}#${cvSectionMetadata[sectionKey].id}`,
   keywords: ['cv', 'section', cvSectionMetadata[sectionKey].navLabel.toLowerCase()],
+  kind: 'cv-section',
+  routeId: 'cv',
 }));
 
 const photographyAlbumActions: CommandPaletteAction[] = photographyCategories.map((category) => ({
@@ -31,6 +46,8 @@ const photographyAlbumActions: CommandPaletteAction[] = photographyCategories.ma
   description: `Open the ${category.name.toLowerCase()} photography album.`,
   path: `${siteRouteMap.photography.path}/${category.slug}`,
   keywords: ['album', 'photography', category.slug, category.name.toLowerCase()],
+  kind: 'photography-album',
+  routeId: 'photography',
 }));
 
 export const commandPaletteActions: CommandPaletteAction[] = [

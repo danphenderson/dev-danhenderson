@@ -41,7 +41,7 @@ export default function Photography() {
   return (
     <PageFrame image={fallbackBackgroundImage}>
       <Stack spacing={2.5}>
-        <SectionCard delayMs={0}>
+        <SectionCard delayMs={0} triggerOnView={false}>
           <Stack spacing={1}>
             <SectionHeading
               overline="Photography"

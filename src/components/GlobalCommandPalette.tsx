@@ -10,12 +10,14 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   commandPaletteActions,
   type CommandPaletteAction,
 } from '../constants/commandPaletteActions';
+import { useCommandPalette } from '../CommandPaletteProvider';
+import { matchesCommandPaletteAction } from '../utils/commandPaletteSearch';
 
 const isEditableTarget = (target: EventTarget | null): boolean => {
   if (!(target instanceof HTMLElement)) {
@@ -28,22 +30,6 @@ const isEditableTarget = (target: EventTarget | null): boolean => {
 
   const tagName = target.tagName.toLowerCase();
   return tagName === 'input' || tagName === 'textarea' || tagName === 'select';
-};
-
-const normalizeSearchValue = (value: string): string => value.trim().toLowerCase();
-
-const matchesAction = (action: CommandPaletteAction, rawQuery: string): boolean => {
-  const query = normalizeSearchValue(rawQuery);
-
-  if (!query) {
-    return true;
-  }
-
-  const haystacks = [action.label, action.description, ...action.keywords].map((value) =>
-    value.toLowerCase()
-  );
-
-  return haystacks.some((value) => value.includes(query));
 };
 
 const scrollToHashTarget = (hashFragment: string): boolean => {
@@ -67,11 +53,11 @@ const scrollToHashTarget = (hashFragment: string): boolean => {
 export const GlobalCommandPalette = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
+  const { isOpen, query, openPalette, closePalette, setQuery } = useCommandPalette();
+  const previousPathnameRef = useRef(location.pathname);
 
   const filteredActions = useMemo(
-    () => commandPaletteActions.filter((action) => matchesAction(action, query)),
+    () => commandPaletteActions.filter((action) => matchesCommandPaletteAction(action, query)),
     [query]
   );
 
@@ -83,24 +69,28 @@ export const GlobalCommandPalette = () => {
 
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
-        setOpen(true);
+        openPalette();
         return;
       }
 
       if (!event.metaKey && !event.ctrlKey && !event.altKey && event.key === '/') {
         event.preventDefault();
-        setOpen(true);
+        openPalette();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [openPalette]);
 
   useEffect(() => {
-    setOpen(false);
-    setQuery('');
-  }, [location.key]);
+    if (previousPathnameRef.current === location.pathname) {
+      return;
+    }
+
+    previousPathnameRef.current = location.pathname;
+    closePalette();
+  }, [closePalette, location.pathname]);
 
   useEffect(() => {
     const hashFragment = location.hash.replace(/^#/, '');
@@ -135,8 +125,7 @@ export const GlobalCommandPalette = () => {
   }, [location.hash, location.pathname]);
 
   const handleClose = () => {
-    setOpen(false);
-    setQuery('');
+    closePalette();
   };
 
   const handleSelect = (action: CommandPaletteAction) => {
@@ -161,7 +150,7 @@ export const GlobalCommandPalette = () => {
 
   return (
     <Dialog
-      open={open}
+      open={isOpen}
       onClose={handleClose}
       fullWidth
       maxWidth="sm"
