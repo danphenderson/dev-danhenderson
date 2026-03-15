@@ -75,7 +75,7 @@ Use a foundation-first execution model:
 6. [x] Add climbing analytics and freshness surfaces on top of `useClimbingData` without changing the source dataset shape.
 7. [x] Expand photography metadata first, then add immersive mode, map view, and slug-aware sharing in that order so schema changes land before UI features. See `plans/photography-immersive-sharing.md`.
 8. [x] Add performance scorecard and PWA basics only after route metadata and build-info plumbing are stable.
-9. [ ] Run route-level validation after each completed slice, then finish with shared-browser validation and final documentation updates.
+9. [x] Run route-level validation after each completed slice, then finish with shared-browser validation and final documentation updates.
 
 ## Validation plan
 
@@ -99,7 +99,7 @@ Use a foundation-first execution model:
 
 ## Progress notes
 
-- Status: In progress
+- Status: Complete
 - Completed the shared route registry and route metadata wiring for the current routes.
 - Completed the first global command palette implementation with keyboard shortcuts, route actions, album actions, and CV section jump actions.
 - Completed shell-level skip links while the top-level app structure was already being touched.
@@ -128,9 +128,14 @@ Use a foundation-first execution model:
 - Completed execution step 8: performance scorecard, build-info plumbing, Web Vitals collection, and PWA basics.
 - Step 8 touched files: `src/utils/buildInfo.ts` (new — typed build metadata from `REACT_APP_*` env vars), `src/hooks/useWebVitals.ts` (new — Core Web Vitals hook with JSDOM-safe feature detection), `src/components/PerformanceScorecard.tsx` (new — dialog showing build info and live Web Vitals with rating chips), `src/components/Footer.tsx` (added scorecard trigger icon), `src/index.tsx` (service worker registration), `src/utils/serviceWorkerRegistration.ts` (new — minimal SW registration utility), `public/manifest.json` (new — PWA web app manifest), `public/service-worker.js` (new — network-first navigation, cache-first static assets), `public/index.html` (manifest link, apple-mobile-web-app-capable, mobile-web-app-capable meta tags), `package.json` (added `web-vitals@^5.1.0` dependency).
 - Step 8 validation actually run: `npm run build`, `CI=true npm test -- --watch=false` (no new test failures, Footer test still passes), browser validation of scorecard dialog on `/` showing build info (Version, Commit, Built, Environment) and live Web Vitals (LCP, CLS, INP, TTFB) with rating indicators and skeleton placeholders for pending metrics.
+- Completed execution step 9 — final validation pass and test cleanup.
+- Step 9 test repair: fixed 4 pre-existing CV component test suites (EducationSection, ExperienceList, CodingExamplesSection, VolunteeringList) that failed due to (1) a missing `getAnimatedSlideListCloseDelayMs` export in the `AnimatedSlideList` mock and (2) `TabPanel`'s `Collapse`-based `enteredPanels` state machine requiring `onEntered` to fire after the parent effect resets the flag. Added a `Collapse` mock using `Promise.resolve().then()` deferred `onEntered` and `await act(async () => {...})` for tab click assertions.
+- Step 9 validation actually run: `npm run build` (compiled successfully), `CI=true npm test -- --watch=false` (76 suites / 347 tests — all passing, zero failures), `npx playwright test test/e2e/home.spec.ts` (2/2 passed), `npx playwright test test/e2e/cv.github.spec.ts` (6/6 passed), `npx playwright test test/e2e/climbing.spec.ts` (5/5 passed), `npx playwright test test/e2e/photography.spec.ts` (5/5 passed), `npx playwright test test/e2e/not-found.spec.ts` (2/2 passed), browser validation on `/`, `/cv`, `/climbing`, `/photography`, `/photography/landscape`, and `/unknown-route` at desktop 1280×900 and mobile 390×844. All routes render correctly, command palette opens with `/`, Escape close works, no console errors observed.
+
+- Step 9 touched files: `test/unit/components/cv/EducationSection.test.tsx`, `test/unit/components/cv/ExperienceList.test.tsx`, `test/unit/components/cv/CodingExamplesSection.test.tsx`, `test/unit/components/cv/VolunteeringList.test.tsx`, `plans/v1-stretch-goals-integration.md`.
 
 ## Completion Status
 
 - [ ] Not started
-- [x] In progress
-- [ ] Complete
+- [ ] In progress
+- [x] Complete

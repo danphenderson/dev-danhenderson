@@ -1,7 +1,7 @@
 import DoneIcon from '@mui/icons-material/Done';
 import ShareIcon from '@mui/icons-material/Share';
 import { IconButton, Tooltip } from '@mui/material';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 type AlbumShareButtonProps = {
   albumName: string;
@@ -21,7 +21,15 @@ export function AlbumShareButton({
   albumDescription,
 }: AlbumShareButtonProps) {
   const [copied, setCopied] = useState(false);
+  const copiedTimerRef = useRef<number>();
   const canonicalUrl = getCanonicalAlbumUrl(albumSlug);
+
+  useEffect(
+    () => () => {
+      window.clearTimeout(copiedTimerRef.current);
+    },
+    []
+  );
 
   const handleShare = useCallback(async () => {
     const shareData = {
@@ -42,7 +50,8 @@ export function AlbumShareButton({
     try {
       await navigator.clipboard.writeText(canonicalUrl);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
+      window.clearTimeout(copiedTimerRef.current);
+      copiedTimerRef.current = window.setTimeout(() => setCopied(false), 2000);
     } catch {
       // Clipboard API unavailable
     }
