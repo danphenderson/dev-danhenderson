@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Box, Button, Chip, Stack, Typography } from '@mui/material';
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';
 import ViewModuleOutlinedIcon from '@mui/icons-material/ViewModuleOutlined';
@@ -10,9 +11,15 @@ type CVStoryHeaderProps = {
   mode: CVMode;
   onToggleMode: () => void;
   chapterLabel?: string;
+  statusIndicator?: ReactNode;
 };
 
-export const CVStoryHeader = ({ mode, onToggleMode, chapterLabel }: CVStoryHeaderProps) => {
+export const CVStoryHeader = ({
+  mode,
+  onToggleMode,
+  chapterLabel,
+  statusIndicator,
+}: CVStoryHeaderProps) => {
   const { compactSidebarSectionSpacing } = useComponentStyles();
   const isStory = mode === 'story';
 
@@ -31,6 +38,7 @@ export const CVStoryHeader = ({ mode, onToggleMode, chapterLabel }: CVStoryHeade
             {chapterLabel}
           </Typography>
         )}
+        {statusIndicator}
       </Box>
       {isStory && <SectionLeadText>{cvStoryIntro}</SectionLeadText>}
       <Box>
