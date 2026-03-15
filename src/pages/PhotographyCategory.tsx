@@ -1,10 +1,9 @@
 import { Link as RouterLink, Navigate, useLocation, useParams } from 'react-router-dom';
-import { Button, Stack } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useMemo } from 'react';
 import { BackToTopButton } from '../components/BackToTopButton';
 import { RouteRecoveryPanel } from '../components/RouteRecoveryPanel';
-import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
 import { QuiltedImageList } from '../components/PhotoAlbum';
@@ -77,7 +76,7 @@ export default function PhotographyCategory() {
       <>
         <Stack spacing={2.5}>
           <SectionCard delayMs={0} triggerOnView={false}>
-            <Stack spacing={1.5}>
+            <Stack spacing={{ xs: 2, md: 2.5 }}>
               <Button
                 component={RouterLink}
                 to="/photography"
@@ -87,16 +86,100 @@ export default function PhotographyCategory() {
               >
                 Back to photography
               </Button>
-              <SectionHeading
-                overline="Photography"
-                title={category?.name ?? 'Album not found'}
-                subtitle={category?.description}
-                sx={appStyles.compactSectionHeadingSx}
-              />
               {category ? (
-                <BodyText sx={appStyles.secondaryTextSx}>{category.album.length} photos</BodyText>
+                <Stack
+                  direction={{ xs: 'column', md: 'row' }}
+                  spacing={{ xs: 2, md: 3 }}
+                  justifyContent="space-between"
+                  alignItems={{ xs: 'flex-start', md: 'flex-end' }}
+                >
+                  <Stack spacing={1} sx={{ minWidth: 0, maxWidth: { md: 760 } }}>
+                    <Typography
+                      component="p"
+                      variant="overline"
+                      sx={{
+                        display: 'block',
+                        color: 'primary.main',
+                        fontWeight: 700,
+                        letterSpacing: '0.2em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Photography album
+                    </Typography>
+                    <Typography
+                      component="h1"
+                      variant="h2"
+                      sx={{
+                        color: 'text.primary',
+                        fontSize: { xs: '2.125rem', sm: '2.5rem', md: '3.25rem' },
+                        lineHeight: { xs: 1.05, md: 1 },
+                        letterSpacing: '-0.04em',
+                        textWrap: 'balance',
+                      }}
+                    >
+                      {category.name}
+                    </Typography>
+                    <Typography
+                      variant="body1"
+                      sx={{
+                        color: 'text.secondary',
+                        fontSize: { xs: '1rem', md: '1.075rem' },
+                        lineHeight: 1.65,
+                        maxWidth: { md: 620 },
+                      }}
+                    >
+                      {category.description}
+                    </Typography>
+                  </Stack>
+                  <Box
+                    sx={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      px: 1.5,
+                      py: 1,
+                      borderRadius: 999,
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      bgcolor: 'background.paper',
+                      boxShadow: 1,
+                      flexShrink: 0,
+                    }}
+                  >
+                    <BodyText sx={appStyles.secondaryTextSx}>
+                      {category.album.length} photos
+                    </BodyText>
+                  </Box>
+                </Stack>
               ) : (
                 <Stack spacing={2.5}>
+                  <Stack spacing={1} sx={{ minWidth: 0, maxWidth: { md: 760 } }}>
+                    <Typography
+                      component="p"
+                      variant="overline"
+                      sx={{
+                        display: 'block',
+                        color: 'primary.main',
+                        fontWeight: 700,
+                        letterSpacing: '0.2em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Photography album
+                    </Typography>
+                    <Typography
+                      component="h1"
+                      variant="h3"
+                      sx={{
+                        color: 'text.primary',
+                        fontSize: { xs: '2rem', md: '2.5rem' },
+                        lineHeight: 1.05,
+                        letterSpacing: '-0.03em',
+                      }}
+                    >
+                      Album not found
+                    </Typography>
+                  </Stack>
                   <BodyText sx={appStyles.secondaryTextSx}>
                     This album does not exist or has been moved. The command palette opens with a
                     recovery search so you can jump to another gallery or route quickly.
