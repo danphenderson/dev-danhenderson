@@ -35,12 +35,12 @@ describe('NotFound', () => {
     );
 
     expect(screen.getByRole('link', { name: 'Go home' })).toHaveAttribute('href', '/');
-    expect(screen.getByRole('link', { name: 'Open CV' })).toHaveAttribute('href', '/cv');
-    expect(screen.getByRole('link', { name: 'Open Climbing' })).toHaveAttribute(
+    expect(screen.getAllByRole('link', { name: 'Open CV' })[0]).toHaveAttribute('href', '/cv');
+    expect(screen.getAllByRole('link', { name: 'Open Climbing' })[0]).toHaveAttribute(
       'href',
       '/climbing'
     );
-    expect(screen.getByRole('link', { name: 'Open Photography' })).toHaveAttribute(
+    expect(screen.getAllByRole('link', { name: 'Open Photography' })[0]).toHaveAttribute(
       'href',
       '/photography'
     );
@@ -56,8 +56,8 @@ describe('NotFound', () => {
     );
 
     const homeLink = screen.getByRole('link', { name: 'Go home' });
-    const cvLink = screen.getByRole('link', { name: 'Open CV' });
-    const photographyLink = screen.getByRole('link', { name: 'Open Photography' });
+    const cvLink = screen.getAllByRole('link', { name: 'Open CV' })[0];
+    const photographyLink = screen.getAllByRole('link', { name: 'Open Photography' })[0];
 
     expect(homeLink).toHaveClass('MuiButton-contained');
     expect(cvLink).toHaveClass('MuiButton-outlined');
@@ -73,8 +73,8 @@ describe('NotFound', () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText(/Use one of the shared recovery routes below/)).toBeInTheDocument();
-    expect(screen.getByText('Return to the home hero route.')).toBeInTheDocument();
-    expect(screen.getByText('Open climbing ticks, goals, and analytics.')).toBeInTheDocument();
+    expect(screen.getByText('Shared recovery routes')).toBeInTheDocument();
+    expect(screen.getAllByText('Return to the home hero route.')).not.toHaveLength(0);
+    expect(screen.getAllByText('Open climbing ticks, goals, and analytics.')).not.toHaveLength(0);
   });
 });

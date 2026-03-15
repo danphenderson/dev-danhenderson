@@ -5,9 +5,9 @@ import { routerFuture } from '../../../../src/routerFuture';
 import { HeaderNav } from '../../../../src/components/header/HeaderNav';
 
 const pages = [
-  { name: 'CV', path: '/cv' },
-  { name: 'Climbing', path: '/climbing' },
-  { name: 'Photography', path: '/photography' },
+  { id: 'cv', label: 'CV', path: '/cv', title: 'CV', description: '', image: '', keywords: [], showInPrimaryNav: true },
+  { id: 'climbing', label: 'Climbing', path: '/climbing', title: 'Climbing', description: '', image: '', keywords: [], showInPrimaryNav: true },
+  { id: 'photography', label: 'Photography', path: '/photography', title: 'Photography', description: '', image: '', keywords: [], showInPrimaryNav: true },
 ];
 
 const defaultProps = {
