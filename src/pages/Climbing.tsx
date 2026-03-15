@@ -4,6 +4,7 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
+import { ClimbingAnalytics } from '../components/climbing/ClimbingAnalytics';
 import { useClimbingData, TickRow, TodoRow } from '../hooks/useClimbingData';
 import { useAppStyles } from '../styles/appStyles';
 import { SectionLeadText } from '../components/text';
@@ -53,7 +54,7 @@ const todoColumns: GridColDef<TodoRow>[] = [
 
 export default function Climbing() {
   const appStyles = useAppStyles();
-  const { ticks, todos } = useClimbingData();
+  const { ticks, todos, analytics, status } = useClimbingData();
 
   return (
     <PageFrame image="assets/climbing/climbing-locations.png" maxWidth={1200}>
@@ -63,6 +64,7 @@ export default function Climbing() {
           <SectionLeadText sx={appStyles.sectionLeadSx}>
             A collection of routes I've remembered to tick on Mountain Project.
           </SectionLeadText>
+          <ClimbingAnalytics analytics={analytics} status={status} />
           <Box sx={appStyles.dataGridContainerSx}>
             <DataGrid
               rows={ticks}
