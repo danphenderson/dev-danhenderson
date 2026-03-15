@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Stack } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { AboutMe } from '../../types/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
@@ -16,10 +16,12 @@ const OPPORTUNITY_DELIMITER = '|opportunity|';
 const WORKFLOW_CONTENT_DELIMITER = '|workflow|';
 const OPPORTUNITIES_HEADING = 'Open to opportunities:';
 const WORKFLOW_HEADING = 'Current workflow:';
+const INLINE_SKILLS_HEADING_COLUMN_WIDTH = '22ch';
 const CHIP_REVEAL_BUFFER_MS = 240;
 
 type InlineAnimatedSkillsRowProps = {
   heading: string;
+  headingColumnWidth: string;
   playing: boolean;
   visible: boolean;
   onHeadingComplete: () => void;
@@ -30,6 +32,7 @@ type InlineAnimatedSkillsRowProps = {
 
 const InlineAnimatedSkillsRow = ({
   heading,
+  headingColumnWidth,
   playing,
   visible,
   onHeadingComplete,
@@ -45,14 +48,16 @@ const InlineAnimatedSkillsRow = ({
     alignItems="center"
     sx={{ visibility: visible ? 'visible' : 'hidden' }}
   >
-    <SubsectionTitle sx={titleSx}>
-      <TypewriterText
-        text={heading}
-        playing={playing}
-        timingPreset="body"
-        onComplete={onHeadingComplete}
-      />
-    </SubsectionTitle>
+    <Box sx={{ minWidth: { sm: headingColumnWidth } }}>
+      <SubsectionTitle sx={titleSx}>
+        <TypewriterText
+          text={heading}
+          playing={playing}
+          timingPreset="body"
+          onComplete={onHeadingComplete}
+        />
+      </SubsectionTitle>
+    </Box>
     <SkillsChipList skills={skills} dense in={showSkills} />
   </Stack>
 );
@@ -186,7 +191,7 @@ export const CVAboutSection = ({
       id={sectionId}
       sx={cvSectionAnchorSx}
     >
-      <Stack spacing={2}>
+      <Stack spacing={compactSidebarSectionSpacing}>
         <Stack spacing={compactSidebarSectionSpacing}>
           <SectionHeading overline="About" sx={sectionHeadingCompactSx} />
           <ProfileCard
@@ -195,28 +200,34 @@ export const CVAboutSection = ({
             bioAnimationStartDelayMs={bioAnimationStartDelayMs}
             onBioAnimationComplete={handleBioAnimationComplete}
           />
-          {opportunities.length > 0 && (
-            <InlineAnimatedSkillsRow
-              heading={OPPORTUNITIES_HEADING}
-              playing={playOpportunitiesHeading}
-              visible={isOpportunitiesSectionVisible}
-              onHeadingComplete={handleOpportunitiesHeadingComplete}
-              skills={opportunities}
-              showSkills={showOpportunities}
-              titleSx={supportAccentTitleSx}
-            />
-          )}
         </Stack>
-        {workflowTools.length > 0 && (
-          <InlineAnimatedSkillsRow
-            heading={WORKFLOW_HEADING}
-            playing={playWorkflowHeading}
-            visible={isWorkflowSectionVisible}
-            onHeadingComplete={handleWorkflowHeadingComplete}
-            skills={workflowTools}
-            showSkills={showWorkflowTools}
-            titleSx={supportAccentTitleSx}
-          />
+        {(opportunities.length > 0 || workflowTools.length > 0) && (
+          <Stack spacing={1} sx={{ pt: 1 }}>
+            {opportunities.length > 0 && (
+              <InlineAnimatedSkillsRow
+                heading={OPPORTUNITIES_HEADING}
+                headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
+                playing={playOpportunitiesHeading}
+                visible={isOpportunitiesSectionVisible}
+                onHeadingComplete={handleOpportunitiesHeadingComplete}
+                skills={opportunities}
+                showSkills={showOpportunities}
+                titleSx={supportAccentTitleSx}
+              />
+            )}
+            {workflowTools.length > 0 && (
+              <InlineAnimatedSkillsRow
+                heading={WORKFLOW_HEADING}
+                headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
+                playing={playWorkflowHeading}
+                visible={isWorkflowSectionVisible}
+                onHeadingComplete={handleWorkflowHeadingComplete}
+                skills={workflowTools}
+                showSkills={showWorkflowTools}
+                titleSx={supportAccentTitleSx}
+              />
+            )}
+          </Stack>
         )}
       </Stack>
     </CVSectionCard>

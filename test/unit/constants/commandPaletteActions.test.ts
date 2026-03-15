@@ -55,6 +55,8 @@ describe('commandPaletteActions', () => {
       label: 'CV: Story Mode',
       path: '/cv?mode=story',
       keywords: expect.arrayContaining(['story', 'narrative']),
+      kind: 'route',
+      routeId: 'cv',
     });
   });
 });

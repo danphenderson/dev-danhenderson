@@ -46,6 +46,8 @@ const cvStoryModeAction: CommandPaletteAction = {
   description: 'View a guided narrative walk through the CV.',
   path: `${siteRouteMap.cv.path}?mode=story`,
   keywords: ['cv', 'story', 'narrative', 'guided'],
+  kind: 'route',
+  routeId: 'cv',
 };
 
 const photographyAlbumActions: CommandPaletteAction[] = photographyCategories.map((category) => ({
