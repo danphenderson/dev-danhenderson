@@ -16,9 +16,11 @@ describe('commandPaletteActions', () => {
     ]);
 
     expect(routeActions[0]).toMatchObject({
+      routeId: siteRouteMap.home.id,
       description: siteRouteMap.home.action?.description,
       keywords: expect.arrayContaining(siteRouteMap.home.action?.keywords ?? []),
     });
+    expect(routeActions[0]).not.toHaveProperty('recoveryPriority');
   });
 
   it('includes the CV About section before the shared section navigation order', () => {
