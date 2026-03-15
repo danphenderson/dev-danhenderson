@@ -1,0 +1,64 @@
+import type { Transition } from 'motion/react';
+import { SPRING_EASING_MOTION } from '../styles/springEasing';
+
+/* ------------------------------------------------------------------ */
+/*  Duration tokens (seconds)                                         */
+/* ------------------------------------------------------------------ */
+
+export const duration = {
+  /** Micro-interactions: hover states, button presses. */
+  instant: 0.12,
+  /** Quick feedback: toggles, small reveals. */
+  fast: 0.2,
+  /** Default UI transitions: cards, panels. */
+  normal: 0.35,
+  /** Larger reveals: sections, hero entrances. */
+  slow: 0.5,
+  /** Dramatic reveals: page-level choreography. */
+  dramatic: 0.7,
+} as const;
+
+/* ------------------------------------------------------------------ */
+/*  Easing tokens                                                     */
+/* ------------------------------------------------------------------ */
+
+export const easing = {
+  /** Standard ease-out for most transitions. */
+  smooth: [0.25, 0.1, 0.25, 1] as [number, number, number, number],
+  /** Spring-like overshoot for playful entrances. */
+  spring: SPRING_EASING_MOTION,
+  /** Deceleration curve for incoming content. */
+  decel: [0, 0, 0.2, 1] as [number, number, number, number],
+  /** Acceleration curve for exiting content. */
+  accel: [0.4, 0, 1, 1] as [number, number, number, number],
+} as const;
+
+/* ------------------------------------------------------------------ */
+/*  Stagger tokens (seconds)                                          */
+/* ------------------------------------------------------------------ */
+
+export const stagger = {
+  /** Tight stagger for related items in a list. */
+  fast: 0.04,
+  /** Default stagger for card grids and section items. */
+  normal: 0.08,
+  /** Relaxed stagger for large sections. */
+  slow: 0.12,
+} as const;
+
+/* ------------------------------------------------------------------ */
+/*  Composite transition presets                                      */
+/* ------------------------------------------------------------------ */
+
+export const transition: Record<string, Transition> = {
+  /** Physics-based spring for natural movement. */
+  spring: { type: 'spring', stiffness: 260, damping: 22 },
+  /** Smooth ease-out for general-purpose reveals. */
+  smooth: { duration: duration.normal, ease: easing.smooth },
+  /** Fast ease-out for micro-interactions. */
+  snappy: { duration: duration.fast, ease: easing.smooth },
+  /** Slow reveal for section entrances. */
+  reveal: { duration: duration.slow, ease: easing.decel },
+  /** Dramatic entrance with spring overshoot. */
+  dramatic: { duration: duration.dramatic, ease: easing.spring },
+} as const;
