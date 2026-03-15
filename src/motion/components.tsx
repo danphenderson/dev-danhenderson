@@ -1,4 +1,4 @@
-import type { ReactNode, ElementType } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import { motion, useInView } from 'motion/react';
 import type { Variants, HTMLMotionProps, TargetAndTransition } from 'motion/react';
 import { useRef } from 'react';
@@ -21,7 +21,20 @@ import {
  * motion/react's `useInView` expects.  The runtime value is identical;
  * only the compile-time type changes.
  */
-const asMargin = (m: string) => m as Parameters<typeof useInView>[1] extends { margin?: infer M } ? M : never;
+const asMargin = (m: string) =>
+  m as Parameters<typeof useInView>[1] extends { margin?: infer M } ? M : never;
+
+const useMotionInView = <Element extends HTMLElement>(
+  ref: RefObject<Element>,
+  rootMargin: string,
+  once: boolean,
+  threshold?: number
+) =>
+  useInView(ref, {
+    once,
+    margin: asMargin(rootMargin),
+    amount: threshold || undefined,
+  });
 
 /* ------------------------------------------------------------------ */
 /*  MotionSection                                                     */
@@ -37,8 +50,6 @@ interface MotionSectionProps extends Omit<HTMLMotionProps<'div'>, 'variants'> {
   threshold?: number;
   /** Play animation only once (default true). */
   once?: boolean;
-  /** HTML tag to render. */
-  as?: ElementType;
 }
 
 /**
@@ -53,15 +64,10 @@ export const MotionSection = ({
   rootMargin = '0px 0px -12% 0px',
   threshold = 0,
   once = true,
-  as: _as,
   ...rest
 }: MotionSectionProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, {
-    once,
-    margin: asMargin(rootMargin),
-    amount: threshold || undefined,
-  });
+  const isInView = useMotionInView(ref, rootMargin, once, threshold);
 
   return (
     <motion.div
@@ -84,8 +90,6 @@ interface StaggerChildrenProps extends Omit<HTMLMotionProps<'div'>, 'variants'> 
   children: ReactNode;
   /** Stagger variant for the container. */
   containerVariants?: Variants;
-  /** Variant applied to each child. */
-  itemVariants?: Variants;
   /** IntersectionObserver margin. */
   rootMargin?: string;
   /** Play animation only once (default true). */
@@ -95,20 +99,19 @@ interface StaggerChildrenProps extends Omit<HTMLMotionProps<'div'>, 'variants'> 
 /**
  * Scroll-triggered stagger container.
  *
- * Each direct child should be wrapped in a `motion.div` with
- * `variants={itemVariants}` for stagger to work correctly.
+ * Each direct child should be wrapped in a `MotionItem` or `motion.div`
+ * with its own `variants` prop for stagger to work correctly.
  * This component provides the container orchestration.
  */
 export const StaggerChildren = ({
   children,
   containerVariants = staggerContainer,
-  itemVariants: _itemVariants,
   rootMargin = '0px 0px -8% 0px',
   once = true,
   ...rest
 }: StaggerChildrenProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once, margin: asMargin(rootMargin) });
+  const isInView = useMotionInView(ref, rootMargin, once);
 
   return (
     <motion.div
@@ -149,8 +152,8 @@ export const MotionCard = ({
 }: MotionCardProps) => {
   return (
     <motion.div
-      whileHover={!disableHover ? (hoverState ?? hoverLift) : undefined}
-      whileTap={!disableHover ? (tapState ?? tapShrink) : undefined}
+      whileHover={!disableHover ? hoverState ?? hoverLift : undefined}
+      whileTap={!disableHover ? tapState ?? tapShrink : undefined}
       {...rest}
     >
       {children}
@@ -224,7 +227,7 @@ export const MotionFadeIn = ({
   ...rest
 }: MotionFadeInProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once, margin: asMargin(rootMargin) });
+  const isInView = useMotionInView(ref, rootMargin, once);
 
   return (
     <motion.div
@@ -257,7 +260,7 @@ export const MotionScaleIn = ({
   ...rest
 }: MotionScaleInProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once, margin: asMargin(rootMargin) });
+  const isInView = useMotionInView(ref, rootMargin, once);
 
   return (
     <motion.div

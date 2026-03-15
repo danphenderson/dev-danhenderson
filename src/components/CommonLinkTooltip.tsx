@@ -19,13 +19,13 @@ export const CommonLinkTooltip = () => {
       place="top"
       offset={10}
       opacity={1}
+      border={`1px solid ${borderColor}`}
       positionStrategy="fixed"
       openEvents={{ mouseenter: true, focus: true }}
       closeEvents={{ mouseleave: true, blur: true }}
       style={{
         backgroundColor,
         color: theme.palette.common.white,
-        border: `1px solid ${borderColor}`,
         borderRadius: 12,
         boxShadow: theme.shadows[4],
         fontSize: theme.typography.pxToRem(13),
