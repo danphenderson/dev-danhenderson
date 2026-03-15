@@ -48,11 +48,20 @@ export type Todo = {
   url: string;
 };
 
+export type PhotoCoordinates = {
+  lat: number;
+  lng: number;
+};
+
 export type PhotoItem = {
   img: string;
   title: string;
   rows?: number;
   cols?: number;
+  location?: string;
+  dateTaken?: string;
+  tags?: string[];
+  coordinates?: PhotoCoordinates;
 };
 
 export type PhotoCategory = {
@@ -61,4 +70,7 @@ export type PhotoCategory = {
   description: string;
   src: string;
   album: PhotoItem[];
+  location?: string;
+  dateRange?: string;
+  coordinates?: PhotoCoordinates;
 };

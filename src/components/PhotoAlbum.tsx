@@ -6,6 +6,7 @@ import type { PhotoItem } from '../types/data';
 type QuiltedImageListProps = {
   imageData: PhotoItem[];
   albumLabel?: string;
+  onPhotoClick?: (index: number) => void;
 };
 
 function srcset(image: string, size: number, rows = 1, cols = 1) {
@@ -22,7 +23,7 @@ function getDownloadFilename(image: string) {
   return decodeURIComponent(segments[segments.length - 1] || 'photo');
 }
 
-export function QuiltedImageList({ imageData, albumLabel }: QuiltedImageListProps) {
+export function QuiltedImageList({ imageData, albumLabel, onPhotoClick }: QuiltedImageListProps) {
   const appStyles = useAppStyles();
 
   return (
@@ -47,6 +48,20 @@ export function QuiltedImageList({ imageData, albumLabel }: QuiltedImageListProp
               alt={altText}
               loading="lazy"
               decoding="async"
+              onClick={onPhotoClick ? () => onPhotoClick(index) : undefined}
+              role={onPhotoClick ? 'button' : undefined}
+              tabIndex={onPhotoClick ? 0 : undefined}
+              onKeyDown={
+                onPhotoClick
+                  ? (e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        onPhotoClick(index);
+                      }
+                    }
+                  : undefined
+              }
+              style={onPhotoClick ? { cursor: 'pointer' } : undefined}
             />
             <IconButton
               className="photo-download-action"

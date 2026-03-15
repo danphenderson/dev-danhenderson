@@ -50,15 +50,47 @@ const cvStoryModeAction: CommandPaletteAction = {
   routeId: 'cv',
 };
 
-const photographyAlbumActions: CommandPaletteAction[] = photographyCategories.map((category) => ({
-  id: `photo-album-${category.slug}`,
-  label: `Album: ${category.name}`,
-  description: `Open the ${category.name.toLowerCase()} photography album.`,
-  path: `${siteRouteMap.photography.path}/${category.slug}`,
-  keywords: ['album', 'photography', category.slug, category.name.toLowerCase()],
-  kind: 'photography-album',
-  routeId: 'photography',
-}));
+const photographyAlbumActions: CommandPaletteAction[] = photographyCategories.map((category) => {
+  const locationKeywords: string[] = [];
+  if (category.location) {
+    locationKeywords.push(category.location.toLowerCase());
+  }
+  const photoLocationSet = new Set<string>();
+  for (const photo of category.album) {
+    if (photo.location) {
+      photoLocationSet.add(photo.location.toLowerCase());
+    }
+  }
+  locationKeywords.push(...Array.from(photoLocationSet));
+
+  const tagSet = new Set<string>();
+  for (const photo of category.album) {
+    if (photo.tags) {
+      for (const tag of photo.tags) {
+        tagSet.add(tag.toLowerCase());
+      }
+    }
+  }
+
+  return {
+    id: `photo-album-${category.slug}`,
+    label: `Album: ${category.name}`,
+    description: `Open the ${category.name.toLowerCase()} photography album.${
+      category.location ? ` ${category.location}.` : ''
+    }${category.album.length ? ` ${category.album.length} photos.` : ''}`,
+    path: `${siteRouteMap.photography.path}/${category.slug}`,
+    keywords: [
+      'album',
+      'photography',
+      category.slug,
+      category.name.toLowerCase(),
+      ...locationKeywords,
+      ...Array.from(tagSet),
+    ],
+    kind: 'photography-album',
+    routeId: 'photography',
+  };
+});
 
 export const commandPaletteActions: CommandPaletteAction[] = [
   ...primaryRouteActions,

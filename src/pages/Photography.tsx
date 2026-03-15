@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
+import PlaceIcon from '@mui/icons-material/Place';
 import { Link as RouterLink } from 'react-router-dom';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
@@ -82,6 +83,26 @@ export default function Photography() {
                     {card.name}
                   </Typography>
                   <BodyText sx={appStyles.secondaryTextSx}>{card.description}</BodyText>
+                  {(card.location || card.dateRange) && (
+                    <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap">
+                      {card.location && (
+                        <Stack direction="row" spacing={0.25} alignItems="center">
+                          <PlaceIcon sx={{ color: 'text.secondary', fontSize: 14 }} />
+                          <Typography variant="caption" color="text.secondary">
+                            {card.location}
+                          </Typography>
+                        </Stack>
+                      )}
+                      {card.dateRange && (
+                        <Typography variant="caption" color="text.secondary">
+                          · {card.dateRange}
+                        </Typography>
+                      )}
+                    </Stack>
+                  )}
+                  <BodyText sx={appStyles.secondaryTextSx}>
+                    {card.album.length} photos
+                  </BodyText>
                 </Stack>
 
                 <Button
