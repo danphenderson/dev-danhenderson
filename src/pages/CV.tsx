@@ -1,5 +1,7 @@
 import { Box, Grid } from '@mui/material';
 import type { ReactNode } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme as useMuiTheme } from '@mui/material/styles';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -15,6 +17,8 @@ import { CVEducationSection } from '../components/cv/CVEducationSection';
 import { CVExperienceSection } from '../components/cv/CVExperienceSection';
 import { CVSectionNavigator } from '../components/cv/CVSectionNavigator';
 import { CVSectionStack } from '../components/cv/CVSectionStack';
+import { CVStoryHeader } from '../components/cv/CVStoryHeader';
+import { CVStoryChapterHeading } from '../components/cv/CVStoryChapterHeading';
 import { CVVolunteeringSection } from '../components/cv/CVVolunteeringSection';
 import {
   cvSectionNavigationOrder,
@@ -29,6 +33,7 @@ import {
   codingExamples,
   currentWorkflowTools,
   cvBackgroundImage,
+  cvStoryChapters,
   educationInfo,
   experiences,
   githubSectionLead,
@@ -38,7 +43,8 @@ import {
   resumeDownloadFilename,
   resumePdfUrl,
 } from '../data/cv';
-import { siteRouteMap } from '../constants/siteRoutes';
+import { siteRouteMap, cvStoryModeMetadata } from '../constants/siteRoutes';
+import type { CVMode } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useGithubProfile } from '../hooks/useGithubProfile';
 import { CVLayoutMode, CVSectionRegion, cvPageSectionLayout } from './cvPageLayout';
@@ -62,6 +68,9 @@ type CVSectionDefinition = {
   render: (layout: { delayMs: number; triggerOnView: boolean }) => ReactNode;
 };
 
+const parseCVMode = (value: string | null): CVMode =>
+  value === 'story' ? 'story' : 'default';
+
 export default function CV() {
   return <CVRouteContent />;
 }
@@ -69,13 +78,38 @@ export default function CV() {
 const CVRouteContent = () => {
   const appStyles = useAppStyles();
   const { motionTokens } = useComponentStyles();
-  useDocumentMetadata({ ...siteRouteMap.cv, canonicalPath: siteRouteMap.cv.path });
+  const [searchParams, setSearchParams] = useSearchParams();
+  const cvMode = parseCVMode(searchParams.get('mode'));
+  const isStoryMode = cvMode === 'story';
+
+  const documentMetadata = isStoryMode
+    ? {
+        title: cvStoryModeMetadata.title,
+        description: cvStoryModeMetadata.description,
+        image: siteRouteMap.cv.image,
+        canonicalPath: siteRouteMap.cv.path,
+      }
+    : { ...siteRouteMap.cv, canonicalPath: siteRouteMap.cv.path };
+  useDocumentMetadata(documentMetadata);
+
   const { activity, contributions, loading, error, status } = useGithubProfile();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const layoutMode: CVLayoutMode = isMobile ? 'mobile' : 'desktop';
   const githubNestedDelayOffsetMs = motionTokens.sectionStaggerMs / 2;
   const itemOffsetMs = motionTokens.itemOffsetMs;
+
+  const handleToggleMode = useCallback(() => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      if (parseCVMode(prev.get('mode')) === 'story') {
+        next.delete('mode');
+      } else {
+        next.set('mode', 'story');
+      }
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   const aboutActions: AppSpeedDialAction[] = [
     {
@@ -215,6 +249,13 @@ const CVRouteContent = () => {
     },
   ];
 
+  const sectionDefinitionsByKey = useMemo(() => {
+    const map = new Map<CVSectionKey, CVSectionDefinition>();
+    sectionDefinitions.forEach((def) => map.set(def.key, def));
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activity, contributions, loading, error, status]);
+
   const sectionDescriptors: CVResolvedSectionDescriptor[] = sectionDefinitions.map(
     ({ key, render }) => {
       const layout = cvPageSectionLayout[key][layoutMode];
@@ -250,6 +291,37 @@ const CVRouteContent = () => {
       .sort((left, right) => left.placement.order - right.placement.order)
       .map(renderSectionDescriptor);
 
+  // ── Story mode ─────────────────────────────────────────────────────
+
+  if (isStoryMode) {
+    return (
+      <PageFrame
+        image={cvBackgroundImage}
+        maxWidth={900}
+        containerSx={appStyles.cvPageContainerSx}
+      >
+        <Box data-testid="cv-story-layout">
+          <CVSectionStack spacing={3}>
+            <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} />
+            {cvStoryChapters.map((chapter, index) => {
+              const definition = sectionDefinitionsByKey.get(chapter.sectionKey);
+              if (!definition) return null;
+              const node = definition.render({ delayMs: 0, triggerOnView: true });
+              return (
+                <Box key={chapter.key}>
+                  <CVStoryChapterHeading chapter={chapter} index={index} />
+                  <Box sx={{ mt: 2 }}>{node}</Box>
+                </Box>
+              );
+            })}
+          </CVSectionStack>
+        </Box>
+      </PageFrame>
+    );
+  }
+
+  // ── Default exploratory mode ───────────────────────────────────────
+
   if (isMobile) {
     const mobileSections = sectionDescriptors
       .filter((descriptor) => descriptor.placement.region === 'stack')
@@ -265,6 +337,7 @@ const CVRouteContent = () => {
       >
         <>
           <CVSectionStack spacing={2.5}>
+            <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} />
             {mobileAboutSection && renderSectionDescriptor(mobileAboutSection)}
             {mobileBodySections.map(renderSectionDescriptor)}
           </CVSectionStack>
@@ -277,6 +350,7 @@ const CVRouteContent = () => {
   return (
     <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
       <>
+        <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} />
         <Grid container spacing={3} alignItems="stretch">
           <Grid item xs={12}>
             <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-top-region">

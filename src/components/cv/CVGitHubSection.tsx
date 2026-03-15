@@ -35,6 +35,10 @@ const getGitHubStatusSummary = (status: SharedDataStatus) => {
     return 'Loading live GitHub activity while keeping bundled fallback highlights available.';
   }
 
+  if (status.reason === 'partial-fallback') {
+    return 'Some GitHub data sources responded while others fell back to bundled highlights.';
+  }
+
   if (status.isFallback) {
     return 'Showing bundled fallback highlights because the live GitHub response was incomplete or unavailable.';
   }
@@ -44,6 +48,13 @@ const getGitHubStatusSummary = (status: SharedDataStatus) => {
   }
 
   return 'Showing live GitHub activity from the latest successful fetch.';
+};
+
+const getGitHubFreshnessLabel = (status: SharedDataStatus) => {
+  if (status.freshness.isStale) {
+    return 'Cached data may be outdated — a fresh fetch will run on the next visit.';
+  }
+  return status.freshness.label;
 };
 
 type CVGitHubSectionProps = {
@@ -130,11 +141,22 @@ export const CVGitHubSection = ({
           <Stack spacing={0.75}>
             <SubsectionTitle sx={supportAccentTitleSx}>Data status</SubsectionTitle>
             <BodyText>{getGitHubStatusSummary(resolvedStatus)}</BodyText>
-            <BodyText>{resolvedStatus.freshness.label}</BodyText>
+            <BodyText>{getGitHubFreshnessLabel(resolvedStatus)}</BodyText>
             {formattedStatusTimestamp && (
               <BodyText>Last refreshed {formattedStatusTimestamp}.</BodyText>
             )}
             {resolvedStatus.error && <BodyText>{resolvedStatus.error}</BodyText>}
+            {resolvedStatus.sourceDetail && resolvedStatus.sourceDetail.some((s) => !s.ok) && (
+              <BodyText>
+                Partial failure:{' '}
+                {resolvedStatus.sourceDetail
+                  .filter((s) => !s.ok)
+                  .map((s) => s.label)
+                  .join(', ')
+                  .toLowerCase()}{' '}
+                did not respond.
+              </BodyText>
+            )}
           </Stack>
         </SectionPanel>
 

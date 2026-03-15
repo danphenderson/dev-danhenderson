@@ -5,6 +5,8 @@ import { resolvePublicAssetPath } from '../utils/assets';
 
 export type SiteRouteId = 'home' | 'cv' | 'climbing' | 'photography' | 'not-found';
 
+export type CVMode = 'default' | 'story';
+
 export type SiteRouteDefinition = {
   id: SiteRouteId;
   label: string;
@@ -128,3 +130,9 @@ export const siteRouteMap: Record<SiteRouteId, SiteRouteDefinition> = {
 export const siteRoutes = Object.values(siteRouteMap);
 
 export const primaryNavigationRoutes = siteRoutes.filter((route) => route.showInPrimaryNav);
+
+export const cvStoryModeMetadata = {
+  title: 'My Story | Daniel Henderson',
+  description:
+    "A guided narrative through Daniel Henderson's career — from mathematics and scientific computing through full-stack engineering and open-source contribution.",
+} as const;
