@@ -101,3 +101,34 @@ export async function mockGitHubAPIFailure(page: Page) {
     route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })
   );
 }
+
+/** Mock GitHub events as successful but contribution search as failed for partial-fallback testing. */
+export async function mockGitHubAPIPartialFailure(page: Page) {
+  await page.route('**/api.github.com/users/*/events/**', (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        {
+          id: '1',
+          type: 'PushEvent',
+          repo: { name: 'danphenderson/dev-danhenderson' },
+          payload: {
+            ref: 'refs/heads/main',
+            before: 'abc',
+            head: 'def',
+            commits: [{ message: 'E2E mock commit', sha: 'abc123' }],
+          },
+        },
+      ]),
+    })
+  );
+
+  await page.route('**/api.github.com/search/issues**', (route) =>
+    route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })
+  );
+
+  await page.route('**/api.github.com/repos/**', (route) =>
+    route.fulfill({ status: 500, contentType: 'application/json', body: '{}' })
+  );
+}

@@ -338,4 +338,39 @@ describe('CV page section navigation', () => {
     ).toBeTruthy();
     expect(navigator.getAttribute('data-sections')).toBe(cvSectionNavigationOrder.join(','));
   });
+
+  it('renders story mode layout when ?mode=story is set', () => {
+    renderCV(['/cv?mode=story']);
+
+    expect(screen.getByTestId('cv-story-layout')).toBeInTheDocument();
+    expect(screen.getByTestId('cv-story-header')).toBeInTheDocument();
+    expect(screen.getByText('Story Mode')).toBeInTheDocument();
+    expect(screen.getByTestId('cv-mode-toggle')).toHaveTextContent('Switch to full CV');
+    expect(screen.queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('cv-desktop-top-region')).not.toBeInTheDocument();
+  });
+
+  it('renders all story chapters with headings and narrative', () => {
+    renderCV(['/cv?mode=story']);
+
+    expect(screen.getByTestId('cv-story-chapter-origin')).toBeInTheDocument();
+    expect(screen.getByText('The Starting Point')).toBeInTheDocument();
+    expect(screen.getByText('Chapter 1')).toBeInTheDocument();
+
+    expect(screen.getByTestId('cv-story-chapter-career')).toBeInTheDocument();
+    expect(screen.getByText('Professional Path')).toBeInTheDocument();
+
+    expect(screen.getByTestId('cv-story-chapter-craft')).toBeInTheDocument();
+    expect(screen.getByText('Code in Practice')).toBeInTheDocument();
+  });
+
+  it('renders the default mode with a story toggle when ?mode is absent', () => {
+    renderCV();
+
+    expect(screen.getByTestId('cv-story-header')).toBeInTheDocument();
+    expect(screen.getByText('Full CV')).toBeInTheDocument();
+    expect(screen.getByTestId('cv-mode-toggle')).toHaveTextContent('Read my story');
+    expect(screen.queryByTestId('cv-story-layout')).not.toBeInTheDocument();
+    expect(screen.getByTestId('cv-desktop-top-region')).toBeInTheDocument();
+  });
 });

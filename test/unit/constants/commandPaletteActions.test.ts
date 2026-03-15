@@ -46,4 +46,15 @@ describe('commandPaletteActions', () => {
       'route-photography',
     ]);
   });
+
+  it('includes a CV story mode action with the query-param path', () => {
+    const storyAction = commandPaletteActions.find((action) => action.id === 'cv-story-mode');
+
+    expect(storyAction).toBeDefined();
+    expect(storyAction).toMatchObject({
+      label: 'CV: Story Mode',
+      path: '/cv?mode=story',
+      keywords: expect.arrayContaining(['story', 'narrative']),
+    });
+  });
 });
