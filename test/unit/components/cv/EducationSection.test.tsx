@@ -1,8 +1,30 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { educationInfo } from '../../../../src/data/cv';
 import { EducationSection } from '../../../../src/components/cv/EducationSection';
+
+jest.mock('@mui/material', () => {
+  const actual = jest.requireActual('@mui/material');
+
+  return {
+    ...actual,
+    Collapse: ({ children, in: inProp, onEntered, ...rest }: any) => {
+      const React = require('react');
+      const onEnteredRef = React.useRef(onEntered);
+
+      onEnteredRef.current = onEntered;
+
+      React.useEffect(() => {
+        if (inProp && onEnteredRef.current) {
+          Promise.resolve().then(() => onEnteredRef.current?.());
+        }
+      }, [inProp]);
+
+      return <div {...rest}>{children}</div>;
+    },
+  };
+});
 
 const mockAnimatedContentList = jest.fn();
 const mockAnimatedSlideList = jest.fn();
@@ -26,6 +48,12 @@ jest.mock('../../../../src/components/AnimatedContentList', () => ({
 }));
 
 jest.mock('../../../../src/components/AnimatedSlideList', () => ({
+  getAnimatedSlideListCloseDelayMs: (
+    itemCount: number,
+    itemStaggerMs: number,
+    startDelayMs: number = 0,
+    exitDurationMs: number = 220
+  ) => (itemCount <= 0 ? 0 : startDelayMs + Math.max(itemCount - 1, 0) * itemStaggerMs + exitDurationMs),
   AnimatedSlideList: (props: {
     items: unknown[];
     getItemKey: (item: unknown, index: number) => string;
@@ -64,7 +92,7 @@ describe('EducationSection', () => {
     mockAnimatedSlideList.mockClear();
   });
 
-  it('groups highlights and skills into the shared tab panel', () => {
+  it('groups highlights and skills into the shared tab panel', async () => {
     render(
       <ThemeProvider>
         <EducationSection education={{ entries: [educationInfo.entries[0]] }} />
@@ -92,7 +120,9 @@ describe('EducationSection', () => {
     expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
     expect(screen.queryByText('LaTeX')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Highlights' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('tab', { name: 'Highlights' }));
+    });
 
     expect(
       screen.getByText(
@@ -106,7 +136,9 @@ describe('EducationSection', () => {
     ).toBe(true);
     expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Coursework' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('tab', { name: 'Coursework' }));
+    });
 
     expect(screen.getByText('Linear Algebra')).toBeVisible();
     expect(screen.getByText('Numerical Optimization')).toBeVisible();
@@ -116,7 +148,9 @@ describe('EducationSection', () => {
       )
     ).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
+    });
 
     expect(screen.getByText('LaTeX')).toBeVisible();
     expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.layout === 'wrap')).toBe(true);

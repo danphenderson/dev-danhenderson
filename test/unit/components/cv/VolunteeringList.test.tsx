@@ -1,8 +1,30 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { COMMON_LINK_TOOLTIP_ID } from '../../../../src/components/CommonLink';
 import { VolunteeringList } from '../../../../src/components/cv/VolunteeringList';
+
+jest.mock('@mui/material', () => {
+  const actual = jest.requireActual('@mui/material');
+
+  return {
+    ...actual,
+    Collapse: ({ children, in: inProp, onEntered, ...rest }: any) => {
+      const React = require('react');
+      const onEnteredRef = React.useRef(onEntered);
+
+      onEnteredRef.current = onEntered;
+
+      React.useEffect(() => {
+        if (inProp && onEnteredRef.current) {
+          Promise.resolve().then(() => onEnteredRef.current?.());
+        }
+      }, [inProp]);
+
+      return <div {...rest}>{children}</div>;
+    },
+  };
+});
 
 const mockAnimatedContentList = jest.fn();
 const mockAnimatedSlideList = jest.fn();
@@ -31,6 +53,12 @@ jest.mock('../../../../src/components/AnimatedContentList', () => ({
 }));
 
 jest.mock('../../../../src/components/AnimatedSlideList', () => ({
+  getAnimatedSlideListCloseDelayMs: (
+    itemCount: number,
+    itemStaggerMs: number,
+    startDelayMs: number = 0,
+    exitDurationMs: number = 220
+  ) => (itemCount <= 0 ? 0 : startDelayMs + Math.max(itemCount - 1, 0) * itemStaggerMs + exitDurationMs),
   AnimatedSlideList: (props: {
     items: unknown[];
     getItemKey: (item: unknown, index: number) => string;
@@ -68,7 +96,7 @@ describe('VolunteeringList', () => {
     mockAnimatedSlideList.mockClear();
   });
 
-  it('renders volunteering entries with role as title, organization as secondary label, and details in a shared tab panel', () => {
+  it('renders volunteering entries with role as title, organization as secondary label, and details in a shared tab panel', async () => {
     render(
       <ThemeProvider>
         <VolunteeringList
@@ -112,7 +140,9 @@ describe('VolunteeringList', () => {
       )
     ).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Details' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('tab', { name: 'Details' }));
+    });
 
     expect(
       screen.getByText(

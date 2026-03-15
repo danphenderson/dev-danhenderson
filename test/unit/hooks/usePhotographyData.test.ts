@@ -50,4 +50,19 @@ describe('usePhotographyData', () => {
 
     expect(result.current.categories).toBe(firstCategories);
   });
+
+  it('reports bundled photography metadata status', () => {
+    const { result } = renderHook(() => usePhotographyData());
+
+    expect(result.current.status).toMatchObject({
+      source: 'static',
+      loading: false,
+      isFallback: false,
+      reason: 'bundled-content',
+      freshness: {
+        isStale: false,
+      },
+    });
+    expect(result.current.status.freshness.label).toContain('Bundled photography album metadata');
+  });
 });

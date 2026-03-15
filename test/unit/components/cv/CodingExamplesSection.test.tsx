@@ -1,9 +1,31 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import type { CodingExample } from '../../../../src/types/cv';
 import { codingExamples } from '../../../../src/data/cv';
 import { CodingExamplesSection } from '../../../../src/components/cv/CodingExamplesSection';
+
+jest.mock('@mui/material', () => {
+  const actual = jest.requireActual('@mui/material');
+
+  return {
+    ...actual,
+    Collapse: ({ children, in: inProp, onEntered, ...rest }: any) => {
+      const React = require('react');
+      const onEnteredRef = React.useRef(onEntered);
+
+      onEnteredRef.current = onEntered;
+
+      React.useEffect(() => {
+        if (inProp && onEnteredRef.current) {
+          Promise.resolve().then(() => onEnteredRef.current?.());
+        }
+      }, [inProp]);
+
+      return <div {...rest}>{children}</div>;
+    },
+  };
+});
 
 const mockAnimatedContentList = jest.fn();
 const mockAnimatedSlideList = jest.fn();
@@ -28,6 +50,12 @@ jest.mock('../../../../src/components/AnimatedContentList', () => ({
 }));
 
 jest.mock('../../../../src/components/AnimatedSlideList', () => ({
+  getAnimatedSlideListCloseDelayMs: (
+    itemCount: number,
+    itemStaggerMs: number,
+    startDelayMs: number = 0,
+    exitDurationMs: number = 220
+  ) => (itemCount <= 0 ? 0 : startDelayMs + Math.max(itemCount - 1, 0) * itemStaggerMs + exitDurationMs),
   AnimatedSlideList: (props: {
     items: unknown[];
     getItemKey: (item: unknown, index: number) => string;
@@ -81,7 +109,7 @@ describe('CodingExamplesSection', () => {
     );
   });
 
-  it('renders project tabs from data, shows the summary immediately, and toggles between list and stack content', () => {
+  it('renders project tabs from data, shows the summary immediately, and toggles between list and stack content', async () => {
     render(
       <ThemeProvider>
         <CodingExamplesSection examples={[codingExamples[0]]} />
@@ -107,7 +135,9 @@ describe('CodingExamplesSection', () => {
     ).not.toBeInTheDocument();
     expect(screen.queryByText('Python')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Purpose' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('tab', { name: 'Purpose' }));
+    });
 
     expect(
       screen.getByText(
@@ -126,7 +156,9 @@ describe('CodingExamplesSection', () => {
     ).toBeVisible();
     expect(screen.queryByText('Python')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Stack' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('tab', { name: 'Stack' }));
+    });
 
     expect(screen.getByText('Python')).toBeVisible();
     expect(screen.getByText('Typer')).toBeVisible();
@@ -137,7 +169,9 @@ describe('CodingExamplesSection', () => {
       )
     ).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Stack' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('tab', { name: 'Stack' }));
+    });
 
     expect(screen.queryByText('Python')).not.toBeInTheDocument();
     expect(screen.queryByText('Typer')).not.toBeInTheDocument();

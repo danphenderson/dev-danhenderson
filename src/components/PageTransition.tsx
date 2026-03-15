@@ -18,7 +18,6 @@ interface PageTransitionProps {
  *
  * Wraps `<Routes>` so that navigating between pages plays a quick
  * opacity + translateY entrance and a fast opacity-only exit.
- * Respects `prefers-reduced-motion` by skipping animation entirely.
  */
 export const PageTransition = ({ children }: PageTransitionProps) => {
   const location = useLocation();

@@ -50,7 +50,6 @@ describe('Photography', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText('Collections')).toBeInTheDocument();
     expect(screen.getByText('2 albums')).toBeInTheDocument();
     expect(screen.getByText('Landscape')).toBeInTheDocument();
     expect(screen.getByText('Astrophotography')).toBeInTheDocument();

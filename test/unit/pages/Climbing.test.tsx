@@ -33,6 +33,35 @@ jest.mock('../../../src/hooks/useClimbingData', () => ({
         url: 'https://mp.com/route/2',
       },
     ],
+    analytics: {
+      overview: {
+        tickCount: 2,
+        todoCount: 1,
+        uniqueLocations: 3,
+        mostRecentDate: '6/26/2025',
+      },
+      gradeProfile: [
+        { bucket: '5.4', tickCount: 0, todoCount: 1 },
+        { bucket: '5.10', tickCount: 1, todoCount: 0 },
+        { bucket: '5.11', tickCount: 1, todoCount: 0 },
+      ],
+      destinationProfile: {
+        topTickLocations: [{ location: 'Leavenworth', count: 1 }],
+        topTodoLocations: [{ location: 'Alpental', count: 1 }],
+      },
+    },
+    status: {
+      source: 'static',
+      loading: false,
+      error: null,
+      isFallback: false,
+      reason: 'bundled-content',
+      freshness: {
+        label: 'Bundled climbing log updated through 6/26/2025.',
+        lastUpdated: '2025-06-26',
+        isStale: false,
+      },
+    },
   }),
   TickRow: undefined,
   TodoRow: undefined,
@@ -148,5 +177,55 @@ describe('Climbing', () => {
     fireEvent.change(tickSearchInput, { target: { value: 'Angel' } });
 
     expect(screen.getByRole('link', { name: 'The Tooth' })).toBeInTheDocument();
+  });
+
+  it('renders the analytics overview section', () => {
+    render(
+      <ThemeProvider>
+        <Climbing />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText('Overview')).toBeInTheDocument();
+    expect(screen.getByText('Routes Climbed')).toBeInTheDocument();
+    expect(screen.getByText('Routes To Do')).toBeInTheDocument();
+    expect(screen.getByText('Unique Locations')).toBeInTheDocument();
+    expect(screen.getByText('Most Recent Tick')).toBeInTheDocument();
+  });
+
+  it('renders the grade profile section', () => {
+    render(
+      <ThemeProvider>
+        <Climbing />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText('Grade Profile')).toBeInTheDocument();
+    expect(screen.getByText('5.11 (1)')).toBeInTheDocument();
+    expect(screen.getByText('5.4 (1)')).toBeInTheDocument();
+  });
+
+  it('renders the destination profile section', () => {
+    render(
+      <ThemeProvider>
+        <Climbing />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText('Top Destinations')).toBeInTheDocument();
+    expect(screen.getByText('Most Climbed')).toBeInTheDocument();
+    expect(screen.getByText('Most Wanted')).toBeInTheDocument();
+    expect(screen.getAllByText('Leavenworth').length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText('Alpental').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('renders the data freshness indicator', () => {
+    render(
+      <ThemeProvider>
+        <Climbing />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText('Bundled climbing log updated through 6/26/2025.')).toBeInTheDocument();
   });
 });

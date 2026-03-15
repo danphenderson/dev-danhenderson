@@ -6,21 +6,12 @@ import { Avatar, Box, Button, IconButton, Menu, MenuItem, Stack } from '@mui/mat
 import type { SxProps, Theme } from '@mui/material/styles';
 import { MouseEvent, ReactElement } from 'react';
 import { Link } from 'react-router-dom';
+import { siteRouteMap, type SiteRouteDefinition } from '../../constants/siteRoutes';
 import { useAppStyles } from '../../styles/appStyles';
 import { NavigationLabel } from '../text';
 
-export type HeaderPage = {
-  name: string;
-  path: string;
-};
-
-const HOME_PAGE: HeaderPage = {
-  name: 'Home',
-  path: '/',
-};
-
 type HeaderNavProps = {
-  pages: HeaderPage[];
+  pages: SiteRouteDefinition[];
   currentPath: string;
   isMobile: boolean;
   iconButtonSize: 'small' | 'medium' | 'large';
@@ -49,7 +40,9 @@ export const HeaderNav = ({
 }: HeaderNavProps) => {
   const appStyles = useAppStyles();
   const showHomeAvatar = !isMobile && !isActivePage(currentPath, '/');
-  const mobilePages = [...pages, HOME_PAGE].filter(({ path }) => !isActivePage(currentPath, path));
+  const mobilePages = [...pages, siteRouteMap.home].filter(
+    ({ path }) => !isActivePage(currentPath, path)
+  );
 
   const getPageChipIcon = (path: string): ReactElement | undefined => {
     switch (path) {
@@ -103,9 +96,9 @@ export const HeaderNav = ({
       {!isMobile && (
         <Box sx={appStyles.headerNavDesktopSx}>
           <Stack direction="row" spacing={{ md: 5 }}>
-            {pages.map(({ name, path }) => (
+            {pages.map(({ id, label, path }) => (
               <Button
-                key={name}
+                key={id}
                 size="large"
                 sx={
                   isActivePage(currentPath, path)
@@ -114,10 +107,10 @@ export const HeaderNav = ({
                 }
                 component={Link}
                 to={path}
-                aria-label={`Go to ${name}`}
+                aria-label={`Go to ${label}`}
                 aria-current={isActivePage(currentPath, path) ? 'page' : undefined}
               >
-                <NavigationLabel>{name}</NavigationLabel>
+                <NavigationLabel>{label}</NavigationLabel>
               </Button>
             ))}
           </Stack>
@@ -132,8 +125,8 @@ export const HeaderNav = ({
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}
       >
-        {mobilePages.map(({ name, path }) => (
-          <MenuItem key={name} component={Link} to={path} onClick={onMobileMenuClose}>
+        {mobilePages.map(({ id, label, path }) => (
+          <MenuItem key={id} component={Link} to={path} onClick={onMobileMenuClose}>
             <Box
               sx={{
                 display: 'flex',
@@ -144,7 +137,7 @@ export const HeaderNav = ({
               }}
             >
               {getPageChipIcon(path)}
-              <NavigationLabel sx={{ flex: 1, textAlign: 'left' }}>{name}</NavigationLabel>
+              <NavigationLabel sx={{ flex: 1, textAlign: 'left' }}>{label}</NavigationLabel>
             </Box>
           </MenuItem>
         ))}

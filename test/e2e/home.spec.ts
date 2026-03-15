@@ -10,8 +10,8 @@ test.describe('Home page', () => {
     await dialog.getByRole('button', { name: 'No thanks' }).click();
     await expect(dialog).toBeHidden();
 
-    // Step 2: Dismiss the dark mode hint popover that appears after audio prompt
-    const darkModeHint = page.getByText(/Try (light|dark) mode/i);
+    // Step 2: Dismiss the appearance hint popover that appears after audio prompt
+    const darkModeHint = page.getByText(/Try an alternative theme/i);
     await expect(darkModeHint).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(darkModeHint).toBeHidden();
@@ -20,9 +20,9 @@ test.describe('Home page', () => {
     await expect(page.getByText(/Hi, my passion is/)).toBeVisible();
 
     // At least one passion word should appear as the typewriter loops
-    await expect(
-      page.getByText(/mathematics!|computers!|adventures!/)
-    ).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText(/mathematics!|computers!|adventures!/)).toBeVisible({
+      timeout: 15000,
+    });
   });
 
   test('welcome audio prompt can be dismissed', async ({ page }) => {

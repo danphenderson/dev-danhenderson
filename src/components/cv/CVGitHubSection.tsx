@@ -79,7 +79,6 @@ export const CVGitHubSection = ({
       <Stack spacing={compactSidebarSectionSpacing}>
         <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
         {lead && <SectionLeadText>{lead}</SectionLeadText>}
-
         <SectionCard delayMs={githubActivityDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>
             <SubsectionTitle sx={supportAccentTitleSx}>Recent Activity</SubsectionTitle>

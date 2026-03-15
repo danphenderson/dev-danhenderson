@@ -1,5 +1,5 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import { mockGitHubAPISuccess, mockGitHubAPIFailure } from './helpers/github';
+import { mockGitHubAPISuccess, mockGitHubAPIFailure, mockGitHubAPIPartialFailure } from './helpers/github';
 
 const COMMON_LINK_TOOLTIP_ID = 'common-link-tooltip';
 
@@ -19,11 +19,25 @@ const expectCommonLinkTooltip = async (page: Page, link: Locator, content: strin
   await expect(tooltip).toContainText(content);
 };
 
+const expectGitHubDataStatusTooltip = async (page: Page, content?: string) => {
+  const trigger = page.getByTestId('cv-github-status-tooltip-trigger');
+  const tooltip = page.getByRole('tooltip');
+
+  await expect(trigger).toBeVisible();
+  await trigger.hover();
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip).toContainText('Data status');
+  if (content) {
+    await expect(tooltip).toContainText(content);
+  }
+};
+
 test.describe('CV page – GitHub integration', () => {
   test('renders the CV page with core sections', async ({ page }) => {
     await page.goto('/cv');
     await expect(page.getByText('Daniel Henderson')).toBeVisible();
     await expect(page.getByText('Software Engineer')).toBeVisible();
+    await expectGitHubDataStatusTooltip(page);
 
     const programLink = page.getByRole('link', {
       name: 'M.S. Mathematics student in the applied/computational track (expected Aug 2026)',
@@ -56,7 +70,10 @@ test.describe('CV page – GitHub integration', () => {
     await expectCommonLinkTooltip(page, mtuOrganizationLink, 'View online graduate degrees page');
     await ensureCvSectionVisible(page, 'cv-volunteering');
     await expect(littleBrothersLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
-    await expect(littleBrothersLink).toHaveAttribute('data-tooltip-content', 'View organization site');
+    await expect(littleBrothersLink).toHaveAttribute(
+      'data-tooltip-content',
+      'View organization site'
+    );
 
     await page.evaluate(() => window.scrollTo({ top: 1000, behavior: 'auto' }));
 
@@ -80,6 +97,10 @@ test.describe('CV page – GitHub integration', () => {
     await expect(
       main.getByText(/Pushed 1 commit to danphenderson\/dev-danhenderson/)
     ).toBeVisible();
+    await expectGitHubDataStatusTooltip(
+      page,
+      'Showing live GitHub activity from the latest successful fetch.'
+    );
 
     // The GitHub section headings should render
     await expect(main.getByRole('heading', { name: 'Recent Activity' })).toBeVisible();
@@ -97,9 +118,54 @@ test.describe('CV page – GitHub integration', () => {
 
     // Fallback contributions should appear (unique to contributions section)
     await expect(main.getByText(/dbt-labs\/dbt-core/)).toBeVisible();
+    await expectGitHubDataStatusTooltip(
+      page,
+      'Showing bundled fallback highlights because the live GitHub response was incomplete or unavailable.'
+    );
 
     // The GitHub section headings should render
     await expect(main.getByRole('heading', { name: 'Recent Activity' })).toBeVisible();
     await expect(main.getByRole('heading', { name: 'Contributions' })).toBeVisible();
+  });
+
+  test('shows partial-failure messaging when some GitHub sources fail', async ({ page }) => {
+    await mockGitHubAPIPartialFailure(page);
+    await page.goto('/cv');
+    await ensureCvSectionVisible(page, 'cv-github');
+
+    const main = page.locator('main');
+
+    // Activity from the successful events endpoint should appear
+    await expect(
+      main.getByText(/Pushed 1 commit to danphenderson\/dev-danhenderson/)
+    ).toBeVisible();
+
+    // Partial-fallback status should be visible
+    await expectGitHubDataStatusTooltip(
+      page,
+      'Some GitHub data sources responded while others fell back to bundled highlights.'
+    );
+  });
+
+  test('renders story mode layout when navigating with ?mode=story', async ({ page }) => {
+    await page.goto('/cv?mode=story');
+
+    // Story mode header and intro should be visible
+    await expect(page.getByText('Story Mode')).toBeVisible();
+    await expect(page.getByTestId('cv-story-header')).toBeVisible();
+
+    // Story chapters should render
+    await expect(page.getByText('The Starting Point')).toBeVisible();
+    await expect(page.getByText('Chapter 1')).toBeVisible();
+
+    // Section navigator should NOT be present in story mode
+    await expect(page.getByRole('button', { name: 'CV section navigation' })).toHaveCount(0);
+  });
+
+  test('default CV renders a story mode toggle', async ({ page }) => {
+    await page.goto('/cv');
+
+    await expect(page.getByText('Full CV')).toBeVisible();
+    await expect(page.getByTestId('cv-mode-toggle')).toContainText('Read my story');
   });
 });

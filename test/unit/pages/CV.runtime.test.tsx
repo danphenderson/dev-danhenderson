@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import ThemeProvider from '../../../src/ThemeProvider';
 import CV from '../../../src/pages/CV';
 
@@ -10,6 +11,18 @@ jest.mock('../../../src/hooks/useGithubProfile', () => ({
     ],
     loading: false,
     error: null,
+    status: {
+      source: 'remote',
+      loading: false,
+      error: null,
+      isFallback: false,
+      reason: 'live-fetch',
+      freshness: {
+        label: 'GitHub activity was fetched live and cached for subsequent visits.',
+        lastUpdated: '2026-03-14T16:45:00.000Z',
+        isStale: false,
+      },
+    },
   }),
 }));
 
@@ -18,12 +31,17 @@ jest.mock('react-github-calendar', () => ({
 }));
 
 describe('CV runtime render', () => {
-  it('renders the live CV component tree without invalid element errors', () => {
+  const renderCV = (initialEntries = ['/cv']) =>
     render(
-      <ThemeProvider>
-        <CV />
-      </ThemeProvider>
+      <MemoryRouter initialEntries={initialEntries}>
+        <ThemeProvider>
+          <CV />
+        </ThemeProvider>
+      </MemoryRouter>
     );
+
+  it('renders the live CV component tree without invalid element errors', () => {
+    renderCV();
 
     expect(screen.getByText('About')).toBeInTheDocument();
     expect(screen.getByText('Daniel Henderson')).toBeInTheDocument();
@@ -32,11 +50,7 @@ describe('CV runtime render', () => {
   });
 
   it('renders all primary CV section headings', () => {
-    render(
-      <ThemeProvider>
-        <CV />
-      </ThemeProvider>
-    );
+    renderCV();
 
     expect(screen.getByText('About')).toBeInTheDocument();
     expect(screen.getAllByText('Experience').length).toBeGreaterThan(0);
@@ -47,22 +61,14 @@ describe('CV runtime render', () => {
   });
 
   it('renders the profile card with name, title, and program link', () => {
-    render(
-      <ThemeProvider>
-        <CV />
-      </ThemeProvider>
-    );
+    renderCV();
 
     expect(screen.getByText('Daniel Henderson')).toBeInTheDocument();
     expect(screen.getByText('Software Engineer')).toBeInTheDocument();
   });
 
   it('renders GitHub section content from mock data', () => {
-    render(
-      <ThemeProvider>
-        <CV />
-      </ThemeProvider>
-    );
+    renderCV();
 
     expect(screen.getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
     expect(screen.getByText('microsoft/playwright')).toBeInTheDocument();

@@ -1,9 +1,31 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { experiences } from '../../../../src/data/cv';
 import { COMMON_LINK_TOOLTIP_ID } from '../../../../src/components/CommonLink';
 import { ExperienceList } from '../../../../src/components/cv/ExperienceList';
+
+jest.mock('@mui/material', () => {
+  const actual = jest.requireActual('@mui/material');
+
+  return {
+    ...actual,
+    Collapse: ({ children, in: inProp, onEntered, ...rest }: any) => {
+      const React = require('react');
+      const onEnteredRef = React.useRef(onEntered);
+
+      onEnteredRef.current = onEntered;
+
+      React.useEffect(() => {
+        if (inProp && onEnteredRef.current) {
+          Promise.resolve().then(() => onEnteredRef.current?.());
+        }
+      }, [inProp]);
+
+      return <div {...rest}>{children}</div>;
+    },
+  };
+});
 
 const mockAnimatedSlideList = jest.fn();
 
@@ -24,6 +46,12 @@ jest.mock('../../../../src/components/AnimatedContentList', () => ({
 }));
 
 jest.mock('../../../../src/components/AnimatedSlideList', () => ({
+  getAnimatedSlideListCloseDelayMs: (
+    itemCount: number,
+    itemStaggerMs: number,
+    startDelayMs: number = 0,
+    exitDurationMs: number = 220
+  ) => (itemCount <= 0 ? 0 : startDelayMs + Math.max(itemCount - 1, 0) * itemStaggerMs + exitDurationMs),
   AnimatedSlideList: (props: {
     items: unknown[];
     getItemKey: (item: unknown, index: number) => string;
@@ -92,7 +120,7 @@ describe('ExperienceList', () => {
     ).toBeVisible();
   });
 
-  it('switches between highlights and skills within the shared tab panel while keeping the summary visible', () => {
+  it('switches between highlights and skills within the shared tab panel while keeping the summary visible', async () => {
     const hemodynamicsExperience = experiences.find(
       (experience) => experience.title === 'Graduate Research Assistant'
     );
@@ -117,7 +145,9 @@ describe('ExperienceList', () => {
       )
     ).toBeVisible();
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
+    });
 
     expect(screen.getByText('PyTorch')).toBeVisible();
     expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.layout === 'wrap')).toBe(true);
@@ -133,7 +163,7 @@ describe('ExperienceList', () => {
     ).toBeVisible();
   });
 
-  it('keeps a visible skills tab when skills are the only supplemental content', () => {
+  it('keeps a visible skills tab when skills are the only supplemental content', async () => {
     const mathematicsTutorExperience = experiences.find(
       (experience) => experience.title === 'Mathematics Tutor | Part Time'
     );
@@ -150,7 +180,9 @@ describe('ExperienceList', () => {
     expect(screen.queryByText('Teaching')).not.toBeInTheDocument();
     expect(screen.queryByText('Mathematica')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
+    });
 
     expect(screen.getByText('Teaching')).toBeVisible();
     expect(screen.getByText('Mathematica')).toBeVisible();
@@ -222,7 +254,7 @@ describe('ExperienceList', () => {
     expect(lucernaLink).toHaveAttribute('data-tooltip-content', 'View company site');
   });
 
-  it('renders inline project links for the research assistant entry without separate reference bullets', () => {
+  it('renders inline project links for the research assistant entry without separate reference bullets', async () => {
     const researchAssistant = experiences.find(
       (experience) => experience.title === 'Research Assistant | Full Time'
     );
@@ -235,7 +267,9 @@ describe('ExperienceList', () => {
       </ThemeProvider>
     );
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Highlights' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('tab', { name: 'Highlights' }));
+    });
 
     const detailList = screen.getByRole('list');
 

@@ -43,6 +43,12 @@ The site is a React Router single-page app. Keep unknown-route rewrites, `PUBLIC
 - Create React App (`react-scripts`)
 - Node 20.x in CI
 
+## Copilot instructions
+
+- Repository-wide Copilot custom instructions live in `.github/copilot-instructions.md`.
+- Path-specific Copilot custom instructions live in `.github/instructions/*.instructions.md`.
+- Agent-specific guidance remains in the root `AGENTS.md` and the nested `src/**/AGENTS.md` files.
+
 ## Component Hierarchy
 
 - `src/index.tsx` bootstraps the app and wraps it with `ThemeProvider` and `WelcomeAudioProvider`.
