@@ -51,6 +51,7 @@ import { useGithubProfile } from '../hooks/useGithubProfile';
 import { CVLayoutMode, CVSectionRegion, cvPageSectionLayout } from './cvPageLayout';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
+import { MotionSection } from '../motion';
 
 type CVResolvedSectionDescriptor = {
   id: string;
@@ -313,10 +314,10 @@ const CVRouteContent = () => {
               if (!definition) return null;
               const node = definition.render({ delayMs: 0, triggerOnView: true });
               return (
-                <Box key={chapter.key}>
+                <MotionSection key={chapter.key}>
                   <CVStoryChapterHeading chapter={chapter} index={index} />
                   <Box sx={{ mt: 2 }}>{node}</Box>
-                </Box>
+                </MotionSection>
               );
             })}
           </CVSectionStack>
@@ -359,11 +360,13 @@ const CVRouteContent = () => {
   return (
     <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
       <>
-        <CVStoryHeader
-          mode={cvMode}
-          onToggleMode={handleToggleMode}
-          statusIndicator={githubStatusTooltip}
-        />
+        <MotionSection>
+          <CVStoryHeader
+            mode={cvMode}
+            onToggleMode={handleToggleMode}
+            statusIndicator={githubStatusTooltip}
+          />
+        </MotionSection>
         <Grid container spacing={3} alignItems="stretch">
           <Grid item xs={12}>
             <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-top-region">

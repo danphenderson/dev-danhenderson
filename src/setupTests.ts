@@ -27,13 +27,11 @@ if (typeof window.IntersectionObserver === 'undefined') {
     }
 
     observe(target: Element) {
-      // Immediately report as intersecting so content is always visible in tests.
-      Promise.resolve().then(() => {
-        this.callback(
-          [{ isIntersecting: true, target, intersectionRatio: 1 } as IntersectionObserverEntry],
-          this
-        );
-      });
+      // Synchronously report as intersecting so content is visible in tests.
+      this.callback(
+        [{ isIntersecting: true, target, intersectionRatio: 1 } as IntersectionObserverEntry],
+        this
+      );
     }
     unobserve() {}
     disconnect() {}
