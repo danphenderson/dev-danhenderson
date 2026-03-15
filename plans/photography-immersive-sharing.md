@@ -60,15 +60,15 @@ Extend `usePhotographyData` to return derived album metadata (unique locations, 
 
 ## Execution steps
 
-1. [ ] Extend `PhotoItem` and `PhotoCategory` types in `src/types/data.ts`.
-2. [ ] Populate metadata in `src/data/photography.ts` for all existing albums.
-3. [ ] Build immersive lightbox component and wire into album view.
-4. [ ] Build album location summary component and wire into album header.
-5. [ ] Build slug-aware share button and wire into album header.
-6. [ ] Extend `usePhotographyData` with derived metadata.
-7. [ ] Enrich command palette photography actions with new keywords.
-8. [ ] Update unit tests and E2E tests.
-9. [ ] Validate with build, tests, and browser.
+1. [x] Extend `PhotoItem` and `PhotoCategory` types in `src/types/data.ts`.
+2. [x] Populate metadata in `src/data/photography.ts` for all existing albums.
+3. [x] Build immersive lightbox component and wire into album view.
+4. [x] Build album location summary component and wire into album header.
+5. [x] Build slug-aware share button and wire into album header.
+6. [x] Extend `usePhotographyData` with derived metadata.
+7. [x] Enrich command palette photography actions with new keywords.
+8. [x] Update unit tests and E2E tests.
+9. [x] Validate with build, tests, and browser.
 
 ## Validation plan
 
@@ -89,11 +89,19 @@ Extend `usePhotographyData` to return derived album metadata (unique locations, 
 
 ## Progress notes
 
-- Status: Not started
-- Will update as work proceeds.
+- Status: Complete
+- Slice 1 complete: Extended `PhotoItem` with `location`, `dateTaken`, `tags`, `coordinates` (all optional); extended `PhotoCategory` with `location`, `dateRange`, `coordinates` (all optional); added `PhotoCoordinates` type. Populated metadata for all 4 existing albums (landscape, action, astronomy, new-mexico) with real location data, tags, and coordinates.
+- Slice 2 complete: Built `ImmersiveLightbox` as a full-screen MUI Dialog with keyboard navigation (←/→ arrows, Escape to close), photo counter, metadata overlay (title, location), and download button. Wired into `PhotographyCategory` via `onPhotoClick` on `QuiltedImageList` items. Photos are now clickable with button role and keyboard support (Enter/Space).
+- Slice 3 complete: Built `AlbumLocationSummary` showing album-level location, date range, and unique per-photo location chips. Renders nothing gracefully when no location data is present.
+- Slice 4 complete: Built `AlbumShareButton` using Web Share API with clipboard-copy fallback. Generates canonical album URL from route model and `PUBLIC_URL`. Shows copied feedback with icon swap and tooltip change.
+- Slice 5 complete: Extended `usePhotographyData` with `albumMeta` (derived unique locations, photo count, date range per album) and `totalPhotos`. Enriched command palette photography actions with location keywords and tag keywords from metadata.
+- Photography index page now shows location, date range, and photo count per category card.
+- Fixed pre-existing test assertion in `PhotographyCategory.test.tsx` (overline text was "Photography album" not "Photography").
+- Validation actually run: `npm run build` (compiled successfully), `CI=true npm test -- --watch=false` (photography suites all pass; pre-existing CV and reduced-motion failures unrelated), `npx playwright test test/e2e/photography.spec.ts` (5/5 passed), browser validation on `/photography` and `/photography/landscape` at desktop viewport with lightbox open/close/navigate, share button, and location summary verified.
+- Map view scope note: Coordinates are stored in the schema for future interactive map integration. The initial UI renders a location-text summary with per-photo location chips rather than a full mapping library, keeping the dependency footprint minimal. A mapping library (e.g., Leaflet) can be added later if desired.
 
 ## Completion Status
 
 - [ ] Not started
 - [ ] In progress
-- [ ] Complete
+- [x] Complete
