@@ -1,12 +1,15 @@
 import { Link as RouterLink, Navigate, useLocation, useParams } from 'react-router-dom';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { BackToTopButton } from '../components/BackToTopButton';
 import { RouteRecoveryPanel } from '../components/RouteRecoveryPanel';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
 import { QuiltedImageList } from '../components/PhotoAlbum';
+import { ImmersiveLightbox } from '../components/photography/ImmersiveLightbox';
+import { AlbumShareButton } from '../components/photography/AlbumShareButton';
+import { AlbumLocationSummary } from '../components/photography/AlbumLocationSummary';
 import { getRecoveryContext } from '../constants/recoveryContext';
 import { recoveryRouteActions } from '../constants/routeActions';
 import { siteRouteMap } from '../constants/siteRoutes';
@@ -39,6 +42,18 @@ export default function PhotographyCategory() {
       })),
     []
   );
+
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+
+  const handlePhotoClick = useCallback((index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  }, []);
+
+  const handleLightboxClose = useCallback(() => {
+    setLightboxOpen(false);
+  }, []);
 
   useDocumentMetadata(
     shouldRedirect
@@ -107,19 +122,26 @@ export default function PhotographyCategory() {
                     >
                       Photography album
                     </Typography>
-                    <Typography
-                      component="h1"
-                      variant="h2"
-                      sx={{
-                        color: 'text.primary',
-                        fontSize: { xs: '2.125rem', sm: '2.5rem', md: '3.25rem' },
-                        lineHeight: { xs: 1.05, md: 1 },
-                        letterSpacing: '-0.04em',
-                        textWrap: 'balance',
-                      }}
-                    >
-                      {category.name}
-                    </Typography>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <Typography
+                        component="h1"
+                        variant="h2"
+                        sx={{
+                          color: 'text.primary',
+                          fontSize: { xs: '2.125rem', sm: '2.5rem', md: '3.25rem' },
+                          lineHeight: { xs: 1.05, md: 1 },
+                          letterSpacing: '-0.04em',
+                          textWrap: 'balance',
+                        }}
+                      >
+                        {category.name}
+                      </Typography>
+                      <AlbumShareButton
+                        albumName={category.name}
+                        albumSlug={category.slug}
+                        albumDescription={category.description}
+                      />
+                    </Stack>
                     <Typography
                       variant="body1"
                       sx={{
@@ -131,6 +153,11 @@ export default function PhotographyCategory() {
                     >
                       {category.description}
                     </Typography>
+                    <AlbumLocationSummary
+                      albumLocation={category.location}
+                      dateRange={category.dateRange}
+                      photos={category.album}
+                    />
                   </Stack>
                   <Box
                     sx={{
@@ -198,8 +225,22 @@ export default function PhotographyCategory() {
 
           {category && (
             <SectionCard delayMs={140} sx={appStyles.albumSectionSx}>
-              <QuiltedImageList imageData={category.album} albumLabel={category.name} />
+              <QuiltedImageList
+                imageData={category.album}
+                albumLabel={category.name}
+                onPhotoClick={handlePhotoClick}
+              />
             </SectionCard>
+          )}
+
+          {category && (
+            <ImmersiveLightbox
+              photos={category.album}
+              initialIndex={lightboxIndex}
+              open={lightboxOpen}
+              onClose={handleLightboxClose}
+              albumLabel={category.name}
+            />
           )}
         </Stack>
         <BackToTopButton />
