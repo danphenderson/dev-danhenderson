@@ -54,7 +54,6 @@ test.describe('Photography page', () => {
 
   test('offers contextual recovery for invalid album slugs', async ({ page }) => {
     await page.goto('/photography/landscap');
-    await page.waitForTimeout(2200);
 
     await expect(page.getByRole('link', { name: 'Back to photography' })).toBeVisible();
     await expect(page.getByText('Album not found')).toBeVisible();
