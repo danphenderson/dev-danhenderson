@@ -70,8 +70,7 @@ type CVSectionDefinition = {
   render: (layout: { delayMs: number; triggerOnView: boolean }) => ReactNode;
 };
 
-const parseCVMode = (value: string | null): CVMode =>
-  value === 'story' ? 'story' : 'default';
+const parseCVMode = (value: string | null): CVMode => (value === 'story' ? 'story' : 'default');
 
 export default function CV() {
   return <CVRouteContent />;
@@ -102,15 +101,18 @@ const CVRouteContent = () => {
   const itemOffsetMs = motionTokens.itemOffsetMs;
 
   const handleToggleMode = useCallback(() => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      if (parseCVMode(prev.get('mode')) === 'story') {
-        next.delete('mode');
-      } else {
-        next.set('mode', 'story');
-      }
-      return next;
-    }, { replace: true });
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (parseCVMode(prev.get('mode')) === 'story') {
+          next.delete('mode');
+        } else {
+          next.set('mode', 'story');
+        }
+        return next;
+      },
+      { replace: true }
+    );
   }, [setSearchParams]);
 
   const aboutActions: AppSpeedDialAction[] = [
@@ -297,11 +299,7 @@ const CVRouteContent = () => {
 
   if (isStoryMode) {
     return (
-      <PageFrame
-        image={cvBackgroundImage}
-        maxWidth={900}
-        containerSx={appStyles.cvPageContainerSx}
-      >
+      <PageFrame image={cvBackgroundImage} maxWidth={900} containerSx={appStyles.cvPageContainerSx}>
         <Box data-testid="cv-story-layout">
           <CVSectionStack spacing={3}>
             <CVStoryHeader
