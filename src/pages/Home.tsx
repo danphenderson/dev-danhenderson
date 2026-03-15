@@ -8,6 +8,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { HeroMotionPath } from '../components/HeroMotionPath';
@@ -29,23 +30,38 @@ export default function Home() {
     useHomeWelcomeSequence();
   const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);
 
+  const { scrollYProgress } = useScroll();
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '20%']);
+
   const handleMotionComplete = useCallback(() => {
     setIsTypewriterPlaying(true);
   }, []);
 
   return (
-    <BackgroundPaper
-      image="assets/home.jpg"
-      contentAlign="flex-end"
-      contentSx={appStyles.homeHeroContentSx}
-      showShell={isHeroAnimationReady}
-      shellSx={appStyles.homeHeroShellSx}
-      shellWrapper={(shell) => (
-        <HeroMotionPath active={isHeroAnimationReady} onComplete={handleMotionComplete}>
-          {shell}
-        </HeroMotionPath>
-      )}
-    >
+    <motion.div style={{ position: 'relative', overflow: 'hidden' }}>
+      <motion.div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: '-20%',
+          y: backgroundY,
+          zIndex: 0,
+        }}
+      />
+      <BackgroundPaper
+        image="assets/home.jpg"
+        contentAlign="flex-end"
+        contentSx={appStyles.homeHeroContentSx}
+        showShell={isHeroAnimationReady}
+        shellSx={appStyles.homeHeroShellSx}
+        shellWrapper={(shell) => (
+          <HeroMotionPath active={isHeroAnimationReady} onComplete={handleMotionComplete}>
+            {shell}
+          </HeroMotionPath>
+        )}
+      >
       <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
         <Stack spacing={2} alignItems="center">
           <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
@@ -89,5 +105,6 @@ export default function Home() {
         </DialogActions>
       </Dialog>
     </BackgroundPaper>
+    </motion.div>
   );
 }
