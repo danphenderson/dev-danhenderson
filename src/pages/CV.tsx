@@ -70,7 +70,7 @@ const CVRouteContent = () => {
   const appStyles = useAppStyles();
   const { motionTokens } = useComponentStyles();
   useDocumentMetadata({ ...siteRouteMap.cv, canonicalPath: siteRouteMap.cv.path });
-  const { activity, contributions, loading, error } = useGithubProfile();
+  const { activity, contributions, loading, error, status } = useGithubProfile();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const layoutMode: CVLayoutMode = isMobile ? 'mobile' : 'desktop';
@@ -180,6 +180,7 @@ const CVRouteContent = () => {
           contributions={contributions}
           loading={loading}
           error={error}
+          status={status}
           sectionDelayMs={layout.delayMs}
           nestedDelayOffsetMs={githubNestedDelayOffsetMs}
           itemOffsetMs={itemOffsetMs}

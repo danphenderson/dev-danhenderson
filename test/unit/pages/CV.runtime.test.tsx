@@ -10,6 +10,18 @@ jest.mock('../../../src/hooks/useGithubProfile', () => ({
     ],
     loading: false,
     error: null,
+    status: {
+      source: 'remote',
+      loading: false,
+      error: null,
+      isFallback: false,
+      reason: 'live-fetch',
+      freshness: {
+        label: 'GitHub activity was fetched live and cached for subsequent visits.',
+        lastUpdated: '2026-03-14T16:45:00.000Z',
+        isStale: false,
+      },
+    },
   }),
 }));
 

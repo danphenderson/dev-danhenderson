@@ -26,12 +26,16 @@ The route registry exists, but action metadata still has a second source in comm
 - `src/hooks/useGithubProfile.ts`: hook-level status surface for CV consumers.
 - `src/hooks/useClimbingData.ts`: static dataset status surface without changing the dataset.
 - `src/hooks/usePhotographyData.ts`: static gallery status surface without inventing async state.
+- `src/pages/NotFound.tsx`: first recovery-path consumer of the shared route actions.
+- `src/pages/CV.tsx`: first route-level consumer of normalized GitHub status metadata.
+- `src/components/cv/CVGitHubSection.tsx`: provenance and freshness presentation for the GitHub slice.
 - `test/unit/constants/*.test.ts`: shared action derivation coverage.
 - `test/unit/hooks/*.test.ts`: status normalization coverage.
+- `test/unit/pages/*.test.tsx`: recovery and route-level status presentation coverage.
 
 ## Proposed approach
 
-Add shared status types, move route action metadata into the canonical route registry, derive shared route actions from that registry, and extend existing hooks to return explicit status metadata alongside their current data payloads. Preserve current pages as consumers; do not introduce new route UI in this slice.
+Add shared status types, move route action metadata into the canonical route registry, derive shared route actions from that registry, extend existing hooks to return explicit status metadata alongside their current data payloads, and wire the first recovery and freshness consumers to prove the primitives are reusable.
 
 ## Execution steps
 
@@ -41,10 +45,14 @@ Add shared status types, move route action metadata into the canonical route reg
 4. Normalize GitHub status metadata for initial fallback, live fetch, partial fallback, cache hits, and hard failures.
 5. Add static-data status descriptors for climbing and photography hooks.
 6. Add unit coverage for the shared route actions and normalized hook status surfaces.
+7. Use shared recovery actions on the not-found route instead of hardcoded CTA buttons.
+8. Surface normalized GitHub freshness and fallback provenance in the CV route.
 
 ## Validation plan
 
-- `npm test -- --watch=false --runInBand test/unit/constants/commandPaletteActions.test.ts test/unit/hooks/useGithubProfile.test.ts test/unit/hooks/useClimbingData.test.ts test/unit/hooks/usePhotographyData.test.ts`
+- `npm test -- --watch=false --runInBand test/unit/constants/commandPaletteActions.test.ts test/unit/hooks/useGithubProfile.test.ts test/unit/hooks/useClimbingData.test.ts test/unit/hooks/usePhotographyData.test.ts test/unit/components/cv/CVGitHubSection.test.tsx test/unit/components/cv/CVGitHubSectionOffsets.test.tsx test/unit/pages/CV.test.tsx test/unit/pages/CV.runtime.test.tsx test/unit/pages/NotFound.test.tsx`
+- `npx playwright test test/e2e/not-found.spec.ts`
+- `npx playwright test test/e2e/cv.github.spec.ts`
 - `npm run build`
 
 ## Risks and rollback
@@ -58,9 +66,11 @@ Add shared status types, move route action metadata into the canonical route reg
 - Status: In progress
 - Shared status types and route-action derivation are being introduced first so later not-found recovery and CV reliability UI can reuse them.
 - Static routes intentionally expose bundled-content status instead of pretending to have live freshness.
+- The shared route actions now power not-found recovery CTAs instead of a hardcoded button list.
+- The CV GitHub section now presents freshness, source, and fallback provenance from the normalized hook status surface.
 
 ## Completion Status
 
 - [ ] Not started
-- [x] In progress
-- [ ] Complete
+- [ ] In progress
+- [x] Complete

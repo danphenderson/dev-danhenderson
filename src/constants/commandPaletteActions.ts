@@ -7,7 +7,7 @@ import { photographyCategories } from '../data/photography';
 import { sharedRouteActions, type SharedRouteAction } from './routeActions';
 import { siteRouteMap } from './siteRoutes';
 
-export type CommandPaletteAction = Omit<SharedRouteAction, 'recoveryPriority'>;
+export type CommandPaletteAction = Omit<SharedRouteAction, 'recoveryPriority' | 'routeId'>;
 
 const primaryRouteActions: CommandPaletteAction[] = sharedRouteActions.map(
   ({ recoveryPriority: _recoveryPriority, ...action }) => action

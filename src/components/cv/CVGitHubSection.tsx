@@ -1,5 +1,6 @@
 import { Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
+import type { SharedDataStatus } from '../../types/data';
 import type { GitHubActivityItem, GitHubContribution } from '../../types/cv';
 import { githubUsername } from '../../data/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
@@ -11,13 +12,46 @@ import { GitHubContributionCalendar } from './GitHubContributionCalendar';
 import { GitHubContributions } from './GitHubContributions';
 import { SectionHeading } from '../layout/SectionHeading';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
-import { SectionLeadText, SubsectionTitle } from '../text';
+import { BodyText, SectionLeadText, SubsectionTitle } from '../text';
+
+const formatStatusTimestamp = (value?: string) => {
+  if (!value) {
+    return null;
+  }
+
+  const resolvedDate = new Date(value);
+  if (Number.isNaN(resolvedDate.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(resolvedDate);
+};
+
+const getGitHubStatusSummary = (status: SharedDataStatus) => {
+  if (status.loading) {
+    return 'Loading live GitHub activity while keeping bundled fallback highlights available.';
+  }
+
+  if (status.isFallback) {
+    return 'Showing bundled fallback highlights because the live GitHub response was incomplete or unavailable.';
+  }
+
+  if (status.source === 'cache') {
+    return 'Showing recent cached GitHub data from an earlier successful fetch.';
+  }
+
+  return 'Showing live GitHub activity from the latest successful fetch.';
+};
 
 type CVGitHubSectionProps = {
   activity: GitHubActivityItem[];
   contributions: GitHubContribution[];
   loading: boolean;
   error?: string | null;
+  status?: SharedDataStatus;
   sectionDelayMs?: number;
   nestedDelayOffsetMs?: number;
   itemOffsetMs?: number;
@@ -31,6 +65,7 @@ export const CVGitHubSection = ({
   contributions,
   loading,
   error,
+  status,
   sectionDelayMs = 0,
   nestedDelayOffsetMs = 0,
   itemOffsetMs,
@@ -63,6 +98,18 @@ export const CVGitHubSection = ({
     motionTokens.githubSubsectionStaggerMs
   );
   const resolvedOverlineSx = overlineSx ?? sectionHeadingCompactSx;
+  const resolvedStatus = status ?? {
+    source: 'static',
+    loading,
+    error: error ?? null,
+    isFallback: Boolean(error),
+    reason: error ? 'fallback-content' : 'bundled-content',
+    freshness: {
+      label: 'GitHub status metadata is unavailable for this render.',
+      isStale: false,
+    },
+  };
+  const formattedStatusTimestamp = formatStatusTimestamp(resolvedStatus.freshness.lastUpdated);
   const githubSubsectionCardSx: SxProps<Theme> = [
     cardResetSx,
     {
@@ -79,6 +126,17 @@ export const CVGitHubSection = ({
       <Stack spacing={compactSidebarSectionSpacing}>
         <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
         {lead && <SectionLeadText>{lead}</SectionLeadText>}
+        <SectionPanel>
+          <Stack spacing={0.75}>
+            <SubsectionTitle sx={supportAccentTitleSx}>Data status</SubsectionTitle>
+            <BodyText>{getGitHubStatusSummary(resolvedStatus)}</BodyText>
+            <BodyText>{resolvedStatus.freshness.label}</BodyText>
+            {formattedStatusTimestamp && (
+              <BodyText>Last refreshed {formattedStatusTimestamp}.</BodyText>
+            )}
+            {resolvedStatus.error && <BodyText>{resolvedStatus.error}</BodyText>}
+          </Stack>
+        </SectionPanel>
 
         <SectionCard delayMs={githubActivityDelayMs} sx={githubSubsectionCardSx}>
           <Stack spacing={compactSidebarSectionSpacing}>

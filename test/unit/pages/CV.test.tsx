@@ -27,6 +27,18 @@ jest.mock('../../../src/hooks/useGithubProfile', () => ({
     ],
     loading: false,
     error: null,
+    status: {
+      source: 'remote',
+      loading: false,
+      error: null,
+      isFallback: false,
+      reason: 'live-fetch',
+      freshness: {
+        label: 'GitHub activity was fetched live and cached for subsequent visits.',
+        lastUpdated: '2026-03-14T16:45:00.000Z',
+        isStale: false,
+      },
+    },
   }),
 }));
 
@@ -204,7 +216,7 @@ describe('CV page section navigation', () => {
       'download',
       'Daniel-Henderson-Resume.pdf'
     );
-    expect(within(aboutSection!).getByText('Open to opportunities:')).toBeInTheDocument();
+    expect(within(aboutSection!).getByText('Daniel Henderson')).toBeInTheDocument();
     expect(mockAppSpeedDial).toHaveBeenCalledWith(
       expect.objectContaining({
         ariaLabel: 'Open about actions',
@@ -260,6 +272,12 @@ describe('CV page section navigation', () => {
     expect(within(githubSection!).getByText('Recent Activity')).toBeInTheDocument();
     expect(within(githubSection!).getByText('Contributions')).toBeInTheDocument();
     expect(within(githubSection!).getByText('Contribution calendar')).toBeInTheDocument();
+    expect(within(githubSection!).getByText('Data status')).toBeInTheDocument();
+    expect(
+      within(githubSection!).getByText(
+        'Showing live GitHub activity from the latest successful fetch.'
+      )
+    ).toBeInTheDocument();
     expect(within(githubSection!).getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
     expect(within(githubSection!).getByText('microsoft/playwright')).toBeInTheDocument();
     expect(within(githubSection!).queryByText('Projects')).not.toBeInTheDocument();
