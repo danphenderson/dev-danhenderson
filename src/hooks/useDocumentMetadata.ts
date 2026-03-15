@@ -52,6 +52,14 @@ const toAbsoluteUrl = (value: string): string => {
   }
 };
 
+const getCurrentAbsoluteUrl = (): string => {
+  if (typeof window === 'undefined') {
+    return '';
+  }
+
+  return new URL(`${window.location.pathname}${window.location.search}`, window.location.origin).toString();
+};
+
 export const useDocumentMetadata = ({
   title,
   description,
@@ -72,16 +80,15 @@ export const useDocumentMetadata = ({
     ensureMetaTag('name', 'twitter:description').content = description;
     ensureMetaTag('name', 'robots').content = noIndex ? 'noindex, nofollow' : 'index, follow';
 
+    const canonicalHref = canonicalPath ? toAbsoluteUrl(canonicalPath) : getCurrentAbsoluteUrl();
+
     if (image) {
       const absoluteImageUrl = toAbsoluteUrl(image);
       ensureMetaTag('property', 'og:image').content = absoluteImageUrl;
       ensureMetaTag('name', 'twitter:image').content = absoluteImageUrl;
     }
 
-    if (canonicalPath) {
-      const canonicalHref = toAbsoluteUrl(canonicalPath);
-      ensureLinkTag('canonical').href = canonicalHref;
-      ensureMetaTag('property', 'og:url').content = canonicalHref;
-    }
+    ensureLinkTag('canonical').href = canonicalHref;
+    ensureMetaTag('property', 'og:url').content = canonicalHref;
   }, [canonicalPath, description, image, noIndex, title, type]);
 };

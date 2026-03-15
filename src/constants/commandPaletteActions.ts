@@ -1,6 +1,10 @@
-import { cvSectionMetadata, cvSectionNavigationOrder } from '../components/cv/cvSectionMetadata';
+import {
+  cvSectionMetadata,
+  cvSectionNavigationOrder,
+  type CVSectionKey,
+} from '../components/cv/cvSectionMetadata';
 import { photographyCategories } from '../data/photography';
-import { siteRouteMap } from './siteRoutes';
+import { primaryNavigationRoutes, siteRouteMap } from './siteRoutes';
 
 export type CommandPaletteAction = {
   id: string;
@@ -10,38 +14,47 @@ export type CommandPaletteAction = {
   keywords: string[];
 };
 
-const primaryRouteActions: CommandPaletteAction[] = [
-  {
-    id: 'route-home',
-    label: siteRouteMap.home.label,
+const primaryRouteActionMetadata = {
+  home: {
     description: 'Return to the home hero route.',
-    path: siteRouteMap.home.path,
-    keywords: ['start', 'landing', ...siteRouteMap.home.keywords],
+    keywords: ['start', 'landing'],
   },
-  {
-    id: 'route-cv',
-    label: siteRouteMap.cv.label,
+  cv: {
     description: 'Open the interactive CV and GitHub-driven profile sections.',
-    path: siteRouteMap.cv.path,
-    keywords: ['resume', 'experience', ...siteRouteMap.cv.keywords],
+    keywords: ['resume', 'experience'],
   },
-  {
-    id: 'route-climbing',
-    label: siteRouteMap.climbing.label,
+  climbing: {
     description: 'Open climbing ticks, goals, and analytics.',
-    path: siteRouteMap.climbing.path,
-    keywords: ['routes', 'analytics', ...siteRouteMap.climbing.keywords],
+    keywords: ['routes', 'analytics'],
   },
-  {
-    id: 'route-photography',
-    label: siteRouteMap.photography.label,
+  photography: {
     description: 'Browse photography albums and route-specific galleries.',
-    path: siteRouteMap.photography.path,
-    keywords: ['gallery', 'photos', ...siteRouteMap.photography.keywords],
+    keywords: ['gallery', 'photos'],
   },
-];
+} as const;
 
-const cvSectionActions: CommandPaletteAction[] = cvSectionNavigationOrder.map((sectionKey) => ({
+type CommandPaletteRouteId = keyof typeof primaryRouteActionMetadata;
+
+const commandPaletteRoutes = [
+  siteRouteMap.home,
+  ...primaryNavigationRoutes,
+] as (typeof siteRouteMap)[CommandPaletteRouteId][];
+
+const primaryRouteActions: CommandPaletteAction[] = commandPaletteRoutes.map((route) => {
+  const routeId = route.id as CommandPaletteRouteId;
+
+  return {
+    id: `route-${routeId}`,
+    label: route.label,
+    description: primaryRouteActionMetadata[routeId].description,
+    path: route.path,
+    keywords: [...primaryRouteActionMetadata[routeId].keywords, ...route.keywords],
+  };
+});
+
+const commandPaletteCVSectionOrder: CVSectionKey[] = ['about', ...cvSectionNavigationOrder];
+
+const cvSectionActions: CommandPaletteAction[] = commandPaletteCVSectionOrder.map((sectionKey) => ({
   id: `cv-section-${sectionKey}`,
   label: `CV: ${cvSectionMetadata[sectionKey].navLabel}`,
   description: `Jump to the ${cvSectionMetadata[

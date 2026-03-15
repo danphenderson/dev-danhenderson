@@ -65,25 +65,27 @@ Use a foundation-first execution model:
 
 ## Execution steps
 
-1. Create a typed route/action registry and lightweight route metadata layer.
-2. Add shared date/freshness helpers and a build-info source.
-3. Implement the global command palette and shell-level accessibility upgrades.
-4. Upgrade the not-found experience to use route/action and recency data.
-5. Add CV story mode and GitHub reliability surfacing.
-6. Add climbing analytics and freshness surfaces.
-7. Expand photography metadata, then add immersive mode, map view, and slug-aware sharing.
-8. Add performance scorecard and PWA basics.
-9. Run route-level validation, browser validation, and final documentation updates.
+1. [x] Create a typed route/action registry and lightweight route metadata layer.
+2. [ ] Normalize shared action/freshness primitives so the remaining recovery, analytics, and installability work can reuse the same sources instead of adding route-local one-offs.
+3. [x] Implement the global command palette and shell-level accessibility upgrades.
+4. [ ] Upgrade the not-found experience to use the shared route/action registry and command palette recovery paths, then validate direct navigation to an unknown route.
+5. [ ] Add CV story mode and GitHub reliability surfacing, keeping fallback provenance and freshness copy in the same slice so the route stays coherent.
+6. [ ] Add climbing analytics and freshness surfaces on top of `useClimbingData` without changing the source dataset shape.
+7. [ ] Expand photography metadata first, then add immersive mode, map view, and slug-aware sharing in that order so schema changes land before UI features.
+8. [ ] Add performance scorecard and PWA basics only after route metadata and build-info plumbing are stable.
+9. [ ] Run route-level validation after each completed slice, then finish with shared-browser validation and final documentation updates.
 
 ## Validation plan
 
 - `npm run build`
+- `CI=true npm test -- --watch=false`
 - `npx playwright test test/e2e/home.spec.ts`
 - `npx playwright test test/e2e/cv.github.spec.ts`
 - `npx playwright test test/e2e/climbing.spec.ts`
 - `npx playwright test test/e2e/photography.spec.ts`
 - `npx playwright test test/e2e/not-found.spec.ts`
 - Browser validation on `/`, `/cv`, `/climbing`, `/photography`, `/photography/:slug`, and an unknown route on mobile and desktop
+- Re-run only the narrowest relevant Playwright spec and browser route checks after each slice instead of deferring all validation to the end
 
 ## Risks and rollback
 
@@ -96,10 +98,12 @@ Use a foundation-first execution model:
 ## Progress notes
 
 - Status: In progress
-- Foundation work starts with a shared route registry and route metadata wiring.
-- Added shared route metadata and client-side head updates for the existing routes.
-- Added the first global command palette implementation with keyboard shortcuts, route actions, album actions, and CV section jump actions.
-- Added shell-level skip links while the top-level app structure was already being touched.
+- Completed the shared route registry and route metadata wiring for the current routes.
+- Completed the first global command palette implementation with keyboard shortcuts, route actions, album actions, and CV section jump actions.
+- Completed shell-level skip links while the top-level app structure was already being touched.
+- Remaining work now depends on keeping shared registries authoritative: route actions should stay derived from the shared route model, and route-level follow-up work should extend those registries rather than reintroducing hardcoded route lists.
+- The next coding slices should proceed in this order: not-found recovery, CV reliability/story mode, climbing freshness surfaces, photography metadata plus immersive features, then performance/PWA work.
+- Each remaining slice should update this plan with the exact touched files and route-level validation actually run before moving on.
 
 ## Completion Status
 
