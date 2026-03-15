@@ -19,11 +19,25 @@ const expectCommonLinkTooltip = async (page: Page, link: Locator, content: strin
   await expect(tooltip).toContainText(content);
 };
 
+const expectGitHubDataStatusTooltip = async (page: Page, content?: string) => {
+  const trigger = page.getByTestId('cv-github-status-tooltip-trigger');
+  const tooltip = page.getByRole('tooltip');
+
+  await expect(trigger).toBeVisible();
+  await trigger.hover();
+  await expect(tooltip).toBeVisible();
+  await expect(tooltip).toContainText('Data status');
+  if (content) {
+    await expect(tooltip).toContainText(content);
+  }
+};
+
 test.describe('CV page – GitHub integration', () => {
   test('renders the CV page with core sections', async ({ page }) => {
     await page.goto('/cv');
     await expect(page.getByText('Daniel Henderson')).toBeVisible();
     await expect(page.getByText('Software Engineer')).toBeVisible();
+    await expectGitHubDataStatusTooltip(page);
 
     const programLink = page.getByRole('link', {
       name: 'M.S. Mathematics student in the applied/computational track (expected Aug 2026)',
@@ -83,10 +97,10 @@ test.describe('CV page – GitHub integration', () => {
     await expect(
       main.getByText(/Pushed 1 commit to danphenderson\/dev-danhenderson/)
     ).toBeVisible();
-    await expect(main.getByText('Data status')).toBeVisible();
-    await expect(
-      main.getByText('Showing live GitHub activity from the latest successful fetch.')
-    ).toBeVisible();
+    await expectGitHubDataStatusTooltip(
+      page,
+      'Showing live GitHub activity from the latest successful fetch.'
+    );
 
     // The GitHub section headings should render
     await expect(main.getByRole('heading', { name: 'Recent Activity' })).toBeVisible();
@@ -104,11 +118,10 @@ test.describe('CV page – GitHub integration', () => {
 
     // Fallback contributions should appear (unique to contributions section)
     await expect(main.getByText(/dbt-labs\/dbt-core/)).toBeVisible();
-    await expect(
-      main.getByText(
-        'Showing bundled fallback highlights because the live GitHub response was incomplete or unavailable.'
-      )
-    ).toBeVisible();
+    await expectGitHubDataStatusTooltip(
+      page,
+      'Showing bundled fallback highlights because the live GitHub response was incomplete or unavailable.'
+    );
 
     // The GitHub section headings should render
     await expect(main.getByRole('heading', { name: 'Recent Activity' })).toBeVisible();
@@ -128,9 +141,10 @@ test.describe('CV page – GitHub integration', () => {
     ).toBeVisible();
 
     // Partial-fallback status should be visible
-    await expect(
-      main.getByText('Some GitHub data sources responded while others fell back to bundled highlights.')
-    ).toBeVisible();
+    await expectGitHubDataStatusTooltip(
+      page,
+      'Some GitHub data sources responded while others fell back to bundled highlights.'
+    );
   });
 
   test('renders story mode layout when navigating with ?mode=story', async ({ page }) => {
