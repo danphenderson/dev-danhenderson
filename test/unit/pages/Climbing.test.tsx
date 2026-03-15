@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { COMMON_LINK_TOOLTIP_ID } from '../../../src/components/CommonLink';
@@ -14,6 +14,14 @@ jest.mock('../../../src/hooks/useClimbingData', () => ({
         grade: '5.11a',
         location: 'Leavenworth',
         url: 'https://mp.com/route/1',
+      },
+      {
+        id: 'tick-2',
+        date: '6/25/2025',
+        route: 'Angel',
+        grade: '5.10b',
+        location: 'Tumwater Canyon',
+        url: 'https://mp.com/route/3',
       },
     ],
     todos: [
@@ -99,5 +107,46 @@ describe('Climbing', () => {
     expect(routeHeaders.length).toBeGreaterThanOrEqual(1);
     expect(gradeHeaders.length).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole('columnheader', { name: 'Date' })).toBeInTheDocument();
+  });
+
+  it('renders search inputs with correct placeholders', () => {
+    render(
+      <ThemeProvider>
+        <Climbing />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByPlaceholderText('Search climbed routes...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search TODO routes...')).toBeInTheDocument();
+  });
+
+  it('filters ticks grid when typing into the ticks search box', async () => {
+    render(
+      <ThemeProvider>
+        <Climbing />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByRole('link', { name: 'Hyperspace' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Angel' })).toBeInTheDocument();
+
+    const tickSearchInput = screen.getByPlaceholderText('Search climbed routes...');
+    fireEvent.change(tickSearchInput, { target: { value: 'Angel' } });
+
+    expect(screen.getByRole('link', { name: 'Angel' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Hyperspace' })).not.toBeInTheDocument();
+  });
+
+  it('maintains independent search state between grids', async () => {
+    render(
+      <ThemeProvider>
+        <Climbing />
+      </ThemeProvider>
+    );
+
+    const tickSearchInput = screen.getByPlaceholderText('Search climbed routes...');
+    fireEvent.change(tickSearchInput, { target: { value: 'Angel' } });
+
+    expect(screen.getByRole('link', { name: 'The Tooth' })).toBeInTheDocument();
   });
 });

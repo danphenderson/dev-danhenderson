@@ -1,4 +1,5 @@
-import { Box, Stack } from '@mui/material';
+import { Box, Stack, TextField, InputAdornment } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../components/CommonLink';
 import { SectionHeading } from '../components/layout/SectionHeading';
@@ -7,6 +8,7 @@ import { SectionCard } from '../components/layout/SectionCard';
 import { siteRouteMap } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useClimbingData, TickRow, TodoRow } from '../hooks/useClimbingData';
+import { useFuzzySearch } from '../hooks/useFuzzySearch';
 import { useAppStyles } from '../styles/appStyles';
 import { SectionLeadText } from '../components/text';
 
@@ -49,10 +51,15 @@ const todoColumns: GridColDef<TodoRow>[] = [
   { field: 'location', headerName: 'Location', flex: 1, minWidth: 150 },
 ];
 
+const tickSearchKeys = ['route', 'location'];
+const todoSearchKeys = ['route', 'location'];
+
 export default function Climbing() {
   const appStyles = useAppStyles();
   useDocumentMetadata({ ...siteRouteMap.climbing, canonicalPath: siteRouteMap.climbing.path });
   const { ticks, todos } = useClimbingData();
+  const tickSearch = useFuzzySearch<TickRow>(ticks, tickSearchKeys);
+  const todoSearch = useFuzzySearch<TodoRow>(todos, todoSearchKeys);
 
   return (
     <PageFrame image="assets/climbing/climbing-locations.png" maxWidth={1200}>
@@ -62,9 +69,22 @@ export default function Climbing() {
           <SectionLeadText sx={appStyles.sectionLeadSx}>
             A collection of routes I've remembered to tick on Mountain Project.
           </SectionLeadText>
+          <TextField
+            size="small"
+            placeholder="Search climbed routes..."
+            value={tickSearch.search}
+            onChange={(e) => tickSearch.setSearch(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+          />
           <Box sx={appStyles.dataGridContainerSx}>
             <DataGrid
-              rows={ticks}
+              rows={tickSearch.filtered}
               columns={columns}
               autoHeight
               disableRowSelectionOnClick
@@ -80,9 +100,22 @@ export default function Climbing() {
           <SectionLeadText sx={appStyles.sectionLeadSx}>
             A collection of routes I'm interested in climbing.
           </SectionLeadText>
+          <TextField
+            size="small"
+            placeholder="Search TODO routes..."
+            value={todoSearch.search}
+            onChange={(e) => todoSearch.setSearch(e.target.value)}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon fontSize="small" />
+                </InputAdornment>
+              ),
+            }}
+          />
           <Box sx={appStyles.dataGridContainerSx}>
             <DataGrid
-              rows={todos}
+              rows={todoSearch.filtered}
               columns={todoColumns}
               autoHeight
               disableRowSelectionOnClick
