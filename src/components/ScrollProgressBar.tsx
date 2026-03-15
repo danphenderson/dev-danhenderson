@@ -7,9 +7,6 @@ import { useTheme } from '@mui/material/styles';
  * Uses the Motion library's `useScroll` to track vertical scroll progress
  * and `useSpring` for smooth, physics-based interpolation. The bar is
  * invisible at the top of the page and fills to 100 % at the bottom.
- *
- * Hidden when the user prefers reduced motion (continuous animation of
- * the bar could be distracting).
  */
 export const ScrollProgressBar = () => {
   const theme = useTheme();

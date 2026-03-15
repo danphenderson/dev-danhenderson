@@ -113,21 +113,3 @@ export const hoverZoom = {
   scale: 1.05,
   transition: { duration: duration.normal, ease: easing.smooth },
 } as const;
-
-/* ------------------------------------------------------------------ */
-/*  Reduced-motion fallback variants                                  */
-/* ------------------------------------------------------------------ */
-
-/**
- * Instant-appear variants: no spatial transform, only opacity snap.
- * Used as a substitute when `prefers-reduced-motion: reduce` is active.
- */
-export const reducedFadeIn: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.01 } },
-};
-
-export const reducedContainer: Variants = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0 } },
-};

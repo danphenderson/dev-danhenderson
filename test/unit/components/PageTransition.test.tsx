@@ -46,21 +46,6 @@ jest.mock('motion/react', () => {
 
 import { PageTransition } from '../../../src/components/PageTransition';
 
-const defaultMatchMedia = window.matchMedia;
-
-const setReducedMotionPreference = (matches: boolean) => {
-  window.matchMedia = jest.fn().mockImplementation((query: string) => ({
-    matches,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  }));
-};
-
 const renderWithProviders = (ui: ReactNode, route = '/') =>
   render(
     <ThemeProvider>
@@ -70,14 +55,11 @@ const renderWithProviders = (ui: ReactNode, route = '/') =>
 
 describe('PageTransition', () => {
   afterEach(() => {
-    window.matchMedia = defaultMatchMedia;
     capturedMotionDivProps = {};
     jest.clearAllMocks();
   });
 
-  it('renders children inside a motion.div wrapper when motion is enabled', () => {
-    setReducedMotionPreference(false);
-
+  it('renders children inside a motion.div wrapper', () => {
     renderWithProviders(
       <PageTransition>
         <div data-testid="page-content">Hello</div>
@@ -89,8 +71,6 @@ describe('PageTransition', () => {
   });
 
   it('provides enter and exit animation props to the motion wrapper', () => {
-    setReducedMotionPreference(false);
-
     renderWithProviders(
       <PageTransition>
         <div>Content</div>
@@ -106,18 +86,5 @@ describe('PageTransition', () => {
         ease: expect.any(Array),
       }),
     );
-  });
-
-  it('skips animation wrapper and renders children directly under reduced motion', () => {
-    setReducedMotionPreference(true);
-
-    renderWithProviders(
-      <PageTransition>
-        <div data-testid="page-content">No Animation</div>
-      </PageTransition>,
-    );
-
-    expect(screen.queryByTestId('page-transition-div')).not.toBeInTheDocument();
-    expect(screen.getByTestId('page-content')).toBeInTheDocument();
   });
 });

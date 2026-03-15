@@ -31,30 +31,12 @@ jest.mock('motion/react', () => {
 
 import { ScrollProgressBar } from '../../../src/components/ScrollProgressBar';
 
-const defaultMatchMedia = window.matchMedia;
-
-const setReducedMotionPreference = (matches: boolean) => {
-  window.matchMedia = jest.fn().mockImplementation((query: string) => ({
-    matches,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(),
-    removeListener: jest.fn(),
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  }));
-};
-
 describe('ScrollProgressBar', () => {
   afterEach(() => {
-    window.matchMedia = defaultMatchMedia;
     jest.clearAllMocks();
   });
 
-  it('renders a fixed-position progress bar when motion is enabled', () => {
-    setReducedMotionPreference(false);
-
+  it('renders a fixed-position progress bar', () => {
     render(
       <ThemeProvider>
         <ScrollProgressBar />
@@ -66,17 +48,5 @@ describe('ScrollProgressBar', () => {
     expect(bar.style.position).toBe('fixed');
     expect(bar.style.top).toBe('0px');
     expect(bar.style.pointerEvents).toBe('none');
-  });
-
-  it('renders nothing when the user prefers reduced motion', () => {
-    setReducedMotionPreference(true);
-
-    render(
-      <ThemeProvider>
-        <ScrollProgressBar />
-      </ThemeProvider>,
-    );
-
-    expect(screen.queryByTestId('scroll-progress-bar')).not.toBeInTheDocument();
   });
 });

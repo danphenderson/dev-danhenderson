@@ -7,8 +7,6 @@
  * Usage:
  *
  *   import { MotionSection, fadeInUp, duration } from '../motion';
- *
- * All components respect `prefers-reduced-motion: reduce` automatically.
  */
 
 export { duration, easing, stagger, transition } from './tokens';
@@ -25,8 +23,6 @@ export {
   hoverLift,
   tapShrink,
   hoverZoom,
-  reducedFadeIn,
-  reducedContainer,
 } from './variants';
 
 export {

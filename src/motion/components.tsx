@@ -1,5 +1,5 @@
 import type { ReactNode, ElementType } from 'react';
-import { motion, useInView, useReducedMotion } from 'motion/react';
+import { motion, useInView } from 'motion/react';
 import type { Variants, HTMLMotionProps, TargetAndTransition } from 'motion/react';
 import { useRef } from 'react';
 import {
@@ -10,8 +10,6 @@ import {
   hoverLift,
   tapShrink,
   hoverZoom,
-  reducedFadeIn,
-  reducedContainer,
 } from './variants';
 
 /* ------------------------------------------------------------------ */
@@ -47,8 +45,7 @@ interface MotionSectionProps extends Omit<HTMLMotionProps<'div'>, 'variants'> {
  * Scroll-triggered section reveal.
  *
  * Wraps content in a `motion.div` that animates from `hidden` → `visible`
- * when the element enters the viewport. Respects reduced-motion by
- * substituting an instant-appear variant.
+ * when the element enters the viewport.
  */
 export const MotionSection = ({
   children,
@@ -65,14 +62,13 @@ export const MotionSection = ({
     margin: asMargin(rootMargin),
     amount: threshold || undefined,
   });
-  const prefersReduced = useReducedMotion();
 
   return (
     <motion.div
       ref={ref}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
-      variants={prefersReduced ? reducedFadeIn : variants}
+      variants={variants}
       {...rest}
     >
       {children}
@@ -113,14 +109,13 @@ export const StaggerChildren = ({
 }: StaggerChildrenProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once, margin: asMargin(rootMargin) });
-  const prefersReduced = useReducedMotion();
 
   return (
     <motion.div
       ref={ref}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
-      variants={prefersReduced ? reducedContainer : containerVariants}
+      variants={containerVariants}
       {...rest}
     >
       {children}
@@ -144,9 +139,6 @@ interface MotionCardProps extends HTMLMotionProps<'div'> {
 
 /**
  * Card wrapper with hover-lift and tap-shrink micro-interactions.
- *
- * The hover/tap effects are disabled when `prefers-reduced-motion`
- * is active to avoid motion sickness triggers.
  */
 export const MotionCard = ({
   children,
@@ -155,12 +147,10 @@ export const MotionCard = ({
   tapState,
   ...rest
 }: MotionCardProps) => {
-  const prefersReduced = useReducedMotion();
-
   return (
     <motion.div
-      whileHover={!disableHover && !prefersReduced ? (hoverState ?? hoverLift) : undefined}
-      whileTap={!disableHover && !prefersReduced ? (tapState ?? tapShrink) : undefined}
+      whileHover={!disableHover ? (hoverState ?? hoverLift) : undefined}
+      whileTap={!disableHover ? (tapState ?? tapShrink) : undefined}
       {...rest}
     >
       {children}
@@ -183,11 +173,9 @@ interface MotionImageProps extends HTMLMotionProps<'img'> {
  * Uses `overflow: hidden` on the parent to clip the zoom effect.
  */
 export const MotionImage = ({ disableHover = false, style, ...rest }: MotionImageProps) => {
-  const prefersReduced = useReducedMotion();
-
   return (
     <motion.img
-      whileHover={!disableHover && !prefersReduced ? hoverZoom : undefined}
+      whileHover={!disableHover ? hoverZoom : undefined}
       style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', ...style }}
       {...rest}
     />
@@ -211,10 +199,8 @@ interface MotionItemProps extends Omit<HTMLMotionProps<'div'>, 'variants'> {
  * state from the parent and applies its own variant for the child animation.
  */
 export const MotionItem = ({ children, variants = fadeInUp, ...rest }: MotionItemProps) => {
-  const prefersReduced = useReducedMotion();
-
   return (
-    <motion.div variants={prefersReduced ? reducedFadeIn : variants} {...rest}>
+    <motion.div variants={variants} {...rest}>
       {children}
     </motion.div>
   );
@@ -239,14 +225,13 @@ export const MotionFadeIn = ({
 }: MotionFadeInProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once, margin: asMargin(rootMargin) });
-  const prefersReduced = useReducedMotion();
 
   return (
     <motion.div
       ref={ref}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
-      variants={prefersReduced ? reducedFadeIn : fadeIn}
+      variants={fadeIn}
       {...rest}
     >
       {children}
@@ -273,14 +258,13 @@ export const MotionScaleIn = ({
 }: MotionScaleInProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once, margin: asMargin(rootMargin) });
-  const prefersReduced = useReducedMotion();
 
   return (
     <motion.div
       ref={ref}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
-      variants={prefersReduced ? reducedFadeIn : scaleIn}
+      variants={scaleIn}
       {...rest}
     >
       {children}
