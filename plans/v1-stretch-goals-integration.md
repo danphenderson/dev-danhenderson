@@ -74,7 +74,7 @@ Use a foundation-first execution model:
 5. [x] Add CV story mode and deepen GitHub reliability surfacing on top of the shared freshness/provenance baseline so the route reads as one coherent slice. See `plans/cv-story-reliability-slice.md`.
 6. [x] Add climbing analytics and freshness surfaces on top of `useClimbingData` without changing the source dataset shape.
 7. [ ] Expand photography metadata first, then add immersive mode, map view, and slug-aware sharing in that order so schema changes land before UI features.
-8. [ ] Add performance scorecard and PWA basics only after route metadata and build-info plumbing are stable.
+8. [x] Add performance scorecard and PWA basics only after route metadata and build-info plumbing are stable.
 9. [ ] Run route-level validation after each completed slice, then finish with shared-browser validation and final documentation updates.
 
 ## Validation plan
@@ -122,6 +122,9 @@ Use a foundation-first execution model:
 - Completed execution step 5 through `plans/cv-story-reliability-slice.md`: query-param-driven story mode on `/cv`, extended GitHub status model with per-source detail and stale computation, richer partial-fallback and freshness messaging in CVGitHubSection, command palette story-mode entry.
 - Step 5 touched files: `src/pages/CV.tsx`, `src/data/cv.ts`, `src/types/data.ts`, `src/hooks/githubProfileData.ts`, `src/hooks/useGithubProfile.ts`, `src/constants/siteRoutes.ts`, `src/constants/commandPaletteActions.ts`, `src/components/cv/CVGitHubSection.tsx`, `src/components/cv/CVStoryHeader.tsx` (new), `src/components/cv/CVStoryChapterHeading.tsx` (new).
 - Step 5 validation actually run: `npm run build`, `CI=true npm test` for useGithubProfile/CV/commandPaletteActions (29 tests), `npx playwright test test/e2e/cv.github.spec.ts` (6 tests including partial-failure and story-mode specs).
+- Completed execution step 8: performance scorecard, build-info plumbing, Web Vitals collection, and PWA basics.
+- Step 8 touched files: `src/utils/buildInfo.ts` (new — typed build metadata from `REACT_APP_*` env vars), `src/hooks/useWebVitals.ts` (new — Core Web Vitals hook with JSDOM-safe feature detection), `src/components/PerformanceScorecard.tsx` (new — dialog showing build info and live Web Vitals with rating chips), `src/components/Footer.tsx` (added scorecard trigger icon), `src/index.tsx` (service worker registration), `src/utils/serviceWorkerRegistration.ts` (new — minimal SW registration utility), `public/manifest.json` (new — PWA web app manifest), `public/service-worker.js` (new — network-first navigation, cache-first static assets), `public/index.html` (manifest link, apple-mobile-web-app-capable, mobile-web-app-capable meta tags), `package.json` (added `web-vitals@^5.1.0` dependency).
+- Step 8 validation actually run: `npm run build`, `CI=true npm test -- --watch=false` (no new test failures, Footer test still passes), browser validation of scorecard dialog on `/` showing build info (Version, Commit, Built, Environment) and live Web Vitals (LCP, CLS, INP, TTFB) with rating indicators and skeleton placeholders for pending metrics.
 
 ## Completion Status
 

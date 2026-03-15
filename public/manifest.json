@@ -5,7 +5,6 @@
   "icons": [
     {
       "src": "./assets/home.jpg",
-      "sizes": "512x512",
       "type": "image/jpeg",
       "purpose": "any"
     }

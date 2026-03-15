@@ -33,10 +33,10 @@ export function useWebVitals(): WebVitalsState {
     if (initialized.current || !supportsWebVitals()) return;
     initialized.current = true;
 
-    const handler = ({ name, value, rating }: { name: string; value: number; rating: 'good' | 'needs-improvement' | 'poor' }) => {
+    const handler = (metric: { name: string; value: number; rating: WebVitalEntry['rating'] }) => {
       setMetrics((prev) => {
         const next = new Map(prev);
-        next.set(name, { name, value, rating });
+        next.set(metric.name, { name: metric.name, value: metric.value, rating: metric.rating });
         return next;
       });
       setCollected(true);

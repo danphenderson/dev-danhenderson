@@ -52,11 +52,9 @@ const formatValue = (name: string, value: number): string => {
 };
 
 const formatBuildTime = (iso: string): string => {
-  try {
-    return new Date(iso).toLocaleString();
-  } catch {
-    return iso;
-  }
+  const date = new Date(iso);
+  if (isNaN(date.getTime())) return iso;
+  return date.toLocaleString();
 };
 
 function VitalRow({ entry }: { entry: WebVitalEntry }) {

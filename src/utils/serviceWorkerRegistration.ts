@@ -7,10 +7,9 @@
  */
 
 const isLocalhost = Boolean(
-  typeof window !== 'undefined' &&
-    (window.location.hostname === 'localhost' ||
-      window.location.hostname === '[::1]' ||
-      /^127(?:\.\d+){3}$/.test(window.location.hostname))
+  window.location.hostname === 'localhost' ||
+    window.location.hostname === '[::1]' ||
+    /^127(?:\.\d+){3}$/.test(window.location.hostname)
 );
 
 type ServiceWorkerConfig = {
