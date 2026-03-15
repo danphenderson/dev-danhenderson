@@ -19,6 +19,7 @@ import { CVSectionNavigator } from '../components/cv/CVSectionNavigator';
 import { CVSectionStack } from '../components/cv/CVSectionStack';
 import { CVStoryHeader } from '../components/cv/CVStoryHeader';
 import { CVStoryChapterHeading } from '../components/cv/CVStoryChapterHeading';
+import { CVGitHubStatusTooltip } from '../components/cv/CVGitHubStatusTooltip';
 import { CVVolunteeringSection } from '../components/cv/CVVolunteeringSection';
 import {
   cvSectionNavigationOrder,
@@ -155,6 +156,7 @@ const CVRouteContent = () => {
       />
     </Box>
   );
+  const githubStatusTooltip = <CVGitHubStatusTooltip status={status} />;
 
   const sectionDefinitions: CVSectionDefinition[] = [
     {
@@ -214,7 +216,6 @@ const CVRouteContent = () => {
           contributions={contributions}
           loading={loading}
           error={error}
-          status={status}
           sectionDelayMs={layout.delayMs}
           nestedDelayOffsetMs={githubNestedDelayOffsetMs}
           itemOffsetMs={itemOffsetMs}
@@ -254,7 +255,7 @@ const CVRouteContent = () => {
     sectionDefinitions.forEach((def) => map.set(def.key, def));
     return map;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activity, contributions, loading, error, status]);
+  }, [activity, contributions, loading, error]);
 
   const sectionDescriptors: CVResolvedSectionDescriptor[] = sectionDefinitions.map(
     ({ key, render }) => {
@@ -302,7 +303,11 @@ const CVRouteContent = () => {
       >
         <Box data-testid="cv-story-layout">
           <CVSectionStack spacing={3}>
-            <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} />
+            <CVStoryHeader
+              mode={cvMode}
+              onToggleMode={handleToggleMode}
+              statusIndicator={githubStatusTooltip}
+            />
             {cvStoryChapters.map((chapter, index) => {
               const definition = sectionDefinitionsByKey.get(chapter.sectionKey);
               if (!definition) return null;
@@ -337,7 +342,11 @@ const CVRouteContent = () => {
       >
         <>
           <CVSectionStack spacing={2.5}>
-            <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} />
+            <CVStoryHeader
+              mode={cvMode}
+              onToggleMode={handleToggleMode}
+              statusIndicator={githubStatusTooltip}
+            />
             {mobileAboutSection && renderSectionDescriptor(mobileAboutSection)}
             {mobileBodySections.map(renderSectionDescriptor)}
           </CVSectionStack>
@@ -350,7 +359,11 @@ const CVRouteContent = () => {
   return (
     <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
       <>
-        <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} />
+        <CVStoryHeader
+          mode={cvMode}
+          onToggleMode={handleToggleMode}
+          statusIndicator={githubStatusTooltip}
+        />
         <Grid container spacing={3} alignItems="stretch">
           <Grid item xs={12}>
             <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-top-region">
