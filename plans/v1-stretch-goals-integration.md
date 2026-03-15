@@ -72,7 +72,7 @@ Use a foundation-first execution model:
 3. [x] Implement the global command palette and shell-level accessibility upgrades.
 4. [x] Extend the not-found recovery baseline with more contextual routing assistance on top of the shared route/action registry and command palette recovery paths, then validate direct navigation to an unknown route.
 5. [x] Add CV story mode and deepen GitHub reliability surfacing on top of the shared freshness/provenance baseline so the route reads as one coherent slice. See `plans/cv-story-reliability-slice.md`.
-6. [ ] Add climbing analytics and freshness surfaces on top of `useClimbingData` without changing the source dataset shape.
+6. [x] Add climbing analytics and freshness surfaces on top of `useClimbingData` without changing the source dataset shape.
 7. [ ] Expand photography metadata first, then add immersive mode, map view, and slug-aware sharing in that order so schema changes land before UI features.
 8. [ ] Add performance scorecard and PWA basics only after route metadata and build-info plumbing are stable.
 9. [ ] Run route-level validation after each completed slice, then finish with shared-browser validation and final documentation updates.
@@ -114,6 +114,7 @@ Use a foundation-first execution model:
 - Follow-up refactor `plans/unify-recovery-palette.md` removed the recovery panel's temporary local dialog so the provider-backed global command palette is again the single searchable surface for both keyboard and recovery entry points, with shared matching semantics in `src/utils/commandPaletteSearch.ts`.
 - `src/pages/Photography.tsx` and `src/pages/PhotographyCategory.tsx` now render their first above-the-fold section cards without waiting on intersection triggers so the photography flows remain stable in headless and browser validation.
 - Execution step 4 validation actually run: `npm run build`, `npx playwright test test/e2e/not-found.spec.ts`, `npx playwright test test/e2e/photography.spec.ts`, and direct browser validation on `/unknown` and `/photography/landscap` at desktop `1440x1200` and mobile `390x844` with no console errors, one command palette dialog per recovery interaction, clean Escape close behavior, intact recovery-seeded queries, intact CV hash scrolling, and no horizontal overflow in the checked viewports.
+- Completed execution step 6 by extending `src/hooks/useClimbingData.ts` with derived analytics (overview totals, normalized grade buckets, top destinations) while preserving the shared `SharedDataStatus` freshness contract, adding `src/components/climbing/ClimbingAnalytics.tsx`, wiring the analytics section into `src/pages/Climbing.tsx`, and extending the corresponding climbing unit and E2E tests.
 - The next coding slices should proceed in this order: CV story mode and reliability refinement, climbing freshness surfaces, photography metadata plus immersive features, then performance/PWA work.
 - Each remaining slice should update this plan with the exact touched files and route-level validation actually run before moving on.
 - Completed execution step 5 through `plans/cv-story-reliability-slice.md`: query-param-driven story mode on `/cv`, extended GitHub status model with per-source detail and stale computation, richer partial-fallback and freshness messaging in CVGitHubSection, command palette story-mode entry.

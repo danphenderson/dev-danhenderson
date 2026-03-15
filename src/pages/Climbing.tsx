@@ -5,6 +5,7 @@ import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../components/CommonLink';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
+import { ClimbingAnalytics } from '../components/climbing/ClimbingAnalytics';
 import { siteRouteMap } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useClimbingData, TickRow, TodoRow } from '../hooks/useClimbingData';
@@ -57,7 +58,7 @@ const todoSearchKeys = ['route', 'location'];
 export default function Climbing() {
   const appStyles = useAppStyles();
   useDocumentMetadata({ ...siteRouteMap.climbing, canonicalPath: siteRouteMap.climbing.path });
-  const { ticks, todos } = useClimbingData();
+  const { ticks, todos, analytics, status } = useClimbingData();
   const tickSearch = useFuzzySearch<TickRow>(ticks, tickSearchKeys);
   const todoSearch = useFuzzySearch<TodoRow>(todos, todoSearchKeys);
 
@@ -69,6 +70,7 @@ export default function Climbing() {
           <SectionLeadText sx={appStyles.sectionLeadSx}>
             A collection of routes I've remembered to tick on Mountain Project.
           </SectionLeadText>
+          <ClimbingAnalytics analytics={analytics} status={status} />
           <TextField
             size="small"
             placeholder="Search climbed routes..."
