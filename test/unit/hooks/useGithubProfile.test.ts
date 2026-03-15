@@ -53,6 +53,11 @@ describe('useGithubProfile', () => {
     expect(result.current.activity).toEqual(fallbackActivity);
     expect(result.current.contributions).toEqual(fallbackContributions);
     expect(result.current.error).toBeNull();
+    expect(result.current.status).toMatchObject({
+      source: 'static',
+      isFallback: true,
+      reason: 'initial-fallback',
+    });
   });
 
   it('fetches and updates activity on mount', async () => {
@@ -83,6 +88,12 @@ describe('useGithubProfile', () => {
         href: 'https://github.com/testuser/my-repo/commit/abc123',
       },
     ]);
+    expect(result.current.status).toMatchObject({
+      source: 'remote',
+      isFallback: true,
+      reason: 'fallback-content',
+    });
+    expect(result.current.status.freshness.lastUpdated).toEqual(expect.any(String));
   });
 
   it('falls back gracefully on fetch failure', async () => {
@@ -99,6 +110,11 @@ describe('useGithubProfile', () => {
 
     expect(result.current.activity).toEqual(fallbackActivity);
     expect(result.current.error).toBeTruthy();
+    expect(result.current.status).toMatchObject({
+      source: 'remote',
+      isFallback: true,
+      reason: 'fallback-content',
+    });
   });
 
   it('falls back gracefully on network error', async () => {
@@ -113,5 +129,45 @@ describe('useGithubProfile', () => {
     expect(result.current.activity).toEqual(fallbackActivity);
     expect(result.current.contributions).toEqual(fallbackContributions);
     expect(result.current.error).toBeTruthy();
+    expect(result.current.status).toMatchObject({
+      source: 'remote',
+      isFallback: true,
+      reason: 'fallback-content',
+    });
+  });
+
+  it('reuses cached GitHub data across hook mounts', async () => {
+    global.fetch = jest
+      .fn()
+      .mockImplementationOnce(() =>
+        createOkResponse([
+          {
+            id: 'event-1',
+            type: 'PushEvent',
+            repo: { name: 'testuser/my-repo' },
+            payload: { commits: [{ sha: 'abc123' }], head: 'abc123' },
+          },
+        ])
+      )
+      .mockImplementationOnce(() => createOkResponse({ items: [] }));
+
+    const firstHook = renderHook(() => useGithubProfile());
+
+    await waitFor(() => {
+      expect(firstHook.result.current.loading).toBe(false);
+    });
+
+    const secondHook = renderHook(() => useGithubProfile());
+
+    await waitFor(() => {
+      expect(secondHook.result.current.loading).toBe(false);
+    });
+
+    expect(global.fetch).toHaveBeenCalledTimes(2);
+    expect(secondHook.result.current.status).toMatchObject({
+      source: 'cache',
+      reason: 'cache-hit',
+      isFallback: true,
+    });
   });
 });

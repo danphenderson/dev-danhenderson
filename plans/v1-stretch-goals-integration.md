@@ -101,6 +101,8 @@ Use a foundation-first execution model:
 - Completed the shared route registry and route metadata wiring for the current routes.
 - Completed the first global command palette implementation with keyboard shortcuts, route actions, album actions, and CV section jump actions.
 - Completed shell-level skip links while the top-level app structure was already being touched.
+- Started execution step 2 with a focused sub-plan in `plans/shared-status-primitives.md` so action derivation, freshness metadata, and fallback provenance can land without pulling route-specific UI work forward.
+- Step 2 should finish by extending the shared route registry and existing data hooks with reusable status primitives, while keeping not-found UI, CV story mode, climbing analytics cards, photography immersive/share work, and PWA behavior in their later slices.
 - Remaining work now depends on keeping shared registries authoritative: route actions should stay derived from the shared route model, and route-level follow-up work should extend those registries rather than reintroducing hardcoded route lists.
 - The next coding slices should proceed in this order: not-found recovery, CV reliability/story mode, climbing freshness surfaces, photography metadata plus immersive features, then performance/PWA work.
 - Each remaining slice should update this plan with the exact touched files and route-level validation actually run before moving on.

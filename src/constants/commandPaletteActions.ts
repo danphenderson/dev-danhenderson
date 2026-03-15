@@ -4,53 +4,14 @@ import {
   type CVSectionKey,
 } from '../components/cv/cvSectionMetadata';
 import { photographyCategories } from '../data/photography';
-import { primaryNavigationRoutes, siteRouteMap } from './siteRoutes';
+import { sharedRouteActions, type SharedRouteAction } from './routeActions';
+import { siteRouteMap } from './siteRoutes';
 
-export type CommandPaletteAction = {
-  id: string;
-  label: string;
-  description: string;
-  path: string;
-  keywords: string[];
-};
+export type CommandPaletteAction = Omit<SharedRouteAction, 'recoveryPriority'>;
 
-const primaryRouteActionMetadata = {
-  home: {
-    description: 'Return to the home hero route.',
-    keywords: ['start', 'landing'],
-  },
-  cv: {
-    description: 'Open the interactive CV and GitHub-driven profile sections.',
-    keywords: ['resume', 'experience'],
-  },
-  climbing: {
-    description: 'Open climbing ticks, goals, and analytics.',
-    keywords: ['routes', 'analytics'],
-  },
-  photography: {
-    description: 'Browse photography albums and route-specific galleries.',
-    keywords: ['gallery', 'photos'],
-  },
-} as const;
-
-type CommandPaletteRouteId = keyof typeof primaryRouteActionMetadata;
-
-const commandPaletteRoutes = [
-  siteRouteMap.home,
-  ...primaryNavigationRoutes,
-] as (typeof siteRouteMap)[CommandPaletteRouteId][];
-
-const primaryRouteActions: CommandPaletteAction[] = commandPaletteRoutes.map((route) => {
-  const routeId = route.id as CommandPaletteRouteId;
-
-  return {
-    id: `route-${routeId}`,
-    label: route.label,
-    description: primaryRouteActionMetadata[routeId].description,
-    path: route.path,
-    keywords: [...primaryRouteActionMetadata[routeId].keywords, ...route.keywords],
-  };
-});
+const primaryRouteActions: CommandPaletteAction[] = sharedRouteActions.map(
+  ({ recoveryPriority: _recoveryPriority, ...action }) => action
+);
 
 const cvCommandPaletteSectionOrder: CVSectionKey[] = ['about', ...cvSectionNavigationOrder];
 

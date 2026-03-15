@@ -121,4 +121,20 @@ describe('useClimbingData', () => {
     expect(todos[1].location).toBe('Smith Rock');
     expect(todos[2].location).toBe('Leavenworth');
   });
+
+  it('reports bundled climbing dataset status and recency', () => {
+    const { result } = renderHook(() => useClimbingData());
+
+    expect(result.current.status).toMatchObject({
+      source: 'static',
+      loading: false,
+      isFallback: false,
+      reason: 'bundled-content',
+      freshness: {
+        lastUpdated: '2024-06-20',
+        isStale: false,
+      },
+    });
+    expect(result.current.status.freshness.label).toContain('updated through');
+  });
 });

@@ -1,5 +1,9 @@
-import { cvSectionMetadata, cvSectionNavigationOrder } from '../../../src/components/cv/cvSectionMetadata';
+import {
+  cvSectionMetadata,
+  cvSectionNavigationOrder,
+} from '../../../src/components/cv/cvSectionMetadata';
 import { commandPaletteActions } from '../../../src/constants/commandPaletteActions';
+import { recoveryRouteActions } from '../../../src/constants/routeActions';
 import { primaryNavigationRoutes, siteRouteMap } from '../../../src/constants/siteRoutes';
 
 describe('commandPaletteActions', () => {
@@ -10,6 +14,11 @@ describe('commandPaletteActions', () => {
       siteRouteMap.home.label,
       ...primaryNavigationRoutes.map((route) => route.label),
     ]);
+
+    expect(routeActions[0]).toMatchObject({
+      description: siteRouteMap.home.action?.description,
+      keywords: expect.arrayContaining(siteRouteMap.home.action?.keywords ?? []),
+    });
   });
 
   it('includes the CV About section before the shared section navigation order', () => {
@@ -25,5 +34,14 @@ describe('commandPaletteActions', () => {
       label: `CV: ${cvSectionMetadata.about.navLabel}`,
       path: `${siteRouteMap.cv.path}#${cvSectionMetadata.about.id}`,
     });
+  });
+
+  it('derives recovery route actions from the canonical route registry in priority order', () => {
+    expect(recoveryRouteActions.map((action) => action.id)).toEqual([
+      'route-home',
+      'route-cv',
+      'route-climbing',
+      'route-photography',
+    ]);
   });
 });

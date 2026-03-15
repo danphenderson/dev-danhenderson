@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { ticks as tickData, todos as todoData } from '../data/climbs';
-import type { Tick, Todo } from '../types/data';
+import type { SharedDataStatus, Tick, Todo } from '../types/data';
 import { formatIsoDateAsUtcCalendar, getIsoDateUtcTimestamp } from '../utils/date';
 
 export type TickRow = Tick & { id: string };
@@ -61,8 +61,36 @@ export function useClimbingData() {
       }));
   }, []);
 
+  const status = useMemo<SharedDataStatus>(() => {
+    const mostRecentTick = tickData.reduce<string | undefined>((latest, tick) => {
+      if (!latest) {
+        return tick.date;
+      }
+
+      return getIsoDateUtcTimestamp(tick.date) > getIsoDateUtcTimestamp(latest)
+        ? tick.date
+        : latest;
+    }, undefined);
+
+    return {
+      source: 'static',
+      loading: false,
+      error: null,
+      isFallback: false,
+      reason: 'bundled-content',
+      freshness: {
+        label: mostRecentTick
+          ? `Bundled climbing log updated through ${formatIsoDateAsUtcCalendar(mostRecentTick)}.`
+          : 'Bundled climbing log data is available in the client build.',
+        lastUpdated: mostRecentTick,
+        isStale: false,
+      },
+    };
+  }, []);
+
   return {
     ticks,
     todos,
+    status,
   };
 }

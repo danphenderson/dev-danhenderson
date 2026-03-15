@@ -5,6 +5,7 @@ import {
   fallbackGitHubContributions,
   githubUsername,
 } from '../data/cv';
+import type { SharedDataStatus, SharedDataStatusReason } from '../types/data';
 import type { GitHubActivityItem, GitHubContribution } from '../types/cv';
 
 type GitHubEvent = {
@@ -41,6 +42,7 @@ export type GitHubProfileData = {
   activity: GitHubActivityItem[];
   contributions: GitHubContribution[];
   encounteredError: boolean;
+  status: SharedDataStatus;
 };
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
@@ -60,6 +62,64 @@ type GitHubProfileCacheEntry = {
 
 let cacheEntry: GitHubProfileCacheEntry | null = null;
 let inFlightPromise: Promise<GitHubProfileData> | null = null;
+
+const createGitHubStatus = ({
+  source,
+  loading,
+  error,
+  isFallback,
+  reason,
+  label,
+  lastUpdated,
+}: {
+  source: SharedDataStatus['source'];
+  loading: boolean;
+  error: string | null;
+  isFallback: boolean;
+  reason: SharedDataStatusReason;
+  label: string;
+  lastUpdated?: string;
+}): SharedDataStatus => ({
+  source,
+  loading,
+  error,
+  isFallback,
+  reason,
+  freshness: {
+    label,
+    lastUpdated,
+    staleAfterMs: CACHE_TTL_MS,
+    isStale: false,
+  },
+});
+
+export const createInitialGitHubProfileStatus = (): SharedDataStatus =>
+  createGitHubStatus({
+    source: 'static',
+    loading: false,
+    error: null,
+    isFallback: true,
+    reason: 'initial-fallback',
+    label: 'Bundled fallback GitHub highlights are ready while live data loads.',
+  });
+
+export const createLoadingGitHubProfileStatus = (
+  previousStatus: SharedDataStatus
+): SharedDataStatus => ({
+  ...previousStatus,
+  loading: true,
+  error: null,
+});
+
+export const createGithubHookErrorStatus = (message: string): SharedDataStatus =>
+  createGitHubStatus({
+    source: 'static',
+    loading: false,
+    error: message,
+    isFallback: true,
+    reason: 'network-error',
+    label: 'Bundled fallback GitHub highlights are shown because the live request failed.',
+  });
 
 const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
   const repoName = event.repo?.name;
@@ -239,6 +299,8 @@ const enrichContributions = async (
 
 const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
   let encounteredError = false;
+  let usedFallbackActivity = false;
+  let usedFallbackContributions = false;
 
   const [eventsResult, contributionsResult] = await Promise.allSettled([
     fetchJson<GitHubEvent[]>(
@@ -254,7 +316,11 @@ const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
   const activity =
     eventsResult.status === 'fulfilled'
       ? buildActivity(eventsResult.value)
-      : ((encounteredError = true), fallbackGitHubActivity);
+      : ((encounteredError = true), (usedFallbackActivity = true), fallbackGitHubActivity);
+
+  if (eventsResult.status === 'fulfilled' && activity === fallbackGitHubActivity) {
+    usedFallbackActivity = true;
+  }
 
   if (eventsResult.status === 'fulfilled') {
     getExternalContributionRepos(eventsResult.value).forEach((repoName) =>
@@ -278,11 +344,34 @@ const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
     buildContributionCandidates(externalRepos)
   );
   encounteredError = encounteredError || enrichedContributions.encounteredError;
+  usedFallbackContributions = enrichedContributions.contributions === fallbackGitHubContributions;
+
+  const lastUpdated = new Date().toISOString();
+  const isFallback = usedFallbackActivity || usedFallbackContributions;
+  const reason: SharedDataStatusReason = isFallback
+    ? encounteredError
+      ? usedFallbackActivity && usedFallbackContributions
+        ? 'fallback-content'
+        : 'partial-fallback'
+      : 'fallback-content'
+    : 'live-fetch';
+  const label = isFallback
+    ? 'GitHub activity is partially or fully backed by bundled fallback highlights.'
+    : 'GitHub activity was fetched live and cached for subsequent visits.';
 
   return {
     activity,
     contributions: enrichedContributions.contributions,
     encounteredError,
+    status: createGitHubStatus({
+      source: 'remote',
+      loading: false,
+      error: null,
+      isFallback,
+      reason,
+      label,
+      lastUpdated,
+    }),
   };
 };
 
@@ -290,7 +379,18 @@ export const loadGitHubProfileData = async () => {
   const now = Date.now();
 
   if (cacheEntry && cacheEntry.expiresAt > now) {
-    return cacheEntry.data;
+    return {
+      ...cacheEntry.data,
+      status: createGitHubStatus({
+        source: 'cache',
+        loading: false,
+        error: null,
+        isFallback: cacheEntry.data.status.isFallback,
+        reason: 'cache-hit',
+        label: 'GitHub activity is served from the recent in-memory cache.',
+        lastUpdated: cacheEntry.data.status.freshness.lastUpdated,
+      }),
+    };
   }
 
   if (!inFlightPromise) {
