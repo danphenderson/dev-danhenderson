@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
 import { useAppStyles } from '../styles/appStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { CommonLink } from './CommonLink';
+import { PerformanceScorecard } from './PerformanceScorecard';
 import { BodyText } from './text';
 
 export default function Footer() {
@@ -39,13 +41,23 @@ export default function Footer() {
         transition: `opacity 0.5s ${SPRING_EASING_CSS}, transform 0.5s ${SPRING_EASING_CSS}`,
       }}
     >
-      <BodyText align="center" sx={appStyles.footerTextSx}>
-        {'Copyright © '}
-        <CommonLink color="inherit" href="https://danhenderson.dev/">
-          danhenderson.dev
-        </CommonLink>{' '}
-        {new Date().getFullYear()}.
-      </BodyText>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 0.5,
+        }}
+      >
+        <BodyText align="center" sx={appStyles.footerTextSx}>
+          {'Copyright © '}
+          <CommonLink color="inherit" href="https://danhenderson.dev/">
+            danhenderson.dev
+          </CommonLink>{' '}
+          {new Date().getFullYear()}.
+        </BodyText>
+        <PerformanceScorecard />
+      </Box>
     </Container>
   );
 }
