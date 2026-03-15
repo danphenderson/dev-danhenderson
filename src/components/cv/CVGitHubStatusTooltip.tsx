@@ -100,6 +100,7 @@ export const CVGitHubStatusTooltip = ({ status }: CVGitHubStatusTooltipProps) =>
         size="small"
         variant="text"
         color="inherit"
+        aria-label="GitHub data status information"
         startIcon={<InfoOutlinedIcon fontSize="small" />}
         data-testid="cv-github-status-tooltip-trigger"
         sx={{ px: 0, minWidth: 0, textTransform: 'none' }}

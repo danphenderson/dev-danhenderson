@@ -59,7 +59,7 @@ describe('CVGitHubStatusTooltip', () => {
       </ThemeProvider>
     );
 
-    fireEvent.mouseOver(screen.getByRole('button', { name: 'Data status' }));
+    fireEvent.mouseOver(screen.getByTestId('cv-github-status-tooltip-trigger'));
 
     expect(await screen.findByRole('tooltip')).toBeVisible();
     expect(
