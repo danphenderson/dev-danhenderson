@@ -38,6 +38,8 @@ import {
   resumeDownloadFilename,
   resumePdfUrl,
 } from '../data/cv';
+import { siteRouteMap } from '../constants/siteRoutes';
+import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useGithubProfile } from '../hooks/useGithubProfile';
 import { CVLayoutMode, CVSectionRegion, cvPageSectionLayout } from './cvPageLayout';
 import { useAppStyles } from '../styles/appStyles';
@@ -67,6 +69,7 @@ export default function CV() {
 const CVRouteContent = () => {
   const appStyles = useAppStyles();
   const { motionTokens } = useComponentStyles();
+  useDocumentMetadata({ ...siteRouteMap.cv, canonicalPath: siteRouteMap.cv.path });
   const { activity, contributions, loading, error } = useGithubProfile();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));

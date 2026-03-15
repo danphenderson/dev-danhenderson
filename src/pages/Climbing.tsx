@@ -4,6 +4,8 @@ import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../components/CommonLink';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
+import { siteRouteMap } from '../constants/siteRoutes';
+import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useClimbingData, TickRow, TodoRow } from '../hooks/useClimbingData';
 import { useAppStyles } from '../styles/appStyles';
 import { SectionLeadText } from '../components/text';
@@ -49,6 +51,7 @@ const todoColumns: GridColDef<TodoRow>[] = [
 
 export default function Climbing() {
   const appStyles = useAppStyles();
+  useDocumentMetadata({ ...siteRouteMap.climbing, canonicalPath: siteRouteMap.climbing.path });
   const { ticks, todos } = useClimbingData();
 
   return (

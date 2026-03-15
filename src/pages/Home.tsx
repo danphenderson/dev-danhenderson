@@ -11,6 +11,8 @@ import {
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { HeroMotionPath } from '../components/HeroMotionPath';
+import { siteRouteMap } from '../constants/siteRoutes';
+import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
@@ -22,6 +24,7 @@ const heroPassions = ['mathematics!', 'computers!', 'adventures!'];
 export default function Home() {
   const appStyles = useAppStyles();
   const { cardResetSx } = useComponentStyles();
+  useDocumentMetadata({ ...siteRouteMap.home, canonicalPath: siteRouteMap.home.path });
   const { error, isHeroAnimationReady, isLoading, isPromptOpen, handleOptOut, handlePlay } =
     useHomeWelcomeSequence();
   const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);

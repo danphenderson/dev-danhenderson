@@ -7,6 +7,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import { useTheme as useMuiTheme } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
+import { primaryNavigationRoutes } from '../constants/siteRoutes';
 import { useAppTheme } from '../ThemeProvider';
 import { avatar as avatarSrc } from '../data/cv';
 import { useAppStyles } from '../styles/appStyles';
@@ -17,12 +18,6 @@ import { HeaderActions } from './header/HeaderActions';
 import { HEADER_HIDE_SCROLL_TRIGGER_OPTIONS } from './header/headerScroll';
 import { HeaderNav } from './header/HeaderNav';
 import { HintPopover } from './header/HintPopover';
-
-const pages = [
-  { name: 'CV', path: '/cv' },
-  { name: 'Climbing', path: '/climbing' },
-  { name: 'Photography', path: '/photography' },
-];
 
 const pulseRing = keyframes`
   0% {
@@ -124,10 +119,10 @@ export default function Header() {
   return (
     <>
       <HideOnScroll>
-        <AppBar position="fixed" elevation={0}>
+        <AppBar id="site-navigation" position="fixed" elevation={0}>
           <Toolbar sx={appStyles.headerToolbarSx}>
             <HeaderNav
-              pages={pages}
+              pages={primaryNavigationRoutes}
               currentPath={path}
               isMobile={isMobile}
               iconButtonSize={iconButtonSize}

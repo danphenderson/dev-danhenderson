@@ -6,10 +6,13 @@ import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
 import { QuiltedImageList } from '../components/PhotoAlbum';
+import { siteRouteMap } from '../constants/siteRoutes';
+import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
 import { BodyText } from '../components/text';
+
 const legacySlugMap: Record<string, string> = {
   'new mexico': 'new-mexico',
   'new%20mexico': 'new-mexico',
@@ -22,12 +25,36 @@ export default function PhotographyCategory() {
   const slugKey = slug?.toLowerCase();
   const canonicalSlug = slugKey ? legacySlugMap[slugKey] ?? slugKey : undefined;
   const shouldRedirect = Boolean(slugKey && legacySlugMap[slugKey]);
+  const category = categories.find((item) => item.slug === canonicalSlug);
+
+  useDocumentMetadata(
+    shouldRedirect
+      ? {
+          ...siteRouteMap.photography,
+          canonicalPath: siteRouteMap.photography.path,
+        }
+      : category
+        ? {
+            title: `${category.name} Photography | Daniel Henderson`,
+            description: `${category.description} Browse ${
+              category.album.length
+            } photos from the ${category.name.toLowerCase()} album.`,
+            image: category.src,
+            canonicalPath: `/photography/${category.slug}`,
+          }
+        : {
+            ...siteRouteMap['not-found'],
+            description:
+              'This photography album does not exist or has moved. Browse the photography index to continue exploring the gallery.',
+            image: siteRouteMap.photography.image,
+            canonicalPath: siteRouteMap.photography.path,
+            noIndex: true,
+          }
+  );
 
   if (shouldRedirect && canonicalSlug) {
     return <Navigate to={`/photography/${canonicalSlug}`} replace />;
   }
-
-  const category = categories.find((item) => item.slug === canonicalSlug);
 
   const backgroundImage = category?.src ?? fallbackBackgroundImage;
 

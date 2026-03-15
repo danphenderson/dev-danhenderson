@@ -4,7 +4,9 @@ import { Link as RouterLink } from 'react-router-dom';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
+import { siteRouteMap } from '../constants/siteRoutes';
 import { LoadingBars } from '../components/LoadingBars';
+import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
@@ -12,6 +14,10 @@ import { BodyText } from '../components/text';
 
 export default function Photography() {
   const appStyles = useAppStyles();
+  useDocumentMetadata({
+    ...siteRouteMap.photography,
+    canonicalPath: siteRouteMap.photography.path,
+  });
   const { categories } = usePhotographyData();
   const loadedImagesRef = useRef<Set<string>>(new Set());
   const [loadedImages, setLoadedImages] = useState(0);

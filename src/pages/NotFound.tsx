@@ -1,9 +1,17 @@
 import { Button, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import BackgroundPaper from '../components/BackgroundPaper';
+import { siteRouteMap } from '../constants/siteRoutes';
 import { fallbackBackgroundImage } from '../data/photography';
+import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 
 export default function NotFound() {
+  useDocumentMetadata({
+    ...siteRouteMap['not-found'],
+    canonicalPath: '/',
+    noIndex: true,
+  });
+
   return (
     <BackgroundPaper image={fallbackBackgroundImage}>
       <Typography variant="h2" marginTop={3}>
