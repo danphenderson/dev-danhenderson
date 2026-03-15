@@ -51,6 +51,7 @@ import { useGithubProfile } from '../hooks/useGithubProfile';
 import { CVLayoutMode, CVSectionRegion, cvPageSectionLayout } from './cvPageLayout';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
+import { MotionSection } from '../motion';
 
 type CVResolvedSectionDescriptor = {
   id: string;
@@ -69,8 +70,7 @@ type CVSectionDefinition = {
   render: (layout: { delayMs: number; triggerOnView: boolean }) => ReactNode;
 };
 
-const parseCVMode = (value: string | null): CVMode =>
-  value === 'story' ? 'story' : 'default';
+const parseCVMode = (value: string | null): CVMode => (value === 'story' ? 'story' : 'default');
 
 export default function CV() {
   return <CVRouteContent />;
@@ -101,15 +101,18 @@ const CVRouteContent = () => {
   const itemOffsetMs = motionTokens.itemOffsetMs;
 
   const handleToggleMode = useCallback(() => {
-    setSearchParams((prev) => {
-      const next = new URLSearchParams(prev);
-      if (parseCVMode(prev.get('mode')) === 'story') {
-        next.delete('mode');
-      } else {
-        next.set('mode', 'story');
-      }
-      return next;
-    }, { replace: true });
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (parseCVMode(prev.get('mode')) === 'story') {
+          next.delete('mode');
+        } else {
+          next.set('mode', 'story');
+        }
+        return next;
+      },
+      { replace: true }
+    );
   }, [setSearchParams]);
 
   const aboutActions: AppSpeedDialAction[] = [
@@ -296,11 +299,7 @@ const CVRouteContent = () => {
 
   if (isStoryMode) {
     return (
-      <PageFrame
-        image={cvBackgroundImage}
-        maxWidth={900}
-        containerSx={appStyles.cvPageContainerSx}
-      >
+      <PageFrame image={cvBackgroundImage} maxWidth={900} containerSx={appStyles.cvPageContainerSx}>
         <Box data-testid="cv-story-layout">
           <CVSectionStack spacing={3}>
             <CVStoryHeader
@@ -313,10 +312,10 @@ const CVRouteContent = () => {
               if (!definition) return null;
               const node = definition.render({ delayMs: 0, triggerOnView: true });
               return (
-                <Box key={chapter.key}>
+                <MotionSection key={chapter.key}>
                   <CVStoryChapterHeading chapter={chapter} index={index} />
                   <Box sx={{ mt: 2 }}>{node}</Box>
-                </Box>
+                </MotionSection>
               );
             })}
           </CVSectionStack>
@@ -359,11 +358,13 @@ const CVRouteContent = () => {
   return (
     <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
       <>
-        <CVStoryHeader
-          mode={cvMode}
-          onToggleMode={handleToggleMode}
-          statusIndicator={githubStatusTooltip}
-        />
+        <MotionSection>
+          <CVStoryHeader
+            mode={cvMode}
+            onToggleMode={handleToggleMode}
+            statusIndicator={githubStatusTooltip}
+          />
+        </MotionSection>
         <Grid container spacing={3} alignItems="stretch">
           <Grid item xs={12}>
             <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-top-region">

@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
   Button,
   Dialog,
@@ -8,6 +8,7 @@ import {
   Stack,
   Typography,
 } from '@mui/material';
+import { motion, useScroll, useTransform } from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { HeroMotionPath } from '../components/HeroMotionPath';
@@ -29,23 +30,29 @@ export default function Home() {
     useHomeWelcomeSequence();
   const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);
 
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
+  const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.6]);
+
   const handleMotionComplete = useCallback(() => {
     setIsTypewriterPlaying(true);
   }, []);
 
   return (
-    <BackgroundPaper
-      image="assets/home.jpg"
-      contentAlign="flex-end"
-      contentSx={appStyles.homeHeroContentSx}
-      showShell={isHeroAnimationReady}
-      shellSx={appStyles.homeHeroShellSx}
-      shellWrapper={(shell) => (
-        <HeroMotionPath active={isHeroAnimationReady} onComplete={handleMotionComplete}>
-          {shell}
-        </HeroMotionPath>
-      )}
-    >
+    <motion.div ref={heroRef} style={{ scale: heroScale, opacity: heroOpacity }}>
+      <BackgroundPaper
+        image="assets/home.jpg"
+        contentAlign="flex-end"
+        contentSx={appStyles.homeHeroContentSx}
+        showShell={isHeroAnimationReady}
+        shellSx={appStyles.homeHeroShellSx}
+        shellWrapper={(shell) => (
+          <HeroMotionPath active={isHeroAnimationReady} onComplete={handleMotionComplete}>
+            {shell}
+          </HeroMotionPath>
+        )}
+      >
       <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
         <Stack spacing={2} alignItems="center">
           <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
@@ -89,5 +96,6 @@ export default function Home() {
         </DialogActions>
       </Dialog>
     </BackgroundPaper>
+    </motion.div>
   );
 }

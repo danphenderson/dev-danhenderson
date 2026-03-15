@@ -18,6 +18,7 @@ import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
 import { BodyText } from '../components/text';
+import { MotionSection, MotionScaleIn } from '../motion';
 
 const legacySlugMap: Record<string, string> = {
   'new mexico': 'new-mexico',
@@ -90,147 +91,151 @@ export default function PhotographyCategory() {
     <PageFrame image={backgroundImage}>
       <>
         <Stack spacing={2.5}>
-          <SectionCard delayMs={0} triggerOnView={false}>
-            <Stack spacing={{ xs: 2, md: 2.5 }}>
-              <Button
-                component={RouterLink}
-                to="/photography"
-                startIcon={<ArrowBackIcon />}
-                size="small"
-                sx={appStyles.inlineStartSx}
-              >
-                Back to photography
-              </Button>
-              {category ? (
-                <Stack
-                  direction={{ xs: 'column', md: 'row' }}
-                  spacing={{ xs: 2, md: 3 }}
-                  justifyContent="space-between"
-                  alignItems={{ xs: 'flex-start', md: 'flex-end' }}
+          <MotionSection>
+            <SectionCard delayMs={0} triggerOnView={false}>
+              <Stack spacing={{ xs: 2, md: 2.5 }}>
+                <Button
+                  component={RouterLink}
+                  to="/photography"
+                  startIcon={<ArrowBackIcon />}
+                  size="small"
+                  sx={appStyles.inlineStartSx}
                 >
-                  <Stack spacing={1} sx={{ minWidth: 0, maxWidth: { md: 760 } }}>
-                    <Typography
-                      component="p"
-                      variant="overline"
-                      sx={{
-                        display: 'block',
-                        color: 'primary.main',
-                        fontWeight: 700,
-                        letterSpacing: '0.2em',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      Photography album
-                    </Typography>
-                    <Stack direction="row" spacing={1} alignItems="center">
+                  Back to photography
+                </Button>
+                {category ? (
+                  <Stack
+                    direction={{ xs: 'column', md: 'row' }}
+                    spacing={{ xs: 2, md: 3 }}
+                    justifyContent="space-between"
+                    alignItems={{ xs: 'flex-start', md: 'flex-end' }}
+                  >
+                    <Stack spacing={1} sx={{ minWidth: 0, maxWidth: { md: 760 } }}>
                       <Typography
-                        component="h1"
-                        variant="h2"
+                        component="p"
+                        variant="overline"
                         sx={{
-                          color: 'text.primary',
-                          fontSize: { xs: '2.125rem', sm: '2.5rem', md: '3.25rem' },
-                          lineHeight: { xs: 1.05, md: 1 },
-                          letterSpacing: '-0.04em',
-                          textWrap: 'balance',
+                          display: 'block',
+                          color: 'primary.main',
+                          fontWeight: 700,
+                          letterSpacing: '0.2em',
+                          textTransform: 'uppercase',
                         }}
                       >
-                        {category.name}
+                        Photography album
                       </Typography>
-                      <AlbumShareButton
-                        albumName={category.name}
-                        albumSlug={category.slug}
-                        albumDescription={category.description}
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <Typography
+                          component="h1"
+                          variant="h2"
+                          sx={{
+                            color: 'text.primary',
+                            fontSize: { xs: '2.125rem', sm: '2.5rem', md: '3.25rem' },
+                            lineHeight: { xs: 1.05, md: 1 },
+                            letterSpacing: '-0.04em',
+                            textWrap: 'balance',
+                          }}
+                        >
+                          {category.name}
+                        </Typography>
+                        <AlbumShareButton
+                          albumName={category.name}
+                          albumSlug={category.slug}
+                          albumDescription={category.description}
+                        />
+                      </Stack>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          color: 'text.secondary',
+                          fontSize: { xs: '1rem', md: '1.075rem' },
+                          lineHeight: 1.65,
+                          maxWidth: { md: 620 },
+                        }}
+                      >
+                        {category.description}
+                      </Typography>
+                      <AlbumLocationSummary
+                        albumLocation={category.location}
+                        dateRange={category.dateRange}
+                        photos={category.album}
                       />
                     </Stack>
-                    <Typography
-                      variant="body1"
+                    <Box
                       sx={{
-                        color: 'text.secondary',
-                        fontSize: { xs: '1rem', md: '1.075rem' },
-                        lineHeight: 1.65,
-                        maxWidth: { md: 620 },
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        px: 1.5,
+                        py: 1,
+                        borderRadius: 999,
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        bgcolor: 'background.paper',
+                        boxShadow: 1,
+                        flexShrink: 0,
                       }}
                     >
-                      {category.description}
-                    </Typography>
-                    <AlbumLocationSummary
-                      albumLocation={category.location}
-                      dateRange={category.dateRange}
-                      photos={category.album}
+                      <BodyText sx={appStyles.secondaryTextSx}>
+                        {category.album.length} photos
+                      </BodyText>
+                    </Box>
+                  </Stack>
+                ) : (
+                  <Stack spacing={2.5}>
+                    <Stack spacing={1} sx={{ minWidth: 0, maxWidth: { md: 760 } }}>
+                      <Typography
+                        component="p"
+                        variant="overline"
+                        sx={{
+                          display: 'block',
+                          color: 'primary.main',
+                          fontWeight: 700,
+                          letterSpacing: '0.2em',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        Photography album
+                      </Typography>
+                      <Typography
+                        component="h1"
+                        variant="h3"
+                        sx={{
+                          color: 'text.primary',
+                          fontSize: { xs: '2rem', md: '2.5rem' },
+                          lineHeight: 1.05,
+                          letterSpacing: '-0.03em',
+                        }}
+                      >
+                        Album not found
+                      </Typography>
+                    </Stack>
+                    <BodyText sx={appStyles.secondaryTextSx}>
+                      This album does not exist or has been moved. The command palette opens with a
+                      recovery search so you can jump to another gallery or route quickly.
+                    </BodyText>
+                    <RouteRecoveryPanel
+                      attemptedPathLabel={recoveryContext.attemptedPathLabel}
+                      routeHintLabel={recoveryContext.routeHintLabel}
+                      contextualSuggestions={recoveryContext.contextualSuggestions}
+                      recoveryActions={recoveryActions}
+                      suggestedPaletteQuery={recoveryContext.suggestedPaletteQuery}
                     />
                   </Stack>
-                  <Box
-                    sx={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      px: 1.5,
-                      py: 1,
-                      borderRadius: 999,
-                      border: '1px solid',
-                      borderColor: 'divider',
-                      bgcolor: 'background.paper',
-                      boxShadow: 1,
-                      flexShrink: 0,
-                    }}
-                  >
-                    <BodyText sx={appStyles.secondaryTextSx}>
-                      {category.album.length} photos
-                    </BodyText>
-                  </Box>
-                </Stack>
-              ) : (
-                <Stack spacing={2.5}>
-                  <Stack spacing={1} sx={{ minWidth: 0, maxWidth: { md: 760 } }}>
-                    <Typography
-                      component="p"
-                      variant="overline"
-                      sx={{
-                        display: 'block',
-                        color: 'primary.main',
-                        fontWeight: 700,
-                        letterSpacing: '0.2em',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      Photography album
-                    </Typography>
-                    <Typography
-                      component="h1"
-                      variant="h3"
-                      sx={{
-                        color: 'text.primary',
-                        fontSize: { xs: '2rem', md: '2.5rem' },
-                        lineHeight: 1.05,
-                        letterSpacing: '-0.03em',
-                      }}
-                    >
-                      Album not found
-                    </Typography>
-                  </Stack>
-                  <BodyText sx={appStyles.secondaryTextSx}>
-                    This album does not exist or has been moved. The command palette opens with a
-                    recovery search so you can jump to another gallery or route quickly.
-                  </BodyText>
-                  <RouteRecoveryPanel
-                    attemptedPathLabel={recoveryContext.attemptedPathLabel}
-                    routeHintLabel={recoveryContext.routeHintLabel}
-                    contextualSuggestions={recoveryContext.contextualSuggestions}
-                    recoveryActions={recoveryActions}
-                    suggestedPaletteQuery={recoveryContext.suggestedPaletteQuery}
-                  />
-                </Stack>
-              )}
-            </Stack>
-          </SectionCard>
+                )}
+              </Stack>
+            </SectionCard>
+          </MotionSection>
 
           {category && (
-            <SectionCard delayMs={140} sx={appStyles.albumSectionSx}>
-              <QuiltedImageList
-                imageData={category.album}
-                albumLabel={category.name}
-                onPhotoClick={handlePhotoClick}
-              />
-            </SectionCard>
+            <MotionScaleIn>
+              <SectionCard delayMs={0} triggerOnView={false} sx={appStyles.albumSectionSx}>
+                <QuiltedImageList
+                  imageData={category.album}
+                  albumLabel={category.name}
+                  onPhotoClick={handlePhotoClick}
+                />
+              </SectionCard>
+            </MotionScaleIn>
           )}
 
           {category && (
