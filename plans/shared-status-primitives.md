@@ -44,7 +44,7 @@ Add shared status types, move route action metadata into the canonical route reg
 
 ## Validation plan
 
-- `npm test -- --watch=false --runInBand test/unit/constants/commandPaletteActions.test.ts test/unit/hooks/useGithubProfile.test.ts test/unit/hooks/useClimbingData.test.ts test/unit/hooks/usePhotographyData.test.ts`
+- `CI=true npm test -- --watch=false --runInBand test/unit/constants/routeActions.test.ts test/unit/constants/commandPaletteActions.test.ts test/unit/hooks/useGithubProfile.test.ts test/unit/hooks/useClimbingData.test.ts test/unit/hooks/usePhotographyData.test.ts`
 - `npm run build`
 
 ## Risks and rollback
@@ -56,8 +56,12 @@ Add shared status types, move route action metadata into the canonical route reg
 ## Progress notes
 
 - Status: In progress
-- Shared status types and route-action derivation are being introduced first so later not-found recovery and CV reliability UI can reuse them.
+- Completed shared status types in `src/types/data.ts`.
+- Completed canonical route action metadata in `src/constants/siteRoutes.ts` and shared derivation in `src/constants/routeActions.ts`; the `not-found` route intentionally has no action block because it is a recovery surface rather than a destination.
+- Completed status normalization in `useGithubProfile`, `useClimbingData`, and `usePhotographyData`, while keeping current route UIs behaviorally unchanged.
+- Completed unit coverage for shared route-action derivation and the normalized hook status surfaces.
 - Static routes intentionally expose bundled-content status instead of pretending to have live freshness.
+- Remaining work in later slices is UI consumption: not-found recovery actions, CV reliability/freshness surfacing, climbing freshness copy, and photography freshness/share affordances still need to read the shared status payloads.
 
 ## Completion Status
 
