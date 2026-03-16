@@ -148,4 +148,17 @@ describe('useTerminalTypewriter', () => {
     expect(result.current.longestCommand).toBe('hello');
     expect(result.current.longestOutput).toBe('world');
   });
+
+  it('computes longest values when they come from different lines', () => {
+    const mixedLines: TerminalLine[] = [
+      { command: 'short', output: 'much longer output' },
+      { command: 'a much longer command', output: 'tiny' },
+    ];
+    const { result } = renderHook(() =>
+      useTerminalTypewriter({ lines: mixedLines, playing: false })
+    );
+
+    expect(result.current.longestCommand).toBe('a much longer command');
+    expect(result.current.longestOutput).toBe('much longer output');
+  });
 });
