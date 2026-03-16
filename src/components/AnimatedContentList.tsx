@@ -27,6 +27,7 @@ type AnimatedContentListProps<Item> = {
   itemContainerSx?: SxProps<Theme>;
   itemSurface?: AnimatedContentItemSurface;
   mountItemsOnView?: boolean;
+  skipEntranceAnimation?: boolean;
   mountThreshold?: number;
   mountRootMargin?: string;
 };
@@ -45,6 +46,7 @@ export const AnimatedContentList = <Item,>({
   itemContainerSx,
   itemSurface = 'card',
   mountItemsOnView = false,
+  skipEntranceAnimation = false,
   mountThreshold = DEFAULT_INTERSECTION_THRESHOLD,
   mountRootMargin = DEFAULT_INTERSECTION_ROOT_MARGIN,
 }: AnimatedContentListProps<Item>) => {
@@ -57,7 +59,7 @@ export const AnimatedContentList = <Item,>({
     wrapItemContainerSx,
   } = useComponentStyles();
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [hasEnteredView, setHasEnteredView] = useState(!mountItemsOnView);
+  const [hasEnteredView, setHasEnteredView] = useState(!mountItemsOnView || skipEntranceAnimation);
   const containerSxArray = normalizeSxProp(containerSx);
   const itemSxArray = normalizeSxProp(itemSx);
   const itemContainerSxArray = normalizeSxProp(itemContainerSx);
@@ -73,6 +75,14 @@ export const AnimatedContentList = <Item,>({
   const shouldRenderItems = !mountItemsOnView || hasEnteredView;
 
   useEffect(() => {
+    if (skipEntranceAnimation) {
+      if (!hasEnteredView) {
+        setHasEnteredView(true);
+      }
+
+      return undefined;
+    }
+
     if (!mountItemsOnView) {
       if (!hasEnteredView) {
         setHasEnteredView(true);
@@ -109,13 +119,14 @@ export const AnimatedContentList = <Item,>({
     observer.observe(node);
 
     return () => observer.disconnect();
-  }, [hasEnteredView, mountItemsOnView, mountRootMargin, mountThreshold]);
+  }, [hasEnteredView, mountItemsOnView, mountRootMargin, mountThreshold, skipEntranceAnimation]);
 
   const animatedItems = shouldRenderItems
     ? items.map((item, index) => (
         <AnimatedContentCard
           key={getItemKey(item, index)}
           delayMs={getItemDelayMs(index, startDelayMs, resolvedItemStaggerMs)}
+          skipEntranceAnimation={skipEntranceAnimation}
           sx={[...itemSurfaceSx, ...itemSxArray]}
           containerSx={resolvedItemContainerSx}
         >

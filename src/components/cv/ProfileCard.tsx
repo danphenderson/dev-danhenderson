@@ -9,6 +9,7 @@ type ProfileCardProps = {
   about: AboutMe;
   avatarSrc?: string;
   actions?: ReactNode;
+  bioRevealed?: boolean;
   bioAnimationStartDelayMs?: number;
   onBioAnimationComplete?: () => void;
 };
@@ -17,6 +18,7 @@ export const ProfileCard = ({
   about,
   avatarSrc,
   actions,
+  bioRevealed = false,
   bioAnimationStartDelayMs = 0,
   onBioAnimationComplete,
 }: ProfileCardProps) => {
@@ -65,6 +67,7 @@ export const ProfileCard = ({
         <BodyText sx={[primaryTextSx, profileBioSx]}>
           <CVAboutBioTypewriter
             about={about}
+            revealed={bioRevealed}
             startDelayMs={bioAnimationStartDelayMs}
             onComplete={onBioAnimationComplete}
           />

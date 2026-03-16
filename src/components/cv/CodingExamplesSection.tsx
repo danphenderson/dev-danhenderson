@@ -12,6 +12,7 @@ import { EntryTitle, BodyText, ListItemText } from '../text';
 type CodingExamplesSectionProps = {
   examples: CodingExample[];
   startDelayMs?: number;
+  skipEntranceAnimation?: boolean;
 };
 
 const CodingExampleDetailList = ({
@@ -44,6 +45,7 @@ const CodingExampleDetailList = ({
 export const CodingExamplesSection = ({
   examples,
   startDelayMs = 0,
+  skipEntranceAnimation = false,
 }: CodingExamplesSectionProps) => {
   const { codingExampleLinkSx, contentListStackSpacing, detailBlockSx, motionTokens } =
     useComponentStyles();
@@ -54,6 +56,7 @@ export const CodingExamplesSection = ({
       getItemKey={(example, index) => `${example.title}-${index}`}
       mountItemsOnView
       startDelayMs={startDelayMs}
+      skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
       renderItem={(example, index) => {

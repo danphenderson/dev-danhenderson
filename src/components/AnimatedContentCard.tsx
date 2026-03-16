@@ -19,25 +19,31 @@ type AnimatedContentCardProps<RootComponent extends ElementType = 'div'> =
     delayMs?: number;
     triggerOnView?: boolean;
     visible?: boolean;
+    skipEntranceAnimation?: boolean;
     threshold?: number;
     rootMargin?: string;
     containerSx?: SxProps<Theme>;
+    onVisible?: () => void;
   };
 
 export const AnimatedContentCard = <RootComponent extends ElementType = 'div'>({
   delayMs = 0,
   triggerOnView = true,
   visible,
+  skipEntranceAnimation = false,
   threshold = DEFAULT_INTERSECTION_THRESHOLD,
   rootMargin = DEFAULT_INTERSECTION_ROOT_MARGIN,
+  onVisible,
   ...props
 }: AnimatedContentCardProps<RootComponent>) => (
   <AnimatedCard
     delayMs={delayMs}
     triggerOnView={triggerOnView}
     visible={visible}
+    skipEntranceAnimation={skipEntranceAnimation}
     threshold={threshold}
     rootMargin={rootMargin}
+    onVisible={onVisible}
     {...props}
   />
 );
@@ -46,19 +52,28 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
   delayMs = 0,
   triggerOnView = true,
   visible,
+  skipEntranceAnimation = false,
   threshold = DEFAULT_INTERSECTION_THRESHOLD,
   rootMargin = DEFAULT_INTERSECTION_ROOT_MARGIN,
   containerSx,
+  onVisible,
   ...props
 }: AnimatedContentCardProps<RootComponent>) => {
   const appStyles = useAppStyles();
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [hasTriggered, setHasTriggered] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+  const hasNotifiedVisibleRef = useRef(false);
+  const [hasTriggered, setHasTriggered] = useState(skipEntranceAnimation);
+  const [isVisible, setIsVisible] = useState(skipEntranceAnimation);
   const isVisibilityControlled = typeof visible === 'boolean';
   const containerSxArray = normalizeSxProp(containerSx);
 
   useEffect(() => {
+    if (skipEntranceAnimation) {
+      if (!hasTriggered) {
+        setHasTriggered(true);
+      }
+      return undefined;
+    }
     if (isVisibilityControlled) {
       return undefined;
     }
@@ -89,9 +104,15 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [isVisibilityControlled, triggerOnView, threshold, rootMargin]);
+  }, [hasTriggered, isVisibilityControlled, rootMargin, skipEntranceAnimation, threshold, triggerOnView]);
 
   useEffect(() => {
+    if (skipEntranceAnimation) {
+      if (!isVisible) {
+        setIsVisible(true);
+      }
+      return undefined;
+    }
     if (isVisibilityControlled) {
       if (!visible) {
         if (isVisible) {
@@ -114,12 +135,26 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
     }
     const timeoutId = window.setTimeout(() => setIsVisible(true), Math.max(0, delayMs));
     return () => window.clearTimeout(timeoutId);
-  }, [delayMs, hasTriggered, isVisible, isVisibilityControlled, visible]);
+  }, [delayMs, hasTriggered, isVisible, isVisibilityControlled, skipEntranceAnimation, visible]);
+
+  useEffect(() => {
+    if (!isVisible || !onVisible || hasNotifiedVisibleRef.current) {
+      return;
+    }
+
+    hasNotifiedVisibleRef.current = true;
+    onVisible();
+  }, [isVisible, onVisible]);
 
   const content = <ContentCard {...props} />;
 
   return (
-    <Zoom in={isVisible} timeout={ANIMATED_CARD_DURATION_MS} easing={{ enter: SPRING_EASING_CSS, exit: undefined }}>
+    <Zoom
+      in={isVisible}
+      appear={!skipEntranceAnimation}
+      timeout={ANIMATED_CARD_DURATION_MS}
+      easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
+    >
       <Box ref={containerRef} sx={[appStyles.animatedCardContainerSx, ...containerSxArray]}>
         {content}
       </Box>

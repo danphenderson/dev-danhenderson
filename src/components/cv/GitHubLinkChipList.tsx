@@ -67,13 +67,13 @@ export const GitHubLinkChipList = ({
 
   if (layout === 'wrap') {
     return animateItems ? (
-      <AnimatedZoomList
-        items={items}
-        getItemKey={(item) => item.key}
-        in
-        startDelayMs={startDelayMs}
-        containerSx={animatedContainerSx}
-        itemStaggerMs={itemStaggerMs}
+        <AnimatedZoomList
+          items={items}
+          getItemKey={(item) => item.key}
+          in
+          startDelayMs={startDelayMs}
+          containerSx={animatedContainerSx}
+          itemStaggerMs={itemStaggerMs}
         renderItem={renderChip}
       />
     ) : (

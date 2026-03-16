@@ -23,6 +23,7 @@ type InlineAnimatedSkillsRowProps = {
   heading: string;
   headingColumnWidth: string;
   playing: boolean;
+  revealed?: boolean;
   visible: boolean;
   onHeadingComplete: () => void;
   skills: string[];
@@ -34,6 +35,7 @@ const InlineAnimatedSkillsRow = ({
   heading,
   headingColumnWidth,
   playing,
+  revealed = false,
   visible,
   onHeadingComplete,
   skills,
@@ -50,15 +52,19 @@ const InlineAnimatedSkillsRow = ({
   >
     <Box sx={{ width: { sm: headingColumnWidth } }}>
       <SubsectionTitle sx={titleSx}>
-        <TypewriterText
-          text={heading}
-          playing={playing}
-          timingPreset="body"
-          onComplete={onHeadingComplete}
-        />
+        {revealed ? (
+          heading
+        ) : (
+          <TypewriterText
+            text={heading}
+            playing={playing}
+            timingPreset="body"
+            onComplete={onHeadingComplete}
+          />
+        )}
       </SubsectionTitle>
     </Box>
-    <SkillsChipList skills={skills} dense in={showSkills} />
+    <SkillsChipList skills={skills} dense in={revealed || showSkills} />
   </Stack>
 );
 
@@ -68,6 +74,8 @@ type CVAboutSectionProps = {
   currentWorkflowTools?: string[];
   delayMs?: number;
   triggerOnView?: boolean;
+  revealed?: boolean;
+  onRevealComplete?: () => void;
   sectionId?: string;
 };
 
@@ -77,6 +85,8 @@ export const CVAboutSection = ({
   currentWorkflowTools = [],
   delayMs = 0,
   triggerOnView = true,
+  revealed = false,
+  onRevealComplete,
   sectionId,
 }: CVAboutSectionProps) => {
   const {
@@ -103,18 +113,28 @@ export const CVAboutSection = ({
     [opportunities, trimmedBio, workflowTools]
   );
   const previousAboutContentKeyRef = useRef<string | null>(null);
+  const previousRevealedRef = useRef<boolean | null>(null);
+  const completedRevealContentKeyRef = useRef<string | null>(null);
   const workflowStartTimerRef = useRef<number | null>(null);
+  const [hasBioCompleted, setHasBioCompleted] = useState(revealed || trimmedBio.length === 0);
   const [playOpportunitiesHeading, setPlayOpportunitiesHeading] = useState(
-    trimmedBio.length === 0 && opportunities.length > 0
+    !revealed && trimmedBio.length === 0 && opportunities.length > 0
   );
-  const [showOpportunities, setShowOpportunities] = useState(false);
+  const [showOpportunities, setShowOpportunities] = useState(revealed && opportunities.length > 0);
   const [playWorkflowHeading, setPlayWorkflowHeading] = useState(
-    trimmedBio.length === 0 && opportunities.length === 0
+    !revealed && trimmedBio.length === 0 && opportunities.length === 0
   );
-  const [showWorkflowTools, setShowWorkflowTools] = useState(false);
-  const isOpportunitiesSectionVisible = playOpportunitiesHeading || showOpportunities;
-  const isWorkflowSectionVisible = playWorkflowHeading || showWorkflowTools;
+  const [showWorkflowTools, setShowWorkflowTools] = useState(revealed && workflowTools.length > 0);
+  const hasCompletedBio = revealed || hasBioCompleted;
+  const shouldShowOpportunities = revealed || showOpportunities;
+  const shouldShowWorkflowTools = revealed || showWorkflowTools;
+  const isOpportunitiesSectionVisible =
+    (revealed && opportunities.length > 0) || playOpportunitiesHeading || showOpportunities;
+  const isWorkflowSectionVisible =
+    (revealed && workflowTools.length > 0) || playWorkflowHeading || showWorkflowTools;
   const handleBioAnimationComplete = useCallback(() => {
+    setHasBioCompleted(true);
+
     if (opportunities.length > 0) {
       setPlayOpportunitiesHeading(true);
       return;
@@ -140,25 +160,40 @@ export const CVAboutSection = ({
   }, []);
 
   useEffect(() => {
-    if (previousAboutContentKeyRef.current === aboutContentKey) {
+    if (
+      previousAboutContentKeyRef.current === aboutContentKey &&
+      previousRevealedRef.current === revealed
+    ) {
       return;
     }
 
     previousAboutContentKeyRef.current = aboutContentKey;
+    previousRevealedRef.current = revealed;
+    completedRevealContentKeyRef.current = null;
 
     if (workflowStartTimerRef.current !== null) {
       window.clearTimeout(workflowStartTimerRef.current);
       workflowStartTimerRef.current = null;
     }
 
+    if (revealed) {
+      setHasBioCompleted(true);
+      setPlayOpportunitiesHeading(false);
+      setShowOpportunities(opportunities.length > 0);
+      setPlayWorkflowHeading(false);
+      setShowWorkflowTools(workflowTools.length > 0);
+      return;
+    }
+
+    setHasBioCompleted(trimmedBio.length === 0);
     setPlayOpportunitiesHeading(trimmedBio.length === 0 && opportunities.length > 0);
     setShowOpportunities(false);
     setPlayWorkflowHeading(trimmedBio.length === 0 && opportunities.length === 0);
     setShowWorkflowTools(false);
-  }, [aboutContentKey, opportunities.length, trimmedBio.length]);
+  }, [aboutContentKey, opportunities.length, revealed, trimmedBio.length, workflowTools.length]);
 
   useEffect(() => {
-    if (!showOpportunities || playWorkflowHeading) {
+    if (revealed || !showOpportunities || playWorkflowHeading) {
       return;
     }
 
@@ -181,8 +216,27 @@ export const CVAboutSection = ({
     motionTokens.accordionChipStaggerMs,
     opportunities.length,
     playWorkflowHeading,
+    revealed,
     showOpportunities,
   ]);
+
+  const hasCompletedAboutReveal =
+    hasCompletedBio &&
+    (opportunities.length === 0 || shouldShowOpportunities) &&
+    (workflowTools.length === 0 || shouldShowWorkflowTools);
+
+  useEffect(() => {
+    if (!onRevealComplete || !hasCompletedAboutReveal) {
+      return;
+    }
+
+    if (completedRevealContentKeyRef.current === aboutContentKey) {
+      return;
+    }
+
+    completedRevealContentKeyRef.current = aboutContentKey;
+    onRevealComplete();
+  }, [aboutContentKey, hasCompletedAboutReveal, onRevealComplete]);
 
   return (
     <CVSectionCard
@@ -197,6 +251,7 @@ export const CVAboutSection = ({
           <ProfileCard
             about={about}
             actions={actions}
+            bioRevealed={revealed}
             bioAnimationStartDelayMs={bioAnimationStartDelayMs}
             onBioAnimationComplete={handleBioAnimationComplete}
           />
@@ -204,29 +259,31 @@ export const CVAboutSection = ({
         {(opportunities.length > 0 || workflowTools.length > 0) && (
           <Stack spacing={1} sx={{ pt: 1 }}>
             {opportunities.length > 0 && (
-              <InlineAnimatedSkillsRow
-                heading={OPPORTUNITIES_HEADING}
-                headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
-                playing={playOpportunitiesHeading}
-                visible={isOpportunitiesSectionVisible}
-                onHeadingComplete={handleOpportunitiesHeadingComplete}
-                skills={opportunities}
-                showSkills={showOpportunities}
-                titleSx={supportAccentTitleSx}
-              />
-            )}
+                <InlineAnimatedSkillsRow
+                  heading={OPPORTUNITIES_HEADING}
+                  headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
+                  playing={playOpportunitiesHeading}
+                  revealed={revealed}
+                  visible={isOpportunitiesSectionVisible}
+                  onHeadingComplete={handleOpportunitiesHeadingComplete}
+                  skills={opportunities}
+                  showSkills={shouldShowOpportunities}
+                  titleSx={supportAccentTitleSx}
+                />
+              )}
             {workflowTools.length > 0 && (
-              <InlineAnimatedSkillsRow
-                heading={WORKFLOW_HEADING}
-                headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
-                playing={playWorkflowHeading}
-                visible={isWorkflowSectionVisible}
-                onHeadingComplete={handleWorkflowHeadingComplete}
-                skills={workflowTools}
-                showSkills={showWorkflowTools}
-                titleSx={supportAccentTitleSx}
-              />
-            )}
+                <InlineAnimatedSkillsRow
+                  heading={WORKFLOW_HEADING}
+                  headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
+                  playing={playWorkflowHeading}
+                  revealed={revealed}
+                  visible={isWorkflowSectionVisible}
+                  onHeadingComplete={handleWorkflowHeadingComplete}
+                  skills={workflowTools}
+                  showSkills={shouldShowWorkflowTools}
+                  titleSx={supportAccentTitleSx}
+                />
+              )}
           </Stack>
         )}
       </Stack>

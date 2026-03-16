@@ -11,6 +11,7 @@ import { CVEntryHeader } from './CVEntryHeader';
 type VolunteeringListProps = {
   volunteering: VolunteeringEntry[];
   startDelayMs?: number;
+  skipEntranceAnimation?: boolean;
 };
 
 const VolunteeringDetailList = ({
@@ -40,7 +41,11 @@ const VolunteeringDetailList = ({
   );
 };
 
-export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: VolunteeringListProps) => {
+export const VolunteeringList = ({
+  volunteering,
+  startDelayMs = 0,
+  skipEntranceAnimation = false,
+}: VolunteeringListProps) => {
   const { contentListStackSpacing, detailBlockSx, motionTokens } = useComponentStyles();
 
   if (volunteering.length === 0) {
@@ -53,6 +58,7 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
       getItemKey={(entry, index) => `${entry.organization}-${entry.role}-${index}`}
       mountItemsOnView
       startDelayMs={startDelayMs}
+      skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
       renderItem={(entry, index) => {

@@ -23,6 +23,7 @@ type RenderSegmentOptions = {
 
 export type CVAboutBioTypewriterProps = {
   about: AboutMe;
+  revealed?: boolean;
   timingPreset?: TypewriterTimingPreset;
   typingBaseMs?: number;
   cursorChar?: React.ReactNode;
@@ -195,7 +196,7 @@ export const CVAboutBioTypewriter = ({
   );
 
   React.useEffect(() => {
-    if (shouldPlay) {
+    if (revealed || shouldPlay) {
       return undefined;
     }
 
@@ -236,7 +237,7 @@ export const CVAboutBioTypewriter = ({
         startTimeoutRef.current = undefined;
       }
     };
-  }, [shouldPlay, startDelayMs]);
+  }, [revealed, shouldPlay, startDelayMs]);
 
   const { charIndex, isComplete, showCursor } = useTypewriterProgress({
     text: fullText,
@@ -264,6 +265,25 @@ export const CVAboutBioTypewriter = ({
 
   if (!fullText) {
     return null;
+  }
+
+  if (revealed) {
+    return (
+      <Box
+        component="span"
+        sx={{
+          position: 'relative',
+          display: 'grid',
+          width: '100%',
+          minWidth: 0,
+          alignItems: 'start',
+        }}
+      >
+        <Box component="span" data-typewriter-layer="animated" sx={layerSx}>
+          {renderSegments(segments, about, fullText.length)}
+        </Box>
+      </Box>
+    );
   }
 
   return (

@@ -8,6 +8,8 @@ type CVExperienceSectionProps = {
   experiences: Experience[];
   delayMs?: number;
   triggerOnView?: boolean;
+  revealed?: boolean;
+  onReveal?: () => void;
   itemOffsetMs?: number;
   sectionId?: string;
 };
@@ -16,16 +18,24 @@ export const CVExperienceSection = ({
   experiences,
   delayMs = 0,
   triggerOnView = true,
+  revealed = false,
+  onReveal,
   itemOffsetMs,
   sectionId,
 }: CVExperienceSectionProps) => (
   <CVSectionCard
     delayMs={delayMs}
     triggerOnView={triggerOnView}
+    skipEntranceAnimation={revealed}
+    onVisible={onReveal}
     id={sectionId}
     sx={cvSectionAnchorSx}
   >
     <SectionHeading overline="Experience" />
-    <ExperienceList experiences={experiences} startDelayMs={itemOffsetMs} />
+    <ExperienceList
+      experiences={experiences}
+      startDelayMs={itemOffsetMs}
+      skipEntranceAnimation={revealed}
+    />
   </CVSectionCard>
 );
