@@ -176,7 +176,7 @@ const renderSegments = (
 
 export const CVAboutBioTypewriter = ({
   about,
-  timingPreset = 'body',
+  timingPreset = 'cvBio',
   typingBaseMs,
   cursorChar = '|',
   reserveWidth = true,
