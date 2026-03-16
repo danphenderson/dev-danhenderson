@@ -61,14 +61,16 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
 
   const handleActivityBarClick = React.useCallback((index: number) => {
     if (index === 0) {
-      setExplorerVisible((prev) => !prev);
-      setActivityBarIndex((prev) => (prev === 0 && explorerVisible ? -1 : 0));
+      setExplorerVisible((prev) => {
+        const next = !prev;
+        setActivityBarIndex(next ? 0 : -1);
+        return next;
+      });
     } else {
       setExplorerVisible(false);
       setActivityBarIndex(index);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [explorerVisible]);
+  }, []);
 
   // Command palette toggle
   const [commandPaletteVisible, setCommandPaletteVisible] = React.useState(false);
