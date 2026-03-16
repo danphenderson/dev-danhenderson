@@ -9,10 +9,8 @@ export type TerminalTypewriterPhase =
   | 'idle'
   | 'typing-command'
   | 'pause-before-output'
-  | 'typing-output'
-  | 'pause-after-output'
-  | 'deleting-output'
-  | 'deleting-command';
+  | 'showing-output'
+  | 'pause-after-output';
 
 export interface TerminalLine {
   command: string;
@@ -25,22 +23,22 @@ interface UseTerminalTypewriterOptions {
   prompt?: string;
   timingPreset?: TypewriterTimingPreset;
   typingBaseMs?: number;
-  deleteMs?: number;
   pauseBeforeOutputMs?: number;
   pauseAfterOutputMs?: number;
 }
 
 export interface UseTerminalTypewriterResult {
   promptText: string;
+  /** The partially-typed command on the active line */
   commandText: string;
+  /** The full output for the active line (shown instantly after "enter") */
   outputText: string;
   showCursor: boolean;
   phase: TerminalTypewriterPhase;
-  longestCommand: string;
-  longestOutput: string;
+  /** Completed command+output pairs that stay visible above the active line */
+  history: TerminalLine[];
 }
 
-const DEFAULT_DELETE_MS = 30;
 const DEFAULT_PAUSE_BEFORE_OUTPUT_MS = 400;
 const DEFAULT_PAUSE_AFTER_OUTPUT_MS = 2400;
 
@@ -50,7 +48,6 @@ export const useTerminalTypewriter = ({
   prompt = '$ ',
   timingPreset = 'default',
   typingBaseMs,
-  deleteMs = DEFAULT_DELETE_MS,
   pauseBeforeOutputMs = DEFAULT_PAUSE_BEFORE_OUTPUT_MS,
   pauseAfterOutputMs = DEFAULT_PAUSE_AFTER_OUTPUT_MS,
 }: UseTerminalTypewriterOptions): UseTerminalTypewriterResult => {
@@ -62,18 +59,11 @@ export const useTerminalTypewriter = ({
   const [phase, setPhase] = React.useState<TerminalTypewriterPhase>('idle');
   const [lineIndex, setLineIndex] = React.useState(0);
   const [commandCharIndex, setCommandCharIndex] = React.useState(0);
-  const [outputCharIndex, setOutputCharIndex] = React.useState(0);
+  const [history, setHistory] = React.useState<TerminalLine[]>([]);
 
-  const currentLine = lines[lineIndex % lines.length] ?? { command: '', output: '' };
-
-  const longestCommand = React.useMemo(
-    () => lines.reduce((a, b) => (a.length >= b.command.length ? a : b.command), ''),
-    [lines]
-  );
-
-  const longestOutput = React.useMemo(
-    () => lines.reduce((a, b) => (a.length >= b.output.length ? a : b.output), ''),
-    [lines]
+  const currentLine = React.useMemo(
+    () => lines[lineIndex % lines.length] ?? { command: '', output: '' },
+    [lines, lineIndex]
   );
 
   // Start typing when playing transitions to true
@@ -83,7 +73,7 @@ export const useTerminalTypewriter = ({
     }
   }, [playing, phase]);
 
-  // Phase: typing-command
+  // Phase: typing-command — type the command character by character
   React.useEffect(() => {
     if (!playing || phase !== 'typing-command') return undefined;
 
@@ -99,81 +89,45 @@ export const useTerminalTypewriter = ({
     return () => window.clearTimeout(timeoutId);
   }, [playing, phase, commandCharIndex, currentLine.command, resolvedTimingProfile]);
 
-  // Phase: pause-before-output
+  // Phase: pause-before-output — brief pause to simulate pressing enter
   React.useEffect(() => {
     if (!playing || phase !== 'pause-before-output') return undefined;
 
     const timeoutId = window.setTimeout(() => {
-      setOutputCharIndex(0);
-      setPhase('typing-output');
+      setPhase('showing-output');
     }, pauseBeforeOutputMs);
 
     return () => window.clearTimeout(timeoutId);
   }, [playing, phase, pauseBeforeOutputMs]);
 
-  // Phase: typing-output
+  // Phase: showing-output — output appears instantly, then pause
   React.useEffect(() => {
-    if (!playing || phase !== 'typing-output') return undefined;
+    if (!playing || phase !== 'showing-output') return undefined;
 
-    if (outputCharIndex >= currentLine.output.length) {
-      setPhase('pause-after-output');
-      return undefined;
-    }
+    setPhase('pause-after-output');
+    return undefined;
+  }, [playing, phase]);
 
-    const timeoutId = window.setTimeout(() => {
-      setOutputCharIndex((prev) => Math.min(prev + 1, currentLine.output.length));
-    }, getTypewriterDelay(currentLine.output, outputCharIndex, resolvedTimingProfile));
-
-    return () => window.clearTimeout(timeoutId);
-  }, [playing, phase, outputCharIndex, currentLine.output, resolvedTimingProfile]);
-
-  // Phase: pause-after-output
+  // Phase: pause-after-output — let the user read the output, then advance
   React.useEffect(() => {
     if (!playing || phase !== 'pause-after-output') return undefined;
 
     const timeoutId = window.setTimeout(() => {
-      setPhase('deleting-output');
+      // Push the completed command+output into history
+      setHistory((prev) => [...prev, currentLine]);
+      setLineIndex((prev) => prev + 1);
+      setCommandCharIndex(0);
+      setPhase('typing-command');
     }, pauseAfterOutputMs);
 
     return () => window.clearTimeout(timeoutId);
-  }, [playing, phase, pauseAfterOutputMs]);
-
-  // Phase: deleting-output
-  React.useEffect(() => {
-    if (!playing || phase !== 'deleting-output') return undefined;
-
-    if (outputCharIndex <= 0) {
-      setPhase('deleting-command');
-      return undefined;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      setOutputCharIndex((prev) => Math.max(prev - 1, 0));
-    }, deleteMs);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [playing, phase, outputCharIndex, deleteMs]);
-
-  // Phase: deleting-command
-  React.useEffect(() => {
-    if (!playing || phase !== 'deleting-command') return undefined;
-
-    if (commandCharIndex <= 0) {
-      setLineIndex((prev) => prev + 1);
-      setPhase('typing-command');
-      return undefined;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      setCommandCharIndex((prev) => Math.max(prev - 1, 0));
-    }, deleteMs);
-
-    return () => window.clearTimeout(timeoutId);
-  }, [playing, phase, commandCharIndex, deleteMs]);
+  }, [playing, phase, pauseAfterOutputMs, currentLine]);
 
   // Compute display text
   const commandText = currentLine.command.slice(0, commandCharIndex);
-  const outputText = currentLine.output.slice(0, outputCharIndex);
+  // Show the full output only during the showing-output and pause-after-output phases
+  const outputText =
+    phase === 'showing-output' || phase === 'pause-after-output' ? currentLine.output : '';
 
   return {
     promptText: prompt,
@@ -181,7 +135,6 @@ export const useTerminalTypewriter = ({
     outputText,
     showCursor: playing && phase !== 'idle',
     phase,
-    longestCommand,
-    longestOutput,
+    history,
   };
 };

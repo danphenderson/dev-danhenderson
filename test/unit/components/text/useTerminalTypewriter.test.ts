@@ -1,8 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { useTerminalTypewriter } from '../../../../src/components/text/useTerminalTypewriter';
-import type { TerminalLine, TerminalTypewriterPhase } from '../../../../src/components/text/useTerminalTypewriter';
 
-const lines: TerminalLine[] = [
+const lines = [
   { command: 'hello', output: 'world' },
   { command: 'foo', output: 'bar' },
 ];
@@ -25,11 +24,12 @@ describe('useTerminalTypewriter', () => {
     expect(result.current.commandText).toBe('');
     expect(result.current.outputText).toBe('');
     expect(result.current.showCursor).toBe(false);
+    expect(result.current.history).toEqual([]);
   });
 
   it('begins typing the command when playing transitions to true', () => {
     const { result, rerender } = renderHook(
-      ({ playing }: { playing: boolean }) =>
+      ({ playing }) =>
         useTerminalTypewriter({ lines, playing }),
       { initialProps: { playing: false } }
     );
@@ -42,14 +42,14 @@ describe('useTerminalTypewriter', () => {
     expect(result.current.showCursor).toBe(true);
   });
 
-  it('types the full command character by character', () => {
+  it('types the full command character by character then pauses', () => {
     const { result } = renderHook(() =>
-      useTerminalTypewriter({ lines, playing: true, typingBaseMs: 10, deleteMs: 10 })
+      useTerminalTypewriter({ lines, playing: true, typingBaseMs: 10, pauseBeforeOutputMs: 5000 })
     );
 
     expect(result.current.phase).toBe('typing-command');
 
-    // Advance enough times to type 'hello' (5 chars)
+    // Type 'hello' one char at a time (use large intervals to avoid firing pause timer)
     for (let i = 0; i < 5; i++) {
       act(() => { jest.advanceTimersByTime(300); });
     }
@@ -58,70 +58,91 @@ describe('useTerminalTypewriter', () => {
     expect(result.current.phase).toBe('pause-before-output');
   });
 
-  it('transitions through all phases in a full cycle', () => {
+  it('shows output instantly after the enter pause and does not type or delete it', () => {
     const { result } = renderHook(() =>
       useTerminalTypewriter({
         lines,
         playing: true,
         typingBaseMs: 10,
-        deleteMs: 10,
-        pauseBeforeOutputMs: 50,
-        pauseAfterOutputMs: 50,
+        pauseBeforeOutputMs: 500,
+        pauseAfterOutputMs: 5000,
       })
     );
 
-    const observedPhases: TerminalTypewriterPhase[] = [result.current.phase];
-
-    // Type the command 'hello' (5 chars)
-    for (let i = 0; i < 6; i++) {
+    // Type the full command
+    for (let i = 0; i < 5; i++) {
       act(() => { jest.advanceTimersByTime(300); });
-      if (!observedPhases.includes(result.current.phase)) {
-        observedPhases.push(result.current.phase);
-      }
     }
+    expect(result.current.phase).toBe('pause-before-output');
+    expect(result.current.outputText).toBe('');
 
-    // Pause before output
-    act(() => { jest.advanceTimersByTime(100); });
-    if (!observedPhases.includes(result.current.phase)) {
-      observedPhases.push(result.current.phase);
-    }
+    // Fire the enter-pause timer — output appears instantly
+    act(() => { jest.advanceTimersByTime(600); });
 
-    // Type the output 'world' (5 chars)
-    for (let i = 0; i < 6; i++) {
+    expect(result.current.phase).toBe('pause-after-output');
+    expect(result.current.outputText).toBe('world');
+    expect(result.current.commandText).toBe('hello');
+  });
+
+  it('accumulates completed lines in history and starts typing the next command', () => {
+    const { result } = renderHook(() =>
+      useTerminalTypewriter({
+        lines,
+        playing: true,
+        typingBaseMs: 10,
+        pauseBeforeOutputMs: 500,
+        pauseAfterOutputMs: 1000,
+      })
+    );
+
+    expect(result.current.history).toEqual([]);
+
+    // Type 'hello'
+    for (let i = 0; i < 5; i++) {
       act(() => { jest.advanceTimersByTime(300); });
-      if (!observedPhases.includes(result.current.phase)) {
-        observedPhases.push(result.current.phase);
-      }
     }
+    expect(result.current.phase).toBe('pause-before-output');
 
-    // Pause after output
-    act(() => { jest.advanceTimersByTime(100); });
-    if (!observedPhases.includes(result.current.phase)) {
-      observedPhases.push(result.current.phase);
-    }
+    // Fire enter-pause timer
+    act(() => { jest.advanceTimersByTime(600); });
+    expect(result.current.phase).toBe('pause-after-output');
+    expect(result.current.outputText).toBe('world');
 
-    // Delete output (5 chars)
-    for (let i = 0; i < 6; i++) {
-      act(() => { jest.advanceTimersByTime(100); });
-      if (!observedPhases.includes(result.current.phase)) {
-        observedPhases.push(result.current.phase);
-      }
-    }
+    // Fire the read-pause timer — history grows and next command starts
+    act(() => { jest.advanceTimersByTime(1100); });
 
-    // Delete command (5 chars)
-    for (let i = 0; i < 6; i++) {
-      act(() => { jest.advanceTimersByTime(100); });
-      if (!observedPhases.includes(result.current.phase)) {
-        observedPhases.push(result.current.phase);
-      }
+    expect(result.current.history).toEqual([{ command: 'hello', output: 'world' }]);
+    expect(result.current.phase).toBe('typing-command');
+    expect(result.current.commandText).toBe('');
+    expect(result.current.outputText).toBe('');
+  });
+
+  it('does not include typing-output, deleting-output, or deleting-command phases', () => {
+    const { result } = renderHook(() =>
+      useTerminalTypewriter({
+        lines,
+        playing: true,
+        typingBaseMs: 10,
+        pauseBeforeOutputMs: 100,
+        pauseAfterOutputMs: 100,
+      })
+    );
+
+    const observedPhases = new Set();
+    observedPhases.add(result.current.phase);
+
+    // Run through enough time to complete the first full cycle
+    for (let i = 0; i < 20; i++) {
+      act(() => { jest.advanceTimersByTime(300); });
+      observedPhases.add(result.current.phase);
     }
 
     expect(observedPhases).toContain('typing-command');
     expect(observedPhases).toContain('pause-before-output');
-    expect(observedPhases).toContain('typing-output');
     expect(observedPhases).toContain('pause-after-output');
-    expect(observedPhases).toContain('deleting-output');
-    expect(observedPhases).toContain('deleting-command');
+    expect(observedPhases).not.toContain('typing-output');
+    expect(observedPhases).not.toContain('deleting-output');
+    expect(observedPhases).not.toContain('deleting-command');
   });
 
   it('provides the default prompt text', () => {
@@ -138,27 +159,5 @@ describe('useTerminalTypewriter', () => {
     );
 
     expect(result.current.promptText).toBe('> ');
-  });
-
-  it('computes longestCommand and longestOutput', () => {
-    const { result } = renderHook(() =>
-      useTerminalTypewriter({ lines, playing: false })
-    );
-
-    expect(result.current.longestCommand).toBe('hello');
-    expect(result.current.longestOutput).toBe('world');
-  });
-
-  it('computes longest values when they come from different lines', () => {
-    const mixedLines: TerminalLine[] = [
-      { command: 'short', output: 'much longer output' },
-      { command: 'a much longer command', output: 'tiny' },
-    ];
-    const { result } = renderHook(() =>
-      useTerminalTypewriter({ lines: mixedLines, playing: false })
-    );
-
-    expect(result.current.longestCommand).toBe('a much longer command');
-    expect(result.current.longestOutput).toBe('much longer output');
   });
 });

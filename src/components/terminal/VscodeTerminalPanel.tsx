@@ -12,19 +12,18 @@ const cursorBlink = keyframes`
 `;
 
 export const isCommandPhase = (phase: TerminalTypewriterPhase): boolean =>
-  phase === 'typing-command' || phase === 'deleting-command' || phase === 'pause-before-output';
+  phase === 'typing-command' || phase === 'pause-before-output';
 
 export const isOutputPhase = (phase: TerminalTypewriterPhase): boolean =>
-  phase === 'typing-output' || phase === 'deleting-output' || phase === 'pause-after-output';
+  phase === 'showing-output' || phase === 'pause-after-output';
 
 interface VscodeTerminalPanelProps {
-  lines: TerminalLine[];
   commandText: string;
   outputText: string;
   showCursor: boolean;
   phase: TerminalTypewriterPhase;
-  longestCommand: string;
-  longestOutput: string;
+  /** Completed command+output pairs shown above the active line */
+  history: TerminalLine[];
 }
 
 const lineNumberSx: SxProps<Theme> = {
@@ -36,15 +35,35 @@ const lineNumberSx: SxProps<Theme> = {
   mr: `${VSCODE_LAYOUT.lineNumberGutter}px`,
 };
 
+/** Renders a single terminal row with a line number */
+const TerminalRow: React.FC<{
+  lineNum: number;
+  children: React.ReactNode;
+}> = ({ lineNum, children }) => (
+  <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
+    <Box component="span" sx={lineNumberSx}>
+      {lineNum}
+    </Box>
+    <Box component="span">{children}</Box>
+  </Box>
+);
+
 export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
-  lines,
   commandText,
   outputText,
   showCursor,
   phase,
-  longestCommand,
-  longestOutput,
+  history,
 }) => {
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to the bottom when history grows or when typing
+  React.useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [history.length, commandText, outputText]);
+
   const isCursorBlinking = phase === 'pause-before-output' || phase === 'pause-after-output';
 
   const cursorSx: SxProps<Theme> = {
@@ -56,6 +75,9 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
       animation: `${cursorBlink} 530ms step-end infinite`,
     }),
   };
+
+  // Compute the running line number across all history + active line
+  let runningLineNum = 1;
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
@@ -138,8 +160,8 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
 
       {/* Terminal body */}
       <Box
+        ref={scrollRef}
         sx={{
-          position: 'relative',
           flex: 1,
           backgroundColor: VSCODE_COLORS.terminalBg,
           fontFamily: monoFontFamily,
@@ -148,96 +170,79 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
           color: VSCODE_COLORS.foreground,
           px: 1.5,
           py: 1,
+          overflowY: 'auto',
+          // Hide scrollbar to keep the terminal looking clean
+          '&::-webkit-scrollbar': { display: 'none' },
+          scrollbarWidth: 'none',
         }}
       >
-        {/* Width-reservation layer — prevents layout shift */}
-        <Box
-          aria-hidden
-          sx={{
-            visibility: 'hidden',
-            pointerEvents: 'none',
-            userSelect: 'none',
-            font: 'inherit',
-            lineHeight: 'inherit',
-          }}
-        >
-          {/* Command row reserve */}
-          <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
-            <Box component="span" sx={lineNumberSx}>
-              1
-            </Box>
-            <Box component="span">
-              {'~ $ '}
-              {longestCommand}
-            </Box>
-          </Box>
-          {/* Output row(s) reserve — split by \n to reserve for multi-line outputs */}
-          {longestOutput.split('\n').map((line, i) => (
-            <Box key={i} sx={{ display: 'flex', alignItems: 'baseline' }}>
-              <Box component="span" sx={lineNumberSx}>
-                {i + 2}
-              </Box>
-              <Box component="span">{line}</Box>
-            </Box>
-          ))}
-        </Box>
+        {/* History — completed commands with their output */}
+        {history.map((line, histIdx) => {
+          const commandLineNum = runningLineNum;
+          runningLineNum += 1;
 
-        {/* Visible layer */}
-        <Box
-          aria-hidden
-          sx={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            font: 'inherit',
-            lineHeight: 'inherit',
-            px: 1.5,
-            py: 1,
-          }}
-        >
-          {/* Command row */}
-          <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
-            <Box component="span" sx={lineNumberSx}>
-              1
-            </Box>
-            <Box component="span">
-              <Box component="span" sx={{ color: VSCODE_COLORS.promptPath }}>
-                {'~ '}
-              </Box>
-              <Box component="span" sx={{ color: VSCODE_COLORS.promptDollar }}>
-                {'$ '}
-              </Box>
-              {commandText}
-              {showCursor && isCommandPhase(phase) && (
-                <Box component="span" sx={cursorSx}>
-                  ▊
+          const outputLines = line.output.split('\n');
+          const outputStartNum = runningLineNum;
+          runningLineNum += outputLines.length;
+
+          return (
+            <React.Fragment key={histIdx}>
+              {/* Command row */}
+              <TerminalRow lineNum={commandLineNum}>
+                <Box component="span" sx={{ color: VSCODE_COLORS.promptPath }}>
+                  {'~ '}
                 </Box>
-              )}
-            </Box>
-          </Box>
-
-          {/* Output row(s) — split by \n to render multi-line outputs with per-row line numbers */}
-          {(outputText || isOutputPhase(phase)) &&
-            (() => {
-              const outputLines = outputText.split('\n');
-              return outputLines.map((line, i) => (
-                <Box key={i} sx={{ display: 'flex', alignItems: 'baseline' }}>
-                  <Box component="span" sx={lineNumberSx}>
-                    {i + 2}
-                  </Box>
+                <Box component="span" sx={{ color: VSCODE_COLORS.promptDollar }}>
+                  {'$ '}
+                </Box>
+                {line.command}
+              </TerminalRow>
+              {/* Output rows */}
+              {outputLines.map((text, i) => (
+                <TerminalRow key={i} lineNum={outputStartNum + i}>
                   <Box component="span" sx={{ color: VSCODE_COLORS.outputText }}>
-                    {line}
-                    {showCursor && isOutputPhase(phase) && i === outputLines.length - 1 && (
-                      <Box component="span" sx={cursorSx}>
-                        ▊
-                      </Box>
-                    )}
+                    {text}
                   </Box>
+                </TerminalRow>
+              ))}
+            </React.Fragment>
+          );
+        })}
+
+        {/* Active command row */}
+        <TerminalRow lineNum={runningLineNum}>
+          <Box component="span" sx={{ color: VSCODE_COLORS.promptPath }}>
+            {'~ '}
+          </Box>
+          <Box component="span" sx={{ color: VSCODE_COLORS.promptDollar }}>
+            {'$ '}
+          </Box>
+          {commandText}
+          {showCursor && isCommandPhase(phase) && (
+            <Box component="span" sx={cursorSx}>
+              ▊
+            </Box>
+          )}
+        </TerminalRow>
+
+        {/* Active output rows — appear instantly when showing-output / pause-after-output */}
+        {outputText &&
+          (() => {
+            const outputLines = outputText.split('\n');
+            const outputStartNum = runningLineNum + 1;
+            return outputLines.map((text, i) => (
+              <TerminalRow key={i} lineNum={outputStartNum + i}>
+                <Box component="span" sx={{ color: VSCODE_COLORS.outputText }}>
+                  {text}
+                  {showCursor && isOutputPhase(phase) && i === outputLines.length - 1 && (
+                    <Box component="span" sx={cursorSx}>
+                      ▊
+                    </Box>
+                  )}
                 </Box>
-              ));
-            })()}
-        </Box>
+              </TerminalRow>
+            ));
+          })()}
       </Box>
     </Box>
   );
