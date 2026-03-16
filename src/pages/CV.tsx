@@ -115,9 +115,10 @@ const CVRouteContent = () => {
   );
   const [revealedAboutKey, setRevealedAboutKey] = useState<string | null>(null);
   const [hasSettledGithubCalendar, setHasSettledGithubCalendar] = useState(false);
-  const aboutRevealKey = useMemo(
-    () => getAboutRevealKey(aboutMe.bio, aboutMe.opportunities ?? [], currentWorkflowTools),
-    []
+  const aboutRevealKey = getAboutRevealKey(
+    aboutMe.bio,
+    aboutMe.opportunities ?? [],
+    currentWorkflowTools
   );
   const isAboutRevealed = revealedAboutKey === aboutRevealKey;
   const isGithubRevealed = Boolean(revealedSections.github);
@@ -326,11 +327,7 @@ const CVRouteContent = () => {
     loading,
     markGithubCalendarSettled,
     markSectionRevealed,
-    revealedSections.certificates,
-    revealedSections.coding,
-    revealedSections.education,
-    revealedSections.experience,
-    revealedSections.volunteering,
+    revealedSections,
   ]);
 
   const sectionDescriptors: CVResolvedSectionDescriptor[] = sectionDefinitions.map(

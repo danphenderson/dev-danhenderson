@@ -125,6 +125,7 @@ export const CVAboutSection = ({
     !revealed && trimmedBio.length === 0 && opportunities.length === 0
   );
   const [showWorkflowTools, setShowWorkflowTools] = useState(revealed && workflowTools.length > 0);
+  const hasCompletedBio = revealed || hasBioCompleted;
   const shouldShowOpportunities = revealed || showOpportunities;
   const shouldShowWorkflowTools = revealed || showWorkflowTools;
   const isOpportunitiesSectionVisible =
@@ -219,13 +220,13 @@ export const CVAboutSection = ({
     showOpportunities,
   ]);
 
-  const hasCompletedLocalSequence =
-    hasBioCompleted &&
+  const hasCompletedAboutReveal =
+    hasCompletedBio &&
     (opportunities.length === 0 || shouldShowOpportunities) &&
     (workflowTools.length === 0 || shouldShowWorkflowTools);
 
   useEffect(() => {
-    if (!onRevealComplete || !hasCompletedLocalSequence) {
+    if (!onRevealComplete || !hasCompletedAboutReveal) {
       return;
     }
 
@@ -235,7 +236,7 @@ export const CVAboutSection = ({
 
     completedRevealContentKeyRef.current = aboutContentKey;
     onRevealComplete();
-  }, [aboutContentKey, hasCompletedLocalSequence, onRevealComplete]);
+  }, [aboutContentKey, hasCompletedAboutReveal, onRevealComplete]);
 
   return (
     <CVSectionCard
