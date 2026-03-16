@@ -14,6 +14,7 @@ import NotFound from './pages/NotFound';
 
 import { Box } from '@mui/material';
 import { CommandPaletteProvider } from './CommandPaletteProvider';
+import { cssDuration } from './motion/tokens';
 import { routerFuture } from './routerFuture';
 
 const skipLinkSx = {
@@ -28,7 +29,7 @@ const skipLinkSx = {
   color: 'text.primary',
   textDecoration: 'none',
   boxShadow: 4,
-  transition: 'top 160ms ease',
+  transition: `top ${cssDuration.quick} ease`,
   '&:focus': {
     top: 16,
   },

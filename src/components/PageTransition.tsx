@@ -1,10 +1,8 @@
 import type { ReactNode } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useLocation } from 'react-router-dom';
+import { duration } from '../motion';
 import { SPRING_EASING_MOTION } from '../styles/springEasing';
-
-/** Duration in seconds for the page crossfade transition. */
-const PAGE_TRANSITION_DURATION_S = 0.18;
 
 /** Subtle vertical offset (px) for the enter slide-up effect. */
 const ENTER_Y_OFFSET = 8;
@@ -30,7 +28,7 @@ export const PageTransition = ({ children }: PageTransitionProps) => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0 }}
         transition={{
-          duration: PAGE_TRANSITION_DURATION_S,
+          duration: duration.quick,
           ease: SPRING_EASING_MOTION,
         }}
       >

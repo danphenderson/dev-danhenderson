@@ -12,6 +12,7 @@ import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import CodeIcon from '@mui/icons-material/Code';
+import { cssDuration } from '../../motion/tokens';
 import { SPRING_EASING_CSS } from '../../styles/springEasing';
 import { AppSpeedDial, AppSpeedDialAction } from '../AppSpeedDial';
 import { CVSectionKey, cvSectionMetadata, cvSectionViewportMetrics } from './cvSectionMetadata';
@@ -187,7 +188,7 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
         onBlur={() => setHovered(false)}
         sx={{
           opacity: dimmed ? IDLE_OPACITY : 1,
-          transition: `opacity 300ms ${SPRING_EASING_CSS}`,
+          transition: `opacity ${cssDuration.normal} ${SPRING_EASING_CSS}`,
           '&:hover': { opacity: 1 },
         }}
       >

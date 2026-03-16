@@ -8,6 +8,8 @@ import { SPRING_EASING_MOTION } from '../styles/springEasing';
 export const duration = {
   /** Micro-interactions: hover states, button presses. */
   instant: 0.12,
+  /** CSS micro-transitions: interactive surface hover, icon-button feedback. */
+  quick: 0.18,
   /** Quick feedback: toggles, small reveals. */
   fast: 0.2,
   /** Default UI transitions: cards, panels. */
@@ -16,6 +18,28 @@ export const duration = {
   slow: 0.5,
   /** Dramatic reveals: page-level choreography. */
   dramatic: 0.7,
+} as const;
+
+/* ------------------------------------------------------------------ */
+/*  CSS-formatted duration strings                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * CSS-formatted counterparts of the `duration` tokens.
+ *
+ * Use these in CSS `transition` shorthands and Emotion `sx` props
+ * instead of hard-coding raw millisecond or second strings.
+ *
+ * Example:
+ *   transition: `opacity ${cssDuration.fast} ${SPRING_EASING_CSS}`
+ */
+export const cssDuration = {
+  instant: `${duration.instant}s`,
+  quick: `${duration.quick}s`,
+  fast: `${duration.fast}s`,
+  normal: `${duration.normal}s`,
+  slow: `${duration.slow}s`,
+  dramatic: `${duration.dramatic}s`,
 } as const;
 
 /* ------------------------------------------------------------------ */
