@@ -59,7 +59,7 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
-      {/* Panel header */}
+      {/* Panel header with tab strip */}
       <Box
         sx={{
           display: 'flex',
@@ -72,17 +72,31 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
           flexShrink: 0,
         }}
       >
-        <Box
-          component="span"
-          sx={{
-            fontFamily: monoFontFamily,
-            fontSize: '0.68rem',
-            color: VSCODE_COLORS.panelLabel,
-            letterSpacing: '0.06em',
-            userSelect: 'none',
-          }}
-        >
-          TERMINAL
+        {/* Panel tabs */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+          {['PROBLEMS', 'OUTPUT', 'DEBUG CONSOLE', 'TERMINAL'].map((tab) => (
+            <Box
+              key={tab}
+              component="span"
+              sx={{
+                fontFamily: monoFontFamily,
+                fontSize: '0.68rem',
+                letterSpacing: '0.06em',
+                userSelect: 'none',
+                ...(tab === 'TERMINAL'
+                  ? {
+                      color: VSCODE_COLORS.foreground,
+                      borderBottom: `1px solid ${VSCODE_COLORS.foreground}`,
+                      pb: '2px',
+                    }
+                  : {
+                      color: VSCODE_COLORS.inactiveTab,
+                    }),
+              }}
+            >
+              {tab}
+            </Box>
+          ))}
         </Box>
         <Box
           component="span"

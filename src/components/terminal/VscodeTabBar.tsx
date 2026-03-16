@@ -29,20 +29,34 @@ export const VscodeTabBar: React.FC = () => (
         flexShrink: 0,
       }}
     >
-      {/* TypeScript badge */}
+      {/* TypeScript icon badge */}
       <Box
         component="span"
         sx={{
-          fontFamily: monoFontFamily,
-          fontSize: '0.62rem',
-          fontWeight: 700,
-          color: VSCODE_COLORS.activeTabAccent,
-          userSelect: 'none',
-          lineHeight: 1,
-          letterSpacing: '-0.02em',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: 16,
+          height: 16,
+          borderRadius: '2px',
+          backgroundColor: '#3178c6',
+          flexShrink: 0,
         }}
       >
-        TS
+        <Box
+          component="span"
+          sx={{
+            fontFamily: monoFontFamily,
+            fontSize: '0.54rem',
+            fontWeight: 700,
+            color: '#ffffff',
+            userSelect: 'none',
+            lineHeight: 1,
+            letterSpacing: '-0.02em',
+          }}
+        >
+          TS
+        </Box>
       </Box>
       <Box
         component="span"

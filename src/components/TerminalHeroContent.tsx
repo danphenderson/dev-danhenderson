@@ -64,7 +64,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
         {/* Right column: tab bar → editor pane → terminal panel */}
         <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
           <VscodeTabBar />
-          <VscodeEditorPane />
+          <VscodeEditorPane playing={playing} />
           <VscodeTerminalPanel
             lines={lines}
             commandText={commandText}

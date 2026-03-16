@@ -2,12 +2,42 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily } from './vscodeTokens';
 
-const dotSx = {
-  width: 12,
-  height: 12,
-  borderRadius: '50%',
-  flexShrink: 0,
-} as const;
+interface TrafficDotProps {
+  color: string;
+  hoverIcon: string;
+}
+
+const TrafficDot: React.FC<TrafficDotProps> = ({ color, hoverIcon }) => (
+  <Box
+    sx={{
+      position: 'relative',
+      width: 12,
+      height: 12,
+      borderRadius: '50%',
+      backgroundColor: color,
+      flexShrink: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      '& .dot-icon': {
+        opacity: 0,
+        fontSize: '0.55rem',
+        fontWeight: 700,
+        color: 'rgba(0,0,0,0.65)',
+        lineHeight: 1,
+        userSelect: 'none',
+        pointerEvents: 'none',
+      },
+      '&:hover .dot-icon': {
+        opacity: 1,
+      },
+    }}
+  >
+    <Box component="span" className="dot-icon">
+      {hoverIcon}
+    </Box>
+  </Box>
+);
 
 export const VscodeTitleBar: React.FC = () => (
   <Box
@@ -23,9 +53,9 @@ export const VscodeTitleBar: React.FC = () => (
   >
     {/* Traffic-light window controls */}
     <Box sx={{ display: 'flex', gap: 0.75, flexShrink: 0 }}>
-      <Box sx={{ ...dotSx, backgroundColor: VSCODE_COLORS.dotRed }} />
-      <Box sx={{ ...dotSx, backgroundColor: VSCODE_COLORS.dotYellow }} />
-      <Box sx={{ ...dotSx, backgroundColor: VSCODE_COLORS.dotGreen }} />
+      <TrafficDot color={VSCODE_COLORS.dotRed} hoverIcon="×" />
+      <TrafficDot color={VSCODE_COLORS.dotYellow} hoverIcon="−" />
+      <TrafficDot color={VSCODE_COLORS.dotGreen} hoverIcon="⊕" />
     </Box>
 
     {/* Centered app label */}
