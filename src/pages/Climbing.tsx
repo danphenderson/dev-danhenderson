@@ -69,7 +69,7 @@ export default function Climbing() {
         <SectionCard sx={appStyles.climbingCardSx}>
           <Stack spacing={2}>
             <SectionHeading overline="Climbing" />
-            <SectionLeadText sx={appStyles.sectionLeadSx}>
+            <SectionLeadText>
               A collection of routes I've remembered to tick on Mountain Project.
             </SectionLeadText>
             <ClimbingAnalytics analytics={analytics} status={status} />
@@ -103,7 +103,7 @@ export default function Climbing() {
             <MotionFadeIn>
               <SectionHeading overline="TODO Routes" sx={appStyles.sectionHeadingOffsetSx} />
             </MotionFadeIn>
-            <SectionLeadText sx={appStyles.sectionLeadSx}>
+            <SectionLeadText>
               A collection of routes I'm interested in climbing.
             </SectionLeadText>
             <TextField

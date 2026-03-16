@@ -12,6 +12,8 @@ export {
   StrongMetaText,
   CaptionText,
   BodyText,
+  SecondaryBodyText,
+  SecondaryCaptionText,
   ListItemText,
   SectionLeadText,
   SubsectionTitle,

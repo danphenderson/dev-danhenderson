@@ -17,7 +17,7 @@ import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
-import { BodyText } from '../components/text';
+import { SecondaryBodyText } from '../components/text';
 import { MotionSection, MotionScaleIn } from '../motion';
 
 const legacySlugMap: Record<string, string> = {
@@ -175,9 +175,7 @@ export default function PhotographyCategory() {
                         flexShrink: 0,
                       }}
                     >
-                      <BodyText sx={appStyles.secondaryTextSx}>
-                        {category.album.length} photos
-                      </BodyText>
+                      <SecondaryBodyText>{category.album.length} photos</SecondaryBodyText>
                     </Box>
                   </Stack>
                 ) : (
@@ -209,10 +207,10 @@ export default function PhotographyCategory() {
                         Album not found
                       </Typography>
                     </Stack>
-                    <BodyText sx={appStyles.secondaryTextSx}>
+                    <SecondaryBodyText>
                       This album does not exist or has been moved. The command palette opens with a
                       recovery search so you can jump to another gallery or route quickly.
-                    </BodyText>
+                    </SecondaryBodyText>
                     <RouteRecoveryPanel
                       attemptedPathLabel={recoveryContext.attemptedPathLabel}
                       routeHintLabel={recoveryContext.routeHintLabel}

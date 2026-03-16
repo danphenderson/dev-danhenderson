@@ -149,6 +149,28 @@ export const BodyText = ({ children, sx, ...rest }: TextPrimitiveProps) => (
   </Typography>
 );
 
+/** Secondary body copy – `variant="body2"` with secondary text styling. */
+export const SecondaryBodyText = ({ children, sx, ...rest }: TextPrimitiveProps) => {
+  const { secondaryTextSx } = useComponentStyles();
+
+  return (
+    <Typography variant="body2" sx={mergeSx([secondaryTextSx], sx)} {...rest}>
+      {children}
+    </Typography>
+  );
+};
+
+/** Secondary caption copy – `variant="caption"` with secondary text styling. */
+export const SecondaryCaptionText = ({ children, sx, ...rest }: TextPrimitiveProps) => {
+  const { secondaryTextSx } = useComponentStyles();
+
+  return (
+    <Typography variant="caption" sx={mergeSx([secondaryTextSx], sx)} {...rest}>
+      {children}
+    </Typography>
+  );
+};
+
 /** List item body copy – `variant="body2"`, `component="li"`. */
 export const ListItemText = ({ children, sx, ...rest }: TextPrimitiveProps) => (
   <Typography component="li" variant="body2" sx={sx} {...rest}>
@@ -158,10 +180,10 @@ export const ListItemText = ({ children, sx, ...rest }: TextPrimitiveProps) => (
 
 /** Section lead/subtitle text – `variant="subtitle2"` with secondary text styling. */
 export const SectionLeadText = ({ children, sx, ...rest }: TextPrimitiveProps) => {
-  const { secondaryTextSx } = useComponentStyles();
+  const { secondaryStrongSx } = useComponentStyles();
 
   return (
-    <Typography component="p" variant="subtitle2" sx={mergeSx([secondaryTextSx], sx)} {...rest}>
+    <Typography component="p" variant="subtitle2" sx={mergeSx([secondaryStrongSx], sx)} {...rest}>
       {children}
     </Typography>
   );

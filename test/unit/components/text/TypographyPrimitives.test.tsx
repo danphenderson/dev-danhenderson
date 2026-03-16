@@ -13,6 +13,8 @@ import {
   StrongMetaText,
   CaptionText,
   BodyText,
+  SecondaryBodyText,
+  SecondaryCaptionText,
   ListItemText,
   SectionLeadText,
   SubsectionTitle,
@@ -117,6 +119,22 @@ describe('Typography primitives', () => {
     expect(el).toHaveClass('MuiTypography-body2');
   });
 
+  it('renders SecondaryBodyText as a body2 element', () => {
+    render(<SecondaryBodyText>Secondary body copy</SecondaryBodyText>, { wrapper });
+
+    const el = screen.getByText('Secondary body copy');
+
+    expect(el).toHaveClass('MuiTypography-body2');
+  });
+
+  it('renders SecondaryCaptionText as a caption element', () => {
+    render(<SecondaryCaptionText>Secondary caption</SecondaryCaptionText>, { wrapper });
+
+    const el = screen.getByText('Secondary caption');
+
+    expect(el).toHaveClass('MuiTypography-caption');
+  });
+
   it('renders ListItemText as a body2 li element', () => {
     render(
       <ul>
@@ -138,6 +156,12 @@ describe('Typography primitives', () => {
 
     expect(el.tagName).toBe('P');
     expect(el).toHaveClass('MuiTypography-subtitle2');
+  });
+
+  it('renders SectionLeadText with strong secondary emphasis', () => {
+    render(<SectionLeadText>Lead copy</SectionLeadText>, { wrapper });
+
+    expect(screen.getByText('Lead copy')).toHaveStyle({ fontWeight: '700' });
   });
 
   it('renders SubsectionTitle as a subtitle2 heading', () => {
