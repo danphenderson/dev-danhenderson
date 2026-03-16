@@ -176,6 +176,48 @@ export const createAppStyleMap = (theme: Theme) => {
     flexGrow: 1,
   };
 
+  /* ---- Immersive photography redesign tokens ---- */
+
+  const photographyHeroSx: SxProps<Theme> = {
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: 3,
+    cursor: 'pointer',
+    aspectRatio: { xs: '3 / 2', sm: '16 / 9', lg: '21 / 9' },
+  };
+
+  const photographyImmersiveCardSx: SxProps<Theme> = {
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: 3,
+    cursor: 'pointer',
+    aspectRatio: '4 / 3',
+  };
+
+  const photographyCardOverlaySx: SxProps<Theme> = {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    px: { xs: 2.5, md: 3 },
+    py: { xs: 2, md: 2.5 },
+    background: `linear-gradient(to top, ${alpha(theme.palette.common.black, 0.88)} 0%, ${alpha(
+      theme.palette.common.black,
+      0.52
+    )} 55%, transparent 100%)`,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 0.75,
+  };
+
+  const photographyDetailCoverSx: SxProps<Theme> = {
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: 3,
+    aspectRatio: { xs: '16 / 9', md: '21 / 9' },
+    mb: 2.5,
+  };
+
   const quiltedImageItemSx: SxProps<Theme> = {
     position: 'relative',
     overflow: 'hidden',
@@ -467,6 +509,10 @@ export const createAppStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     photographyCardSx,
     photographyCardContentSx,
+    photographyHeroSx,
+    photographyImmersiveCardSx,
+    photographyCardOverlaySx,
+    photographyDetailCoverSx,
     photographyMediaSx: {
       position: 'relative',
       borderRadius: 1.5,

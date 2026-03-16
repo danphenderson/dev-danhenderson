@@ -70,6 +70,7 @@ export type PhotoCategory = {
   description: string;
   src: string;
   album: PhotoItem[];
+  featured?: boolean;
   location?: string;
   dateRange?: string;
   coordinates?: PhotoCoordinates;

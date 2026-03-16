@@ -27,7 +27,12 @@ export function QuiltedImageList({ imageData, albumLabel, onPhotoClick }: Quilte
   const appStyles = useAppStyles();
 
   return (
-    <ImageList aria-label={albumLabel ? `${albumLabel} photo gallery` : undefined}>
+    <ImageList
+      variant="quilted"
+      cols={4}
+      rowHeight={200}
+      aria-label={albumLabel ? `${albumLabel} photo gallery` : undefined}
+    >
       {imageData.map((item, index) => {
         const normalizedTitle = item.title.trim();
         const hasMeaningfulTitle =

@@ -11,6 +11,7 @@ export const photographyCategories: PhotoCategory[] = [
     name: 'Landscape',
     description: 'Landscape photo collection',
     src: withBase('/assets/photography/landscape/landscape-tieton-south-fork-1.jpg'),
+    featured: true,
     location: 'Pacific Northwest & Utah',
     dateRange: '2021–2024',
     coordinates: { lat: 46.65, lng: -120.75 },

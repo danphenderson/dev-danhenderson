@@ -69,9 +69,7 @@ describe('PhotographyCategory', () => {
     renderWithSlug('nonexistent');
 
     expect(screen.getByText('Album not found')).toBeInTheDocument();
-    expect(
-      screen.getByText(/This album does not exist or has been moved\./)
-    ).toBeInTheDocument();
+    expect(screen.getByText(/This album does not exist or has been moved\./)).toBeInTheDocument();
     expect(screen.queryByTestId('quilted-image-list')).not.toBeInTheDocument();
   });
 
@@ -83,8 +81,8 @@ describe('PhotographyCategory', () => {
     expect(backLink).toHaveAttribute('href', '/photography');
   });
 
-  it('renders the photography overline on the category page', () => {
-    renderWithSlug('landscape');
+  it('renders the photography overline on the not-found page', () => {
+    renderWithSlug('nonexistent');
 
     expect(screen.getByText('Photography album')).toBeInTheDocument();
   });

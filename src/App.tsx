@@ -10,6 +10,8 @@ import Photography from './pages/Photography';
 import PhotographyCategory from './pages/PhotographyCategory';
 import CV from './pages/CV';
 import Climbing from './pages/Climbing';
+import Blog from './pages/Blog';
+import BlogPost from './pages/BlogPost';
 import NotFound from './pages/NotFound';
 
 import { Box } from '@mui/material';
@@ -55,6 +57,8 @@ function AppContent() {
               <Route path="/climbing" element={<Climbing />} />
               <Route path="/photography" element={<Photography />} />
               <Route path="/photography/:slug" element={<PhotographyCategory />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </PageTransition>

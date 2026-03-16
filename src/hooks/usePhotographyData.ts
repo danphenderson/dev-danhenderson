@@ -43,15 +43,17 @@ export function usePhotographyData() {
     },
   };
 
-  const albumMeta = useMemo(
-    () => photographyCategories.map(deriveAlbumMeta),
-    []
-  );
+  const albumMeta = useMemo(() => photographyCategories.map(deriveAlbumMeta), []);
 
   const totalPhotos = useMemo(
     () => photographyCategories.reduce((sum, cat) => sum + cat.album.length, 0),
     []
   );
 
-  return { categories: photographyCategories, albumMeta, totalPhotos, status };
+  const featuredCategory = useMemo(
+    () => photographyCategories.find((c) => c.featured) ?? photographyCategories[0],
+    []
+  );
+
+  return { categories: photographyCategories, featuredCategory, albumMeta, totalPhotos, status };
 }

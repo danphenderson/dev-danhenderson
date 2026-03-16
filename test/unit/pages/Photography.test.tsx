@@ -5,24 +5,29 @@ import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
 import Photography from '../../../src/pages/Photography';
 
+const mockCategories = [
+  {
+    slug: 'landscape',
+    name: 'Landscape',
+    description: 'Landscape photos',
+    src: '/assets/landscape.jpg',
+    featured: true,
+    album: [{ img: '/img1.jpg', title: 'Photo 1' }],
+  },
+  {
+    slug: 'astro',
+    name: 'Astrophotography',
+    description: 'Night sky photos',
+    src: '/assets/astro.jpg',
+    album: [{ img: '/img2.jpg', title: 'Photo 2' }],
+  },
+];
+
 jest.mock('../../../src/hooks/usePhotographyData', () => ({
   usePhotographyData: () => ({
-    categories: [
-      {
-        slug: 'landscape',
-        name: 'Landscape',
-        description: 'Landscape photos',
-        src: '/assets/landscape.jpg',
-        album: [{ img: '/img1.jpg', title: 'Photo 1' }],
-      },
-      {
-        slug: 'astro',
-        name: 'Astrophotography',
-        description: 'Night sky photos',
-        src: '/assets/astro.jpg',
-        album: [{ img: '/img2.jpg', title: 'Photo 2' }],
-      },
-    ],
+    categories: mockCategories,
+    featuredCategory: mockCategories[0],
+    totalPhotos: 2,
   }),
 }));
 
@@ -50,7 +55,7 @@ describe('Photography', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText('2 albums')).toBeInTheDocument();
+    expect(screen.getByText('2 photos · 2 albums')).toBeInTheDocument();
     expect(screen.getByText('Landscape')).toBeInTheDocument();
     expect(screen.getByText('Astrophotography')).toBeInTheDocument();
     expect(screen.getByText('Landscape photos')).toBeInTheDocument();

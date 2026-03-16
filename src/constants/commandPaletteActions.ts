@@ -3,6 +3,7 @@ import {
   cvSectionNavigationOrder,
   type CVSectionKey,
 } from '../components/cv/cvSectionMetadata';
+import { blogPosts } from '../data/blog';
 import { photographyCategories } from '../data/photography';
 import { sharedRouteActions } from './routeActions';
 import { siteRouteMap, type SiteRouteId } from './siteRoutes';
@@ -92,9 +93,22 @@ const photographyAlbumActions: CommandPaletteAction[] = photographyCategories.ma
   };
 });
 
+export type CommandPaletteActionKindExtended = CommandPaletteActionKind | 'blog-post';
+
+const blogPostActions: CommandPaletteAction[] = blogPosts.map((post) => ({
+  id: `blog-post-${post.slug}`,
+  label: `Blog: ${post.title}`,
+  description: post.excerpt.slice(0, 120) + (post.excerpt.length > 120 ? '…' : ''),
+  path: `${siteRouteMap.blog.path}/${post.slug}`,
+  keywords: ['blog', 'article', 'post', post.slug, post.title.toLowerCase(), ...post.tags],
+  kind: 'route' as CommandPaletteActionKind,
+  routeId: 'blog' as SiteRouteId,
+}));
+
 export const commandPaletteActions: CommandPaletteAction[] = [
   ...primaryRouteActions,
   cvStoryModeAction,
   ...cvSectionActions,
   ...photographyAlbumActions,
+  ...blogPostActions,
 ];

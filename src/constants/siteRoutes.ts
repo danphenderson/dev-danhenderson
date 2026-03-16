@@ -3,7 +3,7 @@ import { fallbackBackgroundImage } from '../data/photography';
 import type { SharedDataSourceKind } from '../types/data';
 import { resolvePublicAssetPath } from '../utils/assets';
 
-export type SiteRouteId = 'home' | 'cv' | 'climbing' | 'photography' | 'not-found';
+export type SiteRouteId = 'home' | 'cv' | 'climbing' | 'photography' | 'blog' | 'not-found';
 
 export type CVMode = 'default' | 'story';
 
@@ -109,6 +109,26 @@ export const siteRouteMap: Record<SiteRouteId, SiteRouteDefinition> = {
     status: {
       source: 'static',
       label: 'Bundled gallery metadata and static image assets.',
+    },
+  },
+  blog: {
+    id: 'blog',
+    label: 'Blog',
+    path: '/blog',
+    title: 'Blog | Daniel Henderson',
+    description:
+      'Technical writing on frontend architecture, React patterns, TypeScript, design systems, and software engineering.',
+    image: homeImage,
+    keywords: ['blog', 'articles', 'writing', 'frontend', 'react', 'typescript'],
+    showInPrimaryNav: true,
+    action: {
+      description: 'Read blog articles on frontend engineering and architecture.',
+      keywords: ['articles', 'writing', 'posts'],
+      recoveryPriority: 5,
+    },
+    status: {
+      source: 'static',
+      label: 'Bundled blog content available in the client build.',
     },
   },
   'not-found': {
