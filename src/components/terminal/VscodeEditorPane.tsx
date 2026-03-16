@@ -7,9 +7,13 @@ import { VscodeIntelliSenseTooltip } from './VscodeIntelliSenseTooltip';
 // Lines that receive a green gutter marker (1-indexed)
 const GUTTER_ADD_LINES = new Set([3, 4]);
 
+// Lines that show a fold indicator (block-start lines, 1-indexed)
+const FOLDABLE_LINES = new Set([2]);
+
 interface CodeLineProps {
   lineNumber: number;
   hovered: boolean;
+  foldable: boolean;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   children: React.ReactNode;
@@ -18,6 +22,7 @@ interface CodeLineProps {
 const CodeLine: React.FC<CodeLineProps> = ({
   lineNumber,
   hovered,
+  foldable,
   onMouseEnter,
   onMouseLeave,
   children,
@@ -34,6 +39,22 @@ const CodeLine: React.FC<CodeLineProps> = ({
       transition: 'background-color 0.12s',
     }}
   >
+    {/* Fold gutter */}
+    <Box
+      component="span"
+      sx={{
+        width: VSCODE_LAYOUT.foldGutterWidth,
+        textAlign: 'center',
+        flexShrink: 0,
+        fontSize: '0.6em',
+        color: VSCODE_COLORS.foldIndicator,
+        userSelect: 'none',
+        opacity: foldable ? (hovered ? 1 : 0.5) : 0,
+        transition: 'opacity 0.12s',
+      }}
+    >
+      {foldable ? '▾' : ''}
+    </Box>
     <Box
       component="span"
       sx={{
@@ -170,6 +191,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
           <CodeLine
             lineNumber={1}
             hovered={hoveredLine === 1}
+            foldable={FOLDABLE_LINES.has(1)}
             onMouseEnter={() => setHoveredLine(1)}
             onMouseLeave={() => setHoveredLine(null)}
           >
@@ -178,6 +200,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
           <CodeLine
             lineNumber={2}
             hovered={hoveredLine === 2}
+            foldable={FOLDABLE_LINES.has(2)}
             onMouseEnter={() => setHoveredLine(2)}
             onMouseLeave={() => setHoveredLine(null)}
           >
@@ -199,6 +222,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
           <CodeLine
             lineNumber={3}
             hovered={hoveredLine === 3}
+            foldable={FOLDABLE_LINES.has(3)}
             onMouseEnter={() => setHoveredLine(3)}
             onMouseLeave={() => setHoveredLine(null)}
           >
@@ -210,6 +234,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
           <CodeLine
             lineNumber={4}
             hovered={hoveredLine === 4}
+            foldable={FOLDABLE_LINES.has(4)}
             onMouseEnter={() => setHoveredLine(4)}
             onMouseLeave={() => setHoveredLine(null)}
           >
@@ -224,6 +249,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
           <CodeLine
             lineNumber={5}
             hovered={hoveredLine === 5}
+            foldable={FOLDABLE_LINES.has(5)}
             onMouseEnter={() => setHoveredLine(5)}
             onMouseLeave={() => setHoveredLine(null)}
           >
@@ -241,6 +267,13 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
                 mt: '1px',
               }}
             >
+              <Box
+                component="span"
+                sx={{
+                  width: VSCODE_LAYOUT.foldGutterWidth,
+                  flexShrink: 0,
+                }}
+              />
               <Box
                 component="span"
                 sx={{

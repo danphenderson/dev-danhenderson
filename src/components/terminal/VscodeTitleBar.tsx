@@ -39,7 +39,11 @@ const TrafficDot: React.FC<TrafficDotProps> = ({ color, hoverIcon }) => (
   </Box>
 );
 
-export const VscodeTitleBar: React.FC = () => (
+interface VscodeTitleBarProps {
+  onCommandPaletteToggle?: () => void;
+}
+
+export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({ onCommandPaletteToggle }) => (
   <Box
     sx={{
       display: 'flex',
@@ -58,9 +62,10 @@ export const VscodeTitleBar: React.FC = () => (
       <TrafficDot color={VSCODE_COLORS.dotGreen} hoverIcon="⊕" />
     </Box>
 
-    {/* Centered app label */}
+    {/* Centered app label — click opens command palette */}
     <Box
       component="span"
+      onClick={onCommandPaletteToggle}
       sx={{
         flex: 1,
         textAlign: 'center',
@@ -69,8 +74,13 @@ export const VscodeTitleBar: React.FC = () => (
         color: VSCODE_COLORS.titleLabel,
         userSelect: 'none',
         letterSpacing: '0.02em',
+        cursor: onCommandPaletteToggle ? 'pointer' : 'default',
         // Offset to visually center relative to the dot cluster on the left
         pr: 4.5,
+        '&:hover': onCommandPaletteToggle
+          ? { color: VSCODE_COLORS.panelLabel }
+          : undefined,
+        transition: 'color 0.12s',
       }}
     >
       danhenderson.dev — Visual Studio Code
