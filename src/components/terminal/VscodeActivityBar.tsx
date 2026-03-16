@@ -18,9 +18,15 @@ const icons = [
 
 interface VscodeActivityBarProps {
   sx?: SxProps<Theme>;
+  activeIndex?: number;
+  onIconClick?: (index: number) => void;
 }
 
-export const VscodeActivityBar: React.FC<VscodeActivityBarProps> = ({ sx }) => (
+export const VscodeActivityBar: React.FC<VscodeActivityBarProps> = ({
+  sx,
+  activeIndex = 0,
+  onIconClick,
+}) => (
   <Box
     aria-hidden="true"
     sx={[
@@ -40,6 +46,7 @@ export const VscodeActivityBar: React.FC<VscodeActivityBarProps> = ({ sx }) => (
     {icons.map((Icon, i) => (
       <Box
         key={i}
+        onClick={() => onIconClick?.(i)}
         sx={{
           position: 'relative',
           display: 'flex',
@@ -47,8 +54,9 @@ export const VscodeActivityBar: React.FC<VscodeActivityBarProps> = ({ sx }) => (
           justifyContent: 'center',
           width: '100%',
           py: 0.75,
-          // Active indicator: left border + full opacity on first icon
-          ...(i === 0 && {
+          cursor: 'pointer',
+          // Active indicator: left border + full opacity on active icon
+          ...(i === activeIndex && {
             '&::before': {
               content: '""',
               position: 'absolute',
@@ -65,7 +73,7 @@ export const VscodeActivityBar: React.FC<VscodeActivityBarProps> = ({ sx }) => (
         <Icon
           sx={{
             fontSize: '1.2rem',
-            color: i === 0 ? VSCODE_COLORS.foreground : VSCODE_COLORS.inactiveTab,
+            color: i === activeIndex ? VSCODE_COLORS.foreground : VSCODE_COLORS.inactiveTab,
           }}
         />
       </Box>

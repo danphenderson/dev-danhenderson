@@ -49,6 +49,33 @@ export const VSCODE_COLORS = {
   dotYellow: '#febc2e',
   dotGreen: '#28c840',
 
+  // Git diff gutter markers
+  gutterAdd: '#28c840',
+
+  // Minimap
+  minimapBg: '#1a1a1a',
+
+  // Breadcrumb
+  breadcrumbBg: '#252526',
+  breadcrumbSep: 'rgba(255,255,255,0.30)',
+
+  // Explorer sidebar
+  explorerBg: '#252526',
+  explorerItemHover: 'rgba(255,255,255,0.06)',
+  explorerItemActive: 'rgba(255,255,255,0.10)',
+
+  // Command palette
+  commandPaletteBg: '#252526',
+  commandPaletteInputBg: '#3c3c3c',
+  commandPaletteItemHover: 'rgba(0,122,204,0.30)',
+  commandPaletteSeparator: 'rgba(255,255,255,0.06)',
+
+  // Fold gutter
+  foldIndicator: 'rgba(255,255,255,0.35)',
+
+  // Status bar dropdown
+  statusDropdownBg: '#252526',
+
   // Terminal prompt colors
   promptPath: 'rgba(255,255,255,0.40)',
   promptDollar: '#28c840',
@@ -67,4 +94,10 @@ export const VSCODE_LAYOUT = {
   statusBarHeight: 22,
   lineNumberWidth: '2ch',
   lineNumberGutter: 12, // px gap between line number and code
+  breadcrumbHeight: 22,
+  gutterWidth: 4,
+  minimapWidth: 48,
+  explorerWidth: 160,
+  commandPaletteWidth: 420,
+  foldGutterWidth: 14,
 } as const;
