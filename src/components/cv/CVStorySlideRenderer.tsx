@@ -236,13 +236,18 @@ const CodingSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'coding' }> 
   const [activeTab, setActiveTab] = useState(0);
 
   const primaryLink = example.links?.[0];
-  const isGitHub = primaryLink?.includes('github.com');
+  let isGitHub = false;
+  if (primaryLink) {
+    try {
+      const host = new URL(primaryLink).hostname;
+      isGitHub = host === 'github.com' || host.endsWith('.github.com');
+    } catch {
+      // invalid URL — not GitHub
+    }
+  }
 
   const skillsTabs = (example.tabs ?? []).filter(
     (t): t is Extract<typeof t, { kind: 'skills' }> => t.kind === 'skills'
-  );
-  const listTabs = (example.tabs ?? []).filter(
-    (t): t is Extract<typeof t, { kind: 'list' }> => t.kind === 'list'
   );
   const allTabs = example.tabs ?? [];
 
@@ -295,7 +300,6 @@ const CodingSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'coding' }> 
           ))}
         </MotionItem>
       )}
-      {allTabs.length === 0 && listTabs.length === 0 && skillsTabs.length === 0 && null}
     </>
   );
 };
