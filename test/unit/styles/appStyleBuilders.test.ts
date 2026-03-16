@@ -69,16 +69,17 @@ describe('createAppStyleMap', () => {
     });
   });
 
-  it('gives the home hero shell a darker dedicated surface so the photo does not bleed through', () => {
+  it('gives the home hero shell a darker terminal-style surface so the photo does not bleed through', () => {
     const theme = createAppTheme('light', defaultAppAppearanceKey);
     const styleMap = createAppStyleMap(theme);
 
     expect(styleMap.homeHeroShellSx).toMatchObject({
-      backgroundColor: alpha(theme.palette.primary.contrastText, 0.76),
+      backgroundColor: alpha(theme.palette.common.black, 0.82),
       backgroundImage: 'none',
-      border: `1px solid ${alpha(theme.palette.common.white, 0.38)}`,
-      backdropFilter: 'blur(12px)',
-      WebkitBackdropFilter: 'blur(12px)',
+      border: `1px solid ${alpha(theme.palette.common.white, 0.10)}`,
+      backdropFilter: 'blur(16px)',
+      WebkitBackdropFilter: 'blur(16px)',
+      borderRadius: 2,
     });
   });
 

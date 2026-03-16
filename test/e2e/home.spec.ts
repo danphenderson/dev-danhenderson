@@ -16,13 +16,19 @@ test.describe('Home page', () => {
     await page.keyboard.press('Escape');
     await expect(darkModeHint).toBeHidden();
 
-    // The hero should show the fixed prefix as part of the looping typewriter
-    await expect(page.getByText(/Hi, my passion is/)).toBeVisible();
+    // The terminal hero shell should be visible with the typed content
+    const terminalHero = page.getByTestId('terminal-hero');
+    await expect(terminalHero).toBeVisible();
 
-    // At least one passion word should appear as the typewriter loops
-    await expect(page.getByText(/mathematics!|computers!|adventures!/)).toBeVisible({
-      timeout: 15000,
-    });
+    // The terminal should type one of the commands and eventually show output
+    await expect(terminalHero).toContainText(
+      /node --version|git log|npm run build|whoami --passions|python --version|julia --version|brew ls/,
+      { timeout: 20000 }
+    );
+    await expect(terminalHero).toContainText(
+      /v22\.14\.0|9ab2238|Compiled successfully|mathematics|Python 3\.14|julia version|Formulae/,
+      { timeout: 20000 }
+    );
   });
 
   test('welcome audio prompt can be dismissed', async ({ page }) => {

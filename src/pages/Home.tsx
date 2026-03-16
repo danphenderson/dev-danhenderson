@@ -5,22 +5,33 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Stack,
   Typography,
 } from '@mui/material';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { HeroMotionPath } from '../components/HeroMotionPath';
+import { TerminalHeroContent } from '../components/TerminalHeroContent';
+import type { TerminalLine } from '../components/text/useTerminalTypewriter';
 import { siteRouteMap } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
-import { DisplayTitle, TypewriterLoopText } from '../components/text';
 
-const heroPrefix = 'Hi, my passion is ';
-const heroPassions = ['mathematics!', 'computers!', 'adventures!'];
+const heroLines: TerminalLine[] = [
+  { command: 'node --version', output: 'v22.14.0' },
+  { command: 'git log --oneline -1', output: '9ab2238 polish: terminal UI chrome' },
+  { command: 'npm run build', output: '\u2713 Compiled successfully in 2.4s' },
+  { command: 'whoami --passions', output: 'mathematics \u00b7 computers \u00b7 adventures' },
+  { command: 'python --version', output: 'Python 3.14.3' },
+  { command: 'julia --version', output: 'julia version 1.10.10' },
+  {
+    command: 'brew ls',
+    output:
+      '==> Formulae\nopenssl\npipenv\npre-commit\npyenv\npython@3.14\ngitsqlite\ngit-extras\njuliaup\n\n==> Casks\ncodex   iterm2  mactex',
+  },
+];
 
 export default function Home() {
   const appStyles = useAppStyles();
@@ -53,49 +64,40 @@ export default function Home() {
           </HeroMotionPath>
         )}
       >
-      <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
-        <Stack spacing={2} alignItems="center">
-          <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
-            {isHeroAnimationReady ? (
-              <TypewriterLoopText
-                prefix={heroPrefix}
-                words={heroPassions}
-                timingPreset="headline"
-                playing={isTypewriterPlaying}
-              />
-            ) : null}
-          </DisplayTitle>
-        </Stack>
-      </AnimatedContentCard>
+        <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
+          {isHeroAnimationReady ? (
+            <TerminalHeroContent lines={heroLines} playing={isTypewriterPlaying} />
+          ) : null}
+        </AnimatedContentCard>
 
-      <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
-        <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1">
-            Would you like to hear a short verse while browsing the site? Use the pause button in
-            the header to stop it anytime.
-          </Typography>
-          {error && (
-            <Typography variant="caption" color="error">
-              {error}
+        <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
+          <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
+          <DialogContent>
+            <Typography variant="body1">
+              Would you like to hear a short verse while browsing the site? Use the pause button in
+              the header to stop it anytime.
             </Typography>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleOptOut} autoFocus>
-            No thanks
-          </Button>
-          <Button
-            onClick={handlePlay}
-            variant="contained"
-            disabled={isLoading}
-            aria-label="Play welcome audio"
-          >
-            {isLoading ? 'Loading…' : 'Play audio'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </BackgroundPaper>
+            {error && (
+              <Typography variant="caption" color="error">
+                {error}
+              </Typography>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleOptOut} autoFocus>
+              No thanks
+            </Button>
+            <Button
+              onClick={handlePlay}
+              variant="contained"
+              disabled={isLoading}
+              aria-label="Play welcome audio"
+            >
+              {isLoading ? 'Loading…' : 'Play audio'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </BackgroundPaper>
     </motion.div>
   );
 }

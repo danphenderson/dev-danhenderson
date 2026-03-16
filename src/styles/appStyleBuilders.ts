@@ -15,18 +15,15 @@ export const createAppStyleMap = (theme: Theme) => {
   );
   const shellBackgroundColor = alpha(theme.palette.background.paper, surface.panelSurfaceAlpha);
   const shellBorder = `1px solid ${alpha(theme.palette.divider, surface.panelBorderAlpha)}`;
-  const homeHeroShellBackgroundColor = alpha(
-    theme.palette.primary.contrastText,
-    theme.palette.mode === 'light' ? 0.76 : 0.72
-  );
-  const homeHeroShellBorder = `1px solid ${alpha(
+  const homeHeroShellBackgroundColor = alpha(theme.palette.common.black, isLight ? 0.82 : 0.88);
+  const homeHeroShellInnerBorder = `1px solid ${alpha(
     theme.palette.common.white,
-    theme.palette.mode === 'light' ? 0.38 : 0.24
+    isLight ? 0.1 : 0.08
   )}`;
-  const homeHeroShellBlurPx = Math.max(surface.cardBlurPx + 2, 12);
+  const homeHeroShellBlurPx = Math.max(surface.cardBlurPx + 4, 16);
   const homeHeroShellShadow = `0 18px 40px ${alpha(
     theme.palette.common.black,
-    theme.palette.mode === 'light' ? 0.22 : 0.34
+    isLight ? 0.28 : 0.44
   )}`;
   const photoPlaceholderColor = alpha(theme.palette.text.primary, isLight ? 0.08 : 0.18);
   const photoDownloadShadow = alpha(theme.palette.common.black, isLight ? 0.18 : 0.42);
@@ -266,14 +263,15 @@ export const createAppStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     homeHeroContentSx: { pb: 24.25 } satisfies SxProps<Theme>,
     homeHeroShellSx: {
-      p: 1.5,
-      pb: 0.5,
+      p: 0,
       backgroundColor: homeHeroShellBackgroundColor,
       backgroundImage: 'none',
-      border: homeHeroShellBorder,
+      border: homeHeroShellInnerBorder,
       boxShadow: homeHeroShellShadow,
       backdropFilter: `blur(${homeHeroShellBlurPx}px)`,
       WebkitBackdropFilter: `blur(${homeHeroShellBlurPx}px)`,
+      borderRadius: 1,
+      overflow: 'hidden',
     } satisfies SxProps<Theme>,
     homeHeroTitleSx: {
       color: theme.palette.common.white,
