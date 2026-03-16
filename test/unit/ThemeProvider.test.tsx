@@ -104,7 +104,8 @@ describe('ThemeProvider', () => {
     expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe(defaultAppAppearanceKey);
   });
 
-  it('renders the provider even when no children are provided', () => {
-    expect(() => render(<ThemeProvider />)).not.toThrow();
+  it('returns null when no children are provided', () => {
+    const { container } = render(<ThemeProvider />);
+    expect(container.innerHTML).toBe('');
   });
 });

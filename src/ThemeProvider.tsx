@@ -76,6 +76,8 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     [mode, appearance, setAppearance, toggleTheme]
   );
 
+  if (!children) return null;
+
   return (
     <ThemeContext.Provider value={value}>
       <MuiThemeProvider theme={theme}>
