@@ -24,8 +24,10 @@ const heroLines: TerminalLine[] = [
   { command: 'git log --oneline -1', output: '9ab2238 polish: terminal UI chrome' },
   { command: 'npm run build', output: '\u2713 Compiled successfully in 2.4s' },
   { command: 'whoami --passions', output: 'mathematics \u00b7 computers \u00b7 adventures' },
-  { command: 'python --version', output: 'Python 3.14.3' },
-  { command: 'julia --version', output: 'julia version 1.10.10' },
+  {
+    command: 'for cmd ({julia,python,node}) $cmd --version',
+    output: 'julia version 1.10.10\nPython 3.14.3\nv22.14.0',
+  },
   {
     command: 'brew ls',
     output:

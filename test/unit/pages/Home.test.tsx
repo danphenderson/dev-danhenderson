@@ -245,7 +245,7 @@ describe('Home welcome flow', () => {
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'false');
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute(
       'data-lines',
-      'node --version:v22.14.0,git log --oneline -1:9ab2238 polish: terminal UI chrome,npm run build:\u2713 Compiled successfully in 2.4s,whoami --passions:mathematics \u00b7 computers \u00b7 adventures,python --version:Python 3.14.3,julia --version:julia version 1.10.10,brew ls:==> Formulae\nopenssl\npipenv\npre-commit\npyenv\npython@3.14\ngitsqlite\ngit-extras\njuliaup\n\n==> Casks\ncodex   iterm2  mactex'
+      'node --version:v22.14.0,git log --oneline -1:9ab2238 polish: terminal UI chrome,npm run build:\u2713 Compiled successfully in 2.4s,whoami --passions:mathematics \u00b7 computers \u00b7 adventures,for cmd ({julia,python,node}) $cmd --version:julia version 1.10.10\nPython 3.14.3\nv22.14.0,brew ls:==> Formulae\nopenssl\npipenv\npre-commit\npyenv\npython@3.14\ngitsqlite\ngit-extras\njuliaup\n\n==> Casks\ncodex   iterm2  mactex'
     );
 
     fireEvent.click(screen.getByTestId('complete-hero-motion'));
@@ -280,7 +280,7 @@ describe('Home welcome flow', () => {
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'false');
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute(
       'data-lines',
-      'node --version:v22.14.0,git log --oneline -1:9ab2238 polish: terminal UI chrome,npm run build:\u2713 Compiled successfully in 2.4s,whoami --passions:mathematics \u00b7 computers \u00b7 adventures,python --version:Python 3.14.3,julia --version:julia version 1.10.10,brew ls:==> Formulae\nopenssl\npipenv\npre-commit\npyenv\npython@3.14\ngitsqlite\ngit-extras\njuliaup\n\n==> Casks\ncodex   iterm2  mactex'
+      'node --version:v22.14.0,git log --oneline -1:9ab2238 polish: terminal UI chrome,npm run build:\u2713 Compiled successfully in 2.4s,whoami --passions:mathematics \u00b7 computers \u00b7 adventures,for cmd ({julia,python,node}) $cmd --version:julia version 1.10.10\nPython 3.14.3\nv22.14.0,brew ls:==> Formulae\nopenssl\npipenv\npre-commit\npyenv\npython@3.14\ngitsqlite\ngit-extras\njuliaup\n\n==> Casks\ncodex   iterm2  mactex'
     );
 
     fireEvent.click(screen.getByTestId('complete-hero-motion'));
@@ -308,7 +308,7 @@ describe('Home welcome flow', () => {
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'false');
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute(
       'data-lines',
-      'node --version:v22.14.0,git log --oneline -1:9ab2238 polish: terminal UI chrome,npm run build:\u2713 Compiled successfully in 2.4s,whoami --passions:mathematics \u00b7 computers \u00b7 adventures,python --version:Python 3.14.3,julia --version:julia version 1.10.10,brew ls:==> Formulae\nopenssl\npipenv\npre-commit\npyenv\npython@3.14\ngitsqlite\ngit-extras\njuliaup\n\n==> Casks\ncodex   iterm2  mactex'
+      'node --version:v22.14.0,git log --oneline -1:9ab2238 polish: terminal UI chrome,npm run build:\u2713 Compiled successfully in 2.4s,whoami --passions:mathematics \u00b7 computers \u00b7 adventures,for cmd ({julia,python,node}) $cmd --version:julia version 1.10.10\nPython 3.14.3\nv22.14.0,brew ls:==> Formulae\nopenssl\npipenv\npre-commit\npyenv\npython@3.14\ngitsqlite\ngit-extras\njuliaup\n\n==> Casks\ncodex   iterm2  mactex'
     );
 
     fireEvent.click(screen.getByTestId('complete-hero-motion'));
