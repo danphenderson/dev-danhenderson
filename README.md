@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/danphenderson/dev-danhenderson/blob/main/LICENSE)
 [![Live Site](https://img.shields.io/website?url=https%3A%2F%2Fwww.danhenderson.dev&label=danhenderson.dev)](https://www.danhenderson.dev)
 
-Source for [danhenderson.dev](https://www.danhenderson.dev), a client-side portfolio site built with React, TypeScript, and MUI. The app stays fully static-hostable: content is stored in local TypeScript modules, routes are handled in the browser, and the CV enhances itself with public GitHub data when it is available.
+Source for [danhenderson.dev](https://www.danhenderson.dev), a client-side React + TypeScript portfolio site for the home page, CV, climbing log, and photography galleries. The app stays fully static-hostable: content lives in local TypeScript modules, routing stays in the browser, and the CV enhances itself with public GitHub data when it is available.
 
 ## Overview
 
@@ -18,6 +18,14 @@ This repository powers four main areas:
 - `/photography` for gallery browsing and album detail pages
 
 The site is a React Router single-page app. Keep unknown-route rewrites, `PUBLIC_URL` compatibility, and shipped static assets intact when making changes.
+
+## Project Signals
+
+- **CI**: pull requests are expected to keep both GitHub Actions workflows green:
+  - `tests.yml` runs `npm ci` and `CI=true npm test -- --watch=false --passWithNoTests --coverage`
+  - `build.yml` runs `npm ci` and `npm run build`
+- **Coverage**: coverage is collected from the Jest run in `tests.yml` and uploaded as a GitHub Actions artifact named `coverage-report-<sha>`. There is no separate coverage SaaS configuration required for contributors right now.
+- **Deployment**: this repo produces a static `build/` output. Deployments must ship `public/assets/`, preserve SPA rewrites to `index.html`, and set `PUBLIC_URL` correctly when serving from a subpath.
 
 ## Routes
 
@@ -179,24 +187,24 @@ PORT=3000 npm start
 
 GitHub Actions workflows live in `.github/workflows/`:
 
-- `tests.yml` runs unit tests on pull requests and pushes to `main`
-  - runs `CI=true npm test -- --watch=false --passWithNoTests --coverage` and uploads the coverage artifact
-  - uploads coverage results to [Codecov](https://codecov.io/gh/danphenderson/dev-danhenderson)
-- `build.yml` builds the app and runs E2E tests on pull requests and pushes to `main`
-  - **`build`**: runs `npm run build` and uploads the production build artifact
-  - **`e2e`**: downloads the build artifact, restores cached Playwright browsers, installs Chromium/system dependencies as needed, and runs `npx playwright test`
-- shared runner setup is centralized in `.github/actions/setup/action.yml` (`actions/setup-node@v4`, npm cache, `npm ci`)
-- docs-only changes are skipped via `paths-ignore` rules for markdown, selected repo config files, `resume/**`, and `plans/**`
-- `codeql.yml` runs GitHub CodeQL analysis for JavaScript/TypeScript on pull requests, pushes to `main`, and a weekly schedule
+- `tests.yml`
+  - installs dependencies with `npm ci`
+  - runs `CI=true npm test -- --watch=false --passWithNoTests --coverage`
+  - uploads the generated `coverage/` directory as a `coverage-report-<sha>` artifact for review in GitHub Actions
+- `build.yml`
+  - installs dependencies with `npm ci`
+  - runs `npm run build`
+  - uploads the production `build/` directory as a `build-output-<sha>` artifact
 
-### CI/CD integration stack
+### Coverage reporting for contributors
 
-- **GitHub Actions** orchestrates CI in `.github/workflows/`
-- **Playwright** provides browser-level E2E coverage in CI and locally from `test/e2e/`
-- **Codecov** reports test coverage from CI runs via the [Codecov dashboard](https://codecov.io/gh/danphenderson/dev-danhenderson)
-- **GitHub Artifacts** store the production build, coverage report, and Playwright failure output
-- **CodeQL** provides repository security analysis for the JavaScript/TypeScript codebase
-- **Dependabot** (`.github/dependabot.yml`) opens weekly npm and GitHub Actions dependency update PRs
+If you need a local coverage report that matches CI, run:
+
+```bash
+CI=true npm test -- --watch=false --coverage
+```
+
+This writes the report to `coverage/`, which is already git-ignored. No additional token, secret, or third-party uploader setup is currently required for contributor pull requests because GitHub Actions handles artifact upload automatically.
 
 ### End-to-end testing
 

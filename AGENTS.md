@@ -59,6 +59,12 @@ Runtime system and developer instructions override repository instructions. With
 
 Use the narrowest relevant validation first, then expand if needed.
 
+After checkout (new or updated dependencies):
+1. `npm install` — installs any new or changed packages declared in `package.json` / `package-lock.json`
+2. `npx playwright install chromium` — only needed when the branch adds Playwright to the project or upgrades its version
+3. `npm run build` — confirm the project compiles cleanly with the new dependency
+4. `CI=true npm test -- --watch=false` — run unit/component tests to catch regressions
+
 Primary commands:
 
 - install: `npm install`
