@@ -18,6 +18,10 @@ type CVGitHubSectionProps = {
   contributions: GitHubContribution[];
   loading: boolean;
   error?: string | null;
+  revealed?: boolean;
+  onReveal?: () => void;
+  calendarSettled?: boolean;
+  onCalendarSettled?: () => void;
   sectionDelayMs?: number;
   nestedDelayOffsetMs?: number;
   itemOffsetMs?: number;
@@ -31,6 +35,10 @@ export const CVGitHubSection = ({
   contributions,
   loading,
   error,
+  revealed = false,
+  onReveal,
+  calendarSettled = false,
+  onCalendarSettled,
   sectionDelayMs = 0,
   nestedDelayOffsetMs = 0,
   itemOffsetMs,
@@ -75,11 +83,21 @@ export const CVGitHubSection = ({
   ];
 
   return (
-    <CVSectionCard delayMs={sectionDelayMs} id={sectionId} sx={cvSectionAnchorSx}>
+    <CVSectionCard
+      delayMs={sectionDelayMs}
+      skipEntranceAnimation={revealed}
+      onVisible={onReveal}
+      id={sectionId}
+      sx={cvSectionAnchorSx}
+    >
       <Stack spacing={compactSidebarSectionSpacing}>
         <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
         {lead && <SectionLeadText>{lead}</SectionLeadText>}
-        <SectionCard delayMs={githubActivityDelayMs} sx={githubSubsectionCardSx}>
+        <SectionCard
+          delayMs={githubActivityDelayMs}
+          skipEntranceAnimation={revealed}
+          sx={githubSubsectionCardSx}
+        >
           <Stack spacing={compactSidebarSectionSpacing}>
             <SubsectionTitle sx={supportAccentTitleSx}>Recent Activity</SubsectionTitle>
             <SectionPanel>
@@ -93,7 +111,11 @@ export const CVGitHubSection = ({
           </Stack>
         </SectionCard>
 
-        <SectionCard delayMs={githubContributionsDelayMs} sx={githubSubsectionCardSx}>
+        <SectionCard
+          delayMs={githubContributionsDelayMs}
+          skipEntranceAnimation={revealed}
+          sx={githubSubsectionCardSx}
+        >
           <Stack spacing={compactSidebarSectionSpacing}>
             <SubsectionTitle sx={supportAccentTitleSx}>Contributions</SubsectionTitle>
             <SectionPanel>
@@ -107,9 +129,18 @@ export const CVGitHubSection = ({
           </Stack>
         </SectionCard>
 
-        <SectionCard delayMs={githubCalendarDelayMs} sx={githubSubsectionCardSx}>
+        <SectionCard
+          delayMs={githubCalendarDelayMs}
+          skipEntranceAnimation={revealed}
+          sx={githubSubsectionCardSx}
+        >
           <Stack spacing={compactSidebarSectionSpacing}>
-            <GitHubContributionCalendar username={githubUsername} contained={false} />
+            <GitHubContributionCalendar
+              username={githubUsername}
+              contained={false}
+              skipEntranceAnimation={calendarSettled}
+              onEntranceComplete={onCalendarSettled}
+            />
           </Stack>
         </SectionCard>
       </Stack>

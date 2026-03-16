@@ -7,9 +7,14 @@ import { EntryTitle, MetaText } from '../text';
 type CertificatesListProps = {
   certificates: Certificate[];
   startDelayMs?: number;
+  skipEntranceAnimation?: boolean;
 };
 
-export const CertificatesList = ({ certificates, startDelayMs = 0 }: CertificatesListProps) => {
+export const CertificatesList = ({
+  certificates,
+  startDelayMs = 0,
+  skipEntranceAnimation = false,
+}: CertificatesListProps) => {
   const { certificateActionSx, contentListStackSpacing, supportAccentInteractiveSurfaceSx } =
     useComponentStyles();
 
@@ -19,6 +24,7 @@ export const CertificatesList = ({ certificates, startDelayMs = 0 }: Certificate
       getItemKey={(certificate, index) => `${certificate.title}-${index}`}
       mountItemsOnView
       startDelayMs={startDelayMs}
+      skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
       renderItem={(certificate) => (

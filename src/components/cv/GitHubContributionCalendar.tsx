@@ -11,6 +11,8 @@ import { easeOutCubic } from '../../utils/easing';
 type GitHubContributionCalendarProps = {
   username: string;
   contained?: boolean;
+  skipEntranceAnimation?: boolean;
+  onEntranceComplete?: () => void;
 };
 
 const CALENDAR_SCROLL_CONTAINER_SELECTOR = '.react-activity-calendar__scroll-container';
@@ -19,10 +21,13 @@ const CALENDAR_SCROLL_DURATION_MS = 900;
 export const GitHubContributionCalendar = ({
   username,
   contained = true,
+  skipEntranceAnimation = false,
+  onEntranceComplete,
 }: GitHubContributionCalendarProps) => {
   const calendarWrapperRef = useRef<HTMLDivElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const containerLookupFrameRef = useRef<number | null>(null);
+  const hasNotifiedEntranceCompleteRef = useRef(false);
   const {
     contentCardInsetSx,
     githubCalendarColorScheme,
@@ -33,9 +38,19 @@ export const GitHubContributionCalendar = ({
     secondaryTextSx,
   } = useComponentStyles();
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(null);
-  const [hasIntersectionTrigger, setHasIntersectionTrigger] = useState(false);
-  const [hasEnteredView, setHasEnteredView] = useState(false);
-  const [hasCompletedEntrance, setHasCompletedEntrance] = useState(false);
+  const [hasIntersectionTrigger, setHasIntersectionTrigger] = useState(skipEntranceAnimation);
+  const [hasEnteredView, setHasEnteredView] = useState(skipEntranceAnimation);
+  const [hasCompletedEntrance, setHasCompletedEntrance] = useState(skipEntranceAnimation);
+
+  useEffect(() => {
+    if (!skipEntranceAnimation) {
+      return;
+    }
+
+    setHasIntersectionTrigger(true);
+    setHasEnteredView(true);
+    setHasCompletedEntrance(true);
+  }, [skipEntranceAnimation]);
 
   useEffect(() => {
     const wrapper = calendarWrapperRef.current;
@@ -97,7 +112,7 @@ export const GitHubContributionCalendar = ({
   useEffect(() => {
     const wrapper = calendarWrapperRef.current;
 
-    if (!wrapper || hasEnteredView || hasCompletedEntrance) {
+    if (!wrapper || hasEnteredView || hasCompletedEntrance || skipEntranceAnimation) {
       return undefined;
     }
 
@@ -119,12 +134,18 @@ export const GitHubContributionCalendar = ({
     observer.observe(wrapper);
 
     return () => observer.disconnect();
-  }, [hasCompletedEntrance, hasEnteredView]);
+  }, [hasCompletedEntrance, hasEnteredView, skipEntranceAnimation]);
 
   useEffect(() => {
     const wrapper = calendarWrapperRef.current;
 
-    if (!wrapper || !hasIntersectionTrigger || hasEnteredView || hasCompletedEntrance) {
+    if (
+      !wrapper ||
+      !hasIntersectionTrigger ||
+      hasEnteredView ||
+      hasCompletedEntrance ||
+      skipEntranceAnimation
+    ) {
       return undefined;
     }
 
@@ -169,10 +190,10 @@ export const GitHubContributionCalendar = ({
         window.cancelAnimationFrame(visibilityFrameId);
       }
     };
-  }, [hasCompletedEntrance, hasEnteredView, hasIntersectionTrigger]);
+  }, [hasCompletedEntrance, hasEnteredView, hasIntersectionTrigger, skipEntranceAnimation]);
 
   useEffect(() => {
-    if (!scrollContainer || !hasEnteredView || hasCompletedEntrance) {
+    if (!scrollContainer || !hasEnteredView || hasCompletedEntrance || skipEntranceAnimation) {
       return undefined;
     }
 
@@ -222,7 +243,16 @@ export const GitHubContributionCalendar = ({
         animationFrameRef.current = null;
       }
     };
-  }, [hasCompletedEntrance, hasEnteredView, scrollContainer]);
+  }, [hasCompletedEntrance, hasEnteredView, scrollContainer, skipEntranceAnimation]);
+
+  useEffect(() => {
+    if (!hasCompletedEntrance || !onEntranceComplete || hasNotifiedEntranceCompleteRef.current) {
+      return;
+    }
+
+    hasNotifiedEntranceCompleteRef.current = true;
+    onEntranceComplete();
+  }, [hasCompletedEntrance, onEntranceComplete]);
 
   useEffect(() => {
     if (!scrollContainer || !hasCompletedEntrance || typeof window === 'undefined') {

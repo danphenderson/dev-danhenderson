@@ -12,6 +12,7 @@ import { CVEntryHeader } from './CVEntryHeader';
 type EducationSectionProps = {
   education: EducationInfo;
   startDelayMs?: number;
+  skipEntranceAnimation?: boolean;
 };
 
 const courseworkPrefixPattern = /^(?:Relevant\s+)?Coursework:\s*/i;
@@ -72,7 +73,11 @@ const EducationDetailList = ({
   );
 };
 
-export const EducationSection = ({ education, startDelayMs = 0 }: EducationSectionProps) => {
+export const EducationSection = ({
+  education,
+  startDelayMs = 0,
+  skipEntranceAnimation = false,
+}: EducationSectionProps) => {
   const { contentListStackSpacing, detailBlockSx, motionTokens } = useComponentStyles();
 
   if (!education.entries || education.entries.length === 0) {
@@ -85,6 +90,7 @@ export const EducationSection = ({ education, startDelayMs = 0 }: EducationSecti
       getItemKey={(entry, index) => `${entry.university}-${entry.program}-${index}`}
       mountItemsOnView
       startDelayMs={startDelayMs}
+      skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
       renderItem={(entry, index) => {

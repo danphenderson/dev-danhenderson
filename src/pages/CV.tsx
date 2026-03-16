@@ -1,6 +1,6 @@
 import { Box, Grid } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme as useMuiTheme } from '@mui/material/styles';
@@ -72,6 +72,17 @@ type CVSectionDefinition = {
 
 const parseCVMode = (value: string | null): CVMode => (value === 'story' ? 'story' : 'default');
 
+const ABOUT_CONTENT_DELIMITER = '|bio|';
+const OPPORTUNITY_DELIMITER = '|opportunity|';
+const WORKFLOW_CONTENT_DELIMITER = '|workflow|';
+
+const getAboutRevealKey = (bio: string, opportunities: string[], workflowTools: string[]) =>
+  `${bio.trim()}${ABOUT_CONTENT_DELIMITER}${opportunities
+    .filter((opportunity) => opportunity.trim().length > 0)
+    .join(OPPORTUNITY_DELIMITER)}${WORKFLOW_CONTENT_DELIMITER}${workflowTools
+    .filter((tool) => tool.trim().length > 0)
+    .join(WORKFLOW_CONTENT_DELIMITER)}`;
+
 export default function CV() {
   return <CVRouteContent />;
 }
@@ -99,6 +110,36 @@ const CVRouteContent = () => {
   const layoutMode: CVLayoutMode = isMobile ? 'mobile' : 'desktop';
   const githubNestedDelayOffsetMs = motionTokens.sectionStaggerMs / 2;
   const itemOffsetMs = motionTokens.itemOffsetMs;
+  const [revealedSections, setRevealedSections] = useState<Partial<Record<CVSectionKey, boolean>>>(
+    {}
+  );
+  const [revealedAboutKey, setRevealedAboutKey] = useState<string | null>(null);
+  const [hasSettledGithubCalendar, setHasSettledGithubCalendar] = useState(false);
+  const aboutRevealKey = useMemo(
+    () => getAboutRevealKey(aboutMe.bio, aboutMe.opportunities ?? [], currentWorkflowTools),
+    []
+  );
+  const isAboutRevealed = revealedAboutKey === aboutRevealKey;
+  const isGithubRevealed = Boolean(revealedSections.github);
+
+  useEffect(() => {
+    setRevealedAboutKey((currentKey) => (currentKey === aboutRevealKey ? currentKey : null));
+  }, [aboutRevealKey]);
+
+  const markSectionRevealed = useCallback((sectionKey: CVSectionKey) => {
+    setRevealedSections((currentSections) =>
+      currentSections[sectionKey]
+        ? currentSections
+        : {
+            ...currentSections,
+            [sectionKey]: true,
+          }
+    );
+  }, []);
+
+  const markGithubCalendarSettled = useCallback(() => {
+    setHasSettledGithubCalendar(true);
+  }, []);
 
   const handleToggleMode = useCallback(() => {
     setSearchParams(
@@ -171,6 +212,8 @@ const CVRouteContent = () => {
           currentWorkflowTools={currentWorkflowTools}
           delayMs={layout.delayMs}
           triggerOnView={layout.triggerOnView}
+          revealed={isAboutRevealed}
+          onRevealComplete={() => setRevealedAboutKey(aboutRevealKey)}
           sectionId={cvSectionMetadata.about.id}
         />
       ),
@@ -182,6 +225,8 @@ const CVRouteContent = () => {
           experiences={experiences}
           delayMs={layout.delayMs}
           triggerOnView={layout.triggerOnView}
+          revealed={Boolean(revealedSections.experience)}
+          onReveal={() => markSectionRevealed('experience')}
           itemOffsetMs={itemOffsetMs}
           sectionId={cvSectionMetadata.experience.id}
         />
@@ -194,6 +239,8 @@ const CVRouteContent = () => {
           education={educationInfo}
           delayMs={layout.delayMs}
           triggerOnView={layout.triggerOnView}
+          revealed={Boolean(revealedSections.education)}
+          onReveal={() => markSectionRevealed('education')}
           itemOffsetMs={itemOffsetMs}
           sectionId={cvSectionMetadata.education.id}
         />
@@ -206,6 +253,8 @@ const CVRouteContent = () => {
           volunteering={volunteering}
           delayMs={layout.delayMs}
           triggerOnView={layout.triggerOnView}
+          revealed={Boolean(revealedSections.volunteering)}
+          onReveal={() => markSectionRevealed('volunteering')}
           itemOffsetMs={itemOffsetMs}
           sectionId={cvSectionMetadata.volunteering.id}
         />
@@ -219,6 +268,10 @@ const CVRouteContent = () => {
           contributions={contributions}
           loading={loading}
           error={error}
+          revealed={isGithubRevealed}
+          onReveal={() => markSectionRevealed('github')}
+          calendarSettled={hasSettledGithubCalendar}
+          onCalendarSettled={markGithubCalendarSettled}
           sectionDelayMs={layout.delayMs}
           nestedDelayOffsetMs={githubNestedDelayOffsetMs}
           itemOffsetMs={itemOffsetMs}
@@ -234,6 +287,8 @@ const CVRouteContent = () => {
           certificates={certificates}
           delayMs={layout.delayMs}
           triggerOnView={layout.triggerOnView}
+          revealed={Boolean(revealedSections.certificates)}
+          onReveal={() => markSectionRevealed('certificates')}
           itemOffsetMs={itemOffsetMs}
           sectionId={cvSectionMetadata.certificates.id}
         />
@@ -246,6 +301,8 @@ const CVRouteContent = () => {
           examples={codingExamples}
           delayMs={layout.delayMs}
           triggerOnView={layout.triggerOnView}
+          revealed={Boolean(revealedSections.coding)}
+          onReveal={() => markSectionRevealed('coding')}
           itemOffsetMs={itemOffsetMs}
           sectionId={cvSectionMetadata.coding.id}
         />
@@ -258,7 +315,23 @@ const CVRouteContent = () => {
     sectionDefinitions.forEach((def) => map.set(def.key, def));
     return map;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activity, contributions, loading, error]);
+  }, [
+    aboutRevealKey,
+    activity,
+    contributions,
+    error,
+    hasSettledGithubCalendar,
+    isAboutRevealed,
+    isGithubRevealed,
+    loading,
+    markGithubCalendarSettled,
+    markSectionRevealed,
+    revealedSections.certificates,
+    revealedSections.coding,
+    revealedSections.education,
+    revealedSections.experience,
+    revealedSections.volunteering,
+  ]);
 
   const sectionDescriptors: CVResolvedSectionDescriptor[] = sectionDefinitions.map(
     ({ key, render }) => {

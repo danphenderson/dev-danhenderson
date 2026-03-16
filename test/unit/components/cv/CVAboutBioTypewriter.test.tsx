@@ -186,4 +186,15 @@ describe('CVAboutBioTypewriter', () => {
     expect(handleComplete).toHaveBeenCalledTimes(1);
   });
 
+  it('renders the full bio immediately when already revealed', () => {
+    const { container } = renderTypewriter({ revealed: true });
+    const animatedLayer = getLayer(container, 'animated');
+
+    expect(animatedLayer).toHaveTextContent('Mathematics cohort building systems.');
+    expect(animatedLayer).toHaveTextContent('Open to opportunities in platform engineering.');
+    expect(animatedLayer.querySelector('a')).toHaveAttribute('href', 'https://example.com/program');
+    expect(container.querySelector('[data-typewriter-layer="accessible"]')).toBeNull();
+    expect(window.IntersectionObserver).not.toHaveBeenCalled();
+  });
+
 });

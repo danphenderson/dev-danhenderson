@@ -319,4 +319,32 @@ describe('GitHubContributionCalendar', () => {
 
     expect(metrics.getScrollLeft()).toBe(92);
   });
+
+  it('restores the settled right-edge state immediately when the calendar was already revealed', () => {
+    const handleEntranceComplete = jest.fn();
+
+    render(
+      <ThemeProvider>
+        <GitHubContributionCalendar
+          username="testuser"
+          skipEntranceAnimation
+          onEntranceComplete={handleEntranceComplete}
+        />
+      </ThemeProvider>
+    );
+
+    const scrollContainer = screen.getByTestId('github-calendar-scroll-container');
+    const metrics = attachScrollMetrics(scrollContainer, { clientWidth: 220, scrollWidth: 520 });
+
+    act(() => {
+      window.dispatchEvent(new Event('resize'));
+    });
+
+    runNextAnimationFrame(1000);
+    runNextAnimationFrame(1016);
+
+    expect(metrics.getScrollLeft()).toBe(300);
+    expect(queuedAnimationFrames.size).toBe(0);
+    expect(handleEntranceComplete).toHaveBeenCalledTimes(1);
+  });
 });

@@ -8,8 +8,16 @@ jest.mock('@mui/material', () => {
 
   return {
     ...actual,
-    Zoom: ({ children, in: inProp }: { children: ReactNode; in: boolean }) => (
-      <div data-testid="zoom" data-in={String(inProp)}>
+    Zoom: ({
+      children,
+      in: inProp,
+      appear,
+    }: {
+      children: ReactNode;
+      in: boolean;
+      appear?: boolean;
+    }) => (
+      <div data-testid="zoom" data-in={String(inProp)} data-appear={String(appear ?? true)}>
         {children}
       </div>
     ),
@@ -151,5 +159,21 @@ describe('AnimatedContentCard', () => {
     });
 
     expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'true');
+  });
+
+  it('can skip the entrance animation and notify once when the card is already revealed', () => {
+    const handleVisible = jest.fn();
+
+    render(
+      <ThemeProvider>
+        <AnimatedContentCard skipEntranceAnimation onVisible={handleVisible}>
+          <div>Persisted Card</div>
+        </AnimatedContentCard>
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'true');
+    expect(screen.getByTestId('zoom')).toHaveAttribute('data-appear', 'false');
+    expect(handleVisible).toHaveBeenCalledTimes(1);
   });
 });

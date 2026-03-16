@@ -19,6 +19,7 @@ import { CVEntryHeader } from './CVEntryHeader';
 type ExperienceListProps = {
   experiences: Experience[];
   startDelayMs?: number;
+  skipEntranceAnimation?: boolean;
 };
 
 const renderInlineSegments = (segments: ExperienceProjectSegment[]) =>
@@ -108,7 +109,11 @@ const ExperienceProjects = ({
   );
 };
 
-export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceListProps) => {
+export const ExperienceList = ({
+  experiences,
+  startDelayMs = 0,
+  skipEntranceAnimation = false,
+}: ExperienceListProps) => {
   const { contentListStackSpacing, detailBlockSx, experienceDescriptionSx, motionTokens } =
     useComponentStyles();
 
@@ -117,6 +122,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
       items={experiences}
       getItemKey={(experience, index) => `${experience.company}-${index}`}
       startDelayMs={startDelayMs}
+      skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
       renderItem={(experience, index) => {
