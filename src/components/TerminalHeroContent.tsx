@@ -18,12 +18,18 @@ export interface TerminalHeroContentProps {
 }
 
 const windowControlSx: SxProps<Theme> = {
-  width: 10,
-  height: 10,
+  width: 12,
+  height: 12,
   borderRadius: '50%',
 };
 
 const monoFontFamily = '"SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace';
+
+const isCommandPhase = (phase: string) =>
+  phase === 'typing-command' || phase === 'deleting-command' || phase === 'pause-before-output';
+
+const isOutputPhase = (phase: string) =>
+  phase === 'typing-output' || phase === 'deleting-output' || phase === 'pause-after-output';
 
 export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   lines,
@@ -31,7 +37,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   sessionLabel = 'danhenderson.dev',
   sx,
 }) => {
-  const { promptText, commandText, outputText, showCursor, phase, longestCommand, longestOutput } =
+  const { commandText, outputText, showCursor, phase, longestCommand, longestOutput } =
     useTerminalTypewriter({
       lines,
       playing,
@@ -43,6 +49,16 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
 
   const isCursorBlinking =
     phase === 'pause-before-output' || phase === 'pause-after-output';
+
+  const cursorSx: SxProps<Theme> = {
+    display: 'inline-block',
+    width: '0.55ch',
+    ml: '1px',
+    userSelect: 'none',
+    ...(isCursorBlinking && {
+      animation: `${cursorBlink} 530ms step-end infinite`,
+    }),
+  };
 
   const accessibleLabel = lines
     .map((l) => `${l.command}: ${l.output}`)
@@ -69,12 +85,14 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
         sx={{
           display: 'flex',
           alignItems: 'center',
-          gap: 0.75,
+          gap: 0.875,
+          pb: 0.875,
           mb: 1,
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
         }}
       >
         {/* Window controls */}
-        <Box sx={{ display: 'flex', gap: 0.625 }}>
+        <Box sx={{ display: 'flex', gap: 0.75 }}>
           <Box sx={{ ...windowControlSx, backgroundColor: '#ff5f57' }} />
           <Box sx={{ ...windowControlSx, backgroundColor: '#febc2e' }} />
           <Box sx={{ ...windowControlSx, backgroundColor: '#28c840' }} />
@@ -87,26 +105,14 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
             flex: 1,
             textAlign: 'center',
             fontSize: '0.72rem',
-            opacity: 0.5,
-            letterSpacing: '0.04em',
+            opacity: 0.4,
+            letterSpacing: '0.03em',
             userSelect: 'none',
+            pr: 4.5,
           }}
         >
           {sessionLabel}
         </Box>
-
-        {/* Status indicator */}
-        <Box
-          component="span"
-          sx={{
-            width: 6,
-            height: 6,
-            borderRadius: '50%',
-            backgroundColor: playing ? '#28c840' : 'rgba(255,255,255,0.25)',
-            transition: 'background-color 300ms ease',
-            flexShrink: 0,
-          }}
-        />
       </Box>
 
       {/* Terminal body */}
@@ -125,7 +131,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
             lineHeight: 'inherit',
           }}
         >
-          {promptText}{longestCommand}
+          {'~ $ '}{longestCommand}
           {'\n'}
           {longestOutput}
         </Box>
@@ -145,53 +151,26 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
         >
           {/* Prompt + command row */}
           <Box component="span">
-            <Box component="span" sx={{ opacity: 0.5 }}>
-              {promptText}
-            </Box>
+            <Box component="span" sx={{ opacity: 0.4 }}>{'~ '}</Box>
+            <Box component="span" sx={{ color: '#28c840' }}>{'$ '}</Box>
             {commandText}
-            {showCursor && (phase === 'typing-command' || phase === 'deleting-command' || phase === 'pause-before-output') && (
-              <Box
-                component="span"
-                sx={{
-                  display: 'inline-block',
-                  width: '0.6ch',
-                  ml: '1px',
-                  userSelect: 'none',
-                  ...(isCursorBlinking && {
-                    animation: `${cursorBlink} 530ms step-end infinite`,
-                  }),
-                }}
-              >
-                ▌
-              </Box>
+            {showCursor && isCommandPhase(phase) && (
+              <Box component="span" sx={cursorSx}>▊</Box>
             )}
           </Box>
 
           {/* Output row */}
-          {(outputText || phase === 'typing-output' || phase === 'pause-after-output' || phase === 'deleting-output') && (
+          {(outputText || isOutputPhase(phase)) && (
             <Box
               component="div"
               sx={{
-                color: 'rgba(255,255,255,0.68)',
-                mt: 0.25,
+                color: 'rgba(255,255,255,0.58)',
+                mt: 0.125,
               }}
             >
-              → {outputText}
-              {showCursor && (phase === 'typing-output' || phase === 'deleting-output' || phase === 'pause-after-output') && (
-                <Box
-                  component="span"
-                  sx={{
-                    display: 'inline-block',
-                    width: '0.6ch',
-                    ml: '1px',
-                    userSelect: 'none',
-                    ...(phase === 'pause-after-output' && {
-                      animation: `${cursorBlink} 530ms step-end infinite`,
-                    }),
-                  }}
-                >
-                  ▌
-                </Box>
+              {outputText}
+              {showCursor && isOutputPhase(phase) && (
+                <Box component="span" sx={cursorSx}>▊</Box>
               )}
             </Box>
           )}
