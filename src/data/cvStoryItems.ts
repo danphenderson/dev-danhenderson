@@ -16,7 +16,8 @@ export type CVStoryItem =
   | { kind: 'education'; data: EducationEntry; sortDate: Date }
   | { kind: 'certificate'; data: Certificate; sortDate: Date }
   | { kind: 'volunteering'; data: VolunteeringEntry; sortDate: Date }
-  | { kind: 'coding'; data: CodingExample };
+  | { kind: 'coding'; data: CodingExample }
+  | { kind: 'end' };
 
 /* ── Date parser ── */
 
@@ -121,6 +122,9 @@ export const buildCVStoryItems = (input: CVStoryInput): CVStoryItem[] => {
   for (const example of input.codingExamples) {
     items.push({ kind: 'coding', data: example });
   }
+
+  // 4. End — terminal "You made it to the end!" slide
+  items.push({ kind: 'end' });
 
   return items;
 };

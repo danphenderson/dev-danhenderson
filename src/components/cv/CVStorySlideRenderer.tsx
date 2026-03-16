@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode, useState } from 'react';
 import { motion } from 'motion/react';
 import { Box, Tabs, Tab } from '@mui/material';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import { HeaderLabel, HeaderTitle, StrongMetaText, MetaText, BodyText } from '../text';
 import { SkillsChipList } from '../SkillsChipList';
 import { CommonLink } from '../CommonLink';
@@ -8,6 +9,7 @@ import { MotionItem } from '../../motion';
 import { slideContentContainer, slideContentItem } from '../../motion/variants';
 import type { CVStoryItem } from '../../data/cvStoryItems';
 import type { ExperienceDescription, ExperienceProjectSegment } from '../../types/cv';
+import { githubProfileUrl } from '../../data/cv';
 
 type CVStorySlideRendererProps = { item: CVStoryItem };
 
@@ -304,6 +306,58 @@ const CodingSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'coding' }> 
   );
 };
 
+const EndSlide = () => {
+  const [imgError, setImgError] = useState(false);
+
+  return (
+    <>
+      <MotionItem variants={slideContentItem}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3, mt: 1 }}>
+          {imgError ? (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: { xs: 120, sm: 160 },
+                height: { xs: 120, sm: 160 },
+                borderRadius: '50%',
+                bgcolor: 'action.hover',
+              }}
+            >
+              <GitHubIcon sx={{ fontSize: { xs: 72, sm: 96 }, color: 'text.primary' }} />
+            </Box>
+          ) : (
+            <Box
+              component="img"
+              src="https://github.githubassets.com/images/modules/logos_page/Octocat.png"
+              alt="GitHub Octocat"
+              onError={() => setImgError(true)}
+              sx={{ width: { xs: 120, sm: 160 }, height: 'auto' }}
+            />
+          )}
+        </Box>
+      </MotionItem>
+      <MotionItem variants={slideContentItem}>
+        <HeaderTitle sx={{ textAlign: 'center' }}>You made it to the end!</HeaderTitle>
+      </MotionItem>
+      <MotionItem variants={slideContentItem}>
+        <BodyText sx={{ textAlign: 'center' }}>
+          Thanks for taking a look at my story. Feel free to explore the full interactive CV or
+          check out my work on GitHub.
+        </BodyText>
+      </MotionItem>
+      <MotionItem variants={slideContentItem}>
+        <Box sx={{ textAlign: 'center', mt: 1 }}>
+          <CommonLink href={githubProfileUrl} target="_blank" rel="noopener noreferrer">
+            View my GitHub profile
+          </CommonLink>
+        </Box>
+      </MotionItem>
+    </>
+  );
+};
+
 /* ── Main renderer ── */
 
 export const CVStorySlideRenderer = ({ item }: CVStorySlideRendererProps) => {
@@ -321,6 +375,7 @@ export const CVStorySlideRenderer = ({ item }: CVStorySlideRendererProps) => {
         {item.kind === 'certificate' && <CertificateSlide item={item} />}
         {item.kind === 'volunteering' && <VolunteeringSlide item={item} />}
         {item.kind === 'coding' && <CodingSlide item={item} />}
+        {item.kind === 'end' && <EndSlide />}
       </Box>
     </motion.div>
   );

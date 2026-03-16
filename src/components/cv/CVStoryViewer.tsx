@@ -22,6 +22,7 @@ const kindLabel: Record<CVStoryItem['kind'], string> = {
   certificate: 'Certificate',
   volunteering: 'Volunteering',
   coding: 'Project',
+  end: '',
 };
 
 export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
