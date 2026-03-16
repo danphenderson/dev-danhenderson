@@ -46,14 +46,15 @@ export const GitHubContributions = ({
 
   if (variant === 'list') {
     return (
-      <GitHubLinkChipList
-        items={sortedContributions.map((project) => ({
-          key: project.name,
-          href: project.url,
-          label: (
-            <ChipMetaLabel>
-              <Box component="span" sx={contributionInlineNameSx}>
-                {project.name}
+        <GitHubLinkChipList
+          items={sortedContributions.map((project) => ({
+            key: project.name,
+            href: project.url,
+            tooltip: `Open ${project.name} on GitHub.`,
+            label: (
+              <ChipMetaLabel>
+                <Box component="span" sx={contributionInlineNameSx}>
+                  {project.name}
               </Box>
               <Box component="span" sx={contributionInlineMetaSx}>
                 ★ {project.stars ?? 0}
