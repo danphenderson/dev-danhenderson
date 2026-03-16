@@ -56,6 +56,12 @@ export const typewriterTimingProfiles = {
     maxDelayMs: 110,
     delayScale: 0.24,
   },
+  cvBio: {
+    baseMs: 0,
+    minDelayMs: 6,
+    maxDelayMs: 72,
+    delayScale: 0.16,
+  },
 } as const;
 
 export type TypewriterTimingPreset = keyof typeof typewriterTimingProfiles;

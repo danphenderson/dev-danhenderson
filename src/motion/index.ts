@@ -9,7 +9,7 @@
  *   import { MotionSection, fadeInUp, duration } from '../motion';
  */
 
-export { duration, easing, stagger, transition } from './tokens';
+export { duration, cssDuration, easing, stagger, transition } from './tokens';
 
 export {
   fadeInUp,
