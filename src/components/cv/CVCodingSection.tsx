@@ -32,10 +32,6 @@ export const CVCodingSection = ({
     sx={cvSectionAnchorSx}
   >
     <SectionHeading overline="Coding Examples" />
-    <CodingExamplesSection
-      examples={examples}
-      startDelayMs={itemOffsetMs}
-      skipEntranceAnimation={revealed}
-    />
+    <CodingExamplesSection examples={examples} startDelayMs={itemOffsetMs} />
   </CVSectionCard>
 );

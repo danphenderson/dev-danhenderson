@@ -32,10 +32,6 @@ export const CVCertificatesSection = ({
     sx={cvSectionAnchorSx}
   >
     <SectionHeading overline="Certificates" />
-    <CertificatesList
-      certificates={certificates}
-      startDelayMs={itemOffsetMs}
-      skipEntranceAnimation={revealed}
-    />
+    <CertificatesList certificates={certificates} startDelayMs={itemOffsetMs} />
   </CVSectionCard>
 );

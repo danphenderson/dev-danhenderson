@@ -32,10 +32,6 @@ export const CVVolunteeringSection = ({
     sx={cvSectionAnchorSx}
   >
     <SectionHeading overline="Volunteering" />
-    <VolunteeringList
-      volunteering={volunteering}
-      startDelayMs={itemOffsetMs}
-      skipEntranceAnimation={revealed}
-    />
+    <VolunteeringList volunteering={volunteering} startDelayMs={itemOffsetMs} />
   </CVSectionCard>
 );

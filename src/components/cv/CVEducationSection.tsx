@@ -32,10 +32,6 @@ export const CVEducationSection = ({
     sx={cvSectionAnchorSx}
   >
     <SectionHeading overline="Education" />
-    <EducationSection
-      education={education}
-      startDelayMs={itemOffsetMs}
-      skipEntranceAnimation={revealed}
-    />
+    <EducationSection education={education} startDelayMs={itemOffsetMs} />
   </CVSectionCard>
 );

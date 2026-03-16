@@ -32,10 +32,6 @@ export const CVExperienceSection = ({
     sx={cvSectionAnchorSx}
   >
     <SectionHeading overline="Experience" />
-    <ExperienceList
-      experiences={experiences}
-      startDelayMs={itemOffsetMs}
-      skipEntranceAnimation={revealed}
-    />
+    <ExperienceList experiences={experiences} startDelayMs={itemOffsetMs} />
   </CVSectionCard>
 );

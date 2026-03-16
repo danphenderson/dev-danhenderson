@@ -4,9 +4,11 @@ import ThemeProvider from '../../../../src/ThemeProvider';
 import { CVExperienceSection } from '../../../../src/components/cv/CVExperienceSection';
 import { cvSectionMetadata } from '../../../../src/components/cv/cvSectionMetadata';
 
-const mockExperienceList = jest.fn((_: { startDelayMs?: number }) => (
-  <div data-testid="experience-list" />
-));
+const mockExperienceList = jest.fn(
+  (_: { startDelayMs?: number; skipEntranceAnimation?: boolean }) => (
+    <div data-testid="experience-list" />
+  )
+);
 
 jest.mock('../../../../src/components/layout/SectionCard', () => ({
   SectionCard: ({
@@ -32,7 +34,8 @@ jest.mock('../../../../src/components/layout/SectionCard', () => ({
 }));
 
 jest.mock('../../../../src/components/cv/ExperienceList', () => ({
-  ExperienceList: (props: { startDelayMs?: number }) => mockExperienceList(props),
+  ExperienceList: (props: { startDelayMs?: number; skipEntranceAnimation?: boolean }) =>
+    mockExperienceList(props),
 }));
 
 describe('CVExperienceSection', () => {
@@ -55,6 +58,18 @@ describe('CVExperienceSection', () => {
 
     expect(mockExperienceList.mock.calls[0][0]).toEqual(
       expect.objectContaining({ startDelayMs: 240 })
+    );
+  });
+
+  it('keeps section reveal persistence on the outer card without disabling inner list entrances', () => {
+    render(
+      <ThemeProvider>
+        <CVExperienceSection experiences={[]} revealed onReveal={jest.fn()} />
+      </ThemeProvider>
+    );
+
+    expect(mockExperienceList.mock.calls[0][0]).not.toEqual(
+      expect.objectContaining({ skipEntranceAnimation: true })
     );
   });
 });
