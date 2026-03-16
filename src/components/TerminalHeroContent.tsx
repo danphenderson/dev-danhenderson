@@ -9,6 +9,7 @@ import { VscodeTabBar } from './terminal/VscodeTabBar';
 import { VscodeEditorPane } from './terminal/VscodeEditorPane';
 import { VscodeTerminalPanel } from './terminal/VscodeTerminalPanel';
 import { VscodeStatusBar } from './terminal/VscodeStatusBar';
+import { VscodeNotificationToast } from './terminal/VscodeNotificationToast';
 
 // Re-export for consumers that import TerminalLine from this module
 export type { TerminalLine };
@@ -20,6 +21,8 @@ export interface TerminalHeroContentProps {
   sessionLabel?: string;
   sx?: SxProps<Theme>;
 }
+
+const TOAST_DURATION_MS = 3000;
 
 export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   lines,
@@ -36,6 +39,20 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
       pauseAfterOutputMs: 2400,
     });
 
+  // Notification toast — fires once when the first output completes
+  const [toastVisible, setToastVisible] = React.useState(false);
+  const hasShownToastRef = React.useRef(false);
+
+  React.useEffect(() => {
+    if (phase === 'pause-after-output' && !hasShownToastRef.current) {
+      hasShownToastRef.current = true;
+      setToastVisible(true);
+      const timerId = window.setTimeout(() => setToastVisible(false), TOAST_DURATION_MS);
+      return () => window.clearTimeout(timerId);
+    }
+    return undefined;
+  }, [phase]);
+
   const accessibleLabel = lines.map((l) => `${l.command}: ${l.output}`).join('; ');
 
   return (
@@ -49,6 +66,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
           flexDirection: 'column',
           width: '100%',
           overflow: 'hidden',
+          position: 'relative',
           // Ensure the inner dark surface fills the shell card
           backgroundColor: '#1e1e1e',
         },
@@ -78,6 +96,11 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
       </Box>
 
       <VscodeStatusBar commandText={commandText} />
+
+      <VscodeNotificationToast
+        visible={toastVisible}
+        onDismiss={() => setToastVisible(false)}
+      />
     </Box>
   );
 };
