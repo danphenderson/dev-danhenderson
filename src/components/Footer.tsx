@@ -1,14 +1,11 @@
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-import { useAppStyles } from '../styles/appStyles';
 import { CommonLink } from './CommonLink';
 import { PerformanceScorecard } from './PerformanceScorecard';
-import { BodyText } from './text';
+import { SecondaryBodyText } from './text';
 import { MotionSection, fadeIn } from '../motion';
 
 export default function Footer() {
-  const appStyles = useAppStyles();
-
   return (
     <MotionSection variants={fadeIn} rootMargin="0px 0px 0px 0px">
       <Container maxWidth="xl">
@@ -20,13 +17,13 @@ export default function Footer() {
             gap: 0.5,
           }}
         >
-          <BodyText align="center" sx={appStyles.footerTextSx}>
+          <SecondaryBodyText align="center">
             {'Copyright © '}
             <CommonLink color="inherit" href="https://danhenderson.dev/">
               danhenderson.dev
             </CommonLink>{' '}
             {new Date().getFullYear()}.
-          </BodyText>
+          </SecondaryBodyText>
           <PerformanceScorecard />
         </Box>
       </Container>

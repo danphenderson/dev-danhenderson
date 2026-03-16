@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import PlaceIcon from '@mui/icons-material/Place';
 import { Link as RouterLink } from 'react-router-dom';
 import { SectionHeading } from '../components/layout/SectionHeading';
@@ -11,7 +11,11 @@ import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
-import { BodyText } from '../components/text';
+import {
+  EntryTitle,
+  SecondaryBodyText,
+  SecondaryCaptionText,
+} from '../components/text';
 import {
   MotionSection,
   StaggerChildren,
@@ -56,7 +60,7 @@ export default function Photography() {
                 subtitle="A selection of field work, climbing days, and stargazing nights."
                 sx={appStyles.compactSectionHeadingSx}
               />
-              <BodyText sx={appStyles.secondaryTextSx}>{categories.length} albums</BodyText>
+              <SecondaryBodyText>{categories.length} albums</SecondaryBodyText>
               {isLoading && (
                 <Box sx={appStyles.sectionLoadingSx}>
                   <LoadingBars label="Loading photography albums" compact />
@@ -85,28 +89,24 @@ export default function Photography() {
                     </Box>
 
                     <Stack spacing={0.5} sx={appStyles.photographyCardContentSx}>
-                      <Typography variant="h6" sx={appStyles.primaryTextSx}>
-                        {card.name}
-                      </Typography>
-                      <BodyText sx={appStyles.secondaryTextSx}>{card.description}</BodyText>
+                      <EntryTitle>{card.name}</EntryTitle>
+                      <SecondaryBodyText>{card.description}</SecondaryBodyText>
                       {(card.location || card.dateRange) && (
                         <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap">
                           {card.location && (
                             <Stack direction="row" spacing={0.25} alignItems="center">
                               <PlaceIcon sx={{ color: 'text.secondary', fontSize: 14 }} />
-                              <Typography variant="caption" color="text.secondary">
-                                {card.location}
-                              </Typography>
+                              <SecondaryCaptionText>{card.location}</SecondaryCaptionText>
                             </Stack>
                           )}
                           {card.dateRange && (
-                            <Typography variant="caption" color="text.secondary">
+                            <SecondaryCaptionText>
                               · {card.dateRange}
-                            </Typography>
+                            </SecondaryCaptionText>
                           )}
                         </Stack>
                       )}
-                      <BodyText sx={appStyles.secondaryTextSx}>{card.album.length} photos</BodyText>
+                      <SecondaryBodyText>{card.album.length} photos</SecondaryBodyText>
                     </Stack>
 
                     <Button

@@ -179,14 +179,6 @@ export const createAppStyleMap = (theme: Theme) => {
     flexGrow: 1,
   };
 
-  const primaryTextSx: SxProps<Theme> = {
-    color: 'text.primary',
-  };
-
-  const secondaryTextSx: SxProps<Theme> = {
-    color: 'text.secondary',
-  };
-
   const quiltedImageItemSx: SxProps<Theme> = {
     position: 'relative',
     overflow: 'hidden',
@@ -462,11 +454,6 @@ export const createAppStyleMap = (theme: Theme) => {
         )}`,
       },
     } satisfies SxProps<Theme>,
-    primaryTextSx,
-    secondaryTextSx,
-    footerTextSx: {
-      color: 'text.secondary',
-    } satisfies SxProps<Theme>,
     hintPopoverPaperSx: {
       p: 2,
       maxWidth: 240,
@@ -498,10 +485,6 @@ export const createAppStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     albumSectionSx: { p: { xs: 1.5, md: 2 } } satisfies SxProps<Theme>,
     climbingCardSx: { p: { xs: 2.5, md: 3.5 } } satisfies SxProps<Theme>,
-    sectionLeadSx: {
-      color: 'text.secondary',
-      fontWeight: 700,
-    } satisfies SxProps<Theme>,
     errorAlertSx: { mb: 1 } satisfies SxProps<Theme>,
     dataGridContainerSx: { width: '100%' } satisfies SxProps<Theme>,
     loadingOverlaySx: { width: '100%', p: 2 } satisfies SxProps<Theme>,
