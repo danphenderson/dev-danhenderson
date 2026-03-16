@@ -34,26 +34,6 @@ export const scaleIn: Variants = {
   },
 };
 
-/** Slide in from the left. */
-export const slideInLeft: Variants = {
-  hidden: { opacity: 0, x: -32 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: duration.normal, ease: easing.decel },
-  },
-};
-
-/** Slide in from the right. */
-export const slideInRight: Variants = {
-  hidden: { opacity: 0, x: 32 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: duration.normal, ease: easing.decel },
-  },
-};
-
 /* ------------------------------------------------------------------ */
 /*  Container (stagger) variants                                      */
 /* ------------------------------------------------------------------ */
@@ -64,28 +44,6 @@ export const staggerContainer: Variants = {
   visible: {
     transition: {
       staggerChildren: stagger.normal,
-      delayChildren: stagger.fast,
-    },
-  },
-};
-
-/** Tight stagger for dense lists. */
-export const staggerFast: Variants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: stagger.fast,
-      delayChildren: 0.02,
-    },
-  },
-};
-
-/** Relaxed stagger for large section reveals. */
-export const staggerSlow: Variants = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: stagger.slow,
       delayChildren: stagger.fast,
     },
   },
