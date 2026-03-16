@@ -22,12 +22,12 @@ test.describe('Home page', () => {
 
     // The terminal should type one of the commands and eventually show output
     await expect(terminalHero).toContainText(
-      /node --version|git log|npm run build|whoami --passions/,
-      { timeout: 15000 }
+      /node --version|git log|npm run build|whoami --passions|python --version|julia --version|brew ls/,
+      { timeout: 20000 }
     );
     await expect(terminalHero).toContainText(
-      /v22\.14\.0|9ab2238|Compiled successfully|mathematics/,
-      { timeout: 15000 }
+      /v22\.14\.0|9ab2238|Compiled successfully|mathematics|Python 3\.14|julia version|Formulae/,
+      { timeout: 20000 }
     );
   });
 

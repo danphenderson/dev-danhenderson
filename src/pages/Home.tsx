@@ -22,8 +22,15 @@ import { useComponentStyles } from '../styles/componentStyles';
 const heroLines: TerminalLine[] = [
   { command: 'node --version', output: 'v22.14.0' },
   { command: 'git log --oneline -1', output: '9ab2238 polish: terminal UI chrome' },
-  { command: 'npm run build', output: '✓ Compiled successfully in 2.4s' },
-  { command: 'whoami --passions', output: 'mathematics · computers · adventures' },
+  { command: 'npm run build', output: '\u2713 Compiled successfully in 2.4s' },
+  { command: 'whoami --passions', output: 'mathematics \u00b7 computers \u00b7 adventures' },
+  { command: 'python --version', output: 'Python 3.14.3' },
+  { command: 'julia --version', output: 'julia version 1.10.10' },
+  {
+    command: 'brew ls',
+    output:
+      '==> Formulae\nopenssl\npipenv\npre-commit\npyenv\npython@3.14\ngitsqlite\ngit-extras\njuliaup\n\n==> Casks\ncodex   iterm2  mactex',
+  },
 ];
 
 export default function Home() {

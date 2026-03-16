@@ -133,13 +133,15 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
               {longestCommand}
             </Box>
           </Box>
-          {/* Output row reserve */}
-          <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
-            <Box component="span" sx={lineNumberSx}>
-              2
+          {/* Output row(s) reserve — split by \n to reserve for multi-line outputs */}
+          {longestOutput.split('\n').map((line, i) => (
+            <Box key={i} sx={{ display: 'flex', alignItems: 'baseline' }}>
+              <Box component="span" sx={lineNumberSx}>
+                {i + 2}
+              </Box>
+              <Box component="span">{line}</Box>
             </Box>
-            <Box component="span">{longestOutput}</Box>
-          </Box>
+          ))}
         </Box>
 
         {/* Visible layer */}
@@ -177,22 +179,26 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
             </Box>
           </Box>
 
-          {/* Output row */}
-          {(outputText || isOutputPhase(phase)) && (
-            <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
-              <Box component="span" sx={lineNumberSx}>
-                2
-              </Box>
-              <Box component="span" sx={{ color: VSCODE_COLORS.outputText }}>
-                {outputText}
-                {showCursor && isOutputPhase(phase) && (
-                  <Box component="span" sx={cursorSx}>
-                    ▊
+          {/* Output row(s) — split by \n to render multi-line outputs with per-row line numbers */}
+          {(outputText || isOutputPhase(phase)) &&
+            (() => {
+              const outputLines = outputText.split('\n');
+              return outputLines.map((line, i) => (
+                <Box key={i} sx={{ display: 'flex', alignItems: 'baseline' }}>
+                  <Box component="span" sx={lineNumberSx}>
+                    {i + 2}
                   </Box>
-                )}
-              </Box>
-            </Box>
-          )}
+                  <Box component="span" sx={{ color: VSCODE_COLORS.outputText }}>
+                    {line}
+                    {showCursor && isOutputPhase(phase) && i === outputLines.length - 1 && (
+                      <Box component="span" sx={cursorSx}>
+                        ▊
+                      </Box>
+                    )}
+                  </Box>
+                </Box>
+              ));
+            })()}
         </Box>
       </Box>
     </Box>
