@@ -1,5 +1,9 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import { mockGitHubAPISuccess, mockGitHubAPIFailure, mockGitHubAPIPartialFailure } from './helpers/github';
+import {
+  mockGitHubAPISuccess,
+  mockGitHubAPIFailure,
+  mockGitHubAPIPartialFailure,
+} from './helpers/github';
 
 const COMMON_LINK_TOOLTIP_ID = 'common-link-tooltip';
 
@@ -37,6 +41,7 @@ test.describe('CV page – GitHub integration', () => {
     await page.goto('/cv');
     await expect(page.getByText('Daniel Henderson')).toBeVisible();
     await expect(page.getByText('Software Engineer')).toBeVisible();
+    await ensureCvSectionVisible(page, 'cv-github');
     await expectGitHubDataStatusTooltip(page);
 
     const programLink = page.getByRole('link', {

@@ -10,15 +10,35 @@ type CVStoryHeaderProps = {
   mode: CVMode;
   onToggleMode: () => void;
   chapterLabel?: string;
+  variant?: 'page' | 'embedded';
 };
 
-export const CVStoryHeader = ({ mode, onToggleMode, chapterLabel }: CVStoryHeaderProps) => {
+export const CVStoryHeader = ({
+  mode,
+  onToggleMode,
+  chapterLabel,
+  variant = 'page',
+}: CVStoryHeaderProps) => {
   const { compactSidebarSectionSpacing } = useComponentStyles();
   const isStory = mode === 'story';
+  const isEmbedded = variant === 'embedded';
 
   return (
-    <Stack spacing={compactSidebarSectionSpacing} data-testid="cv-story-header">
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap' }}>
+    <Stack
+      spacing={isEmbedded ? 0.75 : compactSidebarSectionSpacing}
+      alignItems={isEmbedded ? 'flex-end' : 'stretch'}
+      sx={isEmbedded ? { width: '100%' } : undefined}
+      data-testid="cv-story-header"
+    >
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.5,
+          flexWrap: 'wrap',
+          justifyContent: isEmbedded ? 'flex-end' : 'flex-start',
+        }}
+      >
         <Chip
           icon={isStory ? <AutoStoriesOutlinedIcon /> : <ViewModuleOutlinedIcon />}
           label={isStory ? 'Story Mode' : 'Full CV'}
@@ -26,20 +46,25 @@ export const CVStoryHeader = ({ mode, onToggleMode, chapterLabel }: CVStoryHeade
           color={isStory ? 'primary' : 'default'}
           variant="outlined"
         />
-        {isStory && chapterLabel && (
+        {!isEmbedded && isStory && chapterLabel && (
           <Typography variant="caption" color="text.secondary">
             {chapterLabel}
           </Typography>
         )}
       </Box>
-      {isStory && <SectionLeadText>{cvStoryIntro}</SectionLeadText>}
-      <Box>
+      {!isEmbedded && isStory && <SectionLeadText>{cvStoryIntro}</SectionLeadText>}
+      <Box
+        sx={isEmbedded ? { display: 'flex', justifyContent: 'flex-end', width: '100%' } : undefined}
+      >
         <Button
           size="small"
           variant="text"
           startIcon={isStory ? <ViewModuleOutlinedIcon /> : <AutoStoriesOutlinedIcon />}
           onClick={onToggleMode}
           data-testid="cv-mode-toggle"
+          sx={
+            isEmbedded ? { minWidth: 0, justifyContent: 'flex-end', textAlign: 'right' } : undefined
+          }
         >
           {isStory ? cvStoryCta.switchToDefault : cvStoryCta.switchToStory}
         </Button>

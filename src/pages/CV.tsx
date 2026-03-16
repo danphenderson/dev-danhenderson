@@ -51,7 +51,6 @@ import { useGithubProfile } from '../hooks/useGithubProfile';
 import { CVLayoutMode, CVSectionRegion, cvPageSectionLayout } from './cvPageLayout';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
-import { MotionSection } from '../motion';
 
 type CVResolvedSectionDescriptor = {
   id: string;
@@ -201,6 +200,9 @@ const CVRouteContent = () => {
       />
     </Box>
   );
+  const aboutModeControls = (
+    <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} variant="embedded" />
+  );
   const githubStatusTooltip = <CVGitHubStatusTooltip status={status} />;
 
   const sectionDefinitions: CVSectionDefinition[] = [
@@ -210,6 +212,7 @@ const CVRouteContent = () => {
         <CVAboutSection
           about={aboutMe}
           actions={aboutSpeedDial}
+          footerControls={aboutModeControls}
           currentWorkflowTools={currentWorkflowTools}
           delayMs={layout.delayMs}
           triggerOnView={layout.triggerOnView}
@@ -312,7 +315,6 @@ const CVRouteContent = () => {
     },
   ];
 
-
   const sectionDescriptors: CVResolvedSectionDescriptor[] = sectionDefinitions.map(
     ({ key, render }) => {
       const layout = cvPageSectionLayout[key][layoutMode];
@@ -383,7 +385,6 @@ const CVRouteContent = () => {
       >
         <>
           <CVSectionStack spacing={2.5}>
-            <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} />
             {mobileAboutSection && renderSectionDescriptor(mobileAboutSection)}
             {mobileBodySections.map(renderSectionDescriptor)}
           </CVSectionStack>
@@ -396,9 +397,6 @@ const CVRouteContent = () => {
   return (
     <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
       <>
-        <MotionSection>
-          <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} />
-        </MotionSection>
         <Grid container spacing={3} alignItems="stretch">
           <Grid item xs={12}>
             <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-top-region">

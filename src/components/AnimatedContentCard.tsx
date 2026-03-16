@@ -104,7 +104,14 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
 
     observer.observe(node);
     return () => observer.disconnect();
-  }, [hasTriggered, isVisibilityControlled, rootMargin, skipEntranceAnimation, threshold, triggerOnView]);
+  }, [
+    hasTriggered,
+    isVisibilityControlled,
+    rootMargin,
+    skipEntranceAnimation,
+    threshold,
+    triggerOnView,
+  ]);
 
   useEffect(() => {
     if (skipEntranceAnimation) {
@@ -149,15 +156,15 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
   const content = <ContentCard {...props} />;
 
   return (
-    <Zoom
-      in={isVisible}
-      appear={!skipEntranceAnimation}
-      timeout={ANIMATED_CARD_DURATION_MS}
-      easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
-    >
-      <Box ref={containerRef} sx={[appStyles.animatedCardContainerSx, ...containerSxArray]}>
-        {content}
-      </Box>
-    </Zoom>
+    <Box ref={containerRef} sx={[appStyles.animatedCardContainerSx, ...containerSxArray]}>
+      <Zoom
+        in={isVisible}
+        appear={!skipEntranceAnimation}
+        timeout={ANIMATED_CARD_DURATION_MS}
+        easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
+      >
+        <Box>{content}</Box>
+      </Zoom>
+    </Box>
   );
 };

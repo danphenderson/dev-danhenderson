@@ -71,6 +71,7 @@ const InlineAnimatedSkillsRow = ({
 type CVAboutSectionProps = {
   about: AboutMe;
   actions?: ReactNode;
+  footerControls?: ReactNode;
   currentWorkflowTools?: string[];
   delayMs?: number;
   triggerOnView?: boolean;
@@ -82,6 +83,7 @@ type CVAboutSectionProps = {
 export const CVAboutSection = ({
   about,
   actions,
+  footerControls,
   currentWorkflowTools = [],
   delayMs = 0,
   triggerOnView = true,
@@ -286,6 +288,18 @@ export const CVAboutSection = ({
               />
             )}
           </Stack>
+        )}
+        {footerControls && (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'flex-end',
+              width: '100%',
+              pt: 0.5,
+            }}
+          >
+            {footerControls}
+          </Box>
         )}
       </Stack>
     </CVSectionCard>
