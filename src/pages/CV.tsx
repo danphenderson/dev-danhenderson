@@ -1,6 +1,6 @@
 import { Box, Grid } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme as useMuiTheme } from '@mui/material/styles';
@@ -18,7 +18,7 @@ import { CVExperienceSection } from '../components/cv/CVExperienceSection';
 import { CVSectionNavigator } from '../components/cv/CVSectionNavigator';
 import { CVSectionStack } from '../components/cv/CVSectionStack';
 import { CVStoryHeader } from '../components/cv/CVStoryHeader';
-import { CVStoryChapterHeading } from '../components/cv/CVStoryChapterHeading';
+import { CVStoryViewer } from '../components/cv/CVStoryViewer';
 import { CVGitHubStatusTooltip } from '../components/cv/CVGitHubStatusTooltip';
 import { CVVolunteeringSection } from '../components/cv/CVVolunteeringSection';
 import {
@@ -34,7 +34,6 @@ import {
   codingExamples,
   currentWorkflowTools,
   cvBackgroundImage,
-  cvStoryChapters,
   educationInfo,
   experiences,
   githubSectionLead,
@@ -44,6 +43,7 @@ import {
   resumeDownloadFilename,
   resumePdfUrl,
 } from '../data/cv';
+import { buildCVStoryItems } from '../data/cvStoryItems';
 import { siteRouteMap, cvStoryModeMetadata } from '../constants/siteRoutes';
 import type { CVMode } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
@@ -312,24 +312,6 @@ const CVRouteContent = () => {
     },
   ];
 
-  const sectionDefinitionsByKey = useMemo(() => {
-    const map = new Map<CVSectionKey, CVSectionDefinition>();
-    sectionDefinitions.forEach((def) => map.set(def.key, def));
-    return map;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    aboutRevealKey,
-    activity,
-    contributions,
-    error,
-    hasSettledGithubCalendar,
-    isAboutRevealed,
-    isGithubRevealed,
-    loading,
-    markGithubCalendarSettled,
-    markSectionRevealed,
-    revealedSections,
-  ]);
 
   const sectionDescriptors: CVResolvedSectionDescriptor[] = sectionDefinitions.map(
     ({ key, render }) => {
@@ -370,24 +352,17 @@ const CVRouteContent = () => {
 
   if (isStoryMode) {
     return (
-      <PageFrame image={cvBackgroundImage} maxWidth={900} containerSx={appStyles.cvPageContainerSx}>
-        <Box data-testid="cv-story-layout">
-          <CVSectionStack spacing={3}>
-            <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} />
-            {cvStoryChapters.map((chapter, index) => {
-              const definition = sectionDefinitionsByKey.get(chapter.sectionKey);
-              if (!definition) return null;
-              const node = definition.render({ delayMs: 0, triggerOnView: true });
-              return (
-                <MotionSection key={chapter.key}>
-                  <CVStoryChapterHeading chapter={chapter} index={index} />
-                  <Box sx={{ mt: 2 }}>{node}</Box>
-                </MotionSection>
-              );
-            })}
-          </CVSectionStack>
-        </Box>
-      </PageFrame>
+      <CVStoryViewer
+        items={buildCVStoryItems({
+          about: aboutMe,
+          experiences,
+          education: educationInfo,
+          certificates,
+          volunteering,
+          codingExamples,
+        })}
+        onExit={handleToggleMode}
+      />
     );
   }
 

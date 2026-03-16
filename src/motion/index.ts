@@ -19,6 +19,9 @@ export {
   hoverLift,
   tapShrink,
   hoverZoom,
+  storySlideVariants,
+  slideContentContainer,
+  slideContentItem,
 } from './variants';
 
 export {
