@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Box, Collapse, Tab, Tabs } from '@mui/material';
 import type { ReactNode, SyntheticEvent } from 'react';
+import { cssDuration } from '../motion/tokens';
 import { useComponentStyles } from '../styles/componentStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { InteractiveLabel } from './text';
@@ -286,7 +287,7 @@ export const TabPanel = ({
                 <Box
                   sx={{
                     opacity: isContentVisible ? 1 : 0,
-                    transition: `opacity 180ms ${SPRING_EASING_CSS}`,
+                    transition: `opacity ${cssDuration.quick} ${SPRING_EASING_CSS}`,
                   }}
                 >
                   {item.renderContent(isContentReady, renderContext)}

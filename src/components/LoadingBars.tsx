@@ -1,6 +1,6 @@
-import { keyframes } from '@emotion/react';
 import { LinearProgress, Stack } from '@mui/material';
 import { useAppStyles } from '../styles/appStyles';
+import { loadingPulse } from '../styles/animations';
 import { useComponentStyles } from '../styles/componentStyles';
 
 type LoadingBarsProps = {
@@ -8,18 +8,12 @@ type LoadingBarsProps = {
   compact?: boolean;
 };
 
-const pulse = keyframes`
-  0% { opacity: 0.35; }
-  50% { opacity: 1; }
-  100% { opacity: 0.35; }
-`;
-
 export const LoadingBars = ({ label = 'Loading', compact = false }: LoadingBarsProps) => {
   const appStyles = useAppStyles();
   const { motionTokens } = useComponentStyles();
   const barHeight = compact ? 4 : 6;
   const barSpacing = compact ? 0.75 : 1;
-  const pulseAnimation = `${pulse} ${motionTokens.loadingPulseDurationMs}ms ease-in-out infinite`;
+  const pulseAnimation = `${loadingPulse} ${motionTokens.loadingPulseDurationMs}ms ease-in-out infinite`;
   const bars = [
     { tone: 'primary', delay: 0 },
     { tone: 'secondary', delay: motionTokens.loadingBarStaggerMs },

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { keyframes } from '@emotion/react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Box, Slide } from '@mui/material';
@@ -11,6 +10,7 @@ import { primaryNavigationRoutes } from '../constants/siteRoutes';
 import { useAppTheme } from '../ThemeProvider';
 import { avatar as avatarSrc } from '../data/cv';
 import { useAppStyles } from '../styles/appStyles';
+import { pulseRing } from '../styles/animations';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
@@ -18,20 +18,6 @@ import { HeaderActions } from './header/HeaderActions';
 import { HEADER_HIDE_SCROLL_TRIGGER_OPTIONS } from './header/headerScroll';
 import { HeaderNav } from './header/HeaderNav';
 import { HintPopover } from './header/HintPopover';
-
-const pulseRing = keyframes`
-  0% {
-    transform: scale(0.85);
-    opacity: 0.9;
-  }
-  70% {
-    transform: scale(1.4);
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
-`;
 
 const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
   const trigger = useScrollTrigger(HEADER_HIDE_SCROLL_TRIGGER_OPTIONS);

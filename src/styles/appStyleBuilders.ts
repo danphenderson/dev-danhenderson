@@ -1,4 +1,5 @@
 import { alpha, SxProps, Theme } from '@mui/material/styles';
+import { cssDuration } from '../motion/tokens';
 import { SPRING_EASING_CSS } from './springEasing';
 
 type BackgroundContentAlign = 'flex-start' | 'center' | 'flex-end';
@@ -195,7 +196,7 @@ export const createAppStyleMap = (theme: Theme) => {
       width: '100%',
       height: '100%',
       objectFit: 'cover',
-      transition: `transform 180ms ${SPRING_EASING_CSS}`,
+      transition: `transform ${cssDuration.quick} ${SPRING_EASING_CSS}`,
     },
     '&::after': {
       content: '""',
@@ -207,7 +208,7 @@ export const createAppStyleMap = (theme: Theme) => {
       )} 34%, ${alpha(theme.palette.common.black, 0)} 64%)`,
       opacity: 0,
       pointerEvents: 'none',
-      transition: `opacity 180ms ${SPRING_EASING_CSS}`,
+      transition: `opacity ${cssDuration.quick} ${SPRING_EASING_CSS}`,
     },
     '& .photo-download-action': {
       position: 'absolute',
@@ -216,7 +217,7 @@ export const createAppStyleMap = (theme: Theme) => {
       zIndex: 1,
       opacity: 0,
       transform: 'translateY(-8px)',
-      transition: `opacity 180ms ${SPRING_EASING_CSS}, transform 180ms ${SPRING_EASING_CSS}`,
+      transition: `opacity ${cssDuration.quick} ${SPRING_EASING_CSS}, transform ${cssDuration.quick} ${SPRING_EASING_CSS}`,
     },
     '&:hover img, &:focus-within img': {
       transform: 'scale(1.02)',
@@ -339,7 +340,7 @@ export const createAppStyleMap = (theme: Theme) => {
       color: alpha(theme.palette.common.white, 0.78),
       fontSize: { md: '1.5rem' },
       position: 'relative',
-      transition: `color 180ms ${SPRING_EASING_CSS}`,
+      transition: `color ${cssDuration.quick} ${SPRING_EASING_CSS}`,
       '&:hover': {
         color: theme.palette.common.white,
         backgroundColor: alpha(theme.palette.common.white, 0.08),
@@ -364,7 +365,7 @@ export const createAppStyleMap = (theme: Theme) => {
       display: 'flex',
       alignItems: 'center',
       borderRadius: '50%',
-      transition: `box-shadow 180ms ${SPRING_EASING_CSS}`,
+      transition: `box-shadow ${cssDuration.quick} ${SPRING_EASING_CSS}`,
       '&:hover': {
         boxShadow: `0 0 0 2px ${alpha(theme.palette.common.white, 0.3)}`,
       },
@@ -380,7 +381,7 @@ export const createAppStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     headerIconButtonSx: {
       color: alpha(theme.palette.common.white, 0.82),
-      transition: `color 180ms ${SPRING_EASING_CSS}, background-color 180ms ${SPRING_EASING_CSS}`,
+      transition: `color ${cssDuration.quick} ${SPRING_EASING_CSS}, background-color ${cssDuration.quick} ${SPRING_EASING_CSS}`,
       '&:hover': {
         color: theme.palette.common.white,
         backgroundColor: alpha(theme.palette.common.white, 0.1),

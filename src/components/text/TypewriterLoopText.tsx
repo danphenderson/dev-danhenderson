@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import { keyframes } from '@emotion/react';
 import type { SxProps, Theme } from '@mui/material/styles';
+import { cursorBlink } from '../../styles/animations';
 import { mergeSx } from './textFactory';
 import { useTypewriterLoop } from './useTypewriterLoop';
 import type { TypewriterTimingPreset } from './useTypewriterProgress';
@@ -16,11 +16,6 @@ const sharedTextSx: SxProps<Theme> = {
   textTransform: 'inherit',
   minWidth: 0,
 };
-
-const cursorBlink = keyframes`
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-`;
 
 export interface TypewriterLoopTextProps {
   prefix: string;
