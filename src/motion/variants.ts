@@ -71,3 +71,68 @@ export const hoverZoom = {
   scale: 1.05,
   transition: { duration: duration.normal, ease: easing.smooth },
 } as const;
+
+/* ------------------------------------------------------------------ */
+/*  CV Story slide variants                                           */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Direction-aware slide transition for the CV story viewer.
+ * Pass `custom={direction}` to the motion element (direction: 1=forward, -1=backward).
+ * Uses scale + opacity + rotation for an immersive card-flip feel.
+ */
+export const storySlideVariants: Variants = {
+  enter: (direction: number) => ({
+    opacity: 0,
+    scale: 0.86,
+    rotate: direction * 6,
+    x: direction * 40,
+  }),
+  center: {
+    opacity: 1,
+    scale: 1,
+    rotate: 0,
+    x: 0,
+    transition: {
+      duration: duration.slow,
+      ease: easing.spring,
+    },
+  },
+  exit: (direction: number) => ({
+    opacity: 0,
+    scale: 0.86,
+    rotate: direction * -6,
+    x: direction * -40,
+    transition: {
+      duration: duration.fast,
+      ease: easing.accel,
+    },
+  }),
+};
+
+/**
+ * Slide inner content orchestration — stagger children after the slide enters.
+ * Use on the content wrapper inside each slide (not scroll-triggered).
+ */
+export const slideContentContainer: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: stagger.slow,
+      delayChildren: 0.18,
+    },
+  },
+};
+
+/**
+ * Child item for slide inner stagger — slightly more dramatic than fadeInUp.
+ */
+export const slideContentItem: Variants = {
+  hidden: { opacity: 0, y: 18, scale: 0.97 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: duration.normal, ease: easing.decel },
+  },
+};
