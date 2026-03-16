@@ -162,8 +162,7 @@ describe('useTerminalTypewriter', () => {
     }
 
     // After wrapping, history should be empty since the cycle restarted
-    // (The second line was the last in the array, so completing it clears history)
-    expect(result.current.history.length).toBeLessThan(lines.length);
+    expect(result.current.history).toEqual([]);
   });
 
   it('provides the default prompt text', () => {

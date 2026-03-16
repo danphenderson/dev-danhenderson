@@ -57,12 +57,12 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
 }) => {
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to the bottom when history grows or when typing
+  // Auto-scroll to the bottom when history grows or output appears
   React.useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [history.length, commandText, outputText]);
+  }, [history.length, outputText]);
 
   const isCursorBlinking = phase === 'pause-before-output' || phase === 'pause-after-output';
 

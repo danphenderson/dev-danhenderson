@@ -42,6 +42,11 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
     pauseAfterOutputMs: 2400,
   });
 
+  const historyLineCount = React.useMemo(
+    () => history.reduce((count, line) => count + 1 + line.output.split('\n').length, 0),
+    [history]
+  );
+
   // Notification toast — fires once when the first output completes
   const [toastVisible, setToastVisible] = React.useState(false);
   const hasShownToastRef = React.useRef(false);
@@ -125,10 +130,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
         </Box>
       </Box>
 
-      <VscodeStatusBar commandText={commandText} historyLineCount={history.reduce(
-        (count, line) => count + 1 + line.output.split('\n').length,
-        0
-      )} />
+      <VscodeStatusBar commandText={commandText} historyLineCount={historyLineCount} />
 
       <VscodeNotificationToast
         visible={toastVisible}
