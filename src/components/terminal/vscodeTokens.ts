@@ -51,7 +51,6 @@ export const VSCODE_COLORS = {
 
   // Git diff gutter markers
   gutterAdd: '#28c840',
-  gutterModify: '#e2c08d',
 
   // Minimap
   minimapBg: '#1a1a1a',

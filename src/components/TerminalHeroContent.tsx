@@ -44,13 +44,11 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   const hasShownToastRef = React.useRef(false);
 
   React.useEffect(() => {
-    if (phase === 'pause-after-output' && !hasShownToastRef.current) {
-      hasShownToastRef.current = true;
-      setToastVisible(true);
-      const timerId = window.setTimeout(() => setToastVisible(false), TOAST_DURATION_MS);
-      return () => window.clearTimeout(timerId);
-    }
-    return undefined;
+    if (phase !== 'pause-after-output' || hasShownToastRef.current) return;
+    hasShownToastRef.current = true;
+    setToastVisible(true);
+    const timerId = window.setTimeout(() => setToastVisible(false), TOAST_DURATION_MS);
+    return () => window.clearTimeout(timerId);
   }, [phase]);
 
   const accessibleLabel = lines.map((l) => `${l.command}: ${l.output}`).join('; ');

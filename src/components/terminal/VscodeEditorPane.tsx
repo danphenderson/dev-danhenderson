@@ -194,7 +194,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
               Developer
               <VscodeIntelliSenseTooltip />
             </Box>
-            {' '}{punct('= {')}
+            {punct(' = {')}
           </CodeLine>
           <CodeLine
             lineNumber={3}
