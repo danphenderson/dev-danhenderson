@@ -63,7 +63,6 @@ export const createComponentStyleMap = (theme: Theme) => {
     isLight ? theme.palette.common.white : theme.palette.background.default,
     Math.max(surface.panelSurfaceAlpha - 0.08, 0.18)
   )} 100%)`;
-  const accentTint = alpha(accentColor, surface.accentTintAlpha);
   const supportAccentTint = alpha(supportAccentColor, surface.secondaryTintAlpha);
   const interactiveOutlineColor = alpha(
     accentColor,
@@ -309,10 +308,6 @@ export const createComponentStyleMap = (theme: Theme) => {
     supportAccentColor,
     Math.min(surface.secondaryTintAlpha + 0.02, 0.18)
   )} 24%, ${alpha(supportAccentColor, 0)} 70%)`;
-  const sectionNavigatorActiveShadow = `0 0 0 1px ${alpha(
-    theme.palette.primary.light,
-    isLight ? 0.32 : 0.42
-  )}, 0 0 18px ${alpha(accentColor, scaleGlowAlpha(isLight ? 0.16 : 0.24))}`;
   const hoverShimmerSx =
     motion.tabHoverShimmerMs !== null
       ? {
@@ -494,8 +489,6 @@ export const createComponentStyleMap = (theme: Theme) => {
   return {
     motionTokens,
     contentListStackSpacing,
-    accentColor,
-    accentTint,
     contentCardSx: {
       borderRadius: 3,
       border: `1px solid ${alpha(accentColor, surface.cardBorderAlpha)}`,
@@ -570,25 +563,6 @@ export const createComponentStyleMap = (theme: Theme) => {
           }
         : {}),
     } satisfies SxProps<Theme>,
-    sectionNavigatorRootSx: {
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      alignItems: 'center',
-      columnGap: 1,
-      rowGap: 0.75,
-      width: '100%',
-      minWidth: 0,
-      position: 'relative',
-      borderRadius: 2,
-      border: subtleBorder,
-      backgroundColor: subtleSurface,
-      boxShadow: 'none',
-      backdropFilter: 'none',
-      WebkitBackdropFilter: 'none',
-      px: { xs: 1.25, md: 1.5 },
-      py: 0.875,
-    } satisfies SxProps<Theme>,
     sectionNavigatorLeadSx: {
       color: accentColor,
       display: 'inline-flex',
@@ -598,62 +572,6 @@ export const createComponentStyleMap = (theme: Theme) => {
       whiteSpace: 'nowrap',
       lineHeight: 1,
       textTransform: 'none',
-    } satisfies SxProps<Theme>,
-    sectionNavigatorRailSx: {
-      display: 'flex',
-      flexWrap: 'wrap',
-      gap: 0.5,
-      alignItems: 'center',
-      minWidth: 0,
-      flex: '1 1 0',
-    } satisfies SxProps<Theme>,
-    sectionNavigatorChipSx: {
-      ...sharedPillChipSx,
-      ...interactiveSurfaceSx,
-      ...hoverShimmerSx,
-      minHeight: 30,
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      borderRadius: 999,
-      cursor: 'pointer',
-      appearance: 'none',
-      px: 1.125,
-      py: 0,
-      borderColor: alpha(accentColor, isLight ? 0.14 : 0.26),
-      backgroundColor: alpha(accentColor, isLight ? 0.035 : 0.12),
-      boxShadow: 'none',
-      overflow: 'hidden',
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        inset: -1,
-        borderRadius: 'inherit',
-        boxShadow: glowShadow,
-        opacity: 0,
-        transition: `opacity 0.2s ${SPRING_EASING_CSS}`,
-        pointerEvents: 'none',
-      },
-      '& > span': {
-        whiteSpace: 'nowrap',
-      },
-      '&[aria-pressed="true"]': {
-        backgroundColor: selectedTabSurface,
-        borderColor: alpha(theme.palette.primary.light, isLight ? 0.26 : 0.38),
-        boxShadow: sectionNavigatorActiveShadow,
-        '&::before': {
-          opacity: isLight ? 0.3 : 0.38,
-        },
-      },
-      '&:hover': {
-        backgroundColor: alpha(accentColor, isLight ? 0.1 : 0.16),
-        borderColor: alpha(accentColor, isLight ? 0.36 : 0.52),
-        boxShadow: interactiveSurfaceHoverShadow,
-      },
-      '&.Mui-focusVisible': {
-        outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
-        outlineOffset: 2,
-      },
     } satisfies SxProps<Theme>,
     overlineSx: {
       color: accentColor,
@@ -692,8 +610,6 @@ export const createComponentStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     sectionHeadingSubtitleTextSx: sectionHeadingSubtitleTextSx satisfies SxProps<Theme>,
     sectionHeadingCompactSx: { mb: 0 } satisfies SxProps<Theme>,
-    subtleBorder,
-    subtleSurface,
     sectionPanelSx: {
       borderRadius: 1.5,
       border: subtleBorder,
@@ -702,14 +618,8 @@ export const createComponentStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     cardResetSx: cardResetSx satisfies SxProps<Theme>,
     compactSidebarSectionSpacing,
-    chipWrapperSx: {
-      width: '100%',
-      ...cardResetSx,
-    } satisfies SxProps<Theme>,
     wrapItemContainerSx: { width: 'auto' } satisfies SxProps<Theme>,
-    fullWidthSx: { width: '100%' } satisfies SxProps<Theme>,
     minWidthResetSx: { minWidth: 0 } satisfies SxProps<Theme>,
-    interactiveAccentTextSx,
     interactiveSurfaceSx: interactiveSurfaceSx satisfies SxProps<Theme>,
     supportAccentInteractiveSurfaceSx,
     getSectionDelayMs,
@@ -857,7 +767,6 @@ export const createComponentStyleMap = (theme: Theme) => {
     contributionCardMetaRowSx: {
       flexShrink: 0,
     } satisfies SxProps<Theme>,
-    contributionCardInsetSx: { p: { xs: 1.5, md: 2 } } satisfies SxProps<Theme>,
     githubCalendarContainerSx: {
       mt: 0.5,
       borderRadius: 1.5,
