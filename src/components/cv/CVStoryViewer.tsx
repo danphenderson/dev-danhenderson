@@ -85,7 +85,7 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
         <Box sx={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
           {/* Exit button — top right */}
           <motion.div
-            style={{ position: 'absolute', top: 16, right: 16, zIndex: 1 }}
+            style={{ position: 'absolute', top: 16, right: 16, zIndex: 2 }}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: duration.fast, delay: 0.2 }}
@@ -109,7 +109,8 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
                 left: 0,
                 right: 0,
                 textAlign: 'center',
-                zIndex: 1,
+                zIndex: 2,
+                pointerEvents: 'none',
               }}
             >
               <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: 3 }}>
