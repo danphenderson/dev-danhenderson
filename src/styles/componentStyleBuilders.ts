@@ -1,10 +1,5 @@
 import { alpha, SxProps, Theme } from '@mui/material/styles';
-import {
-  ambientPulse,
-  backgroundSweep,
-  breathe,
-  shimmerSweep,
-} from './animations';
+import { ambientPulse, backgroundSweep, breathe, shimmerSweep } from './animations';
 import { SPRING_EASING_CSS } from './springEasing';
 import { cssDuration } from '../motion/tokens';
 
@@ -22,6 +17,7 @@ export const createComponentStyleMap = (theme: Theme) => {
   } as const;
   const contentListStackSpacing = 2.25;
   const compactSidebarSectionSpacing = 0;
+  const cvSectionItemSpacing = 2;
   const accentColor = theme.palette.primary.main;
   const supportAccentColor = theme.palette.secondary.main;
   const supportAccentLight = theme.palette.secondary.light;
@@ -155,8 +151,7 @@ export const createComponentStyleMap = (theme: Theme) => {
     fontFamily: theme.typography.fontFamily,
     ...interactiveAccentTextSx,
     textTransform: 'none',
-    transition:
-      `color ${cssDuration.fast} ${SPRING_EASING_CSS}, background-color ${cssDuration.fast} ${SPRING_EASING_CSS}, border-color ${cssDuration.fast} ${SPRING_EASING_CSS}, box-shadow ${cssDuration.fast} ${SPRING_EASING_CSS}`,
+    transition: `color ${cssDuration.fast} ${SPRING_EASING_CSS}, background-color ${cssDuration.fast} ${SPRING_EASING_CSS}, border-color ${cssDuration.fast} ${SPRING_EASING_CSS}, box-shadow ${cssDuration.fast} ${SPRING_EASING_CSS}`,
     '&:hover': {
       backgroundColor: alpha(
         accentColor,
@@ -179,8 +174,7 @@ export const createComponentStyleMap = (theme: Theme) => {
       supportAccentColor,
       Math.max(surface.secondaryTintAlpha - 0.04, isLight ? 0.06 : 0.12)
     ),
-    transition:
-      `color ${cssDuration.fast} ${SPRING_EASING_CSS}, background-color ${cssDuration.fast} ${SPRING_EASING_CSS}, border-color ${cssDuration.fast} ${SPRING_EASING_CSS}, box-shadow ${cssDuration.fast} ${SPRING_EASING_CSS}`,
+    transition: `color ${cssDuration.fast} ${SPRING_EASING_CSS}, background-color ${cssDuration.fast} ${SPRING_EASING_CSS}, border-color ${cssDuration.fast} ${SPRING_EASING_CSS}, box-shadow ${cssDuration.fast} ${SPRING_EASING_CSS}`,
     '&:hover': {
       backgroundColor: alpha(
         supportAccentColor,
@@ -619,6 +613,7 @@ export const createComponentStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     cardResetSx: cardResetSx satisfies SxProps<Theme>,
     compactSidebarSectionSpacing,
+    cvSectionItemSpacing,
     wrapItemContainerSx: { width: 'auto' } satisfies SxProps<Theme>,
     minWidthResetSx: { minWidth: 0 } satisfies SxProps<Theme>,
     interactiveSurfaceSx: interactiveSurfaceSx satisfies SxProps<Theme>,

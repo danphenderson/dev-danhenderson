@@ -32,10 +32,11 @@ export const ProfileCard = ({
     profileAvatarSx,
     profileBioSx,
     profileNameRowSx,
+    cvSectionItemSpacing,
   } = useComponentStyles();
 
   return (
-    <Stack spacing={1.5} alignItems="flex-start">
+    <Stack spacing={cvSectionItemSpacing} alignItems="flex-start">
       {avatarSrc && <Avatar src={avatarSrc} alt={about.name} sx={profileAvatarSx} />}
       <Box sx={profileHeaderRowSx}>
         <Stack spacing={0.75} sx={profileHeaderContentSx}>

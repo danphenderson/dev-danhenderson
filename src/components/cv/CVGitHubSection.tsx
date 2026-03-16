@@ -1,4 +1,5 @@
-import { Stack } from '@mui/material';
+import type { ReactNode } from 'react';
+import { Box, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { GitHubActivityItem, GitHubContribution } from '../../types/cv';
 import { githubUsername } from '../../data/cv';
@@ -26,6 +27,7 @@ type CVGitHubSectionProps = {
   nestedDelayOffsetMs?: number;
   itemOffsetMs?: number;
   lead?: string;
+  statusIndicator?: ReactNode;
   overlineSx?: SxProps<Theme>;
   sectionId?: string;
 };
@@ -43,6 +45,7 @@ export const CVGitHubSection = ({
   nestedDelayOffsetMs = 0,
   itemOffsetMs,
   lead,
+  statusIndicator,
   overlineSx,
   sectionId,
 }: CVGitHubSectionProps) => {
@@ -91,7 +94,18 @@ export const CVGitHubSection = ({
       sx={cvSectionAnchorSx}
     >
       <Stack spacing={compactSidebarSectionSpacing}>
-        <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 1,
+            flexWrap: 'wrap',
+          }}
+        >
+          <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
+          {statusIndicator}
+        </Box>
         {lead && <SectionLeadText>{lead}</SectionLeadText>}
         <SectionCard
           delayMs={githubActivityDelayMs}

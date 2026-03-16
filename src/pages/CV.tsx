@@ -269,6 +269,7 @@ const CVRouteContent = () => {
           contributions={contributions}
           loading={loading}
           error={error}
+          statusIndicator={githubStatusTooltip}
           revealed={isGithubRevealed}
           onReveal={() => markSectionRevealed('github')}
           calendarSettled={hasSettledGithubCalendar}
@@ -372,11 +373,7 @@ const CVRouteContent = () => {
       <PageFrame image={cvBackgroundImage} maxWidth={900} containerSx={appStyles.cvPageContainerSx}>
         <Box data-testid="cv-story-layout">
           <CVSectionStack spacing={3}>
-            <CVStoryHeader
-              mode={cvMode}
-              onToggleMode={handleToggleMode}
-              statusIndicator={githubStatusTooltip}
-            />
+            <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} />
             {cvStoryChapters.map((chapter, index) => {
               const definition = sectionDefinitionsByKey.get(chapter.sectionKey);
               if (!definition) return null;
@@ -411,11 +408,7 @@ const CVRouteContent = () => {
       >
         <>
           <CVSectionStack spacing={2.5}>
-            <CVStoryHeader
-              mode={cvMode}
-              onToggleMode={handleToggleMode}
-              statusIndicator={githubStatusTooltip}
-            />
+            <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} />
             {mobileAboutSection && renderSectionDescriptor(mobileAboutSection)}
             {mobileBodySections.map(renderSectionDescriptor)}
           </CVSectionStack>
@@ -429,11 +422,7 @@ const CVRouteContent = () => {
     <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
       <>
         <MotionSection>
-          <CVStoryHeader
-            mode={cvMode}
-            onToggleMode={handleToggleMode}
-            statusIndicator={githubStatusTooltip}
-          />
+          <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} />
         </MotionSection>
         <Grid container spacing={3} alignItems="stretch">
           <Grid item xs={12}>

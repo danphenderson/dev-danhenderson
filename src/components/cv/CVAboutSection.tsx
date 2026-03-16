@@ -94,6 +94,7 @@ export const CVAboutSection = ({
     motionTokens,
     sectionHeadingCompactSx,
     supportAccentTitleSx,
+    cvSectionItemSpacing,
   } = useComponentStyles();
   const bioAnimationStartDelayMs = delayMs + ANIMATED_CARD_DURATION_MS;
   const trimmedBio = about.bio.trim();
@@ -245,7 +246,7 @@ export const CVAboutSection = ({
       id={sectionId}
       sx={cvSectionAnchorSx}
     >
-      <Stack spacing={compactSidebarSectionSpacing}>
+      <Stack spacing={cvSectionItemSpacing}>
         <Stack spacing={compactSidebarSectionSpacing}>
           <SectionHeading overline="About" sx={sectionHeadingCompactSx} />
           <ProfileCard
@@ -257,33 +258,33 @@ export const CVAboutSection = ({
           />
         </Stack>
         {(opportunities.length > 0 || workflowTools.length > 0) && (
-          <Stack spacing={1} sx={{ pt: 1 }}>
+          <Stack spacing={cvSectionItemSpacing}>
             {opportunities.length > 0 && (
-                <InlineAnimatedSkillsRow
-                  heading={OPPORTUNITIES_HEADING}
-                  headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
-                  playing={playOpportunitiesHeading}
-                  revealed={revealed}
-                  visible={isOpportunitiesSectionVisible}
-                  onHeadingComplete={handleOpportunitiesHeadingComplete}
-                  skills={opportunities}
-                  showSkills={shouldShowOpportunities}
-                  titleSx={supportAccentTitleSx}
-                />
-              )}
+              <InlineAnimatedSkillsRow
+                heading={OPPORTUNITIES_HEADING}
+                headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
+                playing={playOpportunitiesHeading}
+                revealed={revealed}
+                visible={isOpportunitiesSectionVisible}
+                onHeadingComplete={handleOpportunitiesHeadingComplete}
+                skills={opportunities}
+                showSkills={shouldShowOpportunities}
+                titleSx={supportAccentTitleSx}
+              />
+            )}
             {workflowTools.length > 0 && (
-                <InlineAnimatedSkillsRow
-                  heading={WORKFLOW_HEADING}
-                  headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
-                  playing={playWorkflowHeading}
-                  revealed={revealed}
-                  visible={isWorkflowSectionVisible}
-                  onHeadingComplete={handleWorkflowHeadingComplete}
-                  skills={workflowTools}
-                  showSkills={shouldShowWorkflowTools}
-                  titleSx={supportAccentTitleSx}
-                />
-              )}
+              <InlineAnimatedSkillsRow
+                heading={WORKFLOW_HEADING}
+                headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
+                playing={playWorkflowHeading}
+                revealed={revealed}
+                visible={isWorkflowSectionVisible}
+                onHeadingComplete={handleWorkflowHeadingComplete}
+                skills={workflowTools}
+                showSkills={shouldShowWorkflowTools}
+                titleSx={supportAccentTitleSx}
+              />
+            )}
           </Stack>
         )}
       </Stack>
