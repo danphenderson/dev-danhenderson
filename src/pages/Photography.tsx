@@ -12,7 +12,7 @@ import { fallbackBackgroundImage } from '../data/photography';
 import { SecondaryBodyText } from '../components/text';
 import { AlbumCard } from '../components/photography/AlbumCard';
 import { TiltCard } from '../components/photography/TiltCard';
-import { MotionSection, MotionItem, scaleIn, staggerContainer } from '../motion';
+import { MotionSection, MotionItem, StaggerChildren, scaleIn } from '../motion';
 
 export default function Photography() {
   const appStyles = useAppStyles();
@@ -76,17 +76,22 @@ export default function Photography() {
           </MotionSection>
         )}
 
-        <Box sx={appStyles.photographyGridSx}>
-          <MotionSection variants={staggerContainer} style={{ display: 'contents' }}>
-            {supportingCategories.map((card) => (
-              <MotionItem key={card.slug} variants={scaleIn} style={{ minWidth: 0 }}>
-                <TiltCard style={{ height: '100%' }}>
-                  <AlbumCard category={card} variant="grid" onImageReady={handleImageReady} />
-                </TiltCard>
-              </MotionItem>
-            ))}
-          </MotionSection>
-        </Box>
+        <StaggerChildren
+          style={{
+            display: 'grid',
+            gap: '20px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            alignItems: 'stretch',
+          }}
+        >
+          {supportingCategories.map((card) => (
+            <MotionItem key={card.slug} variants={scaleIn} style={{ minWidth: 0 }}>
+              <TiltCard style={{ height: '100%' }}>
+                <AlbumCard category={card} variant="grid" onImageReady={handleImageReady} />
+              </TiltCard>
+            </MotionItem>
+          ))}
+        </StaggerChildren>
       </Stack>
     </PageFrame>
   );
