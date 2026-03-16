@@ -145,6 +145,27 @@ describe('useTerminalTypewriter', () => {
     expect(observedPhases).not.toContain('deleting-command');
   });
 
+  it('clears history when the cycle wraps around to the first line', () => {
+    const { result } = renderHook(() =>
+      useTerminalTypewriter({
+        lines,
+        playing: true,
+        typingBaseMs: 10,
+        pauseBeforeOutputMs: 100,
+        pauseAfterOutputMs: 100,
+      })
+    );
+
+    // Advance through enough time to complete both lines and wrap
+    for (let i = 0; i < 60; i++) {
+      act(() => { jest.advanceTimersByTime(300); });
+    }
+
+    // After wrapping, history should be empty since the cycle restarted
+    // (The second line was the last in the array, so completing it clears history)
+    expect(result.current.history.length).toBeLessThan(lines.length);
+  });
+
   it('provides the default prompt text', () => {
     const { result } = renderHook(() =>
       useTerminalTypewriter({ lines, playing: true })

@@ -113,15 +113,18 @@ export const useTerminalTypewriter = ({
     if (!playing || phase !== 'pause-after-output') return undefined;
 
     const timeoutId = window.setTimeout(() => {
-      // Push the completed command+output into history
-      setHistory((prev) => [...prev, currentLine]);
-      setLineIndex((prev) => prev + 1);
+      const nextIndex = lineIndex + 1;
+      const isWrapping = nextIndex % lines.length === 0;
+
+      // Clear history when the cycle wraps to keep the animation tidy
+      setHistory((prev) => (isWrapping ? [] : [...prev, currentLine]));
+      setLineIndex(nextIndex);
       setCommandCharIndex(0);
       setPhase('typing-command');
     }, pauseAfterOutputMs);
 
     return () => window.clearTimeout(timeoutId);
-  }, [playing, phase, pauseAfterOutputMs, currentLine]);
+  }, [playing, phase, pauseAfterOutputMs, currentLine, lineIndex, lines.length]);
 
   // Compute display text
   const commandText = currentLine.command.slice(0, commandCharIndex);
