@@ -201,8 +201,8 @@ export const createAppStyleMap = (theme: Theme) => {
     },
     '& .photo-download-action': {
       position: 'absolute',
-      top: 1.5,
-      right: 1.5,
+      top: 12,
+      right: 12,
       zIndex: 1,
       opacity: 0,
       transform: 'translateY(-8px)',
