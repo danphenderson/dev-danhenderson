@@ -96,6 +96,8 @@ export const VscodeTabBar: React.FC = () => (
         borderRight: `1px solid ${VSCODE_COLORS.tabBorder}`,
         borderTop: '2px solid transparent',
         flexShrink: 0,
+        '& .close-btn': { opacity: 0 },
+        '&:hover .close-btn': { opacity: 1 },
       }}
     >
       <Box
@@ -112,6 +114,7 @@ export const VscodeTabBar: React.FC = () => (
       </Box>
       <Box
         component="span"
+        className="close-btn"
         sx={{
           fontFamily: monoFontFamily,
           fontSize: '0.7rem',
@@ -119,6 +122,7 @@ export const VscodeTabBar: React.FC = () => (
           userSelect: 'none',
           ml: 0.25,
           lineHeight: 1,
+          transition: 'opacity 0.15s',
         }}
       >
         ×

@@ -1,9 +1,16 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
+import { keyframes } from '@emotion/react';
 import { useTheme } from '@mui/material/styles';
 import { VSCODE_LAYOUT, monoFontFamily } from './vscodeTokens';
 
 const PROMPT_PREFIX = '~ $ ';
+
+const colFlash = keyframes`
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
+`;
 
 interface VscodeStatusBarProps {
   commandText: string;
@@ -58,7 +65,12 @@ export const VscodeStatusBar: React.FC<VscodeStatusBarProps> = ({ commandText })
         }}
       >
         <span>TypeScript</span>
-        <span>Ln 1, Col {col}</span>
+        <span
+          key={col}
+          style={{ animation: `${colFlash} 0.3s ease-out` }}
+        >
+          Ln 1, Col {col}
+        </span>
         <span>UTF-8</span>
         <span>LF</span>
       </Box>
