@@ -5,22 +5,25 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Stack,
   Typography,
 } from '@mui/material';
 import { motion, useScroll, useTransform } from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { HeroMotionPath } from '../components/HeroMotionPath';
+import { TerminalHeroContent } from '../components/TerminalHeroContent';
+import type { TerminalLine } from '../components/text/useTerminalTypewriter';
 import { siteRouteMap } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
-import { DisplayTitle, TypewriterLoopText } from '../components/text';
 
-const heroPrefix = 'Hi, my passion is ';
-const heroPassions = ['mathematics!', 'computers!', 'adventures!'];
+const heroLines: TerminalLine[] = [
+  { command: 'whoami --passions', output: 'mathematics' },
+  { command: 'whoami --passions', output: 'computers' },
+  { command: 'whoami --passions', output: 'adventures' },
+];
 
 export default function Home() {
   const appStyles = useAppStyles();
@@ -54,18 +57,12 @@ export default function Home() {
         )}
       >
       <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
-        <Stack spacing={2} alignItems="center">
-          <DisplayTitle align="center" sx={appStyles.homeHeroTitleSx}>
-            {isHeroAnimationReady ? (
-              <TypewriterLoopText
-                prefix={heroPrefix}
-                words={heroPassions}
-                timingPreset="headline"
-                playing={isTypewriterPlaying}
-              />
-            ) : null}
-          </DisplayTitle>
-        </Stack>
+        {isHeroAnimationReady ? (
+          <TerminalHeroContent
+            lines={heroLines}
+            playing={isTypewriterPlaying}
+          />
+        ) : null}
       </AnimatedContentCard>
 
       <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
