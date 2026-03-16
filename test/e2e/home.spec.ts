@@ -16,11 +16,13 @@ test.describe('Home page', () => {
     await page.keyboard.press('Escape');
     await expect(darkModeHint).toBeHidden();
 
-    // The hero should show the fixed prefix as part of the looping typewriter
-    await expect(page.getByText(/Hi, my passion is/)).toBeVisible();
+    // The terminal hero shell should be visible with the typed content
+    const terminalHero = page.getByTestId('terminal-hero');
+    await expect(terminalHero).toBeVisible();
 
-    // At least one passion word should appear as the typewriter loops
-    await expect(page.getByText(/mathematics!|computers!|adventures!/)).toBeVisible({
+    // The terminal should type the command and eventually show an output
+    await expect(terminalHero).toContainText(/whoami --passions/, { timeout: 15000 });
+    await expect(terminalHero).toContainText(/mathematics|computers|adventures/, {
       timeout: 15000,
     });
   });
