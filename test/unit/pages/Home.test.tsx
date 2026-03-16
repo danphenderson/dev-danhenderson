@@ -2,7 +2,10 @@ import * as React from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ThemeProvider from '../../../src/ThemeProvider';
 import Home from '../../../src/pages/Home';
-import { WelcomeOnboardingProvider, useWelcomeOnboarding } from '../../../src/WelcomeOnboardingProvider';
+import {
+  WelcomeOnboardingProvider,
+  useWelcomeOnboarding,
+} from '../../../src/WelcomeOnboardingProvider';
 
 type MockWelcomeAudioState = {
   play: () => Promise<void>;
@@ -50,9 +53,13 @@ jest.mock('../../../src/components/TerminalHeroContent', () => ({
     <div
       data-testid="terminal-hero"
       data-playing={String(Boolean(playing))}
-      data-lines={lines.map((l: { command: string; output: string }) => `${l.command}:${l.output}`).join(',')}
+      data-lines={lines
+        .map((l: { command: string; output: string }) => `${l.command}:${l.output}`)
+        .join(',')}
     >
-      {lines.map((l: { command: string; output: string }) => `${l.command} → ${l.output}`).join('; ')}
+      {lines
+        .map((l: { command: string; output: string }) => `${l.command} → ${l.output}`)
+        .join('; ')}
     </div>
   ),
 }));
@@ -238,7 +245,7 @@ describe('Home welcome flow', () => {
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'false');
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute(
       'data-lines',
-      'whoami --passions:mathematics,whoami --passions:computers,whoami --passions:adventures'
+      'node --version:v22.14.0,git log --oneline -1:9ab2238 polish: terminal UI chrome,npm run build:\u2713 Compiled successfully in 2.4s,whoami --passions:mathematics \u00b7 computers \u00b7 adventures'
     );
 
     fireEvent.click(screen.getByTestId('complete-hero-motion'));
@@ -273,7 +280,7 @@ describe('Home welcome flow', () => {
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'false');
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute(
       'data-lines',
-      'whoami --passions:mathematics,whoami --passions:computers,whoami --passions:adventures'
+      'node --version:v22.14.0,git log --oneline -1:9ab2238 polish: terminal UI chrome,npm run build:\u2713 Compiled successfully in 2.4s,whoami --passions:mathematics \u00b7 computers \u00b7 adventures'
     );
 
     fireEvent.click(screen.getByTestId('complete-hero-motion'));
@@ -301,7 +308,7 @@ describe('Home welcome flow', () => {
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'false');
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute(
       'data-lines',
-      'whoami --passions:mathematics,whoami --passions:computers,whoami --passions:adventures'
+      'node --version:v22.14.0,git log --oneline -1:9ab2238 polish: terminal UI chrome,npm run build:\u2713 Compiled successfully in 2.4s,whoami --passions:mathematics \u00b7 computers \u00b7 adventures'
     );
 
     fireEvent.click(screen.getByTestId('complete-hero-motion'));

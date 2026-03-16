@@ -194,3 +194,4 @@ e2e-results/
 playwright-report/
 blob-report/
 test-results/
+.playwright-mcp/

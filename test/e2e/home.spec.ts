@@ -20,11 +20,15 @@ test.describe('Home page', () => {
     const terminalHero = page.getByTestId('terminal-hero');
     await expect(terminalHero).toBeVisible();
 
-    // The terminal should type the command and eventually show an output
-    await expect(terminalHero).toContainText(/whoami --passions/, { timeout: 15000 });
-    await expect(terminalHero).toContainText(/mathematics|computers|adventures/, {
-      timeout: 15000,
-    });
+    // The terminal should type one of the commands and eventually show output
+    await expect(terminalHero).toContainText(
+      /node --version|git log|npm run build|whoami --passions/,
+      { timeout: 15000 }
+    );
+    await expect(terminalHero).toContainText(
+      /v22\.14\.0|9ab2238|Compiled successfully|mathematics/,
+      { timeout: 15000 }
+    );
   });
 
   test('welcome audio prompt can be dismissed', async ({ page }) => {

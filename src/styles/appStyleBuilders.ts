@@ -14,13 +14,10 @@ export const createAppStyleMap = (theme: Theme) => {
   );
   const shellBackgroundColor = alpha(theme.palette.background.paper, surface.panelSurfaceAlpha);
   const shellBorder = `1px solid ${alpha(theme.palette.divider, surface.panelBorderAlpha)}`;
-  const homeHeroShellBackgroundColor = alpha(
-    theme.palette.common.black,
-    isLight ? 0.82 : 0.88
-  );
+  const homeHeroShellBackgroundColor = alpha(theme.palette.common.black, isLight ? 0.82 : 0.88);
   const homeHeroShellInnerBorder = `1px solid ${alpha(
     theme.palette.common.white,
-    isLight ? 0.10 : 0.08
+    isLight ? 0.1 : 0.08
   )}`;
   const homeHeroShellBlurPx = Math.max(surface.cardBlurPx + 4, 16);
   const homeHeroShellShadow = `0 18px 40px ${alpha(
@@ -273,15 +270,15 @@ export const createAppStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     homeHeroContentSx: { pb: 24.25 } satisfies SxProps<Theme>,
     homeHeroShellSx: {
-      p: 1.5,
-      pb: 1,
+      p: 0,
       backgroundColor: homeHeroShellBackgroundColor,
       backgroundImage: 'none',
       border: homeHeroShellInnerBorder,
       boxShadow: homeHeroShellShadow,
       backdropFilter: `blur(${homeHeroShellBlurPx}px)`,
       WebkitBackdropFilter: `blur(${homeHeroShellBlurPx}px)`,
-      borderRadius: 2,
+      borderRadius: 1,
+      overflow: 'hidden',
     } satisfies SxProps<Theme>,
     homeHeroTitleSx: {
       color: theme.palette.common.white,

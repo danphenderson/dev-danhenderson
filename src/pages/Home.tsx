@@ -20,9 +20,10 @@ import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
 
 const heroLines: TerminalLine[] = [
-  { command: 'whoami --passions', output: 'mathematics' },
-  { command: 'whoami --passions', output: 'computers' },
-  { command: 'whoami --passions', output: 'adventures' },
+  { command: 'node --version', output: 'v22.14.0' },
+  { command: 'git log --oneline -1', output: '9ab2238 polish: terminal UI chrome' },
+  { command: 'npm run build', output: '✓ Compiled successfully in 2.4s' },
+  { command: 'whoami --passions', output: 'mathematics · computers · adventures' },
 ];
 
 export default function Home() {
@@ -56,43 +57,40 @@ export default function Home() {
           </HeroMotionPath>
         )}
       >
-      <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
-        {isHeroAnimationReady ? (
-          <TerminalHeroContent
-            lines={heroLines}
-            playing={isTypewriterPlaying}
-          />
-        ) : null}
-      </AnimatedContentCard>
+        <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
+          {isHeroAnimationReady ? (
+            <TerminalHeroContent lines={heroLines} playing={isTypewriterPlaying} />
+          ) : null}
+        </AnimatedContentCard>
 
-      <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
-        <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
-        <DialogContent>
-          <Typography variant="body1">
-            Would you like to hear a short verse while browsing the site? Use the pause button in
-            the header to stop it anytime.
-          </Typography>
-          {error && (
-            <Typography variant="caption" color="error">
-              {error}
+        <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
+          <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
+          <DialogContent>
+            <Typography variant="body1">
+              Would you like to hear a short verse while browsing the site? Use the pause button in
+              the header to stop it anytime.
             </Typography>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleOptOut} autoFocus>
-            No thanks
-          </Button>
-          <Button
-            onClick={handlePlay}
-            variant="contained"
-            disabled={isLoading}
-            aria-label="Play welcome audio"
-          >
-            {isLoading ? 'Loading…' : 'Play audio'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </BackgroundPaper>
+            {error && (
+              <Typography variant="caption" color="error">
+                {error}
+              </Typography>
+            )}
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleOptOut} autoFocus>
+              No thanks
+            </Button>
+            <Button
+              onClick={handlePlay}
+              variant="contained"
+              disabled={isLoading}
+              aria-label="Play welcome audio"
+            >
+              {isLoading ? 'Loading…' : 'Play audio'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </BackgroundPaper>
     </motion.div>
   );
 }
