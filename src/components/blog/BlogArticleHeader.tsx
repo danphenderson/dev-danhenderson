@@ -1,4 +1,5 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
+import { BlogHeroImage } from './BlogHeroImage';
 import { BlogMetaChips } from './BlogMetaChips';
 import { MotionSection } from '../../motion';
 import type { BlogPost } from '../../types/blog';
@@ -12,36 +13,14 @@ export function BlogArticleHeader({ post }: BlogArticleHeaderProps) {
     <MotionSection>
       <Stack spacing={2}>
         {post.heroImage && (
-          <Box
-            sx={{
-              position: 'relative',
-              width: '100%',
-              height: { xs: 200, sm: 280, md: 380 },
-              borderRadius: 3,
-              overflow: 'hidden',
-            }}
-          >
-            <Box
-              component="img"
-              src={post.heroImage}
-              alt={post.heroImageAlt ?? ''}
-              loading="eager"
-              sx={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                display: 'block',
-              }}
-            />
-            <Box
-              sx={{
-                position: 'absolute',
-                inset: 0,
-                background: (theme) =>
-                  `linear-gradient(to top, ${theme.palette.background.default}cc 0%, transparent 50%)`,
-              }}
-            />
-          </Box>
+          <BlogHeroImage
+            src={post.heroImage}
+            alt={post.heroImageAlt}
+            height={{ xs: 200, sm: 280, md: 380 }}
+            borderRadius={3}
+            overlayOpacity={0.8}
+            overlayFadeStop="50%"
+          />
         )}
 
         <Stack

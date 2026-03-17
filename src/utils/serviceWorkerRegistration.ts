@@ -56,7 +56,7 @@ function checkValidServiceWorker(swUrl: string, config?: ServiceWorkerConfig) {
       }
     })
     .catch(() => {
-      console.log('No internet connection found. App is running in offline mode.');
+      // Offline — service worker serves cached assets
     });
 }
 

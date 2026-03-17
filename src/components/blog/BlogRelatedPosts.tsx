@@ -1,7 +1,7 @@
 import { Link as RouterLink } from 'react-router-dom';
 import { Box, Stack, Typography } from '@mui/material';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { MotionSection, StaggerChildren, MotionItem } from '../../motion';
+import { MotionSection, StaggerChildren, MotionItem, cssDuration } from '../../motion';
 import type { BlogPostMeta } from '../../types/blog';
 import { BlogMetaChips } from './BlogMetaChips';
 
@@ -40,7 +40,7 @@ export function BlogRelatedPosts({ posts }: BlogRelatedPostsProps) {
                     display: 'block',
                     textDecoration: 'none',
                     p: 2.5,
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                    transition: `transform ${cssDuration.fast} ease, box-shadow ${cssDuration.fast} ease`,
                     '&:hover': {
                       transform: 'translateY(-2px)',
                       boxShadow: 4,

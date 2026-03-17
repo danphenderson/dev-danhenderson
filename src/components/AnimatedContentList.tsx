@@ -2,10 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Box, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
-import {
-  DEFAULT_INTERSECTION_ROOT_MARGIN,
-  DEFAULT_INTERSECTION_THRESHOLD,
-} from '../constants/animation';
+import { DEFAULT_INTERSECTION_ROOT_MARGIN, DEFAULT_INTERSECTION_THRESHOLD } from '../motion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { normalizeSxProp } from '../utils/sx';
 import { AnimatedContentCard } from './AnimatedContentCard';
