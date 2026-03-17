@@ -1,35 +1,18 @@
 import { useMemo } from 'react';
 import { ticks as tickData, todos as todoData } from '../data/climbs';
-import type { SharedDataStatus, Tick, Todo } from '../types/data';
+import type {
+  ClimbingAnalytics,
+  GradeBucket,
+  LocationCount,
+  SharedDataStatus,
+  Tick,
+  TickRow,
+  Todo,
+  TodoRow,
+} from '../types/data';
 import { formatIsoDateAsUtcCalendar, getIsoDateUtcTimestamp } from '../utils/date';
 
-export type TickRow = Tick & { id: string };
-export type TodoRow = Todo & { id: string };
-
-export type GradeBucket = {
-  bucket: string;
-  tickCount: number;
-  todoCount: number;
-};
-
-export type LocationCount = {
-  location: string;
-  count: number;
-};
-
-export type ClimbingAnalytics = {
-  overview: {
-    tickCount: number;
-    todoCount: number;
-    uniqueLocations: number;
-    mostRecentDate: string;
-  };
-  gradeProfile: GradeBucket[];
-  destinationProfile: {
-    topTickLocations: LocationCount[];
-    topTodoLocations: LocationCount[];
-  };
-};
+export type { ClimbingAnalytics, GradeBucket, LocationCount, TickRow, TodoRow };
 
 const GRADE_ORDER = [
   '5.6',

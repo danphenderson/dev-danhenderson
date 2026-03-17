@@ -2,7 +2,7 @@ import { Box, Chip, Stack, Typography } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { SectionPanel } from '../layout/SectionPanel';
 import { SubsectionTitle, MetaText, CaptionText } from '../text';
-import type { ClimbingAnalytics as ClimbingAnalyticsType } from '../../hooks/useClimbingData';
+import type { ClimbingAnalytics as ClimbingAnalyticsType } from '../../types/data';
 import type { SharedDataStatus } from '../../types/data';
 
 type ClimbingAnalyticsProps = {

@@ -9,19 +9,9 @@ import type { SpeedDialActionProps } from '@mui/material/SpeedDialAction';
 import type { SpeedDialProps } from '@mui/material/SpeedDial';
 import { Link } from 'react-router-dom';
 import { InteractiveLabel } from './text';
+import type { AppSpeedDialAction, AppSpeedDialLayer } from '../types/ui';
 
-export type AppSpeedDialLayer = 'content' | 'header';
-
-export type AppSpeedDialAction = {
-  id: string;
-  label: string;
-  icon: ReactNode;
-  to?: string;
-  href?: string;
-  download?: string | boolean;
-  external?: boolean;
-  onClick?: (event: ReactMouseEvent<HTMLElement>) => void;
-};
+export type { AppSpeedDialAction, AppSpeedDialLayer };
 
 type AppSpeedDialProps = {
   ariaLabel: string;

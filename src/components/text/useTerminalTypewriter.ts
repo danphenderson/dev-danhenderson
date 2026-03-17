@@ -1,9 +1,9 @@
 import * as React from 'react';
-import {
-  getTypewriterDelay,
-  resolveTypewriterTimingProfile,
-} from './useTypewriterProgress';
+import { getTypewriterDelay, resolveTypewriterTimingProfile } from './useTypewriterProgress';
 import type { TypewriterTimingPreset } from './useTypewriterProgress';
+import type { TerminalLine } from '../../types/ui';
+
+export type { TerminalLine };
 
 export type TerminalTypewriterPhase =
   | 'idle'
@@ -11,11 +11,6 @@ export type TerminalTypewriterPhase =
   | 'pause-before-output'
   | 'showing-output'
   | 'pause-after-output';
-
-export interface TerminalLine {
-  command: string;
-  output: string;
-}
 
 interface UseTerminalTypewriterOptions {
   lines: TerminalLine[];
@@ -82,9 +77,12 @@ export const useTerminalTypewriter = ({
       return undefined;
     }
 
-    const timeoutId = window.setTimeout(() => {
-      setCommandCharIndex((prev) => Math.min(prev + 1, currentLine.command.length));
-    }, getTypewriterDelay(currentLine.command, commandCharIndex, resolvedTimingProfile));
+    const timeoutId = window.setTimeout(
+      () => {
+        setCommandCharIndex((prev) => Math.min(prev + 1, currentLine.command.length));
+      },
+      getTypewriterDelay(currentLine.command, commandCharIndex, resolvedTimingProfile)
+    );
 
     return () => window.clearTimeout(timeoutId);
   }, [playing, phase, commandCharIndex, currentLine.command, resolvedTimingProfile]);

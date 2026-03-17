@@ -5,8 +5,14 @@ import {
   fallbackGitHubContributions,
   githubUsername,
 } from '../data/cv';
-import type { SharedDataSourceDetail, SharedDataStatus, SharedDataStatusReason } from '../types/data';
-import type { GitHubActivityItem, GitHubContribution } from '../types/cv';
+import type {
+  SharedDataSourceDetail,
+  SharedDataStatus,
+  SharedDataStatusReason,
+} from '../types/data';
+import type { GitHubActivityItem, GitHubContribution, GitHubProfileData } from '../types/cv';
+
+export type { GitHubProfileData };
 
 type GitHubEvent = {
   id: string;
@@ -36,13 +42,6 @@ type GitHubRepo = {
 
 type GitHubSearchIssues = {
   items: { repository_url: string }[];
-};
-
-export type GitHubProfileData = {
-  activity: GitHubActivityItem[];
-  contributions: GitHubContribution[];
-  encounteredError: boolean;
-  status: SharedDataStatus;
 };
 
 const CACHE_TTL_MS = 5 * 60 * 1000;
@@ -91,9 +90,7 @@ const createGitHubStatus = ({
     label,
     lastUpdated,
     staleAfterMs: CACHE_TTL_MS,
-    isStale: lastUpdated
-      ? Date.now() - new Date(lastUpdated).getTime() > CACHE_TTL_MS
-      : false,
+    isStale: lastUpdated ? Date.now() - new Date(lastUpdated).getTime() > CACHE_TTL_MS : false,
   },
   ...(sourceDetail ? { sourceDetail } : {}),
 });

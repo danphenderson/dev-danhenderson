@@ -8,7 +8,8 @@ import { SectionCard } from '../components/layout/SectionCard';
 import { ClimbingAnalytics } from '../components/climbing/ClimbingAnalytics';
 import { siteRouteMap } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
-import { useClimbingData, TickRow, TodoRow } from '../hooks/useClimbingData';
+import { useClimbingData } from '../hooks/useClimbingData';
+import type { TickRow, TodoRow } from '../types/data';
 import { useFuzzySearch } from '../hooks/useFuzzySearch';
 import { useAppStyles } from '../styles/appStyles';
 import { SectionLeadText } from '../components/text';
@@ -103,9 +104,7 @@ export default function Climbing() {
             <MotionFadeIn>
               <SectionHeading overline="TODO Routes" sx={appStyles.sectionHeadingOffsetSx} />
             </MotionFadeIn>
-            <SectionLeadText>
-              A collection of routes I'm interested in climbing.
-            </SectionLeadText>
+            <SectionLeadText>A collection of routes I'm interested in climbing.</SectionLeadText>
             <TextField
               size="small"
               placeholder="Search TODO routes..."

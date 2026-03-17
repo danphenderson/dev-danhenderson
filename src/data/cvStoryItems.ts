@@ -1,5 +1,6 @@
 import type {
   AboutMe,
+  CVStoryItem,
   Certificate,
   CodingExample,
   EducationEntry,
@@ -8,15 +9,7 @@ import type {
   VolunteeringEntry,
 } from '../types/cv';
 
-/* ── CVStoryItem discriminated union ── */
-
-export type CVStoryItem =
-  | { kind: 'about'; data: AboutMe }
-  | { kind: 'experience'; data: Experience; sortDate: Date }
-  | { kind: 'education'; data: EducationEntry; sortDate: Date }
-  | { kind: 'certificate'; data: Certificate; sortDate: Date }
-  | { kind: 'volunteering'; data: VolunteeringEntry; sortDate: Date }
-  | { kind: 'coding'; data: CodingExample };
+export type { CVStoryItem };
 
 /* ── Date parser ── */
 
@@ -86,7 +79,11 @@ type CVStoryInput = {
   codingExamples: CodingExample[];
 };
 
-type SortableItem = { kind: 'experience' | 'education' | 'certificate' | 'volunteering'; data: Experience | EducationEntry | Certificate | VolunteeringEntry; sortDate: Date };
+type SortableItem = {
+  kind: 'experience' | 'education' | 'certificate' | 'volunteering';
+  data: Experience | EducationEntry | Certificate | VolunteeringEntry;
+  sortDate: Date;
+};
 
 export const buildCVStoryItems = (input: CVStoryInput): CVStoryItem[] => {
   const items: CVStoryItem[] = [];

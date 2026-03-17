@@ -1,4 +1,5 @@
 import type { SxProps, Theme } from '@mui/material/styles';
+import type { CVSectionKey } from '../../types/cv';
 
 export const cvSectionViewportMetrics = {
   mobile: {
@@ -56,7 +57,7 @@ export const cvSectionMetadata = {
   },
 } as const;
 
-export type CVSectionKey = keyof typeof cvSectionMetadata;
+export type { CVSectionKey };
 
 export const cvSectionNavigationOrder: CVSectionKey[] = [
   'experience',

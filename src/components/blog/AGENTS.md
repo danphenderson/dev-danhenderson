@@ -1,4 +1,8 @@
-# AGENTS.md — Blog Components
+# AGENTS.md
+
+## Scope
+
+These instructions apply to files under `src/components/blog/`.
 
 ## Purpose
 
@@ -24,7 +28,7 @@ Documents conventions, data model, and validation requirements for the editorial
 
 - All new components must have unit tests in `test/unit/components/blog/` or relevant page/hook test.
 - Blog index and post pages must be covered by unit and E2E tests.
-- Run `npm run build` and `npm test -- --watch=false` before PR.
+- Run `npm run build` and `CI=true npm test -- --watch=false` before PR.
 - Validate `/blog` and `/blog/:slug` in browser at multiple viewports and theme presets.
 
 ## Recovery and fallback
@@ -37,6 +41,12 @@ Documents conventions, data model, and validation requirements for the editorial
 - Add new posts by editing `src/data/blog.ts` only.
 - Use the `BlogContentBlock` union for all content — do not use MDX or HTML.
 
-## Contact
+## Final response expectations
 
-- For architecture or design questions, consult the root `AGENTS.md` or contact the repository owner.
+Include:
+
+- which components changed
+- whether any public props or shared blog behavior changed
+- which consuming routes or pages were affected (`/blog`, `/blog/:slug`)
+- what browser validation was actually performed
+- any multi-consumer risks or technical debt noticed

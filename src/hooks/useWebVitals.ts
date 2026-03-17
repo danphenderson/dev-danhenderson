@@ -1,15 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import type { WebVitalEntry, WebVitalsState } from '../types/ui';
 
-export type WebVitalEntry = {
-  name: string;
-  value: number;
-  rating: 'good' | 'needs-improvement' | 'poor';
-};
-
-export type WebVitalsState = {
-  metrics: Map<string, WebVitalEntry>;
-  collected: boolean;
-};
+export type { WebVitalEntry };
 
 const supportsWebVitals = (): boolean =>
   typeof window !== 'undefined' &&

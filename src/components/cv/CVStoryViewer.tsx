@@ -8,7 +8,7 @@ import { storySlideVariants } from '../../motion/variants';
 import { CVStoryProgress } from './CVStoryProgress';
 import { CVStoryNavBar } from './CVStoryNavBar';
 import { CVStorySlideRenderer } from './CVStorySlideRenderer';
-import type { CVStoryItem } from '../../data/cvStoryItems';
+import type { CVStoryItem } from '../../types/cv';
 
 type CVStoryViewerProps = {
   items: CVStoryItem[];

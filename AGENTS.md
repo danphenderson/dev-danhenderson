@@ -10,6 +10,7 @@ Primary user-facing routes:
 - `/cv` interactive CV and GitHub-driven profile sections
 - `/climbing` climbing logs and to-do routes
 - `/photography` and `/photography/:slug` gallery browsing
+- `/blog` and `/blog/:slug` editorial blog and post detail
 
 Prefer changes that preserve the current single-page-app architecture and static hosting model.
 
@@ -60,6 +61,7 @@ Runtime system and developer instructions override repository instructions. With
 Use the narrowest relevant validation first, then expand if needed.
 
 After checkout (new or updated dependencies):
+
 1. `npm install` — installs any new or changed packages declared in `package.json` / `package-lock.json`
 2. `npx playwright install chromium` — only needed when the branch adds Playwright to the project or upgrades its version
 3. `npm run build` — confirm the project compiles cleanly with the new dependency
@@ -71,7 +73,7 @@ Primary commands:
 - dev server: `npm start`
 - dev server on port 3000: `PORT=3000 npm start`
 - build: `npm run build`
-- tests when relevant: `npm test -- --watch=false`
+- tests when relevant: `CI=true npm test -- --watch=false`
 
 Playwright E2E commands, when the working branch includes the Playwright workflow:
 
@@ -102,12 +104,18 @@ Notes:
 
 ## Repository map
 
-- `src/components/`: shared UI and CV-specific components
+- `src/components/`: shared UI and CV-specific components, including `src/components/blog/` for the blog feature
 - `src/pages/`: route-level pages
-- `src/data/`: source-of-truth content for CV, climbing, and photography
-- `src/hooks/`: adapters/hooks for GitHub, climbing, and photography data
-- `src/types/`: centralized data model types
-- `e2e/`: Playwright end-to-end specs and helpers when the branch includes browser integration tests
+- `src/data/`: source-of-truth content for CV, climbing, photography, and blog
+- `src/hooks/`: adapters/hooks for GitHub, climbing, photography, and blog data
+- `src/types/`: centralized data model types shared across layers
+- `src/motion/`: unified animation foundation — duration tokens, easing, variants, and animated primitives
+- `src/styles/`: theme-conditioned style maps, Emotion keyframes, and spring-easing constants
+- `src/theme/`: MUI theme assembly and appearance-preset system
+- `src/constants/`: build-time stable config — route definitions, command palette registry, recovery scoring
+- `src/utils/`: pure, framework-agnostic helper functions
+- `test/e2e/`: Playwright end-to-end specs and helpers when the branch includes browser integration tests
+- `test/unit/`: Jest unit and component tests
 - `public/assets/`: shipped images, certificates, media, and resume PDF
 - `resume/`: LaTeX source for the downloadable resume PDF
 
@@ -138,6 +146,14 @@ Notes:
 
 - Do not edit gallery content in `src/data/photography.ts` unless the task explicitly requests it.
 - Preserve slug generation assumptions used by `usePhotographyData` and route matching.
+
+### Blog content
+
+- Primary content lives in `src/data/blog.ts` as an array of `BlogPost` objects with typed `BlogContentBlock[]` content.
+- Do not edit blog post content unless the task explicitly requests it.
+- All blog UI components live in `src/components/blog/`; use `useBlogData` for all data access and navigation helpers.
+- Do not fetch blog content from remote APIs or a CMS; all content is static.
+- Not-found blog slugs must render `RouteRecoveryPanel` with contextual suggestions.
 
 ### Theme and UX state
 
@@ -179,7 +195,7 @@ Typical checks:
 
 - `npm run build`
 - relevant tests, if the change affects tested behavior
-- `npx playwright test e2e/<route>.spec.ts` for the narrowest relevant route flow when Playwright is present
+- `npx playwright test test/e2e/<route>.spec.ts` for the narrowest relevant route flow when Playwright is present
 - `npm run test:e2e` when changes span multiple covered routes or shared route behavior
 - browser-based route or screenshot validation for UI-affecting changes
 

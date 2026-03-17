@@ -75,3 +75,40 @@ export type PhotoCategory = {
   dateRange?: string;
   coordinates?: PhotoCoordinates;
 };
+
+export type TickRow = Tick & { id: string };
+export type TodoRow = Todo & { id: string };
+
+export type GradeBucket = {
+  bucket: string;
+  tickCount: number;
+  todoCount: number;
+};
+
+export type LocationCount = {
+  location: string;
+  count: number;
+};
+
+export type ClimbingAnalytics = {
+  overview: {
+    tickCount: number;
+    todoCount: number;
+    uniqueLocations: number;
+    mostRecentDate: string;
+  };
+  gradeProfile: GradeBucket[];
+  destinationProfile: {
+    topTickLocations: LocationCount[];
+    topTodoLocations: LocationCount[];
+  };
+};
+
+export type PhotographyAlbumMeta = {
+  slug: string;
+  name: string;
+  photoCount: number;
+  uniqueLocations: string[];
+  location?: string;
+  dateRange?: string;
+};

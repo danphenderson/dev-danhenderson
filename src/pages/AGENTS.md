@@ -94,12 +94,12 @@ Common checks:
 - responsive layout check
 - asset/image/media rendering check
 - Playwright route coverage, when present in the branch:
-  - `/` -> `npx playwright test e2e/home.spec.ts`
-  - `/cv` and mocked GitHub states -> `npx playwright test e2e/cv.github.spec.ts`
-  - `/climbing` -> `npx playwright test e2e/climbing.spec.ts`
-  - `/photography` and `/photography/:slug` -> `npx playwright test e2e/photography.spec.ts`
-  - `/blog` and `/blog/:slug` -> `npx playwright test e2e/blog.spec.ts`
-  - unknown-route handling -> `npx playwright test e2e/not-found.spec.ts`
+  - `/` -> `npx playwright test test/e2e/home.spec.ts`
+  - `/cv` and mocked GitHub states -> `npx playwright test test/e2e/cv.github.spec.ts`
+  - `/climbing` -> `npx playwright test test/e2e/climbing.spec.ts`
+  - `/photography` and `/photography/:slug` -> `npx playwright test test/e2e/photography.spec.ts`
+  - `/blog` and `/blog/:slug` -> `npx playwright test test/e2e/blog.spec.ts`
+  - unknown-route handling -> `npx playwright test test/e2e/not-found.spec.ts`
 - screenshot capture when the task is visual or review-oriented
 
 ## Scope control

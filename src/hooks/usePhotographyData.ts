@@ -1,15 +1,6 @@
 import { useMemo } from 'react';
 import { photographyCategories } from '../data/photography';
-import type { PhotoCategory, SharedDataStatus } from '../types/data';
-
-export type PhotographyAlbumMeta = {
-  slug: string;
-  name: string;
-  photoCount: number;
-  uniqueLocations: string[];
-  location?: string;
-  dateRange?: string;
-};
+import type { PhotoCategory, PhotographyAlbumMeta, SharedDataStatus } from '../types/data';
 
 function deriveAlbumMeta(category: PhotoCategory): PhotographyAlbumMeta {
   const locationSet = new Set<string>();

@@ -11,7 +11,7 @@ import VolunteerActivismOutlinedIcon from '@mui/icons-material/VolunteerActivism
 import CodeIcon from '@mui/icons-material/Code';
 import { MotionCard } from '../../motion';
 import { duration } from '../../motion/tokens';
-import type { CVStoryItem } from '../../data/cvStoryItems';
+import type { CVStoryItem } from '../../types/cv';
 
 type CVStoryNavBarProps = {
   items: CVStoryItem[];
@@ -68,10 +68,7 @@ export const CVStoryNavBar = ({
         }}
       >
         {/* Left arrow */}
-        <MotionCard
-          hoverState={{ scale: 1.12, y: -2 }}
-          tapState={{ scale: 0.92 }}
-        >
+        <MotionCard hoverState={{ scale: 1.12, y: -2 }} tapState={{ scale: 0.92 }}>
           <IconButton
             onClick={onPrev}
             disabled={currentIndex === 0}
@@ -119,10 +116,7 @@ export const CVStoryNavBar = ({
         </Box>
 
         {/* Right arrow */}
-        <MotionCard
-          hoverState={{ scale: 1.12, y: -2 }}
-          tapState={{ scale: 0.92 }}
-        >
+        <MotionCard hoverState={{ scale: 1.12, y: -2 }} tapState={{ scale: 0.92 }}>
           <IconButton
             onClick={onNext}
             disabled={currentIndex === items.length - 1}

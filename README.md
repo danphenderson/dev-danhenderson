@@ -313,12 +313,15 @@ test/
 ├── public/assets/       # Shipped images, certificates, media, and resume PDF
 ├── resume/              # LaTeX resume source
 ├── src/components/      # Shared UI and CV-specific components
+├── src/constants/       # Route registry, command palette actions, recovery context
 ├── src/data/            # Source-of-truth content modules
-├── src/hooks/           # Data adapters for GitHub, climbing, and photography
+├── src/hooks/           # Data adapters for GitHub, climbing, photography, and UI sequencing
+├── src/motion/          # Animation tokens, Motion Variants, and animated primitives
 ├── src/pages/           # Route-level pages
-├── src/styles/          # Shared animation, layout, and component style tokens
-├── src/types/           # Shared TypeScript models
-├── src/utils/           # Asset/date helpers and similar utilities
+├── src/styles/          # Spring easing constants, Emotion keyframes, and theme-conditioned style maps
+├── src/theme/           # MUI theme assembly and appearance-preset definitions
+├── src/types/           # Canonical shared TypeScript type definitions
+├── src/utils/           # Pure helpers: asset paths, date formatting, DOM, search
 ├── test/unit/           # Jest unit and integration tests (mirrors src/ structure)
 ├── test/e2e/            # Playwright end-to-end tests
 └── README.md

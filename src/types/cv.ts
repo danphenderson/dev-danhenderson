@@ -1,3 +1,5 @@
+import type { SharedDataStatus } from './data';
+
 export type AboutMe = {
   name: string;
   title: string;
@@ -98,3 +100,38 @@ export type VolunteeringEntry = {
 
 export type GitHubActivityItem = { label: string; href?: string };
 export type GitHubContribution = { name: string; url: string; stars?: number };
+
+/**
+ * Keys corresponding to CV section anchors in cvSectionMetadata.
+ * Maintained as a plain union to avoid a circular import from components.
+ */
+export type CVSectionKey =
+  | 'about'
+  | 'experience'
+  | 'education'
+  | 'volunteering'
+  | 'github'
+  | 'certificates'
+  | 'coding';
+
+export type CVStoryChapter = {
+  key: string;
+  sectionKey: CVSectionKey;
+  title: string;
+  narrative: string;
+};
+
+export type CVStoryItem =
+  | { kind: 'about'; data: AboutMe }
+  | { kind: 'experience'; data: Experience; sortDate: Date }
+  | { kind: 'education'; data: EducationEntry; sortDate: Date }
+  | { kind: 'certificate'; data: Certificate; sortDate: Date }
+  | { kind: 'volunteering'; data: VolunteeringEntry; sortDate: Date }
+  | { kind: 'coding'; data: CodingExample };
+
+export type GitHubProfileData = {
+  activity: GitHubActivityItem[];
+  contributions: GitHubContribution[];
+  encounteredError: boolean;
+  status: SharedDataStatus;
+};

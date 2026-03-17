@@ -6,7 +6,7 @@ import { SkillsChipList } from '../SkillsChipList';
 import { CommonLink } from '../CommonLink';
 import { MotionItem } from '../../motion';
 import { slideContentContainer, slideContentItem } from '../../motion/variants';
-import type { CVStoryItem } from '../../data/cvStoryItems';
+import type { CVStoryItem } from '../../types/cv';
 import type { ExperienceDescription, ExperienceProjectSegment } from '../../types/cv';
 
 type CVStorySlideRendererProps = { item: CVStoryItem };
@@ -144,15 +144,11 @@ const EducationSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'educatio
       </MotionItem>
       {entry.gpa && entry.gpa.length > 0 && (
         <MotionItem variants={slideContentItem}>
-          <MetaText>
-            {entry.gpa.map((g) => `${g.label}: ${g.value}`).join('  ·  ')}
-          </MetaText>
+          <MetaText>{entry.gpa.map((g) => `${g.label}: ${g.value}`).join('  ·  ')}</MetaText>
         </MotionItem>
       )}
       {entry.highlights && entry.highlights.length > 0 && (
-        <MotionItem variants={slideContentItem}>
-          {renderBulletList(entry.highlights, 4)}
-        </MotionItem>
+        <MotionItem variants={slideContentItem}>{renderBulletList(entry.highlights, 4)}</MotionItem>
       )}
       {entry.skills && entry.skills.length > 0 && (
         <MotionItem variants={slideContentItem}>
@@ -187,22 +183,14 @@ const CertificateSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'certif
   );
 };
 
-const VolunteeringSlide = ({
-  item,
-}: {
-  item: Extract<CVStoryItem, { kind: 'volunteering' }>;
-}) => {
+const VolunteeringSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'volunteering' }> }) => {
   const { data: entry } = item;
   return (
     <>
       <MotionItem variants={slideContentItem}>
         <HeaderLabel>
           {entry.organizationUrl ? (
-            <CommonLink
-              href={entry.organizationUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <CommonLink href={entry.organizationUrl} target="_blank" rel="noopener noreferrer">
               {entry.organization}
             </CommonLink>
           ) : (
@@ -223,9 +211,7 @@ const VolunteeringSlide = ({
         <BodyText>{entry.summary}</BodyText>
       </MotionItem>
       {entry.highlights && entry.highlights.length > 0 && (
-        <MotionItem variants={slideContentItem}>
-          {renderBulletList(entry.highlights)}
-        </MotionItem>
+        <MotionItem variants={slideContentItem}>{renderBulletList(entry.highlights)}</MotionItem>
       )}
     </>
   );

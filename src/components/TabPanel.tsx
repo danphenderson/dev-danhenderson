@@ -5,24 +5,9 @@ import { cssDuration } from '../motion/tokens';
 import { useComponentStyles } from '../styles/componentStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { InteractiveLabel } from './text';
+import type { TabPanelItem, TabPanelRenderContext } from '../types/ui';
 
-export type TabPanelRenderContext = {
-  getDrawerContainer: () => HTMLDivElement | null;
-  panelId: string;
-  tabId?: string;
-  dense: boolean;
-  hasTabs: boolean;
-};
-
-export type TabPanelItem = {
-  value: string;
-  label: string;
-  shortLabel?: string;
-  content?: ReactNode;
-  renderContent?: (selected: boolean, context: TabPanelRenderContext) => ReactNode;
-  closeDelayMs?: number;
-  disabled?: boolean;
-};
+export type { TabPanelItem, TabPanelRenderContext };
 
 type TabPanelValue = string | false;
 

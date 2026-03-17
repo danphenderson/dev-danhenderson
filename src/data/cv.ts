@@ -1,5 +1,6 @@
 import type {
   AboutMe,
+  CVStoryChapter,
   Certificate,
   CodingExample,
   EducationInfo,
@@ -9,22 +10,6 @@ import type {
   VolunteeringEntry,
 } from '../types/cv';
 import { resolvePublicAssetPath } from '../utils/assets';
-
-export type {
-  AboutMe,
-  Certificate,
-  CodingExample,
-  CodingExampleTab,
-  EducationEntry,
-  EducationInfo,
-  Experience,
-  ExperienceDescription,
-  ExperienceProject,
-  ExperienceProjectSegment,
-  GitHubActivityItem,
-  GitHubContribution,
-  VolunteeringEntry,
-} from '../types/cv';
 
 const assetPath = (path: string) => resolvePublicAssetPath(path);
 
@@ -659,13 +644,6 @@ export const MAX_CONTRIBUTION_ENRICHMENTS = 8;
 
 // ── Story-mode metadata ──────────────────────────────────────────────
 
-export type CVStoryChapter = {
-  key: string;
-  sectionKey: import('../components/cv/cvSectionMetadata').CVSectionKey;
-  title: string;
-  narrative: string;
-};
-
 export const cvStoryIntro =
   'A guided walk through my career — from mathematics through scientific computing to full-stack engineering and open-source work.';
 
@@ -709,8 +687,7 @@ export const cvStoryChapters: CVStoryChapter[] = [
     key: 'credentials',
     sectionKey: 'certificates',
     title: 'Credentials',
-    narrative:
-      'Certifications that validate specific skills beyond day-to-day engineering work.',
+    narrative: 'Certifications that validate specific skills beyond day-to-day engineering work.',
   },
   {
     key: 'craft',

@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { useTerminalTypewriter } from './text/useTerminalTypewriter';
-import type { TerminalLine } from './text/useTerminalTypewriter';
+import type { TerminalLine } from '../types/ui';
 import { VscodeTitleBar } from './terminal/VscodeTitleBar';
 import { VscodeActivityBar } from './terminal/VscodeActivityBar';
 import { VscodeTabBar } from './terminal/VscodeTabBar';
@@ -13,7 +13,6 @@ import { VscodeNotificationToast } from './terminal/VscodeNotificationToast';
 import { VscodeExplorerSidebar } from './terminal/VscodeExplorerSidebar';
 import { VscodeCommandPalette } from './terminal/VscodeCommandPalette';
 
-// Re-export for consumers that import TerminalLine from this module
 export type { TerminalLine };
 
 export interface TerminalHeroContentProps {
@@ -102,16 +101,11 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
         ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
       ]}
     >
-      <VscodeTitleBar
-        onCommandPaletteToggle={() => setCommandPaletteVisible((prev) => !prev)}
-      />
+      <VscodeTitleBar onCommandPaletteToggle={() => setCommandPaletteVisible((prev) => !prev)} />
 
       {/* Editor + activity bar row */}
       <Box sx={{ display: 'flex', flex: 1 }}>
-        <VscodeActivityBar
-          activeIndex={activityBarIndex}
-          onIconClick={handleActivityBarClick}
-        />
+        <VscodeActivityBar activeIndex={activityBarIndex} onIconClick={handleActivityBarClick} />
 
         {/* Explorer sidebar */}
         <VscodeExplorerSidebar visible={explorerVisible} />
@@ -132,10 +126,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
 
       <VscodeStatusBar commandText={commandText} historyLineCount={historyLineCount} />
 
-      <VscodeNotificationToast
-        visible={toastVisible}
-        onDismiss={() => setToastVisible(false)}
-      />
+      <VscodeNotificationToast visible={toastVisible} onDismiss={() => setToastVisible(false)} />
 
       <VscodeCommandPalette
         visible={commandPaletteVisible}

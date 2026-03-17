@@ -2,7 +2,8 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import { keyframes } from '@emotion/react';
 import type { SxProps, Theme } from '@mui/material/styles';
-import type { TerminalLine, TerminalTypewriterPhase } from '../text/useTerminalTypewriter';
+import type { TerminalLine } from '../../types/ui';
+import type { TerminalTypewriterPhase } from '../text/useTerminalTypewriter';
 import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily } from './vscodeTokens';
 
 // Module-level keyframe — prevents Emotion from generating duplicate names on re-renders
