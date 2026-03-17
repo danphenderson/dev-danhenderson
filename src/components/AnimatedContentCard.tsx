@@ -2,10 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Box, Zoom } from '@mui/material';
 import type { ElementType } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
-import {
-  DEFAULT_INTERSECTION_ROOT_MARGIN,
-  DEFAULT_INTERSECTION_THRESHOLD,
-} from '../constants/animation';
+import { DEFAULT_INTERSECTION_ROOT_MARGIN, DEFAULT_INTERSECTION_THRESHOLD } from '../motion';
 import { useAppStyles } from '../styles/appStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { normalizeSxProp } from '../utils/sx';

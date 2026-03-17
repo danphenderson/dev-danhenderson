@@ -135,9 +135,9 @@ describe('Blog', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText('All')).toBeInTheDocument();
-    expect(screen.getByText('react (1)')).toBeInTheDocument();
-    expect(screen.getByText('typescript (1)')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /react \(1\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /typescript \(1\)/i })).toBeInTheDocument();
   });
 
   it('renders non-featured posts in the list', () => {

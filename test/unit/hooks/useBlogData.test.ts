@@ -56,13 +56,11 @@ describe('useBlogData', () => {
   it('returns tags with counts sorted by frequency', () => {
     const { result } = renderHook(() => useBlogData());
 
-    expect(result.current.tags.slice(0, 2)).toEqual(
-      expect.arrayContaining([
-        { tag: 'react', count: 2 },
-        { tag: 'typescript', count: 2 },
-      ])
-    );
-    expect(result.current.tags).toContainEqual({ tag: 'performance', count: 1 });
+    expect(result.current.tags).toEqual([
+      { tag: 'react', count: 2 },
+      { tag: 'typescript', count: 2 },
+      { tag: 'performance', count: 1 },
+    ]);
   });
 
   it('looks up a post by slug', () => {

@@ -3,7 +3,7 @@ import { Box, Stack, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { MotionCard, hoverLift, tapShrink } from '../../motion';
+import { MotionCard, hoverLift, tapShrink, cssDuration } from '../../motion';
 import type { BlogPostMeta } from '../../types/blog';
 
 type BlogArticleNavProps = {
@@ -25,7 +25,7 @@ function NavCard({ post, direction }: { post: BlogPostMeta; direction: 'prev' | 
           display: 'block',
           textDecoration: 'none',
           color: 'inherit',
-          transition: 'box-shadow 0.2s ease',
+          transition: `box-shadow ${cssDuration.fast} ease`,
           '&:hover': { boxShadow: 4 },
           '&:focus-visible': {
             outline: '2px solid',
