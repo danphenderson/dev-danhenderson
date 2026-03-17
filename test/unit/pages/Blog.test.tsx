@@ -122,9 +122,7 @@ describe('Blog', () => {
       </ThemeProvider>
     );
 
-    expect(
-      screen.getByRole('heading', { level: 2, name: 'Featured Article' })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Featured Article' })).toBeInTheDocument();
     expect(screen.getByText('Featured excerpt')).toBeInTheDocument();
   });
 
