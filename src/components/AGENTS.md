@@ -24,6 +24,13 @@ Edits here should preserve:
 - Reuse existing patterns for typography, spacing, cards, section containers, lists, and data display before introducing a new UI pattern.
 - Follow existing MUI usage and styling conventions already present in the component family being edited.
 
+## Type handling
+
+- Component-private props interfaces with a single consumer (the component itself) stay in the component file.
+- Types consumed by more than one file — including types defined here that pages or hooks also import — belong in `src/types/ui.ts`. Move them there and keep a `export type { ... }` re-export in the component file to preserve existing import paths.
+- Do not import types from `src/hooks/` in component files. If a hook-defined type is needed by a component, it belongs in `src/types/` (and the hook can re-export from there).
+- Do not define types in component files that are then re-imported by pages or other components without a re-export. That creates hidden cross-layer coupling.
+
 ## Stricter UI-edit behavior
 
 - Treat edits to shared components as potentially multi-route changes.

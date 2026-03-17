@@ -20,7 +20,8 @@ Changes here should preserve schema stability, predictable rendering, and compat
 
 ## Type and schema discipline
 
-- Respect the contracts in `src/types/`.
+- Respect the contracts in `src/types/`. Data modules are consumers of those types, not owners.
+- Do not define types in data files that are consumed by more than one file outside `src/data/`. Those belong in the appropriate `src/types/` file. If a type was originally defined here because the data module needed it, and it has since acquired external consumers, move it to `src/types/` and keep a `export type { ... }` re-export here until all consumers are migrated.
 - Avoid optional-field drift: do not add ad hoc fields to a small subset of records unless the type system and consumers are updated intentionally.
 - Preserve ordering semantics when the UI depends on author-defined order.
 - Prefer explicit, typed content over computed magic values in data files.
