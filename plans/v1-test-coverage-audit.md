@@ -447,3 +447,13 @@ Files that would be created or modified by implementing this plan:
   - No production files changed.
   - `CI=true npm test -- --watch=false --testPathPattern="cvStoryItems|useWebVitals|dom\.test|siteRoutes\.test|easing\.test|ScrollProgressBar"`: **6 suites, 64 tests, all pass**.
   - `npm run build` passes.
+- 2026-03-16: Step 5 completed — P4 schema smoke tests.
+  - 5 new test files created (52 tests):
+    - `test/unit/utils/buildInfo.test.ts` — `BuildInfo` shape, default fallbacks (`gitSha: 'dev'`, `nodeEnv: 'test'`), non-empty string fields.
+    - `test/unit/data/blog.test.ts` — non-empty array, required `BlogPost` fields, slug uniqueness, valid content block discriminators, at most one featured post, kebab-case tags.
+    - `test/unit/data/cv.test.ts` — `aboutMe` required fields, scalar exports (avatar, resumePdfUrl, GitHub/LinkedIn URLs, currentWorkflowTools, MAX constants), experiences/certificates/educationInfo/codingExamples/volunteering required fields, fallback GitHub data shape, story mode metadata (cvStoryIntro, cvStoryChapters uniqueness, cvStoryCta labels).
+    - `test/unit/data/photography.test.ts` — non-empty array, required category fields, slug uniqueness, album photo img/title, coordinate range validation, at least one featured category.
+    - `test/unit/data/climbs.test.ts` — non-empty ticks and todos arrays, required fields (date format, route, grade, location, URL schema).
+  - `src/constants/animation.ts` (P4 plan target) does not exist in the repository — skipped.
+  - No production files changed.
+  - `CI=true npm test -- --watchAll=false --runInBand --testPathPattern="test/unit/(utils/buildInfo|data/(blog|cv|photography|climbs))"`: **6 suites (including pre-existing cvStoryItems), 76 tests, all pass**.
