@@ -11,6 +11,8 @@ export type AppSpeedDialAction = {
   download?: string | boolean;
   external?: boolean;
   onClick?: (event: ReactMouseEvent<HTMLElement>) => void;
+  onMouseEnter?: (event: ReactMouseEvent<HTMLElement>) => void;
+  onMouseLeave?: (event: ReactMouseEvent<HTMLElement>) => void;
 };
 
 export type TabPanelRenderContext = {

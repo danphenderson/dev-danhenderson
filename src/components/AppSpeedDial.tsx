@@ -74,6 +74,8 @@ export const AppSpeedDial = ({
         action.onClick?.(event);
         setOpen(false);
       },
+      ...(action.onMouseEnter && { onMouseEnter: action.onMouseEnter }),
+      ...(action.onMouseLeave && { onMouseLeave: action.onMouseLeave }),
     };
 
     if (action.to) {
