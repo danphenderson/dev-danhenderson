@@ -2,7 +2,8 @@ import { Box, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { BlogMetaChips } from './BlogMetaChips';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { MotionSection } from '../../motion';
+import { MotionSection, cssDuration } from '../../motion';
+import { SPRING_EASING_CSS } from '../../styles/springEasing';
 import type { BlogPost } from '../../types/blog';
 
 type BlogHeroProps = {
@@ -26,8 +27,7 @@ export function BlogHero({ post }: BlogHeroProps) {
           borderRadius: 3,
           overflow: 'hidden',
           cursor: 'pointer',
-          transition:
-            'transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.35s ease',
+          transition: `transform ${cssDuration.normal} ${SPRING_EASING_CSS}, box-shadow ${cssDuration.normal} ease`,
           '&:hover': {
             transform: 'translateY(-3px)',
             boxShadow: 8,

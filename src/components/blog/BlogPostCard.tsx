@@ -2,7 +2,7 @@ import { Box, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { BlogMetaChips } from './BlogMetaChips';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { MotionCard, hoverLift, tapShrink } from '../../motion';
+import { MotionCard, hoverLift, tapShrink, cssDuration } from '../../motion';
 import type { BlogPostMeta } from '../../types/blog';
 
 type BlogPostCardProps = {
@@ -53,7 +53,7 @@ export function BlogPostCard({ post, onTagClick }: BlogPostCardProps) {
                 height: '100%',
                 objectFit: 'cover',
                 display: 'block',
-                transition: 'transform 0.5s ease',
+                transition: `transform ${cssDuration.slow} ease`,
               }}
             />
           </Box>

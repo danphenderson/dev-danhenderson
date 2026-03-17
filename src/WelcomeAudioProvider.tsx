@@ -419,7 +419,7 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
       if (!unmountedRef.current) {
         setError('Unable to load welcome audio.');
       }
-      console.error(err);
+      console.error('Welcome audio initialization failed:', err);
     });
   }, [audioConsent, initializeWidget]);
 
