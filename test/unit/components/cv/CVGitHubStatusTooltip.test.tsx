@@ -3,6 +3,41 @@ import ThemeProvider from '../../../../src/ThemeProvider';
 import { CVGitHubStatusTooltip } from '../../../../src/components/cv/CVGitHubStatusTooltip';
 
 describe('CVGitHubStatusTooltip', () => {
+  it('shows bundled GitHub status details when live requests are disabled', async () => {
+    render(
+      <ThemeProvider>
+        <CVGitHubStatusTooltip
+          status={{
+            source: 'static',
+            loading: false,
+            error: null,
+            isFallback: false,
+            reason: 'bundled-content',
+            freshness: {
+              label:
+                'Bundled GitHub highlights are used by default in development and test environments.',
+              isStale: false,
+            },
+          }}
+        />
+      </ThemeProvider>
+    );
+
+    fireEvent.mouseOver(screen.getByTestId('cv-github-status-tooltip-trigger'));
+
+    expect(await screen.findByRole('tooltip')).toBeVisible();
+    expect(
+      await screen.findByText(
+        'Showing bundled GitHub highlights because live GitHub requests are disabled in this environment.'
+      )
+    ).toBeVisible();
+    expect(
+      screen.getByText(
+        'Bundled GitHub highlights are used by default in development and test environments.'
+      )
+    ).toBeVisible();
+  });
+
   it('shows the live GitHub status details in a tooltip', async () => {
     render(
       <ThemeProvider>
@@ -68,7 +103,9 @@ describe('CVGitHubStatusTooltip', () => {
       )
     ).toBeVisible();
     expect(
-      screen.getByText('Unable to load all GitHub data right now. Showing recent highlights instead.')
+      screen.getByText(
+        'Unable to load all GitHub data right now. Showing recent highlights instead.'
+      )
     ).toBeVisible();
     expect(screen.getByText('Partial failure: enrichment did not respond.')).toBeVisible();
   });

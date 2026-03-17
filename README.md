@@ -142,6 +142,7 @@ When changing CV motion:
 - Repo metadata enrichment: `GET /repos/:owner/:repo`
 
 If API calls fail or are rate-limited, CV sections gracefully fall back to static content from `src/data/cv.ts`.
+In development and test environments, the CV uses bundled GitHub highlights by default. Set `REACT_APP_ENABLE_GITHUB_API_IN_DEV=true` to opt into live GitHub requests locally.
 
 ## Local Development
 
@@ -344,7 +345,7 @@ test/
 - Set `PUBLIC_URL` when deploying under a subpath so generated asset URLs resolve correctly.
 - Route local asset URLs through `resolvePublicAssetPath(...)` (already used by `BackgroundPaper`) to avoid subpath regressions.
 - Ship `public/assets/` with the deployment.
-- The CV fetches public GitHub data at runtime; if requests fail or are rate-limited, the UI falls back to static content from `src/data/cv.ts`.
+- In production, the CV fetches public GitHub data at runtime; if requests fail or are rate-limited, the UI falls back to static content from `src/data/cv.ts`.
 
 ## Validation
 

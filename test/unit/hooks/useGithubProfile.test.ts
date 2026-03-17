@@ -33,34 +33,48 @@ const createOkResponse = (data: unknown) =>
 const createErrorResponse = () =>
   Promise.resolve({ ok: false, status: 500, json: () => Promise.resolve({}) } as Response);
 
+const enableLiveGitHubRequestsForTest = () => {
+  process.env.REACT_APP_ENABLE_GITHUB_API_IN_DEV = 'true';
+};
+
 describe('useGithubProfile', () => {
   const originalFetch = global.fetch;
+  const originalEnableGitHubApiInDev = process.env.REACT_APP_ENABLE_GITHUB_API_IN_DEV;
 
   beforeEach(() => {
     jest.clearAllMocks();
     resetGitHubProfileDataCacheForTests();
+    delete process.env.REACT_APP_ENABLE_GITHUB_API_IN_DEV;
   });
 
   afterEach(() => {
     global.fetch = originalFetch;
+    if (originalEnableGitHubApiInDev === undefined) {
+      delete process.env.REACT_APP_ENABLE_GITHUB_API_IN_DEV;
+    } else {
+      process.env.REACT_APP_ENABLE_GITHUB_API_IN_DEV = originalEnableGitHubApiInDev;
+    }
   });
 
-  it('returns fallback data initially', () => {
-    global.fetch = jest.fn(() => new Promise<Response>(() => {}));
+  it('uses bundled fallback data by default in test environment', () => {
+    global.fetch = jest.fn();
 
     const { result } = renderHook(() => useGithubProfile());
 
     expect(result.current.activity).toEqual(fallbackActivity);
     expect(result.current.contributions).toEqual(fallbackContributions);
+    expect(result.current.loading).toBe(false);
     expect(result.current.error).toBeNull();
     expect(result.current.status).toMatchObject({
       source: 'static',
-      isFallback: true,
-      reason: 'initial-fallback',
+      isFallback: false,
+      reason: 'bundled-content',
     });
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 
   it('fetches and updates activity on mount', async () => {
+    enableLiveGitHubRequestsForTest();
     global.fetch = jest
       .fn()
       .mockImplementationOnce(() =>
@@ -97,6 +111,7 @@ describe('useGithubProfile', () => {
   });
 
   it('falls back gracefully on fetch failure', async () => {
+    enableLiveGitHubRequestsForTest();
     global.fetch = jest
       .fn()
       .mockImplementationOnce(() => createErrorResponse())
@@ -118,6 +133,7 @@ describe('useGithubProfile', () => {
   });
 
   it('falls back gracefully on network error', async () => {
+    enableLiveGitHubRequestsForTest();
     global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
 
     const { result } = renderHook(() => useGithubProfile());
@@ -137,6 +153,7 @@ describe('useGithubProfile', () => {
   });
 
   it('reuses cached GitHub data across hook mounts', async () => {
+    enableLiveGitHubRequestsForTest();
     global.fetch = jest
       .fn()
       .mockImplementationOnce(() =>
@@ -172,6 +189,7 @@ describe('useGithubProfile', () => {
   });
 
   it('reports partial-fallback when events succeed but contributions fail', async () => {
+    enableLiveGitHubRequestsForTest();
     global.fetch = jest
       .fn()
       .mockImplementationOnce(() =>
@@ -207,6 +225,7 @@ describe('useGithubProfile', () => {
   });
 
   it('includes sourceDetail showing which sources succeeded or failed', async () => {
+    enableLiveGitHubRequestsForTest();
     global.fetch = jest
       .fn()
       .mockImplementationOnce(() =>
@@ -237,6 +256,7 @@ describe('useGithubProfile', () => {
   });
 
   it('marks failed sources in sourceDetail on full failure', async () => {
+    enableLiveGitHubRequestsForTest();
     global.fetch = jest
       .fn()
       .mockImplementationOnce(() => createErrorResponse())
@@ -257,6 +277,7 @@ describe('useGithubProfile', () => {
   });
 
   it('provides freshness metadata with lastUpdated and staleAfterMs', async () => {
+    enableLiveGitHubRequestsForTest();
     global.fetch = jest
       .fn()
       .mockImplementationOnce(() =>

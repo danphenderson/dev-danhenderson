@@ -3,10 +3,12 @@ import { fallbackGitHubActivity, fallbackGitHubContributions } from '../data/cv'
 import type { SharedDataStatus } from '../types/data';
 import type { GitHubActivityItem, GitHubContribution } from '../types/cv';
 import {
+  createBundledGitHubProfileStatus,
   createGithubHookErrorStatus,
   createInitialGitHubProfileStatus,
   createLoadingGitHubProfileStatus,
   loadGitHubProfileData,
+  shouldUseBundledGitHubProfileDataByDefault,
 } from './githubProfileData';
 
 export const useGithubProfile = () => {
@@ -16,10 +18,20 @@ export const useGithubProfile = () => {
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState<SharedDataStatus>(createInitialGitHubProfileStatus);
+  const [status, setStatus] = useState<SharedDataStatus>(() =>
+    shouldUseBundledGitHubProfileDataByDefault()
+      ? createBundledGitHubProfileStatus()
+      : createInitialGitHubProfileStatus()
+  );
 
   useEffect(() => {
     let cancelled = false;
+
+    if (shouldUseBundledGitHubProfileDataByDefault()) {
+      return () => {
+        cancelled = true;
+      };
+    }
 
     const fetchGitHub = async () => {
       setLoading(true);

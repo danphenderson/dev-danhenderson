@@ -23,6 +23,10 @@ const getGitHubStatusSummary = (status: SharedDataStatus) => {
     return 'Loading live GitHub activity while keeping bundled fallback highlights available.';
   }
 
+  if (status.reason === 'bundled-content') {
+    return 'Showing bundled GitHub highlights because live GitHub requests are disabled in this environment.';
+  }
+
   if (status.reason === 'partial-fallback') {
     return 'Some GitHub data sources responded while others fell back to bundled highlights.';
   }

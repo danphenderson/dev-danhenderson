@@ -10,7 +10,7 @@ import type {
   SharedDataStatus,
   SharedDataStatusReason,
 } from '../types/data';
-import type { GitHubActivityItem, GitHubContribution, GitHubProfileData } from '../types/cv';
+import type { GitHubActivityItem, GitHubProfileData } from '../types/cv';
 
 export type { GitHubProfileData };
 
@@ -104,6 +104,20 @@ export const createInitialGitHubProfileStatus = (): SharedDataStatus =>
     reason: 'initial-fallback',
     label: 'Bundled fallback GitHub highlights are ready while live data loads.',
   });
+
+export const createBundledGitHubProfileStatus = (): SharedDataStatus =>
+  createGitHubStatus({
+    source: 'static',
+    loading: false,
+    error: null,
+    isFallback: false,
+    reason: 'bundled-content',
+    label: 'Bundled GitHub highlights are used by default in development and test environments.',
+  });
+
+export const shouldUseBundledGitHubProfileDataByDefault = () =>
+  process.env.NODE_ENV !== 'production' &&
+  process.env.REACT_APP_ENABLE_GITHUB_API_IN_DEV !== 'true';
 
 export const createLoadingGitHubProfileStatus = (
   previousStatus: SharedDataStatus
@@ -397,7 +411,18 @@ const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
   };
 };
 
+const createBundledGitHubProfileData = (): GitHubProfileData => ({
+  activity: fallbackGitHubActivity,
+  contributions: fallbackGitHubContributions,
+  encounteredError: false,
+  status: createBundledGitHubProfileStatus(),
+});
+
 export const loadGitHubProfileData = async () => {
+  if (shouldUseBundledGitHubProfileDataByDefault()) {
+    return createBundledGitHubProfileData();
+  }
+
   const now = Date.now();
 
   if (cacheEntry && cacheEntry.expiresAt > now) {
