@@ -1,5 +1,6 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+import { BlogHeroImage } from './BlogHeroImage';
 import { BlogMetaChips } from './BlogMetaChips';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { MotionSection, cssDuration } from '../../motion';
@@ -40,35 +41,13 @@ export function BlogHero({ post }: BlogHeroProps) {
         }}
       >
         {post.heroImage && (
-          <Box
-            sx={{
-              position: 'relative',
-              width: '100%',
-              height: { xs: 200, sm: 280, md: 360 },
-              overflow: 'hidden',
-            }}
-          >
-            <Box
-              component="img"
-              src={post.heroImage}
-              alt={post.heroImageAlt ?? ''}
-              loading="eager"
-              sx={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                display: 'block',
-              }}
-            />
-            <Box
-              sx={{
-                position: 'absolute',
-                inset: 0,
-                background: (theme) =>
-                  `linear-gradient(to top, ${theme.palette.background.default}ee 0%, transparent 60%)`,
-              }}
-            />
-          </Box>
+          <BlogHeroImage
+            src={post.heroImage}
+            alt={post.heroImageAlt}
+            height={{ xs: 200, sm: 280, md: 360 }}
+            overlayOpacity={0.93}
+            overlayFadeStop="60%"
+          />
         )}
 
         <Stack

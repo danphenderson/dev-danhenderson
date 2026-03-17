@@ -122,7 +122,9 @@ describe('Blog', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText('Featured Article')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: 'Featured Article' })
+    ).toBeInTheDocument();
     expect(screen.getByText('Featured excerpt')).toBeInTheDocument();
   });
 
@@ -135,9 +137,9 @@ describe('Blog', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText('All')).toBeInTheDocument();
-    expect(screen.getByText(/react/i)).toBeInTheDocument();
-    expect(screen.getByText(/typescript/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /react \(1\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /typescript \(1\)/i })).toBeInTheDocument();
   });
 
   it('renders non-featured posts in the list', () => {

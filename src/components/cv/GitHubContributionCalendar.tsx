@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Stack } from '@mui/material';
 import { GitHubCalendar } from 'react-github-calendar';
-import { DEFAULT_INTERSECTION_ROOT_MARGIN } from '../../constants/animation';
+import { DEFAULT_INTERSECTION_ROOT_MARGIN } from '../../motion';
 import { ContentCard } from '../ContentCard';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { BodyText, SubsectionTitle } from '../text';

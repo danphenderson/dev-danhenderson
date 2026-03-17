@@ -49,7 +49,7 @@ export function useBlogData() {
       }
     }
     return Array.from(counts.entries())
-      .sort((a, b) => b[1] - a[1])
+      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
       .map(([tag, count]) => ({ tag, count }));
   }, [posts]);
 
