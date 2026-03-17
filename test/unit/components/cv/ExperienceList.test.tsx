@@ -28,21 +28,30 @@ jest.mock('@mui/material', () => {
 });
 
 const mockAnimatedSlideList = jest.fn();
+const mockAnimatedContentList = jest.fn();
 
 jest.mock('../../../../src/components/AnimatedContentList', () => ({
   AnimatedContentList: ({
     items,
     renderItem,
+    ...props
   }: {
     items: unknown[];
     renderItem: (item: unknown, index: number) => ReactNode;
-  }) => (
-    <div>
-      {items.map((item, index) => (
-        <div key={index}>{renderItem(item, index)}</div>
-      ))}
-    </div>
-  ),
+    tiltItems?: boolean;
+    itemSurface?: string;
+  }) =>
+    (() => {
+      mockAnimatedContentList({ items, renderItem, ...props });
+
+      return (
+        <div>
+          {items.map((item, index) => (
+            <div key={index}>{renderItem(item, index)}</div>
+          ))}
+        </div>
+      );
+    })(),
 }));
 
 jest.mock('../../../../src/components/AnimatedSlideList', () => ({
@@ -51,7 +60,8 @@ jest.mock('../../../../src/components/AnimatedSlideList', () => ({
     itemStaggerMs: number,
     startDelayMs: number = 0,
     exitDurationMs: number = 220
-  ) => (itemCount <= 0 ? 0 : startDelayMs + Math.max(itemCount - 1, 0) * itemStaggerMs + exitDurationMs),
+  ) =>
+    itemCount <= 0 ? 0 : startDelayMs + Math.max(itemCount - 1, 0) * itemStaggerMs + exitDurationMs,
   AnimatedSlideList: (props: {
     items: unknown[];
     getItemKey: (item: unknown, index: number) => string;
@@ -86,6 +96,7 @@ jest.mock('../../../../src/components/AnimatedSlideList', () => ({
 
 describe('ExperienceList', () => {
   afterEach(() => {
+    mockAnimatedContentList.mockClear();
     mockAnimatedSlideList.mockClear();
   });
 
@@ -100,6 +111,10 @@ describe('ExperienceList', () => {
       <ThemeProvider>
         <ExperienceList experiences={[hemodynamicsExperience!]} />
       </ThemeProvider>
+    );
+
+    expect(mockAnimatedContentList.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ itemSurface: 'panel', tiltItems: true })
     );
 
     const advisorLink = screen.getByRole('link', { name: 'Jiguang Sun' });

@@ -10,7 +10,8 @@ export type TerminalTypewriterPhase =
   | 'typing-command'
   | 'pause-before-output'
   | 'showing-output'
-  | 'pause-after-output';
+  | 'pause-after-output'
+  | 'clearing-screen';
 
 interface UseTerminalTypewriterOptions {
   lines: TerminalLine[];
@@ -36,6 +37,7 @@ export interface UseTerminalTypewriterResult {
 
 const DEFAULT_PAUSE_BEFORE_OUTPUT_MS = 400;
 const DEFAULT_PAUSE_AFTER_OUTPUT_MS = 2400;
+const CLEAR_SCREEN_PAUSE_MS = 500;
 
 export const useTerminalTypewriter = ({
   lines,
@@ -106,27 +108,36 @@ export const useTerminalTypewriter = ({
     return undefined;
   }, [playing, phase]);
 
-  // Phase: pause-after-output — let the user read the output, then advance
+  // Phase: pause-after-output — let the user read the output, then simulate Control+L
   React.useEffect(() => {
     if (!playing || phase !== 'pause-after-output') return undefined;
 
     const timeoutId = window.setTimeout(() => {
-      const nextIndex = lineIndex + 1;
-      const isWrapping = nextIndex % lines.length === 0;
-
-      // Clear history when the cycle wraps to keep the animation tidy
-      setHistory((prev) => (isWrapping ? [] : [...prev, currentLine]));
-      setLineIndex(nextIndex);
+      // Control+L: clear the screen immediately, show empty prompt briefly
+      setHistory([]);
       setCommandCharIndex(0);
-      setPhase('typing-command');
+      setPhase('clearing-screen');
     }, pauseAfterOutputMs);
 
     return () => window.clearTimeout(timeoutId);
-  }, [playing, phase, pauseAfterOutputMs, currentLine, lineIndex, lines.length]);
+  }, [playing, phase, pauseAfterOutputMs]);
+
+  // Phase: clearing-screen — brief pause showing empty prompt after Control+L, then advance
+  React.useEffect(() => {
+    if (!playing || phase !== 'clearing-screen') return undefined;
+
+    const timeoutId = window.setTimeout(() => {
+      setLineIndex((prev) => prev + 1);
+      setPhase('typing-command');
+    }, CLEAR_SCREEN_PAUSE_MS);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [playing, phase]);
 
   // Compute display text
   const commandText = currentLine.command.slice(0, commandCharIndex);
-  // Show the full output only during the showing-output and pause-after-output phases
+  // Show the full output only during the showing-output and pause-after-output phases;
+  // output is hidden in clearing-screen (screen has been cleared)
   const outputText =
     phase === 'showing-output' || phase === 'pause-after-output' ? currentLine.output : '';
 

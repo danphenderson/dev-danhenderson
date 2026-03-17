@@ -93,6 +93,7 @@ export const EducationSection = ({
       skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
+      tiltItems
       renderItem={(entry, index) => {
         const { highlights: filteredHighlights, coursework: filteredCoursework } =
           splitEducationHighlights(entry.highlights);

@@ -35,6 +35,7 @@ jest.mock('../../../../src/components/AnimatedContentList', () => ({
     renderItem: (item: unknown, index: number) => ReactNode;
     itemSurface?: string;
     mountItemsOnView?: boolean;
+    tiltItems?: boolean;
   }) => {
     mockAnimatedContentList(props);
 
@@ -43,6 +44,7 @@ jest.mock('../../../../src/components/AnimatedContentList', () => ({
         data-testid="volunteering-list"
         data-item-surface={props.itemSurface ?? ''}
         data-mount-items-on-view={String(Boolean(props.mountItemsOnView))}
+        data-tilt-items={String(Boolean(props.tiltItems))}
       >
         {props.items.map((item, index) => (
           <div key={index}>{props.renderItem(item, index)}</div>
@@ -58,7 +60,8 @@ jest.mock('../../../../src/components/AnimatedSlideList', () => ({
     itemStaggerMs: number,
     startDelayMs: number = 0,
     exitDurationMs: number = 220
-  ) => (itemCount <= 0 ? 0 : startDelayMs + Math.max(itemCount - 1, 0) * itemStaggerMs + exitDurationMs),
+  ) =>
+    itemCount <= 0 ? 0 : startDelayMs + Math.max(itemCount - 1, 0) * itemStaggerMs + exitDurationMs,
   AnimatedSlideList: (props: {
     items: unknown[];
     getItemKey: (item: unknown, index: number) => string;
@@ -163,6 +166,7 @@ describe('VolunteeringList', () => {
       'data-mount-items-on-view',
       'true'
     );
+    expect(screen.getByTestId('volunteering-list')).toHaveAttribute('data-tilt-items', 'true');
   });
 
   it('renders tooltip-enabled organization links for Little Brothers and Access Fund', () => {

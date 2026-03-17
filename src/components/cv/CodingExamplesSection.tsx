@@ -59,6 +59,7 @@ export const CodingExamplesSection = ({
       skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
+      tiltItems
       renderItem={(example, index) => {
         const primaryLink = example.links[0];
         const exampleTabs = (example.tabs ?? []).reduce<TabPanelItem[]>((tabs, tab) => {

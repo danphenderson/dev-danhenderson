@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Stack } from '@mui/material';
-import type { ReactNode } from 'react';
+import type { ElementType, ReactNode } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { DEFAULT_INTERSECTION_ROOT_MARGIN, DEFAULT_INTERSECTION_THRESHOLD } from '../motion';
+import {
+  DEFAULT_INTERSECTION_ROOT_MARGIN,
+  DEFAULT_INTERSECTION_THRESHOLD,
+  MotionTiltCard,
+} from '../motion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { normalizeSxProp } from '../utils/sx';
 import { AnimatedContentCard } from './AnimatedContentCard';
@@ -27,6 +31,7 @@ type AnimatedContentListProps<Item> = {
   skipEntranceAnimation?: boolean;
   mountThreshold?: number;
   mountRootMargin?: string;
+  tiltItems?: boolean;
 };
 
 export const AnimatedContentList = <Item,>({
@@ -46,6 +51,7 @@ export const AnimatedContentList = <Item,>({
   skipEntranceAnimation = false,
   mountThreshold = DEFAULT_INTERSECTION_THRESHOLD,
   mountRootMargin = DEFAULT_INTERSECTION_ROOT_MARGIN,
+  tiltItems = false,
 }: AnimatedContentListProps<Item>) => {
   const {
     cardResetSx,
@@ -62,6 +68,7 @@ export const AnimatedContentList = <Item,>({
   const itemContainerSxArray = normalizeSxProp(itemContainerSx);
   const resolvedItemContainerSx =
     layout === 'wrap' ? [wrapItemContainerSx, ...itemContainerSxArray] : itemContainerSxArray;
+  const wrapListSx = getWrapListSx(wrapGap);
   const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.itemStaggerMs;
   const itemSurfaceSx =
     itemSurface === 'panel'
@@ -70,6 +77,7 @@ export const AnimatedContentList = <Item,>({
         ? [cardResetSx]
         : [];
   const shouldRenderItems = !mountItemsOnView || hasEnteredView;
+  const itemComponent: ElementType | undefined = tiltItems ? MotionTiltCard : undefined;
 
   useEffect(() => {
     if (skipEntranceAnimation) {
@@ -126,6 +134,7 @@ export const AnimatedContentList = <Item,>({
           skipEntranceAnimation={skipEntranceAnimation}
           sx={[...itemSurfaceSx, ...itemSxArray]}
           containerSx={resolvedItemContainerSx}
+          {...(itemComponent ? { component: itemComponent } : {})}
         >
           {renderItem(item, index)}
         </AnimatedContentCard>
@@ -134,7 +143,7 @@ export const AnimatedContentList = <Item,>({
 
   if (layout === 'wrap') {
     return (
-      <Box ref={containerRef} sx={[getWrapListSx(wrapGap), ...containerSxArray]}>
+      <Box ref={containerRef} sx={[wrapListSx, ...containerSxArray]}>
         {animatedItems}
       </Box>
     );

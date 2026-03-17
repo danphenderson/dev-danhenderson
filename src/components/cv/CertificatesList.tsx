@@ -27,6 +27,7 @@ export const CertificatesList = ({
       skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
+      tiltItems
       renderItem={(certificate) => (
         <>
           <EntryTitle>{certificate.title}</EntryTitle>

@@ -15,6 +15,7 @@ export {
   easing,
   stagger,
   transition,
+  springOptions,
   DEFAULT_INTERSECTION_THRESHOLD,
   DEFAULT_INTERSECTION_ROOT_MARGIN,
 } from './tokens';
@@ -40,4 +41,5 @@ export {
   MotionItem,
   MotionFadeIn,
   MotionScaleIn,
+  MotionTiltCard,
 } from './components';

@@ -125,6 +125,7 @@ export const ExperienceList = ({
       skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
+      tiltItems
       renderItem={(experience, index) => {
         const filteredSkills = experience.skills?.filter((tool) => tool.trim().length > 0) ?? [];
         const experienceTabs: TabPanelItem[] = [];

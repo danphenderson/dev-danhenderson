@@ -36,6 +36,7 @@ jest.mock('../../../../src/components/AnimatedContentList', () => ({
     renderItem: (item: unknown, index: number) => ReactNode;
     mountItemsOnView?: boolean;
     startDelayMs?: number;
+    tiltItems?: boolean;
   }) => {
     mockAnimatedContentList(props);
 
@@ -55,7 +56,8 @@ jest.mock('../../../../src/components/AnimatedSlideList', () => ({
     itemStaggerMs: number,
     startDelayMs: number = 0,
     exitDurationMs: number = 220
-  ) => (itemCount <= 0 ? 0 : startDelayMs + Math.max(itemCount - 1, 0) * itemStaggerMs + exitDurationMs),
+  ) =>
+    itemCount <= 0 ? 0 : startDelayMs + Math.max(itemCount - 1, 0) * itemStaggerMs + exitDurationMs,
   AnimatedSlideList: (props: {
     items: unknown[];
     getItemKey: (item: unknown, index: number) => string;
@@ -105,6 +107,7 @@ describe('CodingExamplesSection', () => {
       expect.objectContaining({
         mountItemsOnView: true,
         startDelayMs: 120,
+        tiltItems: true,
       })
     );
   });

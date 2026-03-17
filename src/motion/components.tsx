@@ -1,7 +1,8 @@
 import type { ReactNode, RefObject } from 'react';
-import { motion, useInView } from 'motion/react';
+import { motion, useInView, useMotionValue, useReducedMotion, useSpring } from 'motion/react';
 import type { Variants, HTMLMotionProps, TargetAndTransition } from 'motion/react';
-import { useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
+import { springOptions } from './tokens';
 import {
   fadeInUp,
   fadeIn,
@@ -108,6 +109,8 @@ export const StaggerChildren = ({
   containerVariants = staggerContainer,
   rootMargin = '0px 0px -8% 0px',
   once = true,
+  initial,
+  animate,
   ...rest
 }: StaggerChildrenProps) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -116,8 +119,8 @@ export const StaggerChildren = ({
   return (
     <motion.div
       ref={ref}
-      initial="hidden"
-      animate={isInView ? 'visible' : 'hidden'}
+      initial={initial ?? 'hidden'}
+      animate={animate ?? (isInView ? 'visible' : 'hidden')}
       variants={containerVariants}
       {...rest}
     >
@@ -269,6 +272,108 @@ export const MotionScaleIn = ({
       animate={isInView ? 'visible' : 'hidden'}
       variants={scaleIn}
       {...rest}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+/* ------------------------------------------------------------------ */
+/*  MotionTiltCard                                                     */
+/* ------------------------------------------------------------------ */
+
+interface MotionTiltCardProps {
+  children: ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+  /** Multiplier on the base tilt magnitude. At 1 the axis rotation peaks at ±12°. */
+  intensity?: number;
+  /** Disables all pointer-follow updates when true. */
+  disabled?: boolean;
+}
+
+const TILT_DEG = 6;
+
+/**
+ * 3D mouse-follow tilt card.
+ *
+ * Tracks the pointer within the element and applies spring-animated
+ * `rotateX` / `rotateY` transforms for a subtle depth effect.
+ * Fully suppressed when `prefers-reduced-motion` is set or `disabled` is true.
+ */
+export const MotionTiltCard = ({
+  children,
+  className,
+  style,
+  intensity = 1,
+  disabled = false,
+}: MotionTiltCardProps) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const prefersReduced = useReducedMotion();
+  const tiltEnabled = !disabled && !prefersReduced;
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const rotateX = useSpring(rawY, springOptions.tilt);
+  const rotateY = useSpring(rawX, springOptions.tilt);
+
+  const setWillChange = useCallback((active: boolean) => {
+    const el = ref.current;
+    if (!el) {
+      return;
+    }
+
+    el.style.willChange = active ? 'transform' : '';
+  }, []);
+
+  useEffect(() => {
+    if (!tiltEnabled) {
+      setWillChange(false);
+    }
+  }, [setWillChange, tiltEnabled]);
+
+  const handleMouseEnter = useCallback(() => {
+    if (!tiltEnabled) {
+      return;
+    }
+
+    setWillChange(true);
+  }, [setWillChange, tiltEnabled]);
+
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement>) => {
+      if (!tiltEnabled) return;
+      setWillChange(true);
+      const el = ref.current;
+      if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const nx = (e.clientX - rect.left) / rect.width - 0.5;
+      const ny = (e.clientY - rect.top) / rect.height - 0.5;
+      rawX.set(nx * TILT_DEG * 2 * intensity);
+      rawY.set(-ny * TILT_DEG * 2 * intensity);
+    },
+    [rawX, rawY, intensity, setWillChange, tiltEnabled]
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    rawX.set(0);
+    rawY.set(0);
+    setWillChange(false);
+  }, [rawX, rawY, setWillChange]);
+
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      style={{
+        rotateX,
+        rotateY,
+        transformPerspective: 900,
+        transformStyle: 'preserve-3d',
+        ...style,
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
       {children}
     </motion.div>

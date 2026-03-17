@@ -1,5 +1,6 @@
 import { Button, Popover, Typography } from '@mui/material';
 import { useAppStyles } from '../../styles/appStyles';
+import { MotionTiltCard } from '../../motion';
 import { BodyText } from '../text';
 
 type HintPopoverProps = {
@@ -27,13 +28,15 @@ export const HintPopover = ({ id, open, anchorEl, title, body, onClose }: HintPo
         sx: appStyles.hintPopoverPaperSx,
       }}
     >
-      <Typography variant="subtitle1" sx={appStyles.hintPopoverTitleSx}>
-        {title}
-      </Typography>
-      <BodyText sx={appStyles.hintPopoverBodySx}>{body}</BodyText>
-      <Button onClick={onClose} variant="contained" size="small">
-        Okay
-      </Button>
+      <MotionTiltCard intensity={0.5}>
+        <Typography variant="subtitle1" sx={appStyles.hintPopoverTitleSx}>
+          {title}
+        </Typography>
+        <BodyText sx={appStyles.hintPopoverBodySx}>{body}</BodyText>
+        <Button onClick={onClose} variant="contained" size="small">
+          Okay
+        </Button>
+      </MotionTiltCard>
     </Popover>
   );
 };

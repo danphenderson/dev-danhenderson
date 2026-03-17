@@ -61,6 +61,7 @@ export const VolunteeringList = ({
       skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
+      tiltItems
       renderItem={(entry, index) => {
         const volunteeringTabs: TabPanelItem[] = entry.highlights.length
           ? [

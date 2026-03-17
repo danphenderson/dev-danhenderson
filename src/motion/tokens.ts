@@ -101,3 +101,13 @@ export const transition: Record<string, Transition> = {
   /** Dramatic entrance with spring overshoot. */
   dramatic: { duration: duration.dramatic, ease: easing.spring },
 } as const;
+
+/* ------------------------------------------------------------------ */
+/*  Spring physics options for pointer-follow effects                 */
+/* ------------------------------------------------------------------ */
+
+/** Spring physics configuration for {@link useSpring} pointer-follow effects. */
+export const springOptions = {
+  /** Moderately stiff spring for responsive pointer-follow tilt. */
+  tilt: { stiffness: 200, damping: 20 },
+} as const;

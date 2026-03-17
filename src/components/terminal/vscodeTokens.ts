@@ -79,6 +79,7 @@ export const VSCODE_COLORS = {
   // Terminal prompt colors
   promptPath: 'rgba(255,255,255,0.40)',
   promptDollar: '#28c840',
+  promptBranch: '#e5c07b',
   outputText: 'rgba(255,255,255,0.58)',
 } as const;
 

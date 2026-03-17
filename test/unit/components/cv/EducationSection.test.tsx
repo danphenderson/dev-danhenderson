@@ -34,6 +34,7 @@ jest.mock('../../../../src/components/AnimatedContentList', () => ({
     items: unknown[];
     renderItem: (item: unknown, index: number) => ReactNode;
     mountItemsOnView?: boolean;
+    tiltItems?: boolean;
   }) => {
     mockAnimatedContentList(props);
 
@@ -53,7 +54,8 @@ jest.mock('../../../../src/components/AnimatedSlideList', () => ({
     itemStaggerMs: number,
     startDelayMs: number = 0,
     exitDurationMs: number = 220
-  ) => (itemCount <= 0 ? 0 : startDelayMs + Math.max(itemCount - 1, 0) * itemStaggerMs + exitDurationMs),
+  ) =>
+    itemCount <= 0 ? 0 : startDelayMs + Math.max(itemCount - 1, 0) * itemStaggerMs + exitDurationMs,
   AnimatedSlideList: (props: {
     items: unknown[];
     getItemKey: (item: unknown, index: number) => string;
@@ -100,7 +102,7 @@ describe('EducationSection', () => {
     );
 
     expect(mockAnimatedContentList.mock.calls[0][0]).toEqual(
-      expect.objectContaining({ mountItemsOnView: true })
+      expect.objectContaining({ mountItemsOnView: true, tiltItems: true })
     );
     expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
       'Highlights',

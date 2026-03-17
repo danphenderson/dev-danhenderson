@@ -155,16 +155,19 @@ test.describe('CV page – GitHub integration', () => {
   test('renders story mode layout when navigating with ?mode=story', async ({ page }) => {
     await page.goto('/cv?mode=story');
 
-    // Story mode header and intro should be visible
-    await expect(page.getByText('Story Mode')).toBeVisible();
-    await expect(page.getByTestId('cv-story-header')).toBeVisible();
+    // Story mode uses the immersive viewer controls instead of the default CV header.
+    await expect(page.getByRole('button', { name: 'Exit story mode' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Previous slide' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Next slide' })).toBeVisible();
+    await expect(page.getByText(/1\s*\/\s*\d+/)).toBeVisible();
 
-    // Story chapters should render
-    await expect(page.getByText('The Starting Point')).toBeVisible();
-    await expect(page.getByText('Chapter 1')).toBeVisible();
+    // Story navigation should advance within the immersive viewer.
+    await page.getByRole('button', { name: 'Next slide' }).click();
+    await expect(page.getByText(/2\s*\/\s*\d+/)).toBeVisible();
 
     // Section navigator should NOT be present in story mode
     await expect(page.getByRole('button', { name: 'CV section navigation' })).toHaveCount(0);
+    await expect(page.getByTestId('cv-mode-toggle')).toHaveCount(0);
   });
 
   test('default CV renders a story mode toggle', async ({ page }) => {

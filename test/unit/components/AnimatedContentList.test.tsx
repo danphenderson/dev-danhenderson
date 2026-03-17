@@ -3,6 +3,10 @@ import type { ReactNode } from 'react';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { AnimatedContentList } from '../../../src/components/AnimatedContentList';
 
+function mockMotionTiltCard({ children }: { children: ReactNode }) {
+  return <div data-testid="tilt-card">{children}</div>;
+}
+
 type MockSx = { [key: string]: unknown } | Array<{ [key: string]: unknown }>;
 
 const getContainerWidth = (containerSx?: { width?: string } | Array<{ width?: string }>) => {
@@ -25,16 +29,22 @@ jest.mock('../../../src/components/AnimatedContentCard', () => ({
     delayMs,
     containerSx,
     sx,
+    component,
+    skipEntranceAnimation,
   }: {
     children: ReactNode;
     delayMs: number;
     containerSx?: { width?: string } | Array<{ width?: string }>;
     sx?: MockSx;
+    component?: unknown;
+    skipEntranceAnimation?: boolean;
   }) => (
     <div
       data-testid="animated-content-item"
       data-delay={String(delayMs)}
       data-container-width={getContainerWidth(containerSx)}
+      data-component-is-tilt={String(component === mockMotionTiltCard)}
+      data-skip-entrance-animation={String(Boolean(skipEntranceAnimation))}
       data-has-card-reset={String(
         hasSxEntry(
           sx,
@@ -53,6 +63,15 @@ jest.mock('../../../src/components/AnimatedContentCard', () => ({
     </div>
   ),
 }));
+
+jest.mock('../../../src/motion', () => {
+  const actual = jest.requireActual('../../../src/motion');
+
+  return {
+    ...actual,
+    MotionTiltCard: mockMotionTiltCard,
+  };
+});
 
 describe('AnimatedContentList', () => {
   const defaultIntersectionObserver = window.IntersectionObserver;
@@ -185,5 +204,47 @@ describe('AnimatedContentList', () => {
 
     expect(screen.getByText('Selected Work')).toBeInTheDocument();
     expect(disconnect).toHaveBeenCalled();
+  });
+
+  it('can render tilt-enabled items through AnimatedContentCard with preserved per-item delays', () => {
+    render(
+      <ThemeProvider>
+        <AnimatedContentList
+          items={['Experience', 'Education']}
+          getItemKey={(item) => item}
+          startDelayMs={120}
+          itemStaggerMs={80}
+          itemSurface="panel"
+          tiltItems
+          renderItem={(item) => <div>{item}</div>}
+        />
+      </ThemeProvider>
+    );
+
+    const items = screen.getAllByTestId('animated-content-item');
+
+    expect(items[0]).toHaveAttribute('data-delay', '120');
+    expect(items[1]).toHaveAttribute('data-delay', '200');
+    expect(items[0]).toHaveAttribute('data-component-is-tilt', 'true');
+    expect(items[1]).toHaveAttribute('data-component-is-tilt', 'true');
+  });
+
+  it('forces tilt-enabled items visible without an entrance animation when skipping animations', () => {
+    render(
+      <ThemeProvider>
+        <AnimatedContentList
+          items={['Experience']}
+          getItemKey={(item) => item}
+          skipEntranceAnimation
+          tiltItems
+          renderItem={(item) => <div>{item}</div>}
+        />
+      </ThemeProvider>
+    );
+
+    const item = screen.getByTestId('animated-content-item');
+
+    expect(item).toHaveAttribute('data-component-is-tilt', 'true');
+    expect(item).toHaveAttribute('data-skip-entrance-animation', 'true');
   });
 });

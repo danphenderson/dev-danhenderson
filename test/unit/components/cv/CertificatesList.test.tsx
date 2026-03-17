@@ -11,6 +11,7 @@ jest.mock('../../../../src/components/AnimatedContentList', () => ({
     renderItem: (item: unknown, index: number) => ReactNode;
     itemSurface?: string;
     mountItemsOnView?: boolean;
+    tiltItems?: boolean;
   }) => {
     mockAnimatedContentList(props);
 
@@ -19,6 +20,7 @@ jest.mock('../../../../src/components/AnimatedContentList', () => ({
         data-testid="certificates-list"
         data-item-surface={props.itemSurface ?? ''}
         data-mount-items-on-view={String(Boolean(props.mountItemsOnView))}
+        data-tilt-items={String(Boolean(props.tiltItems))}
       >
         {props.items.map((item, index) => (
           <div key={index}>{props.renderItem(item, index)}</div>
@@ -60,5 +62,6 @@ describe('CertificatesList', () => {
       'data-mount-items-on-view',
       'true'
     );
+    expect(screen.getByTestId('certificates-list')).toHaveAttribute('data-tilt-items', 'true');
   });
 });

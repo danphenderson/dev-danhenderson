@@ -11,8 +11,7 @@ import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
 import { SecondaryBodyText } from '../components/text';
 import { AlbumCard } from '../components/photography/AlbumCard';
-import { TiltCard } from '../components/photography/TiltCard';
-import { MotionSection, MotionItem, StaggerChildren, scaleIn } from '../motion';
+import { MotionSection, MotionItem, StaggerChildren, scaleIn, MotionTiltCard } from '../motion';
 
 export default function Photography() {
   const appStyles = useAppStyles();
@@ -65,13 +64,13 @@ export default function Photography() {
         {featuredCategory && (
           <MotionSection>
             <MotionItem variants={scaleIn} style={{ minWidth: 0 }}>
-              <TiltCard>
+              <MotionTiltCard>
                 <AlbumCard
                   category={featuredCategory}
                   variant="hero"
                   onImageReady={handleImageReady}
                 />
-              </TiltCard>
+              </MotionTiltCard>
             </MotionItem>
           </MotionSection>
         )}
@@ -86,9 +85,9 @@ export default function Photography() {
         >
           {supportingCategories.map((card) => (
             <MotionItem key={card.slug} variants={scaleIn} style={{ minWidth: 0 }}>
-              <TiltCard style={{ height: '100%' }}>
+              <MotionTiltCard style={{ height: '100%' }}>
                 <AlbumCard category={card} variant="grid" onImageReady={handleImageReady} />
-              </TiltCard>
+              </MotionTiltCard>
             </MotionItem>
           ))}
         </StaggerChildren>

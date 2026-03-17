@@ -1,19 +1,23 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import type { SxProps, Theme } from '@mui/material/styles';
-import FolderOpenOutlined from '@mui/icons-material/FolderOpenOutlined';
-import SearchOutlined from '@mui/icons-material/SearchOutlined';
-import AccountTreeOutlined from '@mui/icons-material/AccountTreeOutlined';
-import PlayArrowOutlined from '@mui/icons-material/PlayArrowOutlined';
+import FileCopyOutlined from '@mui/icons-material/FileCopyOutlined';
+import AutoAwesomeOutlined from '@mui/icons-material/AutoAwesomeOutlined';
+import GitHub from '@mui/icons-material/GitHub';
+import LoopOutlined from '@mui/icons-material/LoopOutlined';
 import ExtensionOutlined from '@mui/icons-material/ExtensionOutlined';
+import AccountTreeOutlined from '@mui/icons-material/AccountTreeOutlined';
+import Inventory2Outlined from '@mui/icons-material/Inventory2Outlined';
 import { VSCODE_COLORS, VSCODE_LAYOUT } from './vscodeTokens';
 
 const icons = [
-  FolderOpenOutlined,
-  SearchOutlined,
-  AccountTreeOutlined,
-  PlayArrowOutlined,
-  ExtensionOutlined,
+  FileCopyOutlined, // Explorer
+  AutoAwesomeOutlined, // Copilot Chat
+  GitHub, // GitHub
+  LoopOutlined, // GitHub Actions
+  ExtensionOutlined, // Extensions
+  AccountTreeOutlined, // Source Control
+  Inventory2Outlined, // Remote / Container
 ];
 
 interface VscodeActivityBarProps {

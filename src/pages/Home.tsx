@@ -18,6 +18,7 @@ import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
+import { MotionTiltCard } from '../motion';
 
 const heroLines: TerminalLine[] = [
   { command: 'node --version', output: 'v22.14.0' },
@@ -66,11 +67,13 @@ export default function Home() {
           </HeroMotionPath>
         )}
       >
-        <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
-          {isHeroAnimationReady ? (
-            <TerminalHeroContent lines={heroLines} playing={isTypewriterPlaying} />
-          ) : null}
-        </AnimatedContentCard>
+        <MotionTiltCard intensity={0.7}>
+          <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
+            {isHeroAnimationReady ? (
+              <TerminalHeroContent lines={heroLines} playing={isTypewriterPlaying} />
+            ) : null}
+          </AnimatedContentCard>
+        </MotionTiltCard>
 
         <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
           <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
