@@ -365,7 +365,7 @@ Files that would be created or modified by implementing this plan:
 
 ---
 
-## 11. Proposed Approach (for implementation phase)
+## 11. Approach (for implementation phase)
 
 1. Fix pre-existing failures in `Blog.test.tsx` and `useBlogData.test.ts` first so the baseline is green.
 2. Implement P1 tests (7 new files) and the `Header` mobile layout extension.
@@ -403,7 +403,6 @@ Files that would be created or modified by implementing this plan:
   - Build passes.
   - E2E directory is absent from the branch.
 - 2026-03-17: Step 1 started by fixing the stale blog assertions called out in the proposed approach.
-  - Updated `test/unit/pages/Blog.test.tsx` to use unambiguous hero and tag-chip assertions based on the mocked data.
-  - Updated `test/unit/hooks/useBlogData.test.ts` to stop assuming a fixed order for equal-frequency tags.
+  - Updated `test/unit/pages/Blog.test.tsx` and `test/unit/hooks/useBlogData.test.ts` to resolve the stale blog assertions called out in step 1.
   - `CI=true npm test -- --watch=false --runInBand test/unit/pages/Blog.test.tsx test/unit/hooks/useBlogData.test.ts` passes.
   - Full-suite validation still reports unrelated failures in `test/unit/styles/appStyleBuilders.test.ts`, `test/unit/constants/commandPaletteActions.test.ts`, and `test/unit/pages/CV.test.tsx`; the blog-related pre-existing failures are resolved.
