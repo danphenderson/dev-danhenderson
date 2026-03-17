@@ -4,7 +4,7 @@ import { keyframes } from '@emotion/react';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { TerminalLine } from '../../types/ui';
 import type { TerminalTypewriterPhase } from '../text/useTerminalTypewriter';
-import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily } from './vscodeTokens';
+import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily, systemFontFamily } from './vscodeTokens';
 
 // Module-level keyframe — prevents Emotion from generating duplicate names on re-renders
 const cursorBlink = keyframes`
@@ -47,7 +47,7 @@ const GitStatusLine: React.FC = () => (
       sx={{
         flex: 1,
         height: '1px',
-        backgroundColor: VSCODE_COLORS.lineNumber,
+        backgroundColor: 'rgba(255,255,255,0.06)',
         ml: '0.75ch',
       }}
     />
@@ -100,17 +100,44 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
           flexShrink: 0,
         }}
       >
-        <Box
-          component="span"
-          sx={{
-            fontFamily: monoFontFamily,
-            fontSize: '0.68rem',
-            letterSpacing: '0.06em',
-            color: VSCODE_COLORS.foreground,
-            userSelect: 'none',
-          }}
-        >
-          TERMINAL
+        {/* Panel tab row — TERMINAL is the active panel tab */}
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Box
+            component="span"
+            sx={{
+              fontFamily: systemFontFamily,
+              fontSize: '0.68rem',
+              fontWeight: 500,
+              letterSpacing: '0.04em',
+              color: VSCODE_COLORS.foreground,
+              userSelect: 'none',
+              textTransform: 'uppercase',
+              borderBottom: '1px solid ' + VSCODE_COLORS.activeTabAccent,
+              pb: '4px',
+            }}
+          >
+            Terminal
+          </Box>
+          {/* Inactive panel tabs for realism */}
+          {['Problems', 'Output'].map((label) => (
+            <Box
+              key={label}
+              component="span"
+              sx={{
+                fontFamily: systemFontFamily,
+                fontSize: '0.68rem',
+                fontWeight: 400,
+                letterSpacing: '0.04em',
+                color: VSCODE_COLORS.inactiveTab,
+                userSelect: 'none',
+                textTransform: 'uppercase',
+                pb: '4px',
+                borderBottom: '1px solid transparent',
+              }}
+            >
+              {label}
+            </Box>
+          ))}
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           {/* Active zsh session */}
@@ -125,9 +152,9 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
               component="span"
               sx={{
                 fontFamily: monoFontFamily,
-                fontSize: '0.60rem',
+                fontSize: '0.58rem',
                 color: VSCODE_COLORS.inactiveTab,
-                border: `1px solid ${VSCODE_COLORS.panelBorder}`,
+                border: `1px solid rgba(255,255,255,0.12)`,
                 borderRadius: '2px',
                 px: '3px',
                 lineHeight: 1.5,
@@ -140,7 +167,7 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
               component="span"
               sx={{
                 fontFamily: monoFontFamily,
-                fontSize: '0.68rem',
+                fontSize: '0.66rem',
                 color: VSCODE_COLORS.foreground,
                 userSelect: 'none',
               }}
@@ -153,21 +180,43 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
             component="span"
             sx={{
               fontFamily: monoFontFamily,
-              fontSize: '0.78rem',
+              fontSize: '0.76rem',
               color: VSCODE_COLORS.inactiveTab,
               userSelect: 'none',
+              cursor: 'default',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
             }}
           >
-            {'+ ⌄'}
+            <Box
+              component="span"
+              sx={{ '&:hover': { color: VSCODE_COLORS.foreground }, transition: 'color 0.1s' }}
+            >
+              +
+            </Box>
+            <Box
+              component="span"
+              sx={{
+                fontSize: '0.6rem',
+                '&:hover': { color: VSCODE_COLORS.foreground },
+                transition: 'color 0.1s',
+              }}
+            >
+              ⌄
+            </Box>
           </Box>
           {/* Split pane */}
           <Box
             component="span"
             sx={{
               fontFamily: monoFontFamily,
-              fontSize: '0.78rem',
+              fontSize: '0.76rem',
               color: VSCODE_COLORS.inactiveTab,
               userSelect: 'none',
+              cursor: 'default',
+              '&:hover': { color: VSCODE_COLORS.foreground },
+              transition: 'color 0.1s',
             }}
           >
             {'⊟'}
@@ -177,10 +226,13 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
             component="span"
             sx={{
               fontFamily: monoFontFamily,
-              fontSize: '0.80rem',
+              fontSize: '0.78rem',
               color: VSCODE_COLORS.inactiveTab,
               userSelect: 'none',
-              letterSpacing: '0.15em',
+              letterSpacing: '0.12em',
+              cursor: 'default',
+              '&:hover': { color: VSCODE_COLORS.foreground },
+              transition: 'color 0.1s',
             }}
           >
             {'···'}
@@ -196,11 +248,11 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
           flexShrink: 0,
           backgroundColor: VSCODE_COLORS.terminalBg,
           fontFamily: monoFontFamily,
-          fontSize: { xs: '0.82rem', sm: '0.92rem', md: '1rem' },
+          fontSize: { xs: '0.80rem', sm: '0.88rem', md: '0.95rem' },
           lineHeight: 1.7,
           color: VSCODE_COLORS.foreground,
           px: 1.5,
-          py: 1,
+          py: 0.75,
           overflowY: 'auto',
           // Hide scrollbar to keep the terminal looking clean
           '&::-webkit-scrollbar': { display: 'none' },

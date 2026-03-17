@@ -18,7 +18,7 @@ export const VscodeIntelliSenseTooltip: React.FC = () => (
       left: 0,
       mt: '4px',
       zIndex: 10,
-      backgroundColor: '#252526',
+      backgroundColor: VSCODE_COLORS.commandPaletteBg,
       border: `1px solid ${VSCODE_COLORS.panelBorder}`,
       borderRadius: '3px',
       px: 1.5,

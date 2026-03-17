@@ -1,7 +1,13 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import SearchOutlined from '@mui/icons-material/SearchOutlined';
-import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily } from './vscodeTokens';
+import {
+  VSCODE_COLORS,
+  VSCODE_LAYOUT,
+  VSCODE_WINDOW_SHADOW,
+  monoFontFamily,
+  systemFontFamily,
+} from './vscodeTokens';
 
 interface VscodeCommandPaletteProps {
   visible: boolean;
@@ -48,9 +54,9 @@ export const VscodeCommandPalette: React.FC<VscodeCommandPaletteProps> = ({
           backgroundColor: VSCODE_COLORS.commandPaletteBg,
           border: `1px solid ${VSCODE_COLORS.panelBorder}`,
           borderRadius: '6px',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
+          boxShadow: VSCODE_WINDOW_SHADOW,
           overflow: 'hidden',
-          fontFamily: monoFontFamily,
+          fontFamily: systemFontFamily,
         }}
       >
         {/* Search input */}
@@ -83,7 +89,12 @@ export const VscodeCommandPalette: React.FC<VscodeCommandPaletteProps> = ({
             }}
           >
             <SearchOutlined
-              sx={{ fontSize: '0.85rem', color: VSCODE_COLORS.panelLabel, mr: 0.5, verticalAlign: 'middle' }}
+              sx={{
+                fontSize: '0.85rem',
+                color: VSCODE_COLORS.panelLabel,
+                mr: 0.5,
+                verticalAlign: 'middle',
+              }}
             />
             <Box component="span" sx={{ color: VSCODE_COLORS.inactiveTab }}>
               Type a command...

@@ -5,25 +5,30 @@
 
 export const monoFontFamily = '"SF Mono", "Fira Code", "Fira Mono", Menlo, Consolas, monospace';
 
+// System UI font for window chrome labels (title bar, panel headers)
+export const systemFontFamily =
+  '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+
 // ---------------------------------------------------------------------------
 // Color palette
 // ---------------------------------------------------------------------------
 
 export const VSCODE_COLORS = {
-  // Zone backgrounds
-  titleBarBg: '#1a1a1a',
-  activityBarBg: '#222222',
-  tabBarBg: '#2d2d2d',
+  // Zone backgrounds — subtle depth progression from outer to inner
+  titleBarBg: '#323233',
+  activityBarBg: '#2c2c2d',
+  tabBarBg: '#252526',
   activeTabBg: '#1e1e1e',
   inactiveTabBg: '#2d2d2d',
   editorBg: '#1e1e1e',
-  terminalHeaderBg: '#252525',
-  terminalBg: '#181818',
+  terminalHeaderBg: '#383838',
+  terminalBg: '#1a1a1a',
 
-  // Borders
-  titleBorder: 'rgba(255,255,255,0.08)',
-  tabBorder: 'rgba(255,255,255,0.08)',
-  panelBorder: 'rgba(255,255,255,0.10)',
+  // Borders — consistent subtle separation
+  titleBorder: 'rgba(0,0,0,0.35)',
+  tabBorder: 'rgba(0,0,0,0.25)',
+  panelBorder: 'rgba(0,0,0,0.30)',
+  sashBorder: 'rgba(255,255,255,0.04)',
 
   // Active tab top accent
   activeTabAccent: '#007acc',
@@ -38,10 +43,11 @@ export const VSCODE_COLORS = {
   syntaxTypeAnnotation: '#4ec9b0',
 
   // UI chrome text
-  lineNumber: 'rgba(255,255,255,0.28)',
-  inactiveTab: 'rgba(255,255,255,0.45)',
-  panelLabel: 'rgba(255,255,255,0.55)',
-  titleLabel: 'rgba(255,255,255,0.40)',
+  lineNumber: 'rgba(255,255,255,0.22)',
+  lineNumberActive: 'rgba(255,255,255,0.80)',
+  inactiveTab: 'rgba(255,255,255,0.50)',
+  panelLabel: 'rgba(255,255,255,0.60)',
+  titleLabel: 'rgba(255,255,255,0.65)',
   foreground: 'rgba(255,255,255,0.92)',
 
   // macOS-style window control dots
@@ -53,11 +59,12 @@ export const VSCODE_COLORS = {
   gutterAdd: '#28c840',
 
   // Minimap
-  minimapBg: '#1a1a1a',
+  minimapBg: '#232323',
 
   // Breadcrumb
-  breadcrumbBg: '#252526',
-  breadcrumbSep: 'rgba(255,255,255,0.30)',
+  breadcrumbBg: '#1e1e1e',
+  breadcrumbSep: 'rgba(255,255,255,0.25)',
+  breadcrumbText: 'rgba(255,255,255,0.50)',
 
   // Explorer sidebar
   explorerBg: '#252526',
@@ -73,14 +80,19 @@ export const VSCODE_COLORS = {
   // Fold gutter
   foldIndicator: 'rgba(255,255,255,0.35)',
 
-  // Status bar dropdown
+  // Status bar
+  statusBarBg: '#007acc',
   statusDropdownBg: '#252526',
 
   // Terminal prompt colors
   promptPath: 'rgba(255,255,255,0.40)',
   promptDollar: '#28c840',
   promptBranch: '#e5c07b',
-  outputText: 'rgba(255,255,255,0.58)',
+  outputText: 'rgba(255,255,255,0.55)',
+
+  // Hover / focus-visible affordances
+  iconHover: 'rgba(255,255,255,0.10)',
+  tabCloseHover: 'rgba(255,255,255,0.15)',
 } as const;
 
 // ---------------------------------------------------------------------------
@@ -88,17 +100,24 @@ export const VSCODE_COLORS = {
 // ---------------------------------------------------------------------------
 
 export const VSCODE_LAYOUT = {
-  titleBarHeight: 32,
-  activityBarWidth: 40,
-  tabBarHeight: 35,
-  panelHeaderHeight: 28,
-  statusBarHeight: 22,
-  lineNumberWidth: '2ch',
-  lineNumberGutter: 12, // px gap between line number and code
-  breadcrumbHeight: 22,
-  gutterWidth: 4,
-  minimapWidth: 48,
-  explorerWidth: 160,
-  commandPaletteWidth: 420,
-  foldGutterWidth: 14,
+  titleBarHeight: 38,
+  activityBarWidth: 48,
+  tabBarHeight: 36,
+  panelHeaderHeight: 30,
+  statusBarHeight: 24,
+  lineNumberWidth: '3ch',
+  lineNumberGutter: 16, // px gap between line number and code
+  breadcrumbHeight: 24,
+  gutterWidth: 3,
+  minimapWidth: 54,
+  explorerWidth: 170,
+  commandPaletteWidth: 440,
+  foldGutterWidth: 16,
 } as const;
+
+// ---------------------------------------------------------------------------
+// Outer window shadow for the desktop-app look
+// ---------------------------------------------------------------------------
+
+export const VSCODE_WINDOW_SHADOW = '0 8px 40px rgba(0,0,0,0.55), 0 2px 12px rgba(0,0,0,0.35)';
+export const VSCODE_WINDOW_RADIUS = 8;

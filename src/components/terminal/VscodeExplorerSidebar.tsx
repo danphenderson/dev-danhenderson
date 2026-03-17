@@ -4,7 +4,7 @@ import InsertDriveFileOutlined from '@mui/icons-material/InsertDriveFileOutlined
 import FolderOutlined from '@mui/icons-material/FolderOutlined';
 import KeyboardArrowDownOutlined from '@mui/icons-material/KeyboardArrowDownOutlined';
 import KeyboardArrowRightOutlined from '@mui/icons-material/KeyboardArrowRightOutlined';
-import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily } from './vscodeTokens';
+import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily, systemFontFamily } from './vscodeTokens';
 
 interface FileEntry {
   name: string;
@@ -48,7 +48,7 @@ export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({ vi
         sx={{
           px: 1.5,
           py: 0.5,
-          fontFamily: monoFontFamily,
+          fontFamily: systemFontFamily,
           fontSize: '0.62rem',
           fontWeight: 600,
           letterSpacing: '0.08em',
@@ -65,7 +65,7 @@ export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({ vi
         sx={{
           px: 1,
           py: 0.25,
-          fontFamily: monoFontFamily,
+          fontFamily: systemFontFamily,
           fontSize: '0.65rem',
           fontWeight: 700,
           letterSpacing: '0.04em',
@@ -95,15 +95,11 @@ export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({ vi
               fontFamily: monoFontFamily,
               fontSize: '0.68rem',
               color:
-                entry.name === 'portfolio.ts'
-                  ? VSCODE_COLORS.foreground
-                  : VSCODE_COLORS.panelLabel,
+                entry.name === 'portfolio.ts' ? VSCODE_COLORS.foreground : VSCODE_COLORS.panelLabel,
               userSelect: 'none',
               cursor: 'default',
               backgroundColor:
-                entry.name === 'portfolio.ts'
-                  ? VSCODE_COLORS.explorerItemActive
-                  : 'transparent',
+                entry.name === 'portfolio.ts' ? VSCODE_COLORS.explorerItemActive : 'transparent',
               '&:hover': {
                 backgroundColor: VSCODE_COLORS.explorerItemHover,
               },
@@ -120,9 +116,7 @@ export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({ vi
                     sx={{ fontSize: '0.8rem', color: VSCODE_COLORS.panelLabel }}
                   />
                 )}
-                <FolderOutlined
-                  sx={{ fontSize: '0.85rem', color: '#dcb67a' }}
-                />
+                <FolderOutlined sx={{ fontSize: '0.85rem', color: '#dcb67a' }} />
               </>
             ) : (
               <>

@@ -12,6 +12,7 @@ import { VscodeStatusBar } from './terminal/VscodeStatusBar';
 import { VscodeNotificationToast } from './terminal/VscodeNotificationToast';
 import { VscodeExplorerSidebar } from './terminal/VscodeExplorerSidebar';
 import { VscodeCommandPalette } from './terminal/VscodeCommandPalette';
+import { VSCODE_WINDOW_SHADOW, VSCODE_WINDOW_RADIUS, VSCODE_COLORS } from './terminal/vscodeTokens';
 
 export type { TerminalLine };
 
@@ -95,8 +96,11 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
           width: '100%',
           overflow: 'hidden',
           position: 'relative',
-          // Ensure the inner dark surface fills the shell card
-          backgroundColor: '#1e1e1e',
+          backgroundColor: VSCODE_COLORS.editorBg,
+          borderRadius: `${VSCODE_WINDOW_RADIUS}px`,
+          boxShadow: VSCODE_WINDOW_SHADOW,
+          // Subtle outer border for the desktop-window chrome look
+          border: '1px solid rgba(255,255,255,0.06)',
         },
         ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
       ]}

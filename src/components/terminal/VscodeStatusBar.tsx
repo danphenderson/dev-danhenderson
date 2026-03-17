@@ -1,8 +1,13 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import { keyframes } from '@emotion/react';
-import { useTheme } from '@mui/material/styles';
-import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily } from './vscodeTokens';
+import {
+  VSCODE_COLORS,
+  VSCODE_LAYOUT,
+  VSCODE_WINDOW_RADIUS,
+  monoFontFamily,
+  systemFontFamily,
+} from './vscodeTokens';
 
 const PROMPT_PREFIX = '~ $ ';
 
@@ -22,6 +27,11 @@ const StatusSegment: React.FC<{
     sx={{
       position: 'relative',
       cursor: dropdown ? 'pointer' : 'default',
+      px: '4px',
+      py: '1px',
+      borderRadius: '3px',
+      transition: 'background-color 0.1s',
+      '&:hover': { backgroundColor: 'rgba(255,255,255,0.12)' },
       ...(dropdown && {
         '&:hover .status-dropdown': { display: 'block' },
       }),
@@ -77,10 +87,18 @@ interface VscodeStatusBarProps {
   historyLineCount?: number;
 }
 
-export const VscodeStatusBar: React.FC<VscodeStatusBarProps> = ({ commandText, historyLineCount = 0 }) => {
-  const theme = useTheme();
+export const VscodeStatusBar: React.FC<VscodeStatusBarProps> = ({
+  commandText,
+  historyLineCount = 0,
+}) => {
   const col = commandText.length + PROMPT_PREFIX.length + 1;
   const ln = historyLineCount + 1;
+
+  const segmentFont = {
+    fontFamily: systemFontFamily,
+    fontSize: '0.66rem',
+    fontWeight: 400,
+  };
 
   return (
     <Box
@@ -90,10 +108,12 @@ export const VscodeStatusBar: React.FC<VscodeStatusBarProps> = ({ commandText, h
         alignItems: 'center',
         justifyContent: 'space-between',
         height: VSCODE_LAYOUT.statusBarHeight,
-        px: 1.5,
-        backgroundColor: theme.palette.primary.main,
+        backgroundColor: VSCODE_COLORS.statusBarBg,
         flexShrink: 0,
         position: 'relative',
+        borderBottomLeftRadius: VSCODE_WINDOW_RADIUS,
+        borderBottomRightRadius: VSCODE_WINDOW_RADIUS,
+        overflow: 'hidden',
       }}
     >
       {/* Left cluster */}
@@ -101,18 +121,33 @@ export const VscodeStatusBar: React.FC<VscodeStatusBarProps> = ({ commandText, h
         sx={{
           display: 'flex',
           alignItems: 'center',
-          gap: 1.5,
-          fontFamily: monoFontFamily,
-          fontSize: '0.65rem',
-          color: 'rgba(255,255,255,0.90)',
+          gap: 0.25,
+          ...segmentFont,
+          color: 'rgba(255,255,255,0.92)',
           userSelect: 'none',
           whiteSpace: 'nowrap',
+          pl: 1,
         }}
       >
-        <StatusSegment
-          label="⎇ main"
-          dropdown={['main', 'develop', 'feature/hero-shell']}
-        />
+        {/* Remote indicator pill */}
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '3px',
+            backgroundColor: 'rgba(0,0,0,0.18)',
+            px: '6px',
+            py: '1px',
+            borderRadius: '3px',
+            mr: 0.5,
+          }}
+        >
+          <Box component="span" sx={{ fontSize: '0.72rem', lineHeight: 1 }}>
+            {'><'}
+          </Box>
+          <Box component="span">WSL</Box>
+        </Box>
+        <StatusSegment label="⎇ main" dropdown={['main', 'develop', 'feature/hero-shell']} />
         <StatusSegment label="⚠ 0" />
         <StatusSegment label="✗ 0" />
       </Box>
@@ -122,32 +157,30 @@ export const VscodeStatusBar: React.FC<VscodeStatusBarProps> = ({ commandText, h
         sx={{
           display: 'flex',
           alignItems: 'center',
-          gap: 1.5,
-          fontFamily: monoFontFamily,
-          fontSize: '0.65rem',
-          color: 'rgba(255,255,255,0.90)',
+          gap: 0.25,
+          ...segmentFont,
+          color: 'rgba(255,255,255,0.92)',
           userSelect: 'none',
           whiteSpace: 'nowrap',
+          pr: 1,
         }}
       >
         <StatusSegment
           label="TypeScript"
           dropdown={['TypeScript', 'JavaScript', 'JSON', 'Markdown']}
         />
-        <span
+        <Box
+          component="span"
           key={col}
-          style={{ animation: `${colFlash} 0.3s ease-out` }}
+          sx={{
+            px: '4px',
+            animation: `${colFlash} 0.3s ease-out`,
+          }}
         >
           Ln {ln}, Col {col}
-        </span>
-        <StatusSegment
-          label="UTF-8"
-          dropdown={['UTF-8', 'UTF-16', 'ASCII']}
-        />
-        <StatusSegment
-          label="LF"
-          dropdown={['LF', 'CRLF']}
-        />
+        </Box>
+        <StatusSegment label="UTF-8" dropdown={['UTF-8', 'UTF-16', 'ASCII']} />
+        <StatusSegment label="LF" dropdown={['LF', 'CRLF']} />
       </Box>
     </Box>
   );

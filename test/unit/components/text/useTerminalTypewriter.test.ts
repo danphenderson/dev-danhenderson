@@ -16,9 +16,7 @@ describe('useTerminalTypewriter', () => {
   });
 
   it('starts in idle phase and does not type when not playing', () => {
-    const { result } = renderHook(() =>
-      useTerminalTypewriter({ lines, playing: false })
-    );
+    const { result } = renderHook(() => useTerminalTypewriter({ lines, playing: false }));
 
     expect(result.current.phase).toBe('idle');
     expect(result.current.commandText).toBe('');
@@ -29,8 +27,7 @@ describe('useTerminalTypewriter', () => {
 
   it('begins typing the command when playing transitions to true', () => {
     const { result, rerender } = renderHook(
-      ({ playing }) =>
-        useTerminalTypewriter({ lines, playing }),
+      ({ playing }) => useTerminalTypewriter({ lines, playing }),
       { initialProps: { playing: false } }
     );
 
@@ -51,7 +48,9 @@ describe('useTerminalTypewriter', () => {
 
     // Type 'hello' one char at a time (use large intervals to avoid firing pause timer)
     for (let i = 0; i < 5; i++) {
-      act(() => { jest.advanceTimersByTime(300); });
+      act(() => {
+        jest.advanceTimersByTime(300);
+      });
     }
 
     expect(result.current.commandText).toBe('hello');
@@ -71,20 +70,24 @@ describe('useTerminalTypewriter', () => {
 
     // Type the full command
     for (let i = 0; i < 5; i++) {
-      act(() => { jest.advanceTimersByTime(300); });
+      act(() => {
+        jest.advanceTimersByTime(300);
+      });
     }
     expect(result.current.phase).toBe('pause-before-output');
     expect(result.current.outputText).toBe('');
 
     // Fire the enter-pause timer — output appears instantly
-    act(() => { jest.advanceTimersByTime(600); });
+    act(() => {
+      jest.advanceTimersByTime(600);
+    });
 
     expect(result.current.phase).toBe('pause-after-output');
     expect(result.current.outputText).toBe('world');
     expect(result.current.commandText).toBe('hello');
   });
 
-  it('accumulates completed lines in history and starts typing the next command', () => {
+  it('clears screen after reading output then starts typing the next command', () => {
     const { result } = renderHook(() =>
       useTerminalTypewriter({
         lines,
@@ -99,22 +102,34 @@ describe('useTerminalTypewriter', () => {
 
     // Type 'hello'
     for (let i = 0; i < 5; i++) {
-      act(() => { jest.advanceTimersByTime(300); });
+      act(() => {
+        jest.advanceTimersByTime(300);
+      });
     }
     expect(result.current.phase).toBe('pause-before-output');
 
-    // Fire enter-pause timer
-    act(() => { jest.advanceTimersByTime(600); });
+    // Fire enter-pause timer — output appears instantly
+    act(() => {
+      jest.advanceTimersByTime(600);
+    });
     expect(result.current.phase).toBe('pause-after-output');
     expect(result.current.outputText).toBe('world');
 
-    // Fire the read-pause timer — history grows and next command starts
-    act(() => { jest.advanceTimersByTime(1100); });
+    // Fire the read-pause timer — Control+L clears screen, no history accumulation
+    act(() => {
+      jest.advanceTimersByTime(1100);
+    });
 
-    expect(result.current.history).toEqual([{ command: 'hello', output: 'world' }]);
-    expect(result.current.phase).toBe('typing-command');
+    expect(result.current.history).toEqual([]);
+    expect(result.current.phase).toBe('clearing-screen');
     expect(result.current.commandText).toBe('');
     expect(result.current.outputText).toBe('');
+
+    // After the screen-clear pause the next command begins
+    act(() => {
+      jest.advanceTimersByTime(600);
+    });
+    expect(result.current.phase).toBe('typing-command');
   });
 
   it('does not include typing-output, deleting-output, or deleting-command phases', () => {
@@ -133,7 +148,9 @@ describe('useTerminalTypewriter', () => {
 
     // Run through enough time to complete the first full cycle
     for (let i = 0; i < 20; i++) {
-      act(() => { jest.advanceTimersByTime(300); });
+      act(() => {
+        jest.advanceTimersByTime(300);
+      });
       observedPhases.add(result.current.phase);
     }
 
@@ -158,7 +175,9 @@ describe('useTerminalTypewriter', () => {
 
     // Advance through enough time to complete both lines and wrap
     for (let i = 0; i < 60; i++) {
-      act(() => { jest.advanceTimersByTime(300); });
+      act(() => {
+        jest.advanceTimersByTime(300);
+      });
     }
 
     // After wrapping, history should be empty since the cycle restarted
@@ -166,9 +185,7 @@ describe('useTerminalTypewriter', () => {
   });
 
   it('provides the default prompt text', () => {
-    const { result } = renderHook(() =>
-      useTerminalTypewriter({ lines, playing: true })
-    );
+    const { result } = renderHook(() => useTerminalTypewriter({ lines, playing: true }));
 
     expect(result.current.promptText).toBe('$ ');
   });

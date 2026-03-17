@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
+import ChevronRightOutlined from '@mui/icons-material/ChevronRightOutlined';
 import { cursorBlink } from '../../styles/animations';
 import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily } from './vscodeTokens';
 import { VscodeIntelliSenseTooltip } from './VscodeIntelliSenseTooltip';
@@ -13,6 +14,7 @@ const FOLDABLE_LINES = new Set([2]);
 interface CodeLineProps {
   lineNumber: number;
   hovered: boolean;
+  active: boolean;
   foldable: boolean;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
@@ -22,6 +24,7 @@ interface CodeLineProps {
 const CodeLine: React.FC<CodeLineProps> = ({
   lineNumber,
   hovered,
+  active,
   foldable,
   onMouseEnter,
   onMouseLeave,
@@ -34,9 +37,20 @@ const CodeLine: React.FC<CodeLineProps> = ({
     sx={{
       display: 'flex',
       alignItems: 'baseline',
-      lineHeight: 1.65,
-      backgroundColor: hovered ? 'rgba(255,255,255,0.04)' : 'transparent',
-      transition: 'background-color 0.12s',
+      lineHeight: 1.55,
+      backgroundColor: active
+        ? 'rgba(255,255,255,0.04)'
+        : hovered
+          ? 'rgba(255,255,255,0.02)'
+          : 'transparent',
+      transition: 'background-color 0.08s',
+      // Current-line left accent
+      ...(active && {
+        borderLeft: '2px solid rgba(255,255,255,0.12)',
+      }),
+      ...(!active && {
+        borderLeft: '2px solid transparent',
+      }),
     }}
   >
     {/* Fold gutter */}
@@ -46,11 +60,11 @@ const CodeLine: React.FC<CodeLineProps> = ({
         width: VSCODE_LAYOUT.foldGutterWidth,
         textAlign: 'center',
         flexShrink: 0,
-        fontSize: '0.6em',
+        fontSize: '0.55em',
         color: VSCODE_COLORS.foldIndicator,
         userSelect: 'none',
         opacity: foldable ? (hovered ? 1 : 0.5) : 0,
-        transition: 'opacity 0.12s',
+        transition: 'opacity 0.1s',
       }}
     >
       {foldable ? '▾' : ''}
@@ -58,16 +72,17 @@ const CodeLine: React.FC<CodeLineProps> = ({
     <Box
       component="span"
       sx={{
-        width: '2ch',
+        width: VSCODE_LAYOUT.lineNumberWidth,
         textAlign: 'right',
-        color: hovered ? VSCODE_COLORS.foreground : VSCODE_COLORS.lineNumber,
+        color: active ? VSCODE_COLORS.lineNumberActive : VSCODE_COLORS.lineNumber,
         userSelect: 'none',
         flexShrink: 0,
         mr: `${VSCODE_LAYOUT.lineNumberGutter}px`,
-        transition: 'color 0.12s',
+        transition: 'color 0.08s',
+        fontSize: '0.92em',
       }}
     >
-      {hovered ? '›' : lineNumber}
+      {lineNumber}
     </Box>
     {/* Git diff gutter marker */}
     <Box
@@ -75,10 +90,8 @@ const CodeLine: React.FC<CodeLineProps> = ({
       sx={{
         width: VSCODE_LAYOUT.gutterWidth,
         flexShrink: 0,
-        mr: '4px',
-        backgroundColor: GUTTER_ADD_LINES.has(lineNumber)
-          ? VSCODE_COLORS.gutterAdd
-          : 'transparent',
+        mr: '6px',
+        backgroundColor: GUTTER_ADD_LINES.has(lineNumber) ? VSCODE_COLORS.gutterAdd : 'transparent',
         borderRadius: '1px',
         alignSelf: 'stretch',
       }}
@@ -110,7 +123,7 @@ const varr = (text: string) => (
   </Box>
 );
 const comment = (text: string) => (
-  <Box component="span" sx={{ color: VSCODE_COLORS.syntaxComment }}>
+  <Box component="span" sx={{ color: VSCODE_COLORS.syntaxComment, fontStyle: 'italic' }}>
     {text}
   </Box>
 );
@@ -127,6 +140,8 @@ interface VscodeEditorPaneProps {
 
 export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = false }) => {
   const [hoveredLine, setHoveredLine] = React.useState<number | null>(null);
+  // The cursor/active line
+  const activeLine: number | null = playing ? 6 : null;
 
   return (
     <Box
@@ -142,7 +157,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
         overflow: 'visible',
       }}
     >
-      {/* Breadcrumb bar */}
+      {/* Breadcrumb bar — integrated with editor surface */}
       <Box
         sx={{
           display: 'flex',
@@ -150,32 +165,34 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
           height: VSCODE_LAYOUT.breadcrumbHeight,
           px: 1.5,
           backgroundColor: VSCODE_COLORS.breadcrumbBg,
-          borderBottom: `1px solid ${VSCODE_COLORS.panelBorder}`,
+          borderBottom: `1px solid ${VSCODE_COLORS.sashBorder}`,
           flexShrink: 0,
         }}
       >
         {['src', 'portfolio.ts', 'developer'].map((segment, i) => (
           <React.Fragment key={segment}>
             {i > 0 && (
-              <Box
-                component="span"
+              <ChevronRightOutlined
                 sx={{
-                  mx: 0.5,
+                  fontSize: '0.72rem',
                   color: VSCODE_COLORS.breadcrumbSep,
-                  fontSize: '0.6rem',
-                  userSelect: 'none',
+                  mx: '2px',
                 }}
-              >
-                ›
-              </Box>
+              />
             )}
             <Box
               component="span"
               sx={{
                 fontFamily: monoFontFamily,
-                fontSize: '0.65rem',
-                color: VSCODE_COLORS.panelLabel,
+                fontSize: '0.68rem',
+                color: i === 2 ? VSCODE_COLORS.foreground : VSCODE_COLORS.breadcrumbText,
                 userSelect: 'none',
+                px: '3px',
+                py: '1px',
+                borderRadius: '3px',
+                cursor: 'default',
+                transition: 'background-color 0.1s',
+                '&:hover': { backgroundColor: VSCODE_COLORS.iconHover },
               }}
             >
               {segment}
@@ -187,10 +204,11 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
       {/* Editor body with code + minimap */}
       <Box sx={{ display: 'flex', flex: 1, position: 'relative' }}>
         {/* Code area */}
-        <Box sx={{ flex: 1, px: 1.5, py: 1 }}>
+        <Box sx={{ flex: 1, pl: 0.5, pr: 1.5, py: 0.75 }}>
           <CodeLine
             lineNumber={1}
             hovered={hoveredLine === 1}
+            active={activeLine === 1}
             foldable={FOLDABLE_LINES.has(1)}
             onMouseEnter={() => setHoveredLine(1)}
             onMouseLeave={() => setHoveredLine(null)}
@@ -200,6 +218,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
           <CodeLine
             lineNumber={2}
             hovered={hoveredLine === 2}
+            active={activeLine === 2}
             foldable={FOLDABLE_LINES.has(2)}
             onMouseEnter={() => setHoveredLine(2)}
             onMouseLeave={() => setHoveredLine(null)}
@@ -222,6 +241,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
           <CodeLine
             lineNumber={3}
             hovered={hoveredLine === 3}
+            active={activeLine === 3}
             foldable={FOLDABLE_LINES.has(3)}
             onMouseEnter={() => setHoveredLine(3)}
             onMouseLeave={() => setHoveredLine(null)}
@@ -234,6 +254,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
           <CodeLine
             lineNumber={4}
             hovered={hoveredLine === 4}
+            active={activeLine === 4}
             foldable={FOLDABLE_LINES.has(4)}
             onMouseEnter={() => setHoveredLine(4)}
             onMouseLeave={() => setHoveredLine(null)}
@@ -249,6 +270,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
           <CodeLine
             lineNumber={5}
             hovered={hoveredLine === 5}
+            active={activeLine === 5}
             foldable={FOLDABLE_LINES.has(5)}
             onMouseEnter={() => setHoveredLine(5)}
             onMouseLeave={() => setHoveredLine(null)}
@@ -263,8 +285,10 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
               sx={{
                 display: 'flex',
                 alignItems: 'baseline',
-                lineHeight: 1.65,
+                lineHeight: 1.55,
                 mt: '1px',
+                backgroundColor: 'rgba(255,255,255,0.04)',
+                borderLeft: '2px solid rgba(255,255,255,0.12)',
               }}
             >
               <Box
@@ -277,12 +301,13 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
               <Box
                 component="span"
                 sx={{
-                  width: '2ch',
+                  width: VSCODE_LAYOUT.lineNumberWidth,
                   textAlign: 'right',
-                  color: VSCODE_COLORS.lineNumber,
+                  color: VSCODE_COLORS.lineNumberActive,
                   userSelect: 'none',
                   flexShrink: 0,
                   mr: `${VSCODE_LAYOUT.lineNumberGutter}px`,
+                  fontSize: '0.92em',
                 }}
               >
                 6
@@ -292,7 +317,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
                 sx={{
                   width: VSCODE_LAYOUT.gutterWidth,
                   flexShrink: 0,
-                  mr: '4px',
+                  mr: '6px',
                 }}
               />
               <Box
@@ -318,19 +343,35 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
             width: VSCODE_LAYOUT.minimapWidth,
             flexShrink: 0,
             backgroundColor: VSCODE_COLORS.minimapBg,
+            borderLeft: `1px solid ${VSCODE_COLORS.sashBorder}`,
             py: 1,
-            px: 0.5,
+            px: 0.75,
             gap: '3px',
+            position: 'relative',
           }}
         >
-          {[0.6, 0.85, 0.95, 0.8, 0.3].map((w, i) => (
+          {/* Viewport highlight slab */}
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 6,
+              left: 0,
+              right: 0,
+              height: 28,
+              backgroundColor: 'rgba(255,255,255,0.06)',
+              borderLeft: '2px solid rgba(255,255,255,0.12)',
+            }}
+          />
+          {[0.55, 0.82, 0.92, 0.78, 0.25].map((w, i) => (
             <Box
               key={i}
               sx={{
-                height: 3,
+                height: 2.5,
                 width: `${w * 100}%`,
-                backgroundColor: 'rgba(255,255,255,0.10)',
-                borderRadius: '1px',
+                backgroundColor: 'rgba(255,255,255,0.08)',
+                borderRadius: '0.5px',
+                position: 'relative',
+                zIndex: 1,
               }}
             />
           ))}
