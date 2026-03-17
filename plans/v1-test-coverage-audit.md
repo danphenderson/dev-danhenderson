@@ -62,54 +62,54 @@ blog data assertions). Build passes.
 These gaps represent untested behavior on primary user-facing routes or shared primitives that
 affect the entire app.
 
-| Area | Gap |
-|------|-----|
-| `GlobalCommandPalette` | Zero coverage. Keyboard shortcut registration, open/close state, search filtering, action dispatch, route navigation, and route-change auto-close are all untested. This is a cross-route feature used by every page. |
-| `CVStoryViewer` + `CVStoryNavBar` | Zero coverage on the CV story mode overlay, which is a full-viewport interaction surface with keyboard navigation (ArrowLeft/ArrowRight/Escape), direction-aware animation, and progress tracking. |
-| `TerminalHeroContent` | Zero coverage. The Home page hero orchestrator owns interactive state (explorer visibility, command palette, active tab, toast) and drives the typewriter animation. Page-level tests mock it away. |
-| `ImmersiveLightbox` | Zero coverage. Keyboard navigation (ArrowLeft/ArrowRight/Escape), photo index cycling, open/close state, and download link generation are all untested. Used on every photography category page. |
-| `RouteRecoveryPanel` | Zero coverage. The NotFound page mounts this component; its command palette integration, contextual suggestions, and recovery actions are untested. |
-| `commandPaletteSearch.ts` | Zero coverage. `matchesCommandPaletteAction` is the core search predicate for the command palette, a cross-route feature. Normalization, empty-query behavior, multi-field matching, and case-insensitivity need tests. |
-| `recoveryContext.ts` | Zero coverage. `buildRecoveryContext` drives the NotFound page's route hints and suggestion ranking. Path normalization, scoring, and edge-case inputs (empty path, malformed URL segments) are untested. |
+| Area                              | Gap                                                                                                                                                                                                                     |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GlobalCommandPalette`            | Zero coverage. Keyboard shortcut registration, open/close state, search filtering, action dispatch, route navigation, and route-change auto-close are all untested. This is a cross-route feature used by every page.   |
+| `CVStoryViewer` + `CVStoryNavBar` | Zero coverage on the CV story mode overlay, which is a full-viewport interaction surface with keyboard navigation (ArrowLeft/ArrowRight/Escape), direction-aware animation, and progress tracking.                      |
+| `TerminalHeroContent`             | Zero coverage. The Home page hero orchestrator owns interactive state (explorer visibility, command palette, active tab, toast) and drives the typewriter animation. Page-level tests mock it away.                     |
+| `ImmersiveLightbox`               | Zero coverage. Keyboard navigation (ArrowLeft/ArrowRight/Escape), photo index cycling, open/close state, and download link generation are all untested. Used on every photography category page.                        |
+| `RouteRecoveryPanel`              | Zero coverage. The NotFound page mounts this component; its command palette integration, contextual suggestions, and recovery actions are untested.                                                                     |
+| `commandPaletteSearch.ts`         | Zero coverage. `matchesCommandPaletteAction` is the core search predicate for the command palette, a cross-route feature. Normalization, empty-query behavior, multi-field matching, and case-insensitivity need tests. |
+| `recoveryContext.ts`              | Zero coverage. `buildRecoveryContext` drives the NotFound page's route hints and suggestion ranking. Path normalization, scoring, and edge-case inputs (empty path, malformed URL segments) are untested.               |
 
 ### Priority 2 — High / Significant regression risk
 
-| Area | Gap |
-|------|-----|
-| All blog components | Zero coverage across 12 components: `BlogTagFilter`, `BlogPostCard`, `BlogPostList`, `BlogHero`, `BlogArticleHeader`, `BlogArticleBody`, `BlogArticleNav`, `BlogMetaChips`, `BlogCodeBlock`, `BlogCallout`, `BlogBlockquote`, `BlogRelatedPosts`. Blog is a new `v1` feature; every interaction path is uncovered. |
-| `CVStorySlideRenderer` | Zero coverage. Renders each `CVStoryItem` kind — about, experience, education, certificate, volunteering, coding, end — with no tests for unknown kind fallback. |
-| `CVStoryProgress` | Zero coverage. Progress bar calculates filled segments from current index and total count. No tests for boundary values (first, last, single item). |
-| `ClimbingAnalytics` | Zero coverage. The main analytics visualization for the Climbing page is entirely untested. |
-| Photography components | Zero coverage: `AlbumCard`, `AlbumLocationSummary`, `AlbumShareButton`, `TiltCard`. AlbumShareButton exercises the Web Share API and clipboard fallback. |
-| `CommandPaletteProvider` | Zero unit coverage. State transitions (open, close, setQuery, openWithQuery) and hook contract are untested, though indirectly exercised through App.test.tsx. |
-| `WelcomeOnboardingProvider` | Zero dedicated coverage. Hint lifecycle (open, dismiss, reset) is only exercised indirectly through Home.test.tsx. |
-| `dom.ts` | Zero coverage on `getMaxScrollLeft` and `isElementInViewport`. Both are used by scroll-sensitive components. |
+| Area                        | Gap                                                                                                                                                                                                                                                                                                                |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| All blog components         | Zero coverage across 12 components: `BlogTagFilter`, `BlogPostCard`, `BlogPostList`, `BlogHero`, `BlogArticleHeader`, `BlogArticleBody`, `BlogArticleNav`, `BlogMetaChips`, `BlogCodeBlock`, `BlogCallout`, `BlogBlockquote`, `BlogRelatedPosts`. Blog is a new `v1` feature; every interaction path is uncovered. |
+| `CVStorySlideRenderer`      | Zero coverage. Renders each `CVStoryItem` kind — about, experience, education, certificate, volunteering, coding, end — with no tests for unknown kind fallback.                                                                                                                                                   |
+| `CVStoryProgress`           | Zero coverage. Progress bar calculates filled segments from current index and total count. No tests for boundary values (first, last, single item).                                                                                                                                                                |
+| `ClimbingAnalytics`         | Zero coverage. The main analytics visualization for the Climbing page is entirely untested.                                                                                                                                                                                                                        |
+| Photography components      | Zero coverage: `AlbumCard`, `AlbumLocationSummary`, `AlbumShareButton`, `TiltCard`. AlbumShareButton exercises the Web Share API and clipboard fallback.                                                                                                                                                           |
+| `CommandPaletteProvider`    | Zero unit coverage. State transitions (open, close, setQuery, openWithQuery) and hook contract are untested, though indirectly exercised through App.test.tsx.                                                                                                                                                     |
+| `WelcomeOnboardingProvider` | Zero dedicated coverage. Hint lifecycle (open, dismiss, reset) is only exercised indirectly through Home.test.tsx.                                                                                                                                                                                                 |
+| `dom.ts`                    | Zero coverage on `getMaxScrollLeft` and `isElementInViewport`. Both are used by scroll-sensitive components.                                                                                                                                                                                                       |
 
 ### Priority 3 — Medium / Technical debt and branch coverage
 
-| Area | Gap |
-|------|-----|
-| Terminal subcomponents (10 files) | Zero coverage: `VscodeActivityBar`, `VscodeCommandPalette`, `VscodeEditorPane`, `VscodeExplorerSidebar`, `VscodeIntelliSenseTooltip`, `VscodeNotificationToast`, `VscodeStatusBar`, `VscodeTabBar`, `VscodeTerminalPanel`, `VscodeTitleBar`. These are pure presentational, but some have conditional rendering logic. |
-| CV story components | Zero coverage: `CVStoryChapterHeading`, `CVStoryHeader`, `CVCertificatesSection`, `CVCodingSection`, `CVEducationSection`, `CVVolunteeringSection`, `CVSectionStack`. |
-| `cvStoryItems.ts` | `parseCVSortDate` has zero test coverage despite complex branching (season prefixes, ordinal suffixes, range strings, "Present"/"Current"). `buildCVStoryItems` sort order is also untested. |
-| `useWebVitals` | Zero coverage. The `supportsWebVitals` environment guard, dynamic `web-vitals` import, and metric accumulation are untested. |
-| `githubProfileData.ts` | Zero direct coverage. The cache module, cache invalidation, and `resetGitHubProfileDataCacheForTests` export are only exercised via `useGithubProfile` tests. |
-| `buildInfo.ts` | Zero coverage. Build-time constants are trivial but provide a useful smoke test for the build pipeline. |
-| `easing.ts` | Zero coverage for easing utility functions. |
-| `siteRoutes.ts` | Zero coverage. Route map structure, `primaryNavigationRoutes` filter, and `cvStoryModeMetadata` are untested. |
-| Motion system (`tokens.ts`, `variants.ts`, `components.tsx`) | Zero coverage. Token values, variant object shapes, and the `MotionCard`/`MotionSection`/`StaggerChildren` component props are untested. |
-| Styles (`animations.ts`, `appStyles.ts`, `componentStyles.ts`, `springEasing.ts`) | Zero dedicated coverage beyond the builder tests. |
-| `HeaderNav` | Existing test covers render and link presence but misses the active-route highlight and `showInPrimaryNav` filter behavior. |
-| `ScrollProgressBar` | Existing test only checks rendered CSS properties. Motion binding and `scrollYProgress` wiring are not verified. |
-| `CVSectionNavigator` | Missing test: idle-hide/reappear behavior when mouse leaves and re-enters the floating dial (covered in plan spec but not in suite). |
+| Area                                                                              | Gap                                                                                                                                                                                                                                                                                                                    |
+| --------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Terminal subcomponents (10 files)                                                 | Zero coverage: `VscodeActivityBar`, `VscodeCommandPalette`, `VscodeEditorPane`, `VscodeExplorerSidebar`, `VscodeIntelliSenseTooltip`, `VscodeNotificationToast`, `VscodeStatusBar`, `VscodeTabBar`, `VscodeTerminalPanel`, `VscodeTitleBar`. These are pure presentational, but some have conditional rendering logic. |
+| CV story components                                                               | Zero coverage: `CVStoryChapterHeading`, `CVStoryHeader`, `CVCertificatesSection`, `CVCodingSection`, `CVEducationSection`, `CVVolunteeringSection`, `CVSectionStack`.                                                                                                                                                  |
+| `cvStoryItems.ts`                                                                 | `parseCVSortDate` has zero test coverage despite complex branching (season prefixes, ordinal suffixes, range strings, "Present"/"Current"). `buildCVStoryItems` sort order is also untested.                                                                                                                           |
+| `useWebVitals`                                                                    | Zero coverage. The `supportsWebVitals` environment guard, dynamic `web-vitals` import, and metric accumulation are untested.                                                                                                                                                                                           |
+| `githubProfileData.ts`                                                            | Zero direct coverage. The cache module, cache invalidation, and `resetGitHubProfileDataCacheForTests` export are only exercised via `useGithubProfile` tests.                                                                                                                                                          |
+| `buildInfo.ts`                                                                    | Zero coverage. Build-time constants are trivial but provide a useful smoke test for the build pipeline.                                                                                                                                                                                                                |
+| `easing.ts`                                                                       | Zero coverage for easing utility functions.                                                                                                                                                                                                                                                                            |
+| `siteRoutes.ts`                                                                   | Zero coverage. Route map structure, `primaryNavigationRoutes` filter, and `cvStoryModeMetadata` are untested.                                                                                                                                                                                                          |
+| Motion system (`tokens.ts`, `variants.ts`, `components.tsx`)                      | Zero coverage. Token values, variant object shapes, and the `MotionCard`/`MotionSection`/`StaggerChildren` component props are untested.                                                                                                                                                                               |
+| Styles (`animations.ts`, `appStyles.ts`, `componentStyles.ts`, `springEasing.ts`) | Zero dedicated coverage beyond the builder tests.                                                                                                                                                                                                                                                                      |
+| `HeaderNav`                                                                       | Existing test covers render and link presence but misses the active-route highlight and `showInPrimaryNav` filter behavior.                                                                                                                                                                                            |
+| `ScrollProgressBar`                                                               | Existing test only checks rendered CSS properties. Motion binding and `scrollYProgress` wiring are not verified.                                                                                                                                                                                                       |
+| `CVSectionNavigator`                                                              | Missing test: idle-hide/reappear behavior when mouse leaves and re-enters the floating dial (covered in plan spec but not in suite).                                                                                                                                                                                   |
 
 ### Priority 4 — Low / Smoke and schema validation
 
-| Area | Gap |
-|------|-----|
+| Area                                                             | Gap                                                                                                                                                       |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Data modules (`blog.ts`, `climbs.ts`, `cv.ts`, `photography.ts`) | Zero schema validation tests. Required fields, type guards, and referential integrity (e.g., slug uniqueness, photography album references) are untested. |
-| `serviceWorkerRegistration.ts` | Zero coverage. PWA registration is a separate concern from UI, but the `register`/`unregister` paths have no integration test. |
-| `constants/animation.ts` | Zero coverage. Token values are trivially testable and protect against silent regressions. |
+| `serviceWorkerRegistration.ts`                                   | Zero coverage. PWA registration is a separate concern from UI, but the `register`/`unregister` paths have no integration test.                            |
+| `constants/animation.ts`                                         | Zero coverage. Token values are trivially testable and protect against silent regressions.                                                                |
 
 ---
 
@@ -120,60 +120,60 @@ created or extended. Files are listed in priority order.
 
 ### New test files (none exist)
 
-| Source file | Proposed test file | Priority |
-|-------------|-------------------|----------|
-| `src/components/GlobalCommandPalette.tsx` | `test/unit/components/GlobalCommandPalette.test.tsx` | P1 |
-| `src/components/cv/CVStoryViewer.tsx` | `test/unit/components/cv/CVStoryViewer.test.tsx` | P1 |
-| `src/components/cv/CVStoryNavBar.tsx` | `test/unit/components/cv/CVStoryNavBar.test.tsx` | P1 |
-| `src/components/TerminalHeroContent.tsx` | `test/unit/components/TerminalHeroContent.test.tsx` | P1 |
-| `src/components/photography/ImmersiveLightbox.tsx` | `test/unit/components/photography/ImmersiveLightbox.test.tsx` | P1 |
-| `src/components/RouteRecoveryPanel.tsx` | `test/unit/components/RouteRecoveryPanel.test.tsx` | P1 |
-| `src/utils/commandPaletteSearch.ts` | `test/unit/utils/commandPaletteSearch.test.ts` | P1 |
-| `src/constants/recoveryContext.ts` | `test/unit/constants/recoveryContext.test.ts` | P1 |
-| `src/components/blog/BlogTagFilter.tsx` | `test/unit/components/blog/BlogTagFilter.test.tsx` | P2 |
-| `src/components/blog/BlogPostCard.tsx` | `test/unit/components/blog/BlogPostCard.test.tsx` | P2 |
-| `src/components/blog/BlogPostList.tsx` | `test/unit/components/blog/BlogPostList.test.tsx` | P2 |
-| `src/components/blog/BlogHero.tsx` | `test/unit/components/blog/BlogHero.test.tsx` | P2 |
-| `src/components/blog/BlogArticleHeader.tsx` | `test/unit/components/blog/BlogArticleHeader.test.tsx` | P2 |
-| `src/components/blog/BlogArticleBody.tsx` | `test/unit/components/blog/BlogArticleBody.test.tsx` | P2 |
-| `src/components/blog/BlogArticleNav.tsx` | `test/unit/components/blog/BlogArticleNav.test.tsx` | P2 |
-| `src/components/blog/BlogMetaChips.tsx` | `test/unit/components/blog/BlogMetaChips.test.tsx` | P2 |
-| `src/components/blog/BlogCodeBlock.tsx` | `test/unit/components/blog/BlogCodeBlock.test.tsx` | P2 |
-| `src/components/blog/BlogCallout.tsx` | `test/unit/components/blog/BlogCallout.test.tsx` | P2 |
-| `src/components/blog/BlogBlockquote.tsx` | `test/unit/components/blog/BlogBlockquote.test.tsx` | P2 |
-| `src/components/blog/BlogRelatedPosts.tsx` | `test/unit/components/blog/BlogRelatedPosts.test.tsx` | P2 |
-| `src/components/cv/CVStorySlideRenderer.tsx` | `test/unit/components/cv/CVStorySlideRenderer.test.tsx` | P2 |
-| `src/components/cv/CVStoryProgress.tsx` | `test/unit/components/cv/CVStoryProgress.test.tsx` | P2 |
-| `src/components/climbing/ClimbingAnalytics.tsx` | `test/unit/components/climbing/ClimbingAnalytics.test.tsx` | P2 |
-| `src/components/photography/AlbumCard.tsx` | `test/unit/components/photography/AlbumCard.test.tsx` | P2 |
-| `src/components/photography/AlbumLocationSummary.tsx` | `test/unit/components/photography/AlbumLocationSummary.test.tsx` | P2 |
-| `src/components/photography/AlbumShareButton.tsx` | `test/unit/components/photography/AlbumShareButton.test.tsx` | P2 |
-| `src/components/photography/TiltCard.tsx` | `test/unit/components/photography/TiltCard.test.tsx` | P2 |
-| `src/CommandPaletteProvider.tsx` | `test/unit/CommandPaletteProvider.test.tsx` | P2 |
-| `src/WelcomeOnboardingProvider.tsx` | `test/unit/WelcomeOnboardingProvider.test.tsx` | P2 |
-| `src/utils/dom.ts` | `test/unit/utils/dom.test.ts` | P2 |
-| `src/data/cvStoryItems.ts` | `test/unit/data/cvStoryItems.test.ts` | P3 |
-| `src/hooks/useWebVitals.ts` | `test/unit/hooks/useWebVitals.test.ts` | P3 |
-| `src/constants/siteRoutes.ts` | `test/unit/constants/siteRoutes.test.ts` | P3 |
-| `src/utils/easing.ts` | `test/unit/utils/easing.test.ts` | P3 |
-| `src/utils/buildInfo.ts` | `test/unit/utils/buildInfo.test.ts` | P4 |
-| `src/constants/animation.ts` | `test/unit/constants/animation.test.ts` | P4 |
-| `src/data/blog.ts` | `test/unit/data/blog.test.ts` | P4 |
-| `src/data/cv.ts` | `test/unit/data/cv.test.ts` | P4 |
-| `src/data/photography.ts` | `test/unit/data/photography.test.ts` | P4 |
-| `src/data/climbs.ts` | `test/unit/data/climbs.test.ts` | P4 |
+| Source file                                           | Proposed test file                                               | Priority |
+| ----------------------------------------------------- | ---------------------------------------------------------------- | -------- |
+| `src/components/GlobalCommandPalette.tsx`             | `test/unit/components/GlobalCommandPalette.test.tsx`             | P1       |
+| `src/components/cv/CVStoryViewer.tsx`                 | `test/unit/components/cv/CVStoryViewer.test.tsx`                 | P1       |
+| `src/components/cv/CVStoryNavBar.tsx`                 | `test/unit/components/cv/CVStoryNavBar.test.tsx`                 | P1       |
+| `src/components/TerminalHeroContent.tsx`              | `test/unit/components/TerminalHeroContent.test.tsx`              | P1       |
+| `src/components/photography/ImmersiveLightbox.tsx`    | `test/unit/components/photography/ImmersiveLightbox.test.tsx`    | P1       |
+| `src/components/RouteRecoveryPanel.tsx`               | `test/unit/components/RouteRecoveryPanel.test.tsx`               | P1       |
+| `src/utils/commandPaletteSearch.ts`                   | `test/unit/utils/commandPaletteSearch.test.ts`                   | P1       |
+| `src/constants/recoveryContext.ts`                    | `test/unit/constants/recoveryContext.test.ts`                    | P1       |
+| `src/components/blog/BlogTagFilter.tsx`               | `test/unit/components/blog/BlogTagFilter.test.tsx`               | P2       |
+| `src/components/blog/BlogPostCard.tsx`                | `test/unit/components/blog/BlogPostCard.test.tsx`                | P2       |
+| `src/components/blog/BlogPostList.tsx`                | `test/unit/components/blog/BlogPostList.test.tsx`                | P2       |
+| `src/components/blog/BlogHero.tsx`                    | `test/unit/components/blog/BlogHero.test.tsx`                    | P2       |
+| `src/components/blog/BlogArticleHeader.tsx`           | `test/unit/components/blog/BlogArticleHeader.test.tsx`           | P2       |
+| `src/components/blog/BlogArticleBody.tsx`             | `test/unit/components/blog/BlogArticleBody.test.tsx`             | P2       |
+| `src/components/blog/BlogArticleNav.tsx`              | `test/unit/components/blog/BlogArticleNav.test.tsx`              | P2       |
+| `src/components/blog/BlogMetaChips.tsx`               | `test/unit/components/blog/BlogMetaChips.test.tsx`               | P2       |
+| `src/components/blog/BlogCodeBlock.tsx`               | `test/unit/components/blog/BlogCodeBlock.test.tsx`               | P2       |
+| `src/components/blog/BlogCallout.tsx`                 | `test/unit/components/blog/BlogCallout.test.tsx`                 | P2       |
+| `src/components/blog/BlogBlockquote.tsx`              | `test/unit/components/blog/BlogBlockquote.test.tsx`              | P2       |
+| `src/components/blog/BlogRelatedPosts.tsx`            | `test/unit/components/blog/BlogRelatedPosts.test.tsx`            | P2       |
+| `src/components/cv/CVStorySlideRenderer.tsx`          | `test/unit/components/cv/CVStorySlideRenderer.test.tsx`          | P2       |
+| `src/components/cv/CVStoryProgress.tsx`               | `test/unit/components/cv/CVStoryProgress.test.tsx`               | P2       |
+| `src/components/climbing/ClimbingAnalytics.tsx`       | `test/unit/components/climbing/ClimbingAnalytics.test.tsx`       | P2       |
+| `src/components/photography/AlbumCard.tsx`            | `test/unit/components/photography/AlbumCard.test.tsx`            | P2       |
+| `src/components/photography/AlbumLocationSummary.tsx` | `test/unit/components/photography/AlbumLocationSummary.test.tsx` | P2       |
+| `src/components/photography/AlbumShareButton.tsx`     | `test/unit/components/photography/AlbumShareButton.test.tsx`     | P2       |
+| `src/components/photography/TiltCard.tsx`             | `test/unit/components/photography/TiltCard.test.tsx`             | P2       |
+| `src/CommandPaletteProvider.tsx`                      | `test/unit/CommandPaletteProvider.test.tsx`                      | P2       |
+| `src/WelcomeOnboardingProvider.tsx`                   | `test/unit/WelcomeOnboardingProvider.test.tsx`                   | P2       |
+| `src/utils/dom.ts`                                    | `test/unit/utils/dom.test.ts`                                    | P2       |
+| `src/data/cvStoryItems.ts`                            | `test/unit/data/cvStoryItems.test.ts`                            | P3       |
+| `src/hooks/useWebVitals.ts`                           | `test/unit/hooks/useWebVitals.test.ts`                           | P3       |
+| `src/constants/siteRoutes.ts`                         | `test/unit/constants/siteRoutes.test.ts`                         | P3       |
+| `src/utils/easing.ts`                                 | `test/unit/utils/easing.test.ts`                                 | P3       |
+| `src/utils/buildInfo.ts`                              | `test/unit/utils/buildInfo.test.ts`                              | P4       |
+| `src/constants/animation.ts`                          | `test/unit/constants/animation.test.ts`                          | P4       |
+| `src/data/blog.ts`                                    | `test/unit/data/blog.test.ts`                                    | P4       |
+| `src/data/cv.ts`                                      | `test/unit/data/cv.test.ts`                                      | P4       |
+| `src/data/photography.ts`                             | `test/unit/data/photography.test.ts`                             | P4       |
+| `src/data/climbs.ts`                                  | `test/unit/data/climbs.test.ts`                                  | P4       |
 
 ### Existing test files that need extension
 
-| Test file | What to add | Priority |
-|-----------|-------------|----------|
-| `test/unit/components/Header.test.tsx` | Mobile layout: header must remain fixed/sticky at the top of the page even when content overflows (regression: on mobile viewports the header was found to extend into the main page content rather than remaining pinned). Add a viewport/media-query test that verifies the header's sticky positioning and height on small screens. | P1 |
-| `test/unit/components/cv/CVSectionNavigator.test.tsx` | Add: idle-hide/reappear on mouse-leave/enter, hover/focus persistence keeping dial open, keyboard navigation from the dial. | P2 |
-| `test/unit/pages/CV.test.tsx` | Add: CV story mode entry and exit — story mode toggle renders CVStoryViewer, Escape key dismisses it, URL-driven story mode parameter is honored. | P2 |
-| `test/unit/pages/Home.test.tsx` | Replace hardcoded terminal `data-lines` value with a snapshot or structure assertion. The current assertion will break silently whenever terminal content changes. | P2 |
-| `test/unit/pages/NotFound.test.tsx` | Verify `RouteRecoveryPanel` props are wired correctly: contextual suggestions match path segments, command palette query matches the route hint. | P2 |
-| `test/unit/components/ScrollProgressBar.test.tsx` | Add motion binding test: verify `scrollYProgress` is connected to `scaleX`. Current test only checks rendered CSS properties. | P3 |
-| `test/unit/components/header/HeaderNav.test.tsx` | Add active route highlight test: current route link should receive active aria state or active style. | P3 |
+| Test file                                             | What to add                                                                                                                                                                                                                                                                                                                            | Priority |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| `test/unit/components/Header.test.tsx`                | Mobile layout: header must remain fixed/sticky at the top of the page even when content overflows (regression: on mobile viewports the header was found to extend into the main page content rather than remaining pinned). Add a viewport/media-query test that verifies the header's sticky positioning and height on small screens. | P1       |
+| `test/unit/components/cv/CVSectionNavigator.test.tsx` | Add: idle-hide/reappear on mouse-leave/enter, hover/focus persistence keeping dial open, keyboard navigation from the dial.                                                                                                                                                                                                            | P2       |
+| `test/unit/pages/CV.test.tsx`                         | Add: CV story mode entry and exit — story mode toggle renders CVStoryViewer, Escape key dismisses it, URL-driven story mode parameter is honored.                                                                                                                                                                                      | P2       |
+| `test/unit/pages/Home.test.tsx`                       | Replace hardcoded terminal `data-lines` value with a snapshot or structure assertion. The current assertion will break silently whenever terminal content changes.                                                                                                                                                                     | P2       |
+| `test/unit/pages/NotFound.test.tsx`                   | Verify `RouteRecoveryPanel` props are wired correctly: contextual suggestions match path segments, command palette query matches the route hint.                                                                                                                                                                                       | P2       |
+| `test/unit/components/ScrollProgressBar.test.tsx`     | Add motion binding test: verify `scrollYProgress` is connected to `scaleX`. Current test only checks rendered CSS properties.                                                                                                                                                                                                          | P3       |
+| `test/unit/components/header/HeaderNav.test.tsx`      | Add active route highlight test: current route link should receive active aria state or active style.                                                                                                                                                                                                                                  | P3       |
 
 ---
 
@@ -296,14 +296,14 @@ created or extended. Files are listed in priority order.
 
 ## 8. Duplicate, Brittle, or Low-Value Tests to Improve
 
-| Test | Issue | Recommended fix |
-|------|-------|-----------------|
-| `Home.test.tsx` — terminal `data-lines` assertion | Hardcodes the full terminal line string verbatim. Breaks silently when any line changes. | Replace with structural assertion: verify the number of lines, or spot-check a single stable command rather than the entire serialized string. |
-| `Blog.test.tsx` — tag count assertions | Stale tag counts cause pre-existing failures every time blog content is updated. | Drive tag counts from the mocked data inside the test, not from live data, or remove the exact-count assertion in favor of "at least one tag rendered". |
-| `CVSectionCard.test.tsx` — single forwarding assertion | Only verifies that `data-delay-ms` and `data-trigger-on-view` are forwarded. No test for the rendered `id` anchor or the section's role in scroll targeting. | Expand to include the `id` attribute presence and at least one `aria-*` role check. |
-| `ScrollProgressBar.test.tsx` — CSS-only assertion | Tests `position: fixed` and `top: 0px` but not the Framer Motion binding. | Add a test that verifies the `scaleX` style binding is connected to a `MotionValue`. |
-| `BackToTopButton.test.tsx` — only two cases | Covers threshold-gated visibility and smooth scroll. Misses `instant` scroll option and `aria-label` accessibility assertion. | Add test for the `instant` prop producing `behavior: 'instant'` scroll. |
-| `GitHubContributionCalendar.test.tsx` (350 lines) | Very large. Possibly over-specified on internal MUI grid cell structure, making it brittle to MUI version bumps. | Audit for assertions tied to internal MUI class names. Rewrite such assertions as aria/role-based. |
+| Test                                                   | Issue                                                                                                                                                        | Recommended fix                                                                                                                                         |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Home.test.tsx` — terminal `data-lines` assertion      | Hardcodes the full terminal line string verbatim. Breaks silently when any line changes.                                                                     | Replace with structural assertion: verify the number of lines, or spot-check a single stable command rather than the entire serialized string.          |
+| `Blog.test.tsx` — tag count assertions                 | Stale tag counts cause pre-existing failures every time blog content is updated.                                                                             | Drive tag counts from the mocked data inside the test, not from live data, or remove the exact-count assertion in favor of "at least one tag rendered". |
+| `CVSectionCard.test.tsx` — single forwarding assertion | Only verifies that `data-delay-ms` and `data-trigger-on-view` are forwarded. No test for the rendered `id` anchor or the section's role in scroll targeting. | Expand to include the `id` attribute presence and at least one `aria-*` role check.                                                                     |
+| `ScrollProgressBar.test.tsx` — CSS-only assertion      | Tests `position: fixed` and `top: 0px` but not the Framer Motion binding.                                                                                    | Add a test that verifies the `scaleX` style binding is connected to a `MotionValue`.                                                                    |
+| `BackToTopButton.test.tsx` — only two cases            | Covers threshold-gated visibility and smooth scroll. Misses `instant` scroll option and `aria-label` accessibility assertion.                                | Add test for the `instant` prop producing `behavior: 'instant'` scroll.                                                                                 |
+| `GitHubContributionCalendar.test.tsx` (350 lines)      | Very large. Possibly over-specified on internal MUI grid cell structure, making it brittle to MUI version bumps.                                             | Audit for assertions tied to internal MUI class names. Rewrite such assertions as aria/role-based.                                                      |
 
 ---
 
@@ -359,6 +359,7 @@ can follow in a subsequent hardening pass.
 This is a planning document. No source files are modified.
 
 Files that would be created or modified by implementing this plan:
+
 - All test files listed in Section 6
 - Existing test files listed in Section 6 (extensions)
 
@@ -401,3 +402,8 @@ Files that would be created or modified by implementing this plan:
   - 81 test suites found; 5 pre-existing failures (stale blog data assertions).
   - Build passes.
   - E2E directory is absent from the branch.
+- 2026-03-17: Step 1 started by fixing the stale blog assertions called out in the proposed approach.
+  - Updated `test/unit/pages/Blog.test.tsx` to use unambiguous hero and tag-chip assertions based on the mocked data.
+  - Updated `test/unit/hooks/useBlogData.test.ts` to stop assuming a fixed order for equal-frequency tags.
+  - `CI=true npm test -- --watch=false --runInBand test/unit/pages/Blog.test.tsx test/unit/hooks/useBlogData.test.ts` passes.
+  - Full-suite validation still reports unrelated failures in `test/unit/styles/appStyleBuilders.test.ts`, `test/unit/constants/commandPaletteActions.test.ts`, and `test/unit/pages/CV.test.tsx`; the blog-related pre-existing failures are resolved.

@@ -56,8 +56,12 @@ describe('useBlogData', () => {
   it('returns tags with counts sorted by frequency', () => {
     const { result } = renderHook(() => useBlogData());
 
-    expect(result.current.tags[0]).toEqual({ tag: 'react', count: 2 });
-    expect(result.current.tags[1]).toEqual({ tag: 'typescript', count: 2 });
+    expect(result.current.tags.slice(0, 2)).toEqual(
+      expect.arrayContaining([
+        { tag: 'react', count: 2 },
+        { tag: 'typescript', count: 2 },
+      ])
+    );
     expect(result.current.tags).toContainEqual({ tag: 'performance', count: 1 });
   });
 
