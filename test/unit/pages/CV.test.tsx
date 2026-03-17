@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
@@ -362,9 +362,41 @@ describe('CV page section navigation', () => {
 
     expect(screen.getByTestId('cv-story-header')).toBeInTheDocument();
     expect(screen.getByText('Full CV')).toBeInTheDocument();
-    expect(within(screen.getByTestId('cv-story-header')).getByTestId('cv-github-status-tooltip-trigger')).toBeInTheDocument();
+    expect(
+      within(screen.getByTestId('cv-story-header')).getByTestId('cv-github-status-tooltip-trigger')
+    ).toBeInTheDocument();
     expect(screen.getByTestId('cv-mode-toggle')).toHaveTextContent('Read my story');
     expect(screen.queryByTestId('cv-story-layout')).not.toBeInTheDocument();
     expect(screen.getByTestId('cv-desktop-top-region')).toBeInTheDocument();
+  });
+
+  it('enters story mode when the mode toggle is clicked', () => {
+    renderCV();
+
+    // Default mode — story viewer not present
+    expect(screen.queryByLabelText('Exit story mode')).not.toBeInTheDocument();
+
+    // Click the toggle to enter story mode
+    fireEvent.click(screen.getByTestId('cv-mode-toggle'));
+
+    // Story viewer should now render
+    expect(screen.getByLabelText('Exit story mode')).toBeInTheDocument();
+    expect(screen.getByLabelText('Previous slide')).toBeInTheDocument();
+    expect(screen.getByLabelText('Next slide')).toBeInTheDocument();
+  });
+
+  it('exits story mode when Escape key is pressed', () => {
+    renderCV(['/cv?mode=story']);
+
+    // Story mode is active
+    expect(screen.getByLabelText('Exit story mode')).toBeInTheDocument();
+
+    // Press Escape — CVStoryViewer calls onExit which toggles the mode
+    fireEvent.keyDown(window, { key: 'Escape' });
+
+    // Should return to default mode
+    expect(screen.queryByLabelText('Exit story mode')).not.toBeInTheDocument();
+    expect(screen.getByTestId('cv-desktop-top-region')).toBeInTheDocument();
+    expect(screen.getByTestId('cv-mode-toggle')).toHaveTextContent('Read my story');
   });
 });

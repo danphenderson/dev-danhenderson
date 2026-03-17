@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import {
@@ -213,5 +213,101 @@ describe('CVSectionNavigator', () => {
     });
 
     expect(screen.getByTestId('cv-section-navigator')).toBeInTheDocument();
+  });
+
+  describe('idle-hide and hover/focus persistence', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it('changes the class name on the navigator after the idle timeout elapses', () => {
+      render(
+        <ThemeProvider>
+          <CVSectionNavigator sections={['experience']} testId="cv-section-navigator" />
+        </ThemeProvider>
+      );
+
+      const nav = screen.getByTestId('cv-section-navigator');
+      const initialClassName = nav.className;
+
+      act(() => {
+        jest.advanceTimersByTime(2500);
+      });
+
+      // Emotion generates a new class when the sx prop value changes (opacity 1 → 0.32)
+      expect(nav.className).not.toBe(initialClassName);
+    });
+
+    it('restores the initial class on mouseEnter after going idle', () => {
+      render(
+        <ThemeProvider>
+          <CVSectionNavigator sections={['experience']} testId="cv-section-navigator" />
+        </ThemeProvider>
+      );
+
+      const nav = screen.getByTestId('cv-section-navigator');
+      const initialClassName = nav.className;
+
+      act(() => {
+        jest.advanceTimersByTime(2500);
+      });
+
+      const dimmedClassName = nav.className;
+      expect(dimmedClassName).not.toBe(initialClassName);
+
+      act(() => {
+        fireEvent.mouseEnter(nav);
+      });
+
+      // After hover, opacity returns to 1 — className should revert
+      expect(nav.className).toBe(initialClassName);
+    });
+
+    it('keeps the initial class while hovered even after the idle timer fires', () => {
+      render(
+        <ThemeProvider>
+          <CVSectionNavigator sections={['experience']} testId="cv-section-navigator" />
+        </ThemeProvider>
+      );
+
+      const nav = screen.getByTestId('cv-section-navigator');
+      const initialClassName = nav.className;
+
+      act(() => {
+        fireEvent.mouseEnter(nav);
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(5000);
+      });
+
+      // hovered = true prevents dimming even though idle timer has fired
+      expect(nav.className).toBe(initialClassName);
+    });
+
+    it('keeps the initial class while focused even after the idle timer fires', () => {
+      render(
+        <ThemeProvider>
+          <CVSectionNavigator sections={['experience']} testId="cv-section-navigator" />
+        </ThemeProvider>
+      );
+
+      const nav = screen.getByTestId('cv-section-navigator');
+      const initialClassName = nav.className;
+
+      act(() => {
+        fireEvent.focus(nav);
+      });
+
+      act(() => {
+        jest.advanceTimersByTime(5000);
+      });
+
+      expect(nav.className).toBe(initialClassName);
+    });
   });
 });

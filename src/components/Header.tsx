@@ -151,7 +151,7 @@ export default function Header() {
           </Toolbar>
         </AppBar>
       </HideOnScroll>
-      <Toolbar sx={appStyles.headerOffsetToolbarSx} />
+      <Toolbar data-testid="header-offset" sx={appStyles.headerOffsetToolbarSx} />
     </>
   );
 }

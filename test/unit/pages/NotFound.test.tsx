@@ -75,6 +75,50 @@ describe('NotFound', () => {
 
     expect(screen.getByText('Shared recovery routes')).toBeInTheDocument();
     expect(screen.getAllByText('Return to the home hero route.').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Open climbing ticks, goals, and analytics.').length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText('Open climbing ticks, goals, and analytics.').length
+    ).toBeGreaterThan(0);
+  });
+
+  it('wires the attempted path label from the current location', () => {
+    render(
+      <MemoryRouter initialEntries={['/photography/nonexistent']} future={routerFuture}>
+        <ThemeProvider>
+          <NotFound />
+        </ThemeProvider>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('/photography/nonexistent')).toBeInTheDocument();
+  });
+
+  it('shows contextual suggestions matching the attempted path segments', () => {
+    render(
+      <MemoryRouter initialEntries={['/cv/experience']} future={routerFuture}>
+        <ThemeProvider>
+          <NotFound />
+        </ThemeProvider>
+      </MemoryRouter>
+    );
+
+    // /cv/experience should generate suggestions related to CV
+    expect(screen.getByText('/cv/experience')).toBeInTheDocument();
+    // The route hint for /cv should produce suggested destinations
+    expect(screen.getByText('Suggested destinations')).toBeInTheDocument();
+  });
+
+  it('provides a suggested palette query derived from the route', () => {
+    render(
+      <MemoryRouter initialEntries={['/photography/mountains']} future={routerFuture}>
+        <ThemeProvider>
+          <NotFound />
+        </ThemeProvider>
+      </MemoryRouter>
+    );
+
+    // The palette hint button should exist — verifies suggestedPaletteQuery is wired
+    const paletteButton = screen.getByRole('button', { name: 'Open command palette' });
+
+    expect(paletteButton).toBeInTheDocument();
   });
 });

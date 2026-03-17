@@ -406,3 +406,44 @@ Files that would be created or modified by implementing this plan:
   - Updated `test/unit/pages/Blog.test.tsx` and `test/unit/hooks/useBlogData.test.ts` to resolve the stale blog assertions called out in step 1.
   - `CI=true npm test -- --watch=false --runInBand test/unit/pages/Blog.test.tsx test/unit/hooks/useBlogData.test.ts` passes.
   - Full-suite validation still reports unrelated failures in `test/unit/styles/appStyleBuilders.test.ts`, `test/unit/constants/commandPaletteActions.test.ts`, and `test/unit/pages/CV.test.tsx`; the blog-related pre-existing failures are resolved.
+- 2026-03-16: Step 2 completed — P1 test additions + Header mobile layout extension.
+  - 8 new test files created (plan listed 7; `recoveryContext.test.ts` is the 8th, both explicitly P1):
+    - `test/unit/utils/commandPaletteSearch.test.ts`
+    - `test/unit/constants/recoveryContext.test.ts`
+    - `test/unit/components/RouteRecoveryPanel.test.tsx`
+    - `test/unit/components/GlobalCommandPalette.test.tsx`
+    - `test/unit/components/cv/CVStoryNavBar.test.tsx`
+    - `test/unit/components/cv/CVStoryViewer.test.tsx`
+    - `test/unit/components/TerminalHeroContent.test.tsx`
+    - `test/unit/components/photography/ImmersiveLightbox.test.tsx`
+  - Production change: `src/components/Header.tsx` — added `data-testid="header-offset"` to the offset spacer `Toolbar`.
+  - Extension: `test/unit/components/Header.test.tsx` — added `describe('Header mobile layout')` block (6 tests).
+  - `CI=true npm test -- --watch=false --runInBand` on all 9 files: **9 suites, 125 tests, all pass**.
+- 2026-03-16: Step 3 completed — P2 blog component tests + remaining P2 items.
+  - 21 new test files created (109 tests):
+    - Blog components (12 files, 71 tests): `BlogTagFilter`, `BlogPostCard`, `BlogPostList`, `BlogHero`, `BlogArticleHeader`, `BlogArticleBody`, `BlogArticleNav`, `BlogMetaChips`, `BlogCodeBlock`, `BlogCallout`, `BlogBlockquote`, `BlogRelatedPosts`.
+    - Remaining P2 (9 files, 38 tests): `CVStorySlideRenderer`, `CVStoryProgress`, `ClimbingAnalytics`, `AlbumCard`, `AlbumLocationSummary`, `AlbumShareButton`, `TiltCard`, `CommandPaletteProvider`, `WelcomeOnboardingProvider`.
+    - `src/utils/dom.ts` (`test/unit/utils/dom.test.ts`): already existed with full coverage — no action needed.
+  - 4 existing test files extended (13 new tests total):
+    - `test/unit/components/cv/CVSectionNavigator.test.tsx` — 4 idle-hide/hover/focus tests using fake timers; verifies Emotion-generated class changes rather than inline `style.opacity` (MUI `sx` does not produce inline styles in jsdom).
+    - `test/unit/pages/Home.test.tsx` — replaced 3 hardcoded `data-lines` assertions with an `expectTerminalLinesStructure` helper that validates line count and stable anchor commands.
+    - `test/unit/pages/NotFound.test.tsx` — 3 new tests verifying `RouteRecoveryPanel` prop wiring: attempted path label, contextual suggestions heading for path segments, and palette button presence.
+    - `test/unit/pages/CV.test.tsx` — 2 new tests: clicking the story toggle enters story mode; pressing `Escape` exits story mode and returns to the default layout.
+  - No production files changed.
+  - Notable mocking constraints discovered:
+    - `navigator.clipboard.writeText` must be mocked with `Object.defineProperty` inside the specific `it()` block (not `beforeAll`) due to jsdom prototype chain behavior.
+    - `SkillsChipList` must be mocked in tests that render it indirectly because `AnimatedSlideList` → MUI `Slide` transitions do not complete in jsdom.
+  - `CI=true npm test -- --watch=false`: **116 suites, 113 passed, 3 failed (all pre-existing)**; 672 tests, 668 passed, 4 failed (all pre-existing — `appStyleBuilders`, `commandPaletteActions`, and 2 stale `cv-github-status-tooltip-trigger` assertions in `CV.test.tsx`).
+- 2026-03-16: Step 4 completed — P3 behavioral coverage.
+  - 5 new test files created:
+    - `test/unit/data/cvStoryItems.test.ts` — `parseCVSortDate` (season prefixes, ordinal suffixes, range strings, "Present"/"Current", "Various Periods Starting YYYY", empty/malformed fallback) and `buildCVStoryItems` (about-first, coding-last, chronological interleaving across kinds, education `expectedCompletion` fallback).
+    - `test/unit/hooks/useWebVitals.test.ts` — JSDOM environment polyfill, reporter registration, metric accumulation, overwrite on update, multi-metric tracking.
+    - `test/unit/utils/dom.test.ts` — `getMaxScrollLeft` overflow math and clamp-to-zero; `isElementInViewport` fully/partially/fully-hidden cases, zero-dimension elements, and boundary conditions.
+    - `test/unit/constants/siteRoutes.test.ts` — `siteRouteMap` required fields, `primaryNavigationRoutes` filter correctness, `cvStoryModeMetadata` content.
+    - `test/unit/utils/easing.test.ts` — `easeOutCubic` boundary values, monotonicity, and deceleration property.
+  - 1 existing test file extended:
+    - `test/unit/components/ScrollProgressBar.test.tsx` — added motion binding test verifying `useSpring` is called with `scrollYProgress` and the correct spring config.
+  - `HeaderNav` active-route highlight (P3 extension target): already covered by the existing `aria-current="page"` assertion; no changes needed.
+  - No production files changed.
+  - `CI=true npm test -- --watch=false --testPathPattern="cvStoryItems|useWebVitals|dom\.test|siteRoutes\.test|easing\.test|ScrollProgressBar"`: **6 suites, 64 tests, all pass**.
+  - `npm run build` passes.

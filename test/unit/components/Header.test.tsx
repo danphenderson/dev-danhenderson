@@ -210,10 +210,7 @@ describe('Header controls', () => {
   it('marks the active page with aria-current on desktop', () => {
     renderHeader('/cv');
 
-    expect(screen.getByRole('link', { name: 'Go to CV' })).toHaveAttribute(
-      'aria-current',
-      'page'
-    );
+    expect(screen.getByRole('link', { name: 'Go to CV' })).toHaveAttribute('aria-current', 'page');
     expect(screen.getByRole('link', { name: 'Go to Climbing' })).not.toHaveAttribute(
       'aria-current'
     );
@@ -263,5 +260,81 @@ describe('Header controls', () => {
     expect(screen.getByRole('menuitem', { name: 'Climbing' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Daniel Henderson Home' })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Photography' })).not.toBeInTheDocument();
+  });
+});
+
+describe('Header mobile layout', () => {
+  beforeEach(() => {
+    mockUseMediaQuery.mockReturnValue(true);
+    mockUseAppTheme.mockReturnValue({
+      mode: 'light',
+      appearance: 'evergreen',
+      setAppearance: jest.fn(),
+      toggleTheme: jest.fn(),
+    });
+    mockUseWelcomeAudio.mockReturnValue(createAudioState());
+    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState());
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders the site header (AppBar) as a landmark on mobile', () => {
+    renderHeader('/cv');
+    // MUI AppBar renders as <header role="banner"> — verifies the fixed AppBar is present
+    const headerBanner = screen.getByRole('banner');
+    expect(headerBanner).toBeInTheDocument();
+    expect(headerBanner).toHaveAttribute('id', 'site-navigation');
+  });
+
+  it('renders the offset toolbar spacer so content does not slide under the fixed header', () => {
+    renderHeader('/cv');
+    // The offset Toolbar creates a spacer equal to the header height so the page
+    // body starts below the fixed AppBar — regression: without this the header
+    // overlaps the main page content on mobile.
+    expect(screen.getByTestId('header-offset')).toBeInTheDocument();
+  });
+
+  it('renders both the fixed AppBar and the offset spacer on mobile', () => {
+    renderHeader('/');
+    expect(screen.getByRole('banner')).toBeInTheDocument();
+    expect(screen.getByTestId('header-offset')).toBeInTheDocument();
+  });
+
+  it('shows the mobile hamburger menu button rather than inline nav links', () => {
+    renderHeader('/cv');
+    expect(screen.getByRole('button', { name: 'Open navigation menu' })).toBeInTheDocument();
+    // Desktop nav links must not be rendered on mobile
+    expect(screen.queryByRole('link', { name: 'Go to CV' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to Climbing' })).not.toBeInTheDocument();
+  });
+
+  it('opens the mobile nav menu when the hamburger button is clicked', () => {
+    renderHeader('/cv');
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Open navigation menu' }));
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+  });
+
+  it('hides the mobile menu when isMobile transitions from true to false', () => {
+    mockUseMediaQuery.mockReturnValue(true);
+    const { rerender } = renderHeader('/cv');
+
+    // Open the mobile menu
+    fireEvent.click(screen.getByRole('button', { name: 'Open navigation menu' }));
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+
+    // Simulate a viewport resize to desktop
+    mockUseMediaQuery.mockReturnValue(false);
+    rerender(
+      <MuiThemeProvider theme={createAppTheme('light', 'evergreen')}>
+        <MemoryRouter initialEntries={['/cv']} future={routerFuture}>
+          <Header />
+        </MemoryRouter>
+      </MuiThemeProvider>
+    );
+
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });
 });
