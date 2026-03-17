@@ -48,6 +48,20 @@ Changes here should preserve schema stability, predictable rendering, and compat
 - Preserve slug generation and route matching assumptions.
 - Keep image metadata consistent with any derived gallery/detail views.
 
+### `blog.ts`
+
+- Do not edit blog post content unless the task explicitly requests it.
+- Preserve the `BlogContentBlock` discriminated union; all content blocks must use an existing union arm or extend it with a matching type and consumer update in the same change set.
+- Post ordering within the array is author-defined; do not silently reorder entries.
+- Tag strings must be consistent with existing values; do not introduce near-duplicate tags.
+
+### `cvStoryItems.ts`
+
+- Source of truth for the ordered sequence of CV story slides consumed by `CVStoryViewer` and `CVStoryNavBar`.
+- Story item kinds: `about`, `experience`, `education`, `certificate`, `volunteering`, `coding`, `end`. All seven are discriminated union arms; adding a new kind requires updating the union, `kindLabel`/`kindIcon` maps in both viewer and nav-bar, and `buildCVStoryItems` in the same change set.
+- The `end` kind has no `data` field and is always appended last by `buildCVStoryItems` — do not add an `end` entry to the static array.
+- Do not restructure the overall `CVStoryItem` union without updating every downstream consumer in the same change.
+
 ## Editing guidance
 
 - Prefer small, reviewable diffs.
