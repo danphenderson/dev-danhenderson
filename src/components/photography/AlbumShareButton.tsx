@@ -33,10 +33,12 @@ export function AlbumShareButton({
 
   const handleShare = useCallback(async () => {
     const title = `${albumName} Photography | Daniel Henderson`;
-    // Some browsers (e.g. Chrome desktop) reject shareData that includes a
-    // plain-text `text` field alongside a `url`.  Try with the full payload
-    // first; if the browser signals it cannot share that data, retry with
-    // just title + url before falling through to the clipboard fallback.
+    // Try the full payload first; if the browser rejects it (e.g. Chrome
+    // desktop throws TypeError for text+url combinations), retry with only
+    // title+url before falling through to the clipboard fallback.
+    // navigator.canShare is intentionally NOT used as a gate: on macOS Safari
+    // it returns false for non-file ShareData even when navigator.share would
+    // succeed, causing both candidates to be silently skipped.
     const candidates: ShareData[] = [
       { title, text: albumDescription, url: canonicalUrl },
       { title, url: canonicalUrl },
@@ -44,7 +46,6 @@ export function AlbumShareButton({
 
     if (navigator.share) {
       for (const data of candidates) {
-        if (navigator.canShare && !navigator.canShare(data)) continue;
         try {
           await navigator.share(data);
           return;
@@ -53,7 +54,7 @@ export function AlbumShareButton({
             // User dismissed the share sheet — do not copy to clipboard.
             return;
           }
-          // Other error (e.g. TypeError for unsupported data) — try next candidate.
+          // TypeError (unsupported payload) or other error — try next candidate.
         }
       }
     }
