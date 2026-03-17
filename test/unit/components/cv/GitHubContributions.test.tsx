@@ -11,11 +11,13 @@ jest.mock('../../../../src/components/cv/GitHubLinkChipList', () => ({
   GitHubLinkChipList: ({
     items,
   }: {
-    items: Array<{ key: string; label: ReactNode; href?: string }>;
+    items: Array<{ key: string; label: ReactNode; href?: string; tooltip?: string }>;
   }) => (
     <div data-testid="chip-list">
       {items.map((item) => (
-        <span key={item.key}>{item.key}</span>
+        <span key={item.key} data-tooltip={item.tooltip}>
+          {item.key}
+        </span>
       ))}
     </div>
   ),
@@ -74,5 +76,9 @@ describe('GitHubContributions', () => {
     );
 
     expect(screen.getByTestId('chip-list')).toBeInTheDocument();
+    expect(screen.getByText('contrib-a')).toHaveAttribute(
+      'data-tooltip',
+      'Open contrib-a on GitHub.'
+    );
   });
 });

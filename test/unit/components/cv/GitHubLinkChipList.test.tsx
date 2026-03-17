@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../../../src/ThemeProvider';
+import { COMMON_LINK_TOOLTIP_ID } from '../../../../src/components/CommonLink';
 import { GitHubLinkChipList } from '../../../../src/components/cv/GitHubLinkChipList';
 
 jest.mock('@mui/material', () => {
@@ -27,6 +28,9 @@ jest.mock('@mui/material', () => {
       rel,
       label,
       sx,
+      'data-tooltip-id': tooltipId,
+      'data-tooltip-content': tooltipContent,
+      'data-tooltip-place': tooltipPlace,
     }: {
       component?: string;
       href?: string;
@@ -34,6 +38,9 @@ jest.mock('@mui/material', () => {
       rel?: string;
       label: ReactNode;
       sx?: Record<string, unknown> | Array<Record<string, unknown>>;
+      'data-tooltip-id'?: string;
+      'data-tooltip-content'?: string;
+      'data-tooltip-place'?: string;
     }) =>
       React.createElement(
         component === 'a' ? 'a' : 'div',
@@ -41,6 +48,9 @@ jest.mock('@mui/material', () => {
           href,
           target,
           rel,
+          'data-tooltip-id': tooltipId,
+          'data-tooltip-content': tooltipContent,
+          'data-tooltip-place': tooltipPlace,
           'data-animation': String(getSxValue(sx, 'animation') ?? ''),
           'data-animation-delay': String(getSxValue(sx, 'animationDelay') ?? ''),
           'data-background-size': String(getSxValue(sx, 'backgroundSize') ?? ''),
@@ -101,8 +111,18 @@ describe('GitHubLinkChipList', () => {
           startDelayMs={40}
           itemStaggerMs={20}
           items={[
-            { key: 'repo-1', label: 'repo-one', href: 'https://github.com/example/repo-one' },
-            { key: 'repo-2', label: 'repo-two', href: 'https://github.com/example/repo-two' },
+            {
+              key: 'repo-1',
+              label: 'repo-one',
+              href: 'https://github.com/example/repo-one',
+              tooltip: 'Open repo-one on GitHub.',
+            },
+            {
+              key: 'repo-2',
+              label: 'repo-two',
+              href: 'https://github.com/example/repo-two',
+              tooltip: 'Open repo-two on GitHub.',
+            },
           ]}
         />
       </ThemeProvider>
@@ -119,6 +139,18 @@ describe('GitHubLinkChipList', () => {
     expect(screen.getByRole('link', { name: 'repo-two' })).toHaveAttribute(
       'href',
       'https://github.com/example/repo-two'
+    );
+    expect(screen.getByRole('link', { name: 'repo-one' })).toHaveAttribute(
+      'data-tooltip-id',
+      COMMON_LINK_TOOLTIP_ID
+    );
+    expect(screen.getByRole('link', { name: 'repo-one' })).toHaveAttribute(
+      'data-tooltip-content',
+      'Open repo-one on GitHub.'
+    );
+    expect(screen.getByRole('link', { name: 'repo-one' })).toHaveAttribute(
+      'data-tooltip-place',
+      'top'
     );
     expect(screen.getByRole('link', { name: 'repo-one' })).toHaveAttribute(
       'data-animation',

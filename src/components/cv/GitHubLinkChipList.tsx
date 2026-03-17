@@ -5,11 +5,13 @@ import type { ReactNode } from 'react';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { normalizeSxProp } from '../../utils/sx';
 import { AnimatedZoomList } from '../AnimatedZoomList';
+import { COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 
 export type GitHubLinkChipItem = {
   key: string;
   label: ReactNode;
   href?: string;
+  tooltip?: string;
 };
 
 type GitHubLinkChipListProps = {
@@ -47,16 +49,33 @@ export const GitHubLinkChipList = ({
 
   const renderChip = (item: GitHubLinkChipItem, index: number) => {
     const isLink = Boolean(item.href);
+    const tooltipProps =
+      isLink && item.tooltip
+        ? {
+            'data-tooltip-id': COMMON_LINK_TOOLTIP_ID,
+            'data-tooltip-content': item.tooltip,
+            'data-tooltip-place': 'top' as const,
+          }
+        : undefined;
 
     return (
       <Chip
         key={item.key}
-        icon={<GitHubIcon />}
-        label={item.label}
+        icon={
+          <Box component="span" {...tooltipProps}>
+            <GitHubIcon />
+          </Box>
+        }
+        label={
+          <Box component="span" {...tooltipProps}>
+            {item.label}
+          </Box>
+        }
         component={isLink ? 'a' : 'div'}
         href={item.href}
         target={isLink ? '_blank' : undefined}
         rel={isLink ? 'noopener noreferrer' : undefined}
+        {...tooltipProps}
         clickable={isLink}
         variant="outlined"
         size="small"

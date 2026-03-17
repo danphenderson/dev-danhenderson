@@ -32,6 +32,7 @@ export const GitHubActivityList = ({
             key: `${item.label}-${idx}`,
             label: item.label,
             href: item.href,
+            tooltip: item.href ? `Open ${item.label} on GitHub.` : undefined,
           }))}
           layout="stack"
           animateItems

@@ -11,11 +11,13 @@ jest.mock('../../../../src/components/cv/GitHubLinkChipList', () => ({
   GitHubLinkChipList: ({
     items,
   }: {
-    items: Array<{ key: string; label: ReactNode; href?: string }>;
+    items: Array<{ key: string; label: ReactNode; href?: string; tooltip?: string }>;
   }) => (
     <div data-testid="chip-list">
       {items.map((item) => (
-        <span key={item.key}>{typeof item.label === 'string' ? item.label : item.key}</span>
+        <span key={item.key} data-tooltip={item.tooltip}>
+          {typeof item.label === 'string' ? item.label : item.key}
+        </span>
       ))}
     </div>
   ),
@@ -45,6 +47,10 @@ describe('GitHubActivityList', () => {
     );
 
     expect(screen.getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
+    expect(screen.getByText('Pushed 2 commits to owner/repo')).toHaveAttribute(
+      'data-tooltip',
+      'Open Pushed 2 commits to owner/repo on GitHub.'
+    );
   });
 
   it('displays an error message when error is provided', () => {
