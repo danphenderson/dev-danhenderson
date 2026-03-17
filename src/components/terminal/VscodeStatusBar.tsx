@@ -73,11 +73,14 @@ const StatusSegment: React.FC<{
 
 interface VscodeStatusBarProps {
   commandText: string;
+  /** Total number of terminal rows above the current prompt (history) */
+  historyLineCount?: number;
 }
 
-export const VscodeStatusBar: React.FC<VscodeStatusBarProps> = ({ commandText }) => {
+export const VscodeStatusBar: React.FC<VscodeStatusBarProps> = ({ commandText, historyLineCount = 0 }) => {
   const theme = useTheme();
   const col = commandText.length + PROMPT_PREFIX.length + 1;
+  const ln = historyLineCount + 1;
 
   return (
     <Box
@@ -135,7 +138,7 @@ export const VscodeStatusBar: React.FC<VscodeStatusBarProps> = ({ commandText })
           key={col}
           style={{ animation: `${colFlash} 0.3s ease-out` }}
         >
-          Ln 1, Col {col}
+          Ln {ln}, Col {col}
         </span>
         <StatusSegment
           label="UTF-8"

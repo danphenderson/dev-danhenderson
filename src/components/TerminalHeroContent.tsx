@@ -33,15 +33,19 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   playing = false,
   sx,
 }) => {
-  const { commandText, outputText, showCursor, phase, longestCommand, longestOutput } =
-    useTerminalTypewriter({
-      lines,
-      playing,
-      prompt: '~ $ ',
-      timingPreset: 'headline',
-      pauseBeforeOutputMs: 400,
-      pauseAfterOutputMs: 2400,
-    });
+  const { commandText, outputText, showCursor, phase, history } = useTerminalTypewriter({
+    lines,
+    playing,
+    prompt: '~ $ ',
+    timingPreset: 'headline',
+    pauseBeforeOutputMs: 400,
+    pauseAfterOutputMs: 2400,
+  });
+
+  const historyLineCount = React.useMemo(
+    () => history.reduce((count, line) => count + 1 + line.output.split('\n').length, 0),
+    [history]
+  );
 
   // Notification toast — fires once when the first output completes
   const [toastVisible, setToastVisible] = React.useState(false);
@@ -117,18 +121,16 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
           <VscodeTabBar activeTab={activeTab} onTabChange={setActiveTab} />
           <VscodeEditorPane playing={playing} />
           <VscodeTerminalPanel
-            lines={lines}
             commandText={commandText}
             outputText={outputText}
             showCursor={showCursor}
             phase={phase}
-            longestCommand={longestCommand}
-            longestOutput={longestOutput}
+            history={history}
           />
         </Box>
       </Box>
 
-      <VscodeStatusBar commandText={commandText} />
+      <VscodeStatusBar commandText={commandText} historyLineCount={historyLineCount} />
 
       <VscodeNotificationToast
         visible={toastVisible}
