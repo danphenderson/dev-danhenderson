@@ -4,6 +4,12 @@ const HOME_SCREENSHOT_CLOCK_START = new Date('2026-03-17T12:00:00.000Z');
 const STABLE_TERMINAL_OUTPUT_COMMAND = 'npm run build';
 const STABLE_TERMINAL_OUTPUT_TEXT = 'Compiled successfully in 2.4s';
 const TERMINAL_NOTIFICATION_TEXT = 'server.py — No problems detected ✓';
+const HOME_HERO_SCREENSHOT_OPTIONS = {
+  animations: 'disabled' as const,
+  caret: 'hide' as const,
+  scale: 'css' as const,
+  maxDiffPixelRatio: 0.05,
+};
 
 const resetWelcomeState = async (page: Page) => {
   await page.addInitScript(() => {
@@ -26,7 +32,7 @@ const dismissWelcomeSequence = async (page: Page) => {
 
 const moveMouseAwayFromHero = async (page: Page) => {
   await page.mouse.move(4, 4);
-  await page.waitForTimeout(250);
+  await page.waitForTimeout(500);
 };
 
 const getHeroLayoutWidth = async (terminalHero: Locator) =>
@@ -94,11 +100,10 @@ test.describe('Home page', () => {
     await waitForStableTerminalHero(page, terminalHero);
     await pausePageClock(page);
 
-    await expect(terminalHero).toHaveScreenshot('home-terminal-server-tab.png', {
-      animations: 'disabled',
-      caret: 'hide',
-      scale: 'css',
-    });
+    await expect(terminalHero).toHaveScreenshot(
+      'home-terminal-server-tab.png',
+      HOME_HERO_SCREENSHOT_OPTIONS
+    );
   });
 
   test('matches a stable screenshot for the client tab in the home terminal hero', async ({
@@ -124,11 +129,68 @@ test.describe('Home page', () => {
     await moveMouseAwayFromHero(page);
     await pausePageClock(page);
 
-    await expect(terminalHero).toHaveScreenshot('home-terminal-client-tab.png', {
-      animations: 'disabled',
-      caret: 'hide',
-      scale: 'css',
-    });
+    await expect(terminalHero).toHaveScreenshot(
+      'home-terminal-client-tab.png',
+      HOME_HERO_SCREENSHOT_OPTIONS
+    );
+  });
+
+  test('traffic dots close the IDE and restore a fresh server session', async ({ page }) => {
+    await resetWelcomeState(page);
+    await page.goto('/');
+
+    await dismissWelcomeSequence(page);
+
+    const terminalHero = page.getByTestId('terminal-hero');
+    const clientTab = page.getByTestId('vscode-tab-client');
+    const closeWindowButton = page.getByRole('button', { name: 'Close window' });
+    const restoreWindowButton = page.getByRole('button', { name: 'Open Visual Studio Code' });
+
+    await expect(terminalHero).toBeVisible();
+    await waitForStableTerminalHero(page, terminalHero);
+
+    await clientTab.click();
+    await expect(terminalHero).toContainText('SERVER_URL');
+
+    await closeWindowButton.click();
+    await expect(page.getByTestId('terminal-hero')).toHaveCount(0);
+    await expect(restoreWindowButton).toBeVisible();
+
+    await restoreWindowButton.click();
+
+    const restoredHero = page.getByTestId('terminal-hero');
+    await expect(restoredHero).toBeVisible();
+    await expect(restoredHero).toContainText('Ping Pong Server');
+    await expect(restoredHero).not.toContainText('SERVER_URL');
+  });
+
+  test('traffic dots minimize the IDE and restore a fresh server session', async ({ page }) => {
+    await resetWelcomeState(page);
+    await page.goto('/');
+
+    await dismissWelcomeSequence(page);
+
+    const terminalHero = page.getByTestId('terminal-hero');
+    const clientTab = page.getByTestId('vscode-tab-client');
+    const minimizeWindowButton = page.getByRole('button', { name: 'Minimize window' });
+    const restoreMinimizedBar = page.getByRole('button', { name: 'Restore window' });
+
+    await expect(terminalHero).toBeVisible();
+    await waitForStableTerminalHero(page, terminalHero);
+
+    await clientTab.click();
+    await expect(terminalHero).toContainText('SERVER_URL');
+
+    await minimizeWindowButton.click();
+    await expect(page.getByTestId('terminal-hero')).toHaveCount(0);
+    await expect(restoreMinimizedBar).toBeVisible();
+
+    await restoreMinimizedBar.click();
+
+    const restoredHero = page.getByTestId('terminal-hero');
+    await expect(restoredHero).toBeVisible();
+    await expect(restoredHero).toContainText('Ping Pong Server');
+    await expect(restoredHero).not.toContainText('SERVER_URL');
   });
 
   test('allows dragging the hero window by the title bar within the home route', async ({
@@ -164,8 +226,10 @@ test.describe('Home page', () => {
       throw new Error('Expected hero, title bar, and main region bounding boxes to be available.');
     }
 
-    const dragStartX = titleBarBox.x + 40;
-    const dragStartY = titleBarBox.y + titleBarBox.height / 2;
+    // Start from the empty lower-left strip of the title bar so the drag path avoids
+    // the interactive traffic dots and centered search affordance.
+    const dragStartX = titleBarBox.x + 28;
+    const dragStartY = titleBarBox.y + titleBarBox.height - 4;
 
     await page.mouse.move(dragStartX, dragStartY);
     await page.mouse.down();

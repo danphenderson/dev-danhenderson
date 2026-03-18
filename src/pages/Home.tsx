@@ -1,24 +1,28 @@
 import { useCallback, useEffect, useRef, useState, type PointerEventHandler } from 'react';
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  IconButton,
+  Tooltip,
   Typography,
 } from '@mui/material';
-import { motion, useDragControls, useScroll, useTransform } from 'motion/react';
+import { motion, useDragControls, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { HeroMotionPath } from '../components/HeroMotionPath';
 import { TerminalHeroContent } from '../components/TerminalHeroContent';
-import type { TerminalLine } from '../types/ui';
+import type { IdeWindowState, TerminalLine } from '../types/ui';
 import { siteRouteMap } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
 import { MotionTiltCard } from '../motion';
+import { VSCODE_COLORS, VSCODE_WINDOW_RADIUS } from '../components/ide/vscodeTokens';
 
 const heroLines: TerminalLine[] = [
   { command: 'node --version', output: 'v22.14.0' },
@@ -45,6 +49,9 @@ export default function Home() {
   const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);
   const [canDragHeroWindow, setCanDragHeroWindow] = useState(false);
   const [isHeroWindowDragging, setIsHeroWindowDragging] = useState(false);
+  const [ideWindowState, setIdeWindowState] = useState<IdeWindowState>('normal');
+  // Close and minimize intentionally reopen a fresh IDE session on restore.
+  const [ideSessionKey, setIdeSessionKey] = useState(0);
 
   const heroRef = useRef<HTMLDivElement>(null);
   const heroBoundsRef = useRef<HTMLDivElement>(null);
@@ -100,76 +107,247 @@ export default function Home() {
     setIsHeroWindowDragging(false);
   }, []);
 
-  return (
-    <motion.div ref={heroRef} style={{ scale: heroScale, opacity: heroOpacity }}>
-      <BackgroundPaper
-        contentRef={heroBoundsRef}
-        image="assets/home.jpg"
-        contentAlign="flex-end"
-        contentSx={appStyles.homeHeroContentSx}
-        showShell={isHeroAnimationReady}
-        shellSx={appStyles.homeHeroShellSx}
-        shellWrapper={(shell) => (
-          <HeroMotionPath active={isHeroAnimationReady} onComplete={handleMotionComplete}>
-            <motion.div
-              data-testid="home-hero-window"
-              drag={windowDragEnabled}
-              dragConstraints={heroBoundsRef}
-              dragControls={heroDragControls}
-              dragElastic={0}
-              dragListener={false}
-              dragMomentum={false}
-              onDragEnd={handleHeroDragEnd}
-              onDragStart={handleHeroDragStart}
-              style={{ display: 'inline-block', maxWidth: '100%' }}
-            >
-              {shell}
-            </motion.div>
-          </HeroMotionPath>
-        )}
-      >
-        <MotionTiltCard disabled={isHeroWindowDragging} intensity={0.7}>
-          <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
-            {isHeroAnimationReady ? (
-              <TerminalHeroContent
-                lines={heroLines}
-                onWindowDragPointerDown={handleTitleBarPointerDown}
-                playing={isTypewriterPlaying}
-                windowDragEnabled={windowDragEnabled}
-                windowDragging={isHeroWindowDragging}
-              />
-            ) : null}
-          </AnimatedContentCard>
-        </MotionTiltCard>
+  const queueFreshIdeSession = useCallback(() => {
+    setIdeSessionKey((prev) => prev + 1);
+  }, []);
 
-        <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
-          <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
-          <DialogContent>
-            <Typography variant="body1">
-              Would you like to hear a short verse while browsing the site? Use the pause button in
-              the header to stop it anytime.
-            </Typography>
-            {error && (
-              <Typography variant="caption" color="error">
-                {error}
+  const handleIdeClose = useCallback(() => {
+    queueFreshIdeSession();
+    setIdeWindowState('closed');
+  }, [queueFreshIdeSession]);
+
+  const handleIdeMinimize = useCallback(() => {
+    queueFreshIdeSession();
+    setIdeWindowState('minimized');
+  }, [queueFreshIdeSession]);
+
+  const handleIdeExpand = useCallback(() => {
+    setIdeWindowState((prev) => (prev === 'expanded' ? 'normal' : 'expanded'));
+  }, []);
+
+  const handleIdeRestore = useCallback(() => {
+    setIdeWindowState('normal');
+  }, []);
+
+  const ideVisible = ideWindowState !== 'closed' && ideWindowState !== 'minimized';
+
+  return (
+    <>
+      <motion.div ref={heroRef} style={{ scale: heroScale, opacity: heroOpacity }}>
+        <BackgroundPaper
+          contentRef={heroBoundsRef}
+          image="assets/home.jpg"
+          contentAlign="flex-end"
+          contentSx={appStyles.homeHeroContentSx}
+          showShell={isHeroAnimationReady}
+          shellSx={appStyles.homeHeroShellSx}
+          shellWrapper={(shell) => (
+            <HeroMotionPath active={isHeroAnimationReady} onComplete={handleMotionComplete}>
+              <motion.div
+                data-testid="home-hero-window"
+                data-session-key={String(ideSessionKey)}
+                drag={windowDragEnabled && ideWindowState === 'normal'}
+                dragConstraints={heroBoundsRef}
+                dragControls={heroDragControls}
+                dragElastic={0}
+                dragListener={false}
+                dragMomentum={false}
+                onDragEnd={handleHeroDragEnd}
+                onDragStart={handleHeroDragStart}
+                style={{
+                  display: 'inline-block',
+                  maxWidth: '100%',
+                  width: ideWindowState === 'expanded' ? '100%' : undefined,
+                }}
+              >
+                <AnimatePresence mode="wait">
+                  {ideVisible && (
+                    <motion.div
+                      key={`ide-window-${ideSessionKey}`}
+                      initial={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      {shell}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </HeroMotionPath>
+          )}
+        >
+          <MotionTiltCard
+            disabled={isHeroWindowDragging || ideWindowState === 'expanded'}
+            intensity={0.7}
+          >
+            <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
+              {isHeroAnimationReady ? (
+                <TerminalHeroContent
+                  key={ideSessionKey}
+                  lines={heroLines}
+                  onWindowDragPointerDown={handleTitleBarPointerDown}
+                  playing={isTypewriterPlaying}
+                  windowDragEnabled={windowDragEnabled}
+                  windowDragging={isHeroWindowDragging}
+                  onClose={handleIdeClose}
+                  onMinimize={handleIdeMinimize}
+                  onExpand={handleIdeExpand}
+                  sx={ideWindowState === 'expanded' ? { width: '100%' } : undefined}
+                />
+              ) : null}
+            </AnimatedContentCard>
+          </MotionTiltCard>
+
+          <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
+            <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
+            <DialogContent>
+              <Typography variant="body1">
+                Would you like to hear a short verse while browsing the site? Use the pause button
+                in the header to stop it anytime.
               </Typography>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleOptOut} autoFocus>
-              No thanks
-            </Button>
-            <Button
-              onClick={handlePlay}
-              variant="contained"
-              disabled={isLoading}
-              aria-label="Play welcome audio"
-            >
-              {isLoading ? 'Loading…' : 'Play audio'}
-            </Button>
-          </DialogActions>
-        </Dialog>
-      </BackgroundPaper>
-    </motion.div>
+              {error && (
+                <Typography variant="caption" color="error">
+                  {error}
+                </Typography>
+              )}
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleOptOut} autoFocus>
+                No thanks
+              </Button>
+              <Button
+                onClick={handlePlay}
+                variant="contained"
+                disabled={isLoading}
+                aria-label="Play welcome audio"
+              >
+                {isLoading ? 'Loading…' : 'Play audio'}
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </BackgroundPaper>
+      </motion.div>
+
+      {/* Restore controls — visible when IDE is closed or minimized */}
+      <AnimatePresence>
+        {ideWindowState === 'closed' && (
+          <motion.div
+            key="ide-restore-icon"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
+            transition={{ duration: 0.25 }}
+            style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 10 }}
+          >
+            <Tooltip title="Open Visual Studio Code" placement="left">
+              <IconButton
+                data-testid="ide-restore-button"
+                onClick={handleIdeRestore}
+                aria-label="Open Visual Studio Code"
+                sx={{
+                  width: 48,
+                  height: 48,
+                  backgroundColor: VSCODE_COLORS.statusBarBg,
+                  color: '#fff',
+                  borderRadius: `${VSCODE_WINDOW_RADIUS}px`,
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+                  '&:hover': { backgroundColor: '#005a9e' },
+                }}
+              >
+                {/* VS Code-style icon: simplified editor icon */}
+                <Box
+                  component="svg"
+                  viewBox="0 0 24 24"
+                  sx={{ width: 24, height: 24, fill: 'currentColor' }}
+                >
+                  <path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H7V4h10v16zM8 6h3v2H8V6zm0 4h8v2H8v-2zm0 4h8v2H8v-2z" />
+                </Box>
+              </IconButton>
+            </Tooltip>
+          </motion.div>
+        )}
+
+        {ideWindowState === 'minimized' && (
+          <motion.div
+            key="ide-minimized-bar"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
+            transition={{ duration: 0.25 }}
+            style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 10 }}
+          >
+            <Tooltip title="Restore window" placement="left">
+              <Box
+                data-testid="ide-minimized-bar"
+                role="button"
+                tabIndex={0}
+                onClick={handleIdeRestore}
+                onKeyDown={(e: React.KeyboardEvent) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleIdeRestore();
+                  }
+                }}
+                aria-label="Restore window"
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  px: 2,
+                  py: 0.75,
+                  backgroundColor: VSCODE_COLORS.titleBarBg,
+                  borderRadius: `${VSCODE_WINDOW_RADIUS}px`,
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  transition: 'background-color 0.12s',
+                  '&:hover': { backgroundColor: '#3c3c3d' },
+                }}
+              >
+                {/* Mini traffic dots */}
+                <Box sx={{ display: 'flex', gap: '4px' }}>
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: VSCODE_COLORS.dotRed,
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: VSCODE_COLORS.dotYellow,
+                    }}
+                  />
+                  <Box
+                    sx={{
+                      width: 8,
+                      height: 8,
+                      borderRadius: '50%',
+                      backgroundColor: VSCODE_COLORS.dotGreen,
+                    }}
+                  />
+                </Box>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: VSCODE_COLORS.foreground,
+                    fontSize: '0.7rem',
+                    fontFamily:
+                      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                  }}
+                >
+                  dev-danhenderson
+                </Typography>
+              </Box>
+            </Tooltip>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 }

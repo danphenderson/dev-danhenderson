@@ -22,11 +22,17 @@ jest.mock('../../../src/components/ide/VscodeTitleBar', () => ({
     onWindowDragPointerDown,
     windowDragEnabled,
     windowDragging,
+    onClose,
+    onMinimize,
+    onExpand,
   }: {
     onCommandPaletteToggle?: () => void;
     onWindowDragPointerDown?: React.PointerEventHandler<HTMLButtonElement>;
     windowDragEnabled?: boolean;
     windowDragging?: boolean;
+    onClose?: () => void;
+    onMinimize?: () => void;
+    onExpand?: () => void;
   }) => (
     <div
       data-testid="vscode-title-bar"
@@ -49,6 +55,36 @@ jest.mock('../../../src/components/ide/VscodeTitleBar', () => ({
       >
         Drag window
       </button>
+      {onClose && (
+        <button
+          type="button"
+          data-testid="title-bar-close"
+          onClick={onClose}
+          aria-label="Close window"
+        >
+          Close
+        </button>
+      )}
+      {onMinimize && (
+        <button
+          type="button"
+          data-testid="title-bar-minimize"
+          onClick={onMinimize}
+          aria-label="Minimize window"
+        >
+          Minimize
+        </button>
+      )}
+      {onExpand && (
+        <button
+          type="button"
+          data-testid="title-bar-expand"
+          onClick={onExpand}
+          aria-label="Expand window"
+        >
+          Expand
+        </button>
+      )}
     </div>
   ),
 }));
@@ -175,6 +211,9 @@ const renderHero = (
     playing: boolean;
     windowDragEnabled: boolean;
     windowDragging: boolean;
+    onClose: () => void;
+    onMinimize: () => void;
+    onExpand: () => void;
   }> = {}
 ) =>
   render(
@@ -185,6 +224,9 @@ const renderHero = (
         playing={overrides.playing ?? false}
         windowDragEnabled={overrides.windowDragEnabled}
         windowDragging={overrides.windowDragging}
+        onClose={overrides.onClose}
+        onMinimize={overrides.onMinimize}
+        onExpand={overrides.onExpand}
       />
     </ThemeProvider>
   );
@@ -323,6 +365,34 @@ describe('TerminalHeroContent', () => {
     it('is hidden initially', () => {
       renderHero();
       expect(screen.getByTestId('notification-toast')).toHaveAttribute('data-visible', 'false');
+    });
+  });
+
+  describe('window action callbacks', () => {
+    it('forwards the onClose callback to the title bar', () => {
+      const onClose = jest.fn();
+      renderHero({ onClose });
+      fireEvent.click(screen.getByTestId('title-bar-close'));
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it('forwards the onMinimize callback to the title bar', () => {
+      const onMinimize = jest.fn();
+      renderHero({ onMinimize });
+      fireEvent.click(screen.getByTestId('title-bar-minimize'));
+      expect(onMinimize).toHaveBeenCalledTimes(1);
+    });
+
+    it('forwards the onExpand callback to the title bar', () => {
+      const onExpand = jest.fn();
+      renderHero({ onExpand });
+      fireEvent.click(screen.getByTestId('title-bar-expand'));
+      expect(onExpand).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not render close button when onClose is not provided', () => {
+      renderHero();
+      expect(screen.queryByTestId('title-bar-close')).not.toBeInTheDocument();
     });
   });
 });

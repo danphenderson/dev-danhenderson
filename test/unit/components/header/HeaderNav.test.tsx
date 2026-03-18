@@ -6,12 +6,22 @@ import { HeaderNav } from '../../../../src/components/header/HeaderNav';
 import type { SiteRouteDefinition } from '../../../../src/constants/siteRoutes';
 
 const makeNavRoute = (id: string, label: string, path: string): SiteRouteDefinition =>
-  ({ id, label, path, title: label, description: '', image: '', keywords: [], showInPrimaryNav: true } as SiteRouteDefinition);
+  ({
+    id,
+    label,
+    path,
+    title: label,
+    description: '',
+    image: '',
+    keywords: [],
+    showInPrimaryNav: true,
+  }) as SiteRouteDefinition;
 
 const pages = [
   makeNavRoute('cv', 'CV', '/cv'),
   makeNavRoute('climbing', 'Climbing', '/climbing'),
   makeNavRoute('photography', 'Photography', '/photography'),
+  makeNavRoute('blog', 'Blog', '/blog'),
 ];
 
 const defaultProps = {
@@ -52,6 +62,7 @@ describe('HeaderNav', () => {
     expect(screen.getByRole('link', { name: 'Go to CV' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Go to Climbing' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Go to Photography' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Go to Blog' })).toBeInTheDocument();
   });
 
   it('renders the avatar home link away from the home route', () => {
@@ -117,7 +128,12 @@ describe('HeaderNav', () => {
     renderOpenMobileMenu('/cv');
 
     const menuItems = screen.getAllByRole('menuitem');
-    expect(menuItems.map((item) => item.textContent)).toEqual(['Climbing', 'Photography', 'Home']);
+    expect(menuItems.map((item) => item.textContent)).toEqual([
+      'Climbing',
+      'Photography',
+      'Blog',
+      'Home',
+    ]);
     expect(screen.queryByRole('menuitem', { name: 'CV' })).not.toBeInTheDocument();
 
     const climbingItem = screen.getByRole('menuitem', { name: 'Climbing' });
@@ -125,6 +141,9 @@ describe('HeaderNav', () => {
 
     const photographyItem = screen.getByRole('menuitem', { name: 'Photography' });
     expect(within(photographyItem).getByTestId('CameraAltIcon')).toBeInTheDocument();
+
+    const blogItem = screen.getByRole('menuitem', { name: 'Blog' });
+    expect(within(blogItem).getByTestId('ArticleIcon')).toBeInTheDocument();
 
     const homeItem = screen.getByRole('menuitem', { name: 'Daniel Henderson Home' });
     expect(within(homeItem).getByAltText('Daniel Henderson')).toBeInTheDocument();
@@ -137,6 +156,7 @@ describe('HeaderNav', () => {
     expect(screen.getByRole('menuitem', { name: 'CV' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Climbing' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Photography' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Blog' })).toBeInTheDocument();
     expect(screen.queryByRole('menuitem', { name: 'Home' })).not.toBeInTheDocument();
   });
 
@@ -152,16 +172,20 @@ describe('HeaderNav', () => {
     expect(
       within(screen.getByRole('menuitem', { name: 'Photography' })).getByTestId('CameraAltIcon')
     ).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('menuitem', { name: 'Blog' })).getByTestId('ArticleIcon')
+    ).toBeInTheDocument();
   });
 
   it('excludes the current photography route from the mobile menu on detail pages', () => {
     renderOpenMobileMenu('/photography/landscape');
 
     const menuItems = screen.getAllByRole('menuitem');
-    expect(menuItems.map((item) => item.textContent)).toEqual(['CV', 'Climbing', 'Home']);
+    expect(menuItems.map((item) => item.textContent)).toEqual(['CV', 'Climbing', 'Blog', 'Home']);
     expect(screen.queryByRole('menuitem', { name: 'Photography' })).not.toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'CV' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Climbing' })).toBeInTheDocument();
+    expect(screen.getByRole('menuitem', { name: 'Blog' })).toBeInTheDocument();
     expect(screen.getByRole('menuitem', { name: 'Daniel Henderson Home' })).toBeInTheDocument();
   });
 

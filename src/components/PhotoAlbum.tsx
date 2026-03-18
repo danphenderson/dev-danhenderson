@@ -2,6 +2,7 @@ import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 import { IconButton, ImageList, ImageListItem } from '@mui/material';
 import { useAppStyles } from '../styles/appStyles';
 import type { PhotoItem } from '../types/data';
+import { TiltCard } from './photography/TiltCard';
 
 type QuiltedImageListProps = {
   imageData: PhotoItem[];
@@ -48,37 +49,39 @@ export function QuiltedImageList({ imageData, albumLabel, onPhotoClick }: Quilte
             rows={item.rows || 1}
             sx={appStyles.quiltedImageItemSx}
           >
-            <img
-              {...srcset(item.img, 121, item.rows, item.cols)}
-              alt={altText}
-              loading="lazy"
-              decoding="async"
-              onClick={onPhotoClick ? () => onPhotoClick(index) : undefined}
-              role={onPhotoClick ? 'button' : undefined}
-              tabIndex={onPhotoClick ? 0 : undefined}
-              onKeyDown={
-                onPhotoClick
-                  ? (e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        onPhotoClick(index);
+            <TiltCard intensity={0.5} style={{ height: '100%', width: '100%' }}>
+              <img
+                {...srcset(item.img, 121, item.rows, item.cols)}
+                alt={altText}
+                loading="lazy"
+                decoding="async"
+                onClick={onPhotoClick ? () => onPhotoClick(index) : undefined}
+                role={onPhotoClick ? 'button' : undefined}
+                tabIndex={onPhotoClick ? 0 : undefined}
+                onKeyDown={
+                  onPhotoClick
+                    ? (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onPhotoClick(index);
+                        }
                       }
-                    }
-                  : undefined
-              }
-              style={onPhotoClick ? { cursor: 'pointer' } : undefined}
-            />
-            <IconButton
-              className="photo-download-action"
-              component="a"
-              href={item.img}
-              download={getDownloadFilename(item.img)}
-              aria-label={`Download ${altText}`}
-              size="small"
-              sx={appStyles.photoDownloadButtonSx}
-            >
-              <DownloadRoundedIcon fontSize="small" />
-            </IconButton>
+                    : undefined
+                }
+                style={onPhotoClick ? { cursor: 'pointer' } : undefined}
+              />
+              <IconButton
+                className="photo-download-action"
+                component="a"
+                href={item.img}
+                download={getDownloadFilename(item.img)}
+                aria-label={`Download ${altText}`}
+                size="small"
+                sx={appStyles.photoDownloadButtonSx}
+              >
+                <DownloadRoundedIcon fontSize="small" />
+              </IconButton>
+            </TiltCard>
           </ImageListItem>
         );
       })}

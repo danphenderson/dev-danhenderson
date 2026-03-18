@@ -19,10 +19,33 @@ const stopDragStartPropagation = (event: React.PointerEvent<HTMLDivElement>) => 
 interface TrafficDotProps {
   color: string;
   hoverIcon: string;
+  onClick?: () => void;
+  label?: string;
 }
 
-const TrafficDot: React.FC<TrafficDotProps> = ({ color, hoverIcon }) => (
+const TrafficDot: React.FC<TrafficDotProps> = ({ color, hoverIcon, onClick, label }) => (
   <Box
+    role={onClick ? 'button' : undefined}
+    aria-label={label}
+    tabIndex={onClick ? 0 : -1}
+    onClick={(event: React.MouseEvent) => {
+      if (onClick) {
+        event.stopPropagation();
+        onClick();
+      }
+    }}
+    onKeyDown={
+      onClick
+        ? (event: React.KeyboardEvent<HTMLDivElement>) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault();
+              event.stopPropagation();
+              onClick();
+            }
+          }
+        : undefined
+    }
+    onPointerDown={onClick ? stopDragStartPropagation : undefined}
     sx={{
       position: 'relative',
       width: 12,
@@ -34,6 +57,12 @@ const TrafficDot: React.FC<TrafficDotProps> = ({ color, hoverIcon }) => (
       alignItems: 'center',
       justifyContent: 'center',
       transition: 'filter 0.12s',
+      cursor: onClick ? 'pointer' : undefined,
+      outline: 'none',
+      '&:focus-visible': {
+        outline: `2px solid ${VSCODE_COLORS.activeTabAccent}`,
+        outlineOffset: 2,
+      },
       '& .dot-icon': {
         opacity: 0,
         fontSize: '0.5rem',
@@ -79,6 +108,9 @@ interface VscodeTitleBarProps {
   onWindowDragPointerDown?: React.PointerEventHandler<HTMLDivElement>;
   windowDragEnabled?: boolean;
   windowDragging?: boolean;
+  onClose?: () => void;
+  onMinimize?: () => void;
+  onExpand?: () => void;
 }
 
 export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({
@@ -86,6 +118,9 @@ export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({
   onWindowDragPointerDown,
   windowDragEnabled = false,
   windowDragging = false,
+  onClose,
+  onMinimize,
+  onExpand,
 }) => (
   <Box
     data-testid="vscode-title-bar"
@@ -108,9 +143,24 @@ export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({
   >
     {/* Traffic-light window controls — macOS spacing: 8px between dot centers */}
     <Box sx={{ display: 'flex', gap: '8px', flexShrink: 0, zIndex: 1, ml: 0.25 }}>
-      <TrafficDot color={VSCODE_COLORS.dotRed} hoverIcon="×" />
-      <TrafficDot color={VSCODE_COLORS.dotYellow} hoverIcon="−" />
-      <TrafficDot color={VSCODE_COLORS.dotGreen} hoverIcon="⊕" />
+      <TrafficDot
+        color={VSCODE_COLORS.dotRed}
+        hoverIcon="×"
+        onClick={onClose}
+        label="Close window"
+      />
+      <TrafficDot
+        color={VSCODE_COLORS.dotYellow}
+        hoverIcon="−"
+        onClick={onMinimize}
+        label="Minimize window"
+      />
+      <TrafficDot
+        color={VSCODE_COLORS.dotGreen}
+        hoverIcon="⊕"
+        onClick={onExpand}
+        label="Expand window"
+      />
     </Box>
 
     {/* Centered search / command-palette trigger */}

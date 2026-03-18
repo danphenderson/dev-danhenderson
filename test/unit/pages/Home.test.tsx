@@ -42,27 +42,63 @@ jest.mock('../../../src/WelcomeAudioProvider', () => {
   };
 });
 
-jest.mock('../../../src/components/TerminalHeroContent', () => ({
-  TerminalHeroContent: ({
-    lines,
-    playing,
-  }: {
-    lines: Array<{ command: string; output: string }>;
-    playing?: boolean;
-  }) => (
-    <div
-      data-testid="terminal-hero"
-      data-playing={String(Boolean(playing))}
-      data-lines={lines
-        .map((l: { command: string; output: string }) => `${l.command}:${l.output}`)
-        .join(',')}
-    >
-      {lines
-        .map((l: { command: string; output: string }) => `${l.command} → ${l.output}`)
-        .join('; ')}
-    </div>
-  ),
-}));
+jest.mock('../../../src/components/TerminalHeroContent', () => {
+  const resolveWidth = (input?: { width?: string } | Array<{ width?: string }>) => {
+    if (Array.isArray(input)) {
+      return input.find((entry) => entry && 'width' in entry)?.width;
+    }
+
+    return input?.width;
+  };
+
+  return {
+    TerminalHeroContent: ({
+      lines,
+      playing,
+      onClose,
+      onMinimize,
+      onExpand,
+      sx,
+    }: {
+      lines: Array<{ command: string; output: string }>;
+      playing?: boolean;
+      onClose?: () => void;
+      onMinimize?: () => void;
+      onExpand?: () => void;
+      sx?: { width?: string } | Array<{ width?: string }>;
+    }) => {
+      return (
+        <div
+          data-testid="terminal-hero"
+          data-playing={String(Boolean(playing))}
+          data-lines={lines
+            .map((l: { command: string; output: string }) => `${l.command}:${l.output}`)
+            .join(',')}
+          data-width={String(resolveWidth(sx) ?? '')}
+        >
+          {lines
+            .map((l: { command: string; output: string }) => `${l.command} → ${l.output}`)
+            .join('; ')}
+          {onClose && (
+            <button type="button" data-testid="ide-close-btn" onClick={onClose}>
+              Close
+            </button>
+          )}
+          {onMinimize && (
+            <button type="button" data-testid="ide-minimize-btn" onClick={onMinimize}>
+              Minimize
+            </button>
+          )}
+          {onExpand && (
+            <button type="button" data-testid="ide-expand-btn" onClick={onExpand}>
+              Expand
+            </button>
+          )}
+        </div>
+      );
+    },
+  };
+});
 
 jest.mock('../../../src/components/HeroMotionPath', () => {
   return {
@@ -317,5 +353,113 @@ describe('Home welcome flow', () => {
     await waitFor(() =>
       expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'true')
     );
+  });
+});
+
+/** Helper: render Home, dismiss dialogs / hints, and wait for the hero to be visible. */
+const renderHomeWithHeroVisible = async () => {
+  render(<HomeHarness initialAudioConsent="declined" />);
+
+  fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
+
+  await waitFor(() =>
+    expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
+  );
+
+  fireEvent.click(screen.getByTestId('complete-hero-motion'));
+
+  await waitFor(() =>
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'true')
+  );
+};
+
+describe('Home IDE window actions', () => {
+  it('toggles the expanded IDE width when expand is clicked', async () => {
+    await renderHomeWithHeroVisible();
+
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-width', '');
+
+    fireEvent.click(screen.getByTestId('ide-expand-btn'));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-width', '100%')
+    );
+
+    fireEvent.click(screen.getByTestId('ide-expand-btn'));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-width', '')
+    );
+  });
+
+  it('hides the IDE and shows the restore button when close is clicked', async () => {
+    await renderHomeWithHeroVisible();
+
+    expect(screen.getByTestId('terminal-hero')).toBeInTheDocument();
+    expect(screen.queryByTestId('ide-restore-button')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('ide-close-btn'));
+
+    await waitFor(() => expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument());
+    expect(screen.getByTestId('ide-restore-button')).toBeInTheDocument();
+    expect(screen.getByLabelText('Open Visual Studio Code')).toBeInTheDocument();
+  });
+
+  it('restores the IDE when the restore button is clicked after close', async () => {
+    await renderHomeWithHeroVisible();
+
+    const firstSessionKey = screen.getByTestId('home-hero-window').getAttribute('data-session-key');
+
+    fireEvent.click(screen.getByTestId('ide-close-btn'));
+
+    await waitFor(() => expect(screen.getByTestId('ide-restore-button')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByTestId('ide-restore-button'));
+
+    await waitFor(() => expect(screen.getByTestId('terminal-hero')).toBeInTheDocument());
+    expect(screen.getByTestId('home-hero-window')).not.toHaveAttribute(
+      'data-session-key',
+      firstSessionKey ?? ''
+    );
+    await waitFor(() => expect(screen.queryByTestId('ide-restore-button')).not.toBeInTheDocument());
+  });
+
+  it('hides the IDE and shows the minimized bar when minimize is clicked', async () => {
+    await renderHomeWithHeroVisible();
+
+    expect(screen.getByTestId('terminal-hero')).toBeInTheDocument();
+    expect(screen.queryByTestId('ide-minimized-bar')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('ide-minimize-btn'));
+
+    await waitFor(() => expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument());
+    expect(screen.getByTestId('ide-minimized-bar')).toBeInTheDocument();
+    expect(screen.getByLabelText('Restore window')).toBeInTheDocument();
+  });
+
+  it('restores the IDE when the minimized bar is clicked', async () => {
+    await renderHomeWithHeroVisible();
+
+    const firstSessionKey = screen.getByTestId('home-hero-window').getAttribute('data-session-key');
+
+    fireEvent.click(screen.getByTestId('ide-minimize-btn'));
+
+    await waitFor(() => expect(screen.getByTestId('ide-minimized-bar')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByTestId('ide-minimized-bar'));
+
+    await waitFor(() => expect(screen.getByTestId('terminal-hero')).toBeInTheDocument());
+    expect(screen.getByTestId('home-hero-window')).not.toHaveAttribute(
+      'data-session-key',
+      firstSessionKey ?? ''
+    );
+    await waitFor(() => expect(screen.queryByTestId('ide-minimized-bar')).not.toBeInTheDocument());
+  });
+
+  it('does not show restore controls when the IDE is in normal state', async () => {
+    await renderHomeWithHeroVisible();
+
+    expect(screen.queryByTestId('ide-restore-button')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('ide-minimized-bar')).not.toBeInTheDocument();
   });
 });

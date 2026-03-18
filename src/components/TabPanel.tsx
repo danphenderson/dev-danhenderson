@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Box, Collapse, Tab, Tabs } from '@mui/material';
-import type { ReactNode, SyntheticEvent } from 'react';
+import type { SyntheticEvent } from 'react';
 import { cssDuration } from '../motion/tokens';
 import { useComponentStyles } from '../styles/componentStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';

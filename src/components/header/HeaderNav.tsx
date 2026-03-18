@@ -1,3 +1,4 @@
+import ArticleIcon from '@mui/icons-material/Article';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import DescriptionIcon from '@mui/icons-material/Description';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -52,6 +53,8 @@ export const HeaderNav = ({
         return <TerrainIcon fontSize="small" />;
       case '/photography':
         return <CameraAltIcon fontSize="small" />;
+      case '/blog':
+        return <ArticleIcon fontSize="small" />;
       case '/':
         return (
           <Avatar

@@ -29,6 +29,9 @@ export interface TerminalHeroContentProps {
   onWindowDragPointerDown?: React.PointerEventHandler<HTMLDivElement>;
   windowDragEnabled?: boolean;
   windowDragging?: boolean;
+  onClose?: () => void;
+  onMinimize?: () => void;
+  onExpand?: () => void;
   sx?: SxProps<Theme>;
 }
 
@@ -40,6 +43,9 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   onWindowDragPointerDown,
   windowDragEnabled = false,
   windowDragging = false,
+  onClose,
+  onMinimize,
+  onExpand,
   sx,
 }) => {
   const { commandText, outputText, showCursor, phase, history } = useTerminalTypewriter({
@@ -123,6 +129,9 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
         onWindowDragPointerDown={onWindowDragPointerDown}
         windowDragEnabled={windowDragEnabled}
         windowDragging={windowDragging}
+        onClose={onClose}
+        onMinimize={onMinimize}
+        onExpand={onExpand}
       />
 
       {/* Editor + activity bar row */}

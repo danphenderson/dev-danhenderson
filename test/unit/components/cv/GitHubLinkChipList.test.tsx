@@ -4,6 +4,26 @@ import ThemeProvider from '../../../../src/ThemeProvider';
 import { COMMON_LINK_TOOLTIP_ID } from '../../../../src/components/CommonLink';
 import { GitHubLinkChipList } from '../../../../src/components/cv/GitHubLinkChipList';
 
+jest.mock('../../../../src/motion', () => ({
+  MotionTiltCard: ({
+    children,
+    intensity,
+    style,
+  }: {
+    children: ReactNode;
+    intensity?: number;
+    style?: { width?: string };
+  }) => (
+    <div
+      data-testid="github-chip-tilt"
+      data-intensity={String(intensity ?? '')}
+      data-width={String(style?.width ?? '')}
+    >
+      {children}
+    </div>
+  ),
+}));
+
 jest.mock('@mui/material', () => {
   const React = require('react');
   const actual = jest.requireActual('@mui/material');
@@ -132,6 +152,11 @@ describe('GitHubLinkChipList', () => {
     expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-stagger', '20');
     expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-display', 'flex');
     expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-flex-wrap', 'wrap');
+    expect(screen.getAllByTestId('github-chip-tilt')).toHaveLength(2);
+    screen.getAllByTestId('github-chip-tilt').forEach((wrapper) => {
+      expect(wrapper).toHaveAttribute('data-intensity', '0.5');
+      expect(wrapper).toHaveAttribute('data-width', '');
+    });
     expect(screen.getByRole('link', { name: 'repo-one' })).toHaveAttribute(
       'href',
       'https://github.com/example/repo-one'
@@ -193,5 +218,26 @@ describe('GitHubLinkChipList', () => {
       'data-flex-direction',
       'column'
     );
+    expect(screen.getAllByTestId('github-chip-tilt')).toHaveLength(2);
+    screen.getAllByTestId('github-chip-tilt').forEach((wrapper) => {
+      expect(wrapper).toHaveAttribute('data-width', '100%');
+    });
+  });
+
+  it('wraps non-animated chips in tilt cards too', () => {
+    render(
+      <ThemeProvider>
+        <GitHubLinkChipList
+          layout="wrap"
+          items={[
+            { key: 'repo-1', label: 'repo-one', href: 'https://github.com/example/repo-one' },
+            { key: 'repo-2', label: 'repo-two', href: 'https://github.com/example/repo-two' },
+          ]}
+        />
+      </ThemeProvider>
+    );
+
+    expect(screen.queryByTestId('animated-zoom-list')).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('github-chip-tilt')).toHaveLength(2);
   });
 });

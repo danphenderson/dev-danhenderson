@@ -5,9 +5,7 @@ import type {
   GradeBucket,
   LocationCount,
   SharedDataStatus,
-  Tick,
   TickRow,
-  Todo,
   TodoRow,
 } from '../types/data';
 import { formatIsoDateAsUtcCalendar, getIsoDateUtcTimestamp } from '../utils/date';
