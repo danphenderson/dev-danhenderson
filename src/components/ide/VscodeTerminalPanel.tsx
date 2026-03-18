@@ -20,6 +20,7 @@ export const isOutputPhase = (phase: TerminalTypewriterPhase): boolean =>
 
 interface VscodeTerminalPanelProps {
   commandText: string;
+  expanded?: boolean;
   outputText: string;
   showCursor: boolean;
   phase: TerminalTypewriterPhase;
@@ -115,6 +116,7 @@ const GitStatusLine: React.FC = () => (
 
 export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
   commandText,
+  expanded = false,
   outputText,
   showCursor,
   phase,
@@ -149,8 +151,9 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        width: VSCODE_LAYOUT.editorColumnWidth,
+        width: expanded ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
         maxWidth: '100%',
+        minWidth: expanded ? 0 : VSCODE_LAYOUT.editorColumnWidth,
         flexShrink: 0,
         overflow: 'hidden',
       }}
@@ -312,7 +315,9 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
         data-testid="terminal-panel-body"
         sx={{
           // terminalBodyLines * lineHeight(1.7em) + padding; keeps height stable across all phases
-          height: `calc(${VSCODE_LAYOUT.terminalBodyLines} * 1.7em + 16px)`,
+          height: expanded
+            ? 'clamp(12rem, 30vh, 20rem)'
+            : `calc(${VSCODE_LAYOUT.terminalBodyLines} * 1.7em + 16px)`,
           flexShrink: 0,
           backgroundColor: VSCODE_COLORS.terminalBg,
           fontFamily: monoFontFamily,

@@ -24,6 +24,7 @@ export type { TerminalLine };
 export interface TerminalHeroContentProps {
   lines: TerminalLine[];
   playing?: boolean;
+  expanded?: boolean;
   /** @deprecated sessionLabel is no longer rendered; kept for API compatibility */
   sessionLabel?: string;
   onWindowDragPointerDown?: React.PointerEventHandler<HTMLDivElement>;
@@ -40,6 +41,7 @@ const TOAST_DURATION_MS = 3000;
 export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   lines,
   playing = false,
+  expanded = false,
   onWindowDragPointerDown,
   windowDragEnabled = false,
   windowDragging = false,
@@ -98,19 +100,25 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   const [activeTab, setActiveTab] = React.useState<VscodeEditorTab>('server');
 
   const accessibleLabel = lines.map((l) => `${l.command}: ${l.output}`).join('; ');
-  const terminalWindowWidth = explorerVisible
-    ? `calc(${VSCODE_LAYOUT.activityBarWidth}px + ${VSCODE_LAYOUT.explorerWidth}px + ${VSCODE_LAYOUT.editorColumnWidth})`
-    : `calc(${VSCODE_LAYOUT.activityBarWidth}px + ${VSCODE_LAYOUT.editorColumnWidth})`;
+  const terminalWindowWidth = expanded
+    ? '100%'
+    : explorerVisible
+      ? `calc(${VSCODE_LAYOUT.activityBarWidth}px + ${VSCODE_LAYOUT.explorerWidth}px + ${VSCODE_LAYOUT.editorColumnWidth})`
+      : `calc(${VSCODE_LAYOUT.activityBarWidth}px + ${VSCODE_LAYOUT.editorColumnWidth})`;
 
   return (
     <Box
       aria-label={accessibleLabel}
+      data-expanded={String(expanded)}
       data-testid="terminal-hero"
       data-playing={String(Boolean(playing))}
       sx={[
         {
           display: 'flex',
           flexDirection: 'column',
+          height: expanded ? '100%' : undefined,
+          minHeight: expanded ? 0 : undefined,
+          minWidth: 0,
           width: terminalWindowWidth,
           maxWidth: '100%',
           overflow: 'hidden',
@@ -135,18 +143,28 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
       />
 
       {/* Editor + activity bar row */}
-      <Box sx={{ display: 'flex', flex: 1 }}>
+      <Box sx={{ display: 'flex', flex: 1, minHeight: 0 }}>
         <VscodeActivityBar activeIndex={activityBarIndex} onIconClick={handleActivityBarClick} />
 
         {/* Explorer sidebar */}
         <VscodeExplorerSidebar activeTab={activeTab} visible={explorerVisible} />
 
         {/* Right column: tab bar → editor pane → terminal panel */}
-        <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
-          <VscodeTabBar activeTab={activeTab} onTabChange={setActiveTab} />
-          <VscodeEditorPane activeTab={activeTab} />
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            flex: 1,
+            minHeight: 0,
+            minWidth: 0,
+            overflow: 'hidden',
+          }}
+        >
+          <VscodeTabBar activeTab={activeTab} expanded={expanded} onTabChange={setActiveTab} />
+          <VscodeEditorPane activeTab={activeTab} expanded={expanded} />
           <VscodeTerminalPanel
             commandText={commandText}
+            expanded={expanded}
             outputText={outputText}
             showCursor={showCursor}
             phase={phase}

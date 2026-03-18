@@ -55,6 +55,7 @@ jest.mock('../../../src/components/TerminalHeroContent', () => {
     TerminalHeroContent: ({
       lines,
       playing,
+      expanded,
       onClose,
       onMinimize,
       onExpand,
@@ -62,6 +63,7 @@ jest.mock('../../../src/components/TerminalHeroContent', () => {
     }: {
       lines: Array<{ command: string; output: string }>;
       playing?: boolean;
+      expanded?: boolean;
       onClose?: () => void;
       onMinimize?: () => void;
       onExpand?: () => void;
@@ -70,6 +72,7 @@ jest.mock('../../../src/components/TerminalHeroContent', () => {
       return (
         <div
           data-testid="terminal-hero"
+          data-expanded={String(Boolean(expanded))}
           data-playing={String(Boolean(playing))}
           data-lines={lines
             .map((l: { command: string; output: string }) => `${l.command}:${l.output}`)
@@ -377,19 +380,26 @@ describe('Home IDE window actions', () => {
   it('toggles the expanded IDE width when expand is clicked', async () => {
     await renderHomeWithHeroVisible();
 
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'false');
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-width', '');
 
     fireEvent.click(screen.getByTestId('ide-expand-btn'));
 
-    await waitFor(() =>
-      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-width', '100%')
-    );
+    await waitFor(() => {
+      const hero = screen.getByTestId('terminal-hero');
+
+      expect(hero).toHaveAttribute('data-expanded', 'true');
+      expect(hero).toHaveAttribute('data-width', '100%');
+    });
 
     fireEvent.click(screen.getByTestId('ide-expand-btn'));
 
-    await waitFor(() =>
-      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-width', '')
-    );
+    await waitFor(() => {
+      const hero = screen.getByTestId('terminal-hero');
+
+      expect(hero).toHaveAttribute('data-expanded', 'false');
+      expect(hero).toHaveAttribute('data-width', '');
+    });
   });
 
   it('hides the IDE and shows the restore button when close is clicked', async () => {

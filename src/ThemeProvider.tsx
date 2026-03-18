@@ -11,6 +11,7 @@ import {
 import { createAppTheme } from './theme/createAppTheme';
 
 const THEME_STORAGE_KEY = 'danhenderson-theme';
+const DEFAULT_THEME_MODE: PaletteMode = 'dark';
 
 type ThemeContextValue = {
   mode: PaletteMode;
@@ -20,7 +21,7 @@ type ThemeContextValue = {
 };
 
 const ThemeContext = createContext<ThemeContextValue>({
-  mode: 'light',
+  mode: DEFAULT_THEME_MODE,
   appearance: defaultAppAppearanceKey,
   setAppearance: () => {},
   toggleTheme: () => {},
@@ -30,16 +31,14 @@ interface ThemeProviderProps extends PropsWithChildren<{}> {}
 
 const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [mode, setMode] = useState<PaletteMode>(() => {
-    if (typeof window === 'undefined') return 'light';
+    if (typeof window === 'undefined') return DEFAULT_THEME_MODE;
 
     const stored = window.localStorage.getItem(THEME_STORAGE_KEY) as PaletteMode | null;
     if (stored === 'light' || stored === 'dark') {
       return stored;
     }
 
-    const prefersDark =
-      window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return prefersDark ? 'dark' : 'light';
+    return DEFAULT_THEME_MODE;
   });
   const [appearance, setAppearance] = useState<AppAppearanceKey>(() => {
     if (typeof window === 'undefined') return defaultAppAppearanceKey;

@@ -385,7 +385,7 @@ export const experiences: Experience[] = [
     startDate: 'Apr 2022',
     endDate: 'Dec 2022 (9 mos)',
     description:
-      'Contributor to entity-linking, recoding, and ingestion pipelines feeding a healthcare analytics lakehouse, implemented improvements that increased throughput and slashed cloud compute costs.',
+      'Contributed to data ingestion and transformation pipelines for a healthcare analytics platform, improving performance and reducing cloud infrastructure costs.',
     projects: [
       "Supported architectural design, releases, and deployments of data-engineering assets, including data governance, security, and integrity of the platform's data lakehouse.",
       'Repartitioned 50TB datalake, yielding improved query performance to accelerate nightly DBT builds and support analytics and reporting.',

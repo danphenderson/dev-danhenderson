@@ -36,18 +36,19 @@ describe('ThemeProvider', () => {
     jest.restoreAllMocks();
   });
 
-  it('provides light mode by default', () => {
+  it('provides dark evergreen defaults when no stored preference exists', () => {
     render(
       <ThemeProvider>
         <ThemeConsumer />
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('mode')).toHaveTextContent('light');
+    expect(screen.getByTestId('mode')).toHaveTextContent('dark');
     expect(screen.getByTestId('appearance')).toHaveTextContent(defaultAppAppearanceKey);
+    expect(window.matchMedia).not.toHaveBeenCalled();
   });
 
-  it('toggleTheme switches mode to dark and persists it', () => {
+  it('toggleTheme switches mode to light and persists it', () => {
     render(
       <ThemeProvider>
         <ThemeConsumer />
@@ -58,8 +59,8 @@ describe('ThemeProvider', () => {
       screen.getByRole('button', { name: 'toggle' }).click();
     });
 
-    expect(screen.getByTestId('mode')).toHaveTextContent('dark');
-    expect(window.localStorage.getItem('danhenderson-theme')).toBe('dark');
+    expect(screen.getByTestId('mode')).toHaveTextContent('light');
+    expect(window.localStorage.getItem('danhenderson-theme')).toBe('light');
   });
 
   it('setAppearance updates the global appearance and persists it', () => {

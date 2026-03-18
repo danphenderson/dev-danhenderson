@@ -6,6 +6,8 @@ import type { CVStoryItem } from '../../../../src/data/cvStoryItems';
 jest.mock('motion/react', () => ({
   motion: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
+    ul: ({ children, ...rest }: any) => <ul {...rest}>{children}</ul>,
+    li: ({ children, ...rest }: any) => <li {...rest}>{children}</li>,
   },
 }));
 

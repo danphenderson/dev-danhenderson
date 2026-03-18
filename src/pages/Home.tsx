@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type PointerEventHandler } from 'react';
+import { createPortal } from 'react-dom';
 import {
   Box,
   Button,
@@ -40,6 +41,13 @@ const heroLines: TerminalLine[] = [
   },
 ];
 
+type ExpandedIdeViewport = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+};
+
 export default function Home() {
   const appStyles = useAppStyles();
   const { cardResetSx } = useComponentStyles();
@@ -50,6 +58,7 @@ export default function Home() {
   const [canDragHeroWindow, setCanDragHeroWindow] = useState(false);
   const [isHeroWindowDragging, setIsHeroWindowDragging] = useState(false);
   const [ideWindowState, setIdeWindowState] = useState<IdeWindowState>('normal');
+  const [expandedIdeViewport, setExpandedIdeViewport] = useState<ExpandedIdeViewport | null>(null);
   // Close and minimize intentionally reopen a fresh IDE session on restore.
   const [ideSessionKey, setIdeSessionKey] = useState(0);
 
@@ -85,6 +94,74 @@ export default function Home() {
   const handleMotionComplete = useCallback(() => {
     setIsTypewriterPlaying(true);
   }, []);
+
+  const updateExpandedIdeViewport = useCallback(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined') {
+      return;
+    }
+
+    const mainContent = document.getElementById('main-content');
+
+    if (!mainContent) {
+      setExpandedIdeViewport({
+        top: 0,
+        left: 0,
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+      return;
+    }
+
+    const mainRect = mainContent.getBoundingClientRect();
+    const headerRect = document.getElementById('site-navigation')?.getBoundingClientRect();
+    const top = Math.max(0, mainRect.top, headerRect?.bottom ?? 0);
+    const left = Math.max(0, mainRect.left);
+    const visibleRight = Math.min(window.innerWidth, mainRect.right);
+    const visibleBottom = Math.min(window.innerHeight, mainRect.bottom);
+    const width = Math.max(0, visibleRight - left);
+    const height = Math.max(0, visibleBottom - top);
+
+    if (width === 0 || height === 0) {
+      setExpandedIdeViewport(null);
+      return;
+    }
+
+    setExpandedIdeViewport({ top, left, width, height });
+  }, []);
+
+  useEffect(() => {
+    if (ideWindowState !== 'expanded') {
+      setExpandedIdeViewport(null);
+      return undefined;
+    }
+
+    updateExpandedIdeViewport();
+
+    let frameId: number | null = null;
+
+    const handleViewportChange = () => {
+      if (frameId !== null) {
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(() => {
+        frameId = null;
+        updateExpandedIdeViewport();
+      });
+    };
+
+    window.addEventListener('resize', handleViewportChange);
+    window.addEventListener('scroll', handleViewportChange, { passive: true });
+
+    return () => {
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      window.removeEventListener('resize', handleViewportChange);
+      window.removeEventListener('scroll', handleViewportChange);
+    };
+  }, [ideWindowState, updateExpandedIdeViewport]);
 
   const windowDragEnabled = canDragHeroWindow && isTypewriterPlaying;
 
@@ -122,8 +199,18 @@ export default function Home() {
   }, [queueFreshIdeSession]);
 
   const handleIdeExpand = useCallback(() => {
-    setIdeWindowState((prev) => (prev === 'expanded' ? 'normal' : 'expanded'));
-  }, []);
+    setIdeWindowState((prev) => {
+      const next = prev === 'expanded' ? 'normal' : 'expanded';
+
+      if (next === 'expanded' && typeof window !== 'undefined') {
+        window.requestAnimationFrame(() => {
+          updateExpandedIdeViewport();
+        });
+      }
+
+      return next;
+    });
+  }, [updateExpandedIdeViewport]);
 
   const handleIdeRestore = useCallback(() => {
     setIdeWindowState('normal');
@@ -157,11 +244,10 @@ export default function Home() {
                 style={{
                   display: 'inline-block',
                   maxWidth: '100%',
-                  width: ideWindowState === 'expanded' ? '100%' : undefined,
                 }}
               >
                 <AnimatePresence mode="wait">
-                  {ideVisible && (
+                  {ideVisible && ideWindowState !== 'expanded' && (
                     <motion.div
                       key={`ide-window-${ideSessionKey}`}
                       initial={{ opacity: 1, scale: 1 }}
@@ -185,6 +271,7 @@ export default function Home() {
               {isHeroAnimationReady ? (
                 <TerminalHeroContent
                   key={ideSessionKey}
+                  expanded={false}
                   lines={heroLines}
                   onWindowDragPointerDown={handleTitleBarPointerDown}
                   playing={isTypewriterPlaying}
@@ -193,7 +280,6 @@ export default function Home() {
                   onClose={handleIdeClose}
                   onMinimize={handleIdeMinimize}
                   onExpand={handleIdeExpand}
-                  sx={ideWindowState === 'expanded' ? { width: '100%' } : undefined}
                 />
               ) : null}
             </AnimatedContentCard>
@@ -229,6 +315,52 @@ export default function Home() {
         </BackgroundPaper>
       </motion.div>
 
+      {/* Expanded IDE — portal-rendered so it escapes the transform hierarchy and covers the full background */}
+      {createPortal(
+        <AnimatePresence>
+          {ideWindowState === 'expanded' && expandedIdeViewport !== null && (
+            <motion.div
+              data-testid="home-ide-expanded"
+              key="ide-expanded"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.22 }}
+              style={{
+                position: 'fixed',
+                top: expandedIdeViewport.top,
+                left: expandedIdeViewport.left,
+                width: expandedIdeViewport.width,
+                height: expandedIdeViewport.height,
+                zIndex: 1050,
+                overflow: 'hidden',
+                display: 'flex',
+                flexDirection: 'column',
+                backgroundColor: VSCODE_COLORS.editorBg,
+              }}
+            >
+              <TerminalHeroContent
+                key={ideSessionKey}
+                expanded
+                lines={heroLines}
+                playing={isTypewriterPlaying}
+                onClose={handleIdeClose}
+                onMinimize={handleIdeMinimize}
+                onExpand={handleIdeExpand}
+                sx={{
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: 0,
+                  boxShadow: 'none',
+                  border: 'none',
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
+
       {/* Restore controls — visible when IDE is closed or minimized */}
       <AnimatePresence>
         {ideWindowState === 'closed' && (
@@ -255,13 +387,17 @@ export default function Home() {
                   '&:hover': { backgroundColor: '#005a9e' },
                 }}
               >
-                {/* VS Code-style icon: simplified editor icon */}
+                {/* VS Code logo mark */}
                 <Box
                   component="svg"
                   viewBox="0 0 24 24"
-                  sx={{ width: 24, height: 24, fill: 'currentColor' }}
+                  aria-hidden="true"
+                  sx={{ width: 26, height: 26, fill: 'currentColor' }}
                 >
-                  <path d="M17 2H7c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 18H7V4h10v16zM8 6h3v2H8V6zm0 4h8v2H8v-2zm0 4h8v2H8v-2z" />
+                  <path
+                    fillRule="evenodd"
+                    d="M17.484.18l-9.777 9.396L3.054 5.896 0 7.368v9.264l3.054 1.472 4.651-3.678 9.777 9.396L24 21.82V2.18L17.484.18zm.626 18.335L9.72 12l8.39-6.515v13.03z"
+                  />
                 </Box>
               </IconButton>
             </Tooltip>
@@ -278,72 +414,33 @@ export default function Home() {
             style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 10 }}
           >
             <Tooltip title="Restore window" placement="left">
-              <Box
+              <IconButton
                 data-testid="ide-minimized-bar"
-                role="button"
-                tabIndex={0}
                 onClick={handleIdeRestore}
-                onKeyDown={(e: React.KeyboardEvent) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    handleIdeRestore();
-                  }
-                }}
                 aria-label="Restore window"
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1,
-                  px: 2,
-                  py: 0.75,
-                  backgroundColor: VSCODE_COLORS.titleBarBg,
+                  width: 48,
+                  height: 48,
+                  backgroundColor: VSCODE_COLORS.statusBarBg,
+                  color: '#fff',
                   borderRadius: `${VSCODE_WINDOW_RADIUS}px`,
                   boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                  transition: 'background-color 0.12s',
-                  '&:hover': { backgroundColor: '#3c3c3d' },
+                  '&:hover': { backgroundColor: '#005a9e' },
                 }}
               >
-                {/* Mini traffic dots */}
-                <Box sx={{ display: 'flex', gap: '4px' }}>
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      backgroundColor: VSCODE_COLORS.dotRed,
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      backgroundColor: VSCODE_COLORS.dotYellow,
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      width: 8,
-                      height: 8,
-                      borderRadius: '50%',
-                      backgroundColor: VSCODE_COLORS.dotGreen,
-                    }}
+                {/* VS Code logo mark */}
+                <Box
+                  component="svg"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                  sx={{ width: 26, height: 26, fill: 'currentColor' }}
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M17.484.18l-9.777 9.396L3.054 5.896 0 7.368v9.264l3.054 1.472 4.651-3.678 9.777 9.396L24 21.82V2.18L17.484.18zm.626 18.335L9.72 12l8.39-6.515v13.03z"
                   />
                 </Box>
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color: VSCODE_COLORS.foreground,
-                    fontSize: '0.7rem',
-                    fontFamily:
-                      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-                  }}
-                >
-                  dev-danhenderson
-                </Typography>
-              </Box>
+              </IconButton>
             </Tooltip>
           </motion.div>
         )}

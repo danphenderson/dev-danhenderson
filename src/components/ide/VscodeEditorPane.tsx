@@ -551,12 +551,14 @@ const renderToken = (token: CodeToken, i: number): React.ReactNode => {
 
 interface VscodeEditorPaneProps {
   activeTab?: VscodeEditorTab;
+  expanded?: boolean;
   /** When true, show a blinking I-beam cursor after the last line. */
   playing?: boolean;
 }
 
 export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
   activeTab = 'server',
+  expanded = false,
   playing = false,
 }) => {
   const [hoveredLine, setHoveredLine] = React.useState<number | null>(null);
@@ -574,14 +576,14 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
         backgroundColor: VSCODE_COLORS.editorBg,
         fontFamily: monoFontFamily,
         fontSize: { xs: '0.72rem', sm: '0.80rem', md: '0.84rem' },
-        width: VSCODE_LAYOUT.editorColumnWidth,
-        minWidth: VSCODE_LAYOUT.editorColumnWidth,
-        maxWidth: VSCODE_LAYOUT.editorColumnWidth,
-        flexShrink: 0,
+        width: expanded ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
+        minWidth: expanded ? 0 : VSCODE_LAYOUT.editorColumnWidth,
+        maxWidth: expanded ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
         borderBottom: `1px solid ${VSCODE_COLORS.panelBorder}`,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
+        ...(expanded ? { flex: 1, minHeight: 0 } : { flexShrink: 0 }),
       }}
     >
       {/* Breadcrumb bar */}
@@ -634,18 +636,28 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
       </Box>
 
       {/* Editor body with code + minimap */}
-      <Box sx={{ display: 'flex', flex: 1, position: 'relative', minWidth: 0, overflow: 'hidden' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flex: 1,
+          position: 'relative',
+          minHeight: 0,
+          minWidth: 0,
+          overflow: 'hidden',
+        }}
+      >
         {/* Scrollable code area — shows LINES_VISIBLE rows then scrolls */}
         <Box
           sx={{
             flex: 1,
+            minHeight: 0,
             minWidth: 0,
             pl: 0.5,
             pr: 1.5,
             py: 0.75,
             overflowX: 'hidden',
             overflowY: 'auto',
-            maxHeight: `calc(${LINES_VISIBLE} * 1.55em + 12px)`,
+            maxHeight: expanded ? 'none' : `calc(${LINES_VISIBLE} * 1.55em + 12px)`,
             // Thin custom scrollbar to keep the VS Code aesthetic
             '&::-webkit-scrollbar': { width: '6px' },
             '&::-webkit-scrollbar-track': { background: 'transparent' },

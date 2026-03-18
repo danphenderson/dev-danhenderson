@@ -131,12 +131,18 @@ jest.mock('../../../src/components/ide/VscodeExplorerSidebar', () => ({
 jest.mock('../../../src/components/ide/VscodeTabBar', () => ({
   VscodeTabBar: ({
     activeTab,
+    expanded,
     onTabChange,
   }: {
     activeTab: string;
+    expanded?: boolean;
     onTabChange?: (tab: string) => void;
   }) => (
-    <div data-testid="tab-bar" data-active-tab={activeTab}>
+    <div
+      data-testid="tab-bar"
+      data-active-tab={activeTab}
+      data-expanded={String(Boolean(expanded))}
+    >
       <button type="button" aria-label="Server tab" onClick={() => onTabChange?.('server')}>
         Server
       </button>
@@ -148,13 +154,19 @@ jest.mock('../../../src/components/ide/VscodeTabBar', () => ({
 }));
 
 jest.mock('../../../src/components/ide/VscodeEditorPane', () => ({
-  VscodeEditorPane: ({ activeTab }: { activeTab: string }) => (
-    <div data-testid="editor-pane" data-active-tab={activeTab} />
+  VscodeEditorPane: ({ activeTab, expanded }: { activeTab: string; expanded?: boolean }) => (
+    <div
+      data-testid="editor-pane"
+      data-active-tab={activeTab}
+      data-expanded={String(Boolean(expanded))}
+    />
   ),
 }));
 
 jest.mock('../../../src/components/ide/VscodeTerminalPanel', () => ({
-  VscodeTerminalPanel: () => <div data-testid="terminal-panel" />,
+  VscodeTerminalPanel: ({ expanded }: { expanded?: boolean }) => (
+    <div data-testid="terminal-panel" data-expanded={String(Boolean(expanded))} />
+  ),
 }));
 
 jest.mock('../../../src/components/ide/VscodeStatusBar', () => ({
@@ -206,6 +218,7 @@ const SAMPLE_LINES: TerminalLine[] = [
 
 const renderHero = (
   overrides: Partial<{
+    expanded: boolean;
     lines: TerminalLine[];
     onWindowDragPointerDown: React.PointerEventHandler<HTMLDivElement>;
     playing: boolean;
@@ -219,6 +232,7 @@ const renderHero = (
   render(
     <ThemeProvider>
       <TerminalHeroContent
+        expanded={overrides.expanded}
         lines={overrides.lines ?? SAMPLE_LINES}
         onWindowDragPointerDown={overrides.onWindowDragPointerDown}
         playing={overrides.playing ?? false}
@@ -250,6 +264,11 @@ describe('TerminalHeroContent', () => {
     it('sets data-playing="true" when playing is true', () => {
       renderHero({ playing: true });
       expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'true');
+    });
+
+    it('sets data-expanded="false" when expanded is omitted', () => {
+      renderHero();
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'false');
     });
 
     it('carries an aria-label derived from the lines prop', () => {
@@ -365,6 +384,17 @@ describe('TerminalHeroContent', () => {
     it('is hidden initially', () => {
       renderHero();
       expect(screen.getByTestId('notification-toast')).toHaveAttribute('data-visible', 'false');
+    });
+  });
+
+  describe('expanded layout mode', () => {
+    it('threads expanded mode into the IDE shell subcomponents', () => {
+      renderHero({ expanded: true });
+
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'true');
+      expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-expanded', 'true');
+      expect(screen.getByTestId('editor-pane')).toHaveAttribute('data-expanded', 'true');
+      expect(screen.getByTestId('terminal-panel')).toHaveAttribute('data-expanded', 'true');
     });
   });
 

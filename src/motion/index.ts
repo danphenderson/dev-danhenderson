@@ -31,6 +31,15 @@ export {
   storySlideVariants,
   slideContentContainer,
   slideContentItem,
+  storyContentContainer,
+  storyLabelReveal,
+  storyTitleReveal,
+  storyMetaReveal,
+  storyBodyReveal,
+  storyChipsReveal,
+  storyLinkReveal,
+  storyBulletContainer,
+  storyBulletItem,
 } from './variants';
 
 export {

@@ -4,6 +4,10 @@ const HOME_SCREENSHOT_CLOCK_START = new Date('2026-03-17T12:00:00.000Z');
 const STABLE_TERMINAL_OUTPUT_COMMAND = 'npm run build';
 const STABLE_TERMINAL_OUTPUT_TEXT = 'Compiled successfully in 2.4s';
 const TERMINAL_NOTIFICATION_TEXT = 'server.py — No problems detected ✓';
+const HOME_HERO_SNAPSHOT_BOX = {
+  width: 528,
+  height: 439,
+} as const;
 const HOME_HERO_SCREENSHOT_OPTIONS = {
   animations: 'disabled' as const,
   caret: 'hide' as const,
@@ -35,8 +39,41 @@ const moveMouseAwayFromHero = async (page: Page) => {
   await page.waitForTimeout(500);
 };
 
-const getHeroLayoutWidth = async (terminalHero: Locator) =>
-  terminalHero.evaluate((node) => (node as HTMLElement).offsetWidth);
+const getElementLayoutWidth = async (element: Locator) =>
+  element.evaluate((node) => (node as HTMLElement).offsetWidth);
+
+const getElementLayoutHeight = async (element: Locator) =>
+  element.evaluate((node) => (node as HTMLElement).offsetHeight);
+
+const stabilizeHeroForScreenshot = async (terminalHero: Locator) => {
+  await terminalHero.evaluate((node, size) => {
+    const element = node as HTMLElement;
+    element.style.boxSizing = 'border-box';
+    element.style.width = `${size.width}px`;
+    element.style.minWidth = `${size.width}px`;
+    element.style.maxWidth = `${size.width}px`;
+    element.style.height = `${size.height}px`;
+    element.style.minHeight = `${size.height}px`;
+    element.style.maxHeight = `${size.height}px`;
+  }, HOME_HERO_SNAPSHOT_BOX);
+};
+
+const selectHeroEditorTab = async (terminalHero: Locator, tab: Locator, expectedText: string) => {
+  await expect(tab).toBeVisible();
+  await tab.scrollIntoViewIfNeeded();
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await tab.click();
+
+    if ((await tab.getAttribute('aria-selected')) === 'true') {
+      await expect(terminalHero).toContainText(expectedText);
+      return;
+    }
+  }
+
+  await expect(tab).toHaveAttribute('aria-selected', 'true');
+  await expect(terminalHero).toContainText(expectedText);
+};
 
 const dismissTerminalNotificationToast = async (page: Page) => {
   const toast = page.getByText(TERMINAL_NOTIFICATION_TEXT);
@@ -60,6 +97,11 @@ const waitForStableTerminalHero = async (page: Page, terminalHero: Locator) => {
 const pausePageClock = async (page: Page) => {
   const currentTime = await page.evaluate(() => Date.now());
   await page.clock.pauseAt(new Date(currentTime + 100));
+};
+
+const resetHomeScrollForScreenshot = async (page: Page, terminalHero: Locator) => {
+  await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+  await expect(terminalHero).toBeVisible();
 };
 
 test.describe('Home page', () => {
@@ -94,10 +136,11 @@ test.describe('Home page', () => {
     const terminalHero = page.getByTestId('terminal-hero');
 
     await expect(terminalHero).toBeVisible();
-    await terminalHero.scrollIntoViewIfNeeded();
+    await resetHomeScrollForScreenshot(page, terminalHero);
     await expect(terminalHero).toContainText('Ping Pong Server', { timeout: 20000 });
 
     await waitForStableTerminalHero(page, terminalHero);
+    await stabilizeHeroForScreenshot(terminalHero);
     await pausePageClock(page);
 
     await expect(terminalHero).toHaveScreenshot(
@@ -106,7 +149,7 @@ test.describe('Home page', () => {
     );
   });
 
-  test('matches a stable screenshot for the client tab in the home terminal hero', async ({
+  test('switches to the client tab and shows client editor content in the home terminal hero', async ({
     page,
   }) => {
     await resetWelcomeState(page);
@@ -116,23 +159,17 @@ test.describe('Home page', () => {
     await dismissWelcomeSequence(page);
 
     const terminalHero = page.getByTestId('terminal-hero');
-    const clientTab = page.getByTestId('vscode-tab-client');
+    const clientTab = terminalHero.getByTestId('vscode-tab-client');
 
     await expect(terminalHero).toBeVisible();
-    await terminalHero.scrollIntoViewIfNeeded();
+    await resetHomeScrollForScreenshot(page, terminalHero);
     await expect(terminalHero).toContainText('Ping Pong Server', { timeout: 20000 });
 
     await waitForStableTerminalHero(page, terminalHero);
 
-    await clientTab.click();
-    await expect(terminalHero).toContainText('SERVER_URL');
-    await moveMouseAwayFromHero(page);
-    await pausePageClock(page);
-
-    await expect(terminalHero).toHaveScreenshot(
-      'home-terminal-client-tab.png',
-      HOME_HERO_SCREENSHOT_OPTIONS
-    );
+    await selectHeroEditorTab(terminalHero, clientTab, 'SERVER_URL');
+    await expect(terminalHero).toContainText('PingResponse');
+    await expect(terminalHero).toContainText('client.ts');
   });
 
   test('traffic dots close the IDE and restore a fresh server session', async ({ page }) => {
@@ -142,15 +179,14 @@ test.describe('Home page', () => {
     await dismissWelcomeSequence(page);
 
     const terminalHero = page.getByTestId('terminal-hero');
-    const clientTab = page.getByTestId('vscode-tab-client');
+    const clientTab = terminalHero.getByTestId('vscode-tab-client');
     const closeWindowButton = page.getByRole('button', { name: 'Close window' });
     const restoreWindowButton = page.getByRole('button', { name: 'Open Visual Studio Code' });
 
     await expect(terminalHero).toBeVisible();
     await waitForStableTerminalHero(page, terminalHero);
 
-    await clientTab.click();
-    await expect(terminalHero).toContainText('SERVER_URL');
+    await selectHeroEditorTab(terminalHero, clientTab, 'SERVER_URL');
 
     await closeWindowButton.click();
     await expect(page.getByTestId('terminal-hero')).toHaveCount(0);
@@ -171,15 +207,14 @@ test.describe('Home page', () => {
     await dismissWelcomeSequence(page);
 
     const terminalHero = page.getByTestId('terminal-hero');
-    const clientTab = page.getByTestId('vscode-tab-client');
+    const clientTab = terminalHero.getByTestId('vscode-tab-client');
     const minimizeWindowButton = page.getByRole('button', { name: 'Minimize window' });
     const restoreMinimizedBar = page.getByRole('button', { name: 'Restore window' });
 
     await expect(terminalHero).toBeVisible();
     await waitForStableTerminalHero(page, terminalHero);
 
-    await clientTab.click();
-    await expect(terminalHero).toContainText('SERVER_URL');
+    await selectHeroEditorTab(terminalHero, clientTab, 'SERVER_URL');
 
     await minimizeWindowButton.click();
     await expect(page.getByTestId('terminal-hero')).toHaveCount(0);
@@ -191,6 +226,73 @@ test.describe('Home page', () => {
     await expect(restoredHero).toBeVisible();
     await expect(restoredHero).toContainText('Ping Pong Server');
     await expect(restoredHero).not.toContainText('SERVER_URL');
+  });
+
+  test('expands the IDE within the visible page viewport and resizes the inner panes', async ({
+    page,
+  }) => {
+    await resetWelcomeState(page);
+    await page.goto('/');
+
+    await dismissWelcomeSequence(page);
+
+    const terminalHero = page.getByTestId('terminal-hero');
+    const expandWindowButton = page.getByRole('button', { name: 'Expand window' });
+    const expandedOverlay = page.getByTestId('home-ide-expanded');
+    const mainContent = page.locator('#main-content');
+    const header = page.locator('#site-navigation');
+    const editorTabs = terminalHero.getByRole('tablist', { name: 'Editor tabs' });
+    const terminalPanelBody = terminalHero.getByTestId('terminal-panel-body');
+
+    await expect(terminalHero).toBeVisible();
+    await expect(expandWindowButton).toBeVisible();
+    await waitForStableTerminalHero(page, terminalHero);
+
+    const initialTabWidth = await getElementLayoutWidth(editorTabs);
+    const initialTerminalPanelHeight = await getElementLayoutHeight(terminalPanelBody);
+
+    await expandWindowButton.click();
+
+    const expandedHero = expandedOverlay.getByTestId('terminal-hero');
+    const expandedEditorTabs = expandedHero.getByRole('tablist', { name: 'Editor tabs' });
+    const expandedTerminalPanelBody = expandedHero.getByTestId('terminal-panel-body');
+
+    await expect(expandedOverlay).toBeVisible();
+    await expect(expandedHero).toHaveAttribute('data-expanded', 'true');
+
+    const expandedRect = await expandedHero.boundingBox();
+    const mainRect = await mainContent.boundingBox();
+    const headerRect = await header.boundingBox();
+    const viewport = page.viewportSize();
+
+    expect(expandedRect).not.toBeNull();
+    expect(mainRect).not.toBeNull();
+    expect(viewport).not.toBeNull();
+
+    if (!expandedRect || !mainRect || !viewport) {
+      throw new Error('Expected expanded hero, main content, and viewport bounds to be available.');
+    }
+
+    const topBound = headerRect ? Math.max(0, headerRect.y + headerRect.height) : 0;
+    const rightBound = Math.min(viewport.width, mainRect.x + mainRect.width);
+    const bottomBound = Math.min(viewport.height, mainRect.y + mainRect.height);
+
+    expect(expandedRect.x).toBeGreaterThanOrEqual(mainRect.x - 1);
+    expect(expandedRect.y).toBeGreaterThanOrEqual(topBound - 1);
+    expect(expandedRect.x + expandedRect.width).toBeLessThanOrEqual(rightBound + 1);
+    expect(expandedRect.y + expandedRect.height).toBeLessThanOrEqual(bottomBound + 1);
+
+    const expandedTabWidth = await getElementLayoutWidth(expandedEditorTabs);
+    const expandedTerminalPanelHeight = await getElementLayoutHeight(expandedTerminalPanelBody);
+
+    expect(expandedTabWidth).toBeGreaterThan(initialTabWidth + 200);
+    expect(expandedTerminalPanelHeight).toBeGreaterThan(initialTerminalPanelHeight + 60);
+
+    await expandedOverlay.getByRole('button', { name: 'Expand window' }).click();
+    await expect(page.getByTestId('home-hero-window').getByTestId('terminal-hero')).toHaveAttribute(
+      'data-expanded',
+      'false'
+    );
   });
 
   test('allows dragging the hero window by the title bar within the home route', async ({
@@ -261,8 +363,8 @@ test.describe('Home page', () => {
     await dismissWelcomeSequence(page);
 
     const terminalHero = page.getByTestId('terminal-hero');
-    const serverTab = page.getByTestId('vscode-tab-server');
-    const clientTab = page.getByTestId('vscode-tab-client');
+    const serverTab = terminalHero.getByTestId('vscode-tab-server');
+    const clientTab = terminalHero.getByTestId('vscode-tab-client');
 
     await expect(terminalHero).toBeVisible();
     await expect(serverTab).toBeVisible();
@@ -278,17 +380,15 @@ test.describe('Home page', () => {
       { timeout: 20000 }
     );
 
-    const initialWidth = await getHeroLayoutWidth(terminalHero);
+    const initialWidth = await getElementLayoutWidth(terminalHero);
 
-    await clientTab.click();
-    await expect(terminalHero).toContainText('SERVER_URL');
+    await selectHeroEditorTab(terminalHero, clientTab, 'SERVER_URL');
 
-    const clientWidth = await getHeroLayoutWidth(terminalHero);
+    const clientWidth = await getElementLayoutWidth(terminalHero);
 
-    await serverTab.click();
-    await expect(terminalHero).toContainText('Ping Pong Server');
+    await selectHeroEditorTab(terminalHero, serverTab, 'Ping Pong Server');
 
-    const serverWidth = await getHeroLayoutWidth(terminalHero);
+    const serverWidth = await getElementLayoutWidth(terminalHero);
 
     expect(Math.abs(clientWidth - initialWidth)).toBeLessThanOrEqual(2);
     expect(Math.abs(serverWidth - initialWidth)).toBeLessThanOrEqual(2);

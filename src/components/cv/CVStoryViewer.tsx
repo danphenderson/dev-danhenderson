@@ -99,9 +99,9 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
           <AnimatePresence mode="wait">
             <motion.div
               key={currentItem?.kind}
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
+              initial={{ opacity: 0, y: -12, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 12, scale: 0.9 }}
               transition={{ duration: duration.fast }}
               style={{
                 position: 'absolute',
@@ -150,6 +150,7 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
                   inset: 0,
                   overflowY: 'auto',
                   paddingTop: 48,
+                  perspective: 1200,
                 }}
               >
                 <CVStorySlideRenderer item={currentItem} />

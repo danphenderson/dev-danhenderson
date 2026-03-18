@@ -6,6 +6,7 @@ import { VSCODE_EDITOR_TABS } from './vscodeEditorTabs';
 
 interface VscodeTabBarProps {
   activeTab?: VscodeEditorTab;
+  expanded?: boolean;
   onTabChange?: (tab: VscodeEditorTab) => void;
 }
 
@@ -37,8 +38,16 @@ const CloseButton: React.FC<{ active: boolean }> = ({ active }) => (
 
 export const VscodeTabBar: React.FC<VscodeTabBarProps> = ({
   activeTab = 'server',
+  expanded = false,
   onTabChange,
 }) => {
+  const activateTab = React.useCallback(
+    (tab: VscodeEditorTab) => {
+      onTabChange?.(tab);
+    },
+    [onTabChange]
+  );
+
   const tabBaseSx = {
     display: 'flex',
     alignItems: 'center',
@@ -52,13 +61,14 @@ export const VscodeTabBar: React.FC<VscodeTabBarProps> = ({
 
   return (
     <Box
-      aria-hidden="true"
+      role="tablist"
+      aria-label="Editor tabs"
       sx={{
         display: 'flex',
         alignItems: 'stretch',
-        width: VSCODE_LAYOUT.editorColumnWidth,
-        minWidth: VSCODE_LAYOUT.editorColumnWidth,
-        maxWidth: VSCODE_LAYOUT.editorColumnWidth,
+        width: expanded ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
+        minWidth: expanded ? 0 : VSCODE_LAYOUT.editorColumnWidth,
+        maxWidth: expanded ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
         height: VSCODE_LAYOUT.tabBarHeight,
         backgroundColor: VSCODE_COLORS.tabBarBg,
         borderBottom: `1px solid ${VSCODE_COLORS.tabBorder}`,
@@ -71,16 +81,36 @@ export const VscodeTabBar: React.FC<VscodeTabBarProps> = ({
 
         return (
           <Box
+            component="button"
+            type="button"
             key={tab.id}
             data-testid={`vscode-tab-${tab.id}`}
-            onClick={() => onTabChange?.(tab.id)}
+            role="tab"
+            aria-selected={isActive}
+            tabIndex={isActive ? 0 : -1}
+            onClick={() => activateTab(tab.id)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                activateTab(tab.id);
+              }
+            }}
             sx={{
               ...tabBaseSx,
+              appearance: 'none',
+              border: 'none',
+              textAlign: 'left',
+              font: 'inherit',
+              color: 'inherit',
               backgroundColor: isActive ? VSCODE_COLORS.activeTabBg : VSCODE_COLORS.inactiveTabBg,
               borderRight: `1px solid ${VSCODE_COLORS.tabBorder}`,
               borderTop: isActive
                 ? `2px solid ${VSCODE_COLORS.activeTabAccent}`
                 : '2px solid transparent',
+              '&:focus-visible': {
+                outline: `2px solid ${VSCODE_COLORS.activeTabAccent}`,
+                outlineOffset: -2,
+              },
               ...(isActive
                 ? {}
                 : {

@@ -79,20 +79,22 @@ export const hoverZoom = {
 /**
  * Direction-aware slide transition for the CV story viewer.
  * Pass `custom={direction}` to the motion element (direction: 1=forward, -1=backward).
- * Uses scale + opacity + rotation for an immersive card-flip feel.
+ * Uses scale + opacity + rotation + blur for a cinematic sweep.
  */
 export const storySlideVariants: Variants = {
   enter: (direction: number) => ({
     opacity: 0,
-    scale: 0.86,
-    rotate: direction * 6,
-    x: direction * 40,
+    scale: 0.88,
+    rotate: direction * 4,
+    x: direction * 60,
+    filter: 'blur(4px)',
   }),
   center: {
     opacity: 1,
     scale: 1,
     rotate: 0,
     x: 0,
+    filter: 'blur(0px)',
     transition: {
       duration: duration.slow,
       ease: easing.spring,
@@ -100,9 +102,10 @@ export const storySlideVariants: Variants = {
   },
   exit: (direction: number) => ({
     opacity: 0,
-    scale: 0.86,
-    rotate: direction * -6,
-    x: direction * -40,
+    scale: 0.88,
+    rotate: direction * -4,
+    x: direction * -60,
+    filter: 'blur(4px)',
     transition: {
       duration: duration.fast,
       ease: easing.accel,
@@ -134,5 +137,104 @@ export const slideContentItem: Variants = {
     y: 0,
     scale: 1,
     transition: { duration: duration.normal, ease: easing.decel },
+  },
+};
+
+/* ------------------------------------------------------------------ */
+/*  CV Story per-element reveal variants                              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Enhanced story-mode content orchestration with wider timing for
+ * breathing room between per-element reveals.
+ */
+export const storyContentContainer: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.14,
+      delayChildren: 0.25,
+    },
+  },
+};
+
+/** Overline label — slide in from the left with spring overshoot. */
+export const storyLabelReveal: Variants = {
+  hidden: { opacity: 0, x: -30 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: duration.fast, ease: easing.spring },
+  },
+};
+
+/** Heading title — scale up with blur dissolve for a dramatic unveiling. */
+export const storyTitleReveal: Variants = {
+  hidden: { opacity: 0, scale: 0.92, filter: 'blur(6px)' },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    filter: 'blur(0px)',
+    transition: { duration: duration.slow, ease: easing.decel },
+  },
+};
+
+/** Meta text (dates, locations) — fade in from the right. */
+export const storyMetaReveal: Variants = {
+  hidden: { opacity: 0, x: 20 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: duration.normal, ease: easing.smooth },
+  },
+};
+
+/** Body text — gentle fade with subtle upward float. */
+export const storyBodyReveal: Variants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: duration.normal, ease: easing.decel },
+  },
+};
+
+/** Skills chip container — scale from center with spring overshoot. */
+export const storyChipsReveal: Variants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: duration.normal, ease: easing.spring },
+  },
+};
+
+/** Link elements — subtle fade with upward drift, typically appears last. */
+export const storyLinkReveal: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: duration.normal, ease: easing.smooth },
+  },
+};
+
+/** Nested stagger container for bullet lists inside story slides. */
+export const storyBulletContainer: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.06,
+    },
+  },
+};
+
+/** Individual bullet item — slide in from the left. */
+export const storyBulletItem: Variants = {
+  hidden: { opacity: 0, x: -16 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: duration.fast, ease: easing.decel },
   },
 };
