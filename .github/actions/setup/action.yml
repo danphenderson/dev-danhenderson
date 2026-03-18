@@ -9,5 +9,8 @@ runs:
         node-version: '20'
         cache: npm
 
+    - run: npm install -g npm@11
+      shell: bash
+
     - run: npm ci
       shell: bash
