@@ -3,21 +3,21 @@ import Box from '@mui/material/Box';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { useTerminalTypewriter } from './text/useTerminalTypewriter';
 import type { TerminalLine, VscodeEditorTab } from '../types/ui';
-import { VscodeTitleBar } from './terminal/VscodeTitleBar';
-import { VscodeActivityBar } from './terminal/VscodeActivityBar';
-import { VscodeTabBar } from './terminal/VscodeTabBar';
-import { VscodeEditorPane } from './terminal/VscodeEditorPane';
-import { VscodeTerminalPanel } from './terminal/VscodeTerminalPanel';
-import { VscodeStatusBar } from './terminal/VscodeStatusBar';
-import { VscodeNotificationToast } from './terminal/VscodeNotificationToast';
-import { VscodeExplorerSidebar } from './terminal/VscodeExplorerSidebar';
-import { VscodeCommandPalette } from './terminal/VscodeCommandPalette';
+import { VscodeTitleBar } from './ide/VscodeTitleBar';
+import { VscodeActivityBar } from './ide/VscodeActivityBar';
+import { VscodeTabBar } from './ide/VscodeTabBar';
+import { VscodeEditorPane } from './ide/VscodeEditorPane';
+import { VscodeTerminalPanel } from './ide/VscodeTerminalPanel';
+import { VscodeStatusBar } from './ide/VscodeStatusBar';
+import { VscodeNotificationToast } from './ide/VscodeNotificationToast';
+import { VscodeExplorerSidebar } from './ide/VscodeExplorerSidebar';
+import { VscodeCommandPalette } from './ide/VscodeCommandPalette';
 import {
   VSCODE_WINDOW_SHADOW,
   VSCODE_WINDOW_RADIUS,
   VSCODE_COLORS,
   VSCODE_LAYOUT,
-} from './terminal/vscodeTokens';
+} from './ide/vscodeTokens';
 
 export type { TerminalLine };
 

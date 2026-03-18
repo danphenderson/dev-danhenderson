@@ -21,7 +21,7 @@ The terminal hero currently presents as a desktop-style window, but it is fixed 
 - `src/components/BackgroundPaper.tsx`: expose an optional ref to the background content region used as the drag constraint container.
 - `src/pages/Home.tsx`: own the draggable shell wrapper around the hero window and connect the title-bar drag handle to Motion drag controls.
 - `src/components/TerminalHeroContent.tsx`: forward optional title-bar drag props into the terminal window chrome.
-- `src/components/terminal/VscodeTitleBar.tsx`: act as the drag handle while preserving command-palette clicks and other no-drag interaction islands.
+- `src/components/ide/VscodeTitleBar.tsx`: act as the drag handle while preserving command-palette clicks and other no-drag interaction islands.
 - `test/unit/components/TerminalHeroContent.test.tsx`: verify drag-handle props are forwarded and interactive behavior remains intact.
 - `test/e2e/home.spec.ts`: verify the home hero can be dragged by the title bar and remains on screen.
 

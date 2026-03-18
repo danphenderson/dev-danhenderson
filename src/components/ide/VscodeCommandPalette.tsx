@@ -5,7 +5,6 @@ import {
   VSCODE_COLORS,
   VSCODE_LAYOUT,
   VSCODE_WINDOW_SHADOW,
-  monoFontFamily,
   systemFontFamily,
 } from './vscodeTokens';
 

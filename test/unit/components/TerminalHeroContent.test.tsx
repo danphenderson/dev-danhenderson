@@ -15,8 +15,8 @@ jest.mock('../../../src/components/text/useTerminalTypewriter', () => ({
   }),
 }));
 
-// Stub terminal subcomponents with testable stand-ins that forward key events/props
-jest.mock('../../../src/components/terminal/VscodeTitleBar', () => ({
+// Stub IDE subcomponents with testable stand-ins that forward key events/props
+jest.mock('../../../src/components/ide/VscodeTitleBar', () => ({
   VscodeTitleBar: ({
     onCommandPaletteToggle,
     onWindowDragPointerDown,
@@ -53,7 +53,7 @@ jest.mock('../../../src/components/terminal/VscodeTitleBar', () => ({
   ),
 }));
 
-jest.mock('../../../src/components/terminal/VscodeActivityBar', () => ({
+jest.mock('../../../src/components/ide/VscodeActivityBar', () => ({
   VscodeActivityBar: ({
     activeIndex,
     onIconClick,
@@ -82,7 +82,7 @@ jest.mock('../../../src/components/terminal/VscodeActivityBar', () => ({
   ),
 }));
 
-jest.mock('../../../src/components/terminal/VscodeExplorerSidebar', () => ({
+jest.mock('../../../src/components/ide/VscodeExplorerSidebar', () => ({
   VscodeExplorerSidebar: ({ activeTab, visible }: { activeTab: string; visible: boolean }) => (
     <div
       data-testid="explorer-sidebar"
@@ -92,7 +92,7 @@ jest.mock('../../../src/components/terminal/VscodeExplorerSidebar', () => ({
   ),
 }));
 
-jest.mock('../../../src/components/terminal/VscodeTabBar', () => ({
+jest.mock('../../../src/components/ide/VscodeTabBar', () => ({
   VscodeTabBar: ({
     activeTab,
     onTabChange,
@@ -111,23 +111,23 @@ jest.mock('../../../src/components/terminal/VscodeTabBar', () => ({
   ),
 }));
 
-jest.mock('../../../src/components/terminal/VscodeEditorPane', () => ({
+jest.mock('../../../src/components/ide/VscodeEditorPane', () => ({
   VscodeEditorPane: ({ activeTab }: { activeTab: string }) => (
     <div data-testid="editor-pane" data-active-tab={activeTab} />
   ),
 }));
 
-jest.mock('../../../src/components/terminal/VscodeTerminalPanel', () => ({
+jest.mock('../../../src/components/ide/VscodeTerminalPanel', () => ({
   VscodeTerminalPanel: () => <div data-testid="terminal-panel" />,
 }));
 
-jest.mock('../../../src/components/terminal/VscodeStatusBar', () => ({
+jest.mock('../../../src/components/ide/VscodeStatusBar', () => ({
   VscodeStatusBar: ({ activeTab }: { activeTab: string }) => (
     <div data-testid="status-bar" data-active-tab={activeTab} />
   ),
 }));
 
-jest.mock('../../../src/components/terminal/VscodeNotificationToast', () => ({
+jest.mock('../../../src/components/ide/VscodeNotificationToast', () => ({
   VscodeNotificationToast: ({
     activeTab,
     visible,
@@ -151,7 +151,7 @@ jest.mock('../../../src/components/terminal/VscodeNotificationToast', () => ({
   ),
 }));
 
-jest.mock('../../../src/components/terminal/VscodeCommandPalette', () => ({
+jest.mock('../../../src/components/ide/VscodeCommandPalette', () => ({
   VscodeCommandPalette: ({ visible, onDismiss }: { visible: boolean; onDismiss: () => void }) => (
     <div data-testid="vscode-command-palette" data-visible={String(visible)}>
       {visible && (

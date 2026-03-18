@@ -26,8 +26,8 @@ The current panel has several POC-era gaps:
 
 ## Constraints
 
-- Scope is strictly `src/components/terminal/VscodeTerminalPanel.tsx` and
-  `src/components/terminal/vscodeTokens.ts`. Do not touch any other terminal sub-component.
+- Scope is strictly `src/components/ide/VscodeTerminalPanel.tsx` and
+  `src/components/ide/vscodeTokens.ts`. Do not touch any other terminal sub-component.
 - Do not change the `VscodeTerminalPanelProps` interface (no new props).
 - Do not alter the typewriter hook, `TerminalHeroContent`, or `Home.tsx`.
 - Preserve the `isCommandPhase` / `isOutputPhase` exports — they are used by consumers.
@@ -36,9 +36,9 @@ The current panel has several POC-era gaps:
 
 ## Affected files and responsibilities
 
-- `src/components/terminal/VscodeTerminalPanel.tsx` — all prompt, cursor, colorizer, depth, and
+- `src/components/ide/VscodeTerminalPanel.tsx` — all prompt, cursor, colorizer, depth, and
   animation changes
-- `src/components/terminal/vscodeTokens.ts` — three targeted token changes: `outputText` opacity
+- `src/components/ide/vscodeTokens.ts` — three targeted token changes: `outputText` opacity
   bump, `promptArrow` semantic alias, `terminalBodyLines` layout constant
 
 ## Proposed approach

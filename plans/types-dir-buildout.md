@@ -79,7 +79,7 @@ The audit identified:
 - `src/components/cv/ExperienceList.tsx` — update `TabPanelItem`, `TabPanelRenderContext` import to `../../types/ui`
 - `src/components/cv/VolunteeringList.tsx` — update `TabPanelItem`, `TabPanelRenderContext` import to `../../types/ui`
 - `src/components/cv/CodingExamplesSection.tsx` — update `TabPanelItem`, `TabPanelRenderContext` import to `../../types/ui`
-- `src/components/terminal/VscodeTerminalPanel.tsx` — update `TerminalLine` import to `../../types/ui`
+- `src/components/ide/VscodeTerminalPanel.tsx` — update `TerminalLine` import to `../../types/ui`
 - `src/components/PerformanceScorecard.tsx` — update `WebVitalEntry` import to `../types/ui`
 - `src/constants/commandPaletteActions.ts` — update `CVSectionKey` import to `../types/cv`
 - `src/hooks/useGithubProfile.ts` — no type import change needed; `GitHubProfileData` is accessed via the `loadGitHubProfileData` return value
@@ -132,7 +132,7 @@ The audit identified:
 18. `src/components/TabPanel.tsx`: remove type definitions; add `import type { TabPanelItem, TabPanelRenderContext } from '../types/ui'`; add corresponding re-exports.
 19. `src/components/text/useTerminalTypewriter.ts`: remove `TerminalLine` definition; add import from `../../types/ui`.
 20. `src/components/TerminalHeroContent.tsx`: remove the `export type { TerminalLine }` re-export. Consumers still get `TerminalLine` from its canonical home.
-21. `src/components/terminal/VscodeTerminalPanel.tsx`: update import to `../../types/ui`.
+21. `src/components/ide/VscodeTerminalPanel.tsx`: update import to `../../types/ui`.
 22. `src/pages/Home.tsx`: update `TerminalLine` import to `../types/ui` (or `../components/text/useTerminalTypewriter` — either compiles since `useTerminalTypewriter` now imports from `types/ui`).
 23. `src/hooks/useWebVitals.ts`: remove `WebVitalEntry`/`WebVitalsState` definitions; import from `../types/ui`; remove `export` keyword from `WebVitalsState` (no external consumers).
 24. `src/components/PerformanceScorecard.tsx`: update import to `../types/ui`.

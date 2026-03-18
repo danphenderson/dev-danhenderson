@@ -32,19 +32,19 @@ feels production-consistent.
 
 - `src/components/TerminalHeroContent.tsx`: continue to own the shared active-tab state and pass it
   into dependent subcomponents.
-- `src/components/terminal/VscodeTabBar.tsx`: consume shared tab metadata instead of duplicating file
+- `src/components/ide/VscodeTabBar.tsx`: consume shared tab metadata instead of duplicating file
   labels and badge styling.
-- `src/components/terminal/VscodeExplorerSidebar.tsx`: highlight the file that matches the active tab.
-- `src/components/terminal/VscodeStatusBar.tsx`: render the language mode that matches the active tab.
-- `src/components/terminal/VscodeNotificationToast.tsx`: show toast copy for the currently active file.
-- `src/components/terminal/VscodeEditorPane.tsx`: align IntelliSense hover content with the new demo
+- `src/components/ide/VscodeExplorerSidebar.tsx`: highlight the file that matches the active tab.
+- `src/components/ide/VscodeStatusBar.tsx`: render the language mode that matches the active tab.
+- `src/components/ide/VscodeNotificationToast.tsx`: show toast copy for the currently active file.
+- `src/components/ide/VscodeEditorPane.tsx`: align IntelliSense hover content with the new demo
   files and use shared tab metadata where appropriate.
-- `src/components/terminal/VscodeIntelliSenseTooltip.tsx`: render symbol-specific tooltip content.
-- `src/components/terminal/VscodeTerminalPanel.tsx`: align output colorization with the actual home
+- `src/components/ide/VscodeIntelliSenseTooltip.tsx`: render symbol-specific tooltip content.
+- `src/components/ide/VscodeTerminalPanel.tsx`: align output colorization with the actual home
   hero output.
-- `src/components/terminal/vscodeTokens.ts`: hold any shared file-type tokens needed by multiple
+- `src/components/ide/vscodeTokens.ts`: hold any shared file-type tokens needed by multiple
   terminal chrome surfaces.
-- `src/components/terminal/vscodeInteractionHelpers.ts`: remove or narrow the helper if it is no
+- `src/components/ide/vscodeInteractionHelpers.ts`: remove or narrow the helper if it is no
   longer needed after restoring tilt.
 - `test/unit/components/TerminalHeroContent.test.tsx`: cover active-tab propagation beyond the tab bar
   and editor pane.
