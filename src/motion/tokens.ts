@@ -111,3 +111,15 @@ export const springOptions = {
   /** Moderately stiff spring for responsive pointer-follow tilt. */
   tilt: { stiffness: 200, damping: 20 },
 } as const;
+
+/* ------------------------------------------------------------------ */
+/*  Motion intensity scale helpers                                    */
+/* ------------------------------------------------------------------ */
+
+/** Multiply a base duration by a scale factor. Returns 0 when the factor is 0 (instant). */
+export const scaleDuration = (base: number, factor: number): number =>
+  factor === 0 ? 0 : base * factor;
+
+/** Multiply a base stagger delay by a scale factor. Returns 0 when the factor is 0. */
+export const scaleStagger = (base: number, factor: number): number =>
+  factor === 0 ? 0 : base * factor;

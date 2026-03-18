@@ -35,7 +35,8 @@ const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
 };
 
 export default function Header() {
-  const { mode, appearance, setAppearance, toggleTheme } = useAppTheme();
+  const { mode, appearance, motionIntensity, setAppearance, setMotionIntensity, toggleTheme } =
+    useAppTheme();
   const appStyles = useAppStyles();
   const muiTheme = useMuiTheme();
   const location = useLocation();
@@ -102,6 +103,11 @@ export default function Header() {
     triggerHighlightSx: themeHighlightSx,
   };
 
+  const motionDial = {
+    motionIntensity,
+    onChangeMotionIntensity: setMotionIntensity,
+  };
+
   return (
     <>
       <HideOnScroll>
@@ -130,6 +136,7 @@ export default function Header() {
                 showPauseHint={showPauseHint}
                 pauseHighlightSx={pauseHighlightSx}
                 appearanceDial={appearanceDial}
+                motionDial={motionDial}
               />
             </Box>
             <HintPopover

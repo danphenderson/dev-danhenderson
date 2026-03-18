@@ -60,6 +60,10 @@ jest.mock('../../../src/components/header/HeaderAppearanceDial', () => ({
   ),
 }));
 
+jest.mock('../../../src/components/header/HeaderMotionDial', () => ({
+  HeaderMotionDial: () => <div data-testid="header-motion-dial" />,
+}));
+
 const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQuery>;
 const mockUseAppTheme = useAppTheme as jest.MockedFunction<typeof useAppTheme>;
 const mockUseWelcomeAudio = useWelcomeAudio as jest.MockedFunction<typeof useWelcomeAudio>;
@@ -111,6 +115,8 @@ describe('Header controls', () => {
       appearance: 'evergreen',
       setAppearance: jest.fn(),
       toggleTheme: jest.fn(),
+      motionIntensity: 'default' as const,
+      setMotionIntensity: jest.fn(),
     });
     mockUseWelcomeAudio.mockReturnValue(createAudioState());
     mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState());
@@ -158,6 +164,8 @@ describe('Header controls', () => {
       appearance: 'evergreen',
       setAppearance,
       toggleTheme,
+      motionIntensity: 'default' as const,
+      setMotionIntensity: jest.fn(),
     });
     mockUseWelcomeOnboarding.mockReturnValue(
       createOnboardingState({
@@ -180,6 +188,8 @@ describe('Header controls', () => {
       appearance: 'evergreen',
       setAppearance,
       toggleTheme: jest.fn(),
+      motionIntensity: 'default' as const,
+      setMotionIntensity: jest.fn(),
     });
 
     renderHeader('/');
@@ -271,6 +281,8 @@ describe('Header mobile layout', () => {
       appearance: 'evergreen',
       setAppearance: jest.fn(),
       toggleTheme: jest.fn(),
+      motionIntensity: 'default' as const,
+      setMotionIntensity: jest.fn(),
     });
     mockUseWelcomeAudio.mockReturnValue(createAudioState());
     mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState());

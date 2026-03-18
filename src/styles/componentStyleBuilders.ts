@@ -6,14 +6,18 @@ import { cssDuration } from '../motion/tokens';
 type GitHubChipLayout = 'stack' | 'wrap';
 
 export const createComponentStyleMap = (theme: Theme) => {
+  const isLight = theme.palette.mode === 'light';
+  const { surface, motion, motionScale } = theme.appearanceTreatment;
+  const staggerFactor = motionScale.stagger;
+  const durationFactor = motionScale.duration;
   const motionTokens = {
-    itemOffsetMs: 120,
-    itemStaggerMs: 120,
-    sectionStaggerMs: 120,
-    githubSubsectionStaggerMs: 120,
-    accordionChipStaggerMs: 120,
-    loadingPulseDurationMs: 1600,
-    loadingBarStaggerMs: 200,
+    itemOffsetMs: Math.round(120 * staggerFactor),
+    itemStaggerMs: Math.round(120 * staggerFactor),
+    sectionStaggerMs: Math.round(120 * staggerFactor),
+    githubSubsectionStaggerMs: Math.round(120 * staggerFactor),
+    accordionChipStaggerMs: Math.round(120 * staggerFactor),
+    loadingPulseDurationMs: Math.round(1600 * durationFactor),
+    loadingBarStaggerMs: Math.round(200 * staggerFactor),
   } as const;
   const contentListStackSpacing = 2.25;
   const compactSidebarSectionSpacing = 0;
@@ -21,8 +25,6 @@ export const createComponentStyleMap = (theme: Theme) => {
   const accentColor = theme.palette.primary.main;
   const supportAccentColor = theme.palette.secondary.main;
   const supportAccentLight = theme.palette.secondary.light;
-  const isLight = theme.palette.mode === 'light';
-  const { surface, motion } = theme.appearanceTreatment;
   const scaleGlowAlpha = (value: number, strength: number = surface.glowStrength) =>
     Math.min(value * strength, 1);
   const scaleSecondaryGlowAlpha = (

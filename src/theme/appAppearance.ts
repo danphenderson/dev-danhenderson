@@ -71,10 +71,33 @@ export type AppMotionTreatment = {
   headingBreatheMs: number;
 };
 
+export type MotionIntensityLevel = 'off' | 'subtle' | 'default' | 'expressive';
+
+export type MotionScaleFactors = {
+  duration: number;
+  tilt: number;
+  stagger: number;
+  cssAnimations: boolean;
+};
+
+export const MOTION_INTENSITY_STORAGE_KEY = 'danhenderson-motion';
+export const defaultMotionIntensity: MotionIntensityLevel = 'default';
+
+export const isMotionIntensityLevel = (value: string | null): value is MotionIntensityLevel =>
+  value === 'off' || value === 'subtle' || value === 'default' || value === 'expressive';
+
+export const motionIntensityScales: Record<MotionIntensityLevel, MotionScaleFactors> = {
+  off: { duration: 0, tilt: 0, stagger: 0, cssAnimations: false },
+  subtle: { duration: 0.5, tilt: 0.3, stagger: 0.5, cssAnimations: false },
+  default: { duration: 1, tilt: 1, stagger: 1, cssAnimations: true },
+  expressive: { duration: 1.3, tilt: 1.2, stagger: 1.3, cssAnimations: true },
+};
+
 export type AppResolvedTreatment = {
   key: AppAppearanceKey;
   surface: AppSurfaceTreatment;
   motion: AppMotionTreatment;
+  motionScale: MotionScaleFactors;
 };
 
 export type AppAppearancePreset = {
@@ -724,14 +747,31 @@ export const appAppearanceOptions = Object.values(appAppearancePresets);
 
 export const resolveAppearanceTreatment = (
   mode: PaletteMode,
-  appAppearanceKey: AppAppearanceKey
+  appAppearanceKey: AppAppearanceKey,
+  motionIntensity: MotionIntensityLevel = 'default'
 ): AppResolvedTreatment => {
   const preset = appAppearancePresets[appAppearanceKey];
+  const scale = motionIntensityScales[motionIntensity];
+  const baseMotion = preset.motion;
+
+  const motion: AppMotionTreatment = scale.cssAnimations
+    ? baseMotion
+    : {
+        ...baseMotion,
+        pillPulseEnabled: false,
+        chipWaveEnabled: false,
+        borderGlowEnabled: false,
+        sectionBorderSweepEnabled: false,
+        sectionBottomGlowAnimated: false,
+        statusBreatheEnabled: false,
+        headingBreatheEnabled: false,
+      };
 
   return {
     key: preset.key,
     surface: preset.surface[mode],
-    motion: preset.motion,
+    motion,
+    motionScale: scale,
   };
 };
 

@@ -2,6 +2,7 @@ import { Box, Zoom } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { useComponentStyles } from '../styles/componentStyles';
+import { useMotionScale, scaleStagger } from '../motion';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 
 type AnimatedZoomListProps<Item> = {
@@ -24,7 +25,10 @@ export const AnimatedZoomList = <Item,>({
   itemStaggerMs,
 }: AnimatedZoomListProps<Item>) => {
   const { getSectionDelayMs, motionTokens } = useComponentStyles();
-  const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.itemStaggerMs;
+  const { stagger: sFactor } = useMotionScale();
+  const resolvedItemStaggerMs = Math.round(
+    scaleStagger(itemStaggerMs ?? motionTokens.itemStaggerMs, sFactor)
+  );
 
   return (
     <Box sx={containerSx}>

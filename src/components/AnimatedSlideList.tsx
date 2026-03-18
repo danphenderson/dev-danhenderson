@@ -4,6 +4,7 @@ import type { ElementType, ReactNode, RefObject } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { SlideProps } from '@mui/material/Slide';
 import { useComponentStyles } from '../styles/componentStyles';
+import { useMotionScale, scaleStagger } from '../motion';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { normalizeSxProp } from '../utils/sx';
 
@@ -62,10 +63,13 @@ export const AnimatedSlideList = <Item,>({
   reverseExitStagger = false,
 }: AnimatedSlideListProps<Item>) => {
   const { motionTokens } = useComponentStyles();
+  const { stagger: sFactor } = useMotionScale();
   const [enteredKeys, setEnteredKeys] = useState<Set<string>>(() => new Set());
   const nodeRefs = useRef(new Map<string, RefObject<HTMLElement>>());
   const enterTimerIdsRef = useRef<number[]>([]);
-  const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.itemStaggerMs;
+  const resolvedItemStaggerMs = Math.round(
+    scaleStagger(itemStaggerMs ?? motionTokens.itemStaggerMs, sFactor)
+  );
   const itemKeys = useMemo(
     () => items.map((item, index) => getItemKey(item, index)),
     [getItemKey, items]

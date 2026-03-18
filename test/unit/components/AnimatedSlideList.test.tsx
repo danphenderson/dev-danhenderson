@@ -30,6 +30,11 @@ jest.mock('@mui/material', () => {
   };
 });
 
+jest.mock('../../../src/motion', () => ({
+  ...jest.requireActual('../../../src/motion'),
+  useMotionScale: () => ({ duration: 1, stagger: 1, tilt: 1 }),
+}));
+
 jest.mock('../../../src/styles/componentStyles', () => ({
   useComponentStyles: () => ({
     motionTokens: {

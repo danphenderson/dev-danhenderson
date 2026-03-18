@@ -1,6 +1,6 @@
 # danhenderson.dev
 
-Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript portfolio site with an interactive CV, blog, climbing log, and photography galleries.
+Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript portfolio site with an interactive CV, climbing log, photography galleries, and a feature-flagged blog available in development and test builds.
 
 ## Sections
 
@@ -8,7 +8,7 @@ Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript po
 | --------------------------------------- | ---------------------------------------------------------------------------------------- |
 | `/`                                     | Home page with the welcome audio prompt                                                  |
 | `/cv`                                   | Interactive CV, downloadable resume, and GitHub-backed highlights with bundled fallbacks |
-| `/blog` and `/blog/:slug`               | Editorial blog index and post detail pages                                               |
+| `/blog` and `/blog/:slug`               | Editorial blog index and post detail pages in development and test builds                |
 | `/climbing`                             | Climbing ticks and wish-list views                                                       |
 | `/photography` and `/photography/:slug` | Photography collection index and album pages                                             |
 
@@ -18,6 +18,17 @@ Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript po
 - Portfolio content is authored in local TypeScript data modules.
 - GitHub-powered CV sections degrade gracefully to bundled content when live API data is unavailable.
 - Shared motion, theming, and reusable UI primitives power the different sections of the site.
+
+## Feature Flags
+
+- `src/constants/featureFlags.ts` is the central runtime-aware feature-flag registry.
+- The `blog` flag is enabled in `development` and `test`, and disabled in `production`.
+- Override the resolved runtime at build time with `REACT_APP_RUNTIME_ENV=development|test|production` when a workflow needs a non-default bundle.
+
+## Build Variants
+
+- `npm run build` creates the production bundle and disables production-hidden feature flags such as `blog`.
+- `npm run build:e2e` creates the test-runtime bundle used for Playwright so gated routes remain available during browser coverage.
 
 ## Stack
 

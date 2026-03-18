@@ -1,8 +1,9 @@
 import type { ReactNode, RefObject } from 'react';
-import { motion, useInView, useMotionValue, useReducedMotion, useSpring } from 'motion/react';
+import { motion, useInView, useMotionValue, useSpring } from 'motion/react';
 import type { Variants, HTMLMotionProps, TargetAndTransition } from 'motion/react';
-import { useCallback, useEffect, useRef } from 'react';
-import { springOptions } from './tokens';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { springOptions, scaleDuration } from './tokens';
+import { useMotionScale } from './hooks';
 import {
   fadeInUp,
   fadeIn,
@@ -12,6 +13,27 @@ import {
   tapShrink,
   hoverZoom,
 } from './variants';
+
+/* ------------------------------------------------------------------ */
+/*  Shared helper: scale variant transition durations                 */
+/* ------------------------------------------------------------------ */
+
+const scaleVariantDurations = (variants: Variants, factor: number): Variants => {
+  if (factor === 1) return variants;
+  const scaled: Variants = {};
+  for (const [key, variant] of Object.entries(variants)) {
+    if (typeof variant === 'object' && variant !== null && 'transition' in variant) {
+      const v = variant as Record<string, unknown>;
+      const t = v.transition as Record<string, unknown> | undefined;
+      if (t && typeof t.duration === 'number') {
+        scaled[key] = { ...v, transition: { ...t, duration: scaleDuration(t.duration, factor) } };
+        continue;
+      }
+    }
+    scaled[key] = variant;
+  }
+  return scaled;
+};
 
 /* ------------------------------------------------------------------ */
 /*  Shared helper: margin type cast                                   */
@@ -69,13 +91,22 @@ export const MotionSection = ({
 }: MotionSectionProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useMotionInView(ref, rootMargin, once, threshold);
+  const { duration: dFactor } = useMotionScale();
+  const scaledVariants = useMemo(
+    () => scaleVariantDurations(variants, dFactor),
+    [variants, dFactor]
+  );
+
+  if (dFactor === 0) {
+    return <div {...(rest as React.HTMLAttributes<HTMLDivElement>)}>{children}</div>;
+  }
 
   return (
     <motion.div
       ref={ref}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
-      variants={variants}
+      variants={scaledVariants}
       {...rest}
     >
       {children}
@@ -115,13 +146,42 @@ export const StaggerChildren = ({
 }: StaggerChildrenProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useMotionInView(ref, rootMargin, once);
+  const { duration: dFactor, stagger: sFactor } = useMotionScale();
+
+  const scaledVariants = useMemo(() => {
+    if (dFactor === 1 && sFactor === 1) return containerVariants;
+    const scaled: Variants = {};
+    for (const [key, variant] of Object.entries(containerVariants)) {
+      if (typeof variant === 'object' && variant !== null && 'transition' in variant) {
+        const v = variant as Record<string, unknown>;
+        const t = v.transition as Record<string, unknown> | undefined;
+        if (t) {
+          const newT = { ...t };
+          if (typeof newT.staggerChildren === 'number')
+            newT.staggerChildren = scaleDuration(newT.staggerChildren, sFactor);
+          if (typeof newT.delayChildren === 'number')
+            newT.delayChildren = scaleDuration(newT.delayChildren, sFactor);
+          if (typeof newT.duration === 'number')
+            newT.duration = scaleDuration(newT.duration, dFactor);
+          scaled[key] = { ...v, transition: newT };
+          continue;
+        }
+      }
+      scaled[key] = variant;
+    }
+    return scaled;
+  }, [containerVariants, dFactor, sFactor]);
+
+  if (dFactor === 0) {
+    return <div {...(rest as React.HTMLAttributes<HTMLDivElement>)}>{children}</div>;
+  }
 
   return (
     <motion.div
       ref={ref}
       initial={initial ?? 'hidden'}
       animate={animate ?? (isInView ? 'visible' : 'hidden')}
-      variants={containerVariants}
+      variants={scaledVariants}
       {...rest}
     >
       {children}
@@ -153,10 +213,13 @@ export const MotionCard = ({
   tapState,
   ...rest
 }: MotionCardProps) => {
+  const { duration: dFactor } = useMotionScale();
+  const effectiveDisable = disableHover || dFactor === 0;
+
   return (
     <motion.div
-      whileHover={!disableHover ? hoverState ?? hoverLift : undefined}
-      whileTap={!disableHover ? tapState ?? tapShrink : undefined}
+      whileHover={!effectiveDisable ? hoverState ?? hoverLift : undefined}
+      whileTap={!effectiveDisable ? tapState ?? tapShrink : undefined}
       {...rest}
     >
       {children}
@@ -231,13 +294,19 @@ export const MotionFadeIn = ({
 }: MotionFadeInProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useMotionInView(ref, rootMargin, once);
+  const { duration: dFactor } = useMotionScale();
+  const scaledVariants = useMemo(() => scaleVariantDurations(fadeIn, dFactor), [dFactor]);
+
+  if (dFactor === 0) {
+    return <div {...(rest as React.HTMLAttributes<HTMLDivElement>)}>{children}</div>;
+  }
 
   return (
     <motion.div
       ref={ref}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
-      variants={fadeIn}
+      variants={scaledVariants}
       {...rest}
     >
       {children}
@@ -264,13 +333,19 @@ export const MotionScaleIn = ({
 }: MotionScaleInProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useMotionInView(ref, rootMargin, once);
+  const { duration: dFactor } = useMotionScale();
+  const scaledVariants = useMemo(() => scaleVariantDurations(scaleIn, dFactor), [dFactor]);
+
+  if (dFactor === 0) {
+    return <div {...(rest as React.HTMLAttributes<HTMLDivElement>)}>{children}</div>;
+  }
 
   return (
     <motion.div
       ref={ref}
       initial="hidden"
       animate={isInView ? 'visible' : 'hidden'}
-      variants={scaleIn}
+      variants={scaledVariants}
       {...rest}
     >
       {children}
@@ -309,8 +384,9 @@ export const MotionTiltCard = ({
   disabled = false,
 }: MotionTiltCardProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const prefersReduced = useReducedMotion();
-  const tiltEnabled = !disabled && !prefersReduced;
+  const { tilt: tiltFactor } = useMotionScale();
+  const tiltEnabled = !disabled && tiltFactor > 0;
+  const effectiveIntensity = intensity * tiltFactor;
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
   const rotateX = useSpring(rawY, springOptions.tilt);
@@ -348,10 +424,10 @@ export const MotionTiltCard = ({
       const rect = el.getBoundingClientRect();
       const nx = (e.clientX - rect.left) / rect.width - 0.5;
       const ny = (e.clientY - rect.top) / rect.height - 0.5;
-      rawX.set(nx * TILT_DEG * 2 * intensity);
-      rawY.set(-ny * TILT_DEG * 2 * intensity);
+      rawX.set(nx * TILT_DEG * 2 * effectiveIntensity);
+      rawY.set(-ny * TILT_DEG * 2 * effectiveIntensity);
     },
-    [rawX, rawY, intensity, setWillChange, tiltEnabled]
+    [rawX, rawY, effectiveIntensity, setWillChange, tiltEnabled]
   );
 
   const handleMouseLeave = useCallback(() => {

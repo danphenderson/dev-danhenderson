@@ -5,6 +5,8 @@ import Header from './components/Header';
 import { CommonLinkTooltip } from './components/CommonLinkTooltip';
 import { PageTransition } from './components/PageTransition';
 import { ScrollProgressBar } from './components/ScrollProgressBar';
+import { isFeatureEnabled } from './constants/featureFlags';
+import { siteRouteMap } from './constants/siteRoutes';
 import Home from './pages/Home';
 import Photography from './pages/Photography';
 import PhotographyCategory from './pages/PhotographyCategory';
@@ -38,6 +40,8 @@ const skipLinkSx = {
 } as const;
 
 function AppContent() {
+  const isBlogEnabled = isFeatureEnabled('blog');
+
   return (
     <CommandPaletteProvider>
       <Box>
@@ -52,14 +56,19 @@ function AppContent() {
         <Box component="main" id="main-content" tabIndex={-1}>
           <PageTransition>
             <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/cv" element={<CV />} />
-              <Route path="/climbing" element={<Climbing />} />
-              <Route path="/photography" element={<Photography />} />
-              <Route path="/photography/:slug" element={<PhotographyCategory />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:slug" element={<BlogPost />} />
-              <Route path="*" element={<NotFound />} />
+              <Route path={siteRouteMap.home.path} element={<Home />} />
+              <Route path={siteRouteMap.cv.path} element={<CV />} />
+              <Route path={siteRouteMap.climbing.path} element={<Climbing />} />
+              <Route path={siteRouteMap.photography.path} element={<Photography />} />
+              <Route
+                path={`${siteRouteMap.photography.path}/:slug`}
+                element={<PhotographyCategory />}
+              />
+              {isBlogEnabled ? <Route path={siteRouteMap.blog.path} element={<Blog />} /> : null}
+              {isBlogEnabled ? (
+                <Route path={`${siteRouteMap.blog.path}/:slug`} element={<BlogPost />} />
+              ) : null}
+              <Route path={siteRouteMap['not-found'].path} element={<NotFound />} />
             </Routes>
           </PageTransition>
         </Box>

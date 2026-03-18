@@ -13,6 +13,7 @@ import { cssDuration } from '../../motion/tokens';
 import { SPRING_EASING_CSS } from '../../styles/springEasing';
 import { useAppStyles } from '../../styles/appStyles';
 import { AppSpeedDial, type AppSpeedDialAction } from '../AppSpeedDial';
+import { getProximityScale } from './dockScale';
 
 /* ------------------------------------------------------------------ */
 /*  AppearanceSwatchIcon                                              */
@@ -66,25 +67,6 @@ const AppearanceSwatchIcon = ({
     }}
   />
 );
-
-/* ------------------------------------------------------------------ */
-/*  Dock proximity scale helper                                       */
-/* ------------------------------------------------------------------ */
-
-const PROXIMITY_SCALES = [1.38, 1.2, 1.08] as const;
-
-const getProximityScale = (
-  actionId: string,
-  hoveredId: string | null,
-  orderedIds: string[]
-): number => {
-  if (!hoveredId) return 1;
-  const hoveredIdx = orderedIds.indexOf(hoveredId);
-  const targetIdx = orderedIds.indexOf(actionId);
-  if (hoveredIdx === -1 || targetIdx === -1) return 1;
-  const distance = Math.abs(targetIdx - hoveredIdx);
-  return distance < PROXIMITY_SCALES.length ? PROXIMITY_SCALES[distance] : 1;
-};
 
 /* ------------------------------------------------------------------ */
 /*  HeaderAppearanceDial                                              */

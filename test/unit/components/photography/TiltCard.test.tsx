@@ -4,6 +4,10 @@ import { TiltCard } from '../../../../src/components/photography/TiltCard';
 const mockUseSpring = jest.fn((source: unknown) => source);
 const mockUseReducedMotion = jest.fn().mockReturnValue(false);
 
+jest.mock('../../../../src/motion/hooks', () => ({
+  useMotionScale: () => ({ duration: 1, stagger: 1, tilt: mockUseReducedMotion() ? 0 : 1 }),
+}));
+
 jest.mock('motion/react', () => ({
   motion: {
     div: require('react').forwardRef(

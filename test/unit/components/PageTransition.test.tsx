@@ -10,6 +10,7 @@ jest.mock('motion/react', () => {
 
   return {
     AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
+    useReducedMotion: () => false,
     motion: {
       div: React.forwardRef(
         (
@@ -29,7 +30,7 @@ jest.mock('motion/react', () => {
             transition?: Record<string, unknown>;
             style?: CSSProperties;
           } & HTMLAttributes<HTMLDivElement>,
-          ref: Ref<HTMLDivElement>,
+          ref: Ref<HTMLDivElement>
         ) => {
           capturedMotionDivProps = { initial, animate, exit, transition };
 
@@ -38,7 +39,7 @@ jest.mock('motion/react', () => {
               {children}
             </div>
           );
-        },
+        }
       ),
     },
   };
@@ -49,8 +50,13 @@ import { PageTransition } from '../../../src/components/PageTransition';
 const renderWithProviders = (ui: ReactNode, route = '/') =>
   render(
     <ThemeProvider>
-      <MemoryRouter initialEntries={[route]} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{ui}</MemoryRouter>
-    </ThemeProvider>,
+      <MemoryRouter
+        initialEntries={[route]}
+        future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
+      >
+        {ui}
+      </MemoryRouter>
+    </ThemeProvider>
   );
 
 describe('PageTransition', () => {
@@ -63,7 +69,7 @@ describe('PageTransition', () => {
     renderWithProviders(
       <PageTransition>
         <div data-testid="page-content">Hello</div>
-      </PageTransition>,
+      </PageTransition>
     );
 
     expect(screen.getByTestId('page-transition-div')).toBeInTheDocument();
@@ -74,7 +80,7 @@ describe('PageTransition', () => {
     renderWithProviders(
       <PageTransition>
         <div>Content</div>
-      </PageTransition>,
+      </PageTransition>
     );
 
     expect(capturedMotionDivProps.initial).toEqual({ opacity: 0, y: 8 });
@@ -84,7 +90,7 @@ describe('PageTransition', () => {
       expect.objectContaining({
         duration: expect.any(Number),
         ease: expect.any(Array),
-      }),
+      })
     );
   });
 });

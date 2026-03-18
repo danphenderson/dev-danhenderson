@@ -5,6 +5,7 @@ import {
 } from '../components/cv/cvSectionMetadata';
 import { blogPosts } from '../data/blog';
 import { photographyCategories } from '../data/photography';
+import { isFeatureEnabled } from './featureFlags';
 import { sharedRouteActions } from './routeActions';
 import { siteRouteMap, type SiteRouteId } from './siteRoutes';
 
@@ -105,10 +106,12 @@ const blogPostActions: CommandPaletteAction[] = blogPosts.map((post) => ({
   routeId: 'blog' as SiteRouteId,
 }));
 
+const enabledBlogPostActions = isFeatureEnabled('blog') ? blogPostActions : [];
+
 export const commandPaletteActions: CommandPaletteAction[] = [
   ...primaryRouteActions,
   cvStoryModeAction,
   ...cvSectionActions,
   ...photographyAlbumActions,
-  ...blogPostActions,
+  ...enabledBlogPostActions,
 ];

@@ -2,7 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 import { Box, Zoom } from '@mui/material';
 import type { ElementType } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { DEFAULT_INTERSECTION_ROOT_MARGIN, DEFAULT_INTERSECTION_THRESHOLD } from '../motion';
+import {
+  DEFAULT_INTERSECTION_ROOT_MARGIN,
+  DEFAULT_INTERSECTION_THRESHOLD,
+  useMotionScale,
+} from '../motion';
 import { useAppStyles } from '../styles/appStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { normalizeSxProp } from '../utils/sx';
@@ -57,6 +61,7 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
   ...props
 }: AnimatedContentCardProps<RootComponent>) => {
   const appStyles = useAppStyles();
+  const { duration: dFactor } = useMotionScale();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const hasNotifiedVisibleRef = useRef(false);
   const [hasTriggered, setHasTriggered] = useState(skipEntranceAnimation);
@@ -157,7 +162,7 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
       <Zoom
         in={isVisible}
         appear={!skipEntranceAnimation}
-        timeout={ANIMATED_CARD_DURATION_MS}
+        timeout={dFactor === 0 ? 0 : Math.round(ANIMATED_CARD_DURATION_MS * dFactor)}
         easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
       >
         <Box>{content}</Box>

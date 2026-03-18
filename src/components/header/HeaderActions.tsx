@@ -5,6 +5,7 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import type { MutableRefObject } from 'react';
 import { useAppStyles } from '../../styles/appStyles';
 import { HeaderAppearanceDial, type HeaderAppearanceDialProps } from './HeaderAppearanceDial';
+import { HeaderMotionDial, type HeaderMotionDialProps } from './HeaderMotionDial';
 
 type HeaderActionsProps = {
   iconButtonSize: 'small' | 'medium' | 'large';
@@ -16,6 +17,7 @@ type HeaderActionsProps = {
   showPauseHint?: boolean;
   pauseHighlightSx?: SxProps<Theme>;
   appearanceDial?: Omit<HeaderAppearanceDialProps, 'iconButtonSize'>;
+  motionDial?: Omit<HeaderMotionDialProps, 'iconButtonSize'>;
 };
 
 export const HeaderActions = ({
@@ -28,6 +30,7 @@ export const HeaderActions = ({
   showPauseHint = false,
   pauseHighlightSx,
   appearanceDial,
+  motionDial,
 }: HeaderActionsProps) => {
   const appStyles = useAppStyles();
   const pauseButtonSx = (
@@ -63,6 +66,8 @@ export const HeaderActions = ({
       {appearanceDial && (
         <HeaderAppearanceDial iconButtonSize={iconButtonSize} {...appearanceDial} />
       )}
+
+      {motionDial && <HeaderMotionDial iconButtonSize={iconButtonSize} {...motionDial} />}
     </Stack>
   );
 };

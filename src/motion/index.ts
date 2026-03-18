@@ -16,9 +16,13 @@ export {
   stagger,
   transition,
   springOptions,
+  scaleDuration,
+  scaleStagger,
   DEFAULT_INTERSECTION_THRESHOLD,
   DEFAULT_INTERSECTION_ROOT_MARGIN,
 } from './tokens';
+
+export { useMotionScale } from './hooks';
 
 export {
   fadeInUp,

@@ -6,6 +6,48 @@ import {
   type SiteRouteId,
 } from '../../../src/constants/siteRoutes';
 
+const loadSiteRoutesForEnv = (env: { REACT_APP_RUNTIME_ENV?: string; NODE_ENV?: string }) => {
+  const previousRuntimeEnv = process.env.REACT_APP_RUNTIME_ENV;
+  const previousNodeEnv = process.env.NODE_ENV;
+
+  if (env.REACT_APP_RUNTIME_ENV === undefined) {
+    delete process.env.REACT_APP_RUNTIME_ENV;
+  } else {
+    process.env.REACT_APP_RUNTIME_ENV = env.REACT_APP_RUNTIME_ENV;
+  }
+
+  if (env.NODE_ENV === undefined) {
+    delete process.env.NODE_ENV;
+  } else {
+    process.env.NODE_ENV = env.NODE_ENV;
+  }
+
+  jest.resetModules();
+
+  let moduleUnderTest!: typeof import('../../../src/constants/siteRoutes');
+
+  jest.isolateModules(() => {
+    moduleUnderTest =
+      require('../../../src/constants/siteRoutes') as typeof import('../../../src/constants/siteRoutes');
+  });
+
+  if (previousRuntimeEnv === undefined) {
+    delete process.env.REACT_APP_RUNTIME_ENV;
+  } else {
+    process.env.REACT_APP_RUNTIME_ENV = previousRuntimeEnv;
+  }
+
+  if (previousNodeEnv === undefined) {
+    delete process.env.NODE_ENV;
+  } else {
+    process.env.NODE_ENV = previousNodeEnv;
+  }
+
+  jest.resetModules();
+
+  return moduleUnderTest;
+};
+
 describe('siteRouteMap', () => {
   it('contains all expected route IDs', () => {
     const expectedIds: SiteRouteId[] = [
@@ -53,6 +95,10 @@ describe('siteRouteMap', () => {
   it('not-found route has no action metadata', () => {
     expect(siteRouteMap['not-found'].action).toBeUndefined();
   });
+
+  it('marks the blog route with the blog feature flag', () => {
+    expect(siteRouteMap.blog.featureFlag).toBe('blog');
+  });
 });
 
 describe('siteRoutes', () => {
@@ -90,6 +136,17 @@ describe('primaryNavigationRoutes', () => {
     const ids = primaryNavigationRoutes.map((r) => r.id);
     expect(ids).not.toContain('home');
     expect(ids).not.toContain('not-found');
+  });
+
+  it('omits the blog from enabled routes in a production import', () => {
+    const productionRoutes = loadSiteRoutesForEnv({
+      REACT_APP_RUNTIME_ENV: 'production',
+      NODE_ENV: 'production',
+    });
+
+    expect(Object.keys(productionRoutes.siteRouteMap)).toContain('blog');
+    expect(productionRoutes.siteRoutes.map((route) => route.id)).not.toContain('blog');
+    expect(productionRoutes.primaryNavigationRoutes.map((route) => route.id)).not.toContain('blog');
   });
 });
 

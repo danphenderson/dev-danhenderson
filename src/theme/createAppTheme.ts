@@ -4,11 +4,16 @@ import {
   appAppearancePresets,
   resolveAppearanceTreatment,
   type AppAppearanceKey,
+  type MotionIntensityLevel,
 } from './appAppearance';
 
-export const createAppTheme = (mode: PaletteMode, appearanceKey: AppAppearanceKey) => {
+export const createAppTheme = (
+  mode: PaletteMode,
+  appearanceKey: AppAppearanceKey,
+  motionIntensity: MotionIntensityLevel = 'default'
+) => {
   const appearancePreset = appAppearancePresets[appearanceKey];
-  const appearanceTreatment = resolveAppearanceTreatment(mode, appearanceKey);
+  const appearanceTreatment = resolveAppearanceTreatment(mode, appearanceKey, motionIntensity);
   const bodyFontFamily = appearancePreset.typography.bodyFontFamily;
   const headingFontFamily = appearancePreset.typography.headingFontFamily;
   const resolvedPalette = appearancePreset.palette[mode];
@@ -143,8 +148,14 @@ export const createAppTheme = (mode: PaletteMode, appearanceKey: AppAppearanceKe
             WebkitBackdropFilter: 'blur(16px)',
             boxShadow:
               theme.palette.mode === 'light'
-                ? `0 1px 3px ${alpha(theme.palette.common.black, 0.06)}, 0 4px 14px ${alpha(theme.palette.common.black, 0.04)}`
-                : `0 1px 4px ${alpha(theme.palette.common.black, 0.18)}, 0 6px 18px ${alpha(theme.palette.common.black, 0.1)}`,
+                ? `0 1px 3px ${alpha(theme.palette.common.black, 0.06)}, 0 4px 14px ${alpha(
+                    theme.palette.common.black,
+                    0.04
+                  )}`
+                : `0 1px 4px ${alpha(theme.palette.common.black, 0.18)}, 0 6px 18px ${alpha(
+                    theme.palette.common.black,
+                    0.1
+                  )}`,
           }),
         },
       },

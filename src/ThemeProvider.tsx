@@ -4,9 +4,13 @@ import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
 import {
   APP_APPEARANCE_STORAGE_KEY,
+  MOTION_INTENSITY_STORAGE_KEY,
   defaultAppAppearanceKey,
+  defaultMotionIntensity,
   isAppAppearanceKey,
+  isMotionIntensityLevel,
   type AppAppearanceKey,
+  type MotionIntensityLevel,
 } from './theme/appAppearance';
 import { createAppTheme } from './theme/createAppTheme';
 
@@ -16,14 +20,18 @@ const DEFAULT_THEME_MODE: PaletteMode = 'dark';
 type ThemeContextValue = {
   mode: PaletteMode;
   appearance: AppAppearanceKey;
+  motionIntensity: MotionIntensityLevel;
   setAppearance: (appearance: AppAppearanceKey) => void;
+  setMotionIntensity: (level: MotionIntensityLevel) => void;
   toggleTheme: () => void;
 };
 
 const ThemeContext = createContext<ThemeContextValue>({
   mode: DEFAULT_THEME_MODE,
   appearance: defaultAppAppearanceKey,
+  motionIntensity: defaultMotionIntensity,
   setAppearance: () => {},
+  setMotionIntensity: () => {},
   toggleTheme: () => {},
 });
 
@@ -46,7 +54,16 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     const storedAppearance = window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY);
     return isAppAppearanceKey(storedAppearance) ? storedAppearance : defaultAppAppearanceKey;
   });
-  const theme = useMemo(() => createAppTheme(mode, appearance), [appearance, mode]);
+  const [motionIntensity, setMotionIntensity] = useState<MotionIntensityLevel>(() => {
+    if (typeof window === 'undefined') return defaultMotionIntensity;
+
+    const stored = window.localStorage.getItem(MOTION_INTENSITY_STORAGE_KEY);
+    return isMotionIntensityLevel(stored) ? stored : defaultMotionIntensity;
+  });
+  const theme = useMemo(
+    () => createAppTheme(mode, appearance, motionIntensity),
+    [appearance, mode, motionIntensity]
+  );
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -58,6 +75,11 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     window.localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, appearance);
   }, [appearance]);
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.localStorage.setItem(MOTION_INTENSITY_STORAGE_KEY, motionIntensity);
+  }, [motionIntensity]);
+
   const toggleTheme = () => {
     setMode((prev) => (prev === 'light' ? 'dark' : 'light'));
   };
@@ -65,7 +87,9 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
   if (!children) return null;
 
   return (
-    <ThemeContext.Provider value={{ mode, appearance, setAppearance, toggleTheme }}>
+    <ThemeContext.Provider
+      value={{ mode, appearance, motionIntensity, setAppearance, setMotionIntensity, toggleTheme }}
+    >
       <MuiThemeProvider theme={theme}>
         <CssBaseline />
         {children}
