@@ -4,7 +4,9 @@ import InsertDriveFileOutlined from '@mui/icons-material/InsertDriveFileOutlined
 import FolderOutlined from '@mui/icons-material/FolderOutlined';
 import KeyboardArrowDownOutlined from '@mui/icons-material/KeyboardArrowDownOutlined';
 import KeyboardArrowRightOutlined from '@mui/icons-material/KeyboardArrowRightOutlined';
+import type { VscodeEditorTab } from '../../types/ui';
 import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily, systemFontFamily } from './vscodeTokens';
+import { getVscodeEditorTabMetadata } from './vscodeEditorTabs';
 
 interface FileEntry {
   name: string;
@@ -15,7 +17,8 @@ interface FileEntry {
 
 const FILES: FileEntry[] = [
   { name: 'src', kind: 'folder', indent: 0, open: true },
-  { name: 'portfolio.ts', kind: 'file', indent: 1 },
+  { name: 'server.py', kind: 'file', indent: 1 },
+  { name: 'client.ts', kind: 'file', indent: 1 },
   { name: 'App.tsx', kind: 'file', indent: 1 },
   { name: 'index.tsx', kind: 'file', indent: 1 },
   { name: 'public', kind: 'folder', indent: 0, open: false },
@@ -24,11 +27,17 @@ const FILES: FileEntry[] = [
 ];
 
 interface VscodeExplorerSidebarProps {
+  activeTab?: VscodeEditorTab;
   visible: boolean;
 }
 
-export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({ visible }) => {
+export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({
+  activeTab = 'server',
+  visible,
+}) => {
   if (!visible) return null;
+
+  const activeFileName = getVscodeEditorTabMetadata(activeTab).fileName;
 
   return (
     <Box
@@ -95,11 +104,11 @@ export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({ vi
               fontFamily: monoFontFamily,
               fontSize: '0.68rem',
               color:
-                entry.name === 'portfolio.ts' ? VSCODE_COLORS.foreground : VSCODE_COLORS.panelLabel,
+                entry.name === activeFileName ? VSCODE_COLORS.foreground : VSCODE_COLORS.panelLabel,
               userSelect: 'none',
               cursor: 'default',
               backgroundColor:
-                entry.name === 'portfolio.ts' ? VSCODE_COLORS.explorerItemActive : 'transparent',
+                entry.name === activeFileName ? VSCODE_COLORS.explorerItemActive : 'transparent',
               '&:hover': {
                 backgroundColor: VSCODE_COLORS.explorerItemHover,
               },
@@ -116,7 +125,7 @@ export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({ vi
                     sx={{ fontSize: '0.8rem', color: VSCODE_COLORS.panelLabel }}
                   />
                 )}
-                <FolderOutlined sx={{ fontSize: '0.85rem', color: '#dcb67a' }} />
+                <FolderOutlined sx={{ fontSize: '0.85rem', color: VSCODE_COLORS.fileTypeFolder }} />
               </>
             ) : (
               <>
@@ -124,11 +133,12 @@ export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({ vi
                 <InsertDriveFileOutlined
                   sx={{
                     fontSize: '0.85rem',
-                    color:
-                      entry.name.endsWith('.ts') || entry.name.endsWith('.tsx')
-                        ? '#3178c6'
+                    color: entry.name.endsWith('.py')
+                      ? VSCODE_COLORS.fileTypePython
+                      : entry.name.endsWith('.ts') || entry.name.endsWith('.tsx')
+                        ? VSCODE_COLORS.fileTypeTs
                         : entry.name.endsWith('.json')
-                          ? '#e6c07b'
+                          ? VSCODE_COLORS.fileTypeJson
                           : VSCODE_COLORS.panelLabel,
                   }}
                 />

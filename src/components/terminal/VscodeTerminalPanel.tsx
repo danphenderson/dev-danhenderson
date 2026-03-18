@@ -27,11 +27,70 @@ interface VscodeTerminalPanelProps {
   history: TerminalLine[];
 }
 
+/**
+ * Colorize a single output line with VS Code–style token colors.
+ * Rules are applied in priority order; the first match wins.
+ */
+const colorizeOutputLine = (text: string): React.ReactNode => {
+  // ==> Section headers (e.g. brew ls)
+  if (text.startsWith('==>')) {
+    const rest = text.slice(3);
+    return (
+      <>
+        <Box component="span" sx={{ color: VSCODE_COLORS.promptBranch }}>
+          {'==>'}
+        </Box>
+        <Box component="span" sx={{ color: VSCODE_COLORS.syntaxFunction }}>
+          {rest}
+        </Box>
+      </>
+    );
+  }
+  // ✓ Success lines (e.g. npm run build)
+  if (text.startsWith('✓')) {
+    const rest = text.slice(1);
+    return (
+      <>
+        <Box component="span" sx={{ color: VSCODE_COLORS.promptDollar }}>
+          {'✓'}
+        </Box>
+        <Box component="span" sx={{ color: VSCODE_COLORS.foreground }}>
+          {rest}
+        </Box>
+      </>
+    );
+  }
+  // Version strings (v22.14.0, Python 3.x, julia version x)
+  if (/^(v\d|Python \d+\.\d|\d+\.\d|julia version)/.test(text)) {
+    return (
+      <Box component="span" sx={{ color: VSCODE_COLORS.syntaxVariable }}>
+        {text}
+      </Box>
+    );
+  }
+  // Short git hash + commit message (7 hex chars + space)
+  const hashMatch = text.match(/^([0-9a-f]{7}) (.*)$/);
+  if (hashMatch) {
+    return (
+      <>
+        <Box component="span" sx={{ color: VSCODE_COLORS.lineNumber }}>
+          {hashMatch[1]}
+        </Box>{' '}
+        <Box component="span" sx={{ color: VSCODE_COLORS.foreground }}>
+          {hashMatch[2]}
+        </Box>
+      </>
+    );
+  }
+  // Default — inherits parent outputText color
+  return <>{text}</>;
+};
+
 /** First line of the two-line zsh prompt — renders cwd and git status */
 const GitStatusLine: React.FC = () => (
   <Box sx={{ display: 'flex', alignItems: 'center', lineHeight: 1.7 }}>
     <Box component="span" sx={{ color: VSCODE_COLORS.syntaxTypeAnnotation }}>
-      {'~/Desktop/dev-danhenderson'}
+      {'~/dev-danhenderson'}
     </Box>
     <Box component="span" sx={{ color: VSCODE_COLORS.promptBranch, ml: '0.5ch' }}>
       {'v1'}
@@ -40,7 +99,7 @@ const GitStatusLine: React.FC = () => (
       {'*1'}
     </Box>
     <Box component="span" sx={{ color: VSCODE_COLORS.promptDollar, ml: '0.4ch' }}>
-      {'+30'}
+      {'+3'}
     </Box>
     <Box
       component="span"
@@ -86,7 +145,16 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
   };
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: VSCODE_LAYOUT.editorColumnWidth,
+        maxWidth: '100%',
+        flexShrink: 0,
+        overflow: 'hidden',
+      }}
+    >
       {/* Panel header */}
       <Box
         sx={{
@@ -111,7 +179,6 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
               letterSpacing: '0.04em',
               color: VSCODE_COLORS.foreground,
               userSelect: 'none',
-              textTransform: 'uppercase',
               borderBottom: '1px solid ' + VSCODE_COLORS.activeTabAccent,
               pb: '4px',
             }}
@@ -130,7 +197,6 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
                 letterSpacing: '0.04em',
                 color: VSCODE_COLORS.inactiveTab,
                 userSelect: 'none',
-                textTransform: 'uppercase',
                 pb: '4px',
                 borderBottom: '1px solid transparent',
               }}
@@ -243,8 +309,10 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
       {/* Terminal body — fixed height so the component never resizes */}
       <Box
         ref={scrollRef}
+        data-testid="terminal-panel-body"
         sx={{
-          height: 'calc(8.5em + 16px)',
+          // terminalBodyLines * lineHeight(1.7em) + padding; keeps height stable across all phases
+          height: `calc(${VSCODE_LAYOUT.terminalBodyLines} * 1.7em + 16px)`,
           flexShrink: 0,
           backgroundColor: VSCODE_COLORS.terminalBg,
           fontFamily: monoFontFamily,
@@ -253,7 +321,11 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
           color: VSCODE_COLORS.foreground,
           px: 1.5,
           py: 0.75,
+          overflowX: 'hidden',
           overflowY: 'auto',
+          // Fade out during clear-screen phase to simulate Control+L flash
+          opacity: phase === 'clearing-screen' ? 0.35 : 1,
+          transition: 'opacity 0.12s ease-in',
           // Hide scrollbar to keep the terminal looking clean
           '&::-webkit-scrollbar': { display: 'none' },
           scrollbarWidth: 'none',
@@ -261,23 +333,23 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
       >
         {/* History — completed commands with their output */}
         {history.map((line, histIdx) => (
-          <React.Fragment key={histIdx}>
+          <Box key={histIdx} sx={{ opacity: 0.62, transition: 'opacity 0.15s' }}>
             <GitStatusLine />
             <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
               <Box component="span" sx={{ color: VSCODE_COLORS.lineNumber }}>
                 {'○ '}
               </Box>
-              <Box component="span" sx={{ color: VSCODE_COLORS.promptDollar }}>
-                {'> '}
+              <Box component="span" sx={{ color: 'rgba(255,255,255,0.35)' }}>
+                {'❯ '}
               </Box>
               {line.command}
             </Box>
             {line.output.split('\n').map((text, i) => (
               <Box key={i} sx={{ color: VSCODE_COLORS.outputText }}>
-                {text}
+                {colorizeOutputLine(text)}
               </Box>
             ))}
-          </React.Fragment>
+          </Box>
         ))}
 
         {/* Active prompt */}
@@ -286,13 +358,13 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
           <Box component="span" sx={{ color: VSCODE_COLORS.lineNumber }}>
             {'○ '}
           </Box>
-          <Box component="span" sx={{ color: VSCODE_COLORS.promptDollar }}>
-            {'> '}
+          <Box component="span" sx={{ color: VSCODE_COLORS.promptArrow }}>
+            {'❯ '}
           </Box>
           {commandText}
           {showCursor && isCommandPhase(phase) && (
             <Box component="span" sx={cursorSx}>
-              ▊
+              █
             </Box>
           )}
         </Box>
@@ -303,10 +375,10 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
             const outputLines = outputText.split('\n');
             return outputLines.map((text, i) => (
               <Box key={i} sx={{ color: VSCODE_COLORS.outputText }}>
-                {text}
+                {colorizeOutputLine(text)}
                 {showCursor && isOutputPhase(phase) && i === outputLines.length - 1 && (
                   <Box component="span" sx={cursorSx}>
-                    ▊
+                    █
                   </Box>
                 )}
               </Box>

@@ -17,15 +17,39 @@ jest.mock('../../../src/components/text/useTerminalTypewriter', () => ({
 
 // Stub terminal subcomponents with testable stand-ins that forward key events/props
 jest.mock('../../../src/components/terminal/VscodeTitleBar', () => ({
-  VscodeTitleBar: ({ onCommandPaletteToggle }: { onCommandPaletteToggle?: () => void }) => (
-    <button
-      type="button"
-      data-testid="title-bar-palette-btn"
-      onClick={onCommandPaletteToggle}
-      aria-label="Toggle command palette"
+  VscodeTitleBar: ({
+    onCommandPaletteToggle,
+    onWindowDragPointerDown,
+    windowDragEnabled,
+    windowDragging,
+  }: {
+    onCommandPaletteToggle?: () => void;
+    onWindowDragPointerDown?: React.PointerEventHandler<HTMLButtonElement>;
+    windowDragEnabled?: boolean;
+    windowDragging?: boolean;
+  }) => (
+    <div
+      data-testid="vscode-title-bar"
+      data-drag-enabled={String(Boolean(windowDragEnabled))}
+      data-dragging={String(Boolean(windowDragging))}
     >
-      Toggle palette
-    </button>
+      <button
+        type="button"
+        data-testid="title-bar-palette-btn"
+        onClick={onCommandPaletteToggle}
+        aria-label="Toggle command palette"
+      >
+        Toggle palette
+      </button>
+      <button
+        type="button"
+        data-testid="title-bar-drag-handle"
+        onPointerDown={onWindowDragPointerDown}
+        aria-label="Start window drag"
+      >
+        Drag window
+      </button>
+    </div>
   ),
 }));
 
@@ -59,8 +83,12 @@ jest.mock('../../../src/components/terminal/VscodeActivityBar', () => ({
 }));
 
 jest.mock('../../../src/components/terminal/VscodeExplorerSidebar', () => ({
-  VscodeExplorerSidebar: ({ visible }: { visible: boolean }) => (
-    <div data-testid="explorer-sidebar" data-visible={String(visible)} />
+  VscodeExplorerSidebar: ({ activeTab, visible }: { activeTab: string; visible: boolean }) => (
+    <div
+      data-testid="explorer-sidebar"
+      data-active-tab={activeTab}
+      data-visible={String(visible)}
+    />
   ),
 }));
 
@@ -73,18 +101,20 @@ jest.mock('../../../src/components/terminal/VscodeTabBar', () => ({
     onTabChange?: (tab: string) => void;
   }) => (
     <div data-testid="tab-bar" data-active-tab={activeTab}>
-      <button type="button" aria-label="Portfolio tab" onClick={() => onTabChange?.('portfolio')}>
-        Portfolio
+      <button type="button" aria-label="Server tab" onClick={() => onTabChange?.('server')}>
+        Server
       </button>
-      <button type="button" aria-label="Terminal tab" onClick={() => onTabChange?.('terminal')}>
-        Terminal
+      <button type="button" aria-label="Client tab" onClick={() => onTabChange?.('client')}>
+        Client
       </button>
     </div>
   ),
 }));
 
 jest.mock('../../../src/components/terminal/VscodeEditorPane', () => ({
-  VscodeEditorPane: () => <div data-testid="editor-pane" />,
+  VscodeEditorPane: ({ activeTab }: { activeTab: string }) => (
+    <div data-testid="editor-pane" data-active-tab={activeTab} />
+  ),
 }));
 
 jest.mock('../../../src/components/terminal/VscodeTerminalPanel', () => ({
@@ -92,18 +122,26 @@ jest.mock('../../../src/components/terminal/VscodeTerminalPanel', () => ({
 }));
 
 jest.mock('../../../src/components/terminal/VscodeStatusBar', () => ({
-  VscodeStatusBar: () => <div data-testid="status-bar" />,
+  VscodeStatusBar: ({ activeTab }: { activeTab: string }) => (
+    <div data-testid="status-bar" data-active-tab={activeTab} />
+  ),
 }));
 
 jest.mock('../../../src/components/terminal/VscodeNotificationToast', () => ({
   VscodeNotificationToast: ({
+    activeTab,
     visible,
     onDismiss,
   }: {
+    activeTab: string;
     visible: boolean;
     onDismiss: () => void;
   }) => (
-    <div data-testid="notification-toast" data-visible={String(visible)}>
+    <div
+      data-testid="notification-toast"
+      data-active-tab={activeTab}
+      data-visible={String(visible)}
+    >
       {visible && (
         <button type="button" aria-label="Dismiss notification" onClick={onDismiss}>
           Dismiss
@@ -130,12 +168,23 @@ const SAMPLE_LINES: TerminalLine[] = [
   { command: 'ls', output: 'src  tests' },
 ];
 
-const renderHero = (overrides: Partial<{ lines: TerminalLine[]; playing: boolean }> = {}) =>
+const renderHero = (
+  overrides: Partial<{
+    lines: TerminalLine[];
+    onWindowDragPointerDown: React.PointerEventHandler<HTMLDivElement>;
+    playing: boolean;
+    windowDragEnabled: boolean;
+    windowDragging: boolean;
+  }> = {}
+) =>
   render(
     <ThemeProvider>
       <TerminalHeroContent
         lines={overrides.lines ?? SAMPLE_LINES}
+        onWindowDragPointerDown={overrides.onWindowDragPointerDown}
         playing={overrides.playing ?? false}
+        windowDragEnabled={overrides.windowDragEnabled}
+        windowDragging={overrides.windowDragging}
       />
     </ThemeProvider>
   );
@@ -178,9 +227,19 @@ describe('TerminalHeroContent', () => {
       expect(screen.getByTestId('vscode-command-palette')).toHaveAttribute('data-visible', 'false');
     });
 
-    it('renders with portfolio as the active tab by default', () => {
+    it('leaves title-bar dragging disabled by default', () => {
       renderHero();
-      expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-active-tab', 'portfolio');
+      expect(screen.getByTestId('vscode-title-bar')).toHaveAttribute('data-drag-enabled', 'false');
+      expect(screen.getByTestId('vscode-title-bar')).toHaveAttribute('data-dragging', 'false');
+    });
+
+    it('renders with server.py as the active tab by default', () => {
+      renderHero();
+      expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-active-tab', 'server');
+      expect(screen.getByTestId('editor-pane')).toHaveAttribute('data-active-tab', 'server');
+      expect(screen.getByTestId('explorer-sidebar')).toHaveAttribute('data-active-tab', 'server');
+      expect(screen.getByTestId('status-bar')).toHaveAttribute('data-active-tab', 'server');
+      expect(screen.getByTestId('notification-toast')).toHaveAttribute('data-active-tab', 'server');
     });
   });
 
@@ -213,6 +272,22 @@ describe('TerminalHeroContent', () => {
       expect(screen.getByTestId('vscode-command-palette')).toHaveAttribute('data-visible', 'true');
     });
 
+    it('forwards the title-bar drag handler when dragging is enabled', () => {
+      const onWindowDragPointerDown = jest.fn();
+
+      renderHero({
+        onWindowDragPointerDown,
+        windowDragEnabled: true,
+        windowDragging: true,
+      });
+
+      fireEvent.pointerDown(screen.getByLabelText('Start window drag'));
+
+      expect(onWindowDragPointerDown).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId('vscode-title-bar')).toHaveAttribute('data-drag-enabled', 'true');
+      expect(screen.getByTestId('vscode-title-bar')).toHaveAttribute('data-dragging', 'true');
+    });
+
     it('hides the VS Code command palette on a second click', () => {
       renderHero();
       fireEvent.click(screen.getByLabelText('Toggle command palette'));
@@ -222,17 +297,25 @@ describe('TerminalHeroContent', () => {
   });
 
   describe('tab switching', () => {
-    it('switches active tab to "terminal" when the terminal tab is clicked', () => {
+    it('switches active tab to "client" when the client tab is clicked', () => {
       renderHero();
-      fireEvent.click(screen.getByLabelText('Terminal tab'));
-      expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-active-tab', 'terminal');
+      fireEvent.click(screen.getByLabelText('Client tab'));
+      expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-active-tab', 'client');
+      expect(screen.getByTestId('editor-pane')).toHaveAttribute('data-active-tab', 'client');
+      expect(screen.getByTestId('explorer-sidebar')).toHaveAttribute('data-active-tab', 'client');
+      expect(screen.getByTestId('status-bar')).toHaveAttribute('data-active-tab', 'client');
+      expect(screen.getByTestId('notification-toast')).toHaveAttribute('data-active-tab', 'client');
     });
 
-    it('switches back to "portfolio" tab when portfolio is clicked', () => {
+    it('switches back to "server" when the server tab is clicked', () => {
       renderHero();
-      fireEvent.click(screen.getByLabelText('Terminal tab'));
-      fireEvent.click(screen.getByLabelText('Portfolio tab'));
-      expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-active-tab', 'portfolio');
+      fireEvent.click(screen.getByLabelText('Client tab'));
+      fireEvent.click(screen.getByLabelText('Server tab'));
+      expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-active-tab', 'server');
+      expect(screen.getByTestId('editor-pane')).toHaveAttribute('data-active-tab', 'server');
+      expect(screen.getByTestId('explorer-sidebar')).toHaveAttribute('data-active-tab', 'server');
+      expect(screen.getByTestId('status-bar')).toHaveAttribute('data-active-tab', 'server');
+      expect(screen.getByTestId('notification-toast')).toHaveAttribute('data-active-tab', 'server');
     });
   });
 

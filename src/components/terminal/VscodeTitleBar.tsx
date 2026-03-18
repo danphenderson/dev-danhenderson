@@ -12,6 +12,10 @@ import {
   systemFontFamily,
 } from './vscodeTokens';
 
+const stopDragStartPropagation = (event: React.PointerEvent<HTMLDivElement>) => {
+  event.stopPropagation();
+};
+
 interface TrafficDotProps {
   color: string;
   hoverIcon: string;
@@ -72,10 +76,20 @@ const TitleBarIcon: React.FC<{ children: React.ReactNode }> = ({ children }) => 
 
 interface VscodeTitleBarProps {
   onCommandPaletteToggle?: () => void;
+  onWindowDragPointerDown?: React.PointerEventHandler<HTMLDivElement>;
+  windowDragEnabled?: boolean;
+  windowDragging?: boolean;
 }
 
-export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({ onCommandPaletteToggle }) => (
+export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({
+  onCommandPaletteToggle,
+  onWindowDragPointerDown,
+  windowDragEnabled = false,
+  windowDragging = false,
+}) => (
   <Box
+    data-testid="vscode-title-bar"
+    onPointerDown={onWindowDragPointerDown}
     sx={{
       display: 'flex',
       alignItems: 'center',
@@ -88,8 +102,8 @@ export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({ onCommandPalette
       // Rounded top-left and top-right to match the window radius
       borderTopLeftRadius: VSCODE_WINDOW_RADIUS,
       borderTopRightRadius: VSCODE_WINDOW_RADIUS,
-      // Draggable window chrome feel
-      WebkitAppRegion: 'drag',
+      cursor: windowDragEnabled ? (windowDragging ? 'grabbing' : 'grab') : 'default',
+      userSelect: 'none',
     }}
   >
     {/* Traffic-light window controls — macOS spacing: 8px between dot centers */}
@@ -112,6 +126,7 @@ export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({ onCommandPalette
     >
       <Box
         onClick={onCommandPaletteToggle}
+        onPointerDown={stopDragStartPropagation}
         sx={{
           pointerEvents: 'auto',
           display: 'flex',
@@ -129,7 +144,6 @@ export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({ onCommandPalette
             ? { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: 'rgba(255,255,255,0.18)' }
             : undefined,
           transition: 'background-color 0.12s, border-color 0.12s',
-          WebkitAppRegion: 'no-drag',
         }}
       >
         <SearchOutlined
@@ -158,6 +172,7 @@ export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({ onCommandPalette
     {/* Right-side action cluster */}
     <Box
       aria-hidden="true"
+      onPointerDown={stopDragStartPropagation}
       sx={{
         display: 'flex',
         alignItems: 'center',
@@ -165,7 +180,6 @@ export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({ onCommandPalette
         ml: 'auto',
         flexShrink: 0,
         zIndex: 1,
-        WebkitAppRegion: 'no-drag',
       }}
     >
       {/* Copilot / AI assistant + dropdown */}

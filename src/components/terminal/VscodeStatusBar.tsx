@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import { keyframes } from '@emotion/react';
+import type { VscodeEditorTab } from '../../types/ui';
 import {
   VSCODE_COLORS,
   VSCODE_LAYOUT,
@@ -8,6 +9,7 @@ import {
   monoFontFamily,
   systemFontFamily,
 } from './vscodeTokens';
+import { getVscodeEditorTabMetadata } from './vscodeEditorTabs';
 
 const PROMPT_PREFIX = '~ $ ';
 
@@ -20,7 +22,7 @@ const colFlash = keyframes`
 /** Reusable status bar segment with an optional hover dropdown */
 const StatusSegment: React.FC<{
   label: React.ReactNode;
-  dropdown?: string[];
+  dropdown?: readonly string[];
 }> = ({ label, dropdown }) => (
   <Box
     component="span"
@@ -82,15 +84,18 @@ const StatusSegment: React.FC<{
 );
 
 interface VscodeStatusBarProps {
+  activeTab?: VscodeEditorTab;
   commandText: string;
   /** Total number of terminal rows above the current prompt (history) */
   historyLineCount?: number;
 }
 
 export const VscodeStatusBar: React.FC<VscodeStatusBarProps> = ({
+  activeTab = 'server',
   commandText,
   historyLineCount = 0,
 }) => {
+  const activeTabMetadata = getVscodeEditorTabMetadata(activeTab);
   const col = commandText.length + PROMPT_PREFIX.length + 1;
   const ln = historyLineCount + 1;
 
@@ -166,8 +171,8 @@ export const VscodeStatusBar: React.FC<VscodeStatusBarProps> = ({
         }}
       >
         <StatusSegment
-          label="TypeScript"
-          dropdown={['TypeScript', 'JavaScript', 'JSON', 'Markdown']}
+          label={activeTabMetadata.languageMode}
+          dropdown={activeTabMetadata.languageOptions}
         />
         <Box
           component="span"

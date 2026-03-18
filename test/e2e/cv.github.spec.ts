@@ -40,12 +40,12 @@ test.describe('CV page – GitHub integration', () => {
   test('renders the CV page with core sections', async ({ page }) => {
     await page.goto('/cv');
     await expect(page.getByText('Daniel Henderson')).toBeVisible();
-    await expect(page.getByText('Software Engineer')).toBeVisible();
+    await expect(page.getByText('Software Engineer', { exact: true })).toBeVisible();
     await ensureCvSectionVisible(page, 'cv-github');
     await expectGitHubDataStatusTooltip(page);
 
     const programLink = page.getByRole('link', {
-      name: 'M.S. Mathematics student in the applied/computational track (expected Aug 2026)',
+      name: 'M.S. in applied/computational mathematics',
     });
     const advisorLink = page.getByRole('link', { name: 'Jiguang Sun' });
     const mtuOrganizationLink = page

@@ -48,3 +48,5 @@ export interface TerminalLine {
   command: string;
   output: string;
 }
+
+export type VscodeEditorTab = 'server' | 'client';

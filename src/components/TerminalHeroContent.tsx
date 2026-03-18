@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { useTerminalTypewriter } from './text/useTerminalTypewriter';
-import type { TerminalLine } from '../types/ui';
+import type { TerminalLine, VscodeEditorTab } from '../types/ui';
 import { VscodeTitleBar } from './terminal/VscodeTitleBar';
 import { VscodeActivityBar } from './terminal/VscodeActivityBar';
 import { VscodeTabBar } from './terminal/VscodeTabBar';
@@ -12,7 +12,12 @@ import { VscodeStatusBar } from './terminal/VscodeStatusBar';
 import { VscodeNotificationToast } from './terminal/VscodeNotificationToast';
 import { VscodeExplorerSidebar } from './terminal/VscodeExplorerSidebar';
 import { VscodeCommandPalette } from './terminal/VscodeCommandPalette';
-import { VSCODE_WINDOW_SHADOW, VSCODE_WINDOW_RADIUS, VSCODE_COLORS } from './terminal/vscodeTokens';
+import {
+  VSCODE_WINDOW_SHADOW,
+  VSCODE_WINDOW_RADIUS,
+  VSCODE_COLORS,
+  VSCODE_LAYOUT,
+} from './terminal/vscodeTokens';
 
 export type { TerminalLine };
 
@@ -21,16 +26,20 @@ export interface TerminalHeroContentProps {
   playing?: boolean;
   /** @deprecated sessionLabel is no longer rendered; kept for API compatibility */
   sessionLabel?: string;
+  onWindowDragPointerDown?: React.PointerEventHandler<HTMLDivElement>;
+  windowDragEnabled?: boolean;
+  windowDragging?: boolean;
   sx?: SxProps<Theme>;
 }
 
 const TOAST_DURATION_MS = 3000;
 
-type ActiveTab = 'portfolio' | 'terminal';
-
 export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   lines,
   playing = false,
+  onWindowDragPointerDown,
+  windowDragEnabled = false,
+  windowDragging = false,
   sx,
 }) => {
   const { commandText, outputText, showCursor, phase, history } = useTerminalTypewriter({
@@ -80,9 +89,12 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   const [commandPaletteVisible, setCommandPaletteVisible] = React.useState(false);
 
   // Clickable tab focus
-  const [activeTab, setActiveTab] = React.useState<ActiveTab>('portfolio');
+  const [activeTab, setActiveTab] = React.useState<VscodeEditorTab>('server');
 
   const accessibleLabel = lines.map((l) => `${l.command}: ${l.output}`).join('; ');
+  const terminalWindowWidth = explorerVisible
+    ? `calc(${VSCODE_LAYOUT.activityBarWidth}px + ${VSCODE_LAYOUT.explorerWidth}px + ${VSCODE_LAYOUT.editorColumnWidth})`
+    : `calc(${VSCODE_LAYOUT.activityBarWidth}px + ${VSCODE_LAYOUT.editorColumnWidth})`;
 
   return (
     <Box
@@ -93,7 +105,8 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
         {
           display: 'flex',
           flexDirection: 'column',
-          width: '100%',
+          width: terminalWindowWidth,
+          maxWidth: '100%',
           overflow: 'hidden',
           position: 'relative',
           backgroundColor: VSCODE_COLORS.editorBg,
@@ -105,19 +118,24 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
         ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
       ]}
     >
-      <VscodeTitleBar onCommandPaletteToggle={() => setCommandPaletteVisible((prev) => !prev)} />
+      <VscodeTitleBar
+        onCommandPaletteToggle={() => setCommandPaletteVisible((prev) => !prev)}
+        onWindowDragPointerDown={onWindowDragPointerDown}
+        windowDragEnabled={windowDragEnabled}
+        windowDragging={windowDragging}
+      />
 
       {/* Editor + activity bar row */}
       <Box sx={{ display: 'flex', flex: 1 }}>
         <VscodeActivityBar activeIndex={activityBarIndex} onIconClick={handleActivityBarClick} />
 
         {/* Explorer sidebar */}
-        <VscodeExplorerSidebar visible={explorerVisible} />
+        <VscodeExplorerSidebar activeTab={activeTab} visible={explorerVisible} />
 
         {/* Right column: tab bar → editor pane → terminal panel */}
         <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
           <VscodeTabBar activeTab={activeTab} onTabChange={setActiveTab} />
-          <VscodeEditorPane />
+          <VscodeEditorPane activeTab={activeTab} />
           <VscodeTerminalPanel
             commandText={commandText}
             outputText={outputText}
@@ -128,9 +146,17 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
         </Box>
       </Box>
 
-      <VscodeStatusBar commandText={commandText} historyLineCount={historyLineCount} />
+      <VscodeStatusBar
+        activeTab={activeTab}
+        commandText={commandText}
+        historyLineCount={historyLineCount}
+      />
 
-      <VscodeNotificationToast visible={toastVisible} onDismiss={() => setToastVisible(false)} />
+      <VscodeNotificationToast
+        activeTab={activeTab}
+        visible={toastVisible}
+        onDismiss={() => setToastVisible(false)}
+      />
 
       <VscodeCommandPalette
         visible={commandPaletteVisible}

@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import { Box, Grid, Paper } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { useAppStyles } from '../styles/appStyles';
@@ -10,6 +11,7 @@ interface BackgroundPaperProps {
   showShell?: boolean;
   contentAlign?: 'flex-start' | 'center' | 'flex-end';
   contentSx?: SxProps<Theme>;
+  contentRef?: Ref<HTMLDivElement>;
   shellSx?: SxProps<Theme>;
   shellWrapper?: (shell: React.ReactNode) => React.ReactNode;
 }
@@ -20,6 +22,7 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
   showShell = true,
   contentAlign = 'flex-start',
   contentSx,
+  contentRef,
   shellSx,
   shellWrapper,
 }) => {
@@ -32,7 +35,10 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
   return (
     <Grid container component="main" sx={appStyles.backgroundRootSx}>
       <Grid item xs={12} sm={12} md={12} sx={appStyles.getBackgroundImageSx(resolvedImage)}>
-        <Box sx={[appStyles.getBackgroundContentSx(contentAlign), ...normalizeSxProp(contentSx)]}>
+        <Box
+          ref={contentRef}
+          sx={[appStyles.getBackgroundContentSx(contentAlign), ...normalizeSxProp(contentSx)]}
+        >
           {showShell ? (
             shellWrapper ? (
               shellWrapper(shell)

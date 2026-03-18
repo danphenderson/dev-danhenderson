@@ -46,15 +46,13 @@ export const aboutMe: AboutMe = {
   location: 'Seattle, WA',
   opportunities: ['Scientific computing', 'Data platforms', 'ML/AI engineering'],
   bioLink: {
-    text: 'M.S. Mathematics student in the applied/computational track (expected Aug 2026)',
+    text: 'M.S. in applied/computational mathematics',
     url: mtuMathGraduateBioUrl,
     tooltip: 'View the Michigan Tech graduate mathematics student page.',
   },
-  bio: `M.S. Mathematics student in the applied/computational track (expected Aug 2026) researching macrocirculatory hemodynamics.
+  bio: `Software engineer building scientific, data, and AI-enabled systems.
 
-Former data scientist and data pipeline engineer who built ingestion, analytics, and machine-learning solutions for a healthcare data platform.
-
-Open-source contributions spanning Julia documentation, Microsoft Playwright, Data Build Tool community plugins, and scientific-computing libraries.`,
+I previously built ingestion, analytics, and ML solutions for a healthcare data platform. Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software.`,
 };
 
 export const codingExamples: CodingExample[] = [

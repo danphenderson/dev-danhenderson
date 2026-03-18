@@ -1,9 +1,12 @@
 import * as React from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Box from '@mui/material/Box';
+import type { VscodeEditorTab } from '../../types/ui';
 import { VSCODE_COLORS, monoFontFamily } from './vscodeTokens';
+import { getVscodeEditorTabMetadata } from './vscodeEditorTabs';
 
 interface VscodeNotificationToastProps {
+  activeTab?: VscodeEditorTab;
   visible: boolean;
   onDismiss: () => void;
 }
@@ -12,16 +15,18 @@ const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
 const usePrefersReducedMotion = (): boolean => {
   const [prefersReducedMotion] = React.useState(
-    () => typeof window !== 'undefined' && window.matchMedia(REDUCED_MOTION_QUERY).matches,
+    () => typeof window !== 'undefined' && window.matchMedia(REDUCED_MOTION_QUERY).matches
   );
   return prefersReducedMotion;
 };
 
 export const VscodeNotificationToast: React.FC<VscodeNotificationToastProps> = ({
+  activeTab = 'server',
   visible,
   onDismiss,
 }) => {
   const prefersReducedMotion = usePrefersReducedMotion();
+  const activeTabMetadata = getVscodeEditorTabMetadata(activeTab);
 
   return (
     <AnimatePresence>
@@ -40,7 +45,7 @@ export const VscodeNotificationToast: React.FC<VscodeNotificationToastProps> = (
             display: 'flex',
             alignItems: 'center',
             gap: 1,
-            backgroundColor: '#252526',
+            backgroundColor: VSCODE_COLORS.tabBarBg,
             border: `1px solid ${VSCODE_COLORS.panelBorder}`,
             borderRadius: '3px',
             px: 1.5,
@@ -53,7 +58,7 @@ export const VscodeNotificationToast: React.FC<VscodeNotificationToastProps> = (
           }}
         >
           <Box component="span" sx={{ color: VSCODE_COLORS.syntaxComment }}>
-            portfolio.ts — No problems detected ✓
+            {`${activeTabMetadata.fileName} — No problems detected ✓`}
           </Box>
           <Box
             component="span"

@@ -2,20 +2,414 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import ChevronRightOutlined from '@mui/icons-material/ChevronRightOutlined';
 import { cursorBlink } from '../../styles/animations';
+import type { VscodeEditorTab } from '../../types/ui';
 import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily } from './vscodeTokens';
 import { VscodeIntelliSenseTooltip } from './VscodeIntelliSenseTooltip';
+import { getVscodeEditorTabMetadata } from './vscodeEditorTabs';
+import { kw, str, fn, varr, comment, punct } from './vscodeSyntaxHelpers';
 
-// Lines that receive a green gutter marker (1-indexed)
-const GUTTER_ADD_LINES = new Set([3, 4]);
+// ---------------------------------------------------------------------------
+// Demo content — edit here to change what appears in the editor pane
+// ---------------------------------------------------------------------------
 
-// Lines that show a fold indicator (block-start lines, 1-indexed)
-const FOLDABLE_LINES = new Set([2]);
+type TokenKind =
+  | 'kw'
+  | 'str'
+  | 'fn'
+  | 'varr'
+  | 'comment'
+  | 'punct'
+  | 'typeAnnotation'
+  | 'intellisense'
+  | 'raw';
+
+interface CodeToken {
+  kind: TokenKind;
+  text: string;
+}
+
+interface CodeLineData {
+  tokens: CodeToken[];
+  gutterAdd?: boolean;
+  foldable?: boolean;
+}
+
+// server.py — FastAPI ping server
+const SERVER_CODE_LINES: CodeLineData[] = [
+  {
+    tokens: [{ kind: 'comment', text: '# server.py' }],
+  },
+  {
+    tokens: [
+      { kind: 'kw', text: 'from' },
+      { kind: 'raw', text: ' fastapi ' },
+      { kind: 'kw', text: 'import' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'intellisense', text: 'FastAPI' },
+    ],
+  },
+  {
+    tokens: [
+      { kind: 'kw', text: 'from' },
+      { kind: 'raw', text: ' fastapi.middleware.cors ' },
+      { kind: 'kw', text: 'import' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'intellisense', text: 'CORSMiddleware' },
+    ],
+  },
+  {
+    tokens: [],
+  },
+  {
+    tokens: [
+      { kind: 'varr', text: 'app' },
+      { kind: 'punct', text: ' = ' },
+      { kind: 'intellisense', text: 'FastAPI' },
+      { kind: 'punct', text: '(' },
+      { kind: 'punct', text: 'title=' },
+      { kind: 'str', text: '"Ping Pong Server"' },
+      { kind: 'punct', text: ')' },
+    ],
+  },
+  {
+    tokens: [],
+  },
+  {
+    tokens: [
+      { kind: 'varr', text: 'app' },
+      { kind: 'punct', text: '.' },
+      { kind: 'fn', text: 'add_middleware' },
+      { kind: 'punct', text: '(' },
+    ],
+    foldable: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'intellisense', text: 'CORSMiddleware' },
+      { kind: 'punct', text: ',' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'punct', text: 'allow_origins=' },
+      { kind: 'str', text: '["*"]' },
+      { kind: 'punct', text: ',' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'punct', text: 'allow_credentials=' },
+      { kind: 'kw', text: 'True' },
+      { kind: 'punct', text: ',' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'punct', text: 'allow_methods=' },
+      { kind: 'str', text: '["*"]' },
+      { kind: 'punct', text: ',' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'punct', text: 'allow_headers=' },
+      { kind: 'str', text: '["*"]' },
+      { kind: 'punct', text: ',' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [{ kind: 'punct', text: ')' }],
+  },
+  {
+    tokens: [],
+  },
+  {
+    tokens: [
+      { kind: 'punct', text: '@' },
+      { kind: 'varr', text: 'app' },
+      { kind: 'punct', text: '.' },
+      { kind: 'fn', text: 'get' },
+      { kind: 'punct', text: '(' },
+      { kind: 'str', text: '"/ping"' },
+      { kind: 'punct', text: ')' },
+    ],
+  },
+  {
+    tokens: [
+      { kind: 'kw', text: 'async' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'kw', text: 'def' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'fn', text: 'ping' },
+      { kind: 'punct', text: '() -> dict[str, str]:' },
+    ],
+    foldable: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'kw', text: 'return' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'punct', text: '{' },
+      { kind: 'str', text: '"message"' },
+      { kind: 'punct', text: ': ' },
+      { kind: 'str', text: '"pong"' },
+      { kind: 'punct', text: '}' },
+    ],
+    gutterAdd: true,
+  },
+];
+
+// client.ts — TypeScript fetch client
+const CLIENT_CODE_LINES: CodeLineData[] = [
+  {
+    tokens: [{ kind: 'comment', text: '// client.ts' }],
+  },
+  {
+    tokens: [
+      { kind: 'kw', text: 'const' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'varr', text: 'SERVER_URL' },
+      { kind: 'punct', text: ' = ' },
+      { kind: 'str', text: '"http://127.0.0.1:8000"' },
+      { kind: 'punct', text: ';' },
+    ],
+  },
+  {
+    tokens: [],
+  },
+  {
+    tokens: [
+      { kind: 'kw', text: 'type' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'intellisense', text: 'PingResponse' },
+      { kind: 'raw', text: ' = {' },
+    ],
+    foldable: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '  ' },
+      { kind: 'punct', text: 'message: ' },
+      { kind: 'typeAnnotation', text: 'string' },
+      { kind: 'punct', text: ';' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [{ kind: 'punct', text: '};' }],
+  },
+  {
+    tokens: [],
+  },
+  {
+    tokens: [
+      { kind: 'kw', text: 'async' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'kw', text: 'function' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'fn', text: 'main' },
+      { kind: 'punct', text: '(): ' },
+      { kind: 'typeAnnotation', text: 'Promise<void>' },
+      { kind: 'punct', text: ' {' },
+    ],
+    foldable: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '  ' },
+      { kind: 'kw', text: 'try' },
+      { kind: 'raw', text: ' {' },
+    ],
+    foldable: true,
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'kw', text: 'const' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'varr', text: 'response' },
+      { kind: 'punct', text: ' = ' },
+      { kind: 'kw', text: 'await' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'fn', text: 'fetch' },
+      { kind: 'punct', text: '(`' },
+      { kind: 'punct', text: '${' },
+      { kind: 'varr', text: 'SERVER_URL' },
+      { kind: 'punct', text: '}' },
+      { kind: 'str', text: '/ping' },
+      { kind: 'punct', text: '`);' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [],
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'kw', text: 'if' },
+      { kind: 'punct', text: ' (!' },
+      { kind: 'varr', text: 'response' },
+      { kind: 'punct', text: '.ok) {' },
+    ],
+    foldable: true,
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '      ' },
+      { kind: 'kw', text: 'throw' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'kw', text: 'new' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'typeAnnotation', text: 'Error' },
+      { kind: 'punct', text: '(`' },
+      { kind: 'str', text: 'Request failed with status ' },
+      { kind: 'punct', text: '${' },
+      { kind: 'varr', text: 'response' },
+      { kind: 'punct', text: '.status}`);' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'punct', text: '}' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [],
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'kw', text: 'const' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'varr', text: 'data' },
+      { kind: 'punct', text: ' = (' },
+      { kind: 'kw', text: 'await' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'varr', text: 'response' },
+      { kind: 'punct', text: '.' },
+      { kind: 'fn', text: 'json' },
+      { kind: 'punct', text: '()) as ' },
+      { kind: 'intellisense', text: 'PingResponse' },
+      { kind: 'punct', text: ';' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'varr', text: 'console' },
+      { kind: 'punct', text: '.' },
+      { kind: 'fn', text: 'log' },
+      { kind: 'punct', text: '(' },
+      { kind: 'str', text: '"client: ping"' },
+      { kind: 'punct', text: ');' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'varr', text: 'console' },
+      { kind: 'punct', text: '.' },
+      { kind: 'fn', text: 'log' },
+      { kind: 'punct', text: '(`' },
+      { kind: 'str', text: 'server: ' },
+      { kind: 'punct', text: '${' },
+      { kind: 'varr', text: 'data' },
+      { kind: 'punct', text: '.message}`);' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '  ' },
+      { kind: 'punct', text: '} ' },
+      { kind: 'kw', text: 'catch' },
+      { kind: 'punct', text: ' (' },
+      { kind: 'varr', text: 'error' },
+      { kind: 'punct', text: ') {' },
+    ],
+    foldable: true,
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'varr', text: 'console' },
+      { kind: 'punct', text: '.' },
+      { kind: 'fn', text: 'error' },
+      { kind: 'punct', text: '(' },
+      { kind: 'str', text: '"Ping failed:"' },
+      { kind: 'punct', text: ', ' },
+      { kind: 'varr', text: 'error' },
+      { kind: 'punct', text: ');' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '    ' },
+      { kind: 'varr', text: 'process' },
+      { kind: 'punct', text: '.exitCode = 1;' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [
+      { kind: 'raw', text: '  ' },
+      { kind: 'punct', text: '}' },
+    ],
+    gutterAdd: true,
+  },
+  {
+    tokens: [{ kind: 'punct', text: '}' }],
+  },
+  {
+    tokens: [],
+  },
+  {
+    tokens: [
+      { kind: 'kw', text: 'void' },
+      { kind: 'raw', text: ' ' },
+      { kind: 'fn', text: 'main' },
+      { kind: 'punct', text: '();' },
+    ],
+  },
+];
+
+const EDITOR_TAB_LINES: Record<VscodeEditorTab, CodeLineData[]> = {
+  server: SERVER_CODE_LINES,
+  client: CLIENT_CODE_LINES,
+};
+
+/** Number of editor lines visible before scrolling. */
+const LINES_VISIBLE = 6;
 
 interface CodeLineProps {
   lineNumber: number;
   hovered: boolean;
   active: boolean;
   foldable: boolean;
+  gutterAdd: boolean;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
   children: React.ReactNode;
@@ -26,6 +420,7 @@ const CodeLine: React.FC<CodeLineProps> = ({
   hovered,
   active,
   foldable,
+  gutterAdd,
   onMouseEnter,
   onMouseLeave,
   children,
@@ -36,6 +431,7 @@ const CodeLine: React.FC<CodeLineProps> = ({
     onMouseLeave={onMouseLeave}
     sx={{
       display: 'flex',
+      minWidth: 0,
       alignItems: 'baseline',
       lineHeight: 1.55,
       backgroundColor: active
@@ -91,57 +487,85 @@ const CodeLine: React.FC<CodeLineProps> = ({
         width: VSCODE_LAYOUT.gutterWidth,
         flexShrink: 0,
         mr: '6px',
-        backgroundColor: GUTTER_ADD_LINES.has(lineNumber) ? VSCODE_COLORS.gutterAdd : 'transparent',
+        backgroundColor: gutterAdd ? VSCODE_COLORS.gutterAdd : 'transparent',
         borderRadius: '1px',
         alignSelf: 'stretch',
       }}
     />
-    <Box component="span" sx={{ flex: 1, whiteSpace: 'pre' }}>
+    <Box
+      component="span"
+      sx={{
+        flex: 1,
+        minWidth: 0,
+        display: 'block',
+        whiteSpace: 'pre',
+        overflow: 'hidden',
+      }}
+    >
       {children}
     </Box>
   </Box>
 );
 
-const kw = (text: string) => (
-  <Box component="span" sx={{ color: VSCODE_COLORS.syntaxKeyword }}>
-    {text}
-  </Box>
-);
-const str = (text: string) => (
-  <Box component="span" sx={{ color: VSCODE_COLORS.syntaxString }}>
-    {text}
-  </Box>
-);
-const fn = (text: string) => (
-  <Box component="span" sx={{ color: VSCODE_COLORS.syntaxFunction }}>
-    {text}
-  </Box>
-);
-const varr = (text: string) => (
-  <Box component="span" sx={{ color: VSCODE_COLORS.syntaxVariable }}>
-    {text}
-  </Box>
-);
-const comment = (text: string) => (
-  <Box component="span" sx={{ color: VSCODE_COLORS.syntaxComment, fontStyle: 'italic' }}>
-    {text}
-  </Box>
-);
-const punct = (text: string) => (
-  <Box component="span" sx={{ color: VSCODE_COLORS.syntaxPunct }}>
-    {text}
-  </Box>
-);
+/** Renders a single CodeToken as the appropriate syntax-highlight span. */
+const renderToken = (token: CodeToken, i: number): React.ReactNode => {
+  switch (token.kind) {
+    case 'kw':
+      return <React.Fragment key={i}>{kw(token.text)}</React.Fragment>;
+    case 'str':
+      return <React.Fragment key={i}>{str(token.text)}</React.Fragment>;
+    case 'fn':
+      return <React.Fragment key={i}>{fn(token.text)}</React.Fragment>;
+    case 'varr':
+      return <React.Fragment key={i}>{varr(token.text)}</React.Fragment>;
+    case 'comment':
+      return <React.Fragment key={i}>{comment(token.text)}</React.Fragment>;
+    case 'punct':
+      return <React.Fragment key={i}>{punct(token.text)}</React.Fragment>;
+    case 'typeAnnotation':
+      return (
+        <Box key={i} component="span" sx={{ color: VSCODE_COLORS.syntaxTypeAnnotation }}>
+          {token.text}
+        </Box>
+      );
+    case 'intellisense':
+      return (
+        <Box
+          key={i}
+          component="span"
+          sx={{
+            color: VSCODE_COLORS.syntaxTypeAnnotation,
+            position: 'relative',
+            '&:hover .intellisense-tooltip': { display: 'block' },
+          }}
+        >
+          {token.text}
+          <VscodeIntelliSenseTooltip symbol={token.text} />
+        </Box>
+      );
+    case 'raw':
+    default:
+      return <React.Fragment key={i}>{token.text}</React.Fragment>;
+  }
+};
 
 interface VscodeEditorPaneProps {
+  activeTab?: VscodeEditorTab;
   /** When true, show a blinking I-beam cursor after the last line. */
   playing?: boolean;
 }
 
-export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = false }) => {
+export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
+  activeTab = 'server',
+  playing = false,
+}) => {
   const [hoveredLine, setHoveredLine] = React.useState<number | null>(null);
-  // The cursor/active line
-  const activeLine: number | null = playing ? 6 : null;
+
+  const tabMetadata = getVscodeEditorTabMetadata(activeTab);
+  const codeLines = EDITOR_TAB_LINES[activeTab] ?? EDITOR_TAB_LINES.server;
+
+  // Active (cursor) line is one past the last code line
+  const activeLine: number | null = playing ? codeLines.length + 1 : null;
 
   return (
     <Box
@@ -150,14 +574,17 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
         backgroundColor: VSCODE_COLORS.editorBg,
         fontFamily: monoFontFamily,
         fontSize: { xs: '0.72rem', sm: '0.80rem', md: '0.84rem' },
+        width: VSCODE_LAYOUT.editorColumnWidth,
+        minWidth: VSCODE_LAYOUT.editorColumnWidth,
+        maxWidth: VSCODE_LAYOUT.editorColumnWidth,
         flexShrink: 0,
         borderBottom: `1px solid ${VSCODE_COLORS.panelBorder}`,
         display: 'flex',
         flexDirection: 'column',
-        overflow: 'visible',
+        overflow: 'hidden',
       }}
     >
-      {/* Breadcrumb bar — integrated with editor surface */}
+      {/* Breadcrumb bar */}
       <Box
         sx={{
           display: 'flex',
@@ -167,9 +594,11 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
           backgroundColor: VSCODE_COLORS.breadcrumbBg,
           borderBottom: `1px solid ${VSCODE_COLORS.sashBorder}`,
           flexShrink: 0,
+          minWidth: 0,
+          overflow: 'hidden',
         }}
       >
-        {['src', 'portfolio.ts', 'developer'].map((segment, i) => (
+        {tabMetadata.breadcrumbs.map((segment, i) => (
           <React.Fragment key={segment}>
             {i > 0 && (
               <ChevronRightOutlined
@@ -185,7 +614,10 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
               sx={{
                 fontFamily: monoFontFamily,
                 fontSize: '0.68rem',
-                color: i === 2 ? VSCODE_COLORS.foreground : VSCODE_COLORS.breadcrumbText,
+                color:
+                  i === tabMetadata.breadcrumbs.length - 1
+                    ? VSCODE_COLORS.foreground
+                    : VSCODE_COLORS.breadcrumbText,
                 userSelect: 'none',
                 px: '3px',
                 py: '1px',
@@ -202,83 +634,49 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
       </Box>
 
       {/* Editor body with code + minimap */}
-      <Box sx={{ display: 'flex', flex: 1, position: 'relative' }}>
-        {/* Code area */}
-        <Box sx={{ flex: 1, pl: 0.5, pr: 1.5, py: 0.75 }}>
-          <CodeLine
-            lineNumber={1}
-            hovered={hoveredLine === 1}
-            active={activeLine === 1}
-            foldable={FOLDABLE_LINES.has(1)}
-            onMouseEnter={() => setHoveredLine(1)}
-            onMouseLeave={() => setHoveredLine(null)}
-          >
-            {comment('// portfolio.ts')}
-          </CodeLine>
-          <CodeLine
-            lineNumber={2}
-            hovered={hoveredLine === 2}
-            active={activeLine === 2}
-            foldable={FOLDABLE_LINES.has(2)}
-            onMouseEnter={() => setHoveredLine(2)}
-            onMouseLeave={() => setHoveredLine(null)}
-          >
-            {kw('const')} {varr('developer')}
-            {punct(': ')}
-            <Box
-              component="span"
-              sx={{
-                color: VSCODE_COLORS.syntaxTypeAnnotation,
-                position: 'relative',
-                '&:hover .intellisense-tooltip': { display: 'block' },
-              }}
-            >
-              Developer
-              <VscodeIntelliSenseTooltip />
-            </Box>
-            {punct(' = {')}
-          </CodeLine>
-          <CodeLine
-            lineNumber={3}
-            hovered={hoveredLine === 3}
-            active={activeLine === 3}
-            foldable={FOLDABLE_LINES.has(3)}
-            onMouseEnter={() => setHoveredLine(3)}
-            onMouseLeave={() => setHoveredLine(null)}
-          >
-            {'  '}
-            {punct('passions: ')}
-            {str('["mathematics", "computers", "adventures"]')}
-            {punct(',')}
-          </CodeLine>
-          <CodeLine
-            lineNumber={4}
-            hovered={hoveredLine === 4}
-            active={activeLine === 4}
-            foldable={FOLDABLE_LINES.has(4)}
-            onMouseEnter={() => setHoveredLine(4)}
-            onMouseLeave={() => setHoveredLine(null)}
-          >
-            {'  '}
-            {punct('contact: ')}
-            {punct('() => ')}
-            {fn('navigate')}
-            {punct('(')}
-            {str('"/cv"')}
-            {punct('),')}
-          </CodeLine>
-          <CodeLine
-            lineNumber={5}
-            hovered={hoveredLine === 5}
-            active={activeLine === 5}
-            foldable={FOLDABLE_LINES.has(5)}
-            onMouseEnter={() => setHoveredLine(5)}
-            onMouseLeave={() => setHoveredLine(null)}
-          >
-            {punct('};')}
-          </CodeLine>
+      <Box sx={{ display: 'flex', flex: 1, position: 'relative', minWidth: 0, overflow: 'hidden' }}>
+        {/* Scrollable code area — shows LINES_VISIBLE rows then scrolls */}
+        <Box
+          sx={{
+            flex: 1,
+            minWidth: 0,
+            pl: 0.5,
+            pr: 1.5,
+            py: 0.75,
+            overflowX: 'hidden',
+            overflowY: 'auto',
+            maxHeight: `calc(${LINES_VISIBLE} * 1.55em + 12px)`,
+            // Thin custom scrollbar to keep the VS Code aesthetic
+            '&::-webkit-scrollbar': { width: '6px' },
+            '&::-webkit-scrollbar-track': { background: 'transparent' },
+            '&::-webkit-scrollbar-thumb': {
+              background: 'rgba(255,255,255,0.18)',
+              borderRadius: '3px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': { background: 'rgba(255,255,255,0.30)' },
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'rgba(255,255,255,0.18) transparent',
+          }}
+        >
+          {codeLines.map((line, idx) => {
+            const lineNumber = idx + 1;
+            return (
+              <CodeLine
+                key={lineNumber}
+                lineNumber={lineNumber}
+                hovered={hoveredLine === lineNumber}
+                active={activeLine === lineNumber}
+                foldable={!!line.foldable}
+                gutterAdd={!!line.gutterAdd}
+                onMouseEnter={() => setHoveredLine(lineNumber)}
+                onMouseLeave={() => setHoveredLine(null)}
+              >
+                {line.tokens.map(renderToken)}
+              </CodeLine>
+            );
+          })}
 
-          {/* Blinking I-beam cursor */}
+          {/* Blinking I-beam cursor row */}
           {playing && (
             <Box
               component="div"
@@ -291,13 +689,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
                 borderLeft: '2px solid rgba(255,255,255,0.12)',
               }}
             >
-              <Box
-                component="span"
-                sx={{
-                  width: VSCODE_LAYOUT.foldGutterWidth,
-                  flexShrink: 0,
-                }}
-              />
+              <Box component="span" sx={{ width: VSCODE_LAYOUT.foldGutterWidth, flexShrink: 0 }} />
               <Box
                 component="span"
                 sx={{
@@ -310,15 +702,11 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({ playing = fa
                   fontSize: '0.92em',
                 }}
               >
-                6
+                {codeLines.length + 1}
               </Box>
               <Box
                 component="span"
-                sx={{
-                  width: VSCODE_LAYOUT.gutterWidth,
-                  flexShrink: 0,
-                  mr: '6px',
-                }}
+                sx={{ width: VSCODE_LAYOUT.gutterWidth, flexShrink: 0, mr: '6px' }}
               />
               <Box
                 component="span"

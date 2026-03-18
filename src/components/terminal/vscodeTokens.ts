@@ -71,6 +71,12 @@ export const VSCODE_COLORS = {
   explorerItemHover: 'rgba(255,255,255,0.06)',
   explorerItemActive: 'rgba(255,255,255,0.10)',
 
+  // File-type icon colors (used in explorer sidebar and tab bar)
+  fileTypeTs: '#3178c6',
+  fileTypePython: '#e5c07b',
+  fileTypeFolder: '#dcb67a',
+  fileTypeJson: '#e6c07b',
+
   // Command palette
   commandPaletteBg: '#252526',
   commandPaletteInputBg: '#3c3c3c',
@@ -87,8 +93,9 @@ export const VSCODE_COLORS = {
   // Terminal prompt colors
   promptPath: 'rgba(255,255,255,0.40)',
   promptDollar: '#28c840',
+  promptArrow: '#28c840',
   promptBranch: '#e5c07b',
-  outputText: 'rgba(255,255,255,0.55)',
+  outputText: 'rgba(255,255,255,0.82)',
 
   // Hover / focus-visible affordances
   iconHover: 'rgba(255,255,255,0.10)',
@@ -105,6 +112,7 @@ export const VSCODE_LAYOUT = {
   tabBarHeight: 36,
   panelHeaderHeight: 30,
   statusBarHeight: 24,
+  editorColumnWidth: 'clamp(15rem, 70vw, 30rem)',
   lineNumberWidth: '3ch',
   lineNumberGutter: 16, // px gap between line number and code
   breadcrumbHeight: 24,
@@ -113,6 +121,8 @@ export const VSCODE_LAYOUT = {
   explorerWidth: 170,
   commandPaletteWidth: 440,
   foldGutterWidth: 16,
+  /** Number of visible lines in the terminal body; drives the fixed height calc */
+  terminalBodyLines: 5,
 } as const;
 
 // ---------------------------------------------------------------------------

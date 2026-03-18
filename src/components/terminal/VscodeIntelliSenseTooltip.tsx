@@ -1,14 +1,62 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import { VSCODE_COLORS, monoFontFamily } from './vscodeTokens';
+import { fn, kw, punct, typeAnnotation, varr } from './vscodeSyntaxHelpers';
+
+interface VscodeIntelliSenseTooltipProps {
+  symbol: string;
+}
+
+const TOOLTIP_CONTENT: Record<string, React.ReactNode> = {
+  FastAPI: (
+    <>
+      {kw('class ')}
+      {typeAnnotation('FastAPI')}
+      {punct('(')}
+      {typeAnnotation('Starlette')}
+      {punct(')\n')}
+      {kw('def ')}
+      {fn('get')}
+      {punct('(path: ')}
+      {typeAnnotation('str')}
+      {punct(') -> ')}
+      {typeAnnotation('Callable[..., Any]')}
+    </>
+  ),
+  CORSMiddleware: (
+    <>
+      {kw('class ')}
+      {typeAnnotation('CORSMiddleware')}
+      {punct('\n')}
+      {varr('  allow_origins')}
+      {punct(': ')}
+      {typeAnnotation('Sequence[str]')}
+      {punct('\n')}
+      {varr('  allow_methods')}
+      {punct(': ')}
+      {typeAnnotation('Sequence[str]')}
+    </>
+  ),
+  PingResponse: (
+    <>
+      {kw('type ')}
+      {typeAnnotation('PingResponse')}
+      {punct(' = {\n')}
+      {varr('  message')}
+      {punct(': ')}
+      {typeAnnotation('string')}
+      {punct(';\n}')}
+    </>
+  ),
+};
 
 /**
- * IntelliSense-style tooltip that appears on `:hover` of the `Developer` type span.
+ * IntelliSense-style tooltip that appears on `:hover` of highlighted editor symbols.
  * Must be rendered inside a `position: relative` parent.
  * Visibility is controlled via CSS: the parent's `&:hover .intellisense-tooltip` rule
  * toggles `display: block`.
  */
-export const VscodeIntelliSenseTooltip: React.FC = () => (
+export const VscodeIntelliSenseTooltip: React.FC<VscodeIntelliSenseTooltipProps> = ({ symbol }) => (
   <Box
     className="intellisense-tooltip"
     sx={{
@@ -32,41 +80,6 @@ export const VscodeIntelliSenseTooltip: React.FC = () => (
       pointerEvents: 'none',
     }}
   >
-    <Box component="span" sx={{ color: VSCODE_COLORS.syntaxKeyword }}>
-      {'type '}
-    </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.syntaxTypeAnnotation }}>
-      Developer
-    </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.syntaxPunct }}>
-      {' = {\n'}
-    </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.syntaxVariable }}>
-      {'  passions'}
-    </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.syntaxPunct }}>
-      {': '}
-    </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.syntaxTypeAnnotation }}>
-      string
-    </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.syntaxPunct }}>
-      {'[];\n'}
-    </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.syntaxVariable }}>
-      {'  contact'}
-    </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.syntaxPunct }}>
-      {': '}
-    </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.syntaxPunct }}>
-      {'() => '}
-    </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.syntaxKeyword }}>
-      void
-    </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.syntaxPunct }}>
-      {';\n}'}
-    </Box>
+    {TOOLTIP_CONTENT[symbol] ?? typeAnnotation(symbol)}
   </Box>
 );

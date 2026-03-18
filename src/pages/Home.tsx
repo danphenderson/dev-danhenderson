@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type PointerEventHandler } from 'react';
 import {
   Button,
   Dialog,
@@ -7,7 +7,7 @@ import {
   DialogTitle,
   Typography,
 } from '@mui/material';
-import { motion, useScroll, useTransform } from 'motion/react';
+import { motion, useDragControls, useScroll, useTransform } from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { HeroMotionPath } from '../components/HeroMotionPath';
@@ -43,19 +43,67 @@ export default function Home() {
   const { error, isHeroAnimationReady, isLoading, isPromptOpen, handleOptOut, handlePlay } =
     useHomeWelcomeSequence();
   const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);
+  const [canDragHeroWindow, setCanDragHeroWindow] = useState(false);
+  const [isHeroWindowDragging, setIsHeroWindowDragging] = useState(false);
 
   const heroRef = useRef<HTMLDivElement>(null);
+  const heroBoundsRef = useRef<HTMLDivElement>(null);
+  const heroDragControls = useDragControls();
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.6]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return undefined;
+    }
+
+    const mediaQueryList = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+    const updateCanDragHeroWindow = () => {
+      setCanDragHeroWindow(mediaQueryList.matches);
+    };
+
+    updateCanDragHeroWindow();
+
+    if (typeof mediaQueryList.addEventListener === 'function') {
+      mediaQueryList.addEventListener('change', updateCanDragHeroWindow);
+      return () => mediaQueryList.removeEventListener('change', updateCanDragHeroWindow);
+    }
+
+    mediaQueryList.addListener(updateCanDragHeroWindow);
+    return () => mediaQueryList.removeListener(updateCanDragHeroWindow);
+  }, []);
 
   const handleMotionComplete = useCallback(() => {
     setIsTypewriterPlaying(true);
   }, []);
 
+  const windowDragEnabled = canDragHeroWindow && isTypewriterPlaying;
+
+  const handleTitleBarPointerDown = useCallback<PointerEventHandler<HTMLDivElement>>(
+    (event) => {
+      if (!windowDragEnabled || event.button !== 0) {
+        return;
+      }
+
+      heroDragControls.start(event);
+    },
+    [heroDragControls, windowDragEnabled]
+  );
+
+  const handleHeroDragStart = useCallback(() => {
+    setIsHeroWindowDragging(true);
+  }, []);
+
+  const handleHeroDragEnd = useCallback(() => {
+    setIsHeroWindowDragging(false);
+  }, []);
+
   return (
     <motion.div ref={heroRef} style={{ scale: heroScale, opacity: heroOpacity }}>
       <BackgroundPaper
+        contentRef={heroBoundsRef}
         image="assets/home.jpg"
         contentAlign="flex-end"
         contentSx={appStyles.homeHeroContentSx}
@@ -63,14 +111,33 @@ export default function Home() {
         shellSx={appStyles.homeHeroShellSx}
         shellWrapper={(shell) => (
           <HeroMotionPath active={isHeroAnimationReady} onComplete={handleMotionComplete}>
-            {shell}
+            <motion.div
+              data-testid="home-hero-window"
+              drag={windowDragEnabled}
+              dragConstraints={heroBoundsRef}
+              dragControls={heroDragControls}
+              dragElastic={0}
+              dragListener={false}
+              dragMomentum={false}
+              onDragEnd={handleHeroDragEnd}
+              onDragStart={handleHeroDragStart}
+              style={{ display: 'inline-block', maxWidth: '100%' }}
+            >
+              {shell}
+            </motion.div>
           </HeroMotionPath>
         )}
       >
-        <MotionTiltCard intensity={0.7}>
+        <MotionTiltCard disabled={isHeroWindowDragging} intensity={0.7}>
           <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
             {isHeroAnimationReady ? (
-              <TerminalHeroContent lines={heroLines} playing={isTypewriterPlaying} />
+              <TerminalHeroContent
+                lines={heroLines}
+                onWindowDragPointerDown={handleTitleBarPointerDown}
+                playing={isTypewriterPlaying}
+                windowDragEnabled={windowDragEnabled}
+                windowDragging={isHeroWindowDragging}
+              />
             ) : null}
           </AnimatedContentCard>
         </MotionTiltCard>

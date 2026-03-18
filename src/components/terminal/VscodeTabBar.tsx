@@ -1,13 +1,12 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import TerminalOutlined from '@mui/icons-material/TerminalOutlined';
+import type { VscodeEditorTab } from '../../types/ui';
 import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily } from './vscodeTokens';
-
-type TabId = 'portfolio' | 'terminal';
+import { VSCODE_EDITOR_TABS } from './vscodeEditorTabs';
 
 interface VscodeTabBarProps {
-  activeTab?: TabId;
-  onTabChange?: (tab: TabId) => void;
+  activeTab?: VscodeEditorTab;
+  onTabChange?: (tab: VscodeEditorTab) => void;
 }
 
 /** Shared close-button styling */
@@ -37,12 +36,9 @@ const CloseButton: React.FC<{ active: boolean }> = ({ active }) => (
 );
 
 export const VscodeTabBar: React.FC<VscodeTabBarProps> = ({
-  activeTab = 'portfolio',
+  activeTab = 'server',
   onTabChange,
 }) => {
-  const isPortfolioActive = activeTab === 'portfolio';
-  const isTerminalActive = activeTab === 'terminal';
-
   const tabBaseSx = {
     display: 'flex',
     alignItems: 'center',
@@ -60,6 +56,9 @@ export const VscodeTabBar: React.FC<VscodeTabBarProps> = ({
       sx={{
         display: 'flex',
         alignItems: 'stretch',
+        width: VSCODE_LAYOUT.editorColumnWidth,
+        minWidth: VSCODE_LAYOUT.editorColumnWidth,
+        maxWidth: VSCODE_LAYOUT.editorColumnWidth,
         height: VSCODE_LAYOUT.tabBarHeight,
         backgroundColor: VSCODE_COLORS.tabBarBg,
         borderBottom: `1px solid ${VSCODE_COLORS.tabBorder}`,
@@ -67,113 +66,75 @@ export const VscodeTabBar: React.FC<VscodeTabBarProps> = ({
         overflow: 'hidden',
       }}
     >
-      {/* Portfolio tab */}
-      <Box
-        onClick={() => onTabChange?.('portfolio')}
-        sx={{
-          ...tabBaseSx,
-          backgroundColor: isPortfolioActive
-            ? VSCODE_COLORS.activeTabBg
-            : VSCODE_COLORS.inactiveTabBg,
-          borderRight: `1px solid ${VSCODE_COLORS.tabBorder}`,
-          borderTop: isPortfolioActive
-            ? `2px solid ${VSCODE_COLORS.activeTabAccent}`
-            : '2px solid transparent',
-          ...(!isPortfolioActive && {
-            '& .close-btn': { opacity: 0 },
-            '&:hover .close-btn': { opacity: 1 },
-            '&:hover': { backgroundColor: 'rgba(255,255,255,0.04)' },
-          }),
-        }}
-      >
-        {/* TypeScript icon badge */}
-        <Box
-          component="span"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 16,
-            height: 16,
-            borderRadius: '3px',
-            backgroundColor: '#3178c6',
-            flexShrink: 0,
-          }}
-        >
+      {VSCODE_EDITOR_TABS.map((tab) => {
+        const isActive = activeTab === tab.id;
+
+        return (
           <Box
-            component="span"
+            key={tab.id}
+            data-testid={`vscode-tab-${tab.id}`}
+            onClick={() => onTabChange?.(tab.id)}
             sx={{
-              fontFamily: monoFontFamily,
-              fontSize: '0.52rem',
-              fontWeight: 700,
-              color: '#ffffff',
-              userSelect: 'none',
-              lineHeight: 1,
-              letterSpacing: '-0.02em',
+              ...tabBaseSx,
+              backgroundColor: isActive ? VSCODE_COLORS.activeTabBg : VSCODE_COLORS.inactiveTabBg,
+              borderRight: `1px solid ${VSCODE_COLORS.tabBorder}`,
+              borderTop: isActive
+                ? `2px solid ${VSCODE_COLORS.activeTabAccent}`
+                : '2px solid transparent',
+              ...(isActive
+                ? {}
+                : {
+                    '& .close-btn': { opacity: 0 },
+                    '&:hover .close-btn': { opacity: 1 },
+                    '&:hover': { backgroundColor: 'rgba(255,255,255,0.04)' },
+                  }),
             }}
           >
-            TS
+            <Box
+              component="span"
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 16,
+                height: 16,
+                borderRadius: '3px',
+                backgroundColor: tab.badgeColor,
+                flexShrink: 0,
+              }}
+            >
+              <Box
+                component="span"
+                sx={{
+                  fontFamily: monoFontFamily,
+                  fontSize: '0.52rem',
+                  fontWeight: 700,
+                  color: tab.badgeTextColor,
+                  userSelect: 'none',
+                  lineHeight: 1,
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                {tab.badgeLabel}
+              </Box>
+            </Box>
+            <Box
+              component="span"
+              sx={{
+                fontFamily: monoFontFamily,
+                fontSize: '0.74rem',
+                color: isActive ? VSCODE_COLORS.foreground : VSCODE_COLORS.inactiveTab,
+                userSelect: 'none',
+                whiteSpace: 'nowrap',
+                transition: 'color 0.1s',
+              }}
+            >
+              {tab.fileName}
+            </Box>
+            <CloseButton active={isActive} />
           </Box>
-        </Box>
-        <Box
-          component="span"
-          sx={{
-            fontFamily: monoFontFamily,
-            fontSize: '0.74rem',
-            color: isPortfolioActive ? VSCODE_COLORS.foreground : VSCODE_COLORS.inactiveTab,
-            userSelect: 'none',
-            whiteSpace: 'nowrap',
-            transition: 'color 0.1s',
-          }}
-        >
-          portfolio.ts
-        </Box>
-        <CloseButton active={isPortfolioActive} />
-      </Box>
-
-      {/* Terminal tab */}
-      <Box
-        onClick={() => onTabChange?.('terminal')}
-        sx={{
-          ...tabBaseSx,
-          backgroundColor: isTerminalActive
-            ? VSCODE_COLORS.activeTabBg
-            : VSCODE_COLORS.inactiveTabBg,
-          borderRight: `1px solid ${VSCODE_COLORS.tabBorder}`,
-          borderTop: isTerminalActive
-            ? `2px solid ${VSCODE_COLORS.activeTabAccent}`
-            : '2px solid transparent',
-          ...(!isTerminalActive && {
-            '& .close-btn': { opacity: 0 },
-            '&:hover .close-btn': { opacity: 1 },
-            '&:hover': { backgroundColor: 'rgba(255,255,255,0.04)' },
-          }),
-        }}
-      >
-        {/* Terminal icon */}
-        <TerminalOutlined
-          sx={{
-            fontSize: '0.88rem',
-            color: isTerminalActive ? VSCODE_COLORS.foreground : VSCODE_COLORS.inactiveTab,
-            flexShrink: 0,
-            transition: 'color 0.1s',
-          }}
-        />
-        <Box
-          component="span"
-          sx={{
-            fontFamily: monoFontFamily,
-            fontSize: '0.74rem',
-            color: isTerminalActive ? VSCODE_COLORS.foreground : VSCODE_COLORS.inactiveTab,
-            userSelect: 'none',
-            whiteSpace: 'nowrap',
-            transition: 'color 0.1s',
-          }}
-        >
-          terminal
-        </Box>
-        <CloseButton active={isTerminalActive} />
-      </Box>
+        );
+      })}
     </Box>
   );
 };
