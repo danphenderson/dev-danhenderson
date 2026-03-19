@@ -8,11 +8,10 @@ import {
   IconButton,
   Skeleton,
   Tooltip,
-  Typography,
 } from '@mui/material';
 import { useState } from 'react';
 import { useWebVitals, type WebVitalEntry } from '../hooks/useWebVitals';
-import { HeaderLabel, SecondaryCaptionText } from './text';
+import { BodyText, HeaderLabel, SecondaryBodyText, SecondaryCaptionText } from './text';
 import { buildInfo } from '../utils/buildInfo';
 
 const ratingColor: Record<WebVitalEntry['rating'], 'success' | 'warning' | 'error'> = {
@@ -62,17 +61,19 @@ function VitalRow({ entry }: { entry: WebVitalEntry }) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 0.75 }}>
       <Tooltip title={meta?.description ?? ''} placement="left" arrow>
-        <Typography variant="body2" sx={{ fontWeight: 500 }}>
-          {entry.name}
-          <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 0.75 }}>
-            {meta?.label ?? ''}
-          </Typography>
-        </Typography>
+        <Box component="span">
+          <BodyText component="span" sx={{ fontWeight: 500 }}>
+            {entry.name}
+            <SecondaryCaptionText component="span" sx={{ ml: 0.75 }}>
+              {meta?.label ?? ''}
+            </SecondaryCaptionText>
+          </BodyText>
+        </Box>
       </Tooltip>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+        <BodyText component="span" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
           {formatValue(entry.name, entry.value)}
-        </Typography>
+        </BodyText>
         <Chip
           label={entry.rating}
           color={ratingColor[entry.rating]}
@@ -88,12 +89,12 @@ function VitalPlaceholder({ name }: { name: string }) {
   const meta = vitalLabels[name];
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 0.75 }}>
-      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+      <BodyText component="span" sx={{ fontWeight: 500 }}>
         {name}
-        <Typography component="span" variant="caption" color="text.secondary" sx={{ ml: 0.75 }}>
+        <SecondaryCaptionText component="span" sx={{ ml: 0.75 }}>
           {meta?.label ?? ''}
-        </Typography>
-      </Typography>
+        </SecondaryCaptionText>
+      </BodyText>
       <Skeleton width={80} height={24} />
     </Box>
   );
@@ -163,15 +164,13 @@ export function PerformanceScorecard() {
 function InfoRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 0.25 }}>
-      <Typography variant="body2" color="text.secondary">
-        {label}
-      </Typography>
-      <Typography
-        variant="body2"
+      <SecondaryBodyText component="span">{label}</SecondaryBodyText>
+      <BodyText
+        component="span"
         sx={{ fontWeight: 500, ...(mono ? { fontFamily: 'monospace' } : {}) }}
       >
         {value}
-      </Typography>
+      </BodyText>
     </Box>
   );
 }

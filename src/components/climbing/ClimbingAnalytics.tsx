@@ -1,7 +1,7 @@
-import { Box, Chip, Stack, Typography } from '@mui/material';
+import { Box, Chip, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { SectionPanel } from '../layout/SectionPanel';
-import { SubsectionTitle, MetaText, CaptionText } from '../text';
+import { BodyText, SubsectionTitle, MetaText, CaptionText } from '../text';
 import type { ClimbingAnalytics as ClimbingAnalyticsType } from '../../types/data';
 import type { SharedDataStatus } from '../../types/data';
 
@@ -68,19 +68,27 @@ export const ClimbingAnalytics = ({ analytics, status }: ClimbingAnalyticsProps)
           }}
         >
           <Box sx={metricSx}>
-            <Typography sx={metricValueSx}>{overview.tickCount}</Typography>
+            <BodyText component="p" sx={metricValueSx}>
+              {overview.tickCount}
+            </BodyText>
             <MetaText>Routes Climbed</MetaText>
           </Box>
           <Box sx={metricSx}>
-            <Typography sx={metricValueSx}>{overview.todoCount}</Typography>
+            <BodyText component="p" sx={metricValueSx}>
+              {overview.todoCount}
+            </BodyText>
             <MetaText>Routes To Do</MetaText>
           </Box>
           <Box sx={metricSx}>
-            <Typography sx={metricValueSx}>{overview.uniqueLocations}</Typography>
+            <BodyText component="p" sx={metricValueSx}>
+              {overview.uniqueLocations}
+            </BodyText>
             <MetaText>Unique Locations</MetaText>
           </Box>
           <Box sx={metricSx}>
-            <Typography sx={metricValueSx}>{overview.mostRecentDate || 'N/A'}</Typography>
+            <BodyText component="p" sx={metricValueSx}>
+              {overview.mostRecentDate || 'N/A'}
+            </BodyText>
             <MetaText>Most Recent Tick</MetaText>
           </Box>
         </Box>
