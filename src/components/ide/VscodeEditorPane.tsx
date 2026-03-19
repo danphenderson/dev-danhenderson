@@ -170,10 +170,10 @@ const SERVER_CODE_LINES: CodeLineData[] = [
   },
 ];
 
-// client.tsx — TypeScript fetch client
+// client.ts — TypeScript fetch client
 const CLIENT_CODE_LINES: CodeLineData[] = [
   {
-    tokens: [{ kind: 'comment', text: '// client.tsx' }],
+    tokens: [{ kind: 'comment', text: '// client.ts' }],
   },
   {
     tokens: [

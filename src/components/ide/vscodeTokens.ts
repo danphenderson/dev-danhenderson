@@ -118,7 +118,7 @@ export const VSCODE_LAYOUT = {
   breadcrumbHeight: 24,
   gutterWidth: 3,
   minimapWidth: 54,
-  explorerWidth: 170,
+  explorerWidth: 220,
   commandPaletteWidth: 440,
   foldGutterWidth: 16,
   /** Number of visible lines in the terminal body; drives the fixed height calc */

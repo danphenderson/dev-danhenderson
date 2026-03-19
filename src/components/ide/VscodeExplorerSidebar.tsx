@@ -16,11 +16,19 @@ interface FileEntry {
 }
 
 const FILES: FileEntry[] = [
-  { name: 'Pipfile', kind: 'file', indent: 0 },
-  { name: 'package.json', kind: 'file', indent: 0 },
+  { name: '.github', kind: 'folder', indent: 0, open: true },
+  { name: 'ISSUE_TEMPLATE', kind: 'folder', indent: 1 },
+  { name: 'hooks', kind: 'folder', indent: 1 },
+  { name: 'instructions', kind: 'folder', indent: 1 },
+  { name: 'workflows', kind: 'folder', indent: 1 },
+  { name: '.editorconfig', kind: 'file', indent: 0 },
   { name: 'src', kind: 'folder', indent: 0, open: true },
-  { name: 'client.tsx', kind: 'file', indent: 1 },
+  { name: 'client.ts', kind: 'file', indent: 1 },
   { name: 'server.py', kind: 'file', indent: 1 },
+  { name: '.pre-commit-config.yaml', kind: 'file', indent: 0 },
+  { name: 'Pipfile', kind: 'file', indent: 0 },
+  { name: 'docker-compose.yml', kind: 'file', indent: 0 },
+  { name: 'package.json', kind: 'file', indent: 0 },
   { name: 'tsconfig.json', kind: 'file', indent: 0 },
 ];
 
@@ -95,7 +103,7 @@ export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({
       <Box sx={{ flex: 1, pt: 0.25 }}>
         {FILES.map((entry) => (
           <Box
-            key={entry.name}
+            key={`${entry.indent}-${entry.name}`}
             sx={{
               display: 'flex',
               alignItems: 'center',
@@ -109,6 +117,7 @@ export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({
                 entry.name === activeFileName ? VSCODE_COLORS.foreground : VSCODE_COLORS.panelLabel,
               userSelect: 'none',
               cursor: 'default',
+              minWidth: 0,
               backgroundColor:
                 entry.name === activeFileName ? VSCODE_COLORS.explorerItemActive : 'transparent',
               '&:hover': {
@@ -146,7 +155,17 @@ export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({
                 />
               </>
             )}
-            {entry.name}
+            <Box
+              component="span"
+              sx={{
+                minWidth: 0,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {entry.name}
+            </Box>
           </Box>
         ))}
       </Box>
