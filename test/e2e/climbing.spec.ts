@@ -4,7 +4,7 @@ import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 const waitForClimbingRoute = async (page: Page) => {
   const main = page.locator('main');
   const intro = main.getByText(
-    "A collection of routes I've remembered to tick on Mountain Project."
+    /A collection of routes I've remembered to tick on Mountain Project, including some\s+top-rope ascents/
   );
   const firstRouteLink = main.locator('a[href*="mountainproject.com/route/"]').first();
 
@@ -22,7 +22,9 @@ test.describe('Climbing page', () => {
     const { main, firstRouteLink } = await waitForClimbingRoute(page);
 
     await expect(
-      main.getByText("A collection of routes I've remembered to tick on Mountain Project.")
+      main.getByText(
+        /A collection of routes I've remembered to tick on Mountain Project, including some\s+top-rope ascents/
+      )
     ).toBeVisible();
     await expect(main.getByText('TODO Routes')).toBeVisible();
     await expect(firstRouteLink).toBeVisible();

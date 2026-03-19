@@ -88,7 +88,9 @@ describe('Climbing', () => {
     expect(screen.getByText('Climbing')).toBeInTheDocument();
     expect(screen.getByText('TODO Routes')).toBeInTheDocument();
     expect(
-      screen.getByText("A collection of routes I've remembered to tick on Mountain Project.")
+      screen.getByText(
+        /A collection of routes I've remembered to tick on Mountain Project, including some\s+top-rope ascents — I don't climb 5\.14\./
+      )
     ).toBeInTheDocument();
     expect(
       screen.getByText("A collection of routes I'm interested in climbing.")
@@ -135,7 +137,7 @@ describe('Climbing', () => {
 
     expect(routeHeaders.length).toBeGreaterThanOrEqual(1);
     expect(gradeHeaders.length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByRole('columnheader', { name: 'Date' })).toBeInTheDocument();
+    expect(screen.queryByRole('columnheader', { name: 'Date' })).not.toBeInTheDocument();
   });
 
   it('renders search inputs with correct placeholders', () => {
