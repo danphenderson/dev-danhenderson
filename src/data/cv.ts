@@ -1,6 +1,7 @@
 import type {
   AboutMe,
   CVStoryChapter,
+  CVStoryEndData,
   Certificate,
   CodingExample,
   EducationInfo,
@@ -50,9 +51,11 @@ export const aboutMe: AboutMe = {
     url: mtuMathGraduateBioUrl,
     tooltip: 'View the Michigan Tech graduate mathematics student page.',
   },
-  bio: `Software engineer building scientific, data, and AI-enabled systems.
+  bio: `Software engineer building scientific, data, and AI-enabled systems. I'm drawn to problems where mathematics meets computation — from modeling blood flow in arteries to building production data pipelines that handle terabytes of healthcare records.
 
-I previously built ingestion, analytics, and ML solutions for a healthcare data platform. Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software.`,
+I previously built ingestion, analytics, and ML solutions for a healthcare data platform. Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software.
+
+Outside of work, I climb rocks, ride bikes, and tinker with side projects that keep me learning.`,
 };
 
 export const codingExamples: CodingExample[] = [
@@ -300,7 +303,7 @@ export const experiences: Experience[] = [
     endDate: 'Current',
     description: [
       {
-        text: 'Researching blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.',
+        text: 'Researching blood-flow and transport models governed by Navier–Stokes and convection-diffusion PDEs using traditional numerical and machine-learning approaches. The work bridges continuum mechanics theory with modern scientific ML to model hemodynamics in the human cardiovascular system.',
       },
       {
         text: ' Advisor: ',
@@ -385,7 +388,7 @@ export const experiences: Experience[] = [
     startDate: 'Apr 2022',
     endDate: 'Dec 2022 (9 mos)',
     description:
-      'Contributed to data ingestion and transformation pipelines for a healthcare analytics platform, improving performance and reducing cloud infrastructure costs.',
+      'Owned data ingestion, transformation, and infrastructure for a multi-tenant healthcare analytics platform. Focused on pipeline performance, cost optimization, and infrastructure-as-code maturity while navigating a rapid organizational transition.',
     projects: [
       "Supported architectural design, releases, and deployments of data-engineering assets, including data governance, security, and integrity of the platform's data lakehouse.",
       'Repartitioned 50TB datalake, yielding improved query performance to accelerate nightly DBT builds and support analytics and reporting.',
@@ -425,7 +428,7 @@ export const experiences: Experience[] = [
     startDate: 'Nov 2021',
     endDate: 'Apr 2022 (6 mos)',
     description:
-      'Contributor to production ML and analytics layers of a multi-tenant cloud health data platform.',
+      'Built production ML and analytics capabilities for a multi-tenant healthcare data platform — from anomaly detection pipelines to CI/CD for model artifacts. Bridged data science and data engineering, often serving as the connecting layer between ML research and production systems.',
     projects: [
       'Introduced CI/CD for machine-learning code, infrastructure, and model artifacts with AWS CDK and Bitbucket Pipelines, safeguarding our workflows and streamlining deployment processes.',
       'Developed a schema-agnostic anomaly-detection pipeline and presented the workflow for broader team adoption, using PySpark isolation forest models to identify outliers in the platform`s S3 data lake.',
@@ -462,7 +465,7 @@ export const experiences: Experience[] = [
     startDate: 'May 2021',
     endDate: 'Nov 2021 (7 mos)',
     description:
-      'Contributor to quasi-Newton optimization research (Azzam, Henderson, Ong, Struthers; 2022), led numerical experiments.',
+      'Led numerical experiments for quasi-Newton optimization research that resulted in a published paper (Azzam, Henderson, Ong, Struthers; 2022). Designed and implemented the software artifacts in Julia, combining trust-region methods with automatic differentiation to solve high-dimensional unconstrained optimization problems.',
     projects: [
       [
         { text: '2022, Azzam J, Henderson D, Ong BW, and Struthers AA, ' },
@@ -533,7 +536,7 @@ export const educationInfo: EducationInfo = {
       university: 'Michigan Technological University',
       program: 'MS Mathematics, Applied/Computational',
       summary:
-        'Graduate work centered on applied mathematics, numerical methods, and computational modeling for hemodynamics research.',
+        'Graduate work centered on applied mathematics, numerical methods, and computational modeling for hemodynamics research. Coursework spans theoretical and computational PDE analysis, numerical optimization, and error-correcting codes, while research focuses on bridging classical fluid dynamics with scientific machine learning.',
       dateRange: 'Fall 2024 – Present',
       expectedCompletion: 'Expected Summer 2026',
       gpa: [{ label: 'Cumulative', value: '3.44' }],
@@ -548,7 +551,7 @@ export const educationInfo: EducationInfo = {
       university: 'Michigan Technological University',
       program: 'B.S. Cum Laude, Mathematics, Applied/Computational',
       summary:
-        'Applied/computational mathematics degree paired with computer science coursework, scientific computing, and campus leadership experience.',
+        'Applied/computational mathematics degree paired with a computer science minor, spanning scientific computing, algorithms, and systems programming. Complemented by extensive campus leadership in student government, finance, and athletics.',
       minor: 'Computer Science',
       gpa: [
         { label: 'Cumulative', value: '3.56' },
@@ -695,6 +698,17 @@ export const cvStoryChapters: CVStoryChapter[] = [
       'Selected projects and code samples that illustrate how I approach real-world problems.',
   },
 ];
+
+export const cvStoryEndData: CVStoryEndData = {
+  headline: "Let's Connect",
+  body: "Thanks for reading. Whether you're interested in scientific computing, data engineering, open-source collaboration, or just want to say hello — I'd love to hear from you.",
+  channels: [
+    { label: 'me@danhenderson.dev', url: 'mailto:me@danhenderson.dev', icon: 'email' },
+    { label: 'GitHub', url: githubProfileUrl, icon: 'github' },
+    { label: 'LinkedIn', url: linkedinProfileUrl, icon: 'linkedin' },
+    { label: 'danhenderson.dev', url: 'https://danhenderson.dev', icon: 'web' },
+  ],
+};
 
 export const cvStoryCta = {
   switchToDefault: 'Switch to full CV',

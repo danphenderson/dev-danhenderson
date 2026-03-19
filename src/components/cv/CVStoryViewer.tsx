@@ -1,13 +1,11 @@
-import { AnimatePresence, motion } from 'motion/react';
+import { motion } from 'motion/react';
 import { Box, IconButton, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { useTheme } from '@mui/material/styles';
-import { useCallback, useEffect, useState } from 'react';
-import { duration } from '../../motion/tokens';
-import { storySlideVariants } from '../../motion/variants';
+import { useTheme, alpha } from '@mui/material/styles';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { duration, easing } from '../../motion/tokens';
 import { CVStoryProgress } from './CVStoryProgress';
-import { CVStoryNavBar } from './CVStoryNavBar';
-import { CVStorySlideRenderer } from './CVStorySlideRenderer';
+import { CVStorySectionRenderer } from './CVStorySlideRenderer';
 import type { CVStoryItem } from '../../types/cv';
 
 type CVStoryViewerProps = {
@@ -22,43 +20,68 @@ const kindLabel: Record<CVStoryItem['kind'], string> = {
   certificate: 'Certificate',
   volunteering: 'Volunteering',
   coding: 'Project',
+  end: 'Connect',
 };
 
 export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
   const theme = useTheme();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [direction, setDirection] = useState<1 | -1>(1);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollProgress, setScrollProgress] = useState(0);
+  const [activeKind, setActiveKind] = useState<CVStoryItem['kind']>('about');
+  const sectionRefs = useRef<Map<number, HTMLDivElement>>(new Map());
 
-  const goTo = useCallback(
-    (index: number) => {
-      if (index === currentIndex) return;
-      setDirection(index > currentIndex ? 1 : -1);
-      setCurrentIndex(index);
-    },
-    [currentIndex]
-  );
+  // Track scroll progress
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const { scrollTop, scrollHeight, clientHeight } = el;
+    const maxScroll = scrollHeight - clientHeight;
+    setScrollProgress(maxScroll > 0 ? scrollTop / maxScroll : 0);
+  }, []);
 
-  const goNext = useCallback(() => {
-    if (currentIndex < items.length - 1) goTo(currentIndex + 1);
-  }, [currentIndex, items.length, goTo]);
+  // Track which section is active based on scroll position
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
 
-  const goPrev = useCallback(() => {
-    if (currentIndex > 0) goTo(currentIndex - 1);
-  }, [currentIndex, goTo]);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const index = Number(entry.target.getAttribute('data-story-index'));
+            if (!isNaN(index) && items[index]) {
+              setActiveKind(items[index].kind);
+            }
+          }
+        }
+      },
+      { root: el, rootMargin: '-30% 0px -60% 0px', threshold: 0 }
+    );
 
+    sectionRefs.current.forEach((ref) => {
+      observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, [items]);
+
+  // Escape key exits
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goNext();
-      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goPrev();
-      else if (e.key === 'Escape') onExit();
+      if (e.key === 'Escape') onExit();
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [goNext, goPrev, onExit]);
+  }, [onExit]);
 
-  const progress = items.length > 0 ? (currentIndex + 1) / items.length : 0;
-  const currentItem = items[currentIndex];
+  const registerRef = useCallback((index: number, el: HTMLDivElement | null) => {
+    if (el) {
+      sectionRefs.current.set(index, el);
+    } else {
+      sectionRefs.current.delete(index);
+    }
+  }, []);
 
   return (
     <Box
@@ -79,13 +102,38 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
         exit={{ opacity: 0 }}
         transition={{ duration: duration.fast }}
       >
-        <CVStoryProgress progress={progress} />
+        <CVStoryProgress progress={scrollProgress} />
 
-        {/* Slide area */}
-        <Box sx={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
-          {/* Exit button — top right */}
+        {/* Header bar */}
+        <Box
+          sx={{
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            px: 2,
+            py: 1,
+            minHeight: 48,
+            borderBottom: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
+          }}
+        >
           <motion.div
-            style={{ position: 'absolute', top: 16, right: 16, zIndex: 2 }}
+            key={activeKind}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: duration.fast, ease: easing.decel }}
+          >
+            <Typography
+              variant="overline"
+              color="text.secondary"
+              sx={{ letterSpacing: 3, userSelect: 'none' }}
+            >
+              {kindLabel[activeKind]}
+            </Typography>
+          </motion.div>
+
+          <motion.div
+            style={{ position: 'absolute', right: 16, top: '50%', y: '-50%' }}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: duration.fast, delay: 0.2 }}
@@ -94,78 +142,37 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
               <CloseIcon />
             </IconButton>
           </motion.div>
-
-          {/* Kind label — top center */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentItem?.kind}
-              initial={{ opacity: 0, y: -12, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 12, scale: 0.9 }}
-              transition={{ duration: duration.fast }}
-              style={{
-                position: 'absolute',
-                top: 16,
-                left: 0,
-                right: 0,
-                textAlign: 'center',
-                zIndex: 2,
-                pointerEvents: 'none',
-              }}
-            >
-              <Typography variant="overline" color="text.secondary" sx={{ letterSpacing: 3 }}>
-                {currentItem ? kindLabel[currentItem.kind] : ''}
-              </Typography>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Slide content with drag */}
-          <motion.div
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.2}
-            dragDirectionLock
-            onDragEnd={(_, info) => {
-              if (info.offset.x < -80 || info.velocity.x < -300) goNext();
-              else if (info.offset.x > 80 || info.velocity.x > 300) goPrev();
-            }}
-            style={{
-              position: 'relative',
-              width: '100%',
-              height: '100%',
-              cursor: 'grab',
-              overflow: 'hidden',
-            }}
-          >
-            <AnimatePresence mode="wait" custom={direction}>
-              <motion.div
-                key={currentIndex}
-                custom={direction}
-                variants={storySlideVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  overflowY: 'auto',
-                  paddingTop: 48,
-                  perspective: 1200,
-                }}
-              >
-                <CVStorySlideRenderer item={currentItem} />
-              </motion.div>
-            </AnimatePresence>
-          </motion.div>
         </Box>
 
-        <CVStoryNavBar
-          items={items}
-          currentIndex={currentIndex}
-          onPrev={goPrev}
-          onNext={goNext}
-          onJumpTo={goTo}
-        />
+        {/* Scrollable narrative */}
+        <Box
+          ref={scrollRef}
+          onScroll={handleScroll}
+          sx={{
+            flex: 1,
+            overflowY: 'auto',
+            overflowX: 'hidden',
+            WebkitOverflowScrolling: 'touch',
+            scrollBehavior: 'smooth',
+          }}
+        >
+          {/* Top spacing */}
+          <Box sx={{ height: { xs: 32, sm: 48 } }} />
+
+          {items.map((item, index) => (
+            <Box
+              key={index}
+              ref={(el: HTMLDivElement | null) => registerRef(index, el)}
+              data-story-index={index}
+              sx={{ mb: { xs: 6, sm: 8 } }}
+            >
+              <CVStorySectionRenderer item={item} index={index} />
+            </Box>
+          ))}
+
+          {/* Bottom spacing */}
+          <Box sx={{ height: { xs: 48, sm: 80 } }} />
+        </Box>
       </motion.div>
     </Box>
   );

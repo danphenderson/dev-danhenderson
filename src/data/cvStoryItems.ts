@@ -1,5 +1,6 @@
 import type {
   AboutMe,
+  CVStoryEndData,
   CVStoryItem,
   Certificate,
   CodingExample,
@@ -77,6 +78,7 @@ type CVStoryInput = {
   certificates: Certificate[];
   volunteering: VolunteeringEntry[];
   codingExamples: CodingExample[];
+  endData: CVStoryEndData;
 };
 
 type SortableItem = {
@@ -114,10 +116,13 @@ export const buildCVStoryItems = (input: CVStoryInput): CVStoryItem[] => {
   sortable.sort((a, b) => a.sortDate.getTime() - b.sortDate.getTime());
   items.push(...(sortable as CVStoryItem[]));
 
-  // 3. Coding — appended last (no date field)
+  // 3. Coding — appended after date-sorted items
   for (const example of input.codingExamples) {
     items.push({ kind: 'coding', data: example });
   }
+
+  // 4. End / contact — always last
+  items.push({ kind: 'end', data: input.endData });
 
   return items;
 };

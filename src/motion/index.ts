@@ -44,6 +44,7 @@ export {
   storyLinkReveal,
   storyBulletContainer,
   storyBulletItem,
+  storyDividerReveal,
 } from './variants';
 
 export {

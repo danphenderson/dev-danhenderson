@@ -5,6 +5,7 @@ import {
 } from '../../../src/data/cvStoryItems';
 import type {
   AboutMe,
+  CVStoryEndData,
   Certificate,
   CodingExample,
   EducationEntry,
@@ -67,6 +68,12 @@ const makeCoding = (title = 'Project'): CodingExample => ({
   title,
   description: 'desc',
   links: [],
+});
+
+const makeEndData = (): CVStoryEndData => ({
+  headline: "Let's Connect",
+  body: 'Thanks for reading.',
+  channels: [{ label: 'Email', url: 'mailto:test@example.com', icon: 'email' }],
 });
 
 /* ── parseCVSortDate ── */
@@ -185,6 +192,7 @@ describe('buildCVStoryItems', () => {
     certificates: [],
     volunteering: [],
     codingExamples: [],
+    endData: makeEndData(),
   };
 
   it('always places the about item first', () => {
@@ -197,7 +205,17 @@ describe('buildCVStoryItems', () => {
     expect(items[0].kind).toBe('about');
   });
 
-  it('always places coding items after all time-bounded items', () => {
+  it('always places the end item last', () => {
+    const items = buildCVStoryItems({
+      ...defaultInput,
+      experiences: [makeExperience('Jan 2020')],
+      codingExamples: [makeCoding()],
+    });
+
+    expect(items[items.length - 1].kind).toBe('end');
+  });
+
+  it('always places coding items after all time-bounded items but before end', () => {
     const items = buildCVStoryItems({
       ...defaultInput,
       experiences: [makeExperience('Jan 2025')],
@@ -207,7 +225,9 @@ describe('buildCVStoryItems', () => {
     const kinds = items.map((i) => i.kind);
     const lastExperienceIdx = kinds.lastIndexOf('experience');
     const firstCodingIdx = kinds.indexOf('coding');
+    const endIdx = kinds.indexOf('end');
     expect(firstCodingIdx).toBeGreaterThan(lastExperienceIdx);
+    expect(endIdx).toBeGreaterThan(firstCodingIdx);
   });
 
   it('sorts time-bounded items chronologically oldest-first', () => {
@@ -232,7 +252,9 @@ describe('buildCVStoryItems', () => {
       volunteering: [makeVolunteering('Dec 2021', { organization: 'Late Vol' })],
     });
 
-    const timeBounded = items.filter((i) => i.kind !== 'about' && i.kind !== 'coding');
+    const timeBounded = items.filter(
+      (i) => i.kind !== 'about' && i.kind !== 'coding' && i.kind !== 'end'
+    );
     expect(timeBounded[0].kind).toBe('certificate');
     expect(timeBounded[1].kind).toBe('experience');
     expect(timeBounded[2].kind).toBe('volunteering');
@@ -264,10 +286,11 @@ describe('buildCVStoryItems', () => {
     ).toBe(2026);
   });
 
-  it('returns only about when all arrays are empty', () => {
+  it('returns about and end when all arrays are empty', () => {
     const items = buildCVStoryItems(defaultInput);
-    expect(items).toHaveLength(1);
+    expect(items).toHaveLength(2);
     expect(items[0].kind).toBe('about');
+    expect(items[1].kind).toBe('end');
   });
 
   it('preserves the full item structure through the builder', () => {

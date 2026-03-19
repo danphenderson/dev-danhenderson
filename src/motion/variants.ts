@@ -238,3 +238,17 @@ export const storyBulletItem: Variants = {
     transition: { duration: duration.fast, ease: easing.decel },
   },
 };
+
+/* ------------------------------------------------------------------ */
+/*  CV Story scroll-narrative variants                                */
+/* ------------------------------------------------------------------ */
+
+/** Section divider line — grow from center. */
+export const storyDividerReveal: Variants = {
+  hidden: { scaleX: 0, opacity: 0 },
+  visible: {
+    scaleX: 1,
+    opacity: 1,
+    transition: { duration: duration.normal, ease: easing.decel },
+  },
+};

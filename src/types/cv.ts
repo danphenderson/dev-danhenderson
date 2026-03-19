@@ -121,13 +121,26 @@ export type CVStoryChapter = {
   narrative: string;
 };
 
+export type CVStoryContactChannel = {
+  label: string;
+  url: string;
+  icon: 'email' | 'github' | 'linkedin' | 'web';
+};
+
+export type CVStoryEndData = {
+  headline: string;
+  body: string;
+  channels: CVStoryContactChannel[];
+};
+
 export type CVStoryItem =
   | { kind: 'about'; data: AboutMe }
   | { kind: 'experience'; data: Experience; sortDate: Date }
   | { kind: 'education'; data: EducationEntry; sortDate: Date }
   | { kind: 'certificate'; data: Certificate; sortDate: Date }
   | { kind: 'volunteering'; data: VolunteeringEntry; sortDate: Date }
-  | { kind: 'coding'; data: CodingExample };
+  | { kind: 'coding'; data: CodingExample }
+  | { kind: 'end'; data: CVStoryEndData };
 
 export type GitHubProfileData = {
   activity: GitHubActivityItem[];

@@ -9,6 +9,7 @@ import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
 import EmojiEventsOutlinedIcon from '@mui/icons-material/EmojiEventsOutlined';
 import VolunteerActivismOutlinedIcon from '@mui/icons-material/VolunteerActivismOutlined';
 import CodeIcon from '@mui/icons-material/Code';
+import ConnectWithoutContactOutlinedIcon from '@mui/icons-material/ConnectWithoutContactOutlined';
 import { MotionCard } from '../../motion';
 import { duration } from '../../motion/tokens';
 import type { CVStoryItem } from '../../types/cv';
@@ -28,6 +29,7 @@ const kindIcon: Record<CVStoryItem['kind'], React.ReactNode> = {
   certificate: <EmojiEventsOutlinedIcon fontSize="small" />,
   volunteering: <VolunteerActivismOutlinedIcon fontSize="small" />,
   coding: <CodeIcon fontSize="small" />,
+  end: <ConnectWithoutContactOutlinedIcon fontSize="small" />,
 };
 
 export const CVStoryNavBar = ({

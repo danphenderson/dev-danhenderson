@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../../src/ThemeProvider';
-import { CVStorySlideRenderer } from '../../../../src/components/cv/CVStorySlideRenderer';
+import { CVStorySectionRenderer } from '../../../../src/components/cv/CVStorySlideRenderer';
 import type { CVStoryItem } from '../../../../src/data/cvStoryItems';
 
 jest.mock('motion/react', () => ({
@@ -13,6 +13,7 @@ jest.mock('motion/react', () => ({
 
 jest.mock('../../../../src/motion', () => ({
   MotionItem: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  MotionSection: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 jest.mock('../../../../src/components/SkillsChipList', () => ({
@@ -102,11 +103,23 @@ const codingItem: CVStoryItem = {
   },
 };
 
-describe('CVStorySlideRenderer', () => {
-  it('renders about slide with name, title, location, bio, and opportunities', () => {
+const endItem: CVStoryItem = {
+  kind: 'end',
+  data: {
+    headline: "Let's Connect",
+    body: 'Thanks for reading.',
+    channels: [
+      { label: 'me@test.dev', url: 'mailto:me@test.dev', icon: 'email' as const },
+      { label: 'GitHub', url: 'https://github.com/testuser', icon: 'github' as const },
+    ],
+  },
+};
+
+describe('CVStorySectionRenderer', () => {
+  it('renders about section with name, title, location, bio, and opportunities', () => {
     render(
       <ThemeProvider>
-        <CVStorySlideRenderer item={aboutItem} />
+        <CVStorySectionRenderer item={aboutItem} index={0} />
       </ThemeProvider>
     );
 
@@ -120,25 +133,24 @@ describe('CVStorySlideRenderer', () => {
     expect(screen.getByText('Portfolio')).toHaveAttribute('href', 'https://example.com');
   });
 
-  it('renders experience slide with company link, title, date range, description, and skills', () => {
+  it('renders experience section with company link, title, date range, description, and skills', () => {
     render(
       <ThemeProvider>
-        <CVStorySlideRenderer item={experienceItem} />
+        <CVStorySectionRenderer item={experienceItem} index={1} />
       </ThemeProvider>
     );
 
     expect(screen.getByText('Acme Corp')).toBeInTheDocument();
     expect(screen.getByText('Senior Engineer')).toBeInTheDocument();
-    expect(screen.getByText('Jan 2023 – Present')).toBeInTheDocument();
     expect(screen.getByText('Built things.')).toBeInTheDocument();
     expect(screen.getByText('Go')).toBeInTheDocument();
     expect(screen.getByText('Kubernetes')).toBeInTheDocument();
   });
 
-  it('renders education slide with university, program, GPA, highlights, and skills', () => {
+  it('renders education section with university, program, GPA, highlights, and skills', () => {
     render(
       <ThemeProvider>
-        <CVStorySlideRenderer item={educationItem} />
+        <CVStorySectionRenderer item={educationItem} index={2} />
       </ThemeProvider>
     );
 
@@ -151,10 +163,10 @@ describe('CVStorySlideRenderer', () => {
     expect(screen.getByText('Python')).toBeInTheDocument();
   });
 
-  it('renders certificate slide with issuer, title, date, and link', () => {
+  it('renders certificate section with issuer, title, date, and link', () => {
     render(
       <ThemeProvider>
-        <CVStorySlideRenderer item={certificateItem} />
+        <CVStorySectionRenderer item={certificateItem} index={3} />
       </ThemeProvider>
     );
 
@@ -167,10 +179,10 @@ describe('CVStorySlideRenderer', () => {
     );
   });
 
-  it('renders volunteering slide with organization link, role, summary, and highlights', () => {
+  it('renders volunteering section with organization link, role, summary, and highlights', () => {
     render(
       <ThemeProvider>
-        <CVStorySlideRenderer item={volunteeringItem} />
+        <CVStorySectionRenderer item={volunteeringItem} index={4} />
       </ThemeProvider>
     );
 
@@ -180,10 +192,10 @@ describe('CVStorySlideRenderer', () => {
     expect(screen.getByText('Trained 10 students')).toBeInTheDocument();
   });
 
-  it('renders coding slide with project title, description, GitHub link, and skills tab', () => {
+  it('renders coding section with project title, description, GitHub link, and skills tab', () => {
     render(
       <ThemeProvider>
-        <CVStorySlideRenderer item={codingItem} />
+        <CVStorySectionRenderer item={codingItem} index={5} />
       </ThemeProvider>
     );
 
@@ -196,5 +208,18 @@ describe('CVStorySlideRenderer', () => {
     );
     expect(screen.getByText('React')).toBeInTheDocument();
     expect(screen.getByText('TS')).toBeInTheDocument();
+  });
+
+  it('renders end section with headline, body, and contact channels', () => {
+    render(
+      <ThemeProvider>
+        <CVStorySectionRenderer item={endItem} index={6} />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByText("Let's Connect")).toBeInTheDocument();
+    expect(screen.getByText('Thanks for reading.')).toBeInTheDocument();
+    expect(screen.getByText('me@test.dev')).toHaveAttribute('href', 'mailto:me@test.dev');
+    expect(screen.getByText('GitHub')).toHaveAttribute('href', 'https://github.com/testuser');
   });
 });

@@ -90,6 +90,15 @@ const makeItem = (kind: CVStoryItem['kind']): CVStoryItem => {
           links: ['https://github.com/example/project'],
         },
       };
+    case 'end':
+      return {
+        kind: 'end',
+        data: {
+          headline: "Let's Connect",
+          body: 'Thanks.',
+          channels: [{ label: 'Email', url: 'mailto:test@example.com', icon: 'email' }],
+        },
+      };
   }
 };
 
