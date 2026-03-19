@@ -142,6 +142,7 @@ describe('CVStorySectionRenderer', () => {
 
     expect(screen.getByText('Acme Corp')).toBeInTheDocument();
     expect(screen.getByText('Senior Engineer')).toBeInTheDocument();
+    expect(screen.getByText('Jan 2023 – Present')).toBeInTheDocument();
     expect(screen.getByText('Built things.')).toBeInTheDocument();
     expect(screen.getByText('Go')).toBeInTheDocument();
     expect(screen.getByText('Kubernetes')).toBeInTheDocument();

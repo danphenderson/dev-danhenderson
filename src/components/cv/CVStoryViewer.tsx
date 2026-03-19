@@ -133,7 +133,12 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
           </motion.div>
 
           <motion.div
-            style={{ position: 'absolute', right: 16, top: '50%', y: '-50%' }}
+            style={{
+              position: 'absolute',
+              right: 16,
+              top: '50%',
+              transform: 'translateY(-50%)',
+            }}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: duration.fast, delay: 0.2 }}
