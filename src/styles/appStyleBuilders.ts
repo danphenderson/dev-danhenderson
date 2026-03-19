@@ -134,6 +134,17 @@ export const createAppStyleMap = (theme: Theme) => {
     py: { xs: 2, md: 4 },
   };
 
+  const headerNavButtonBaseSx = {
+    fontSize: { md: '0.875rem' },
+    fontWeight: 500,
+    letterSpacing: '0.04em',
+    textTransform: 'none',
+    position: 'relative',
+    px: 1.5,
+    py: 0.75,
+    minWidth: 'auto',
+  } as const;
+
   const headerIconSx: SxProps<Theme> = {
     fontSize: { xs: 22, md: 24 },
   };
@@ -363,15 +374,8 @@ export const createAppStyleMap = (theme: Theme) => {
       minWidth: 0,
     } satisfies SxProps<Theme>,
     headerNavButtonSx: {
+      ...headerNavButtonBaseSx,
       color: alpha(theme.palette.common.white, 0.72),
-      fontSize: { md: '0.875rem' },
-      fontWeight: 500,
-      letterSpacing: '0.04em',
-      textTransform: 'none',
-      position: 'relative',
-      px: 1.5,
-      py: 0.75,
-      minWidth: 'auto',
       transition: `color ${cssDuration.quick} ${SPRING_EASING_CSS}`,
       '&:hover': {
         color: theme.palette.common.white,
@@ -379,15 +383,8 @@ export const createAppStyleMap = (theme: Theme) => {
       },
     } satisfies SxProps<Theme>,
     headerNavButtonActiveSx: {
+      ...headerNavButtonBaseSx,
       color: theme.palette.common.white,
-      fontSize: { md: '0.875rem' },
-      fontWeight: 500,
-      letterSpacing: '0.04em',
-      textTransform: 'none',
-      position: 'relative',
-      px: 1.5,
-      py: 0.75,
-      minWidth: 'auto',
       '&::after': {
         content: '""',
         position: 'absolute',

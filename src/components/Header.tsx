@@ -49,7 +49,7 @@ export default function Header() {
   const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState<null | HTMLElement>(null);
   const mobileMenuOpen = Boolean(mobileMenuAnchor);
   const settingsButtonRef = React.useRef<HTMLButtonElement | null>(null);
-  const themeHintTitle = 'Customise your experience';
+  const themeHintTitle = 'Customize your experience';
   const themeHintBody =
     'Open settings to switch theme, change appearance, and adjust motion preferences.';
   const settingsHighlightSx =

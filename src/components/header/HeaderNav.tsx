@@ -98,7 +98,7 @@ export const HeaderNav = ({
       </Box>
       {!isMobile && (
         <Box sx={appStyles.headerNavDesktopSx}>
-          <Stack direction="row" spacing={{ md: 1 }}>
+          <Stack direction="row" spacing={1}>
             {pages.map(({ id, label, path }) => (
               <Button
                 key={id}

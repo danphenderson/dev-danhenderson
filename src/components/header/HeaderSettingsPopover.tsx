@@ -166,7 +166,7 @@ export const HeaderSettingsPopover = ({
     setAnchorEl(null);
   };
 
-  const handleMotionChange = (_: React.MouseEvent<HTMLElement>, value: MotionIntensityLevel | null) => {
+  const handleMotionChange = (_event: React.MouseEvent<HTMLElement>, value: MotionIntensityLevel | null) => {
     if (value !== null) {
       onChangeMotionIntensity(value);
     }
