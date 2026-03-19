@@ -43,10 +43,9 @@ type SwatchProps = {
   selected: boolean;
   label: string;
   onClick: () => void;
-  tabIndex?: number;
 };
 
-const AppearanceSwatch = ({ primaryColor, secondaryColor, selected, label, onClick, tabIndex }: SwatchProps) => (
+const AppearanceSwatch = ({ primaryColor, secondaryColor, selected, label, onClick }: SwatchProps) => (
   <Tooltip title={label} placement="top">
     <Box
       component="button"
@@ -55,7 +54,7 @@ const AppearanceSwatch = ({ primaryColor, secondaryColor, selected, label, onCli
       aria-checked={selected}
       aria-label={label}
       onClick={onClick}
-      tabIndex={tabIndex ?? (selected ? 0 : -1)}
+      tabIndex={selected ? 0 : -1}
       sx={{
         width: 28,
         height: 28,
@@ -184,7 +183,12 @@ export const HeaderSettingsPopover = ({
   /* Arrow-key navigation for the appearance radiogroup */
   const handleSwatchKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      const keys: Record<string, number> = { ArrowRight: 1, ArrowLeft: -1 };
+      const keys: Record<string, number> = {
+        ArrowRight: 1,
+        ArrowDown: 1,
+        ArrowLeft: -1,
+        ArrowUp: -1,
+      };
       const delta = keys[event.key];
       if (delta === undefined) return;
 
@@ -193,6 +197,11 @@ export const HeaderSettingsPopover = ({
       const nextIndex = (currentIndex + delta + appAppearanceOptions.length) % appAppearanceOptions.length;
       const nextKey = appAppearanceOptions[nextIndex].key;
       onChangeAppearance(nextKey);
+
+      /* Move focus to the newly selected swatch */
+      const group = event.currentTarget;
+      const radios = group.querySelectorAll<HTMLElement>('[role="radio"]');
+      radios[nextIndex]?.focus();
     },
     [appearance, onChangeAppearance]
   );
