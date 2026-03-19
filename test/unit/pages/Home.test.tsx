@@ -1,11 +1,14 @@
 import * as React from 'react';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import ThemeProvider from '../../../src/ThemeProvider';
 import Home from '../../../src/pages/Home';
+import { duration } from '../../../src/motion/tokens';
 import {
   WelcomeOnboardingProvider,
   useWelcomeOnboarding,
 } from '../../../src/WelcomeOnboardingProvider';
+
+const AUTO_EXPAND_PULSE_DURATION_MS = Math.round(duration.slow * 1000);
 
 type MockWelcomeAudioState = {
   play: () => Promise<void>;
@@ -620,6 +623,116 @@ describe('Home IDE window actions', () => {
 
     expect(screen.queryByTestId('ide-restore-button')).not.toBeInTheDocument();
     expect(screen.queryByTestId('ide-minimized-bar')).not.toBeInTheDocument();
+  });
+});
+
+describe('Home auto-expand after motion', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    setViewportSize(1280, 800);
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  });
+
+  it('automatically expands the IDE after the motion path completes', async () => {
+    setViewportSize(1280, 800);
+    const { header, mainContent } = mountLayoutAnchors();
+    setElementRect(header, { left: 0, top: 0, width: 1280, height: 64 });
+    setElementRect(mainContent, { left: 24, top: 40, width: 1000, height: 680 });
+
+    render(<HomeHarness initialAudioConsent="declined" />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
+    await waitFor(() =>
+      expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
+    );
+
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'false');
+
+    // Complete the motion-path — typewriter starts, auto-expand is queued
+    fireEvent.click(screen.getByTestId('complete-hero-motion'));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'true')
+    );
+
+    // IDE should still be in normal state before the delay elapses
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'false');
+    expect(screen.queryByTestId('home-ide-expanded')).not.toBeInTheDocument();
+
+    // Advance through the pulse duration — triggers the expand
+    act(() => {
+      jest.advanceTimersByTime(AUTO_EXPAND_PULSE_DURATION_MS);
+    });
+
+    // The expanded portal should now render
+    const expandedPortal = await screen.findByTestId('home-ide-expanded');
+    expect(expandedPortal).toBeInTheDocument();
+    expect(within(expandedPortal).getByTestId('terminal-hero')).toHaveAttribute(
+      'data-expanded',
+      'true'
+    );
+  });
+
+  it('cancels the auto-expand when the user manually closes the IDE before the delay', async () => {
+    render(<HomeHarness initialAudioConsent="declined" />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
+    await waitFor(() =>
+      expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
+    );
+
+    fireEvent.click(screen.getByTestId('complete-hero-motion'));
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'true')
+    );
+
+    // Close IDE before the auto-expand delay fires
+    act(() => {
+      fireEvent.click(screen.getByTestId('ide-close-btn'));
+    });
+
+    // The restore button should appear (IDE closed)
+    await waitFor(() => expect(screen.getByTestId('ide-restore-button')).toBeInTheDocument());
+
+    act(() => {
+      jest.advanceTimersByTime(AUTO_EXPAND_PULSE_DURATION_MS);
+    });
+
+    // Should remain closed — auto-expand was cancelled
+    expect(screen.queryByTestId('home-ide-expanded')).not.toBeInTheDocument();
+    expect(screen.getByTestId('ide-restore-button')).toBeInTheDocument();
+  });
+
+  it('does not re-trigger auto-expand after the IDE is manually restored', async () => {
+    render(<HomeHarness initialAudioConsent="declined" />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
+    await waitFor(() =>
+      expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
+    );
+
+    fireEvent.click(screen.getByTestId('complete-hero-motion'));
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'true')
+    );
+
+    // Close and restore — simulates user interaction cycle
+    fireEvent.click(screen.getByTestId('ide-close-btn'));
+    await waitFor(() => expect(screen.getByTestId('ide-restore-button')).toBeInTheDocument());
+    fireEvent.click(screen.getByTestId('ide-restore-button'));
+    await waitFor(() => expect(screen.getByTestId('terminal-hero')).toBeInTheDocument());
+
+    // Advance well past the auto-expand delay
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    // IDE should remain in normal state — auto-expand fires only once
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'false');
   });
 });
 

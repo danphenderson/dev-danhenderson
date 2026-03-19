@@ -87,3 +87,14 @@ export const cursorBlink = keyframes`
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 `;
+
+/**
+ * Traffic-dot pulse – scale-up with a fading glow ring to indicate
+ * an auto-triggered window-control action.
+ * Used on: VscodeTitleBar green traffic-light dot during auto-expand.
+ */
+export const trafficDotPulse = keyframes`
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(40, 200, 64, 0.7); }
+  50%  { transform: scale(1.45);  box-shadow: 0 0 8px 4px rgba(40, 200, 64, 0.35); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(40, 200, 64, 0); }
+`;

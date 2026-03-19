@@ -40,6 +40,7 @@ export interface TerminalHeroContentProps {
   resizeEnabled?: boolean;
   isResizing?: boolean;
   onResizeStart?: (edge: IdeResizeEdge, event: React.PointerEvent<HTMLDivElement>) => void;
+  expandHighlighted?: boolean;
   sx?: SxProps<Theme>;
 }
 
@@ -60,6 +61,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   resizeEnabled = false,
   isResizing = false,
   onResizeStart,
+  expandHighlighted,
   sx,
 }) => {
   const { commandText, outputText, showCursor, phase, history } = useTerminalTypewriter({
@@ -163,6 +165,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
           onClose={onClose}
           onMinimize={onMinimize}
           onExpand={onExpand}
+          expandHighlighted={expandHighlighted}
         />
 
         {/* Editor + activity bar row */}

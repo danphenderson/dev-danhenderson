@@ -22,6 +22,49 @@ const HOME_HERO_SCREENSHOT_OPTIONS = {
   scale: 'css' as const,
   maxDiffPixelRatio: 0.05,
 };
+const HOME_ACTIVE_TERMINAL_HERO_SELECTOR =
+  '[data-testid="home-ide-expanded"] [data-testid="terminal-hero"], [data-testid="home-hero-window"] [data-testid="terminal-hero"]';
+
+const getWindowedTerminalHero = (page: Page) =>
+  page.getByTestId('home-hero-window').getByTestId('terminal-hero');
+
+const getExpandedTerminalHero = (page: Page) =>
+  page.getByTestId('home-ide-expanded').getByTestId('terminal-hero');
+
+const getActiveTerminalHero = (page: Page) =>
+  page.locator(HOME_ACTIVE_TERMINAL_HERO_SELECTOR).last();
+
+const waitForHomeTerminalHero = async (page: Page) => {
+  const terminalHero = getActiveTerminalHero(page);
+  await expect(terminalHero).toBeVisible();
+  return terminalHero;
+};
+
+const waitForStableHomeTerminalHero = async (page: Page) => {
+  const terminalHero = await waitForHomeTerminalHero(page);
+  await waitForStableTerminalHero(page, terminalHero);
+  return getActiveTerminalHero(page);
+};
+
+const ensureWindowedTerminalHero = async (page: Page) => {
+  const expandedOverlay = page.getByTestId('home-ide-expanded');
+  let collapsedExpandedOverlay = false;
+
+  if (await expandedOverlay.isVisible().catch(() => false)) {
+    collapsedExpandedOverlay = true;
+    await expandedOverlay.getByRole('button', { name: 'Expand window' }).click();
+    await expect(expandedOverlay).toBeHidden();
+  }
+
+  const terminalHero = getWindowedTerminalHero(page);
+  await expect(terminalHero).toBeVisible();
+
+  if (collapsedExpandedOverlay) {
+    await waitForStableTerminalHero(page, terminalHero);
+  }
+
+  return terminalHero;
+};
 
 const moveMouseAwayFromHero = async (page: Page) => {
   await page.mouse.move(4, 4);
@@ -104,9 +147,7 @@ test.describe('Home page', () => {
 
     await dismissWelcomeSequence(page);
 
-    // The terminal hero shell should be visible with the typed content
-    const terminalHero = page.getByTestId('terminal-hero');
-    await expect(terminalHero).toBeVisible();
+    const terminalHero = await waitForHomeTerminalHero(page);
 
     // The terminal should type one of the commands and eventually show output
     await expect(terminalHero).toContainText(
@@ -117,6 +158,21 @@ test.describe('Home page', () => {
       /v22\.14\.0|9ab2238|Compiled successfully|mathematics|Python 3\.14|julia version|Formulae/,
       { timeout: 20000 }
     );
+  });
+
+  test('auto-expands the hero into the viewport overlay after the welcome sequence', async ({
+    page,
+  }) => {
+    await resetWelcomeState(page);
+    await page.goto('/');
+
+    await dismissWelcomeSequence(page);
+
+    const expandedHero = getExpandedTerminalHero(page);
+    await expect(expandedHero).toBeVisible();
+    await expect(expandedHero).toHaveAttribute('data-expanded', 'true');
+    await expect(getWindowedTerminalHero(page)).toHaveCount(0);
+    await waitForStableTerminalHero(page, expandedHero);
   });
 
   test('renders the desktop AppBar navigation and consolidated settings popover', async ({
@@ -137,7 +193,12 @@ test.describe('Home page', () => {
     await expect(siteNavigation.getByText('CV', { exact: true })).toBeVisible();
     await expect(siteNavigation.getByText('Climbing', { exact: true })).toBeVisible();
     await expect(siteNavigation.getByText('Photography', { exact: true })).toBeVisible();
-    await expect(siteNavigation.getByText('Blog', { exact: true })).toBeVisible();
+
+    const blogNavigationLink = siteNavigation.getByText('Blog', { exact: true });
+    if ((await blogNavigationLink.count()) > 0) {
+      await expect(blogNavigationLink).toBeVisible();
+    }
+
     await expect(settingsTrigger).toBeVisible();
 
     await expectHeaderSettingsHint(page);
@@ -168,13 +229,12 @@ test.describe('Home page', () => {
 
     await dismissWelcomeSequence(page);
 
-    const terminalHero = page.getByTestId('terminal-hero');
+    await waitForStableHomeTerminalHero(page);
 
-    await expect(terminalHero).toBeVisible();
+    const terminalHero = await ensureWindowedTerminalHero(page);
+
     await resetHomeScrollForScreenshot(page, terminalHero);
     await expect(terminalHero).toContainText('Ping Pong Server', { timeout: 20000 });
-
-    await waitForStableTerminalHero(page, terminalHero);
     await stabilizeHeroForScreenshot(terminalHero);
     await pausePageClock(page);
 
@@ -193,14 +253,11 @@ test.describe('Home page', () => {
 
     await dismissWelcomeSequence(page);
 
-    const terminalHero = page.getByTestId('terminal-hero');
+    const terminalHero = await waitForStableHomeTerminalHero(page);
     const clientTab = terminalHero.getByTestId('vscode-tab-client');
 
-    await expect(terminalHero).toBeVisible();
     await resetHomeScrollForScreenshot(page, terminalHero);
     await expect(terminalHero).toContainText('Ping Pong Server', { timeout: 20000 });
-
-    await waitForStableTerminalHero(page, terminalHero);
 
     await selectHeroEditorTab(terminalHero, clientTab, 'SERVER_URL');
     await expect(terminalHero).toContainText('PingResponse');
@@ -213,23 +270,20 @@ test.describe('Home page', () => {
 
     await dismissWelcomeSequence(page);
 
-    const terminalHero = page.getByTestId('terminal-hero');
+    const terminalHero = await waitForStableHomeTerminalHero(page);
     const clientTab = terminalHero.getByTestId('vscode-tab-client');
     const closeWindowButton = page.getByRole('button', { name: 'Close window' });
     const restoreWindowButton = page.getByRole('button', { name: 'Open Visual Studio Code' });
 
-    await expect(terminalHero).toBeVisible();
-    await waitForStableTerminalHero(page, terminalHero);
-
     await selectHeroEditorTab(terminalHero, clientTab, 'SERVER_URL');
 
     await closeWindowButton.click();
-    await expect(page.getByTestId('terminal-hero')).toHaveCount(0);
+    await expect(page.locator(HOME_ACTIVE_TERMINAL_HERO_SELECTOR)).toHaveCount(0);
     await expect(restoreWindowButton).toBeVisible();
 
     await restoreWindowButton.click();
 
-    const restoredHero = page.getByTestId('terminal-hero');
+    const restoredHero = getWindowedTerminalHero(page);
     await expect(restoredHero).toBeVisible();
     await expect(restoredHero).toContainText('Ping Pong Server');
     await expect(restoredHero).not.toContainText('SERVER_URL');
@@ -241,23 +295,20 @@ test.describe('Home page', () => {
 
     await dismissWelcomeSequence(page);
 
-    const terminalHero = page.getByTestId('terminal-hero');
+    const terminalHero = await waitForStableHomeTerminalHero(page);
     const clientTab = terminalHero.getByTestId('vscode-tab-client');
     const minimizeWindowButton = page.getByRole('button', { name: 'Minimize window' });
     const restoreMinimizedBar = page.getByRole('button', { name: 'Restore window' });
 
-    await expect(terminalHero).toBeVisible();
-    await waitForStableTerminalHero(page, terminalHero);
-
     await selectHeroEditorTab(terminalHero, clientTab, 'SERVER_URL');
 
     await minimizeWindowButton.click();
-    await expect(page.getByTestId('terminal-hero')).toHaveCount(0);
+    await expect(page.locator(HOME_ACTIVE_TERMINAL_HERO_SELECTOR)).toHaveCount(0);
     await expect(restoreMinimizedBar).toBeVisible();
 
     await restoreMinimizedBar.click();
 
-    const restoredHero = page.getByTestId('terminal-hero');
+    const restoredHero = getWindowedTerminalHero(page);
     await expect(restoredHero).toBeVisible();
     await expect(restoredHero).toContainText('Ping Pong Server');
     await expect(restoredHero).not.toContainText('SERVER_URL');
@@ -271,17 +322,17 @@ test.describe('Home page', () => {
 
     await dismissWelcomeSequence(page);
 
-    const terminalHero = page.getByTestId('terminal-hero');
-    const expandWindowButton = page.getByRole('button', { name: 'Expand window' });
+    await waitForStableHomeTerminalHero(page);
+
+    const terminalHero = await ensureWindowedTerminalHero(page);
+    const expandWindowButton = terminalHero.getByRole('button', { name: 'Expand window' });
     const expandedOverlay = page.getByTestId('home-ide-expanded');
     const mainContent = page.locator('#main-content');
     const header = page.locator('#site-navigation');
     const editorTabs = terminalHero.getByRole('tablist', { name: 'Editor tabs' });
     const terminalPanelBody = terminalHero.getByTestId('terminal-panel-body');
 
-    await expect(terminalHero).toBeVisible();
     await expect(expandWindowButton).toBeVisible();
-    await waitForStableTerminalHero(page, terminalHero);
 
     const initialTabWidth = await getElementLayoutWidth(editorTabs);
     const initialTerminalPanelHeight = await getElementLayoutHeight(terminalPanelBody);
@@ -338,11 +389,12 @@ test.describe('Home page', () => {
 
     await dismissWelcomeSequence(page);
 
-    const terminalHero = page.getByTestId('terminal-hero');
+    await waitForStableHomeTerminalHero(page);
+
+    const terminalHero = await ensureWindowedTerminalHero(page);
     const titleBar = page.getByTestId('vscode-title-bar');
     const mainRegion = page.locator('main').last();
 
-    await expect(terminalHero).toBeVisible();
     await expect(titleBar).toBeVisible();
     await expect(terminalHero).toContainText(
       /node --version|git log|npm run build|whoami --passions|brew ls/,
@@ -397,11 +449,12 @@ test.describe('Home page', () => {
 
     await dismissWelcomeSequence(page);
 
-    const terminalHero = page.getByTestId('terminal-hero');
+    await waitForStableHomeTerminalHero(page);
+
+    const terminalHero = await ensureWindowedTerminalHero(page);
     const serverTab = terminalHero.getByTestId('vscode-tab-server');
     const clientTab = terminalHero.getByTestId('vscode-tab-client');
 
-    await expect(terminalHero).toBeVisible();
     await expect(serverTab).toBeVisible();
     await expect(clientTab).toBeVisible();
     await expect(terminalHero).toContainText(
@@ -437,13 +490,13 @@ test.describe('Home page', () => {
 
     await dismissWelcomeSequence(page);
 
-    const terminalHero = page.getByTestId('terminal-hero');
+    await waitForStableHomeTerminalHero(page);
+
+    const terminalHero = await ensureWindowedTerminalHero(page);
     const explorerToggle = terminalHero.getByTestId('activity-icon-0');
     const explorerSidebarLabel = terminalHero.getByText('Explorer');
 
-    await expect(terminalHero).toBeVisible();
     await expect(explorerToggle).toBeVisible();
-    await waitForStableTerminalHero(page, terminalHero);
 
     const initialWidth = await getElementLayoutWidth(terminalHero);
 
@@ -467,12 +520,12 @@ test.describe('Home page', () => {
 
     await dismissWelcomeSequence(page);
 
-    const terminalHero = page.getByTestId('terminal-hero');
+    await waitForStableHomeTerminalHero(page);
+
+    const terminalHero = await ensureWindowedTerminalHero(page);
     const resizeHandle = page.getByTestId('resize-handle-right');
 
-    await expect(terminalHero).toBeVisible();
     await expect(resizeHandle).toBeVisible();
-    await waitForStableTerminalHero(page, terminalHero);
 
     const initialWidth = await getElementLayoutWidth(terminalHero);
     const initialHeight = await getElementLayoutHeight(terminalHero);

@@ -11,6 +11,8 @@ import {
   VSCODE_WINDOW_RADIUS,
   systemFontFamily,
 } from './vscodeTokens';
+import { cssDuration } from '../../motion/tokens';
+import { trafficDotPulse } from '../../styles/animations';
 
 const stopDragStartPropagation = (event: React.PointerEvent<HTMLDivElement>) => {
   event.stopPropagation();
@@ -21,9 +23,16 @@ interface TrafficDotProps {
   hoverIcon: string;
   onClick?: () => void;
   label?: string;
+  highlighted?: boolean;
 }
 
-const TrafficDot: React.FC<TrafficDotProps> = ({ color, hoverIcon, onClick, label }) => (
+const TrafficDot: React.FC<TrafficDotProps> = ({
+  color,
+  hoverIcon,
+  onClick,
+  label,
+  highlighted,
+}) => (
   <Box
     role={onClick ? 'button' : undefined}
     aria-label={label}
@@ -59,6 +68,12 @@ const TrafficDot: React.FC<TrafficDotProps> = ({ color, hoverIcon, onClick, labe
       transition: 'filter 0.12s',
       cursor: onClick ? 'pointer' : undefined,
       outline: 'none',
+      ...(highlighted && {
+        animation: `${trafficDotPulse} ${cssDuration.slow} ease-out`,
+        '@media (prefers-reduced-motion: reduce)': {
+          animation: 'none',
+        },
+      }),
       '&:focus-visible': {
         outline: `2px solid ${VSCODE_COLORS.activeTabAccent}`,
         outlineOffset: 2,
@@ -111,6 +126,7 @@ interface VscodeTitleBarProps {
   onClose?: () => void;
   onMinimize?: () => void;
   onExpand?: () => void;
+  expandHighlighted?: boolean;
 }
 
 export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({
@@ -121,6 +137,7 @@ export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({
   onClose,
   onMinimize,
   onExpand,
+  expandHighlighted,
 }) => (
   <Box
     data-testid="vscode-title-bar"
@@ -160,6 +177,7 @@ export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({
         hoverIcon="⊕"
         onClick={onExpand}
         label="Expand window"
+        highlighted={expandHighlighted}
       />
     </Box>
 

@@ -10,7 +10,14 @@ import {
   IconButton,
   Tooltip,
 } from '@mui/material';
-import { motion, useDragControls, useScroll, useTransform, AnimatePresence } from 'motion/react';
+import {
+  motion,
+  useDragControls,
+  useScroll,
+  useTransform,
+  AnimatePresence,
+  useReducedMotion,
+} from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { HeroMotionPath } from '../components/HeroMotionPath';
@@ -23,7 +30,11 @@ import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
 import { BodyText, CaptionText } from '../components/text';
 import { MotionTiltCard } from '../motion';
+import { duration } from '../motion/tokens';
 import { VSCODE_COLORS, VSCODE_RESIZE, VSCODE_WINDOW_RADIUS } from '../components/ide/vscodeTokens';
+
+/** Green-dot pulse duration before the IDE auto-expands. */
+const AUTO_EXPAND_PULSE_DURATION_MS = Math.round(duration.slow * 1000);
 
 const heroLines: TerminalLine[] = [
   { command: 'node --version', output: 'v22.14.0' },
@@ -69,10 +80,14 @@ export default function Home() {
 
   const heroRef = useRef<HTMLDivElement>(null);
   const heroBoundsRef = useRef<HTMLDivElement>(null);
+  const hasAutoExpandedRef = useRef(false);
+  const autoExpandTimerRef = useRef<number | null>(null);
   const heroDragControls = useDragControls();
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.6]);
+  const prefersReducedMotion = useReducedMotion();
+  const [expandDotHighlighted, setExpandDotHighlighted] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
@@ -96,9 +111,41 @@ export default function Home() {
     return () => mediaQueryList.removeListener(updateCanDragHeroWindow);
   }, []);
 
+  const cancelAutoExpand = useCallback(() => {
+    if (autoExpandTimerRef.current !== null) {
+      window.clearTimeout(autoExpandTimerRef.current);
+      autoExpandTimerRef.current = null;
+    }
+    setExpandDotHighlighted(false);
+  }, []);
+
+  const scheduleAutoExpand = useCallback(() => {
+    if (hasAutoExpandedRef.current) {
+      return;
+    }
+
+    hasAutoExpandedRef.current = true;
+    cancelAutoExpand();
+
+    if (prefersReducedMotion) {
+      setIdeWindowState((prev) => (prev === 'normal' ? 'expanded' : prev));
+      return;
+    }
+
+    setExpandDotHighlighted(true);
+    autoExpandTimerRef.current = window.setTimeout(() => {
+      autoExpandTimerRef.current = null;
+      setExpandDotHighlighted(false);
+      setIdeWindowState((prev) => (prev === 'normal' ? 'expanded' : prev));
+    }, AUTO_EXPAND_PULSE_DURATION_MS);
+  }, [cancelAutoExpand, prefersReducedMotion]);
+
   const handleMotionComplete = useCallback(() => {
     setIsTypewriterPlaying(true);
-  }, []);
+    scheduleAutoExpand();
+  }, [scheduleAutoExpand]);
+
+  useEffect(() => cancelAutoExpand, [cancelAutoExpand]);
 
   const updateExpandedIdeViewport = useCallback(() => {
     if (typeof window === 'undefined' || typeof document === 'undefined') {
@@ -199,20 +246,23 @@ export default function Home() {
   }, []);
 
   const handleIdeClose = useCallback(() => {
+    cancelAutoExpand();
     queueFreshIdeSession();
     setIdeWindowState('closed');
     setIdeWindowSize(null);
-  }, [queueFreshIdeSession]);
+  }, [cancelAutoExpand, queueFreshIdeSession]);
 
   const handleIdeMinimize = useCallback(() => {
+    cancelAutoExpand();
     queueFreshIdeSession();
     setIdeWindowState('minimized');
     setIdeWindowSize(null);
-  }, [queueFreshIdeSession]);
+  }, [cancelAutoExpand, queueFreshIdeSession]);
 
   const handleIdeExpand = useCallback(() => {
+    cancelAutoExpand();
     setIdeWindowState((prev) => (prev === 'expanded' ? 'normal' : 'expanded'));
-  }, []);
+  }, [cancelAutoExpand]);
 
   const handleIdeRestore = useCallback(() => {
     setIdeWindowState('normal');
@@ -317,19 +367,21 @@ export default function Home() {
                   maxWidth: '100%',
                 }}
               >
-                <AnimatePresence mode="wait">
-                  {ideVisible && ideWindowState !== 'expanded' && (
-                    <motion.div
-                      key={`ide-window-${ideSessionKey}`}
-                      initial={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {shell}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                {ideWindowState === 'expanded' ? null : (
+                  <AnimatePresence mode="wait">
+                    {ideVisible && (
+                      <motion.div
+                        key={`ide-window-${ideSessionKey}`}
+                        initial={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {shell}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                )}
               </motion.div>
             </HeroMotionPath>
           )}
@@ -351,6 +403,7 @@ export default function Home() {
                   onClose={handleIdeClose}
                   onMinimize={handleIdeMinimize}
                   onExpand={handleIdeExpand}
+                  expandHighlighted={expandDotHighlighted}
                   resizeWidth={ideWindowSize?.width}
                   resizeHeight={ideWindowSize?.height}
                   resizeEnabled={resizeEnabled}
