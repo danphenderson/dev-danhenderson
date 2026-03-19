@@ -400,6 +400,85 @@ test.describe('Home page', () => {
     expect(Math.abs(serverWidth - initialWidth)).toBeLessThanOrEqual(2);
   });
 
+  test('keeps the hero window width stable when toggling the explorer sidebar', async ({
+    page,
+  }) => {
+    await resetWelcomeState(page);
+    await page.goto('/');
+
+    await dismissWelcomeSequence(page);
+
+    const terminalHero = page.getByTestId('terminal-hero');
+    const explorerToggle = terminalHero.getByTestId('activity-icon-0');
+    const explorerSidebarLabel = terminalHero.getByText('Explorer');
+
+    await expect(terminalHero).toBeVisible();
+    await expect(explorerToggle).toBeVisible();
+    await waitForStableTerminalHero(page, terminalHero);
+
+    const initialWidth = await getElementLayoutWidth(terminalHero);
+
+    await explorerToggle.click();
+    await expect(explorerSidebarLabel).toBeVisible();
+
+    const explorerOpenWidth = await getElementLayoutWidth(terminalHero);
+
+    await explorerToggle.click();
+    await expect(explorerSidebarLabel).toBeHidden();
+
+    const explorerClosedWidth = await getElementLayoutWidth(terminalHero);
+
+    expect(Math.abs(explorerOpenWidth - initialWidth)).toBeLessThanOrEqual(2);
+    expect(Math.abs(explorerClosedWidth - initialWidth)).toBeLessThanOrEqual(2);
+  });
+
+  test('keeps the hero window height stable during horizontal resize', async ({ page }) => {
+    await resetWelcomeState(page);
+    await page.goto('/');
+
+    await dismissWelcomeSequence(page);
+
+    const terminalHero = page.getByTestId('terminal-hero');
+    const resizeHandle = page.getByTestId('resize-handle-right');
+
+    await expect(terminalHero).toBeVisible();
+    await expect(resizeHandle).toBeVisible();
+    await waitForStableTerminalHero(page, terminalHero);
+
+    const initialWidth = await getElementLayoutWidth(terminalHero);
+    const initialHeight = await getElementLayoutHeight(terminalHero);
+    const handleBox = await resizeHandle.boundingBox();
+
+    expect(handleBox).not.toBeNull();
+
+    if (!handleBox) {
+      throw new Error('Expected the right resize handle bounding box to be available.');
+    }
+
+    const dragStartX = handleBox.x + handleBox.width / 2;
+    const dragStartY = handleBox.y + handleBox.height / 2;
+
+    await resizeHandle.dispatchEvent('pointerdown', {
+      button: 0,
+      clientX: dragStartX,
+      clientY: dragStartY,
+      pointerType: 'mouse',
+    });
+    await page.mouse.move(dragStartX + 120, dragStartY, { steps: 12 });
+    await page.locator('body').dispatchEvent('pointerup', {
+      button: 0,
+      clientX: dragStartX + 120,
+      clientY: dragStartY,
+      pointerType: 'mouse',
+    });
+
+    const resizedWidth = await getElementLayoutWidth(terminalHero);
+    const resizedHeight = await getElementLayoutHeight(terminalHero);
+
+    expect(resizedWidth).toBeGreaterThan(initialWidth + 40);
+    expect(Math.abs(resizedHeight - initialHeight)).toBeLessThanOrEqual(2);
+  });
+
   test('welcome audio prompt can be dismissed', async ({ page }) => {
     await resetWelcomeState(page);
     await page.goto('/');

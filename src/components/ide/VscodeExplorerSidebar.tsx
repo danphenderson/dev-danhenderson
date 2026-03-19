@@ -16,13 +16,11 @@ interface FileEntry {
 }
 
 const FILES: FileEntry[] = [
-  { name: 'src', kind: 'folder', indent: 0, open: true },
-  { name: 'server.py', kind: 'file', indent: 1 },
-  { name: 'client.ts', kind: 'file', indent: 1 },
-  { name: 'App.tsx', kind: 'file', indent: 1 },
-  { name: 'index.tsx', kind: 'file', indent: 1 },
-  { name: 'public', kind: 'folder', indent: 0, open: false },
+  { name: 'Pipfile', kind: 'file', indent: 0 },
   { name: 'package.json', kind: 'file', indent: 0 },
+  { name: 'src', kind: 'folder', indent: 0, open: true },
+  { name: 'client.tsx', kind: 'file', indent: 1 },
+  { name: 'server.py', kind: 'file', indent: 1 },
   { name: 'tsconfig.json', kind: 'file', indent: 0 },
 ];
 

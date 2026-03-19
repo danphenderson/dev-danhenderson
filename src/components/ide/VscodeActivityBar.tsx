@@ -58,6 +58,7 @@ export const VscodeActivityBar: React.FC<VscodeActivityBarProps> = ({
       return (
         <Box
           key={i}
+          data-testid={`activity-icon-${i}`}
           onClick={() => onIconClick?.(i)}
           sx={{
             position: 'relative',

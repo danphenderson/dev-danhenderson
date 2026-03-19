@@ -113,9 +113,8 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
 
   const isUserResized = resizeWidth != null || resizeHeight != null;
   const showResizeHandles = resizeEnabled && !expanded;
-  const autoWidth = explorerVisible
-    ? `calc(${VSCODE_LAYOUT.activityBarWidth}px + ${VSCODE_LAYOUT.explorerWidth}px + ${VSCODE_LAYOUT.editorColumnWidth})`
-    : `calc(${VSCODE_LAYOUT.activityBarWidth}px + ${VSCODE_LAYOUT.editorColumnWidth})`;
+  const fluidEditorLayout = explorerVisible;
+  const autoWidth = `calc(${VSCODE_LAYOUT.activityBarWidth}px + ${VSCODE_LAYOUT.editorColumnWidth})`;
   const terminalWindowWidth = expanded ? '100%' : resizeWidth != null ? resizeWidth : autoWidth;
   const terminalWindowHeight = expanded ? '100%' : resizeHeight != null ? resizeHeight : undefined;
 
@@ -191,13 +190,20 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
             <VscodeTabBar
               activeTab={activeTab}
               expanded={expanded}
+              fluidLayout={fluidEditorLayout}
               resized={isUserResized}
               onTabChange={setActiveTab}
             />
-            <VscodeEditorPane activeTab={activeTab} expanded={expanded} resized={isUserResized} />
+            <VscodeEditorPane
+              activeTab={activeTab}
+              expanded={expanded}
+              fluidLayout={fluidEditorLayout}
+              resized={isUserResized}
+            />
             <VscodeTerminalPanel
               commandText={commandText}
               expanded={expanded}
+              fluidLayout={fluidEditorLayout}
               resized={isUserResized}
               outputText={outputText}
               showCursor={showCursor}

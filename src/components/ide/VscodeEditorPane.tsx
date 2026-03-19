@@ -170,10 +170,10 @@ const SERVER_CODE_LINES: CodeLineData[] = [
   },
 ];
 
-// client.ts — TypeScript fetch client
+// client.tsx — TypeScript fetch client
 const CLIENT_CODE_LINES: CodeLineData[] = [
   {
-    tokens: [{ kind: 'comment', text: '// client.ts' }],
+    tokens: [{ kind: 'comment', text: '// client.tsx' }],
   },
   {
     tokens: [
@@ -552,6 +552,8 @@ const renderToken = (token: CodeToken, i: number): React.ReactNode => {
 interface VscodeEditorPaneProps {
   activeTab?: VscodeEditorTab;
   expanded?: boolean;
+  /** When true, fill the remaining editor column width instead of using the fixed demo width. */
+  fluidLayout?: boolean;
   /** When true, the outer IDE window has been user-resized; use flex layout. */
   resized?: boolean;
   /** When true, show a blinking I-beam cursor after the last line. */
@@ -561,10 +563,11 @@ interface VscodeEditorPaneProps {
 export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
   activeTab = 'server',
   expanded = false,
+  fluidLayout = false,
   resized = false,
   playing = false,
 }) => {
-  const flexLayout = expanded || resized;
+  const flexLayout = expanded || fluidLayout || resized;
   const [hoveredLine, setHoveredLine] = React.useState<number | null>(null);
 
   const tabMetadata = getVscodeEditorTabMetadata(activeTab);

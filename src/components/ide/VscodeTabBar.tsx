@@ -7,6 +7,8 @@ import { VSCODE_EDITOR_TABS } from './vscodeEditorTabs';
 interface VscodeTabBarProps {
   activeTab?: VscodeEditorTab;
   expanded?: boolean;
+  /** When true, fill the remaining editor column width instead of using the fixed demo width. */
+  fluidLayout?: boolean;
   /** When true, the outer IDE window has been user-resized; use flex layout. */
   resized?: boolean;
   onTabChange?: (tab: VscodeEditorTab) => void;
@@ -41,10 +43,11 @@ const CloseButton: React.FC<{ active: boolean }> = ({ active }) => (
 export const VscodeTabBar: React.FC<VscodeTabBarProps> = ({
   activeTab = 'server',
   expanded = false,
+  fluidLayout = false,
   resized = false,
   onTabChange,
 }) => {
-  const flexLayout = expanded || resized;
+  const flexLayout = expanded || fluidLayout || resized;
   const activateTab = React.useCallback(
     (tab: VscodeEditorTab) => {
       onTabChange?.(tab);

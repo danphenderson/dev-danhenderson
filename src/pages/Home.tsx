@@ -242,10 +242,13 @@ export default function Home() {
         VSCODE_RESIZE.minHeight,
         boundsRect ? boundsRect.bottom - rect.top : window.innerHeight - rect.top
       );
+      const lockedWidth = Math.min(Math.max(rect.width, VSCODE_RESIZE.minWidth), maxWidth);
+      const lockedHeight = Math.min(Math.max(rect.height, VSCODE_RESIZE.minHeight), maxHeight);
 
       resizeEdgeRef.current = edge;
       resizeInitialPointerRef.current = { x: startClientX, y: startClientY };
-      resizeInitialSizeRef.current = { width: rect.width, height: rect.height };
+      resizeInitialSizeRef.current = { width: lockedWidth, height: lockedHeight };
+      setIdeWindowSize({ width: lockedWidth, height: lockedHeight });
       setIsResizing(true);
 
       const handleMove = (e: PointerEvent) => {

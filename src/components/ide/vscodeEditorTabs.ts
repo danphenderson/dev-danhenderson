@@ -27,11 +27,11 @@ export const VSCODE_EDITOR_TAB_METADATA: Record<VscodeEditorTab, VscodeEditorTab
   },
   client: {
     id: 'client',
-    fileName: 'client.ts',
+    fileName: 'client.tsx',
     badgeLabel: 'TS',
     badgeColor: VSCODE_COLORS.fileTypeTs,
     badgeTextColor: '#ffffff',
-    breadcrumbs: ['src', 'client.ts', 'main'],
+    breadcrumbs: ['src', 'client.tsx', 'main'],
     languageMode: 'TypeScript',
     languageOptions: ['TypeScript', 'JavaScript', 'JSON', 'Markdown', 'Python'],
   },

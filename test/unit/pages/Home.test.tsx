@@ -692,6 +692,26 @@ describe('Home IDE resize', () => {
     );
   });
 
+  it('locks the current hero width and height as soon as resize starts', async () => {
+    await renderHomeWithHeroVisible();
+
+    const hero = screen.getByTestId('terminal-hero');
+    const backgroundContent = screen.getByTestId('background-content');
+
+    setElementRect(backgroundContent, { left: 0, top: 0, width: 1000, height: 700 });
+    setElementRect(hero, { left: 80, top: 60, width: 420, height: 312 });
+
+    fireEvent.pointerDown(screen.getByTestId('ide-resize-start-btn'), {
+      clientX: 500,
+      clientY: 180,
+      button: 0,
+    });
+
+    await waitFor(() => expect(hero).toHaveAttribute('data-is-resizing', 'true'));
+    expect(hero).toHaveAttribute('data-resize-width', '420');
+    expect(hero).toHaveAttribute('data-resize-height', '312');
+  });
+
   it('updates resize dimensions on pointermove and clears isResizing on pointerup', async () => {
     await renderHomeWithHeroVisible();
 

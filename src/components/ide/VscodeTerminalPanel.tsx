@@ -21,6 +21,8 @@ export const isOutputPhase = (phase: TerminalTypewriterPhase): boolean =>
 interface VscodeTerminalPanelProps {
   commandText: string;
   expanded?: boolean;
+  /** When true, fill the remaining editor column width instead of using the fixed demo width. */
+  fluidLayout?: boolean;
   /** When true, the outer IDE window has been user-resized; use flex layout. */
   resized?: boolean;
   outputText: string;
@@ -119,13 +121,14 @@ const GitStatusLine: React.FC = () => (
 export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
   commandText,
   expanded = false,
+  fluidLayout = false,
   resized = false,
   outputText,
   showCursor,
   phase,
   history,
 }) => {
-  const flexLayout = expanded || resized;
+  const flexLayout = expanded || fluidLayout || resized;
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
   // Auto-scroll to the bottom when history grows or output appears
