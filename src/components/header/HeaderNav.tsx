@@ -98,11 +98,11 @@ export const HeaderNav = ({
       </Box>
       {!isMobile && (
         <Box sx={appStyles.headerNavDesktopSx}>
-          <Stack direction="row" spacing={{ md: 5 }}>
+          <Stack direction="row" spacing={1}>
             {pages.map(({ id, label, path }) => (
               <Button
                 key={id}
-                size="large"
+                size="small"
                 sx={
                   isActivePage(currentPath, path)
                     ? appStyles.headerNavButtonActiveSx

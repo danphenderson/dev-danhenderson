@@ -14,9 +14,9 @@ import { pulseRing } from '../styles/animations';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
-import { HeaderActions } from './header/HeaderActions';
 import { HEADER_HIDE_SCROLL_TRIGGER_OPTIONS } from './header/headerScroll';
 import { HeaderNav } from './header/HeaderNav';
+import { HeaderSettingsPopover } from './header/HeaderSettingsPopover';
 import { HintPopover } from './header/HintPopover';
 
 const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
@@ -48,17 +48,14 @@ export default function Header() {
   const iconButtonSize = isMobile ? 'medium' : ('large' as const);
   const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState<null | HTMLElement>(null);
   const mobileMenuOpen = Boolean(mobileMenuAnchor);
-  const pauseButtonRef = React.useRef<HTMLButtonElement | null>(null);
-  const appearanceDialRef = React.useRef<HTMLElement | null>(null);
-  const themeHintTitle = 'Try an alternative theme';
+  const settingsButtonRef = React.useRef<HTMLButtonElement | null>(null);
+  const themeHintTitle = 'Customize your experience';
   const themeHintBody =
-    'Open this palette menu to switch theme and toggle between light and dark mode.';
-  const pauseHighlightSx = showPauseHint
-    ? appStyles.getHeaderHighlightSx('secondary', `${pulseRing} 1.6s ease-out infinite`)
-    : {};
-  const themeHighlightSx = showDarkModeHint
-    ? appStyles.getHeaderHighlightSx('primary', `${pulseRing} 1.6s ease-out infinite`)
-    : {};
+    'Open settings to switch theme, change appearance, and adjust motion preferences.';
+  const settingsHighlightSx =
+    showDarkModeHint || showPauseHint
+      ? appStyles.getHeaderHighlightSx('primary', `${pulseRing} 1.6s ease-out infinite`)
+      : {};
 
   React.useEffect(() => {
     if (!isMobile && mobileMenuOpen) {
@@ -93,21 +90,6 @@ export default function Header() {
     toggleTheme();
   };
 
-  const appearanceDial = {
-    appearance,
-    mode,
-    onChangeAppearance: setAppearance,
-    onToggleTheme: handleThemeToggle,
-    controlRef: appearanceDialRef,
-    triggerDescriptionId: showDarkModeHint ? 'dark-mode-popover' : undefined,
-    triggerHighlightSx: themeHighlightSx,
-  };
-
-  const motionDial = {
-    motionIntensity,
-    onChangeMotionIntensity: setMotionIntensity,
-  };
-
   return (
     <>
       <HideOnScroll>
@@ -126,32 +108,28 @@ export default function Header() {
               onMobileMenuClose={handleMobileMenuClose}
             />
             <Box sx={appStyles.headerActionsContainerSx}>
-              <HeaderActions
-                iconButtonSize={iconButtonSize}
-                headerIconSx={appStyles.headerIconSx}
+              <HeaderSettingsPopover
+                mode={mode}
+                onToggleTheme={handleThemeToggle}
+                appearance={appearance}
+                onChangeAppearance={setAppearance}
+                motionIntensity={motionIntensity}
+                onChangeMotionIntensity={setMotionIntensity}
                 showAudioControl={audioConsent !== 'declined'}
                 isPlaying={isPlaying}
                 onToggleAudio={handleAudioToggle}
-                pauseButtonRef={pauseButtonRef}
-                showPauseHint={showPauseHint}
-                pauseHighlightSx={pauseHighlightSx}
-                appearanceDial={appearanceDial}
-                motionDial={motionDial}
+                settingsButtonRef={settingsButtonRef}
+                triggerHighlightSx={settingsHighlightSx}
               />
             </Box>
             <HintPopover
-              id="pause-audio-popover"
-              open={showPauseHint && Boolean(pauseButtonRef.current)}
-              anchorEl={pauseButtonRef.current}
-              onClose={dismissPauseHint}
-              title="Pause anytime"
-              body="Use this pause button in the header to stop the welcome audio whenever you want."
-            />
-            <HintPopover
-              id="dark-mode-popover"
-              open={showDarkModeHint && Boolean(appearanceDialRef.current)}
-              anchorEl={appearanceDialRef.current}
-              onClose={dismissDarkModeHint}
+              id="settings-hint-popover"
+              open={(showPauseHint || showDarkModeHint) && Boolean(settingsButtonRef.current)}
+              anchorEl={settingsButtonRef.current}
+              onClose={() => {
+                if (showPauseHint) dismissPauseHint();
+                if (showDarkModeHint) dismissDarkModeHint();
+              }}
               title={themeHintTitle}
               body={themeHintBody}
             />
