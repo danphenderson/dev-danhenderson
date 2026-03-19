@@ -2,7 +2,39 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { COMMON_LINK_TOOLTIP_ID } from '../../../src/components/CommonLink';
+import { MOTION_INTENSITY_STORAGE_KEY } from '../../../src/theme/appAppearance';
 import Climbing from '../../../src/pages/Climbing';
+
+jest.mock('../../../src/motion', () => {
+  const actual = jest.requireActual('../../../src/motion');
+
+  return {
+    ...actual,
+    MotionTiltCard: ({
+      children,
+      intensity,
+      disabled,
+    }: {
+      children: ReactNode;
+      intensity?: number;
+      disabled?: boolean;
+    }) => {
+      const { tilt } = actual.useMotionScale();
+      const tiltEnabled = !disabled && tilt > 0;
+
+      return (
+        <div
+          data-testid="climbing-tilt-card"
+          data-intensity={String(intensity ?? '')}
+          data-disabled={String(Boolean(disabled))}
+          data-tilt-enabled={String(tiltEnabled)}
+        >
+          {children}
+        </div>
+      );
+    },
+  };
+});
 
 jest.mock('../../../src/hooks/useClimbingData', () => ({
   useClimbingData: () => ({
@@ -78,6 +110,14 @@ jest.mock('../../../src/components/AnimatedContentCard', () => ({
 }));
 
 describe('Climbing', () => {
+  beforeEach(() => {
+    window.localStorage.removeItem(MOTION_INTENSITY_STORAGE_KEY);
+  });
+
+  afterEach(() => {
+    window.localStorage.removeItem(MOTION_INTENSITY_STORAGE_KEY);
+  });
+
   it('renders the climbing page with section headings, data grids, and inline route links', () => {
     render(
       <ThemeProvider>
@@ -107,6 +147,42 @@ describe('Climbing', () => {
     expect(todoLink).toHaveAttribute('href', 'https://mp.com/route/2');
     expect(todoLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
     expect(todoLink).toHaveAttribute('data-tooltip-content', 'Open The Tooth on Mountain Project.');
+  });
+
+  it('renders each data grid inside a MotionTiltCard surface', () => {
+    render(
+      <ThemeProvider>
+        <Climbing />
+      </ThemeProvider>
+    );
+
+    const tiltCards = screen.getAllByTestId('climbing-tilt-card');
+
+    expect(tiltCards).toHaveLength(2);
+    tiltCards.forEach((tiltCard) => {
+      expect(tiltCard).toHaveAttribute('data-intensity', '0.4');
+      expect(tiltCard).toHaveAttribute('data-tilt-enabled', 'true');
+    });
+
+    expect(tiltCards[0]).toContainElement(screen.getByRole('link', { name: 'Hyperspace' }));
+    expect(tiltCards[1]).toContainElement(screen.getByRole('link', { name: 'The Tooth' }));
+  });
+
+  it('keeps tilt interaction disabled when motion intensity is off', () => {
+    window.localStorage.setItem(MOTION_INTENSITY_STORAGE_KEY, 'off');
+
+    render(
+      <ThemeProvider>
+        <Climbing />
+      </ThemeProvider>
+    );
+
+    const tiltCards = screen.getAllByTestId('climbing-tilt-card');
+
+    expect(tiltCards).toHaveLength(2);
+    tiltCards.forEach((tiltCard) => {
+      expect(tiltCard).toHaveAttribute('data-tilt-enabled', 'false');
+    });
   });
 
   it('opens route links in a new tab with noopener noreferrer', () => {
