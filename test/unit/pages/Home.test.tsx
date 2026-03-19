@@ -709,6 +709,7 @@ describe('Home auto-expand after motion', () => {
 
     // IDE should still be in normal state before the delay elapses
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'false');
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-boot-active', 'false');
     expect(screen.queryByTestId('home-ide-expanded')).not.toBeInTheDocument();
 
     // Advance through the pulse duration — triggers the expand
@@ -722,6 +723,10 @@ describe('Home auto-expand after motion', () => {
     expect(within(expandedPortal).getByTestId('terminal-hero')).toHaveAttribute(
       'data-expanded',
       'true'
+    );
+    expect(within(expandedPortal).getByTestId('terminal-hero')).toHaveAttribute(
+      'data-boot-active',
+      'false'
     );
   });
 

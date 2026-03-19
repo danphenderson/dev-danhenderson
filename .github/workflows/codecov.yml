@@ -1,4 +1,4 @@
-name: Tests
+name: Codecov
 
 on:
   pull_request:
@@ -28,7 +28,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: tests-${{ github.ref }}
+  group: codecov-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:

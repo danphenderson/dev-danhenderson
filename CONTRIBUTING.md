@@ -59,11 +59,11 @@ For layout, navigation, interaction, animation, or responsive changes, validate 
 
 GitHub Actions currently runs three workflows:
 
-- `Tests`: runs `CI=true npm test -- --watch=false --passWithNoTests --coverage`, uploads the `coverage/` artifact, and reports to Codecov when configured.
+- `Codecov`: runs `CI=true npm test -- --watch=false --passWithNoTests --coverage`, uploads the `coverage/` artifact, and reports to Codecov when configured.
 - `Build`: runs `npm run build`, uploads the production `build/` artifact, then runs Playwright against that build artifact.
 - `CodeQL`: analyzes the JavaScript/TypeScript codebase on pushes, pull requests, and the weekly schedule.
 
-Docs-only, `plans/`, `resume/`, `LICENSE`, and formatting-config-only changes do not trigger the `Tests` or `Build` workflows.
+Docs-only, `plans/`, `resume/`, `LICENSE`, and formatting-config-only changes do not trigger the `Codecov` or `Build` workflows.
 
 ## Project structure
 

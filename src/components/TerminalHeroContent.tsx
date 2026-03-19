@@ -72,7 +72,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   const boot = useTerminalBootSequence(bootActive);
 
   // The existing loop starts only after the boot completes
-  const loopPlaying = playing && boot.complete;
+  const loopPlaying = playing && (!bootActive || boot.complete);
 
   const {
     commandText: loopCommand,

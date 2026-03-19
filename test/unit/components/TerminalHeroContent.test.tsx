@@ -3,17 +3,26 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { TerminalHeroContent } from '../../../src/components/TerminalHeroContent';
 import type { TerminalLine } from '../../../src/components/TerminalHeroContent';
+import { useTerminalBootSequence } from '../../../src/hooks/useTerminalBootSequence';
 
 // Stub the typewriter hook so tests are deterministic and instant
 jest.mock('../../../src/components/text/useTerminalTypewriter', () => ({
-  useTerminalTypewriter: () => ({
-    commandText: 'echo hello',
-    outputText: 'hello',
-    showCursor: true,
-    phase: 'idle',
+  useTerminalTypewriter: ({ playing }: { playing?: boolean }) => ({
+    commandText: playing ? 'echo hello' : '',
+    outputText: playing ? 'hello' : '',
+    showCursor: Boolean(playing),
+    phase: playing ? 'typing-command' : 'idle',
     history: [],
   }),
 }));
+
+jest.mock('../../../src/hooks/useTerminalBootSequence', () => ({
+  useTerminalBootSequence: jest.fn(),
+}));
+
+const mockUseTerminalBootSequence = useTerminalBootSequence as jest.MockedFunction<
+  typeof useTerminalBootSequence
+>;
 
 // Stub IDE subcomponents with testable stand-ins that forward key events/props
 jest.mock('../../../src/components/ide/VscodeTitleBar', () => ({
@@ -185,11 +194,29 @@ jest.mock('../../../src/components/ide/VscodeEditorPane', () => ({
 }));
 
 jest.mock('../../../src/components/ide/VscodeTerminalPanel', () => ({
-  VscodeTerminalPanel: ({ expanded, resized }: { expanded?: boolean; resized?: boolean }) => (
+  VscodeTerminalPanel: ({
+    commandText,
+    outputText,
+    expanded,
+    resized,
+    activeSessionId,
+    sessions,
+  }: {
+    commandText: string;
+    outputText: string;
+    expanded?: boolean;
+    resized?: boolean;
+    activeSessionId?: string;
+    sessions?: Array<{ id: string; label: string }>;
+  }) => (
     <div
       data-testid="terminal-panel"
       data-expanded={String(Boolean(expanded))}
       data-resized={String(Boolean(resized))}
+      data-command-text={commandText}
+      data-output-text={outputText}
+      data-active-session-id={activeSessionId ?? ''}
+      data-session-labels={(sessions ?? []).map((session) => session.label).join(',')}
     />
   ),
 }));
@@ -252,6 +279,7 @@ const renderHero = (
     onClose: () => void;
     onMinimize: () => void;
     onExpand: () => void;
+    bootActive: boolean;
     resizeEnabled: boolean;
     resizeWidth: number;
     resizeHeight: number;
@@ -266,6 +294,7 @@ const renderHero = (
     <ThemeProvider>
       <TerminalHeroContent
         expanded={overrides.expanded}
+        bootActive={overrides.bootActive}
         lines={overrides.lines ?? SAMPLE_LINES}
         onWindowDragPointerDown={overrides.onWindowDragPointerDown}
         playing={overrides.playing ?? false}
@@ -284,7 +313,34 @@ const renderHero = (
   );
 
 describe('TerminalHeroContent', () => {
+  beforeEach(() => {
+    mockUseTerminalBootSequence.mockImplementation((active: boolean) =>
+      active
+        ? {
+            phase: 'server-output',
+            sessions: [{ id: 'server', label: 'uvicorn' }],
+            activeSessionId: 'server',
+            commandText: 'uvicorn server:app --reload',
+            outputText: 'INFO:     Application startup complete.',
+            showCursor: true,
+            complete: false,
+            editorTab: 'server',
+          }
+        : {
+            phase: 'idle',
+            sessions: [{ id: 'zsh', label: 'zsh' }],
+            activeSessionId: 'zsh',
+            commandText: '',
+            outputText: '',
+            showCursor: false,
+            complete: false,
+            editorTab: 'server',
+          }
+    );
+  });
+
   afterEach(() => {
+    mockUseTerminalBootSequence.mockClear();
     jest.clearAllMocks();
   });
 
@@ -433,6 +489,42 @@ describe('TerminalHeroContent', () => {
       expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-expanded', 'true');
       expect(screen.getByTestId('editor-pane')).toHaveAttribute('data-expanded', 'true');
       expect(screen.getByTestId('terminal-panel')).toHaveAttribute('data-expanded', 'true');
+    });
+  });
+
+  describe('boot sequence handoff', () => {
+    it('keeps the normal terminal loop running when boot mode is inactive', () => {
+      renderHero({ playing: true, bootActive: false });
+
+      expect(screen.getByTestId('terminal-panel')).toHaveAttribute(
+        'data-command-text',
+        'echo hello'
+      );
+      expect(screen.getByTestId('terminal-panel')).toHaveAttribute('data-output-text', 'hello');
+      expect(screen.getByTestId('terminal-panel')).toHaveAttribute('data-active-session-id', '');
+      expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-active-tab', 'server');
+    });
+
+    it('shows boot-driven terminal content while boot mode is active', () => {
+      renderHero({ playing: true, bootActive: true });
+
+      expect(screen.getByTestId('terminal-panel')).toHaveAttribute(
+        'data-command-text',
+        'uvicorn server:app --reload'
+      );
+      expect(screen.getByTestId('terminal-panel')).toHaveAttribute(
+        'data-output-text',
+        'INFO:     Application startup complete.'
+      );
+      expect(screen.getByTestId('terminal-panel')).toHaveAttribute(
+        'data-active-session-id',
+        'server'
+      );
+      expect(screen.getByTestId('terminal-panel')).toHaveAttribute(
+        'data-session-labels',
+        'uvicorn'
+      );
+      expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-active-tab', 'server');
     });
   });
 
