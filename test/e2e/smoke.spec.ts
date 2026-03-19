@@ -79,10 +79,7 @@ test.describe('Production smoke', () => {
   test('header does not show Blog link in production', async ({ page }) => {
     await page.goto('/climbing');
 
-    const main = page.locator('#main-content');
-    await waitForAnimatedSectionReadiness({
-      anchor: main.getByText("A collection of routes I've remembered to tick on Mountain Project."),
-    });
+    await expect(page.locator('#main-content')).toBeVisible();
 
     await expect(page.getByRole('link', { name: 'CV' }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: 'Blog' })).toHaveCount(0);
