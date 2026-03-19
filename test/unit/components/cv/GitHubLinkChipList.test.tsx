@@ -91,8 +91,8 @@ const getSxValue = (
   return sx?.[key];
 };
 
-jest.mock('../../../../src/components/AnimatedZoomList', () => ({
-  AnimatedZoomList: ({
+jest.mock('../../../../src/components/AnimatedChipSlideList', () => ({
+  AnimatedChipSlideList: ({
     children,
     items,
     renderItem,
@@ -108,7 +108,7 @@ jest.mock('../../../../src/components/AnimatedZoomList', () => ({
     containerSx?: Record<string, unknown> | Array<Record<string, unknown>>;
   }) => (
     <div
-      data-testid="animated-zoom-list"
+      data-testid="animated-chip-slide-list"
       data-start-delay={String(startDelayMs ?? 0)}
       data-stagger={String(itemStaggerMs ?? '')}
       data-display={String(getSxValue(containerSx, 'display') ?? '')}
@@ -148,10 +148,10 @@ describe('GitHubLinkChipList', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-start-delay', '40');
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-stagger', '20');
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-display', 'flex');
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-flex-wrap', 'wrap');
+    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-start-delay', '40');
+    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-stagger', '20');
+    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-display', 'flex');
+    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-flex-wrap', 'wrap');
     expect(screen.getAllByTestId('github-chip-tilt')).toHaveLength(2);
     screen.getAllByTestId('github-chip-tilt').forEach((wrapper) => {
       expect(wrapper).toHaveAttribute('data-intensity', '0.5');
@@ -211,10 +211,10 @@ describe('GitHubLinkChipList', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-start-delay', '120');
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-stagger', '30');
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-display', 'flex');
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute(
+    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-start-delay', '120');
+    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-stagger', '30');
+    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-display', 'flex');
+    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute(
       'data-flex-direction',
       'column'
     );
@@ -237,7 +237,7 @@ describe('GitHubLinkChipList', () => {
       </ThemeProvider>
     );
 
-    expect(screen.queryByTestId('animated-zoom-list')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('animated-chip-slide-list')).not.toBeInTheDocument();
     expect(screen.getAllByTestId('github-chip-tilt')).toHaveLength(2);
   });
 });

@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { MotionTiltCard } from '../../motion';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { normalizeSxProp } from '../../utils/sx';
-import { AnimatedZoomList } from '../AnimatedZoomList';
+import { AnimatedChipSlideList } from '../AnimatedChipSlideList';
 import { COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 
 export type GitHubLinkChipItem = {
@@ -93,7 +93,7 @@ export const GitHubLinkChipList = ({
 
   if (layout === 'wrap') {
     return animateItems ? (
-      <AnimatedZoomList
+      <AnimatedChipSlideList
         items={items}
         getItemKey={(item) => item.key}
         in
@@ -108,7 +108,7 @@ export const GitHubLinkChipList = ({
   }
 
   return animateItems ? (
-    <AnimatedZoomList
+    <AnimatedChipSlideList
       items={items}
       getItemKey={(item) => item.key}
       in
