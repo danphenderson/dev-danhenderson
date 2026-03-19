@@ -582,7 +582,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
       sx={{
         backgroundColor: VSCODE_COLORS.editorBg,
         fontFamily: monoFontFamily,
-        fontSize: { xs: '0.72rem', sm: '0.80rem', md: '0.84rem' },
+        fontSize: { xs: '0.70rem', sm: '0.76rem', md: '0.80rem' },
         width: flexLayout ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
         minWidth: flexLayout ? 0 : VSCODE_LAYOUT.editorColumnWidth,
         maxWidth: flexLayout ? '100%' : VSCODE_LAYOUT.editorColumnWidth,

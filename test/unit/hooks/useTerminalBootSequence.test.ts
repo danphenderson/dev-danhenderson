@@ -66,13 +66,21 @@ describe('useTerminalBootSequence', () => {
 
   // ---- Activation ----
 
-  it('transitions to server-typing after the settle delay', () => {
+  it('transitions to explorer-open then server-typing after settle + explorer delay', () => {
     const { result } = renderHook(() => useTerminalBootSequence(true));
 
     expect(result.current.phase).toBe('idle');
 
-    // EXPAND_SETTLE_MS = 300
+    // EXPAND_SETTLE_MS = 300 → explorer-open
     advance(300);
+
+    expect(result.current.phase).toBe('explorer-open');
+    expect(result.current.explorerOpen).toBe(true);
+    expect(result.current.activeSessionId).toBe('zsh');
+    expect(result.current.sessions).toEqual([{ id: 'zsh', label: 'zsh' }]);
+
+    // EXPLORER_OPEN_MS = 600 → server-typing
+    advance(600);
 
     expect(result.current.phase).toBe('server-typing');
     expect(result.current.showCursor).toBe(true);
@@ -86,7 +94,8 @@ describe('useTerminalBootSequence', () => {
   it('types the server command character by character', () => {
     const { result } = renderHook(() => useTerminalBootSequence(true));
 
-    advance(300); // settle
+    advance(300); // settle → explorer-open
+    advance(600); // explorer-open → server-typing
     expect(result.current.phase).toBe('server-typing');
 
     // Advance enough for at least one character
@@ -102,7 +111,11 @@ describe('useTerminalBootSequence', () => {
   it('progresses through all phases to complete', () => {
     const { result } = renderHook(() => useTerminalBootSequence(true));
 
-    // idle → server-typing
+    // idle → explorer-open
+    advanceUntilPhase(result, 'explorer-open');
+    expect(result.current.explorerOpen).toBe(true);
+
+    // explorer-open → server-typing
     advanceUntilPhase(result, 'server-typing');
     expect(result.current.activeSessionId).toBe('server');
     expect(result.current.editorTab).toBe('server');

@@ -103,7 +103,9 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
         ? ('pause-before-output' as const)
         : boot.phase === 'handoff'
           ? ('clearing-screen' as const)
-          : ('typing-command' as const)
+          : boot.phase === 'explorer-open'
+            ? ('pause-before-output' as const)
+            : ('typing-command' as const)
     : loopPhase;
 
   const historyLineCount = React.useMemo(
@@ -126,6 +128,14 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   // Explorer sidebar toggle
   const [explorerVisible, setExplorerVisible] = React.useState(false);
   const [activityBarIndex, setActivityBarIndex] = React.useState(0);
+
+  // During boot, auto-open the explorer when the boot sequence signals it
+  React.useEffect(() => {
+    if (isBoot && boot.explorerOpen && !explorerVisible) {
+      setExplorerVisible(true);
+      setActivityBarIndex(0);
+    }
+  }, [isBoot, boot.explorerOpen, explorerVisible]);
 
   const handleActivityBarClick = React.useCallback((index: number) => {
     if (index === 0) {
