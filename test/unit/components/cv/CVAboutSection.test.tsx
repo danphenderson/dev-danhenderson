@@ -4,6 +4,31 @@ import ThemeProvider from '../../../../src/ThemeProvider';
 import { CVAboutSection } from '../../../../src/components/cv/CVAboutSection';
 import { cvSectionMetadata } from '../../../../src/components/cv/cvSectionMetadata';
 
+jest.mock('../../../../src/motion', () => {
+  const actual = jest.requireActual('../../../../src/motion');
+
+  return {
+    ...actual,
+    MotionTiltCard: ({
+      children,
+      intensity,
+      disabled,
+    }: {
+      children: ReactNode;
+      intensity?: number;
+      disabled?: boolean;
+    }) => (
+      <div
+        data-testid="cv-about-tilt-card"
+        data-intensity={String(intensity ?? '')}
+        data-disabled={String(Boolean(disabled))}
+      >
+        {children}
+      </div>
+    ),
+  };
+});
+
 jest.mock('../../../../src/components/cv/CVSectionCard', () => ({
   CVSectionCard: ({
     children,
@@ -135,6 +160,17 @@ const renderAboutSection = (overrides?: Partial<Parameters<typeof CVAboutSection
 describe('CVAboutSection', () => {
   afterEach(() => {
     jest.useRealTimers();
+  });
+
+  it('renders the About section inside a MotionTiltCard with the configured intensity', () => {
+    renderAboutSection();
+
+    const tiltCard = screen.getByTestId('cv-about-tilt-card');
+
+    expect(tiltCard).toHaveAttribute('data-intensity', '0.5');
+    expect(tiltCard).toContainElement(
+      screen.getByTestId(`section-card-${cvSectionMetadata.about.id}`)
+    );
   });
 
   it('reveals opportunities after the bio completes, then starts the workflow heading and chips in sequence', () => {
