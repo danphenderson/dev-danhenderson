@@ -664,7 +664,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
             py: 0.75,
             overflowX: 'hidden',
             overflowY: 'auto',
-            maxHeight: flexLayout ? 'none' : `calc(${LINES_VISIBLE} * 1.55em + 12px)`,
+            maxHeight: expanded || resized ? 'none' : `calc(${LINES_VISIBLE} * 1.55em + 12px)`,
             // Thin custom scrollbar to keep the VS Code aesthetic
             '&::-webkit-scrollbar': { width: '6px' },
             '&::-webkit-scrollbar-track': { background: 'transparent' },
