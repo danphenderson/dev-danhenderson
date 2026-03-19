@@ -135,7 +135,7 @@ export const createAppStyleMap = (theme: Theme) => {
   };
 
   const headerIconSx: SxProps<Theme> = {
-    fontSize: { xs: 26, md: 30 },
+    fontSize: { xs: 22, md: 24 },
   };
 
   const headerSpeedDialSx = {
@@ -318,12 +318,12 @@ export const createAppStyleMap = (theme: Theme) => {
     photographyGridSx,
     photographyGridItemSx,
     headerToolbarSx: {
-      px: { xs: 1.5, md: 2.5 },
-      gap: { xs: 1.5, md: 2.5 },
-      minHeight: { xs: 64, md: 80 },
+      px: { xs: 1.5, md: 3 },
+      gap: { xs: 1.5, md: 2 },
+      minHeight: { xs: 56, md: 56 },
     } satisfies SxProps<Theme>,
     headerOffsetToolbarSx: {
-      minHeight: { xs: 64, md: 80 },
+      minHeight: { xs: 56, md: 56 },
     } satisfies SxProps<Theme>,
     headerActionsContainerSx: {
       display: 'flex',
@@ -363,26 +363,38 @@ export const createAppStyleMap = (theme: Theme) => {
       minWidth: 0,
     } satisfies SxProps<Theme>,
     headerNavButtonSx: {
-      color: alpha(theme.palette.common.white, 0.78),
-      fontSize: { md: '1.5rem' },
+      color: alpha(theme.palette.common.white, 0.72),
+      fontSize: { md: '0.875rem' },
+      fontWeight: 500,
+      letterSpacing: '0.04em',
+      textTransform: 'none',
       position: 'relative',
+      px: 1.5,
+      py: 0.75,
+      minWidth: 'auto',
       transition: `color ${cssDuration.quick} ${SPRING_EASING_CSS}`,
       '&:hover': {
         color: theme.palette.common.white,
-        backgroundColor: alpha(theme.palette.common.white, 0.08),
+        backgroundColor: alpha(theme.palette.common.white, 0.06),
       },
     } satisfies SxProps<Theme>,
     headerNavButtonActiveSx: {
       color: theme.palette.common.white,
-      fontSize: { md: '1.5rem' },
+      fontSize: { md: '0.875rem' },
+      fontWeight: 500,
+      letterSpacing: '0.04em',
+      textTransform: 'none',
       position: 'relative',
+      px: 1.5,
+      py: 0.75,
+      minWidth: 'auto',
       '&::after': {
         content: '""',
         position: 'absolute',
-        bottom: 4,
-        left: '20%',
-        right: '20%',
-        height: 2,
+        bottom: 2,
+        left: '25%',
+        right: '25%',
+        height: 1.5,
         borderRadius: 1,
         backgroundColor: alpha(theme.palette.primary.light, 0.85),
       },
@@ -401,9 +413,9 @@ export const createAppStyleMap = (theme: Theme) => {
       },
     } satisfies SxProps<Theme>,
     headerAvatarSx: {
-      width: { xs: 36, md: 44 },
-      height: { xs: 36, md: 44 },
-      border: `2px solid ${alpha(theme.palette.common.white, 0.7)}`,
+      width: { xs: 32, md: 36 },
+      height: { xs: 32, md: 36 },
+      border: `1.5px solid ${alpha(theme.palette.common.white, 0.6)}`,
     } satisfies SxProps<Theme>,
     headerIconButtonSx: {
       color: alpha(theme.palette.common.white, 0.82),

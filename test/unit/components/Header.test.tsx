@@ -24,19 +24,25 @@ jest.mock('../../../src/WelcomeOnboardingProvider', () => ({
   useWelcomeOnboarding: jest.fn(),
 }));
 
-jest.mock('../../../src/components/header/HeaderAppearanceDial', () => ({
-  HeaderAppearanceDial: ({
+jest.mock('../../../src/components/header/HeaderSettingsPopover', () => ({
+  HeaderSettingsPopover: ({
     onChangeAppearance,
     onToggleTheme,
+    onToggleAudio,
     mode,
+    showAudioControl,
+    isPlaying,
   }: {
     onChangeAppearance?: (appearance: AppAppearanceKey) => void;
     onToggleTheme?: () => void;
+    onToggleAudio?: () => void;
     mode?: 'light' | 'dark';
+    showAudioControl?: boolean;
+    isPlaying?: boolean;
   }) => (
-    <div data-testid="header-appearance-dial">
-      <button type="button" aria-label="Open appearance presets">
-        Open appearance presets
+    <div data-testid="header-settings-popover">
+      <button type="button" aria-label="Open settings">
+        Open settings
       </button>
       {onToggleTheme ? (
         <button
@@ -56,12 +62,17 @@ jest.mock('../../../src/components/header/HeaderAppearanceDial', () => ({
           Use Ember appearance
         </button>
       ) : null}
+      {showAudioControl && onToggleAudio ? (
+        <button
+          type="button"
+          aria-label={isPlaying ? 'Pause welcome audio' : 'Play welcome audio'}
+          onClick={() => onToggleAudio()}
+        >
+          {isPlaying ? 'Pause' : 'Play'}
+        </button>
+      ) : null}
     </div>
   ),
-}));
-
-jest.mock('../../../src/components/header/HeaderMotionDial', () => ({
-  HeaderMotionDial: () => <div data-testid="header-motion-dial" />,
 }));
 
 const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQuery>;
@@ -155,7 +166,7 @@ describe('Header controls', () => {
     expect(screen.queryByRole('button', { name: 'Pause welcome audio' })).not.toBeInTheDocument();
   });
 
-  it('toggles theme and dismisses dark mode hint when the theme dial action is clicked', () => {
+  it('toggles theme and dismisses dark mode hint when the theme action is clicked', () => {
     const toggleTheme = jest.fn();
     const setAppearance = jest.fn();
     const dismissDarkModeHint = jest.fn();
@@ -181,7 +192,7 @@ describe('Header controls', () => {
     expect(toggleTheme).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the appearance dial on the home route and forwards preset changes', () => {
+  it('renders the settings popover on the home route and forwards preset changes', () => {
     const setAppearance = jest.fn();
     mockUseAppTheme.mockReturnValue({
       mode: 'light',
@@ -194,7 +205,7 @@ describe('Header controls', () => {
 
     renderHeader('/');
 
-    expect(screen.getByTestId('header-appearance-dial')).toBeInTheDocument();
+    expect(screen.getByTestId('header-settings-popover')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Use Ember appearance' }));
 
