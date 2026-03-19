@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState, type PointerEventHandler } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type PointerEventHandler,
+} from 'react';
 import { createPortal } from 'react-dom';
 import {
   Box,
@@ -34,7 +41,7 @@ import { duration } from '../motion/tokens';
 import { VSCODE_COLORS, VSCODE_RESIZE, VSCODE_WINDOW_RADIUS } from '../components/ide/vscodeTokens';
 
 /** Green-dot pulse duration before the IDE auto-expands. */
-const AUTO_EXPAND_PULSE_DURATION_MS = Math.round(duration.slow * 1000);
+const AUTO_EXPAND_PULSE_DURATION_MS = Math.round(duration.slow * 150);
 
 const heroLines: TerminalLine[] = [
   { command: 'node --version', output: 'v22.14.0' },
@@ -77,9 +84,18 @@ export default function Home() {
   const resizeEdgeRef = useRef<IdeResizeEdge | null>(null);
   const resizeInitialPointerRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const resizeInitialSizeRef = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
+  const [ideWindowPortalContainer] = useState<HTMLDivElement | null>(() => {
+    if (typeof document === 'undefined') {
+      return null;
+    }
+
+    return document.createElement('div');
+  });
 
   const heroRef = useRef<HTMLDivElement>(null);
   const heroBoundsRef = useRef<HTMLDivElement>(null);
+  const inlineIdeHostRef = useRef<HTMLDivElement | null>(null);
+  const expandedIdeHostRef = useRef<HTMLDivElement | null>(null);
   const hasAutoExpandedRef = useRef(false);
   const autoExpandTimerRef = useRef<number | null>(null);
   const heroDragControls = useDragControls();
@@ -88,6 +104,61 @@ export default function Home() {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.6]);
   const prefersReducedMotion = useReducedMotion();
   const [expandDotHighlighted, setExpandDotHighlighted] = useState(false);
+
+  const attachIdeWindowContainer = useCallback(
+    (target: HTMLDivElement | null, mode: 'normal' | 'expanded') => {
+      if (!ideWindowPortalContainer || !target) {
+        return;
+      }
+
+      ideWindowPortalContainer.style.width = mode === 'expanded' ? '100%' : 'auto';
+      ideWindowPortalContainer.style.height = mode === 'expanded' ? '100%' : 'auto';
+      ideWindowPortalContainer.style.maxWidth = '100%';
+
+      if (ideWindowPortalContainer.parentElement !== target) {
+        target.appendChild(ideWindowPortalContainer);
+      }
+    },
+    [ideWindowPortalContainer]
+  );
+
+  const setInlineIdeHost = useCallback(
+    (node: HTMLDivElement | null) => {
+      inlineIdeHostRef.current = node;
+
+      if (node && ideWindowState !== 'expanded') {
+        attachIdeWindowContainer(node, 'normal');
+      }
+    },
+    [attachIdeWindowContainer, ideWindowState]
+  );
+
+  const setExpandedIdeHost = useCallback(
+    (node: HTMLDivElement | null) => {
+      expandedIdeHostRef.current = node;
+
+      if (node && ideWindowState === 'expanded') {
+        attachIdeWindowContainer(node, 'expanded');
+      }
+    },
+    [attachIdeWindowContainer, ideWindowState]
+  );
+
+  useLayoutEffect(() => {
+    if (ideWindowState === 'expanded') {
+      attachIdeWindowContainer(expandedIdeHostRef.current, 'expanded');
+      return;
+    }
+
+    attachIdeWindowContainer(inlineIdeHostRef.current, 'normal');
+  }, [attachIdeWindowContainer, ideWindowState]);
+
+  useEffect(
+    () => () => {
+      ideWindowPortalContainer?.remove();
+    },
+    [ideWindowPortalContainer]
+  );
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
@@ -392,23 +463,13 @@ export default function Home() {
           >
             <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
               {isHeroAnimationReady ? (
-                <TerminalHeroContent
-                  key={ideSessionKey}
-                  expanded={false}
-                  lines={heroLines}
-                  onWindowDragPointerDown={handleTitleBarPointerDown}
-                  playing={isTypewriterPlaying}
-                  windowDragEnabled={windowDragEnabled && !isResizing}
-                  windowDragging={isHeroWindowDragging}
-                  onClose={handleIdeClose}
-                  onMinimize={handleIdeMinimize}
-                  onExpand={handleIdeExpand}
-                  expandHighlighted={expandDotHighlighted}
-                  resizeWidth={ideWindowSize?.width}
-                  resizeHeight={ideWindowSize?.height}
-                  resizeEnabled={resizeEnabled}
-                  isResizing={isResizing}
-                  onResizeStart={handleResizeStart}
+                <Box
+                  ref={setInlineIdeHost}
+                  sx={{
+                    display: 'inline-block',
+                    maxWidth: '100%',
+                    minWidth: 0,
+                  }}
                 />
               ) : null}
             </AnimatedContentCard>
@@ -444,6 +505,43 @@ export default function Home() {
         </BackgroundPaper>
       </motion.div>
 
+      {ideWindowPortalContainer && isHeroAnimationReady && ideVisible
+        ? createPortal(
+            <TerminalHeroContent
+              key={ideSessionKey}
+              expanded={ideWindowState === 'expanded'}
+              lines={heroLines}
+              onWindowDragPointerDown={
+                ideWindowState === 'normal' ? handleTitleBarPointerDown : undefined
+              }
+              playing={isTypewriterPlaying}
+              windowDragEnabled={windowDragEnabled && !isResizing && ideWindowState === 'normal'}
+              windowDragging={isHeroWindowDragging}
+              onClose={handleIdeClose}
+              onMinimize={handleIdeMinimize}
+              onExpand={handleIdeExpand}
+              expandHighlighted={expandDotHighlighted}
+              resizeWidth={ideWindowSize?.width}
+              resizeHeight={ideWindowSize?.height}
+              resizeEnabled={resizeEnabled}
+              isResizing={isResizing}
+              onResizeStart={ideWindowState === 'normal' ? handleResizeStart : undefined}
+              sx={
+                ideWindowState === 'expanded'
+                  ? {
+                      width: '100%',
+                      height: '100%',
+                      borderRadius: 0,
+                      boxShadow: 'none',
+                      border: 'none',
+                    }
+                  : undefined
+              }
+            />,
+            ideWindowPortalContainer
+          )
+        : null}
+
       {/* Expanded IDE — portal-rendered so it escapes the transform hierarchy and covers the full background */}
       {createPortal(
         <AnimatePresence>
@@ -468,20 +566,13 @@ export default function Home() {
                 backgroundColor: VSCODE_COLORS.editorBg,
               }}
             >
-              <TerminalHeroContent
-                key={ideSessionKey}
-                expanded
-                lines={heroLines}
-                playing={isTypewriterPlaying}
-                onClose={handleIdeClose}
-                onMinimize={handleIdeMinimize}
-                onExpand={handleIdeExpand}
+              <Box
+                ref={setExpandedIdeHost}
                 sx={{
                   width: '100%',
                   height: '100%',
-                  borderRadius: 0,
-                  boxShadow: 'none',
-                  border: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
               />
             </motion.div>

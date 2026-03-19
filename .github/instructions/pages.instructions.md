@@ -10,6 +10,6 @@ These files own route-level composition for the portfolio SPA. Preserve the docu
 - Keep page-level state focused on orchestration concerns like filters, search, layout mode, or section timing; let feature components own local interaction state.
 - Do not silently change route semantics, section ordering intent, navigation affordances, or breakpoint behavior without validating downstream impact.
 - Use existing hooks and data modules instead of introducing ad hoc page-local data structures or fetch patterns.
-- For route-level UI changes, validate the changed route directly and check direct navigation, responsive layout, link behavior, and asset rendering as needed. Use `npm run build:e2e` before Playwright coverage on feature-gated blog routes.
+- For route-level UI changes, validate the changed route directly and check direct navigation, responsive layout, link behavior, and asset rendering as needed. Use `npm run build:e2e` before Playwright coverage on feature-gated blog routes, and keep Playwright runs at 4 workers.
 
 For more detail, follow `src/pages/AGENTS.md` and `docs/frontend/page-choreography.md`.

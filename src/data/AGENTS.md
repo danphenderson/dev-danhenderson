@@ -73,7 +73,7 @@ Changes here should preserve schema stability, predictable rendering, and compat
 - Verify that changed data still matches the consuming types and renders through the existing pages/hooks.
 - For schema-affecting edits, validate all known consumers touched by the changed fields.
 - For content-only edits, validate the affected page or section at minimum.
-- When the working branch includes Playwright E2E coverage for the affected route, run the corresponding route spec after `npm run build`.
+- When the working branch includes Playwright E2E coverage for the affected route, run the corresponding route spec after `npm run build`, using 4 workers for the Playwright command.
 - For `cv.ts` changes that affect GitHub fallback content or `/cv` route behavior, prefer mocked Playwright `/cv` coverage over live API-dependent validation when available.
 
 ## Scope control

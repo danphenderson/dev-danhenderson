@@ -32,7 +32,7 @@ This directory is one of the documented intentional design-system exceptions; pr
 - All new components must have unit tests in `test/unit/components/blog/` or relevant page/hook test.
 - Blog index and post pages must be covered by unit and E2E tests.
 - Run `npm run build` for compile checks and the narrowest relevant unit tests for changed behavior.
-- Use `npm run build:e2e` before `npm run test:e2e` or `npx playwright test test/e2e/blog.spec.ts` so the feature-gated blog routes are enabled in the E2E build.
+- Use `npm run build:e2e` before `npm run test:e2e -- --workers=4` or `npx playwright test --workers=4 test/e2e/blog.spec.ts` so the feature-gated blog routes are enabled in the E2E build.
 - Validate `/blog` and `/blog/:slug` in browser at multiple viewports and theme presets.
 
 ## Recovery and fallback

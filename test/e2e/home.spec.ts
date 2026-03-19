@@ -13,8 +13,8 @@ const TERMINAL_NOTIFICATION_TEXT = 'server.py — No problems detected ✓';
 const WELCOME_AUDIO_PROMPT_BODY =
   'Would you like to hear a short verse while browsing the site? Use the pause button in the header to stop it anytime.';
 const HOME_HERO_SNAPSHOT_BOX = {
-  width: 528,
-  height: 439,
+  width: 529,
+  height: 441,
 } as const;
 const HOME_HERO_SCREENSHOT_OPTIONS = {
   animations: 'disabled' as const,
@@ -326,6 +326,7 @@ test.describe('Home page', () => {
 
     const terminalHero = await ensureWindowedTerminalHero(page);
     const expandWindowButton = terminalHero.getByRole('button', { name: 'Expand window' });
+    const clientTab = terminalHero.getByTestId('vscode-tab-client');
     const expandedOverlay = page.getByTestId('home-ide-expanded');
     const mainContent = page.locator('#main-content');
     const header = page.locator('#site-navigation');
@@ -333,6 +334,8 @@ test.describe('Home page', () => {
     const terminalPanelBody = terminalHero.getByTestId('terminal-panel-body');
 
     await expect(expandWindowButton).toBeVisible();
+
+    await selectHeroEditorTab(terminalHero, clientTab, 'SERVER_URL');
 
     const initialTabWidth = await getElementLayoutWidth(editorTabs);
     const initialTerminalPanelHeight = await getElementLayoutHeight(terminalPanelBody);
@@ -345,6 +348,11 @@ test.describe('Home page', () => {
 
     await expect(expandedOverlay).toBeVisible();
     await expect(expandedHero).toHaveAttribute('data-expanded', 'true');
+    await expect(expandedHero).toContainText('SERVER_URL');
+    await expect(expandedHero.getByTestId('vscode-tab-client')).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
 
     const expandedRect = await expandedHero.boundingBox();
     const mainRect = await mainContent.boundingBox();
@@ -375,9 +383,13 @@ test.describe('Home page', () => {
     expect(expandedTerminalPanelHeight).toBeGreaterThan(initialTerminalPanelHeight + 60);
 
     await expandedOverlay.getByRole('button', { name: 'Expand window' }).click();
-    await expect(page.getByTestId('home-hero-window').getByTestId('terminal-hero')).toHaveAttribute(
-      'data-expanded',
-      'false'
+
+    const collapsedHero = page.getByTestId('home-hero-window').getByTestId('terminal-hero');
+    await expect(collapsedHero).toHaveAttribute('data-expanded', 'false');
+    await expect(collapsedHero).toContainText('SERVER_URL');
+    await expect(collapsedHero.getByTestId('vscode-tab-client')).toHaveAttribute(
+      'aria-selected',
+      'true'
     );
   });
 

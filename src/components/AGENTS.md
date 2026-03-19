@@ -76,7 +76,7 @@ For shared component changes:
 - validate at least one primary consuming route
 - validate one additional consuming route when the component is clearly reused
 - check at least one narrow/mobile viewport and one desktop viewport for layout-sensitive edits
-- when the affected consumers are covered by Playwright E2E, run the relevant route specs after `npm run build`
+- when the affected consumers are covered by Playwright E2E, run the relevant route specs after `npm run build`, using 4 workers for the Playwright command
 - prefer validating shared component behavior through consuming route specs rather than adding broad E2E coverage unless a new route flow needs it
 - for GitHub-backed CV components, prefer mocked `/cv` Playwright coverage over live API-dependent validation when the helper flow is available
 - verify hover, focus, click, expand/collapse, or scroll-triggered behavior if applicable
