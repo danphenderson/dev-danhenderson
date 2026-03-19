@@ -5,6 +5,7 @@ import { VscodeEditorPane } from '../../../../src/components/ide/VscodeEditorPan
 import { VscodeTabBar } from '../../../../src/components/ide/VscodeTabBar';
 import { VscodeTerminalPanel } from '../../../../src/components/ide/VscodeTerminalPanel';
 import { VscodeExplorerSidebar } from '../../../../src/components/ide/VscodeExplorerSidebar';
+import { getVscodeEditorTabMetadata } from '../../../../src/components/ide/vscodeEditorTabs';
 
 const renderInShell = (ui: ReactElement, shellStyle: CSSProperties = {}) =>
   render(
@@ -51,7 +52,9 @@ describe('VscodeEditorPane resize layout', () => {
   it('renders the active tab breadcrumb content in resized mode', () => {
     renderInShell(<VscodeEditorPane activeTab="client" resized />);
 
-    expect(screen.getAllByText('client.ts').length).toBeGreaterThan(0);
+    expect(
+      screen.getAllByText(getVscodeEditorTabMetadata('client').fileName).length
+    ).toBeGreaterThan(0);
   });
 
   it('renders each active tab in resized mode', () => {
