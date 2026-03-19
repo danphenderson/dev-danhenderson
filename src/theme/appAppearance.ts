@@ -80,6 +80,10 @@ export type MotionScaleFactors = {
   cssAnimations: boolean;
 };
 
+/**
+ * @deprecated Import `PREFERENCE_STORAGE_KEYS.motionIntensity` from
+ * `src/constants/preferences` instead.
+ */
 export const MOTION_INTENSITY_STORAGE_KEY = 'danhenderson-motion';
 export const defaultMotionIntensity: MotionIntensityLevel = 'default';
 
@@ -110,6 +114,10 @@ export type AppAppearancePreset = {
   motion: AppMotionTreatment;
 };
 
+/**
+ * @deprecated Import `PREFERENCE_STORAGE_KEYS.appearance` from
+ * `src/constants/preferences` instead.
+ */
 export const APP_APPEARANCE_STORAGE_KEY = 'danhenderson-appearance';
 export const defaultAppAppearanceKey: AppAppearanceKey = 'evergreen';
 

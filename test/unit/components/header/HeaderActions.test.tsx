@@ -37,22 +37,30 @@ describe('HeaderSettingsPopover', () => {
     expect(screen.getByTestId('settings-popover-content')).toBeInTheDocument();
   });
 
-  it('renders the theme toggle inside the popover', () => {
+  it('renders the dark mode switch inside the popover', () => {
     renderSettingsPopover({ mode: 'light' });
 
     fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
 
-    expect(
-      screen.getByRole('button', { name: 'Switch to dark mode' })
-    ).toBeInTheDocument();
+    const toggle = screen.getByRole('checkbox', { name: /dark mode/i });
+    expect(toggle).toBeInTheDocument();
+    expect(toggle).not.toBeChecked();
   });
 
-  it('calls onToggleTheme when the theme action is clicked', () => {
+  it('shows the dark mode switch as checked when mode is dark', () => {
+    renderSettingsPopover({ mode: 'dark' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
+
+    expect(screen.getByRole('checkbox', { name: /dark mode/i })).toBeChecked();
+  });
+
+  it('calls onToggleTheme when the dark mode switch is toggled', () => {
     const onToggleTheme = jest.fn();
     renderSettingsPopover({ onToggleTheme });
 
     fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Switch to dark mode' }));
+    fireEvent.click(screen.getByRole('checkbox', { name: /dark mode/i }));
 
     expect(onToggleTheme).toHaveBeenCalledTimes(1);
   });
@@ -68,6 +76,14 @@ describe('HeaderSettingsPopover', () => {
     expect(screen.getByRole('radio', { name: 'Solstice' })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: 'Drift' })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: 'Graphite' })).toBeInTheDocument();
+  });
+
+  it('displays the active appearance preset label', () => {
+    renderSettingsPopover({ appearance: 'ember' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
+
+    expect(screen.getByTestId('active-appearance-label')).toHaveTextContent('Ember');
   });
 
   it('calls onChangeAppearance when a swatch is clicked', () => {
