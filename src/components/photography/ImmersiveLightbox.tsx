@@ -3,9 +3,10 @@ import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import PlaceIcon from '@mui/icons-material/Place';
-import { Box, Dialog, IconButton, Stack, Typography } from '@mui/material';
+import { Box, Dialog, IconButton, Stack } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import type { PhotoItem } from '../../types/data';
+import { EntryTitle, SecondaryBodyText } from '../text';
 
 type ImmersiveLightboxProps = {
   photos: PhotoItem[];
@@ -112,9 +113,9 @@ export function ImmersiveLightbox({
             background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%)',
           }}
         >
-          <Typography variant="body2" sx={{ color: 'common.white', opacity: 0.8 }}>
+          <SecondaryBodyText sx={{ color: 'common.white', opacity: 0.8 }}>
             {currentIndex + 1} / {photos.length}
-          </Typography>
+          </SecondaryBodyText>
           <Stack direction="row" spacing={0.5}>
             <IconButton
               component="a"
@@ -210,18 +211,18 @@ export function ImmersiveLightbox({
           }}
         >
           <Stack spacing={0.25}>
-            <Typography
-              variant="subtitle1"
-              sx={{ color: 'common.white', fontWeight: 600, lineHeight: 1.3 }}
+            <EntryTitle
+              component="p"
+              sx={{ color: 'common.white', fontSize: '1rem', fontWeight: 600, lineHeight: 1.3 }}
             >
               {displayTitle}
-            </Typography>
+            </EntryTitle>
             {photo.location && (
               <Stack direction="row" spacing={0.5} alignItems="center">
                 <PlaceIcon sx={{ color: 'common.white', opacity: 0.7, fontSize: 16 }} />
-                <Typography variant="body2" sx={{ color: 'common.white', opacity: 0.7 }}>
+                <SecondaryBodyText sx={{ color: 'common.white', opacity: 0.7 }}>
                   {photo.location}
-                </Typography>
+                </SecondaryBodyText>
               </Stack>
             )}
           </Stack>

@@ -7,7 +7,7 @@ import { MotionSection, fadeIn } from '../motion';
 
 export default function Footer() {
   return (
-    <MotionSection variants={fadeIn} rootMargin="0px 0px 0px 0px">
+    <MotionSection id="site-footer" variants={fadeIn} rootMargin="0px 0px 0px 0px">
       <Container maxWidth="xl">
         <Box
           sx={{

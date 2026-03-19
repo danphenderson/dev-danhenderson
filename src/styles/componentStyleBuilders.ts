@@ -256,6 +256,7 @@ export const createComponentStyleMap = (theme: Theme) => {
     boxShadow: 'none',
     borderRadius: 0,
     backdropFilter: 'none',
+    '&::after': { display: 'none' },
   };
 
   const shimmerGradient = `linear-gradient(90deg, transparent 0%, ${alpha(

@@ -40,11 +40,17 @@ export function AlbumLocationSummary({
         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
           {albumLocation && (
             <Stack direction="row" spacing={0.5} alignItems="center">
-              <PlaceIcon sx={{ color: 'text.secondary', fontSize: 18 }} />
-              <SecondaryBodyText>{albumLocation}</SecondaryBodyText>
+              <PlaceIcon sx={{ color: 'rgba(255,255,255,0.7)', fontSize: 18 }} />
+              <SecondaryBodyText sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                {albumLocation}
+              </SecondaryBodyText>
             </Stack>
           )}
-          {dateRange && <SecondaryBodyText>· {dateRange}</SecondaryBodyText>}
+          {dateRange && (
+            <SecondaryBodyText sx={{ color: 'rgba(255,255,255,0.7)' }}>
+              · {dateRange}
+            </SecondaryBodyText>
+          )}
         </Stack>
       )}
       {uniqueLocations.length > 1 && (

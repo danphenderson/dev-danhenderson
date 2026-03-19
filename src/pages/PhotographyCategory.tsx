@@ -1,5 +1,5 @@
 import { Link as RouterLink, Navigate, useLocation, useParams } from 'react-router-dom';
-import { Box, Button, Stack, Typography } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useCallback, useMemo, useState } from 'react';
 import { BackToTopButton } from '../components/BackToTopButton';
@@ -18,7 +18,7 @@ import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
-import { SecondaryBodyText, SecondaryCaptionText } from '../components/text';
+import { EntryTitle, SecondaryBodyText, SecondaryCaptionText } from '../components/text';
 import { MotionSection, MotionScaleIn, MotionImage } from '../motion';
 
 const legacySlugMap: Record<string, string> = {
@@ -119,9 +119,8 @@ export default function PhotographyCategory() {
                   />
                   <Box sx={appStyles.photographyCardOverlaySx}>
                     <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography
+                      <EntryTitle
                         component="h1"
-                        variant="h2"
                         sx={{
                           color: 'common.white',
                           fontSize: { xs: '2rem', sm: '2.5rem', md: '3.25rem' },
@@ -131,7 +130,7 @@ export default function PhotographyCategory() {
                         }}
                       >
                         {category.name}
-                      </Typography>
+                      </EntryTitle>
                       <AlbumShareButton
                         albumName={category.name}
                         albumSlug={category.slug}

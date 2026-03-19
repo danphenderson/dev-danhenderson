@@ -119,10 +119,15 @@ export default function Home() {
 
     const mainRect = mainContent.getBoundingClientRect();
     const headerRect = document.getElementById('site-navigation')?.getBoundingClientRect();
+    const footerRect = document.getElementById('site-footer')?.getBoundingClientRect();
     const top = Math.max(0, mainRect.top, headerRect?.bottom ?? 0);
     const left = Math.max(0, mainRect.left);
     const visibleRight = Math.min(window.innerWidth, mainRect.right);
-    const visibleBottom = Math.min(window.innerHeight, mainRect.bottom);
+    const visibleBottom = Math.min(
+      window.innerHeight,
+      mainRect.bottom,
+      footerRect ? footerRect.top : window.innerHeight
+    );
     const width = Math.max(0, visibleRight - left);
     const height = Math.max(0, visibleBottom - top);
 

@@ -59,13 +59,15 @@ Common consumers:
 
 ### 3. Editorial and image-overlay typography
 
-Blog hero/article surfaces and photography overlays intentionally use custom `Typography` styling for larger display scale, tighter tracking, and white-on-image presentation.
+Blog hero/article surfaces and photography overlays intentionally use custom typography for larger display scale, tighter tracking, and white-on-image presentation. Photography overlay copy should still start from the shared semantic text primitives in [src/components/text/TypographyPrimitives.tsx](../src/components/text/TypographyPrimitives.tsx), with local `sx` overrides for white-on-image treatments rather than a photography-local text primitive layer.
 
 Common consumers:
 
 - [src/components/blog/BlogHero.tsx](../src/components/blog/BlogHero.tsx)
 - [src/components/blog/BlogArticleHeader.tsx](../src/components/blog/BlogArticleHeader.tsx)
 - [src/components/blog/BlogArticleBody.tsx](../src/components/blog/BlogArticleBody.tsx)
+- [src/components/photography/AlbumCard.tsx](../src/components/photography/AlbumCard.tsx)
+- [src/components/photography/AlbumLocationSummary.tsx](../src/components/photography/AlbumLocationSummary.tsx)
 - [src/pages/PhotographyCategory.tsx](../src/pages/PhotographyCategory.tsx)
 - [src/components/photography/ImmersiveLightbox.tsx](../src/components/photography/ImmersiveLightbox.tsx)
 

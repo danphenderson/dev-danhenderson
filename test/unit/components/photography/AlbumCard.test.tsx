@@ -37,7 +37,7 @@ describe('AlbumCard', () => {
   it('renders the album name and description', () => {
     renderCard();
 
-    expect(screen.getByText('Yosemite')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Yosemite' })).toBeInTheDocument();
     expect(screen.getByText('Photos from Yosemite National Park.')).toBeInTheDocument();
   });
 
