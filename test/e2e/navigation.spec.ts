@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { declineWelcomeAudio, dismissHeaderSettingsHint } from './helpers/header';
 import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
 /**
@@ -8,26 +9,16 @@ import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
  * browser back-button behavior works correctly.
  */
 
-const suppressWelcomeDialog = async (page: Page) => {
-  await page.addInitScript(() => {
-    window.localStorage.setItem('danhenderson-welcome-audio-consent', 'declined');
-  });
-};
-
 test.describe('Cross-route navigation', () => {
   test.beforeEach(async ({ page }) => {
-    await suppressWelcomeDialog(page);
+    await declineWelcomeAudio(page);
   });
 
   test('Home → CV via header link', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('#main-content')).toBeVisible();
 
-    // Dismiss the dark-mode hint popover that opens automatically on Home
-    const darkModeHint = page.getByText(/Try an alternative theme/i);
-    await expect(darkModeHint).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(darkModeHint).toBeHidden();
+    await dismissHeaderSettingsHint(page);
 
     await page.getByRole('link', { name: 'CV' }).first().click();
 

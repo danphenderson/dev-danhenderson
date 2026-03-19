@@ -1,4 +1,10 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
+import {
+  dismissHeaderSettingsHint,
+  dismissWelcomeSequence,
+  expectHeaderSettingsHint,
+  resetWelcomeState,
+} from './helpers/header';
 
 const HOME_SCREENSHOT_CLOCK_START = new Date('2026-03-17T12:00:00.000Z');
 const STABLE_TERMINAL_OUTPUT_COMMAND = 'npm run build';
@@ -15,25 +21,6 @@ const HOME_HERO_SCREENSHOT_OPTIONS = {
   caret: 'hide' as const,
   scale: 'css' as const,
   maxDiffPixelRatio: 0.05,
-};
-
-const resetWelcomeState = async (page: Page) => {
-  await page.addInitScript(() => {
-    window.localStorage.clear();
-    window.sessionStorage.clear();
-  });
-};
-
-const dismissWelcomeSequence = async (page: Page) => {
-  const dialog = page.getByRole('dialog');
-  await expect(dialog).toBeVisible();
-  await dialog.getByRole('button', { name: 'No thanks' }).click();
-  await expect(dialog).toBeHidden();
-
-  const darkModeHint = page.getByText(/Try an alternative theme/i);
-  await expect(darkModeHint).toBeVisible();
-  await page.keyboard.press('Escape');
-  await expect(darkModeHint).toBeHidden();
 };
 
 const moveMouseAwayFromHero = async (page: Page) => {
@@ -130,6 +117,48 @@ test.describe('Home page', () => {
       /v22\.14\.0|9ab2238|Compiled successfully|mathematics|Python 3\.14|julia version|Formulae/,
       { timeout: 20000 }
     );
+  });
+
+  test('renders the desktop AppBar navigation and consolidated settings popover', async ({
+    page,
+  }) => {
+    await resetWelcomeState(page);
+    await page.goto('/');
+
+    const siteNavigation = page.locator('#site-navigation');
+    const settingsTrigger = siteNavigation.locator('button').first();
+
+    const welcomePrompt = page.getByRole('dialog', { name: 'Play welcome audio?' });
+    await expect(welcomePrompt).toBeVisible();
+    await welcomePrompt.getByRole('button', { name: 'No thanks' }).click();
+    await expect(welcomePrompt).toBeHidden();
+
+    await expect(siteNavigation).toBeVisible();
+    await expect(siteNavigation.getByText('CV', { exact: true })).toBeVisible();
+    await expect(siteNavigation.getByText('Climbing', { exact: true })).toBeVisible();
+    await expect(siteNavigation.getByText('Photography', { exact: true })).toBeVisible();
+    await expect(siteNavigation.getByText('Blog', { exact: true })).toBeVisible();
+    await expect(settingsTrigger).toBeVisible();
+
+    await expectHeaderSettingsHint(page);
+    await dismissHeaderSettingsHint(page);
+
+    await settingsTrigger.click();
+
+    const settingsPopover = page.getByTestId('settings-popover-content');
+    await expect(settingsPopover).toBeVisible();
+    await expect(settingsPopover.getByText('Theme', { exact: true })).toBeVisible();
+    await expect(settingsPopover.getByText(/Dark mode|Light mode/)).toBeVisible();
+    await expect(
+      settingsPopover.getByRole('button', { name: /Switch to (dark|light) mode/i })
+    ).toBeVisible();
+    await expect(
+      settingsPopover.getByRole('radiogroup', { name: 'Appearance presets' })
+    ).toBeVisible();
+    await expect(settingsPopover.getByRole('radio', { name: 'Evergreen (active)' })).toBeVisible();
+    await expect(settingsPopover.getByRole('radio', { name: 'Graphite' })).toBeVisible();
+    await expect(settingsPopover.getByRole('button', { name: 'Default' })).toBeVisible();
+    await expect(settingsPopover.getByRole('button', { name: 'Expressive' })).toBeVisible();
   });
 
   test('matches a stable screenshot for the default home terminal hero tab', async ({ page }) => {

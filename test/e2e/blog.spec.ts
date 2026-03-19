@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { dismissWelcomeSequence } from './helpers/header';
 import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
 const FEATURED_POST_TITLE = 'Building a Design System That Scales';
@@ -180,17 +181,7 @@ test.describe('Blog cross-route navigation', () => {
   test('header navigation includes a Blog link that reaches the blog index', async ({ page }) => {
     await page.goto('/');
 
-    // Dismiss the welcome prompt to reach the main UI
-    const dialog = page.getByRole('dialog');
-    await expect(dialog).toBeVisible();
-    await dialog.getByRole('button', { name: 'No thanks' }).click();
-    await expect(dialog).toBeHidden();
-
-    // Dismiss the dark mode hint
-    const darkModeHint = page.getByText(/Try an alternative theme/i);
-    await expect(darkModeHint).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(darkModeHint).toBeHidden();
+    await dismissWelcomeSequence(page);
 
     // The header should contain a Blog link
     const blogLink = page.getByRole('link', { name: 'Blog' });
