@@ -16,9 +16,26 @@ Prefer changes that preserve the current single-page-app architecture and static
 
 ## Source-of-truth docs
 
-- `docs/README.md` is the index for the repository documentation set.
-- `docs/engineering/agent-guide.md` supplements this root file with repository-wide architectural invariants and safe extension patterns.
-- Use the docs set for architecture, design system, motion, theme/styling, and testing guidance when the root or scoped `AGENTS.md` files are not specific enough.
+- `docs/README.md` is the index for the repository documentation set and the instruction-discovery map.
+- `docs/engineering/agent-guide.md` is the canonical source for repository-wide architecture invariants, intentional exceptions, and safe extension patterns.
+- `docs/engineering/testing-strategy.md` is the canonical source for validation matrices, build variants, and repo-standard Playwright/Jest command shapes.
+- `PLANS.md` is the canonical source for ExecPlan requirements, triggers, and templates.
+- Scoped `AGENTS.md` files under `src/` (and `resume/` when relevant) are the canonical local rules for the files they cover.
+
+## Instruction map
+
+- `resume/AGENTS.md` — resume-source work and PDF update constraints
+- `src/pages/AGENTS.md` — route-level composition, page-local behavior, and route validation expectations
+- `src/components/AGENTS.md` — shared component design, multi-consumer risk, and component validation expectations
+- `src/components/blog/AGENTS.md` — editorial blog subsystem rules and blog-specific validation
+- `src/data/AGENTS.md` — content source-of-truth modules, schema discipline, and protected datasets
+- `src/hooks/AGENTS.md` — adapter-layer boundaries, fallback behavior, and shared hook rules
+- `src/constants/AGENTS.md` — route metadata, feature flags, command palette data, and recovery logic
+- `src/motion/AGENTS.md` — motion foundation, timing rules, and Motion-library boundaries
+- `src/styles/AGENTS.md` — style builders, keyframes, and CSS animation ownership
+- `src/theme/AGENTS.md` — appearance presets, theme assembly, and token ownership
+- `src/types/AGENTS.md` — shared type ownership and low-level dependency boundaries
+- `src/utils/AGENTS.md` — pure helpers and `PUBLIC_URL`-safe asset path construction
 
 ## Stack and runtime
 
@@ -41,84 +58,66 @@ When instructions conflict, prioritize:
 3. following existing component, hook, and data-module patterns
 4. keeping `README.md` aligned with implementation changes
 
-Runtime system and developer instructions override repository instructions. Within repository docs, the closest in-scope `AGENTS.md` takes precedence.
+Runtime system and developer instructions override repository instructions. Within repository docs, follow the canonical owner for the topic; for directory-specific work, the closest in-scope `AGENTS.md` takes precedence over broader repo guidance.
 
-## Local instructions and planning
-
-- More specific instructions may exist in nested `AGENTS.md` files. Follow the closest applicable file for the area being changed.
-- For non-trivial features, refactors, or cross-cutting changes, create and follow an ExecPlan using `PLANS.md`. Treat an ExecPlan as required when any ExecPlan trigger in `PLANS.md` is met.
-- Keep plans current as implementation details change.
-
-## Working workflow
+## Planning and workflow
 
 - Start with the smallest relevant file set: the affected route page, shared component, hook, and data module.
 - Prefer the minimum viable change. Do not broad-scan or refactor unrelated areas unless the task clearly requires it.
+- Use the nearest scoped `AGENTS.md` before editing inside that directory.
 - Before editing, identify the smallest set of files that can satisfy the request while preserving behavior.
-- For tasks affecting multiple routes, cross-cutting UX, architecture, or more than a few source files, write an ExecPlan before making changes.
+- For non-trivial features, refactors, cross-cutting changes, or any task that meets an ExecPlan trigger in `PLANS.md`, create and follow an ExecPlan before making changes.
+- Keep plans current as implementation details change.
 - Preserve existing public component APIs where practical. Change them only when required for correctness or the requested task.
 - If the task is review-only, prioritize findings over implementation and distinguish required fixes from optional improvements.
 - For UI edits, identify whether the change is page-local or shared-component-impacting before editing, then validate accordingly.
-
-## Repository-wide invariants
-
-- Preserve provider order: `ThemeProvider -> WelcomeOnboardingProvider -> WelcomeAudioProvider -> BrowserRouter -> CommandPaletteProvider -> AppContent`.
-- All Framer Motion timing and stagger behavior must flow through `useMotionScale()`. When motion intensity is `off`, or `prefers-reduced-motion` is active, entrance animation and stagger timing must collapse to instant rendering and CSS decorative animations must be disabled.
-- Theme-conditional reusable surfaces belong in the style-builder pipeline (`createComponentStyleMap()` / `createAppStyleMap()`), not in ad hoc inline `sx` objects that read `theme.appearanceTreatment` directly.
-- Feature-gated routes and navigation (currently blog) must remain driven by `isFeatureEnabled()` and route metadata rather than unconditional route or nav rendering.
-- Treat the Home IDE hero, blog editorial surfaces, photography overlays/lightbox, and CV story mode as documented intentional design-system exceptions, not default patterns to normalize.
 
 ## Concurrent work
 
 - Multiple agents and the repository developer may work on the same branch at the same time. Treat the branch as shared and assume others may push changes at any time.
 
+## Repo-wide guardrails
+
+- Keep the app fully client-side unless backend work is explicitly requested.
+- Preserve SPA routing behavior, direct-link compatibility, and `PUBLIC_URL`-safe asset handling.
+- Prefer focused, minimal edits that fit the current component, hook, and data model patterns.
+- Use existing TypeScript data modules as the primary content source; do not introduce a CMS or new remote content source unless explicitly requested.
+- Preserve graceful fallbacks for GitHub-backed CV content.
+- Do not add new dependencies unless the task cannot be completed cleanly with the existing stack. If a new dependency is necessary, explain why.
+- Keep `README.md` aligned with implementation changes when setup, commands, architecture, or public behavior changes.
+- Avoid unrelated refactors, formatting-only churn, mass renames, or dependency upgrades unless required by the task.
+
+## Repository-wide invariants
+
+Canonical definitions live in `docs/engineering/agent-guide.md`.
+
+- Preserve provider nesting order.
+- Preserve the motion intensity contract through `useMotionScale()`.
+- Keep theme-conditional reusable surfaces in the style-builder pipeline.
+- Keep feature-gated routes and navigation driven by `isFeatureEnabled()` and route metadata.
+- Respect the documented intentional design-system exceptions for the Home IDE hero, blog editorial surfaces, photography overlays/lightbox, and CV story mode.
+
 ## Commands
 
 Use the narrowest relevant validation first, then expand if needed.
 
-After checkout (new or updated dependencies):
+`docs/engineering/testing-strategy.md` is the canonical source for validation matrices, build variants, browser-validation expectations, and repo-standard Playwright/Jest command shapes.
 
-1. `npm install` — installs any new or changed packages declared in `package.json` / `package-lock.json`
-2. `npx playwright install chromium` — only needed when the branch adds Playwright to the project or upgrades its version
-3. `npm run build` — confirm the project compiles cleanly with the new dependency
-4. `CI=true npm test -- --watch=false` — run unit/component tests to catch regressions
-
-Primary commands:
+Quick reference:
 
 - install: `npm install`
 - dev server: `npm start`
-- dev server on port 3000: `PORT=3000 npm start`
 - build: `npm run build`
-- E2E build variant for gated blog coverage: `npm run build:e2e`
-- tests when relevant: `CI=true npm test -- --watch=false`
-
-Playwright E2E commands, when the working branch includes the Playwright workflow:
-
-- one-time browser install: `npx playwright install chromium`
-- serve the production build for local E2E debugging: `npm run serve:e2e`
-- end-to-end tests: `npm run test:e2e`
-- headed E2E tests: `npm run test:e2e:headed`
-- interactive E2E runner: `npm run test:e2e:ui`
+- gated E2E build: `npm run build:e2e`
+- unit/component tests: `CI=true npm test -- --watch=false`
+- Playwright: `npm run test:e2e`
 
 Notes:
 
 - The dev server defaults to port `3001` in this repository.
-- `docs/engineering/testing-strategy.md` is the canonical source for Playwright command shapes, and `playwright.config.ts` owns shared worker concurrency.
-- Playwright E2E runs against a production build served on port `3100`; run `npm run build` before the narrowest relevant `npm run test:e2e -- test/e2e/<spec>.ts` or `npm run test:e2e` command when that workflow is present.
-- Use `npm run build:e2e` before blog Playwright coverage or other feature-gated route validation so `REACT_APP_RUNTIME_ENV=test` enables the gated routes.
-- `npm run serve:e2e` is optional for local iteration; Playwright can start the server itself when the branch includes a `webServer` config.
+- Playwright serves the `build/` directory on port `3100`.
+- `CI=true npm test -- --watch=false` currently has unrelated baseline failures in existing CV tests, so prefer the narrowest relevant validation for the files you change and separate unrelated failures from regressions you introduce.
 - Do not claim a command or validation step was run unless it was actually run.
-
-## Core expectations
-
-- Keep the app fully client-side unless backend work is explicitly requested.
-- Preserve SPA routing behavior. Direct links must continue to work via host-side rewrites to `index.html`.
-- Preserve static asset compatibility with `PUBLIC_URL`.
-- Prefer focused, minimal edits that fit the current component and data model patterns.
-- Do not add new dependencies unless the task cannot be completed cleanly with the existing stack. If a new dependency is necessary, explain why.
-- When updating content, prefer the existing TypeScript data modules over introducing a CMS or remote content source.
-- Keep `README.md` aligned with implementation changes in the same change set when setup, commands, architecture, or user-visible behavior meaningfully changes.
-- Identify technical debt relevant to the requested change. Fix it only if required for correctness, maintainability, or task completion. Otherwise, note it briefly without expanding scope.
-- Emphasize component reuse and consistency with existing UI, hook, and data handling patterns.
 
 ## Repository map
 
@@ -138,42 +137,30 @@ Notes:
 - `resume/`: LaTeX source for the downloadable resume PDF
 - `docs/`: source-of-truth architecture, frontend, engineering, and reference documentation
 
-## Change guidance by area
+## Area guidance
 
 ### CV / portfolio content
 
-- Primary content lives in `src/data/cv.ts`.
 - Treat `src/data/cv.ts` as the source of truth for the interactive `/cv` experience and routine CV content updates.
-- It isn't necessary for the live `/cv` experience and the downloadable resume to be conceptually aligned unless the task explicitly involves the resume artifact or resume source.
-- Do not modify files in `resume/`, which are read-only for agents by default unless the user explicitly requests resume-source updates.
-- If the user explicitly requests a downloadable resume artifact update, replace `public/assets/daniel-henderson-resume.pdf` and verify any related metadata in `src/data/cv.ts`.
-- If the user explicitly requests resume-source work, update the relevant files under `resume/` and keep any related metadata in `src/data/cv.ts` consistent when needed.
+- `resume/` is read-only unless the task explicitly requests resume-source changes or a resume PDF update.
+- The live `/cv` experience and the downloadable resume do not need conceptual parity unless the task explicitly connects them.
 
 ### GitHub-driven sections
 
 - Dynamic CV highlights use GitHub API-backed hooks with fallback content.
 - Preserve graceful degradation when GitHub API calls fail or are rate-limited.
 - Prefer deterministic mocked validation over live GitHub API behavior when Playwright E2E helpers are available.
-- Do not introduce authenticated backend infrastructure unless explicitly requested.
 
-### Climbing data
+### Climbing and photography data
 
-- Do not edit climbing datasets in `src/data/climbs.ts` unless the task explicitly requests it.
-- Preserve sorting and normalization assumptions used by `useClimbingData` and DataGrid views.
-
-### Photography
-
-- Do not edit gallery content in `src/data/photography.ts` unless the task explicitly requests it.
-- Preserve slug generation assumptions used by `usePhotographyData` and route matching.
+- Do not edit `src/data/climbs.ts` or `src/data/photography.ts` unless the task explicitly requests it.
+- Preserve sorting, normalization, slug generation, and route-matching assumptions used by their hooks and routes.
 
 ### Blog content
 
-- Primary content lives in `src/data/blog.ts` as an array of `BlogPost` objects with typed `BlogContentBlock[]` content.
-- Do not edit blog post content unless the task explicitly requests it.
 - All blog UI components live in `src/components/blog/`; use `useBlogData` for all data access and navigation helpers.
 - Blog routes are feature-gated via `isFeatureEnabled('blog')`; preserve the current behavior where they are available in development/test builds and omitted in production.
 - Do not fetch blog content from remote APIs or a CMS; all content is static.
-- Not-found blog slugs must render `RouteRecoveryPanel` with contextual suggestions.
 
 ### Theme and UX state
 
@@ -181,52 +168,6 @@ Notes:
 - Welcome audio behavior lives in `src/WelcomeAudioProvider.tsx`.
 - Preserve localStorage-backed preferences unless migration is explicitly requested.
 - Do not hardcode theme logic in components or routes; use the existing context and hooks.
-
-## Scope control
-
-- Do not perform unrelated refactors, formatting-only churn, mass renames, or dependency upgrades unless required by the task.
-- Do not rename routes, exported types, or stable data model fields unless explicitly required.
-- Prefer preserving existing component APIs where practical.
-- Avoid mixing content changes, UI refactors, and infrastructure changes in one pass unless the task explicitly calls for it.
-
-## UI validation
-
-- Use the webdev MCP server when validating UI changes, route rendering, or screenshots.
-- When the working branch includes Playwright E2E coverage, use it for repeatable route flows, navigation, mocked integration states, and browser regressions that benefit from deterministic automation.
-- Treat webdev and Playwright as complementary: use webdev for visual/responsive inspection and screenshots, and Playwright for scripted end-to-end validation.
-- Browser-based validation is required for changes that affect layout, interaction, navigation, responsive behavior, animations, conditional rendering, or asset rendering.
-- If browser tooling is unavailable, run the narrowest available fallback validation (for example build plus targeted tests) and report browser validation as deferred.
-- Validate the smallest set of affected routes first, then expand to additional consumers if a shared component or layout primitive changed.
-- For layout-affecting edits, check at least one narrow/mobile viewport and one desktop viewport.
-- Tear down the browser session after validation so no stale tabs or sessions remain open.
-
-## Validation matrix
-
-- Content-only change: verify the affected page renders and touched data modules still build.
-- Page-level UI change: browser validation required on the changed route; when Playwright coverage exists for that route, run the narrowest relevant spec after `npm run build`.
-- Shared component change: browser validation required on at least one primary consuming route and one additional consumer when reuse is clear; if those routes are covered by Playwright E2E, run the relevant route specs.
-- Layout, interaction, navigation, responsive, animation, conditional-rendering, or asset-rendering change: browser-based validation required.
-- Route, navigation, or not-found behavior change: validate direct navigation and `PUBLIC_URL` compatibility, and run the relevant Playwright route coverage when available.
-- Feature-gated content change: use the runtime-appropriate build variant, including `npm run build:e2e` before Playwright coverage when gated blog behavior is involved.
-- GitHub-backed CV or fallback-content change: validate `/cv` in the browser and run mocked Playwright coverage for GitHub success/failure states when available.
-- Asset-path change: validate direct navigation and `PUBLIC_URL` compatibility.
-- Resume artifact change: verify the updated PDF path and any related metadata references.
-
-Typical checks:
-
-- `npm run build`
-- `npm run build:e2e` before gated blog route specs
-- relevant tests, if the change affects tested behavior
-- `npm run test:e2e -- test/e2e/<route>.spec.ts` for the narrowest relevant route flow when Playwright is present
-- `npm run test:e2e` when changes span multiple covered routes or shared route behavior
-- browser-based route or screenshot validation for UI-affecting changes
-
-## Deployment-sensitive constraints
-
-- Production output is generated in `build/`.
-- Hosts must rewrite unknown paths to `index.html` for SPA routing.
-- Static assets under `public/assets/` must ship with the deployment.
-- Review any asset URL changes for `PUBLIC_URL` compatibility.
 
 ## Review guidelines
 

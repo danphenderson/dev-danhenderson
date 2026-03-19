@@ -45,25 +45,13 @@ PORT=3000 npm start
 
 Use the narrowest relevant validation for the change you made.
 
-- General compile check:
+The canonical validation matrix, build variants, and repo-standard command shapes live in `docs/engineering/testing-strategy.md`. Repo-level guardrails and instruction discovery live in `AGENTS.md`.
 
-  ```bash
-  npm run build
-  ```
+Common starting points:
 
-- Unit and component tests:
-
-  ```bash
-  CI=true npm test -- --watch=false
-  ```
-
-- Browser end-to-end tests:
-
-  ```bash
-  npx playwright install chromium
-  npm run build
-  npm run test:e2e
-  ```
+- `npm run build`
+- `CI=true npm test -- --watch=false`
+- `npm run build:e2e` then `npm run test:e2e` for feature-gated blog coverage or Playwright route validation
 
 For layout, navigation, interaction, animation, or responsive changes, validate in a browser on at least one desktop viewport and one mobile viewport.
 
@@ -124,4 +112,5 @@ In development and tests, bundled GitHub data is used by default. Set `REACT_APP
 
 - General contributor guidance lives in `AGENTS.md`.
 - Copilot-specific guidance lives in `.github/copilot-instructions.md`.
-- Path-specific AI instructions live in `.github/instructions/`.
+- Path-specific AI instructions live in `.github/instructions/` and defer to the scoped `AGENTS.md` files they summarize.
+- `docs/README.md` contains the instruction map and links to the canonical engineering docs.

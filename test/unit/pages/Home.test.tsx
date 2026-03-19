@@ -62,6 +62,7 @@ jest.mock('../../../src/components/TerminalHeroContent', () => {
       lines,
       playing,
       expanded,
+      bootActive,
       onClose,
       onMinimize,
       onExpand,
@@ -75,6 +76,7 @@ jest.mock('../../../src/components/TerminalHeroContent', () => {
       lines: Array<{ command: string; output: string }>;
       playing?: boolean;
       expanded?: boolean;
+      bootActive?: boolean;
       onClose?: () => void;
       onMinimize?: () => void;
       onExpand?: () => void;
@@ -96,6 +98,7 @@ jest.mock('../../../src/components/TerminalHeroContent', () => {
         <div
           data-testid="terminal-hero"
           data-expanded={String(Boolean(expanded))}
+          data-boot-active={String(Boolean(bootActive))}
           data-instance-id={String(instanceId.current)}
           data-playing={String(Boolean(playing))}
           data-lines={lines

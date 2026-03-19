@@ -51,6 +51,11 @@ export interface TerminalLine {
 
 export type VscodeEditorTab = 'server' | 'client';
 
+export type TerminalSessionTab = {
+  id: string;
+  label: string;
+};
+
 export type IdeWindowState = 'normal' | 'closed' | 'minimized' | 'expanded';
 
 export type IdeResizeEdge = 'right' | 'bottom' | 'corner';

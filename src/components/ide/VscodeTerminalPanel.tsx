@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import { keyframes } from '@emotion/react';
 import type { SxProps, Theme } from '@mui/material/styles';
-import type { TerminalLine } from '../../types/ui';
+import type { TerminalLine, TerminalSessionTab } from '../../types/ui';
 import type { TerminalTypewriterPhase } from '../text/useTerminalTypewriter';
 import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily, systemFontFamily } from './vscodeTokens';
 
@@ -30,6 +30,10 @@ interface VscodeTerminalPanelProps {
   phase: TerminalTypewriterPhase;
   /** Completed command+output pairs shown above the active line */
   history: TerminalLine[];
+  /** Terminal session tabs; when omitted the default single "zsh" badge renders. */
+  sessions?: TerminalSessionTab[];
+  /** Which session tab is active; only meaningful when `sessions` is provided. */
+  activeSessionId?: string;
 }
 
 /**
@@ -127,6 +131,8 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
   showCursor,
   phase,
   history,
+  sessions,
+  activeSessionId,
 }) => {
   const flexLayout = expanded || fluidLayout || resized;
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -216,40 +222,57 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
           ))}
         </Box>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          {/* Active zsh session */}
+          {/* Terminal session tabs */}
           <Box
             sx={{
               display: { xs: 'none', sm: 'flex' },
               alignItems: 'center',
-              gap: 0.5,
+              gap: 0.75,
             }}
           >
-            <Box
-              component="span"
-              sx={{
-                fontFamily: monoFontFamily,
-                fontSize: '0.58rem',
-                color: VSCODE_COLORS.inactiveTab,
-                border: `1px solid rgba(255,255,255,0.12)`,
-                borderRadius: '2px',
-                px: '3px',
-                lineHeight: 1.5,
-                userSelect: 'none',
-              }}
-            >
-              {'>_'}
-            </Box>
-            <Box
-              component="span"
-              sx={{
-                fontFamily: monoFontFamily,
-                fontSize: '0.66rem',
-                color: VSCODE_COLORS.foreground,
-                userSelect: 'none',
-              }}
-            >
-              zsh
-            </Box>
+            {(sessions ?? [{ id: 'zsh', label: 'zsh' }]).map((session) => {
+              const isActive = sessions ? session.id === activeSessionId : true;
+              return (
+                <Box
+                  key={session.id}
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 0.5,
+                    opacity: isActive ? 1 : 0.55,
+                    transition: 'opacity 0.15s',
+                  }}
+                >
+                  <Box
+                    component="span"
+                    sx={{
+                      fontFamily: monoFontFamily,
+                      fontSize: '0.58rem',
+                      color: VSCODE_COLORS.inactiveTab,
+                      border: `1px solid rgba(255,255,255,0.12)`,
+                      borderRadius: '2px',
+                      px: '3px',
+                      lineHeight: 1.5,
+                      userSelect: 'none',
+                    }}
+                  >
+                    {'>_'}
+                  </Box>
+                  <Box
+                    component="span"
+                    sx={{
+                      fontFamily: monoFontFamily,
+                      fontSize: '0.66rem',
+                      color: isActive ? VSCODE_COLORS.foreground : VSCODE_COLORS.inactiveTab,
+                      userSelect: 'none',
+                      transition: 'color 0.15s',
+                    }}
+                  >
+                    {session.label}
+                  </Box>
+                </Box>
+              );
+            })}
           </Box>
           {/* Add / dropdown */}
           <Box

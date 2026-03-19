@@ -16,6 +16,21 @@ These docs serve three groups:
 2. **Developers** — precise documentation of motion systems, page composition, theme/styling patterns, and shared primitives
 3. **Reviewers / hiring managers** — evidence of deliberate frontend engineering, system design, and implementation maturity
 
+## Instruction map
+
+Repository instructions are layered. Use them in this order:
+
+| Resource                                            | Owns                                                                         | When to use                                                                      |
+| --------------------------------------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| [AGENTS.md](../AGENTS.md)                           | Repo-level workflow, guardrails, and instruction discovery                   | Before any cross-cutting or repo-wide task                                       |
+| [Agent guide](engineering/agent-guide.md)           | Architecture invariants, intentional exceptions, and safe extension patterns | When making structural UI, motion, theme, styling, or route changes              |
+| [Testing strategy](engineering/testing-strategy.md) | Validation matrix, build variants, and repo-standard command shapes          | Whenever validating a change                                                     |
+| [PLANS.md](../PLANS.md)                             | ExecPlan triggers, requirements, and template                                | When a task is non-trivial, cross-cutting, or otherwise meets a planning trigger |
+| `src/**/AGENTS.md` and `resume/AGENTS.md`           | Canonical local rules for the directory being edited                         | Before editing files in that scope                                               |
+| `.github/instructions/*.instructions.md`            | Auto-applied shims that summarize the relevant scoped rules                  | When Copilot preloads file-matched instructions                                  |
+
+If multiple documents overlap, prefer the canonical owner above and then the nearest scoped `AGENTS.md` for the files you are editing.
+
 ## Application at a glance
 
 ```mermaid

@@ -34,6 +34,42 @@ This document covers the actual test organization, harness patterns, and coverag
   - specific spec: `npm run test:e2e -- test/e2e/<spec>.ts`
   - specific project: `npm run test:e2e -- --project=<project-name>`
 
+## Validation ownership
+
+This document is the canonical source for:
+
+- repo-standard Playwright, Jest, and build command shapes
+- build-variant requirements such as `npm run build:e2e`
+- change-type validation expectations referenced by `AGENTS.md`, `CONTRIBUTING.md`, and scoped instruction files
+- browser-validation expectations for UI-affecting changes
+
+When another instruction file says to validate a change, it should point here rather than restating the full matrix or command list.
+
+## Validation matrix
+
+| Change type                     | Required validation                                                                                                                     |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Data module only                | `npm run build` + targeted route or consumer validation                                                                                 |
+| Page-level UI                   | `npm run build` + browser validation on the changed route                                                                               |
+| Shared component                | `npm run build` + browser validation on a primary consumer and at least one additional consumer when reuse is clear                     |
+| Motion/animation                | `npm run build` + validation with motion intensity `off` + browser validation                                                           |
+| Theme/styling                   | `npm run build` + browser validation in both light and dark modes; when shared appearance treatment changes, check at least two presets |
+| Route/navigation/not-found      | `npm run build` + direct-navigation check + relevant Playwright route coverage when present                                             |
+| Feature-gated content           | `npm run build:e2e` + gating check + relevant Playwright coverage                                                                       |
+| GitHub-backed CV/fallback data  | `npm run build` + mocked `/cv` success/failure coverage when present + browser validation                                               |
+| Asset-path or media-path change | `npm run build` + direct-navigation check + `PUBLIC_URL` compatibility check                                                            |
+
+### Browser validation expectations
+
+- Use the webdev browser tooling for route rendering, layout inspection, and screenshots when UI is affected.
+- Validate the smallest set of affected routes first, then expand to another consumer when a shared component or layout primitive changed.
+- Check at least one narrow/mobile viewport and one desktop viewport for layout-affecting edits.
+- When Playwright E2E coverage exists for the touched behavior, run the narrowest relevant spec after the appropriate build variant.
+- Use `npm run build:e2e` before blog or other feature-gated Playwright coverage so `REACT_APP_RUNTIME_ENV=test` enables the gated routes.
+- Prefer mocked `/cv` coverage over live GitHub API-dependent validation when that workflow is available.
+- If browser tooling is unavailable, run the narrowest fallback validation and report browser validation as deferred.
+- Close browser sessions when validation is finished.
+
 ## Test organization
 
 ```mermaid

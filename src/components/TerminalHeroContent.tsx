@@ -2,6 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { useTerminalTypewriter } from './text/useTerminalTypewriter';
+import { useTerminalBootSequence } from '../hooks/useTerminalBootSequence';
 import type { TerminalLine, VscodeEditorTab } from '../types/ui';
 import { VscodeTitleBar } from './ide/VscodeTitleBar';
 import { VscodeActivityBar } from './ide/VscodeActivityBar';
@@ -27,6 +28,8 @@ export interface TerminalHeroContentProps {
   lines: TerminalLine[];
   playing?: boolean;
   expanded?: boolean;
+  /** When true the post-expand boot sequence runs before the loop starts. */
+  bootActive?: boolean;
   /** @deprecated sessionLabel is no longer rendered; kept for API compatibility */
   sessionLabel?: string;
   onWindowDragPointerDown?: React.PointerEventHandler<HTMLDivElement>;
@@ -50,6 +53,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   lines,
   playing = false,
   expanded = false,
+  bootActive = false,
   onWindowDragPointerDown,
   windowDragEnabled = false,
   windowDragging = false,
@@ -64,14 +68,43 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   expandHighlighted,
   sx,
 }) => {
-  const { commandText, outputText, showCursor, phase, history } = useTerminalTypewriter({
+  // ---- Boot sequence ----
+  const boot = useTerminalBootSequence(bootActive);
+
+  // The existing loop starts only after the boot completes
+  const loopPlaying = playing && boot.complete;
+
+  const {
+    commandText: loopCommand,
+    outputText: loopOutput,
+    showCursor: loopCursor,
+    phase: loopPhase,
+    history,
+  } = useTerminalTypewriter({
     lines,
-    playing,
+    playing: loopPlaying,
     prompt: '~ $ ',
     timingPreset: 'headline',
     pauseBeforeOutputMs: 400,
     pauseAfterOutputMs: 2400,
   });
+
+  // Merge boot vs loop display values
+  const isBoot = bootActive && !boot.complete;
+  const commandText = isBoot ? boot.commandText : loopCommand;
+  const outputText = isBoot ? boot.outputText : loopOutput;
+  const showCursor = isBoot ? boot.showCursor : loopCursor;
+
+  // Map boot phases to TerminalTypewriterPhase so VscodeTerminalPanel renders correctly
+  const phase = isBoot
+    ? boot.phase === 'server-output' || boot.phase === 'client-output'
+      ? ('pause-after-output' as const)
+      : boot.phase === 'server-enter' || boot.phase === 'client-enter'
+        ? ('pause-before-output' as const)
+        : boot.phase === 'handoff'
+          ? ('clearing-screen' as const)
+          : ('typing-command' as const)
+    : loopPhase;
 
   const historyLineCount = React.useMemo(
     () => history.reduce((count, line) => count + 1 + line.output.split('\n').length, 0),
@@ -110,8 +143,9 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   // Command palette toggle
   const [commandPaletteVisible, setCommandPaletteVisible] = React.useState(false);
 
-  // Clickable tab focus
-  const [activeTab, setActiveTab] = React.useState<VscodeEditorTab>('server');
+  // Clickable tab focus — boot drives the tab during boot, user has control after
+  const [userTab, setUserTab] = React.useState<VscodeEditorTab>('server');
+  const activeTab: VscodeEditorTab = isBoot ? boot.editorTab : userTab;
 
   const isUserResized = resizeWidth != null || resizeHeight != null;
   const showResizeHandles = resizeEnabled && !expanded;
@@ -195,7 +229,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
               expanded={expanded}
               fluidLayout={fluidEditorLayout}
               resized={isUserResized}
-              onTabChange={setActiveTab}
+              onTabChange={setUserTab}
             />
             <VscodeEditorPane
               activeTab={activeTab}
@@ -212,6 +246,8 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
               showCursor={showCursor}
               phase={phase}
               history={history}
+              sessions={isBoot ? boot.sessions : undefined}
+              activeSessionId={isBoot ? boot.activeSessionId : undefined}
             />
           </Box>
         </Box>

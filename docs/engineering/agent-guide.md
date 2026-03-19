@@ -2,7 +2,7 @@
 
 Operational rules, failure modes, and safe extension patterns for coding agents working in this repository.
 
-This guide supplements the root [`AGENTS.md`](../../AGENTS.md) and nested `AGENTS.md` files with architecture-informed guidance. When rules conflict, prioritize the nearest `AGENTS.md` to the file being changed.
+This guide supplements the root [`AGENTS.md`](../../AGENTS.md) and nested `AGENTS.md` files with architecture-informed guidance. It is the canonical source for repository-wide architecture invariants and safe extension patterns. For validation matrices, build variants, and repo-standard command shapes, use [Testing strategy](testing-strategy.md). When rules conflict, prioritize the nearest `AGENTS.md` to the file being changed.
 
 ## Before you start
 
@@ -175,17 +175,18 @@ Four subsystems intentionally deviate from the shared design system. Do not "fix
 | Photography lightbox | `src/components/photography/`    | Image-first overlay with minimal UI chrome                       |
 | CV story mode        | `src/components/cv/CVStory*.tsx` | Full-screen immersive experience with its own motion system      |
 
-## Validation matrix (quick reference)
+## Validation handoff
 
-| Change type           | Required validation                                                          |
-| --------------------- | ---------------------------------------------------------------------------- |
-| Data module only      | `npm run build` + targeted test                                              |
-| Page-level UI         | Build + browser validation on the changed route                              |
-| Shared component      | Build + browser validation on primary consumer + at least one other consumer |
-| Motion/animation      | Build + test with intensity `off` + browser validation                       |
-| Theme/styling         | Build + test with at least 2 presets × 2 modes                               |
-| Route/navigation      | Build + direct link test + E2E route spec                                    |
-| Feature-gated content | Build:e2e variant + check flag gating                                        |
+[Testing strategy](testing-strategy.md) is the canonical source for validation commands, build variants, browser-validation expectations, and the repo-wide validation matrix. Use it whenever root or scoped instructions tell you to validate a change.
+
+Architecture-specific reminders:
+
+| Change area           | Additional check                                                                                 |
+| --------------------- | ------------------------------------------------------------------------------------------------ |
+| Motion/animation      | Verify motion intensity `off` and reduced-motion handling collapse entrance and stagger behavior |
+| Theme/styling         | Validate both light/dark modes and at least two appearance presets when shared styling changes   |
+| Shared component      | Validate a primary consumer and at least one additional clear consumer                           |
+| Feature-gated content | Use `npm run build:e2e` and verify the gate still hides content outside enabled environments     |
 
 ## Safe extension patterns
 
