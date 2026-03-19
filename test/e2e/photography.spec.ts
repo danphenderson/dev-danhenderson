@@ -1,11 +1,31 @@
 import { test, expect, type Page } from '@playwright/test';
 import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
+const PHOTOGRAPHY_NOT_FOUND_COPY =
+  /This album does not exist or has been moved\. The command palette opens with a recovery search so you can jump to another gallery or route quickly\./;
+const INVALID_PHOTOGRAPHY_SLUG_QUERY = 'landscap';
+
 const waitForPhotographySection = async (page: Page) => {
   await waitForAnimatedSectionReadiness({
     anchor: page.getByText('A selection of field work, climbing days, and stargazing nights.'),
     readyLocators: [page.getByText('4 albums')],
     hiddenLocators: [page.getByRole('status', { name: 'Loading photography albums' })],
+  });
+};
+
+const waitForPhotographyFallback = async (page: Page) => {
+  const main = page.locator('main');
+
+  await waitForAnimatedSectionReadiness({
+    anchor: main.getByRole('heading', { name: 'Album not found' }),
+    readyLocators: [
+      main.getByRole('link', { name: 'Back to photography' }),
+      main.getByText(/^Photography album$/),
+      main.getByText(PHOTOGRAPHY_NOT_FOUND_COPY),
+      main.getByRole('heading', { name: 'Suggested destinations' }),
+      main.getByRole('heading', { name: 'Shared recovery routes' }),
+      main.getByRole('link', { name: 'Open Album: Landscape' }),
+    ],
   });
 };
 
@@ -52,8 +72,8 @@ test.describe('Photography page', () => {
   test('offers contextual recovery for invalid album slugs', async ({ page }) => {
     await page.goto('/photography/landscap');
 
-    await expect(page.getByRole('link', { name: 'Back to photography' })).toBeVisible();
-    await expect(page.getByText('Album not found')).toBeVisible();
+    await waitForPhotographyFallback(page);
+
     await page.getByRole('button', { name: 'Open command palette' }).click();
 
     await expect(page.getByRole('dialog')).toHaveCount(1);
@@ -61,7 +81,7 @@ test.describe('Photography page', () => {
     await expect(dialog).toBeVisible();
     await expect(
       dialog.getByRole('textbox', { name: 'Search routes, albums, and CV sections' })
-    ).toHaveValue('landscap');
+    ).toHaveValue(INVALID_PHOTOGRAPHY_SLUG_QUERY);
     const landscapeAction = dialog.getByRole('button', { name: /Album: Landscape/ });
     await expect(landscapeAction).toBeVisible();
 

@@ -8,7 +8,6 @@ import {
   ListItemButton,
   ListItemText,
   TextField,
-  Typography,
 } from '@mui/material';
 import { useEffect, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -17,6 +16,7 @@ import {
   type CommandPaletteAction,
 } from '../constants/commandPaletteActions';
 import { useCommandPalette } from '../CommandPaletteProvider';
+import { CaptionText, EntryTitle, SecondaryBodyText } from './text';
 import { matchesCommandPaletteAction } from '../utils/commandPaletteSearch';
 
 const isEditableTarget = (target: EventTarget | null): boolean => {
@@ -166,12 +166,10 @@ export const GlobalCommandPalette = () => {
               gap: 2,
             }}
           >
-            <Typography id="command-palette-title" variant="h6">
+            <EntryTitle id="command-palette-title" component="h2">
               Command palette
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Press / or Cmd+K
-            </Typography>
+            </EntryTitle>
+            <CaptionText color="text.secondary">Press / or Cmd+K</CaptionText>
           </Box>
           <TextField
             autoFocus
@@ -205,9 +203,7 @@ export const GlobalCommandPalette = () => {
               ))
             ) : (
               <Box sx={{ px: 1, py: 2 }}>
-                <Typography variant="body2" color="text.secondary">
-                  No matching routes or sections.
-                </Typography>
+                <SecondaryBodyText>No matching routes or sections.</SecondaryBodyText>
               </Box>
             )}
           </List>

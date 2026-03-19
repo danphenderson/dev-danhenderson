@@ -1,8 +1,9 @@
-import { Typography } from '@mui/material';
 import { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import BackgroundPaper from '../components/BackgroundPaper';
+import { SectionHeading } from '../components/layout/SectionHeading';
 import { RouteRecoveryPanel } from '../components/RouteRecoveryPanel';
+import { SecondaryBodyText, SecondaryCaptionText } from '../components/text';
 import { getRecoveryContext } from '../constants/recoveryContext';
 import { recoveryRouteActions } from '../constants/routeActions';
 import { siteRouteMap } from '../constants/siteRoutes';
@@ -34,25 +35,23 @@ export default function NotFound() {
     <BackgroundPaper image={fallbackBackgroundImage}>
       <StaggerChildren>
         <MotionItem>
-          <Typography variant="h2" marginTop={3}>
-            404 Not Found
-          </Typography>
+          <SectionHeading
+            overline="Route recovery"
+            title="404 Not Found"
+            subtitle="The page you're looking for doesn't exist."
+            sx={{ mt: 3, maxWidth: 560 }}
+          />
         </MotionItem>
         <MotionItem>
-          <Typography variant="body1" sx={{ mt: 1, opacity: 0.85 }}>
-            The page you&apos;re looking for doesn&apos;t exist.
-          </Typography>
+          <SecondaryBodyText sx={{ maxWidth: 560, opacity: 0.78 }}>
+            Use the command palette or the contextual suggestions below to recover without leaving
+            the shared route and section registry.
+          </SecondaryBodyText>
         </MotionItem>
         <MotionItem>
-          <Typography variant="body2" sx={{ mt: 1.5, maxWidth: 560, opacity: 0.78 }}>
-            Use the command palette or the contextual suggestions below to recover without leaving the
-            shared route and section registry.
-          </Typography>
-        </MotionItem>
-        <MotionItem>
-          <Typography variant="caption" sx={{ mt: 1, display: 'block', opacity: 0.62 }}>
+          <SecondaryCaptionText sx={{ display: 'block', maxWidth: 560, opacity: 0.62 }}>
             Press `/` or `Cmd+K` at any time to reopen the palette after dismissing it.
-          </Typography>
+          </SecondaryCaptionText>
         </MotionItem>
         <MotionItem variants={fadeIn}>
           <RouteRecoveryPanel

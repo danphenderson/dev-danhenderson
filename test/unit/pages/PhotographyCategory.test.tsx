@@ -5,6 +5,15 @@ import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
 import PhotographyCategory from '../../../src/pages/PhotographyCategory';
 
+jest.mock('../../../src/components/layout/SectionHeading', () => ({
+  SectionHeading: ({ overline, title }: { overline: string; title?: string }) => (
+    <div data-testid="section-heading" data-overline={overline} data-title={title ?? ''}>
+      <span>{overline}</span>
+      {title}
+    </div>
+  ),
+}));
+
 jest.mock('../../../src/hooks/usePhotographyData', () => ({
   usePhotographyData: () => ({
     categories: [
@@ -85,6 +94,16 @@ describe('PhotographyCategory', () => {
     renderWithSlug('nonexistent');
 
     expect(screen.getByText('Photography album')).toBeInTheDocument();
+  });
+
+  it('uses the shared section heading for the not-found recovery branch', () => {
+    renderWithSlug('nonexistent');
+
+    expect(screen.getByTestId('section-heading')).toHaveAttribute(
+      'data-overline',
+      'Photography album'
+    );
+    expect(screen.getByTestId('section-heading')).toHaveAttribute('data-title', 'Album not found');
   });
 
   it('passes the category album label to the quilted image list', () => {

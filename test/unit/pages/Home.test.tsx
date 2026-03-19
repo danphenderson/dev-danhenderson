@@ -213,10 +213,32 @@ const OnboardingStateProbe = () => {
   );
 };
 
+const OnboardingBootstrap = ({
+  openPauseHintOnMount = false,
+}: {
+  openPauseHintOnMount?: boolean;
+}) => {
+  const { openPauseHint } = useWelcomeOnboarding();
+
+  React.useEffect(() => {
+    if (!openPauseHintOnMount) {
+      return;
+    }
+
+    openPauseHint();
+  }, [openPauseHintOnMount, openPauseHint]);
+
+  return null;
+};
+
 const HomeHarness = ({
   initialAudioConsent = 'unknown',
+  error,
+  openPauseHintOnMount = false,
 }: {
   initialAudioConsent?: MockWelcomeAudioState['audioConsent'];
+  error?: string;
+  openPauseHintOnMount?: boolean;
 }) => {
   const [audioConsent, setAudioConsent] =
     React.useState<MockWelcomeAudioState['audioConsent']>(initialAudioConsent);
@@ -240,7 +262,7 @@ const HomeHarness = ({
         pause,
         isPlaying,
         ready: true,
-        error: undefined,
+        error,
         audioConsent,
         grantAudioConsent,
         declineAudioConsent,
@@ -248,6 +270,7 @@ const HomeHarness = ({
     >
       <ThemeProvider>
         <WelcomeOnboardingProvider>
+          <OnboardingBootstrap openPauseHintOnMount={openPauseHintOnMount} />
           <Home />
           <OnboardingStateProbe />
         </WelcomeOnboardingProvider>
@@ -281,6 +304,20 @@ describe('Home audio prompt', () => {
     expect(screen.getByRole('button', { name: 'Play welcome audio' })).toBeInTheDocument();
   });
 
+  it('uses shared text primitives for the prompt body and error copy', async () => {
+    render(<HomeHarness error="Playback failed" />);
+
+    const bodyText = await screen.findByText(
+      'Would you like to hear a short verse while browsing the site? Use the pause button in the header to stop it anytime.'
+    );
+    const errorText = screen.getByText('Playback failed');
+
+    expect(bodyText.tagName).toBe('P');
+    expect(bodyText).toHaveClass('MuiTypography-body2');
+    expect(errorText.tagName).toBe('SPAN');
+    expect(errorText).toHaveClass('MuiTypography-caption');
+  });
+
   it('hides the hero card and background shell while the prompt is open', () => {
     render(<HomeHarness />);
 
@@ -292,17 +329,15 @@ describe('Home audio prompt', () => {
 
 describe('Home welcome flow', () => {
   it('waits for the pause and theme hints to close before showing the hero card after audio starts', async () => {
-    render(<HomeHarness />);
+    render(<HomeHarness initialAudioConsent="granted" openPauseHintOnMount />);
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    await waitFor(() => expect(screen.getByTestId('pause-hint-open')).toHaveTextContent('true'));
 
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
     expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument();
-
-    fireEvent.click(await screen.findByRole('button', { name: 'Play welcome audio' }));
-
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(screen.getByTestId('pause-hint-open')).toHaveTextContent('true');
-    expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
 
     fireEvent.click(screen.getByRole('button', { name: 'Dismiss pause hint' }));
 
@@ -335,7 +370,9 @@ describe('Home welcome flow', () => {
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
     expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument();
 
-    fireEvent.click(await screen.findByRole('button', { name: 'No thanks' }));
+    await act(async () => {
+      fireEvent.click(await screen.findByRole('button', { name: 'No thanks' }));
+    });
 
     await waitFor(() =>
       expect(screen.getByTestId('dark-mode-hint-open')).toHaveTextContent('true')

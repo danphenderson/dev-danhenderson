@@ -15,9 +15,15 @@ Edits here should preserve:
 - compatibility with the current SPA/static-hosting model
 - predictable responsive layout and navigation behavior
 
+Source-of-truth docs:
+
+- `docs/architecture/app-architecture.md`
+- `docs/frontend/page-choreography.md`
+
 ## Role of page files
 
 - Page files own route-level composition, section ordering, and route-specific data wiring.
+- Standard content routes should compose `PageFrame` with `SectionHeading` and `SectionCard` / `CVSectionCard`; only the documented full-bleed exceptions (`/` and not-found) should default to `BackgroundPaper`.
 - Prefer keeping heavy presentation details in shared components rather than growing route files into large UI monoliths.
 - Prefer keeping route files readable and declarative.
 
@@ -26,6 +32,7 @@ Edits here should preserve:
 - Treat route-level UI edits as behavior-sensitive, even when they appear cosmetic.
 - Preserve visible content hierarchy, information scent, and primary calls to action unless the task explicitly requests UX changes.
 - Prefer small, local edits over page-wide restructuring.
+- Keep page-level state focused on orchestration concerns such as filters, search, layout mode, or background selection; let feature components own local tab, accordion, drawer, and other interaction state.
 - Do not move logic from shared components into route files unless the route truly owns that behavior.
 - Do not duplicate UI patterns across pages when an existing shared component or pattern already fits.
 - Preserve existing spacing rhythm, section ordering intent, and breakpoint behavior unless the task explicitly requires a layout change.
@@ -36,6 +43,8 @@ Edits here should preserve:
 - Preserve stable route paths and direct-navigation behavior.
 - Do not rename route exports, route elements, or route wiring unless explicitly required.
 - Keep page composition aligned with the current architecture: pages assemble content, components render reusable UI, hooks provide data adaptation.
+- For multi-section choreography, prefer layout metadata for section ordering, `delayMs`, and `triggerOnView` instead of scattering delay literals inline.
+- Feature-gated routes must respect `isFeatureEnabled()` and the route metadata in `src/constants/siteRoutes.ts`.
 - If a page change suggests a shared abstraction, prefer extracting only the repeated part rather than refactoring the whole page.
 
 ## Data and hook usage
@@ -67,7 +76,7 @@ When page UI changes are made:
 - validate the changed route directly
 - validate any adjacent route affected by shared navigation or layout
 - check at least one narrow/mobile viewport and one desktop viewport for layout-affecting edits
-- when the working branch includes Playwright E2E coverage for the touched route, run `npm run build` and then the narrowest relevant `npx playwright test e2e/<spec>.ts` command
+- when the working branch includes Playwright E2E coverage for the touched route, run `npm run build` (or `npm run build:e2e` for feature-gated blog coverage) and then the narrowest relevant `npx playwright test test/e2e/<spec>.ts` command
 - when that workflow is present, use `npm run test:e2e` if a page change spans multiple covered routes or shared route behavior
 - for `/cv` GitHub-backed behavior, prefer mocked Playwright success/failure coverage over live API-dependent validation when that workflow is available
 - verify that major headings, primary content blocks, and critical assets render as intended
@@ -98,7 +107,7 @@ Common checks:
   - `/cv` and mocked GitHub states -> `npx playwright test test/e2e/cv.github.spec.ts`
   - `/climbing` -> `npx playwright test test/e2e/climbing.spec.ts`
   - `/photography` and `/photography/:slug` -> `npx playwright test test/e2e/photography.spec.ts`
-  - `/blog` and `/blog/:slug` -> `npx playwright test test/e2e/blog.spec.ts`
+  - `/blog` and `/blog/:slug` -> `npm run build:e2e` then `npx playwright test test/e2e/blog.spec.ts`
   - unknown-route handling -> `npx playwright test test/e2e/not-found.spec.ts`
 - screenshot capture when the task is visual or review-oriented
 

@@ -1,0 +1,238 @@
+# Testing Strategy
+
+This document covers the actual test organization, harness patterns, and coverage priorities in this repository.
+
+## Test infrastructure
+
+| Layer              | Framework                    | Location     | Run command                         |
+| ------------------ | ---------------------------- | ------------ | ----------------------------------- |
+| Unit / component   | Jest + React Testing Library | `test/unit/` | `CI=true npm test -- --watch=false` |
+| End-to-end         | Playwright (Desktop Chrome)  | `test/e2e/`  | `npm run test:e2e`                  |
+| Build verification | `react-scripts build`        | —            | `npm run build`                     |
+
+### Jest configuration
+
+- Test root: `test/unit/` (configured in `package.json` `jest.testMatch`)
+- Pattern: `**/*.test.{ts,tsx}`
+- Setup: `src/setupTests.ts` provides:
+  - `@testing-library/jest-dom` matchers
+  - `window.matchMedia` polyfill for responsive/media-query code
+  - Custom `IntersectionObserver` stub that synchronously reports elements as intersecting (so animated content is visible during tests)
+
+### Playwright configuration
+
+- Test directory: `test/e2e/`
+- Serves production build on port 3100 via `serve -s build -l 3100`
+- Single project: Desktop Chrome
+- Retries: 2 in CI, 0 locally
+- Build variant: `npm run build:e2e` sets `REACT_APP_RUNTIME_ENV=test` so feature-gated routes (blog) are available
+
+## Test organization
+
+```mermaid
+flowchart TB
+  subgraph Unit["test/unit/ (~125 files)"]
+    Providers["Root providers<br/>App · ThemeProvider<br/>CommandPalette · WelcomeAudio<br/>WelcomeOnboarding"]
+    Pages["Pages<br/>Home · CV · Climbing<br/>Photography · Blog · BlogPost · NotFound"]
+    Components["Components<br/>AnimatedContentList · Header<br/>GlobalCommandPalette · PhotoAlbum<br/>+ cv/ blog/ ide/ header/ layout/ text/"]
+    Hooks["Hooks<br/>data adapters · custom hooks"]
+    Utils["Utilities<br/>date · sx · easing · assets · dom"]
+    Constants["Constants<br/>feature flags · routes · recovery"]
+    Styles["Styles<br/>style builder outputs"]
+    Data["Data modules<br/>schema validation"]
+  end
+
+  subgraph E2E["test/e2e/ (6 specs + 2 helpers)"]
+    HomeE2E["home.spec.ts<br/>hero render · navigation · screenshots"]
+    CVE2E["cv.github.spec.ts<br/>GitHub API mocking · fallback"]
+    BlogE2E["blog.spec.ts<br/>listing · post detail"]
+    ClimbE2E["climbing.spec.ts<br/>page render"]
+    PhotoE2E["photography.spec.ts<br/>gallery · category"]
+    NFE2E["not-found.spec.ts<br/>recovery panel"]
+    Helpers["helpers/<br/>github.ts (API mocking)<br/>routeReadiness.ts (route checks)"]
+  end
+```
+
+## Unit test patterns
+
+### Component tests
+
+Components are tested with `render()` + `screen` from React Testing Library. Key patterns:
+
+- **Mock dependencies** via `jest.mock()` for child components, hooks, and imports
+- **ThemeProvider wrapper** for any component that needs theme context
+- **Data attributes** (`data-testid`, `data-delay`, `data-component-is-tilt`) for prop assertions in mocked children
+- **Proxy render** in mocked components to capture and assert on passed props
+
+### Provider tests
+
+Root providers are tested for:
+
+- Context value defaults
+- State update behavior (toggle, set)
+- localStorage persistence (read on mount, write on change)
+- Child rendering
+
+### Hook tests
+
+Data hooks are tested for:
+
+- Correct data transformation from source modules
+- Sorting, filtering, and lookup behavior
+- Edge cases (empty data, missing slugs)
+- Deterministic ordering (e.g., blog tags sorted by frequency with alphabetical tie-break)
+
+### Utility tests
+
+Pure functions in `src/utils/` have straightforward input → output test suites.
+
+## E2E test patterns
+
+### Route specs
+
+Each route spec covers:
+
+- Page render and basic content visibility
+- Navigation from the route
+- Key interactive behavior (if applicable)
+- Screenshot comparison (home page)
+
+### GitHub API mocking
+
+`test/e2e/helpers/github.ts` provides `page.route()` intercepts for GitHub API responses:
+
+- Success state (mocked profile + contributions data)
+- Error state (simulated API failure)
+- Validates that fallback content renders when the API fails
+
+### Route readiness
+
+`test/e2e/helpers/routeReadiness.ts` provides helpers to wait for route-specific signals before asserting (e.g., waiting for data to load, animations to settle).
+
+## What kinds of behavior are protected
+
+### Currently tested
+
+| Category                      | What's covered                                                           | Test layer       |
+| ----------------------------- | ------------------------------------------------------------------------ | ---------------- |
+| Provider state                | Theme toggle, appearance, motion intensity, audio consent, palette state | Unit             |
+| Route rendering               | All 6 routes render expected content                                     | Unit + E2E       |
+| Component APIs                | Props, conditional rendering, data-driven content                        | Unit             |
+| Data hooks                    | Sorting, lookup, transformation, edge cases                              | Unit             |
+| GitHub fallback               | Success and error API states, fallback rendering                         | E2E              |
+| Feature gating                | Blog routes present/absent based on runtime env                          | Unit (constants) |
+| CV story mode                 | Story mode activation, slide navigation, controls                        | Unit             |
+| Not-found recovery            | Recovery panel renders with contextual suggestions                       | Unit + E2E       |
+| Animation component contracts | Delay props, tilt flag, visibility callbacks                             | Unit             |
+| Style builder outputs         | Builder functions execute without error against theme                    | Unit             |
+
+### Not currently tested (gaps)
+
+| Category                            | Why it matters                                                          | Recommended approach                      |
+| ----------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------- |
+| Motion intensity scaling end-to-end | Verifies off/subtle/default/expressive produce visually correct results | E2E visual regression per intensity level |
+| Theme appearance preset switching   | Verifies all 6 presets render without visual breakage                   | E2E screenshot comparison across presets  |
+| IDE window drag/resize/expand       | Complex pointer interaction on home hero                                | E2E with pointer simulation               |
+| Lightbox keyboard navigation        | Accessibility for photography lightbox                                  | E2E keyboard-driven spec                  |
+| Responsive breakpoint behavior      | Layout changes at mobile/tablet/desktop thresholds                      | E2E with viewport resizing                |
+| Command palette search accuracy     | Fuzzy matching across routes and actions                                | Unit for search utility + E2E for modal   |
+
+## Testing motion-heavy features
+
+Motion is the highest regression risk in this codebase. Key principles:
+
+### Test behavior, not cosmetics
+
+- Assert that animated components become visible (the `IntersectionObserver` stub ensures this in unit tests)
+- Assert that `delayMs` and stagger props are passed correctly
+- Assert that `skipEntranceAnimation` and `visible` overrides work
+- Do not assert on specific pixel positions or keyframe values
+
+### Test the scaling contract
+
+- Verify that components respect `useMotionScale()` — when motion is `off`, elements should render instantly
+- Verify that `prefers-reduced-motion` forces the `off` scale
+
+### Test interaction state machines
+
+- Tab open/close transitions
+- Accordion expand/collapse
+- Story mode forward/backward navigation
+- IDE window state changes (normal → minimized → expanded)
+
+### Use the IntersectionObserver stub
+
+`src/setupTests.ts` stubs `IntersectionObserver` to synchronously report intersection. This means:
+
+- Viewport-triggered animations fire immediately in tests
+- You don't need to scroll or wait for intersection
+- Tests see the final visible state, not the hidden initial state
+
+## Testing boundaries
+
+```mermaid
+flowchart TB
+  subgraph UnitBoundary["Unit test boundary"]
+    Components["Component render + props"]
+    Hooks["Hook return values"]
+    Utils["Utility functions"]
+    Providers["Provider state"]
+  end
+
+  subgraph E2EBoundary["E2E test boundary"]
+    Routes["Route render + navigation"]
+    Interactions["User interactions"]
+    API["API mocking + fallback"]
+    Visual["Screenshots + layout"]
+  end
+
+  subgraph NotTested["Manual / visual"]
+    Motion["Animation smoothness"]
+    Theme["Cross-preset visual quality"]
+    Perf["Performance / loading"]
+    A11y["Full a11y audit"]
+  end
+```
+
+## Regression risks specific to this codebase
+
+| Risk                    | What breaks                                                         | How to catch it                                              |
+| ----------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Broken motion handoffs  | Typewriter doesn't start, sections never reveal                     | E2E route specs + unit delay prop tests                      |
+| Tab/drawer lifecycle    | Content stays mounted when it should unmount, re-render flicker     | Unit tests with state toggling                               |
+| Route transition issues | Blank pages during navigation, stale content                        | E2E navigation tests                                         |
+| Theme drift             | Hardcoded colors/spacing bypass theme, look broken on preset switch | Unit style builder tests + E2E visual regression             |
+| Component API breaks    | Changed prop names or defaults affect multiple consumers            | Unit tests per component + consumer integration tests        |
+| Composition breakage    | Shared primitives render incorrectly when composed together         | Unit render tests with full ThemeProvider wrapper            |
+| Feature flag leaks      | Feature-gated content appears in production or disappears in test   | Unit tests for `isFeatureEnabled` + E2E build variant checks |
+
+## Running tests
+
+```bash
+# Unit tests (all)
+CI=true npm test -- --watch=false
+
+# Unit tests (specific file)
+CI=true npm test -- --watch=false --testPathPattern=AnimatedContentList
+
+# Build verification
+npm run build
+
+# E2E tests (requires build first)
+npm run build:e2e
+npm run test:e2e
+
+# E2E tests (headed, for debugging)
+npm run test:e2e:headed
+
+# E2E tests (specific spec)
+npx playwright test test/e2e/cv.github.spec.ts
+```
+
+**Note:** `CI=true npm test -- --watch=false` may show baseline failures in existing CV tests unrelated to your changes. Focus on regressions in the files you changed.
+
+## Further reading
+
+- [Agent guide](agent-guide.md) — validation expectations for agents making code changes
+- [App architecture](../architecture/app-architecture.md) — route definitions for understanding test coverage mapping
+- [Motion architecture](../frontend/motion-architecture.md) — intensity scaling contract that tests must respect

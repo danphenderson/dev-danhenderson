@@ -1,5 +1,6 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Button, Stack, Tooltip, Typography } from '@mui/material';
+import { Button, Stack, Tooltip } from '@mui/material';
+import { BodyText, StrongMetaText } from '../text';
 import type { SharedDataStatus } from '../../types/data';
 
 const formatStatusTimestamp = (value?: string) => {
@@ -89,13 +90,11 @@ export const CVGitHubStatusTooltip = ({ status }: CVGitHubStatusTooltipProps) =>
       leaveDelay={0}
       title={
         <Stack spacing={0.75} sx={{ maxWidth: 320, py: 0.25 }}>
-          <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
-            Data status
-          </Typography>
+          <StrongMetaText sx={{ color: 'inherit' }}>Data status</StrongMetaText>
           {statusLines.map((line) => (
-            <Typography key={line} variant="body2">
+            <BodyText key={line} sx={{ color: 'inherit' }}>
               {line}
-            </Typography>
+            </BodyText>
           ))}
         </Stack>
       }

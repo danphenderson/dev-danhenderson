@@ -4,6 +4,8 @@ const HOME_SCREENSHOT_CLOCK_START = new Date('2026-03-17T12:00:00.000Z');
 const STABLE_TERMINAL_OUTPUT_COMMAND = 'npm run build';
 const STABLE_TERMINAL_OUTPUT_TEXT = 'Compiled successfully in 2.4s';
 const TERMINAL_NOTIFICATION_TEXT = 'server.py — No problems detected ✓';
+const WELCOME_AUDIO_PROMPT_BODY =
+  'Would you like to hear a short verse while browsing the site? Use the pause button in the header to stop it anytime.';
 const HOME_HERO_SNAPSHOT_BOX = {
   width: 528,
   height: 439,
@@ -108,6 +110,10 @@ test.describe('Home page', () => {
   test('renders the hero content after completing the welcome sequence', async ({ page }) => {
     await resetWelcomeState(page);
     await page.goto('/');
+
+    const welcomePrompt = page.getByRole('dialog', { name: 'Play welcome audio?' });
+    await expect(welcomePrompt).toBeVisible();
+    await expect(welcomePrompt).toContainText(WELCOME_AUDIO_PROMPT_BODY);
 
     await dismissWelcomeSequence(page);
 

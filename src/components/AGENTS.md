@@ -15,14 +15,22 @@ Edits here should preserve:
 - consistency with the existing MUI and Emotion patterns
 - visual stability across pages that consume shared components
 
+Source-of-truth docs:
+
+- `docs/design-system-reference.md`
+- `docs/frontend/component-architecture.md`
+
 ## Component design rules
 
 - Prefer minimal, targeted edits to the existing component API.
 - Preserve public props and default behavior unless a breaking change is required for correctness or explicitly requested.
+- Start with the documented shared primitives before inventing a new pattern: `SectionHeading`, `SectionCard` / `CVSectionCard`, `SectionPanel`, semantic text primitives under `src/components/text/`, and repeated-content primitives such as `AnimatedContentList`, `AnimatedSlideList`, and `SkillsChipList`.
 - Prefer composition over widening a component into a highly configurable catch-all.
 - Keep components focused on presentation and local interaction; avoid moving route-level orchestration into shared components.
+- Prefer semantic text primitives over styling raw `Typography` for standard labels, headings, metadata, and body copy.
 - Reuse existing patterns for typography, spacing, cards, section containers, lists, and data display before introducing a new UI pattern.
 - Follow existing MUI usage and styling conventions already present in the component family being edited.
+- Treat the Home IDE hero, blog editorial surfaces, photography overlays/lightbox, and CV story mode as intentional exceptions. Do not normalize them into the default shared card-and-section system.
 
 ## Type handling
 

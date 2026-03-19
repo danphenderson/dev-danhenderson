@@ -43,7 +43,15 @@ Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript po
 
 Setup, testing, project structure, and contribution guidelines live in [CONTRIBUTING.md](CONTRIBUTING.md).
 
-UI pattern and design-system guidance live in [docs/design-system-reference.md](docs/design-system-reference.md).
+Architecture, design system, motion, theme, and engineering docs live in [docs/](docs/README.md).
+
+To browse them as a rendered site locally:
+
+```bash
+cd docs-site && npm install && npm start
+```
+
+See [docs-site/README.md](docs-site/README.md) for build, deploy, and authoring details.
 
 ## License
 

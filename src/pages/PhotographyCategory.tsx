@@ -6,6 +6,7 @@ import { BackToTopButton } from '../components/BackToTopButton';
 import { RouteRecoveryPanel } from '../components/RouteRecoveryPanel';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
+import { SectionHeading } from '../components/layout/SectionHeading';
 import { QuiltedImageList } from '../components/PhotoAlbum';
 import { ImmersiveLightbox } from '../components/photography/ImmersiveLightbox';
 import { AlbumShareButton } from '../components/photography/AlbumShareButton';
@@ -174,33 +175,11 @@ export default function PhotographyCategory() {
             <MotionSection>
               <SectionCard delayMs={0} triggerOnView={false}>
                 <Stack spacing={2.5}>
-                  <Stack spacing={1} sx={{ minWidth: 0, maxWidth: { md: 760 } }}>
-                    <Typography
-                      component="p"
-                      variant="overline"
-                      sx={{
-                        display: 'block',
-                        color: 'primary.main',
-                        fontWeight: 700,
-                        letterSpacing: '0.2em',
-                        textTransform: 'uppercase',
-                      }}
-                    >
-                      Photography album
-                    </Typography>
-                    <Typography
-                      component="h1"
-                      variant="h3"
-                      sx={{
-                        color: 'text.primary',
-                        fontSize: { xs: '2rem', md: '2.5rem' },
-                        lineHeight: 1.05,
-                        letterSpacing: '-0.03em',
-                      }}
-                    >
-                      Album not found
-                    </Typography>
-                  </Stack>
+                  <SectionHeading
+                    overline="Photography album"
+                    title="Album not found"
+                    sx={{ minWidth: 0, maxWidth: { md: 760 } }}
+                  />
                   <SecondaryBodyText>
                     This album does not exist or has been moved. The command palette opens with a
                     recovery search so you can jump to another gallery or route quickly.

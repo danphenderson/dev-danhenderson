@@ -5,6 +5,32 @@ import { CommandPaletteProvider } from '../../../src/CommandPaletteProvider';
 import { RouteRecoveryPanel } from '../../../src/components/RouteRecoveryPanel';
 import type { RecoverySuggestion } from '../../../src/constants/recoveryContext';
 
+jest.mock('../../../src/components/layout/SectionPanel', () => ({
+  SectionPanel: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="section-panel">{children}</div>
+  ),
+}));
+
+jest.mock('../../../src/components/text', () => {
+  const actual = jest.requireActual('../../../src/components/text');
+
+  return {
+    ...actual,
+    MetaText: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="meta-text">{children}</div>
+    ),
+    SecondaryBodyText: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="secondary-body-text">{children}</div>
+    ),
+    SecondaryCaptionText: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="secondary-caption-text">{children}</div>
+    ),
+    SubsectionTitle: ({ children }: { children: React.ReactNode }) => (
+      <div data-testid="subsection-title">{children}</div>
+    ),
+  };
+});
+
 const mockOpenPalette = jest.fn();
 
 jest.mock('../../../src/CommandPaletteProvider', () => {
@@ -152,5 +178,24 @@ describe('RouteRecoveryPanel', () => {
   it('labels subsequent recovery actions "Open <label>"', () => {
     renderPanel();
     expect(screen.getByRole('link', { name: /^open cv$/i })).toBeInTheDocument();
+  });
+
+  it('uses shared panel and text primitives for the recovery content', () => {
+    renderPanel();
+
+    expect(screen.getByTestId('meta-text')).toHaveTextContent('Attempted path');
+    expect(screen.getAllByTestId('section-panel')).toHaveLength(3);
+    expect(screen.getAllByTestId('subsection-title').map((element) => element.textContent)).toEqual(
+      expect.arrayContaining([
+        'Suggested destinations',
+        'Shared recovery routes',
+        'CV: About',
+        'Home',
+        'CV',
+      ])
+    );
+    expect(
+      screen.getAllByTestId('secondary-caption-text').map((element) => element.textContent)
+    ).toEqual(expect.arrayContaining(['Closest matching CV section.']));
   });
 });

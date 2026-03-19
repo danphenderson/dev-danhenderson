@@ -10,9 +10,15 @@ Primary user-facing routes:
 - `/cv` interactive CV and GitHub-driven profile sections
 - `/climbing` climbing logs and to-do routes
 - `/photography` and `/photography/:slug` gallery browsing
-- `/blog` and `/blog/:slug` editorial blog and post detail
+- `/blog` and `/blog/:slug` editorial blog and post detail, feature-gated to dev/test builds
 
 Prefer changes that preserve the current single-page-app architecture and static hosting model.
+
+## Source-of-truth docs
+
+- `docs/README.md` is the index for the repository documentation set.
+- `docs/engineering/agent-guide.md` supplements this root file with repository-wide architectural invariants and safe extension patterns.
+- Use the docs set for architecture, design system, motion, theme/styling, and testing guidance when the root or scoped `AGENTS.md` files are not specific enough.
 
 ## Stack and runtime
 
@@ -21,6 +27,7 @@ Prefer changes that preserve the current single-page-app architecture and static
 - React Router v6
 - MUI + Emotion
 - MUI X DataGrid
+- Framer Motion (via `motion/react`)
 - Create React App (`react-scripts`)
 - Node 20 in CI
 - webdev MCP server available for browser-based UI validation and screenshots
@@ -52,6 +59,14 @@ Runtime system and developer instructions override repository instructions. With
 - If the task is review-only, prioritize findings over implementation and distinguish required fixes from optional improvements.
 - For UI edits, identify whether the change is page-local or shared-component-impacting before editing, then validate accordingly.
 
+## Repository-wide invariants
+
+- Preserve provider order: `ThemeProvider -> WelcomeOnboardingProvider -> WelcomeAudioProvider -> BrowserRouter -> CommandPaletteProvider -> AppContent`.
+- All Framer Motion timing and stagger behavior must flow through `useMotionScale()`. When motion intensity is `off`, or `prefers-reduced-motion` is active, entrance animation and stagger timing must collapse to instant rendering and CSS decorative animations must be disabled.
+- Theme-conditional reusable surfaces belong in the style-builder pipeline (`createComponentStyleMap()` / `createAppStyleMap()`), not in ad hoc inline `sx` objects that read `theme.appearanceTreatment` directly.
+- Feature-gated routes and navigation (currently blog) must remain driven by `isFeatureEnabled()` and route metadata rather than unconditional route or nav rendering.
+- Treat the Home IDE hero, blog editorial surfaces, photography overlays/lightbox, and CV story mode as documented intentional design-system exceptions, not default patterns to normalize.
+
 ## Concurrent work
 
 - Multiple agents and the repository developer may work on the same branch at the same time. Treat the branch as shared and assume others may push changes at any time.
@@ -73,6 +88,7 @@ Primary commands:
 - dev server: `npm start`
 - dev server on port 3000: `PORT=3000 npm start`
 - build: `npm run build`
+- E2E build variant for gated blog coverage: `npm run build:e2e`
 - tests when relevant: `CI=true npm test -- --watch=false`
 
 Playwright E2E commands, when the working branch includes the Playwright workflow:
@@ -87,6 +103,7 @@ Notes:
 
 - The dev server defaults to port `3001` in this repository.
 - Playwright E2E runs against a production build served on port `3100`; run `npm run build` before the narrowest relevant `npx playwright test ...` or `npm run test:e2e` command when that workflow is present.
+- Use `npm run build:e2e` before blog Playwright coverage or other feature-gated route validation so `REACT_APP_RUNTIME_ENV=test` enables the gated routes.
 - `npm run serve:e2e` is optional for local iteration; Playwright can start the server itself when the branch includes a `webServer` config.
 - Do not claim a command or validation step was run unless it was actually run.
 
@@ -112,12 +129,13 @@ Notes:
 - `src/motion/`: unified animation foundation — duration tokens, easing, variants, and animated primitives
 - `src/styles/`: theme-conditioned style maps, Emotion keyframes, and spring-easing constants
 - `src/theme/`: MUI theme assembly and appearance-preset system
-- `src/constants/`: build-time stable config — route definitions, command palette registry, recovery scoring
+- `src/constants/`: build-time stable config — route definitions, feature flags, command palette registry, recovery scoring
 - `src/utils/`: pure, framework-agnostic helper functions
 - `test/e2e/`: Playwright end-to-end specs and helpers when the branch includes browser integration tests
 - `test/unit/`: Jest unit and component tests
 - `public/assets/`: shipped images, certificates, media, and resume PDF
 - `resume/`: LaTeX source for the downloadable resume PDF
+- `docs/`: source-of-truth architecture, frontend, engineering, and reference documentation
 
 ## Change guidance by area
 
@@ -152,6 +170,7 @@ Notes:
 - Primary content lives in `src/data/blog.ts` as an array of `BlogPost` objects with typed `BlogContentBlock[]` content.
 - Do not edit blog post content unless the task explicitly requests it.
 - All blog UI components live in `src/components/blog/`; use `useBlogData` for all data access and navigation helpers.
+- Blog routes are feature-gated via `isFeatureEnabled('blog')`; preserve the current behavior where they are available in development/test builds and omitted in production.
 - Do not fetch blog content from remote APIs or a CMS; all content is static.
 - Not-found blog slugs must render `RouteRecoveryPanel` with contextual suggestions.
 
@@ -187,6 +206,7 @@ Notes:
 - Shared component change: browser validation required on at least one primary consuming route and one additional consumer when reuse is clear; if those routes are covered by Playwright E2E, run the relevant route specs.
 - Layout, interaction, navigation, responsive, animation, conditional-rendering, or asset-rendering change: browser-based validation required.
 - Route, navigation, or not-found behavior change: validate direct navigation and `PUBLIC_URL` compatibility, and run the relevant Playwright route coverage when available.
+- Feature-gated content change: use the runtime-appropriate build variant, including `npm run build:e2e` before Playwright coverage when gated blog behavior is involved.
 - GitHub-backed CV or fallback-content change: validate `/cv` in the browser and run mocked Playwright coverage for GitHub success/failure states when available.
 - Asset-path change: validate direct navigation and `PUBLIC_URL` compatibility.
 - Resume artifact change: verify the updated PDF path and any related metadata references.
@@ -194,6 +214,7 @@ Notes:
 Typical checks:
 
 - `npm run build`
+- `npm run build:e2e` before gated blog route specs
 - relevant tests, if the change affects tested behavior
 - `npx playwright test test/e2e/<route>.spec.ts` for the narrowest relevant route flow when Playwright is present
 - `npm run test:e2e` when changes span multiple covered routes or shared route behavior

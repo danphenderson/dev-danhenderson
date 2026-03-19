@@ -5,6 +5,14 @@ import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
 import BlogPost from '../../../src/pages/BlogPost';
 
+jest.mock('../../../src/components/layout/SectionHeading', () => ({
+  SectionHeading: ({ overline, title }: { overline: string; title?: string }) => (
+    <div data-testid="section-heading" data-overline={overline} data-title={title ?? ''}>
+      {title}
+    </div>
+  ),
+}));
+
 const mockPost = {
   slug: 'test-article',
   title: 'Test Article Title',
@@ -85,5 +93,12 @@ describe('BlogPost', () => {
     renderBlogPost('nonexistent-slug');
 
     expect(screen.getByText('Post not found')).toBeInTheDocument();
+  });
+
+  it('uses the shared section heading for the not-found recovery branch', () => {
+    renderBlogPost('nonexistent-slug');
+
+    expect(screen.getByTestId('section-heading')).toHaveAttribute('data-overline', 'Blog');
+    expect(screen.getByTestId('section-heading')).toHaveAttribute('data-title', 'Post not found');
   });
 });

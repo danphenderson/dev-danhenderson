@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
 import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
+import { SectionHeading } from '../components/layout/SectionHeading';
 import { BlogArticleHeader } from '../components/blog/BlogArticleHeader';
 import { BlogArticleBody } from '../components/blog/BlogArticleBody';
 import { BlogArticleNav } from '../components/blog/BlogArticleNav';
@@ -91,33 +92,11 @@ export default function BlogPost() {
           <MotionSection>
             <SectionCard>
               <Stack spacing={2.5}>
-                <Stack spacing={1} sx={{ maxWidth: { md: 760 } }}>
-                  <Typography
-                    component="p"
-                    variant="overline"
-                    sx={{
-                      display: 'block',
-                      color: 'primary.main',
-                      fontWeight: 700,
-                      letterSpacing: '0.2em',
-                      textTransform: 'uppercase',
-                    }}
-                  >
-                    Blog
-                  </Typography>
-                  <Typography
-                    component="h1"
-                    variant="h3"
-                    sx={{
-                      color: 'text.primary',
-                      fontSize: { xs: '2rem', md: '2.5rem' },
-                      lineHeight: 1.05,
-                      letterSpacing: '-0.03em',
-                    }}
-                  >
-                    Post not found
-                  </Typography>
-                </Stack>
+                <SectionHeading
+                  overline="Blog"
+                  title="Post not found"
+                  sx={{ maxWidth: { md: 760 } }}
+                />
                 <SecondaryBodyText>
                   This article does not exist or has been moved. Use the command palette or recovery
                   links below to navigate to another page.

@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useWebVitals, type WebVitalEntry } from '../hooks/useWebVitals';
+import { HeaderLabel, SecondaryCaptionText } from './text';
 import { buildInfo } from '../utils/buildInfo';
 
 const ratingColor: Record<WebVitalEntry['rating'], 'success' | 'warning' | 'error'> = {
@@ -125,9 +126,9 @@ export function PerformanceScorecard() {
         <DialogTitle id="performance-scorecard-title">Performance & Build Info</DialogTitle>
         <DialogContent sx={{ px: { xs: 2, sm: 3 }, pb: 3 }}>
           {/* Build info section */}
-          <Typography variant="overline" color="text.secondary">
+          <HeaderLabel component="p" sx={{ color: 'text.secondary' }}>
             Build
-          </Typography>
+          </HeaderLabel>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 3 }}>
             <InfoRow label="Version" value={buildInfo.version} />
             <InfoRow label="Commit" value={buildInfo.gitSha} mono />
@@ -136,9 +137,9 @@ export function PerformanceScorecard() {
           </Box>
 
           {/* Web Vitals section */}
-          <Typography variant="overline" color="text.secondary">
+          <HeaderLabel component="p" sx={{ color: 'text.secondary' }}>
             Core Web Vitals
-          </Typography>
+          </HeaderLabel>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
             {EXPECTED_VITALS.map((name) => {
               const entry = metrics.get(name);
@@ -149,10 +150,10 @@ export function PerformanceScorecard() {
               );
             })}
           </Box>
-          <Typography variant="caption" color="text.secondary" sx={{ mt: 1.5, display: 'block' }}>
+          <SecondaryCaptionText sx={{ mt: 1.5, display: 'block' }}>
             Vitals are measured in real time for this session. Some metrics (INP) require user
             interaction before they appear.
-          </Typography>
+          </SecondaryCaptionText>
         </DialogContent>
       </Dialog>
     </>

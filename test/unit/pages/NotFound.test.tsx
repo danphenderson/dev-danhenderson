@@ -11,6 +11,28 @@ jest.mock('../../../src/components/BackgroundPaper', () => ({
   ),
 }));
 
+jest.mock('../../../src/components/layout/SectionHeading', () => ({
+  SectionHeading: ({
+    overline,
+    title,
+    subtitle,
+  }: {
+    overline: string;
+    title?: string;
+    subtitle?: string;
+  }) => (
+    <div
+      data-testid="section-heading"
+      data-overline={overline}
+      data-title={title ?? ''}
+      data-subtitle={subtitle ?? ''}
+    >
+      {title}
+      {subtitle && <span>{subtitle}</span>}
+    </div>
+  ),
+}));
+
 describe('NotFound', () => {
   it('renders 404 Not Found message with descriptive text', () => {
     render(
@@ -23,6 +45,26 @@ describe('NotFound', () => {
 
     expect(screen.getByText('404 Not Found')).toBeInTheDocument();
     expect(screen.getByText("The page you're looking for doesn't exist.")).toBeInTheDocument();
+  });
+
+  it('uses the shared section heading for the route recovery intro', () => {
+    render(
+      <MemoryRouter future={routerFuture}>
+        <ThemeProvider>
+          <NotFound />
+        </ThemeProvider>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByTestId('section-heading')).toHaveAttribute(
+      'data-overline',
+      'Route recovery'
+    );
+    expect(screen.getByTestId('section-heading')).toHaveAttribute('data-title', '404 Not Found');
+    expect(screen.getByTestId('section-heading')).toHaveAttribute(
+      'data-subtitle',
+      "The page you're looking for doesn't exist."
+    );
   });
 
   it('renders navigation links to Home, CV, and Photography', () => {

@@ -1,7 +1,9 @@
 import SearchIcon from '@mui/icons-material/Search';
-import { Box, Button, Chip, Stack, Typography } from '@mui/material';
+import { Box, Button, Chip, Stack } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { useCommandPalette } from '../CommandPaletteProvider';
+import { SectionPanel } from './layout/SectionPanel';
+import { MetaText, SecondaryBodyText, SecondaryCaptionText, SubsectionTitle } from './text';
 import type { RecoverySuggestion } from '../constants/recoveryContext';
 import type { SharedRouteAction } from '../constants/routeActions';
 
@@ -17,12 +19,13 @@ type RouteRecoveryPanelProps = {
   suggestedPaletteQuery: string;
 };
 
-const cardSx = {
-  px: 2,
-  py: 1.5,
-  borderRadius: 2,
-  bgcolor: 'rgba(255, 255, 255, 0.08)',
-  backdropFilter: 'blur(8px)',
+const rowPanelSx = {
+  display: 'flex',
+  flexDirection: { xs: 'column', sm: 'row' },
+  gap: 1.25,
+  alignItems: { xs: 'flex-start', sm: 'center' },
+  justifyContent: 'space-between',
+  p: { xs: 1.5, sm: 1.75 },
 } as const;
 
 export const RouteRecoveryPanel = ({
@@ -42,77 +45,59 @@ export const RouteRecoveryPanel = ({
     <Stack spacing={2.5} sx={{ width: '100%', maxWidth: 720 }}>
       <Stack spacing={1}>
         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
-          <Typography variant="body2" sx={{ opacity: 0.78 }}>
+          <MetaText component="span" sx={{ opacity: 0.78 }}>
             Attempted path
-          </Typography>
+          </MetaText>
           <Chip label={attemptedPathLabel} size="small" sx={{ maxWidth: '100%' }} />
         </Stack>
         {routeHintLabel && (
-          <Typography variant="body2" sx={{ opacity: 0.82 }}>
-            {routeHintLabel}
-          </Typography>
+          <SecondaryBodyText sx={{ opacity: 0.82 }}>{routeHintLabel}</SecondaryBodyText>
         )}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25}>
           <Button variant="contained" startIcon={<SearchIcon />} onClick={handleOpenPalette}>
             Open command palette
           </Button>
-          <Typography variant="caption" sx={{ alignSelf: 'center', opacity: 0.7 }}>
+          <SecondaryCaptionText sx={{ alignSelf: 'center', opacity: 0.7 }}>
             {suggestedPaletteQuery
               ? `Prefilled with "${suggestedPaletteQuery}" for faster recovery.`
               : 'Search all routes, albums, and CV sections.'}
-          </Typography>
+          </SecondaryCaptionText>
         </Stack>
       </Stack>
 
       {contextualSuggestions.length > 0 && (
         <Stack spacing={1.25}>
-          <Typography variant="subtitle2">Suggested destinations</Typography>
+          <SubsectionTitle component="h2">Suggested destinations</SubsectionTitle>
           {contextualSuggestions.map((suggestion) => (
-            <Stack
-              key={suggestion.id}
-              direction={{ xs: 'column', sm: 'row' }}
-              spacing={1.25}
-              alignItems={{ xs: 'flex-start', sm: 'center' }}
-              justifyContent="space-between"
-              sx={cardSx}
-            >
-              <Box>
-                <Typography variant="subtitle2">{suggestion.label}</Typography>
-                <Typography variant="body2" sx={{ opacity: 0.82 }}>
+            <SectionPanel key={suggestion.id} sx={rowPanelSx}>
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <SubsectionTitle component="p">{suggestion.label}</SubsectionTitle>
+                <SecondaryBodyText sx={{ opacity: 0.82 }}>
                   {suggestion.description}
-                </Typography>
-                <Typography variant="caption" sx={{ display: 'block', mt: 0.5, opacity: 0.68 }}>
+                </SecondaryBodyText>
+                <SecondaryCaptionText sx={{ display: 'block', mt: 0.5, opacity: 0.68 }}>
                   {suggestion.matchReason}
-                </Typography>
+                </SecondaryCaptionText>
               </Box>
               <Button variant="outlined" component={RouterLink} to={suggestion.path}>
                 Open {suggestion.label}
               </Button>
-            </Stack>
+            </SectionPanel>
           ))}
         </Stack>
       )}
 
       <Stack spacing={1.25}>
-        <Typography variant="subtitle2">Shared recovery routes</Typography>
+        <SubsectionTitle component="h2">Shared recovery routes</SubsectionTitle>
         {recoveryActions.map((action, index) => (
-          <Stack
-            key={action.id}
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={1.25}
-            alignItems={{ xs: 'flex-start', sm: 'center' }}
-            justifyContent="space-between"
-            sx={cardSx}
-          >
-            <Box>
-              <Typography variant="subtitle2">{action.label}</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.82 }}>
-                {action.description}
-              </Typography>
+          <SectionPanel key={action.id} sx={rowPanelSx}>
+            <Box sx={{ flex: 1, minWidth: 0 }}>
+              <SubsectionTitle component="p">{action.label}</SubsectionTitle>
+              <SecondaryBodyText sx={{ opacity: 0.82 }}>{action.description}</SecondaryBodyText>
               {action.routeStatusLabel && (
-                <Typography variant="caption" sx={{ display: 'block', mt: 0.5, opacity: 0.68 }}>
+                <SecondaryCaptionText sx={{ display: 'block', mt: 0.5, opacity: 0.68 }}>
                   {action.routeStatusLabel}
-                </Typography>
+                </SecondaryCaptionText>
               )}
             </Box>
             <Button
@@ -122,7 +107,7 @@ export const RouteRecoveryPanel = ({
             >
               {index === 0 ? 'Go home' : `Open ${action.label}`}
             </Button>
-          </Stack>
+          </SectionPanel>
         ))}
       </Stack>
     </Stack>

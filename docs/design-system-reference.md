@@ -1,6 +1,8 @@
 # Design System Reference
 
-This repository already has a consistent UI language. Before introducing a new pattern, start with the existing foundations below and adapt the narrowest existing layer that fits.
+This is the concrete catalog of established UI surfaces, primitives, and patterns. Before introducing a new pattern, start with the existing foundations below and adapt the narrowest existing layer that fits.
+
+For architecture-level context, see [Component architecture](frontend/component-architecture.md) and [Theme and styling](frontend/theme-and-styling.md).
 
 ## Core Rules
 
@@ -328,6 +330,29 @@ Common consumers:
 
 When adding or changing UI, prefer this order:
 
+```mermaid
+flowchart TB
+  Start["New UI element"] --> Q1{"Route-level<br/>scaffold?"}
+  Q1 -- Yes --> PF["PageFrame or BackgroundPaper"]
+  Q1 -- No --> Q2{"Section intro?"}
+  Q2 -- Yes --> SH["SectionHeading"]
+  Q2 -- No --> Q3{"Top-level<br/>surface?"}
+  Q3 -- Yes --> SC["SectionCard or CVSectionCard"]
+  Q3 -- No --> Q4{"Dense nested<br/>panel?"}
+  Q4 -- Yes --> SP["SectionPanel"]
+  Q4 -- No --> Q5{"Text content?"}
+  Q5 -- Yes --> TP["Text primitives from src/components/text"]
+  Q5 -- No --> Q6{"Repeated items?"}
+  Q6 -- Yes --> Lists["AnimatedContentList · AnimatedSlideList<br/>SkillsChipList · grid/list component"]
+  Q6 -- No --> Q7{"Collapsible<br/>data?"}
+  Q7 -- Yes --> Tab["TabPanel"]
+  Q7 -- No --> Q8{"Needs animation?"}
+  Q8 -- Yes --> Motion["Wrap existing surface with motion primitive"]
+  Q8 -- No --> Custom["Adapt from nearest existing pattern"]
+```
+
+Priority order:
+
 1. Route scaffold: `PageFrame` or `BackgroundPaper`
 2. Section intro: `SectionHeading`
 3. Top-level surface: `SectionCard` or `CVSectionCard`
@@ -338,3 +363,11 @@ When adding or changing UI, prefer this order:
 8. Motion: wrap the existing surface with a motion primitive only if that pattern already exists nearby
 
 If the UI you want does not fit one of the intentional exceptions above, it should usually be adapted from one of these existing patterns instead of introduced as a new one.
+
+## Further reading
+
+- [Component architecture](frontend/component-architecture.md) — layering, ownership boundaries, composition rules
+- [Theme and styling](frontend/theme-and-styling.md) — style builder system and surface tokens
+- [Motion architecture](frontend/motion-architecture.md) — animation primitives and intensity scaling
+- [Page choreography](frontend/page-choreography.md) — how each route assembles these primitives
+- [Agent guide](engineering/agent-guide.md) — decision trees for where to place new components and styles

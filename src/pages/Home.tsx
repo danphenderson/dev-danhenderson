@@ -9,7 +9,6 @@ import {
   DialogTitle,
   IconButton,
   Tooltip,
-  Typography,
 } from '@mui/material';
 import { motion, useDragControls, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
@@ -22,6 +21,7 @@ import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
+import { BodyText, CaptionText } from '../components/text';
 import { MotionTiltCard } from '../motion';
 import { VSCODE_COLORS, VSCODE_RESIZE, VSCODE_WINDOW_RADIUS } from '../components/ide/vscodeTokens';
 
@@ -356,14 +356,14 @@ export default function Home() {
           <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
             <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
             <DialogContent>
-              <Typography variant="body1">
+              <BodyText sx={{ mt: 1 }}>
                 Would you like to hear a short verse while browsing the site? Use the pause button
                 in the header to stop it anytime.
-              </Typography>
+              </BodyText>
               {error && (
-                <Typography variant="caption" color="error">
+                <CaptionText color="error" sx={{ display: 'block', mt: 1 }}>
                   {error}
-                </Typography>
+                </CaptionText>
               )}
             </DialogContent>
             <DialogActions>

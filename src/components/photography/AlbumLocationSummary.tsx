@@ -1,6 +1,7 @@
 import PlaceIcon from '@mui/icons-material/Place';
-import { Chip, Stack, Typography } from '@mui/material';
+import { Chip, Stack } from '@mui/material';
 import type { PhotoItem } from '../../types/data';
+import { SecondaryBodyText } from '../text';
 
 type AlbumLocationSummaryProps = {
   albumLocation?: string;
@@ -40,16 +41,10 @@ export function AlbumLocationSummary({
           {albumLocation && (
             <Stack direction="row" spacing={0.5} alignItems="center">
               <PlaceIcon sx={{ color: 'text.secondary', fontSize: 18 }} />
-              <Typography variant="body2" color="text.secondary">
-                {albumLocation}
-              </Typography>
+              <SecondaryBodyText>{albumLocation}</SecondaryBodyText>
             </Stack>
           )}
-          {dateRange && (
-            <Typography variant="body2" color="text.secondary">
-              · {dateRange}
-            </Typography>
-          )}
+          {dateRange && <SecondaryBodyText>· {dateRange}</SecondaryBodyText>}
         </Stack>
       )}
       {uniqueLocations.length > 1 && (

@@ -6,6 +6,9 @@ const FEATURED_POST_SLUG = 'building-a-design-system-that-scales';
 const SECOND_POST_TITLE = 'React Performance Patterns Beyond React.memo';
 const SECOND_POST_SLUG = 'react-performance-patterns-beyond-memo';
 const THIRD_POST_TITLE = 'TypeScript Discriminated Unions for UI State Machines';
+const BLOG_NOT_FOUND_COPY =
+  /This article does not exist or has been moved\. Use the command palette or recovery links below to navigate to another page\./;
+const INVALID_BLOG_SLUG_QUERY = 'nonexistent post';
 
 const waitForBlogIndex = async (page: Page) => {
   const main = page.locator('main');
@@ -14,6 +17,22 @@ const waitForBlogIndex = async (page: Page) => {
       'Technical writing on frontend architecture, React patterns, and software engineering.'
     ),
     readyLocators: [main.getByText(/\d+ articles?/)],
+  });
+};
+
+const waitForBlogFallback = async (page: Page) => {
+  const main = page.locator('main');
+
+  await waitForAnimatedSectionReadiness({
+    anchor: main.getByRole('heading', { name: 'Post not found' }),
+    readyLocators: [
+      main.getByRole('link', { name: 'Back to blog' }),
+      main.getByText(/^Blog$/).first(),
+      main.getByText(BLOG_NOT_FOUND_COPY),
+      main.getByRole('heading', { name: 'Suggested destinations' }),
+      main.getByRole('heading', { name: 'Shared recovery routes' }),
+      main.getByRole('link', { name: /^Open Blog:/ }).first(),
+    ],
   });
 };
 
@@ -145,14 +164,15 @@ test.describe('Blog post detail page', () => {
     await page.goto('/blog/nonexistent-post');
 
     const main = page.locator('main');
-    await expect(main.getByText('Post not found')).toBeVisible();
-    await expect(main.getByText(/does not exist or has been moved/)).toBeVisible();
+    await waitForBlogFallback(page);
 
-    // Recovery panel should offer a command palette link
     await main.getByRole('button', { name: 'Open command palette' }).click();
     await expect(page.getByRole('dialog')).toHaveCount(1);
     const dialog = page.getByRole('dialog', { name: 'Command palette' });
     await expect(dialog).toBeVisible();
+    await expect(
+      dialog.getByRole('textbox', { name: 'Search routes, albums, and CV sections' })
+    ).toHaveValue(INVALID_BLOG_SLUG_QUERY);
   });
 });
 
