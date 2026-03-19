@@ -3,6 +3,7 @@ import { Box, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { AboutMe } from '../../types/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { MotionTiltCard } from '../../motion';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { ProfileCard } from './ProfileCard';
 import { SectionHeading } from '../layout/SectionHeading';
@@ -242,66 +243,68 @@ export const CVAboutSection = ({
   }, [aboutContentKey, hasCompletedAboutReveal, onRevealComplete]);
 
   return (
-    <CVSectionCard
-      delayMs={delayMs}
-      triggerOnView={triggerOnView}
-      id={sectionId}
-      sx={cvSectionAnchorSx}
-    >
-      <Stack spacing={cvSectionItemSpacing}>
-        <Stack spacing={compactSidebarSectionSpacing}>
-          <SectionHeading overline="About" sx={sectionHeadingCompactSx} />
-          <ProfileCard
-            about={about}
-            actions={actions}
-            bioRevealed={revealed}
-            bioAnimationStartDelayMs={bioAnimationStartDelayMs}
-            onBioAnimationComplete={handleBioAnimationComplete}
-          />
-        </Stack>
-        {(opportunities.length > 0 || workflowTools.length > 0) && (
-          <Stack spacing={cvSectionItemSpacing}>
-            {opportunities.length > 0 && (
-              <InlineAnimatedSkillsRow
-                heading={OPPORTUNITIES_HEADING}
-                headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
-                playing={playOpportunitiesHeading}
-                revealed={revealed}
-                visible={isOpportunitiesSectionVisible}
-                onHeadingComplete={handleOpportunitiesHeadingComplete}
-                skills={opportunities}
-                showSkills={shouldShowOpportunities}
-                titleSx={supportAccentTitleSx}
-              />
-            )}
-            {workflowTools.length > 0 && (
-              <InlineAnimatedSkillsRow
-                heading={WORKFLOW_HEADING}
-                headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
-                playing={playWorkflowHeading}
-                revealed={revealed}
-                visible={isWorkflowSectionVisible}
-                onHeadingComplete={handleWorkflowHeadingComplete}
-                skills={workflowTools}
-                showSkills={shouldShowWorkflowTools}
-                titleSx={supportAccentTitleSx}
-              />
-            )}
+    <MotionTiltCard intensity={0.5}>
+      <CVSectionCard
+        delayMs={delayMs}
+        triggerOnView={triggerOnView}
+        id={sectionId}
+        sx={cvSectionAnchorSx}
+      >
+        <Stack spacing={cvSectionItemSpacing}>
+          <Stack spacing={compactSidebarSectionSpacing}>
+            <SectionHeading overline="About" sx={sectionHeadingCompactSx} />
+            <ProfileCard
+              about={about}
+              actions={actions}
+              bioRevealed={revealed}
+              bioAnimationStartDelayMs={bioAnimationStartDelayMs}
+              onBioAnimationComplete={handleBioAnimationComplete}
+            />
           </Stack>
-        )}
-        {footerControls && (
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'flex-end',
-              width: '100%',
-              pt: 0.5,
-            }}
-          >
-            {footerControls}
-          </Box>
-        )}
-      </Stack>
-    </CVSectionCard>
+          {(opportunities.length > 0 || workflowTools.length > 0) && (
+            <Stack spacing={cvSectionItemSpacing}>
+              {opportunities.length > 0 && (
+                <InlineAnimatedSkillsRow
+                  heading={OPPORTUNITIES_HEADING}
+                  headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
+                  playing={playOpportunitiesHeading}
+                  revealed={revealed}
+                  visible={isOpportunitiesSectionVisible}
+                  onHeadingComplete={handleOpportunitiesHeadingComplete}
+                  skills={opportunities}
+                  showSkills={shouldShowOpportunities}
+                  titleSx={supportAccentTitleSx}
+                />
+              )}
+              {workflowTools.length > 0 && (
+                <InlineAnimatedSkillsRow
+                  heading={WORKFLOW_HEADING}
+                  headingColumnWidth={INLINE_SKILLS_HEADING_COLUMN_WIDTH}
+                  playing={playWorkflowHeading}
+                  revealed={revealed}
+                  visible={isWorkflowSectionVisible}
+                  onHeadingComplete={handleWorkflowHeadingComplete}
+                  skills={workflowTools}
+                  showSkills={shouldShowWorkflowTools}
+                  titleSx={supportAccentTitleSx}
+                />
+              )}
+            </Stack>
+          )}
+          {footerControls && (
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'flex-end',
+                width: '100%',
+                pt: 0.5,
+              }}
+            >
+              {footerControls}
+            </Box>
+          )}
+        </Stack>
+      </CVSectionCard>
+    </MotionTiltCard>
   );
 };

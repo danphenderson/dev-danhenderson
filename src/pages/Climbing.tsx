@@ -13,7 +13,7 @@ import type { TickRow, TodoRow } from '../types/data';
 import { useFuzzySearch } from '../hooks/useFuzzySearch';
 import { useAppStyles } from '../styles/appStyles';
 import { SectionLeadText } from '../components/text';
-import { MotionSection, MotionFadeIn } from '../motion';
+import { MotionSection, MotionFadeIn, MotionTiltCard } from '../motion';
 
 const renderRouteLink = (label: string, href: string) => (
   <CommonLink
@@ -87,20 +87,22 @@ export default function Climbing() {
                 ),
               }}
             />
-            <Box sx={appStyles.dataGridContainerSx}>
-              <DataGrid
-                rows={tickSearch.filtered}
-                columns={columns}
-                autoHeight
-                disableRowSelectionOnClick
-                pageSizeOptions={[5, 10, 25, 50]}
-                initialState={{
-                  pagination: {
-                    paginationModel: { pageSize: 10, page: 0 },
-                  },
-                }}
-              />
-            </Box>
+            <MotionTiltCard intensity={0.4}>
+              <Box sx={appStyles.dataGridContainerSx}>
+                <DataGrid
+                  rows={tickSearch.filtered}
+                  columns={columns}
+                  autoHeight
+                  disableRowSelectionOnClick
+                  pageSizeOptions={[5, 10, 25, 50]}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { pageSize: 10, page: 0 },
+                    },
+                  }}
+                />
+              </Box>
+            </MotionTiltCard>
             <MotionFadeIn>
               <SectionHeading overline="TODO Routes" sx={appStyles.sectionHeadingOffsetSx} />
             </MotionFadeIn>
@@ -118,20 +120,22 @@ export default function Climbing() {
                 ),
               }}
             />
-            <Box sx={appStyles.dataGridContainerSx}>
-              <DataGrid
-                rows={todoSearch.filtered}
-                columns={todoColumns}
-                autoHeight
-                disableRowSelectionOnClick
-                pageSizeOptions={[5, 10, 25, 50]}
-                initialState={{
-                  pagination: {
-                    paginationModel: { pageSize: 10, page: 0 },
-                  },
-                }}
-              />
-            </Box>
+            <MotionTiltCard intensity={0.4}>
+              <Box sx={appStyles.dataGridContainerSx}>
+                <DataGrid
+                  rows={todoSearch.filtered}
+                  columns={todoColumns}
+                  autoHeight
+                  disableRowSelectionOnClick
+                  pageSizeOptions={[5, 10, 25, 50]}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { pageSize: 10, page: 0 },
+                    },
+                  }}
+                />
+              </Box>
+            </MotionTiltCard>
           </Stack>
         </SectionCard>
       </MotionSection>
