@@ -43,13 +43,13 @@ This repository contains `danhenderson.dev`, a client-side React + TypeScript po
 - Build with `npm run build`.
 - Use `npm run build:e2e` before Playwright coverage when feature-gated blog behavior is part of the touched flow.
 - Run Jest with `CI=true npm test -- --watch=false` or narrower targeted variants when relevant.
-- Run Playwright with `npm run test:e2e -- --workers=4` after the appropriate build variant when the touched behavior has E2E coverage.
+- Run Playwright with the repo-standard `npm run test:e2e` command after the appropriate build variant when the touched behavior has E2E coverage.
 
 ## Validation notes
 
 - `npm run build` passes in the current repository state after `npm install`.
 - `npm run build:e2e` is the correct build variant when validating feature-gated blog routes under Playwright because it sets `REACT_APP_RUNTIME_ENV=test`.
-- Direct `npx playwright test ...` invocations should include `--workers=4` so manual runs match CI and the shared Playwright config.
+- `playwright.config.ts` and `docs/engineering/testing-strategy.md` together own the shared Playwright worker count and command shapes; prefer the repo-standard npm scripts and avoid restating worker flags in nested instruction files or workflows.
 - `CI=true npm test -- --watch=false` currently has unrelated baseline failures in existing CV tests, so prefer the narrowest relevant validation for the files you change and separate unrelated failures from regressions you introduce.
 
 Trust these instructions first and only explore further when a task needs deeper file-specific details or the documented guidance is incomplete.

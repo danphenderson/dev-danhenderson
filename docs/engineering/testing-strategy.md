@@ -4,11 +4,11 @@ This document covers the actual test organization, harness patterns, and coverag
 
 ## Test infrastructure
 
-| Layer              | Framework                    | Location     | Run command                         |
-| ------------------ | ---------------------------- | ------------ | ----------------------------------- |
-| Unit / component   | Jest + React Testing Library | `test/unit/` | `CI=true npm test -- --watch=false` |
-| End-to-end         | Playwright (Desktop Chrome)  | `test/e2e/`  | `npm run test:e2e`                  |
-| Build verification | `react-scripts build`        | —            | `npm run build`                     |
+| Layer              | Framework                         | Location     | Run command                         |
+| ------------------ | --------------------------------- | ------------ | ----------------------------------- |
+| Unit / component   | Jest + React Testing Library      | `test/unit/` | `CI=true npm test -- --watch=false` |
+| End-to-end         | Playwright (`chromium` + `smoke`) | `test/e2e/`  | `npm run test:e2e`                  |
+| Build verification | `react-scripts build`             | —            | `npm run build`                     |
 
 ### Jest configuration
 
@@ -22,10 +22,17 @@ This document covers the actual test organization, harness patterns, and coverag
 ### Playwright configuration
 
 - Test directory: `test/e2e/`
+- Projects: `chromium` for route/browser coverage and `smoke` for production smoke coverage
 - Serves production build on port 3100 via `serve -s build -l 3100`
-- Single project: Desktop Chrome
+- Shared worker count is owned by `playwright.config.ts` (currently 4); docs, workflows, and nested instructions should rely on that default unless a job intentionally overrides it
 - Retries: 2 in CI, 0 locally
 - Build variant: `npm run build:e2e` sets `REACT_APP_RUNTIME_ENV=test` so feature-gated routes (blog) are available
+- Standard command shapes:
+  - full suite: `npm run test:e2e`
+  - headed debugging: `npm run test:e2e:headed`
+  - UI runner: `npm run test:e2e:ui`
+  - specific spec: `npm run test:e2e -- test/e2e/<spec>.ts`
+  - specific project: `npm run test:e2e -- --project=<project-name>`
 
 ## Test organization
 
@@ -42,13 +49,15 @@ flowchart TB
     Data["Data modules<br/>schema validation"]
   end
 
-  subgraph E2E["test/e2e/ (6 specs + 2 helpers)"]
+  subgraph E2E["test/e2e/ (8 specs + 2 helpers + snapshots)"]
     HomeE2E["home.spec.ts<br/>hero render · navigation · screenshots"]
     CVE2E["cv.github.spec.ts<br/>GitHub API mocking · fallback"]
     BlogE2E["blog.spec.ts<br/>listing · post detail"]
     ClimbE2E["climbing.spec.ts<br/>page render"]
     PhotoE2E["photography.spec.ts<br/>gallery · category"]
+    NavE2E["navigation.spec.ts<br/>cross-route navigation"]
     NFE2E["not-found.spec.ts<br/>recovery panel"]
+    SmokeE2E["smoke.spec.ts<br/>production route smoke checks"]
     Helpers["helpers/<br/>github.ts (API mocking)<br/>routeReadiness.ts (route checks)"]
   end
 ```
@@ -226,7 +235,10 @@ npm run test:e2e
 npm run test:e2e:headed
 
 # E2E tests (specific spec)
-npx playwright test test/e2e/cv.github.spec.ts
+npm run test:e2e -- test/e2e/cv.github.spec.ts
+
+# E2E tests (specific project)
+npm run test:e2e -- --project=chromium
 ```
 
 **Note:** `CI=true npm test -- --watch=false` may show baseline failures in existing CV tests unrelated to your changes. Focus on regressions in the files you changed.

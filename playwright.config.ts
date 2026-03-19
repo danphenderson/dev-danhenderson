@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test';
 
 const PORT = 3100;
 const baseURL = `http://localhost:${PORT}`;
+// Shared Playwright concurrency is owned here; docs and workflows should not restate it.
 const PLAYWRIGHT_WORKERS = 4;
 
 export default defineConfig({

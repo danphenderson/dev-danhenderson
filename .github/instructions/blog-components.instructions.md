@@ -9,6 +9,6 @@ These files implement the editorial blog UI for `/blog` and `/blog/:slug`. Prese
 - Reuse the current motion, theme, typography, and content-card patterns rather than adding a parallel style system.
 - Preserve React Router navigation and not-found recovery behavior for blog slugs.
 - Preserve feature-gated blog behavior via `isFeatureEnabled('blog')`; the routes are enabled in development/test builds and hidden in production.
-- Add or update focused tests when blog component behavior changes, and validate both blog routes when the UI is affected. Use `npm run build:e2e` before Playwright blog coverage so the gated routes are enabled in the E2E build, and keep Playwright runs at 4 workers.
+- Add or update focused tests when blog component behavior changes, and validate both blog routes when the UI is affected. Use `npm run build:e2e` before Playwright blog coverage so the gated routes are enabled in the E2E build, and follow `docs/engineering/testing-strategy.md` for the repo-standard Playwright command path.
 
 For more detail, follow `src/components/blog/AGENTS.md`.

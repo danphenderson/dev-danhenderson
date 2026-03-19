@@ -76,8 +76,8 @@ When page UI changes are made:
 - validate the changed route directly
 - validate any adjacent route affected by shared navigation or layout
 - check at least one narrow/mobile viewport and one desktop viewport for layout-affecting edits
-- when the working branch includes Playwright E2E coverage for the touched route, run `npm run build` (or `npm run build:e2e` for feature-gated blog coverage) and then the narrowest relevant `npx playwright test --workers=4 test/e2e/<spec>.ts` command
-- when that workflow is present, use `npm run test:e2e -- --workers=4` if a page change spans multiple covered routes or shared route behavior
+- when the working branch includes Playwright E2E coverage for the touched route, run `npm run build` (or `npm run build:e2e` for feature-gated blog coverage) and then the narrowest relevant spec using the repo-standard Playwright command shape from `docs/engineering/testing-strategy.md`
+- when that workflow is present, use the full `npm run test:e2e` suite if a page change spans multiple covered routes or shared route behavior
 - for `/cv` GitHub-backed behavior, prefer mocked Playwright success/failure coverage over live API-dependent validation when that workflow is available
 - verify that major headings, primary content blocks, and critical assets render as intended
 - verify that no obvious overflow, clipping, overlap, or collapsed spacing was introduced
@@ -102,13 +102,13 @@ Common checks:
 - direct navigation to the changed route
 - responsive layout check
 - asset/image/media rendering check
-- Playwright route coverage, when present in the branch:
-  - `/` -> `npx playwright test --workers=4 test/e2e/home.spec.ts`
-  - `/cv` and mocked GitHub states -> `npx playwright test --workers=4 test/e2e/cv.github.spec.ts`
-  - `/climbing` -> `npx playwright test --workers=4 test/e2e/climbing.spec.ts`
-  - `/photography` and `/photography/:slug` -> `npx playwright test --workers=4 test/e2e/photography.spec.ts`
-  - `/blog` and `/blog/:slug` -> `npm run build:e2e` then `npx playwright test --workers=4 test/e2e/blog.spec.ts`
-  - unknown-route handling -> `npx playwright test --workers=4 test/e2e/not-found.spec.ts`
+- Playwright route coverage, when present in the branch, maps to these spec files; run them with the repo-standard command from `docs/engineering/testing-strategy.md`:
+  - `/` -> `test/e2e/home.spec.ts`
+  - `/cv` and mocked GitHub states -> `test/e2e/cv.github.spec.ts`
+  - `/climbing` -> `test/e2e/climbing.spec.ts`
+  - `/photography` and `/photography/:slug` -> `test/e2e/photography.spec.ts`
+  - `/blog` and `/blog/:slug` -> `npm run build:e2e` then `test/e2e/blog.spec.ts`
+  - unknown-route handling -> `test/e2e/not-found.spec.ts`
 - screenshot capture when the task is visual or review-oriented
 
 ## Scope control

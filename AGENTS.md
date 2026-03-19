@@ -95,14 +95,15 @@ Playwright E2E commands, when the working branch includes the Playwright workflo
 
 - one-time browser install: `npx playwright install chromium`
 - serve the production build for local E2E debugging: `npm run serve:e2e`
-- end-to-end tests: `npm run test:e2e -- --workers=4`
-- headed E2E tests: `npm run test:e2e:headed -- --workers=4`
-- interactive E2E runner: `npm run test:e2e:ui -- --workers=4`
+- end-to-end tests: `npm run test:e2e`
+- headed E2E tests: `npm run test:e2e:headed`
+- interactive E2E runner: `npm run test:e2e:ui`
 
 Notes:
 
 - The dev server defaults to port `3001` in this repository.
-- Playwright E2E runs against a production build served on port `3100`; run `npm run build` before the narrowest relevant `npx playwright test --workers=4 ...` or `npm run test:e2e -- --workers=4` command when that workflow is present.
+- `docs/engineering/testing-strategy.md` is the canonical source for Playwright command shapes, and `playwright.config.ts` owns shared worker concurrency.
+- Playwright E2E runs against a production build served on port `3100`; run `npm run build` before the narrowest relevant `npm run test:e2e -- test/e2e/<spec>.ts` or `npm run test:e2e` command when that workflow is present.
 - Use `npm run build:e2e` before blog Playwright coverage or other feature-gated route validation so `REACT_APP_RUNTIME_ENV=test` enables the gated routes.
 - `npm run serve:e2e` is optional for local iteration; Playwright can start the server itself when the branch includes a `webServer` config.
 - Do not claim a command or validation step was run unless it was actually run.
@@ -216,8 +217,8 @@ Typical checks:
 - `npm run build`
 - `npm run build:e2e` before gated blog route specs
 - relevant tests, if the change affects tested behavior
-- `npx playwright test --workers=4 test/e2e/<route>.spec.ts` for the narrowest relevant route flow when Playwright is present
-- `npm run test:e2e -- --workers=4` when changes span multiple covered routes or shared route behavior
+- `npm run test:e2e -- test/e2e/<route>.spec.ts` for the narrowest relevant route flow when Playwright is present
+- `npm run test:e2e` when changes span multiple covered routes or shared route behavior
 - browser-based route or screenshot validation for UI-affecting changes
 
 ## Deployment-sensitive constraints

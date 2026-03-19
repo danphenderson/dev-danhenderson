@@ -69,7 +69,7 @@ jobs:
       - run: npx playwright install-deps chromium
         if: steps.playwright-cache.outputs.cache-hit == 'true'
 
-      - run: npx playwright test --workers=4 --project=chromium
+      - run: npm run test:e2e -- --project=chromium
 
       - uses: actions/upload-artifact@v4
         if: failure()
@@ -105,7 +105,7 @@ jobs:
       - run: npx playwright install-deps chromium
         if: steps.playwright-cache-smoke.outputs.cache-hit == 'true'
 
-      - run: npx playwright test --workers=4 --project=smoke
+      - run: npm run test:e2e -- --project=smoke
 
       - uses: actions/upload-artifact@v4
         if: failure()
