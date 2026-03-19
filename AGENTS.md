@@ -139,35 +139,20 @@ Notes:
 
 ## Area guidance
 
-### CV / portfolio content
+### CV / portfolio and GitHub-backed sections
 
-- Treat `src/data/cv.ts` as the source of truth for the interactive `/cv` experience and routine CV content updates.
-- `resume/` is read-only unless the task explicitly requests resume-source changes or a resume PDF update.
-- The live `/cv` experience and the downloadable resume do not need conceptual parity unless the task explicitly connects them.
+- `src/data/cv.ts` is the source of truth for interactive `/cv`; use `src/data/AGENTS.md` for content/schema rules and `resume/AGENTS.md` for resume-source work.
+- Preserve graceful GitHub fallback behavior through the existing hooks and prefer mocked validation when applicable; see `src/hooks/AGENTS.md`.
 
-### GitHub-driven sections
+### Climbing, photography, and blog content
 
-- Dynamic CV highlights use GitHub API-backed hooks with fallback content.
-- Preserve graceful degradation when GitHub API calls fail or are rate-limited.
-- Prefer deterministic mocked validation over live GitHub API behavior when Playwright E2E helpers are available.
+- Content edits stay in `src/data/`; use `src/data/AGENTS.md` for protected datasets, ordering rules, and schema expectations.
+- Blog UI, routing, and gating should follow `src/components/blog/AGENTS.md`, `src/pages/AGENTS.md`, and `src/constants/AGENTS.md`.
 
-### Climbing and photography data
+### Theme, motion, and UX state
 
-- Do not edit `src/data/climbs.ts` or `src/data/photography.ts` unless the task explicitly requests it.
-- Preserve sorting, normalization, slug generation, and route-matching assumptions used by their hooks and routes.
-
-### Blog content
-
-- All blog UI components live in `src/components/blog/`; use `useBlogData` for all data access and navigation helpers.
-- Blog routes are feature-gated via `isFeatureEnabled('blog')`; preserve the current behavior where they are available in development/test builds and omitted in production.
-- Do not fetch blog content from remote APIs or a CMS; all content is static.
-
-### Theme and UX state
-
-- Theme configuration lives in `src/ThemeProvider.tsx`.
-- Welcome audio behavior lives in `src/WelcomeAudioProvider.tsx`.
-- Preserve localStorage-backed preferences unless migration is explicitly requested.
-- Do not hardcode theme logic in components or routes; use the existing context and hooks.
+- Theme, appearance, motion intensity, and reusable styling rules are owned by the `src/theme/`, `src/styles/`, and `src/motion/` instruction files plus their canonical docs.
+- Preserve existing provider-driven UX state and localStorage-backed preferences; do not reimplement theme or welcome-audio logic in pages or components.
 
 ## Review guidelines
 

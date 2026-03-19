@@ -67,9 +67,10 @@ Implementation will proceed from top-level sources to scoped shims so the canoni
 - 2026-03-19: Implementation started with the top-level instruction stack and instruction-discovery cleanup.
 - 2026-03-19: First implementation pass completed. Root instruction ownership now points to canonical docs, validation ownership moved into `docs/engineering/testing-strategy.md`, `docs/README.md` now includes an instruction map, and the highest-duplication scoped shims now defer detailed validation behavior to their paired scoped `AGENTS.md` files and the testing guide.
 - 2026-03-19: Workspace diagnostics reported no errors on the edited markdown and instruction files.
+- 2026-03-19: Second implementation pass trimmed the remaining lower-priority `.github/instructions/*.instructions.md` shims and shortened root `AGENTS.md` area guidance so scoped `AGENTS.md` files own more of the file-specific detail.
 
 ## Completion Status
 
 - [ ] Not started
-- [x] In progress
-- [ ] Complete
+- [ ] In progress
+- [x] Complete

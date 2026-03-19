@@ -4,9 +4,9 @@ applyTo: 'src/types/**/*.ts'
 
 These files are the canonical home for shared TypeScript types used across layers. Preserve the low-level dependency boundary and keep shared types centralized here.
 
-- Move cross-layer types here without reshaping them during the move.
-- Keep component-, page-, and hook-private types local when they only have a single consumer.
-- Do not import from components, hooks, pages, or data into `src/types/`.
-- Update all consumers in the same change set when making breaking type edits.
+- Keep `src/types/` as the canonical home for cross-layer shared types.
+- Keep component-, page-, and hook-private types local when they have only a single consumer.
+- Do not import upward from components, hooks, pages, or data into `src/types/`.
+- Use `src/types/AGENTS.md` for domain placement and migration steps.
 
 For more detail, follow `src/types/AGENTS.md`.
