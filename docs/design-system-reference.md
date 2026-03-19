@@ -30,6 +30,7 @@ Use purpose-named text wrappers instead of styling raw `Typography` when the cop
 
 - Section labels and titles: `HeaderLabel`, `HeaderTitle`, `HeaderSubtitle`
 - Entry and metadata text: `EntryTitle`, `MetaText`, `StrongMetaText`, `BodyText`, `CaptionText`
+- Dashboard/stat values: `MetricValueText`
 - Secondary copy: `SecondaryBodyText`, `SecondaryCaptionText`
 - List copy: `ListItemText`
 
@@ -40,7 +41,7 @@ Common consumers:
 - [src/components/layout/SectionHeading.tsx](../src/components/layout/SectionHeading.tsx)
 - [src/components/cv/CVEntryHeader.tsx](../src/components/cv/CVEntryHeader.tsx)
 - [src/components/cv/ProfileCard.tsx](../src/components/cv/ProfileCard.tsx)
-- [src/components/climbing/ClimbingAnalytics.tsx](../src/components/climbing/ClimbingAnalytics.tsx)
+- [src/components/climbing/ClimbingAnalytics.tsx](../src/components/climbing/ClimbingAnalytics.tsx) for metric dashboards
 - [src/components/photography/AlbumCard.tsx](../src/components/photography/AlbumCard.tsx)
 
 ### 2. Inline label primitives

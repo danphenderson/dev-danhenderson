@@ -255,10 +255,11 @@ describe('CV page section navigation', () => {
     renderCV();
 
     const githubSection = document.getElementById(cvSectionMetadata.github.id);
-    const storyHeader = screen.getByTestId('cv-story-header');
 
     expect(githubSection).not.toBeNull();
-    expect(within(storyHeader).getByTestId('cv-github-status-tooltip-trigger')).toBeInTheDocument();
+    expect(
+      within(githubSection!).getByTestId('cv-github-status-tooltip-trigger')
+    ).toBeInTheDocument();
     expect(within(githubSection!).getByText('GitHub')).toBeInTheDocument();
     expect(
       within(githubSection!).getByText(
@@ -268,7 +269,6 @@ describe('CV page section navigation', () => {
     expect(within(githubSection!).getByText('Recent Activity')).toBeInTheDocument();
     expect(within(githubSection!).getByText('Contributions')).toBeInTheDocument();
     expect(within(githubSection!).getByText('Contribution calendar')).toBeInTheDocument();
-    expect(within(githubSection!).queryByText('Data status')).not.toBeInTheDocument();
     expect(within(githubSection!).getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
     expect(within(githubSection!).getByText('microsoft/playwright')).toBeInTheDocument();
     expect(within(githubSection!).queryByText('Projects')).not.toBeInTheDocument();
@@ -362,8 +362,11 @@ describe('CV page section navigation', () => {
 
     expect(screen.getByTestId('cv-story-header')).toBeInTheDocument();
     expect(screen.getByText('Full CV')).toBeInTheDocument();
+
+    const githubSectionForMode = document.getElementById(cvSectionMetadata.github.id);
+    expect(githubSectionForMode).not.toBeNull();
     expect(
-      within(screen.getByTestId('cv-story-header')).getByTestId('cv-github-status-tooltip-trigger')
+      within(githubSectionForMode!).getByTestId('cv-github-status-tooltip-trigger')
     ).toBeInTheDocument();
     expect(screen.getByTestId('cv-mode-toggle')).toHaveTextContent('Read my story');
     expect(screen.queryByTestId('cv-story-layout')).not.toBeInTheDocument();

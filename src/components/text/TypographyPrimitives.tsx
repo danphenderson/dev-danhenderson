@@ -87,6 +87,17 @@ export const EntryTitle = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   );
 };
 
+/** Dashboard/stat value text – `variant="body2"`, accent-colored and bold. */
+export const MetricValueText = ({ children, sx, ...rest }: TextPrimitiveProps) => {
+  const { metricValueTextSx } = useComponentStyles();
+
+  return (
+    <Typography variant="body2" sx={mergeSx([metricValueTextSx], sx)} {...rest}>
+      {children}
+    </Typography>
+  );
+};
+
 /** Entry-level subtitle – `variant="subtitle1"`, italic secondary text. */
 export const EntrySubtitle = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { secondaryItalicSx } = useComponentStyles();

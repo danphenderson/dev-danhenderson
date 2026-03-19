@@ -584,6 +584,11 @@ export const createComponentStyleMap = (theme: Theme) => {
       color: 'text.primary',
       fontWeight: 700,
     } satisfies SxProps<Theme>,
+    metricValueTextSx: {
+      color: 'primary.main',
+      fontWeight: 700,
+      fontSize: '1.5rem',
+    } satisfies SxProps<Theme>,
     supportAccentTitleSx,
     secondaryStrongSx: {
       color: 'text.secondary',

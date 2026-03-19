@@ -8,6 +8,7 @@ import type { BlogPostMeta } from '../../../../src/types/blog';
 
 jest.mock('../../../../src/motion', () => ({
   MotionCard: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  MotionTiltCard: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   hoverLift: {},
   tapShrink: {},
   cssDuration: { slow: '0.5s' },

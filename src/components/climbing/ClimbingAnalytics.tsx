@@ -1,7 +1,7 @@
 import { Box, Chip, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { SectionPanel } from '../layout/SectionPanel';
-import { BodyText, SubsectionTitle, MetaText, CaptionText } from '../text';
+import { MetricValueText, SubsectionTitle, MetaText, CaptionText } from '../text';
 import type { ClimbingAnalytics as ClimbingAnalyticsType } from '../../types/data';
 import type { SharedDataStatus } from '../../types/data';
 
@@ -15,12 +15,6 @@ const metricSx: SxProps<Theme> = {
   flexDirection: 'column',
   alignItems: 'center',
   minWidth: 96,
-};
-
-const metricValueSx: SxProps<Theme> = {
-  fontWeight: 700,
-  fontSize: '1.5rem',
-  color: 'primary.main',
 };
 
 const gradeSectionSx: SxProps<Theme> = {
@@ -68,27 +62,19 @@ export const ClimbingAnalytics = ({ analytics, status }: ClimbingAnalyticsProps)
           }}
         >
           <Box sx={metricSx}>
-            <BodyText component="p" sx={metricValueSx}>
-              {overview.tickCount}
-            </BodyText>
+            <MetricValueText>{overview.tickCount}</MetricValueText>
             <MetaText>Routes Climbed</MetaText>
           </Box>
           <Box sx={metricSx}>
-            <BodyText component="p" sx={metricValueSx}>
-              {overview.todoCount}
-            </BodyText>
+            <MetricValueText>{overview.todoCount}</MetricValueText>
             <MetaText>Routes To Do</MetaText>
           </Box>
           <Box sx={metricSx}>
-            <BodyText component="p" sx={metricValueSx}>
-              {overview.uniqueLocations}
-            </BodyText>
+            <MetricValueText>{overview.uniqueLocations}</MetricValueText>
             <MetaText>Unique Locations</MetaText>
           </Box>
           <Box sx={metricSx}>
-            <BodyText component="p" sx={metricValueSx}>
-              {overview.mostRecentDate || 'N/A'}
-            </BodyText>
+            <MetricValueText>{overview.mostRecentDate || 'N/A'}</MetricValueText>
             <MetaText>Most Recent Tick</MetaText>
           </Box>
         </Box>

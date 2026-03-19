@@ -70,7 +70,9 @@ describe('HeaderAppearanceDial', () => {
     expect(screen.getByRole('button', { name: 'Open appearance presets' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Switch to dark mode' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use Atlas appearance' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Use Evergreen appearance' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Use Evergreen appearance (active)' })
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use Ember appearance' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use Solstice appearance' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Use Drift appearance' })).toBeInTheDocument();

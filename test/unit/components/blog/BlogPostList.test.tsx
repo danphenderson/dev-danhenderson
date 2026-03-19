@@ -10,6 +10,7 @@ jest.mock('../../../../src/motion', () => ({
   StaggerChildren: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   MotionItem: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   MotionCard: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  MotionTiltCard: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   fadeInUp: {},
   hoverLift: {},
   tapShrink: {},

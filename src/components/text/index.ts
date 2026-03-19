@@ -6,6 +6,7 @@ export {
   HeaderSubtitle,
   DisplayTitle,
   EntryTitle,
+  MetricValueText,
   EntrySubtitle,
   SectionLabel,
   MetaText,

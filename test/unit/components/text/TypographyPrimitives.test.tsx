@@ -7,6 +7,7 @@ import {
   HeaderSubtitle,
   DisplayTitle,
   EntryTitle,
+  MetricValueText,
   EntrySubtitle,
   SectionLabel,
   MetaText,
@@ -67,6 +68,16 @@ describe('Typography primitives', () => {
 
     expect(el.tagName).toBe('H6');
     expect(el).toHaveClass('MuiTypography-h6');
+  });
+
+  it('renders MetricValueText with the shared metric styling', () => {
+    render(<MetricValueText>42</MetricValueText>, { wrapper });
+
+    const el = screen.getByText('42');
+
+    expect(el.tagName).toBe('P');
+    expect(el).toHaveClass('MuiTypography-body2');
+    expect(el).toHaveStyle({ fontWeight: '700', fontSize: '1.5rem' });
   });
 
   it('renders EntrySubtitle as a subtitle1 paragraph', () => {
