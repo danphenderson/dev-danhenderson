@@ -22,6 +22,14 @@ import type { ReactNode } from 'react';
 import type { MotionIntensityLevel } from '../theme/appAppearance';
 import { BodyText, CaptionText } from './text';
 
+const sectionLabelSx = {
+  fontSize: '0.625rem',
+  fontWeight: 600,
+  letterSpacing: '0.1em',
+  color: 'text.secondary',
+  lineHeight: 1,
+} as const;
+
 const MOTION_LEVELS: { key: MotionIntensityLevel; label: string; icon: ReactNode }[] = [
   { key: 'off', label: 'Off', icon: <MotionPhotosOffOutlinedIcon sx={{ fontSize: 16 }} /> },
   { key: 'subtle', label: 'Subtle', icon: <SlowMotionVideoOutlinedIcon sx={{ fontSize: 16 }} /> },
@@ -79,10 +87,7 @@ export const FirstVisitCustomizeModal = ({
         <Stack spacing={2.5}>
           {/* Motion intensity */}
           <Stack spacing={1}>
-            <Typography
-              variant="overline"
-              sx={{ fontSize: '0.625rem', fontWeight: 600, letterSpacing: '0.1em', color: 'text.secondary', lineHeight: 1 }}
-            >
+            <Typography variant="overline" sx={sectionLabelSx}>
               Motion
             </Typography>
             <ToggleButtonGroup
@@ -114,10 +119,7 @@ export const FirstVisitCustomizeModal = ({
 
           {/* Audio */}
           <Stack spacing={1}>
-            <Typography
-              variant="overline"
-              sx={{ fontSize: '0.625rem', fontWeight: 600, letterSpacing: '0.1em', color: 'text.secondary', lineHeight: 1 }}
-            >
+            <Typography variant="overline" sx={sectionLabelSx}>
               Audio
             </Typography>
             <Stack direction="row" alignItems="center" justifyContent="space-between">

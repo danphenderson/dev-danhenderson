@@ -47,7 +47,7 @@ describe('useHomeWelcomeSequence', () => {
     mockOnboardingState = createMockOnboardingState();
   });
 
-  it('opens prompt when audioConsent is unknown and onboarding is not completed', () => {
+  it('opens prompt when audioConsent is unknown and onboarding has not been completed', () => {
     const { result } = renderHook(() => useHomeWelcomeSequence());
     expect(result.current.isPromptOpen).toBe(true);
   });
