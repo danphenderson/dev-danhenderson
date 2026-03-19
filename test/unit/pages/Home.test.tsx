@@ -87,7 +87,7 @@ jest.mock('../../../src/components/TerminalHeroContent', () => {
       onResizeStart?: (edge: string, event: unknown) => void;
       sx?: { width?: string } | Array<{ width?: string }>;
     }) => {
-      const instanceId = React.useRef<number | null>(null);
+      const instanceId = React.useRef(null);
 
       if (instanceId.current === null) {
         nextInstanceId += 1;
