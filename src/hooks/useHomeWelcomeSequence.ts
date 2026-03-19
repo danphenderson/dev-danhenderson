@@ -7,27 +7,24 @@ type HomeWelcomeSequence = {
   isHeroAnimationReady: boolean;
   isLoading: boolean;
   isPromptOpen: boolean;
+  isCustomizeOpen: boolean;
   handleOptOut: () => void;
   handlePlay: () => Promise<void>;
+  handleCustomizeDismiss: () => void;
 };
 
 export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
   const { play, isPlaying, error, audioConsent, declineAudioConsent } = useWelcomeAudio();
-  const {
-    showPauseHint,
-    showDarkModeHint,
-    openPauseHint,
-    openDarkModeHint,
-    dismissPauseHint,
-    dismissDarkModeHint,
-    resetHints,
-  } = useWelcomeOnboarding();
+  const { onboardingCompleted, showCustomizeModal, openCustomizeModal, completeOnboarding } =
+    useWelcomeOnboarding();
   const [isPromptOpen, setIsPromptOpen] = useState(false);
-  const [hasShownDarkModePrompt, setHasShownDarkModePrompt] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const hasHandledAudioPrompt = audioConsent !== 'unknown';
 
+  /* Open the audio prompt for first-time visitors. */
   useEffect(() => {
+    if (onboardingCompleted) return;
+
     if (audioConsent === 'unknown' && !isPlaying) {
       setIsPromptOpen(true);
       return;
@@ -36,31 +33,17 @@ export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
     if (audioConsent === 'declined') {
       setIsPromptOpen(false);
     }
-  }, [audioConsent, isPlaying]);
+  }, [onboardingCompleted, audioConsent, isPlaying]);
 
-  useEffect(
-    () => () => {
-      resetHints();
-    },
-    [resetHints]
-  );
-
+  /* After the audio prompt is handled, show the customize modal. */
   useEffect(() => {
-    if (hasShownDarkModePrompt || !hasHandledAudioPrompt || showPauseHint || isPromptOpen) return;
-    openDarkModeHint();
-    setHasShownDarkModePrompt(true);
-  }, [
-    hasHandledAudioPrompt,
-    hasShownDarkModePrompt,
-    showPauseHint,
-    isPromptOpen,
-    openDarkModeHint,
-  ]);
+    if (onboardingCompleted || !hasHandledAudioPrompt || isPromptOpen || showCustomizeModal) return;
+    openCustomizeModal();
+  }, [onboardingCompleted, hasHandledAudioPrompt, isPromptOpen, showCustomizeModal, openCustomizeModal]);
 
   const handleOptOut = () => {
     declineAudioConsent();
     setIsPromptOpen(false);
-    dismissPauseHint();
   };
 
   const handlePlay = async () => {
@@ -68,8 +51,6 @@ export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
       setIsLoading(true);
       await play();
       setIsPromptOpen(false);
-      dismissDarkModeHint();
-      openPauseHint();
     } catch (err) {
       console.error('Unable to play welcome audio', err);
     } finally {
@@ -77,17 +58,18 @@ export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
     }
   };
 
+  const handleCustomizeDismiss = () => {
+    completeOnboarding();
+  };
+
   return {
     error,
-    isHeroAnimationReady:
-      hasHandledAudioPrompt &&
-      hasShownDarkModePrompt &&
-      !isPromptOpen &&
-      !showPauseHint &&
-      !showDarkModeHint,
+    isHeroAnimationReady: onboardingCompleted && !isPromptOpen && !showCustomizeModal,
     isLoading,
     isPromptOpen,
+    isCustomizeOpen: showCustomizeModal,
     handleOptOut,
     handlePlay,
+    handleCustomizeDismiss,
   };
 };
