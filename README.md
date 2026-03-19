@@ -43,6 +43,8 @@ Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript po
 
 Setup, testing, project structure, and contribution guidelines live in [CONTRIBUTING.md](CONTRIBUTING.md).
 
+UI pattern and design-system guidance live in [docs/design-system-reference.md](docs/design-system-reference.md).
+
 ## License
 
 [MIT](LICENSE)

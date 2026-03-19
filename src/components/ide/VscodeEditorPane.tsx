@@ -552,6 +552,8 @@ const renderToken = (token: CodeToken, i: number): React.ReactNode => {
 interface VscodeEditorPaneProps {
   activeTab?: VscodeEditorTab;
   expanded?: boolean;
+  /** When true, the outer IDE window has been user-resized; use flex layout. */
+  resized?: boolean;
   /** When true, show a blinking I-beam cursor after the last line. */
   playing?: boolean;
 }
@@ -559,8 +561,10 @@ interface VscodeEditorPaneProps {
 export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
   activeTab = 'server',
   expanded = false,
+  resized = false,
   playing = false,
 }) => {
+  const flexLayout = expanded || resized;
   const [hoveredLine, setHoveredLine] = React.useState<number | null>(null);
 
   const tabMetadata = getVscodeEditorTabMetadata(activeTab);
@@ -576,14 +580,14 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
         backgroundColor: VSCODE_COLORS.editorBg,
         fontFamily: monoFontFamily,
         fontSize: { xs: '0.72rem', sm: '0.80rem', md: '0.84rem' },
-        width: expanded ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
-        minWidth: expanded ? 0 : VSCODE_LAYOUT.editorColumnWidth,
-        maxWidth: expanded ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
+        width: flexLayout ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
+        minWidth: flexLayout ? 0 : VSCODE_LAYOUT.editorColumnWidth,
+        maxWidth: flexLayout ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
         borderBottom: `1px solid ${VSCODE_COLORS.panelBorder}`,
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        ...(expanded ? { flex: 1, minHeight: 0 } : { flexShrink: 0 }),
+        ...(flexLayout ? { flex: 1, minHeight: 0 } : { flexShrink: 0 }),
       }}
     >
       {/* Breadcrumb bar */}
@@ -657,7 +661,7 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
             py: 0.75,
             overflowX: 'hidden',
             overflowY: 'auto',
-            maxHeight: expanded ? 'none' : `calc(${LINES_VISIBLE} * 1.55em + 12px)`,
+            maxHeight: flexLayout ? 'none' : `calc(${LINES_VISIBLE} * 1.55em + 12px)`,
             // Thin custom scrollbar to keep the VS Code aesthetic
             '&::-webkit-scrollbar': { width: '6px' },
             '&::-webkit-scrollbar-track': { background: 'transparent' },

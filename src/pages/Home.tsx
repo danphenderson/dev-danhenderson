@@ -16,14 +16,14 @@ import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { HeroMotionPath } from '../components/HeroMotionPath';
 import { TerminalHeroContent } from '../components/TerminalHeroContent';
-import type { IdeWindowState, TerminalLine } from '../types/ui';
+import type { IdeResizeEdge, IdeWindowSize, IdeWindowState, TerminalLine } from '../types/ui';
 import { siteRouteMap } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
 import { MotionTiltCard } from '../motion';
-import { VSCODE_COLORS, VSCODE_WINDOW_RADIUS } from '../components/ide/vscodeTokens';
+import { VSCODE_COLORS, VSCODE_RESIZE, VSCODE_WINDOW_RADIUS } from '../components/ide/vscodeTokens';
 
 const heroLines: TerminalLine[] = [
   { command: 'node --version', output: 'v22.14.0' },
@@ -61,6 +61,11 @@ export default function Home() {
   const [expandedIdeViewport, setExpandedIdeViewport] = useState<ExpandedIdeViewport | null>(null);
   // Close and minimize intentionally reopen a fresh IDE session on restore.
   const [ideSessionKey, setIdeSessionKey] = useState(0);
+  const [ideWindowSize, setIdeWindowSize] = useState<IdeWindowSize>(null);
+  const [isResizing, setIsResizing] = useState(false);
+  const resizeEdgeRef = useRef<IdeResizeEdge | null>(null);
+  const resizeInitialPointerRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
+  const resizeInitialSizeRef = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
 
   const heroRef = useRef<HTMLDivElement>(null);
   const heroBoundsRef = useRef<HTMLDivElement>(null);
@@ -191,32 +196,90 @@ export default function Home() {
   const handleIdeClose = useCallback(() => {
     queueFreshIdeSession();
     setIdeWindowState('closed');
+    setIdeWindowSize(null);
   }, [queueFreshIdeSession]);
 
   const handleIdeMinimize = useCallback(() => {
     queueFreshIdeSession();
     setIdeWindowState('minimized');
+    setIdeWindowSize(null);
   }, [queueFreshIdeSession]);
 
   const handleIdeExpand = useCallback(() => {
-    setIdeWindowState((prev) => {
-      const next = prev === 'expanded' ? 'normal' : 'expanded';
-
-      if (next === 'expanded' && typeof window !== 'undefined') {
-        window.requestAnimationFrame(() => {
-          updateExpandedIdeViewport();
-        });
-      }
-
-      return next;
-    });
-  }, [updateExpandedIdeViewport]);
+    setIdeWindowState((prev) => (prev === 'expanded' ? 'normal' : 'expanded'));
+  }, []);
 
   const handleIdeRestore = useCallback(() => {
     setIdeWindowState('normal');
+    setIdeWindowSize(null);
   }, []);
 
   const ideVisible = ideWindowState !== 'closed' && ideWindowState !== 'minimized';
+
+  const resizeEnabled = canDragHeroWindow && ideWindowState === 'normal' && !isHeroWindowDragging;
+
+  const handleResizeStart = useCallback(
+    (edge: IdeResizeEdge, event: React.PointerEvent<HTMLDivElement>) => {
+      if (!resizeEnabled) return;
+
+      const heroEl = heroRef.current?.querySelector<HTMLElement>('[data-testid="terminal-hero"]');
+      if (!heroEl) return;
+
+      const rect = heroEl.getBoundingClientRect();
+      const boundsRect = heroBoundsRef.current?.getBoundingClientRect();
+      const startClientX = Number.isFinite(event.clientX) ? event.clientX : rect.right;
+      const startClientY = Number.isFinite(event.clientY) ? event.clientY : rect.bottom;
+      const maxWidth = Math.max(
+        VSCODE_RESIZE.minWidth,
+        boundsRect ? boundsRect.right - rect.left : window.innerWidth - rect.left
+      );
+      const maxHeight = Math.max(
+        VSCODE_RESIZE.minHeight,
+        boundsRect ? boundsRect.bottom - rect.top : window.innerHeight - rect.top
+      );
+
+      resizeEdgeRef.current = edge;
+      resizeInitialPointerRef.current = { x: startClientX, y: startClientY };
+      resizeInitialSizeRef.current = { width: rect.width, height: rect.height };
+      setIsResizing(true);
+
+      const handleMove = (e: PointerEvent) => {
+        const currentClientX = Number.isFinite(e.clientX)
+          ? e.clientX
+          : resizeInitialPointerRef.current.x;
+        const currentClientY = Number.isFinite(e.clientY)
+          ? e.clientY
+          : resizeInitialPointerRef.current.y;
+        const dx = currentClientX - resizeInitialPointerRef.current.x;
+        const dy = currentClientY - resizeInitialPointerRef.current.y;
+        const activeEdge = resizeEdgeRef.current;
+        const initial = resizeInitialSizeRef.current;
+
+        let newWidth = initial.width;
+        let newHeight = initial.height;
+
+        if (activeEdge === 'right' || activeEdge === 'corner') {
+          newWidth = Math.min(Math.max(initial.width + dx, VSCODE_RESIZE.minWidth), maxWidth);
+        }
+        if (activeEdge === 'bottom' || activeEdge === 'corner') {
+          newHeight = Math.min(Math.max(initial.height + dy, VSCODE_RESIZE.minHeight), maxHeight);
+        }
+
+        setIdeWindowSize({ width: newWidth, height: newHeight });
+      };
+
+      const handleUp = () => {
+        document.removeEventListener('pointermove', handleMove);
+        document.removeEventListener('pointerup', handleUp);
+        setIsResizing(false);
+        resizeEdgeRef.current = null;
+      };
+
+      document.addEventListener('pointermove', handleMove);
+      document.addEventListener('pointerup', handleUp);
+    },
+    [resizeEnabled]
+  );
 
   return (
     <>
@@ -233,7 +296,7 @@ export default function Home() {
               <motion.div
                 data-testid="home-hero-window"
                 data-session-key={String(ideSessionKey)}
-                drag={windowDragEnabled && ideWindowState === 'normal'}
+                drag={windowDragEnabled && ideWindowState === 'normal' && !isResizing}
                 dragConstraints={heroBoundsRef}
                 dragControls={heroDragControls}
                 dragElastic={0}
@@ -264,7 +327,7 @@ export default function Home() {
           )}
         >
           <MotionTiltCard
-            disabled={isHeroWindowDragging || ideWindowState === 'expanded'}
+            disabled={isHeroWindowDragging || isResizing || ideWindowState === 'expanded'}
             intensity={0.7}
           >
             <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
@@ -275,11 +338,16 @@ export default function Home() {
                   lines={heroLines}
                   onWindowDragPointerDown={handleTitleBarPointerDown}
                   playing={isTypewriterPlaying}
-                  windowDragEnabled={windowDragEnabled}
+                  windowDragEnabled={windowDragEnabled && !isResizing}
                   windowDragging={isHeroWindowDragging}
                   onClose={handleIdeClose}
                   onMinimize={handleIdeMinimize}
                   onExpand={handleIdeExpand}
+                  resizeWidth={ideWindowSize?.width}
+                  resizeHeight={ideWindowSize?.height}
+                  resizeEnabled={resizeEnabled}
+                  isResizing={isResizing}
+                  onResizeStart={handleResizeStart}
                 />
               ) : null}
             </AnimatedContentCard>

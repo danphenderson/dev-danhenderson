@@ -245,7 +245,7 @@ export const createComponentStyleMap = (theme: Theme) => {
       px: { xs: 1.25, sm: 1.5 },
       pt: hasTabs ? (dense ? 1.25 : 1.5) : 0,
       pb: dense ? 1.25 : 1.5,
-      borderTop: hasTabs ? `1px solid ${interactiveOutlineColor}` : 'none',
+      boxShadow: hasTabs ? `inset 0 1px 0 ${interactiveOutlineColor}` : 'none',
     }) satisfies SxProps<Theme>;
 
   const cardResetSx = {
@@ -329,7 +329,7 @@ export const createComponentStyleMap = (theme: Theme) => {
       : {};
 
   const sharedPillChipSx = {
-    border: subtleBorder,
+    boxShadow: `inset 0 0 0 1px ${alpha(accentColor, surface.panelBorderAlpha * 0.7)}`,
     backgroundColor: subtleSurface,
     fontWeight: 500,
     color: 'text.primary',
@@ -453,7 +453,7 @@ export const createComponentStyleMap = (theme: Theme) => {
       : {};
 
   const getGitHubChipSx = (layout: GitHubChipLayout): SxProps<Theme> => ({
-    border: subtleBorder,
+    boxShadow: `inset 0 0 0 1px ${alpha(accentColor, surface.panelBorderAlpha * 0.7)}`,
     backgroundColor: subtleSurface,
     fontWeight: 600,
     color: 'text.primary',
@@ -488,17 +488,19 @@ export const createComponentStyleMap = (theme: Theme) => {
     contentListStackSpacing,
     contentCardSx: {
       borderRadius: 3,
-      border: `1px solid ${alpha(accentColor, surface.cardBorderAlpha)}`,
       background: cardBackground,
       boxShadow: isLight
-        ? `0 10px 28px ${alpha(
+        ? `0 0 0 1px ${alpha(accentColor, surface.cardBorderAlpha * 0.6)}, 0 10px 28px ${alpha(
             theme.palette.text.primary,
             Math.max(surface.cardShadowAlpha, 0.08)
           )}`
-        : `0 12px 32px ${alpha(theme.palette.common.black, surface.cardShadowAlpha)}`,
+        : `0 0 0 1px ${alpha(accentColor, surface.cardBorderAlpha * 0.6)}, 0 12px 32px ${alpha(
+            theme.palette.common.black,
+            surface.cardShadowAlpha
+          )}`,
       backdropFilter: `blur(${surface.cardBlurPx}px)`,
       p: { xs: 2, md: 2.5 },
-      transition: `border-color ${cssDuration.fast} ${SPRING_EASING_CSS}, transform ${cssDuration.fast} ${SPRING_EASING_CSS}, box-shadow ${cssDuration.fast} ${SPRING_EASING_CSS}`,
+      transition: `box-shadow ${cssDuration.fast} ${SPRING_EASING_CSS}, transform ${cssDuration.fast} ${SPRING_EASING_CSS}`,
       ...borderGlowOverlaySx,
     } satisfies SxProps<Theme>,
     cvSectionCardSx: {

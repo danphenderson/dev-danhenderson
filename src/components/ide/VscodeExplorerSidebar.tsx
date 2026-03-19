@@ -28,11 +28,14 @@ const FILES: FileEntry[] = [
 
 interface VscodeExplorerSidebarProps {
   activeTab?: VscodeEditorTab;
+  /** When true, the outer IDE window has been user-resized; allow flex-shrink. */
+  resized?: boolean;
   visible: boolean;
 }
 
 export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({
   activeTab = 'server',
+  resized = false,
   visible,
 }) => {
   if (!visible) return null;
@@ -43,8 +46,9 @@ export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({
     <Box
       aria-hidden="true"
       sx={{
-        width: VSCODE_LAYOUT.explorerWidth,
-        flexShrink: 0,
+        width: resized ? 'auto' : VSCODE_LAYOUT.explorerWidth,
+        minWidth: resized ? 100 : undefined,
+        flexShrink: resized ? 1 : 0,
         backgroundColor: VSCODE_COLORS.explorerBg,
         borderRight: `1px solid ${VSCODE_COLORS.panelBorder}`,
         display: { xs: 'none', sm: 'flex' },

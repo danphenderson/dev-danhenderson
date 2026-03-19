@@ -131,3 +131,18 @@ export const VSCODE_LAYOUT = {
 
 export const VSCODE_WINDOW_SHADOW = '0 8px 40px rgba(0,0,0,0.55), 0 2px 12px rgba(0,0,0,0.35)';
 export const VSCODE_WINDOW_RADIUS = 8;
+
+// ---------------------------------------------------------------------------
+// Resize handle constants
+// ---------------------------------------------------------------------------
+
+export const VSCODE_RESIZE = {
+  /** Width of the invisible hit-area along each edge (px) */
+  handleSize: 6,
+  /** Minimum window width (px) */
+  minWidth: 280,
+  /** Minimum window height (px) */
+  minHeight: 220,
+  /** Sash highlight color on hover (VS Code sash-active blue) */
+  sashHoverColor: 'rgba(0, 122, 204, 0.50)',
+} as const;

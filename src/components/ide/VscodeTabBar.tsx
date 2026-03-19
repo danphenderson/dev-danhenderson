@@ -7,6 +7,8 @@ import { VSCODE_EDITOR_TABS } from './vscodeEditorTabs';
 interface VscodeTabBarProps {
   activeTab?: VscodeEditorTab;
   expanded?: boolean;
+  /** When true, the outer IDE window has been user-resized; use flex layout. */
+  resized?: boolean;
   onTabChange?: (tab: VscodeEditorTab) => void;
 }
 
@@ -39,8 +41,10 @@ const CloseButton: React.FC<{ active: boolean }> = ({ active }) => (
 export const VscodeTabBar: React.FC<VscodeTabBarProps> = ({
   activeTab = 'server',
   expanded = false,
+  resized = false,
   onTabChange,
 }) => {
+  const flexLayout = expanded || resized;
   const activateTab = React.useCallback(
     (tab: VscodeEditorTab) => {
       onTabChange?.(tab);
@@ -66,9 +70,9 @@ export const VscodeTabBar: React.FC<VscodeTabBarProps> = ({
       sx={{
         display: 'flex',
         alignItems: 'stretch',
-        width: expanded ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
-        minWidth: expanded ? 0 : VSCODE_LAYOUT.editorColumnWidth,
-        maxWidth: expanded ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
+        width: flexLayout ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
+        minWidth: flexLayout ? 0 : VSCODE_LAYOUT.editorColumnWidth,
+        maxWidth: flexLayout ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
         height: VSCODE_LAYOUT.tabBarHeight,
         backgroundColor: VSCODE_COLORS.tabBarBg,
         borderBottom: `1px solid ${VSCODE_COLORS.tabBorder}`,

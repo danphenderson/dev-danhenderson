@@ -14,7 +14,7 @@ export const createAppStyleMap = (theme: Theme) => {
     surface.backgroundOverlayOpacity
   );
   const shellBackgroundColor = alpha(theme.palette.background.paper, surface.panelSurfaceAlpha);
-  const shellBorder = `1px solid ${alpha(theme.palette.divider, surface.panelBorderAlpha)}`;
+  const shellBorder = `1px solid ${alpha(theme.palette.divider, surface.panelBorderAlpha * 0.5)}`;
 
   const photoPlaceholderColor = alpha(theme.palette.text.primary, isLight ? 0.08 : 0.18);
   const photoDownloadShadow = alpha(theme.palette.common.black, isLight ? 0.18 : 0.42);
@@ -26,13 +26,16 @@ export const createAppStyleMap = (theme: Theme) => {
     theme.palette.background.paper,
     Math.min(surface.panelSurfaceAlpha + (isLight ? 0.22 : 0.3), 1)
   );
-  const floatingActionBorder = `1px solid ${alpha(
-    theme.palette.primary.main,
-    Math.min(surface.panelBorderAlpha + 0.08, 0.58)
-  )}`;
+  const floatingActionBorder = 'none';
   const floatingActionShadow = isLight
-    ? `0 12px 28px ${alpha(theme.palette.common.black, surface.cardShadowAlpha + 0.02)}`
-    : `0 14px 30px ${alpha(theme.palette.common.black, surface.cardShadowAlpha)}`;
+    ? `0 0 0 1px ${alpha(
+        theme.palette.primary.main,
+        Math.min(surface.panelBorderAlpha + 0.04, 0.36)
+      )}, 0 12px 28px ${alpha(theme.palette.common.black, surface.cardShadowAlpha + 0.02)}`
+    : `0 0 0 1px ${alpha(
+        theme.palette.primary.main,
+        Math.min(surface.panelBorderAlpha + 0.04, 0.36)
+      )}, 0 14px 30px ${alpha(theme.palette.common.black, surface.cardShadowAlpha)}`;
 
   const getBackgroundImageSx = (resolvedImage: string): SxProps<Theme> => ({
     backgroundImage: `url('${resolvedImage}')`,

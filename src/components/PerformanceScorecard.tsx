@@ -5,7 +5,6 @@ import {
   Dialog,
   DialogContent,
   DialogTitle,
-  Divider,
   IconButton,
   Skeleton,
   Tooltip,
@@ -73,7 +72,12 @@ function VitalRow({ entry }: { entry: WebVitalEntry }) {
         <Typography variant="body2" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
           {formatValue(entry.name, entry.value)}
         </Typography>
-        <Chip label={entry.rating} color={ratingColor[entry.rating]} size="small" variant="outlined" />
+        <Chip
+          label={entry.rating}
+          color={ratingColor[entry.rating]}
+          size="small"
+          variant="outlined"
+        />
       </Box>
     </Box>
   );
@@ -124,14 +128,12 @@ export function PerformanceScorecard() {
           <Typography variant="overline" color="text.secondary">
             Build
           </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 3 }}>
             <InfoRow label="Version" value={buildInfo.version} />
             <InfoRow label="Commit" value={buildInfo.gitSha} mono />
             <InfoRow label="Built" value={formatBuildTime(buildInfo.buildTime)} />
             <InfoRow label="Environment" value={buildInfo.nodeEnv} />
           </Box>
-
-          <Divider sx={{ my: 1.5 }} />
 
           {/* Web Vitals section */}
           <Typography variant="overline" color="text.secondary">

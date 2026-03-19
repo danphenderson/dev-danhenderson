@@ -12,12 +12,14 @@ import { VscodeStatusBar } from './ide/VscodeStatusBar';
 import { VscodeNotificationToast } from './ide/VscodeNotificationToast';
 import { VscodeExplorerSidebar } from './ide/VscodeExplorerSidebar';
 import { VscodeCommandPalette } from './ide/VscodeCommandPalette';
+import { VscodeResizeHandle } from './ide/VscodeResizeHandle';
 import {
   VSCODE_WINDOW_SHADOW,
   VSCODE_WINDOW_RADIUS,
   VSCODE_COLORS,
   VSCODE_LAYOUT,
 } from './ide/vscodeTokens';
+import type { IdeResizeEdge } from '../types/ui';
 
 export type { TerminalLine };
 
@@ -33,6 +35,11 @@ export interface TerminalHeroContentProps {
   onClose?: () => void;
   onMinimize?: () => void;
   onExpand?: () => void;
+  resizeWidth?: number;
+  resizeHeight?: number;
+  resizeEnabled?: boolean;
+  isResizing?: boolean;
+  onResizeStart?: (edge: IdeResizeEdge, event: React.PointerEvent<HTMLDivElement>) => void;
   sx?: SxProps<Theme>;
 }
 
@@ -48,6 +55,11 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   onClose,
   onMinimize,
   onExpand,
+  resizeWidth,
+  resizeHeight,
+  resizeEnabled = false,
+  isResizing = false,
+  onResizeStart,
   sx,
 }) => {
   const { commandText, outputText, showCursor, phase, history } = useTerminalTypewriter({
@@ -99,96 +111,121 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   // Clickable tab focus
   const [activeTab, setActiveTab] = React.useState<VscodeEditorTab>('server');
 
-  const accessibleLabel = lines.map((l) => `${l.command}: ${l.output}`).join('; ');
-  const terminalWindowWidth = expanded
-    ? '100%'
-    : explorerVisible
-      ? `calc(${VSCODE_LAYOUT.activityBarWidth}px + ${VSCODE_LAYOUT.explorerWidth}px + ${VSCODE_LAYOUT.editorColumnWidth})`
-      : `calc(${VSCODE_LAYOUT.activityBarWidth}px + ${VSCODE_LAYOUT.editorColumnWidth})`;
+  const isUserResized = resizeWidth != null || resizeHeight != null;
+  const showResizeHandles = resizeEnabled && !expanded;
+  const autoWidth = explorerVisible
+    ? `calc(${VSCODE_LAYOUT.activityBarWidth}px + ${VSCODE_LAYOUT.explorerWidth}px + ${VSCODE_LAYOUT.editorColumnWidth})`
+    : `calc(${VSCODE_LAYOUT.activityBarWidth}px + ${VSCODE_LAYOUT.editorColumnWidth})`;
+  const terminalWindowWidth = expanded ? '100%' : resizeWidth != null ? resizeWidth : autoWidth;
+  const terminalWindowHeight = expanded ? '100%' : resizeHeight != null ? resizeHeight : undefined;
 
   return (
     <Box
-      aria-label={accessibleLabel}
-      data-expanded={String(expanded)}
-      data-testid="terminal-hero"
-      data-playing={String(Boolean(playing))}
-      sx={[
-        {
-          display: 'flex',
-          flexDirection: 'column',
-          height: expanded ? '100%' : undefined,
-          minHeight: expanded ? 0 : undefined,
-          minWidth: 0,
-          width: terminalWindowWidth,
-          maxWidth: '100%',
-          overflow: 'hidden',
-          position: 'relative',
-          backgroundColor: VSCODE_COLORS.editorBg,
-          borderRadius: `${VSCODE_WINDOW_RADIUS}px`,
-          boxShadow: VSCODE_WINDOW_SHADOW,
-          // Subtle outer border for the desktop-window chrome look
-          border: '1px solid rgba(255,255,255,0.06)',
-        },
-        ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
-      ]}
+      sx={{
+        height: terminalWindowHeight,
+        minHeight: expanded ? 0 : undefined,
+        minWidth: 0,
+        width: terminalWindowWidth,
+        maxWidth: '100%',
+        position: 'relative',
+      }}
     >
-      <VscodeTitleBar
-        onCommandPaletteToggle={() => setCommandPaletteVisible((prev) => !prev)}
-        onWindowDragPointerDown={onWindowDragPointerDown}
-        windowDragEnabled={windowDragEnabled}
-        windowDragging={windowDragging}
-        onClose={onClose}
-        onMinimize={onMinimize}
-        onExpand={onExpand}
-      />
-
-      {/* Editor + activity bar row */}
-      <Box sx={{ display: 'flex', flex: 1, minHeight: 0 }}>
-        <VscodeActivityBar activeIndex={activityBarIndex} onIconClick={handleActivityBarClick} />
-
-        {/* Explorer sidebar */}
-        <VscodeExplorerSidebar activeTab={activeTab} visible={explorerVisible} />
-
-        {/* Right column: tab bar → editor pane → terminal panel */}
-        <Box
-          sx={{
+      <Box
+        aria-label={lines.map((l) => `${l.command}: ${l.output}`).join('; ')}
+        data-expanded={String(expanded)}
+        data-testid="terminal-hero"
+        data-playing={String(Boolean(playing))}
+        sx={[
+          {
             display: 'flex',
             flexDirection: 'column',
-            flex: 1,
-            minHeight: 0,
+            height: terminalWindowHeight == null ? undefined : '100%',
+            minHeight: expanded ? 0 : undefined,
             minWidth: 0,
+            width: '100%',
+            maxWidth: '100%',
             overflow: 'hidden',
-          }}
-        >
-          <VscodeTabBar activeTab={activeTab} expanded={expanded} onTabChange={setActiveTab} />
-          <VscodeEditorPane activeTab={activeTab} expanded={expanded} />
-          <VscodeTerminalPanel
-            commandText={commandText}
-            expanded={expanded}
-            outputText={outputText}
-            showCursor={showCursor}
-            phase={phase}
-            history={history}
+            position: 'relative',
+            backgroundColor: VSCODE_COLORS.editorBg,
+            borderRadius: `${VSCODE_WINDOW_RADIUS}px`,
+            boxShadow: VSCODE_WINDOW_SHADOW,
+            // Subtle outer border for the desktop-window chrome look
+            border: '1px solid rgba(255,255,255,0.06)',
+            ...(isResizing && { userSelect: 'none' }),
+          },
+          ...(Array.isArray(sx) ? sx : sx ? [sx] : []),
+        ]}
+      >
+        <VscodeTitleBar
+          onCommandPaletteToggle={() => setCommandPaletteVisible((prev) => !prev)}
+          onWindowDragPointerDown={onWindowDragPointerDown}
+          windowDragEnabled={windowDragEnabled}
+          windowDragging={windowDragging}
+          onClose={onClose}
+          onMinimize={onMinimize}
+          onExpand={onExpand}
+        />
+
+        {/* Editor + activity bar row */}
+        <Box sx={{ display: 'flex', flex: 1, minHeight: 0 }}>
+          <VscodeActivityBar activeIndex={activityBarIndex} onIconClick={handleActivityBarClick} />
+
+          {/* Explorer sidebar */}
+          <VscodeExplorerSidebar
+            activeTab={activeTab}
+            resized={isUserResized}
+            visible={explorerVisible}
           />
+
+          {/* Right column: tab bar → editor pane → terminal panel */}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              flex: 1,
+              minHeight: 0,
+              minWidth: 0,
+              overflow: 'hidden',
+            }}
+          >
+            <VscodeTabBar
+              activeTab={activeTab}
+              expanded={expanded}
+              resized={isUserResized}
+              onTabChange={setActiveTab}
+            />
+            <VscodeEditorPane activeTab={activeTab} expanded={expanded} resized={isUserResized} />
+            <VscodeTerminalPanel
+              commandText={commandText}
+              expanded={expanded}
+              resized={isUserResized}
+              outputText={outputText}
+              showCursor={showCursor}
+              phase={phase}
+              history={history}
+            />
+          </Box>
         </Box>
+
+        <VscodeStatusBar
+          activeTab={activeTab}
+          commandText={commandText}
+          historyLineCount={historyLineCount}
+        />
+
+        <VscodeNotificationToast
+          activeTab={activeTab}
+          visible={toastVisible}
+          onDismiss={() => setToastVisible(false)}
+        />
+
+        <VscodeCommandPalette
+          visible={commandPaletteVisible}
+          onDismiss={() => setCommandPaletteVisible(false)}
+        />
       </Box>
 
-      <VscodeStatusBar
-        activeTab={activeTab}
-        commandText={commandText}
-        historyLineCount={historyLineCount}
-      />
-
-      <VscodeNotificationToast
-        activeTab={activeTab}
-        visible={toastVisible}
-        onDismiss={() => setToastVisible(false)}
-      />
-
-      <VscodeCommandPalette
-        visible={commandPaletteVisible}
-        onDismiss={() => setCommandPaletteVisible(false)}
-      />
+      <VscodeResizeHandle disabled={!showResizeHandles} onResizeStart={onResizeStart} />
     </Box>
   );
 };

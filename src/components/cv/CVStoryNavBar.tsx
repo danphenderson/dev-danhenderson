@@ -62,7 +62,7 @@ export const CVStoryNavBar = ({
           px: { xs: 2, sm: 3 },
           py: 1.5,
           gap: 1,
-          borderTop: `1px solid ${alpha(theme.palette.divider, 0.15)}`,
+          boxShadow: `0 -1px 6px ${alpha(theme.palette.common.black, 0.08)}`,
           background: alpha(theme.palette.background.paper, 0.6),
           backdropFilter: 'blur(12px)',
         }}

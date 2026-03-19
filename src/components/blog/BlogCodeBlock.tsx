@@ -28,8 +28,6 @@ export function BlogCodeBlock({ language, code, filename, caption }: BlogCodeBlo
         sx={{
           ...componentStyles.contentCardSx,
           overflow: 'hidden',
-          border: '1px solid',
-          borderColor: 'divider',
           borderRadius: 2.5,
         }}
       >
@@ -41,10 +39,8 @@ export function BlogCodeBlock({ language, code, filename, caption }: BlogCodeBlo
           sx={{
             px: 2,
             py: 0.75,
-            borderBottom: '1px solid',
-            borderColor: 'divider',
             bgcolor: (theme) =>
-              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+              theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.035)',
           }}
         >
           <Stack direction="row" spacing={1} alignItems="center">

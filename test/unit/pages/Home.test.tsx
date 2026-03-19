@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ThemeProvider from '../../../src/ThemeProvider';
 import Home from '../../../src/pages/Home';
 import {
@@ -59,6 +59,11 @@ jest.mock('../../../src/components/TerminalHeroContent', () => {
       onClose,
       onMinimize,
       onExpand,
+      resizeEnabled,
+      isResizing,
+      resizeWidth,
+      resizeHeight,
+      onResizeStart,
       sx,
     }: {
       lines: Array<{ command: string; output: string }>;
@@ -67,6 +72,11 @@ jest.mock('../../../src/components/TerminalHeroContent', () => {
       onClose?: () => void;
       onMinimize?: () => void;
       onExpand?: () => void;
+      resizeEnabled?: boolean;
+      isResizing?: boolean;
+      resizeWidth?: number;
+      resizeHeight?: number;
+      onResizeStart?: (edge: string, event: unknown) => void;
       sx?: { width?: string } | Array<{ width?: string }>;
     }) => {
       return (
@@ -78,6 +88,10 @@ jest.mock('../../../src/components/TerminalHeroContent', () => {
             .map((l: { command: string; output: string }) => `${l.command}:${l.output}`)
             .join(',')}
           data-width={String(resolveWidth(sx) ?? '')}
+          data-resize-enabled={String(Boolean(resizeEnabled))}
+          data-is-resizing={String(Boolean(isResizing))}
+          data-resize-width={resizeWidth != null ? String(resizeWidth) : ''}
+          data-resize-height={resizeHeight != null ? String(resizeHeight) : ''}
         >
           {lines
             .map((l: { command: string; output: string }) => `${l.command} → ${l.output}`)
@@ -95,6 +109,15 @@ jest.mock('../../../src/components/TerminalHeroContent', () => {
           {onExpand && (
             <button type="button" data-testid="ide-expand-btn" onClick={onExpand}>
               Expand
+            </button>
+          )}
+          {onResizeStart && (
+            <button
+              type="button"
+              data-testid="ide-resize-start-btn"
+              onPointerDown={(e) => onResizeStart('right', e)}
+            >
+              Start resize
             </button>
           )}
         </div>
@@ -152,17 +175,21 @@ jest.mock('../../../src/components/BackgroundPaper', () => ({
   default: ({
     children,
     showShell,
+    contentRef,
     shellWrapper,
   }: {
     children: React.ReactNode;
     showShell?: boolean;
+    contentRef?: React.Ref<HTMLDivElement>;
     shellWrapper?: (shell: React.ReactNode) => React.ReactNode;
   }) => {
     const shell = <div data-testid="background-shell">{children}</div>;
 
     return (
       <div data-testid="background-paper" data-show-shell={String(Boolean(showShell))}>
-        {showShell ? (shellWrapper ? shellWrapper(shell) : shell) : children}
+        <div data-testid="background-content" ref={contentRef}>
+          {showShell ? (shellWrapper ? shellWrapper(shell) : shell) : children}
+        </div>
       </div>
     );
   },
@@ -376,8 +403,84 @@ const renderHomeWithHeroVisible = async () => {
   );
 };
 
+const setViewportSize = (width: number, height: number) => {
+  Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: width });
+  Object.defineProperty(window, 'innerHeight', {
+    writable: true,
+    configurable: true,
+    value: height,
+  });
+};
+
+const setElementRect = (
+  element: Element,
+  rect: { left: number; top: number; width: number; height: number }
+) => {
+  const domRect = {
+    x: rect.left,
+    y: rect.top,
+    left: rect.left,
+    top: rect.top,
+    width: rect.width,
+    height: rect.height,
+    right: rect.left + rect.width,
+    bottom: rect.top + rect.height,
+    toJSON: () => ({}),
+  } as DOMRect;
+
+  Object.defineProperty(element, 'getBoundingClientRect', {
+    configurable: true,
+    value: () => domRect,
+  });
+};
+
+const mountLayoutAnchors = () => {
+  const header = document.createElement('div');
+  header.id = 'site-navigation';
+
+  const mainContent = document.createElement('div');
+  mainContent.id = 'main-content';
+
+  document.body.append(header, mainContent);
+
+  return { header, mainContent };
+};
+
+const dispatchPointerMove = (clientX: number, clientY: number) => {
+  act(() => {
+    document.dispatchEvent(
+      new MouseEvent('pointermove', {
+        bubbles: true,
+        clientX,
+        clientY,
+      })
+    );
+  });
+};
+
+const dispatchPointerUp = () => {
+  act(() => {
+    document.dispatchEvent(
+      new MouseEvent('pointerup', {
+        bubbles: true,
+      })
+    );
+  });
+};
+
+afterEach(() => {
+  document.getElementById('site-navigation')?.remove();
+  document.getElementById('main-content')?.remove();
+});
+
 describe('Home IDE window actions', () => {
-  it('toggles the expanded IDE width when expand is clicked', async () => {
+  it('expands inside the visible page viewport and restores the normal hero when toggled off', async () => {
+    setViewportSize(1280, 800);
+    const { header, mainContent } = mountLayoutAnchors();
+
+    setElementRect(header, { left: 0, top: 0, width: 1280, height: 64 });
+    setElementRect(mainContent, { left: 24, top: 40, width: 1000, height: 680 });
+
     await renderHomeWithHeroVisible();
 
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'false');
@@ -385,11 +488,19 @@ describe('Home IDE window actions', () => {
 
     fireEvent.click(screen.getByTestId('ide-expand-btn'));
 
+    const expandedOverlay = await screen.findByTestId('home-ide-expanded');
+
     await waitFor(() => {
       const hero = screen.getByTestId('terminal-hero');
 
       expect(hero).toHaveAttribute('data-expanded', 'true');
       expect(hero).toHaveAttribute('data-width', '100%');
+    });
+    expect(expandedOverlay).toHaveStyle({
+      top: '64px',
+      left: '24px',
+      width: '1000px',
+      height: '656px',
     });
 
     fireEvent.click(screen.getByTestId('ide-expand-btn'));
@@ -397,6 +508,7 @@ describe('Home IDE window actions', () => {
     await waitFor(() => {
       const hero = screen.getByTestId('terminal-hero');
 
+      expect(screen.queryByTestId('home-ide-expanded')).not.toBeInTheDocument();
       expect(hero).toHaveAttribute('data-expanded', 'false');
       expect(hero).toHaveAttribute('data-width', '');
     });
@@ -471,5 +583,170 @@ describe('Home IDE window actions', () => {
 
     expect(screen.queryByTestId('ide-restore-button')).not.toBeInTheDocument();
     expect(screen.queryByTestId('ide-minimized-bar')).not.toBeInTheDocument();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Resize tests
+// ---------------------------------------------------------------------------
+
+/** Stub matchMedia to report (or not report) a hover/pointer-fine device. */
+const setPointerDevice = (matches: boolean) => {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    configurable: true,
+    value: (query: string) => ({
+      matches,
+      media: query,
+      onchange: null,
+      addListener: jest.fn(),
+      removeListener: jest.fn(),
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    }),
+  });
+};
+
+describe('Home IDE resize', () => {
+  beforeEach(() => {
+    setPointerDevice(true);
+    setViewportSize(1280, 800);
+  });
+
+  afterEach(() => {
+    setPointerDevice(false);
+    jest.clearAllMocks();
+  });
+
+  it('passes resizeEnabled=false when the device is not pointer-fine', async () => {
+    setPointerDevice(false);
+    await renderHomeWithHeroVisible();
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-resize-enabled', 'false');
+  });
+
+  it('passes resizeEnabled=true in normal window state on a pointer-fine device', async () => {
+    await renderHomeWithHeroVisible();
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-resize-enabled', 'true');
+  });
+
+  it('does not render a resize trigger in expanded mode', async () => {
+    await renderHomeWithHeroVisible();
+    fireEvent.click(screen.getByTestId('ide-expand-btn'));
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'true')
+    );
+    // Expanded TerminalHeroContent receives no onResizeStart → no trigger button
+    expect(screen.queryByTestId('ide-resize-start-btn')).not.toBeInTheDocument();
+  });
+
+  it('sets isResizing=true while a resize is in progress', async () => {
+    await renderHomeWithHeroVisible();
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-is-resizing', 'false');
+
+    fireEvent.pointerDown(screen.getByTestId('ide-resize-start-btn'), {
+      clientX: 100,
+      clientY: 100,
+      button: 0,
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-is-resizing', 'true')
+    );
+  });
+
+  it('updates resize dimensions on pointermove and clears isResizing on pointerup', async () => {
+    await renderHomeWithHeroVisible();
+
+    fireEvent.pointerDown(screen.getByTestId('ide-resize-start-btn'), {
+      clientX: 100,
+      clientY: 100,
+      button: 0,
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-is-resizing', 'true')
+    );
+
+    dispatchPointerMove(300, 250);
+
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero').getAttribute('data-resize-width')).not.toBe('')
+    );
+
+    dispatchPointerUp();
+
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-is-resizing', 'false')
+    );
+  });
+
+  it('clamps resize width to the remaining space when the dragged window is near the right edge', async () => {
+    await renderHomeWithHeroVisible();
+
+    const hero = screen.getByTestId('terminal-hero');
+    const backgroundContent = screen.getByTestId('background-content');
+
+    setElementRect(backgroundContent, { left: 0, top: 0, width: 1000, height: 700 });
+    setElementRect(hero, { left: 650, top: 100, width: 300, height: 300 });
+
+    fireEvent.pointerDown(screen.getByTestId('ide-resize-start-btn'), {
+      clientX: 950,
+      clientY: 160,
+      button: 0,
+    });
+    dispatchPointerMove(1150, 160);
+
+    await waitFor(() => expect(hero).toHaveAttribute('data-resize-width', '350'));
+  });
+
+  it('clears resize dimensions when the window is closed and then restored', async () => {
+    await renderHomeWithHeroVisible();
+
+    fireEvent.pointerDown(screen.getByTestId('ide-resize-start-btn'), {
+      clientX: 100,
+      clientY: 100,
+      button: 0,
+    });
+    dispatchPointerMove(300, 250);
+    dispatchPointerUp();
+
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero').getAttribute('data-resize-width')).not.toBe('')
+    );
+
+    fireEvent.click(screen.getByTestId('ide-close-btn'));
+    await waitFor(() => expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument());
+
+    fireEvent.click(screen.getByTestId('ide-restore-button'));
+    await waitFor(() => expect(screen.getByTestId('terminal-hero')).toBeInTheDocument());
+
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-resize-width', '');
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-resize-height', '');
+  });
+
+  it('clears resize dimensions when the window is minimized and then restored', async () => {
+    await renderHomeWithHeroVisible();
+
+    fireEvent.pointerDown(screen.getByTestId('ide-resize-start-btn'), {
+      clientX: 100,
+      clientY: 100,
+      button: 0,
+    });
+    dispatchPointerMove(300, 250);
+    dispatchPointerUp();
+
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero').getAttribute('data-resize-width')).not.toBe('')
+    );
+
+    fireEvent.click(screen.getByTestId('ide-minimize-btn'));
+    await waitFor(() => expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument());
+
+    fireEvent.click(screen.getByTestId('ide-minimized-bar'));
+    await waitFor(() => expect(screen.getByTestId('terminal-hero')).toBeInTheDocument());
+
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-resize-width', '');
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-resize-height', '');
   });
 });

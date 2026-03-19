@@ -119,10 +119,19 @@ jest.mock('../../../src/components/ide/VscodeActivityBar', () => ({
 }));
 
 jest.mock('../../../src/components/ide/VscodeExplorerSidebar', () => ({
-  VscodeExplorerSidebar: ({ activeTab, visible }: { activeTab: string; visible: boolean }) => (
+  VscodeExplorerSidebar: ({
+    activeTab,
+    resized,
+    visible,
+  }: {
+    activeTab: string;
+    resized?: boolean;
+    visible: boolean;
+  }) => (
     <div
       data-testid="explorer-sidebar"
       data-active-tab={activeTab}
+      data-resized={String(Boolean(resized))}
       data-visible={String(visible)}
     />
   ),
@@ -132,16 +141,19 @@ jest.mock('../../../src/components/ide/VscodeTabBar', () => ({
   VscodeTabBar: ({
     activeTab,
     expanded,
+    resized,
     onTabChange,
   }: {
     activeTab: string;
     expanded?: boolean;
+    resized?: boolean;
     onTabChange?: (tab: string) => void;
   }) => (
     <div
       data-testid="tab-bar"
       data-active-tab={activeTab}
       data-expanded={String(Boolean(expanded))}
+      data-resized={String(Boolean(resized))}
     >
       <button type="button" aria-label="Server tab" onClick={() => onTabChange?.('server')}>
         Server
@@ -154,18 +166,31 @@ jest.mock('../../../src/components/ide/VscodeTabBar', () => ({
 }));
 
 jest.mock('../../../src/components/ide/VscodeEditorPane', () => ({
-  VscodeEditorPane: ({ activeTab, expanded }: { activeTab: string; expanded?: boolean }) => (
+  VscodeEditorPane: ({
+    activeTab,
+    expanded,
+    resized,
+  }: {
+    activeTab: string;
+    expanded?: boolean;
+    resized?: boolean;
+  }) => (
     <div
       data-testid="editor-pane"
       data-active-tab={activeTab}
       data-expanded={String(Boolean(expanded))}
+      data-resized={String(Boolean(resized))}
     />
   ),
 }));
 
 jest.mock('../../../src/components/ide/VscodeTerminalPanel', () => ({
-  VscodeTerminalPanel: ({ expanded }: { expanded?: boolean }) => (
-    <div data-testid="terminal-panel" data-expanded={String(Boolean(expanded))} />
+  VscodeTerminalPanel: ({ expanded, resized }: { expanded?: boolean; resized?: boolean }) => (
+    <div
+      data-testid="terminal-panel"
+      data-expanded={String(Boolean(expanded))}
+      data-resized={String(Boolean(resized))}
+    />
   ),
 }));
 
@@ -227,6 +252,14 @@ const renderHero = (
     onClose: () => void;
     onMinimize: () => void;
     onExpand: () => void;
+    resizeEnabled: boolean;
+    resizeWidth: number;
+    resizeHeight: number;
+    isResizing: boolean;
+    onResizeStart: (
+      edge: 'right' | 'bottom' | 'corner',
+      event: React.PointerEvent<HTMLDivElement>
+    ) => void;
   }> = {}
 ) =>
   render(
@@ -241,6 +274,11 @@ const renderHero = (
         onClose={overrides.onClose}
         onMinimize={overrides.onMinimize}
         onExpand={overrides.onExpand}
+        resizeEnabled={overrides.resizeEnabled}
+        resizeWidth={overrides.resizeWidth}
+        resizeHeight={overrides.resizeHeight}
+        isResizing={overrides.isResizing}
+        onResizeStart={overrides.onResizeStart}
       />
     </ThemeProvider>
   );
@@ -423,6 +461,116 @@ describe('TerminalHeroContent', () => {
     it('does not render close button when onClose is not provided', () => {
       renderHero();
       expect(screen.queryByTestId('title-bar-close')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('resize handles', () => {
+    it('does not render resize handles when resizeEnabled is omitted', () => {
+      renderHero();
+      expect(screen.queryByTestId('resize-handle-right')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('resize-handle-bottom')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('resize-handle-corner')).not.toBeInTheDocument();
+    });
+
+    it('does not render resize handles when resizeEnabled is false', () => {
+      render(
+        <ThemeProvider>
+          <TerminalHeroContent lines={SAMPLE_LINES} resizeEnabled={false} />
+        </ThemeProvider>
+      );
+      expect(screen.queryByTestId('resize-handle-right')).not.toBeInTheDocument();
+    });
+
+    it('renders all three resize handles when resizeEnabled is true', () => {
+      renderHero({ resizeEnabled: true });
+      expect(screen.getByTestId('resize-handle-right')).toBeInTheDocument();
+      expect(screen.getByTestId('resize-handle-bottom')).toBeInTheDocument();
+      expect(screen.getByTestId('resize-handle-corner')).toBeInTheDocument();
+    });
+
+    it('does not render resize handles or gutters in expanded mode', () => {
+      renderHero({ expanded: true, resizeEnabled: true });
+
+      expect(screen.queryByTestId('resize-handle-right')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('resize-handle-bottom')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('resize-handle-corner')).not.toBeInTheDocument();
+    });
+
+    it('calls onResizeStart with "right" when the right edge is pointer-downed', () => {
+      const onResizeStart = jest.fn();
+      render(
+        <ThemeProvider>
+          <TerminalHeroContent lines={SAMPLE_LINES} resizeEnabled onResizeStart={onResizeStart} />
+        </ThemeProvider>
+      );
+      fireEvent.pointerDown(screen.getByTestId('resize-handle-right'), { button: 0 });
+      expect(onResizeStart).toHaveBeenCalledTimes(1);
+      expect(onResizeStart).toHaveBeenCalledWith('right', expect.anything());
+    });
+
+    it('calls onResizeStart with "bottom" when the bottom edge is pointer-downed', () => {
+      const onResizeStart = jest.fn();
+      render(
+        <ThemeProvider>
+          <TerminalHeroContent lines={SAMPLE_LINES} resizeEnabled onResizeStart={onResizeStart} />
+        </ThemeProvider>
+      );
+      fireEvent.pointerDown(screen.getByTestId('resize-handle-bottom'), { button: 0 });
+      expect(onResizeStart).toHaveBeenCalledWith('bottom', expect.anything());
+    });
+
+    it('calls onResizeStart with "corner" when the corner handle is pointer-downed', () => {
+      const onResizeStart = jest.fn();
+      render(
+        <ThemeProvider>
+          <TerminalHeroContent lines={SAMPLE_LINES} resizeEnabled onResizeStart={onResizeStart} />
+        </ThemeProvider>
+      );
+      fireEvent.pointerDown(screen.getByTestId('resize-handle-corner'), { button: 0 });
+      expect(onResizeStart).toHaveBeenCalledWith('corner', expect.anything());
+    });
+  });
+
+  describe('resize-to-child threading', () => {
+    it('does not set resized on children when no resizeWidth/resizeHeight is supplied', () => {
+      renderHero();
+      expect(screen.getByTestId('editor-pane')).toHaveAttribute('data-resized', 'false');
+      expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-resized', 'false');
+      expect(screen.getByTestId('terminal-panel')).toHaveAttribute('data-resized', 'false');
+      expect(screen.getByTestId('explorer-sidebar')).toHaveAttribute('data-resized', 'false');
+    });
+
+    it('sets resized=true on children when resizeWidth is provided', () => {
+      render(
+        <ThemeProvider>
+          <TerminalHeroContent lines={SAMPLE_LINES} resizeWidth={600} />
+        </ThemeProvider>
+      );
+      expect(screen.getByTestId('editor-pane')).toHaveAttribute('data-resized', 'true');
+      expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-resized', 'true');
+      expect(screen.getByTestId('terminal-panel')).toHaveAttribute('data-resized', 'true');
+      expect(screen.getByTestId('explorer-sidebar')).toHaveAttribute('data-resized', 'true');
+    });
+
+    it('sets resized=true on children when resizeHeight is provided', () => {
+      render(
+        <ThemeProvider>
+          <TerminalHeroContent lines={SAMPLE_LINES} resizeHeight={400} />
+        </ThemeProvider>
+      );
+      expect(screen.getByTestId('editor-pane')).toHaveAttribute('data-resized', 'true');
+      expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-resized', 'true');
+      expect(screen.getByTestId('terminal-panel')).toHaveAttribute('data-resized', 'true');
+    });
+
+    it('sets resized=true on children when both resizeWidth and resizeHeight are provided', () => {
+      render(
+        <ThemeProvider>
+          <TerminalHeroContent lines={SAMPLE_LINES} resizeWidth={600} resizeHeight={400} />
+        </ThemeProvider>
+      );
+      expect(screen.getByTestId('editor-pane')).toHaveAttribute('data-resized', 'true');
+      expect(screen.getByTestId('terminal-panel')).toHaveAttribute('data-resized', 'true');
     });
   });
 });

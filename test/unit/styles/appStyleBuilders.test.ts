@@ -17,7 +17,10 @@ describe('createAppStyleMap', () => {
     expect(backgroundOverlaySx.backgroundColor).toBe(alpha(theme.palette.common.black, 0.56));
     expect(styleMap.backgroundShellSx).toMatchObject({
       backgroundColor: alpha(theme.palette.background.paper, 0.88),
-      border: `1px solid ${alpha(theme.palette.divider, 0.14)}`,
+      border: `1px solid ${alpha(
+        theme.palette.divider,
+        theme.appearanceTreatment.surface.panelBorderAlpha * 0.5
+      )}`,
     });
   });
 
@@ -33,7 +36,10 @@ describe('createAppStyleMap', () => {
     expect(backgroundOverlaySx.backgroundColor).toBe(alpha(theme.palette.common.black, 0.56));
     expect(styleMap.backgroundShellSx).toMatchObject({
       backgroundColor: alpha(theme.palette.background.paper, 0.88),
-      border: `1px solid ${alpha(theme.palette.divider, 0.14)}`,
+      border: `1px solid ${alpha(
+        theme.palette.divider,
+        theme.appearanceTreatment.surface.panelBorderAlpha * 0.5
+      )}`,
     });
   });
 
@@ -49,7 +55,10 @@ describe('createAppStyleMap', () => {
     expect(backgroundOverlaySx.backgroundColor).toBe(alpha(theme.palette.common.black, 0.46));
     expect(styleMap.backgroundShellSx).toMatchObject({
       backgroundColor: alpha(theme.palette.background.paper, 0.8),
-      border: `1px solid ${alpha(theme.palette.divider, 0.18)}`,
+      border: `1px solid ${alpha(
+        theme.palette.divider,
+        theme.appearanceTreatment.surface.panelBorderAlpha * 0.5
+      )}`,
     });
   });
 
@@ -65,21 +74,25 @@ describe('createAppStyleMap', () => {
     expect(backgroundOverlaySx.backgroundColor).toBe(alpha(theme.palette.common.black, 0.5));
     expect(styleMap.backgroundShellSx).toMatchObject({
       backgroundColor: alpha(theme.palette.background.paper, 0.6),
-      border: `1px solid ${alpha(theme.palette.divider, 0.4)}`,
+      border: `1px solid ${alpha(
+        theme.palette.divider,
+        theme.appearanceTreatment.surface.panelBorderAlpha * 0.5
+      )}`,
     });
   });
 
-  it('gives the home hero shell a darker terminal-style surface so the photo does not bleed through', () => {
+  it('keeps the home hero shell transparent so the embedded VS Code window owns the chrome', () => {
     const theme = createAppTheme('light', defaultAppAppearanceKey);
     const styleMap = createAppStyleMap(theme);
 
     expect(styleMap.homeHeroShellSx).toMatchObject({
-      backgroundColor: alpha(theme.palette.common.black, 0.82),
+      backgroundColor: 'transparent',
       backgroundImage: 'none',
-      border: `1px solid ${alpha(theme.palette.common.white, 0.10)}`,
-      backdropFilter: 'blur(16px)',
-      WebkitBackdropFilter: 'blur(16px)',
-      borderRadius: 2,
+      border: 'none',
+      boxShadow: 'none',
+      backdropFilter: 'none',
+      WebkitBackdropFilter: 'none',
+      borderRadius: 1,
     });
   });
 

@@ -21,6 +21,8 @@ export const isOutputPhase = (phase: TerminalTypewriterPhase): boolean =>
 interface VscodeTerminalPanelProps {
   commandText: string;
   expanded?: boolean;
+  /** When true, the outer IDE window has been user-resized; use flex layout. */
+  resized?: boolean;
   outputText: string;
   showCursor: boolean;
   phase: TerminalTypewriterPhase;
@@ -117,11 +119,13 @@ const GitStatusLine: React.FC = () => (
 export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
   commandText,
   expanded = false,
+  resized = false,
   outputText,
   showCursor,
   phase,
   history,
 }) => {
+  const flexLayout = expanded || resized;
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
   // Auto-scroll to the bottom when history grows or output appears
@@ -151,9 +155,9 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        width: expanded ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
+        width: flexLayout ? '100%' : VSCODE_LAYOUT.editorColumnWidth,
         maxWidth: '100%',
-        minWidth: expanded ? 0 : VSCODE_LAYOUT.editorColumnWidth,
+        minWidth: flexLayout ? 0 : VSCODE_LAYOUT.editorColumnWidth,
         flexShrink: 0,
         overflow: 'hidden',
       }}
