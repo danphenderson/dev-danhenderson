@@ -1,5 +1,7 @@
 import type { ReactNode, MouseEvent as ReactMouseEvent } from 'react';
 
+export type AudioConsent = 'unknown' | 'granted' | 'declined';
+
 export type AppSpeedDialLayer = 'content' | 'header';
 
 export type AppSpeedDialAction = {

@@ -2,6 +2,12 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { HeaderSettingsPopover } from '../../../../src/components/header/HeaderSettingsPopover';
 
+const mockUseReducedMotion = jest.fn().mockReturnValue(false);
+
+jest.mock('motion/react', () => ({
+  useReducedMotion: () => mockUseReducedMotion(),
+}));
+
 const renderSettingsPopover = (
   props: Partial<React.ComponentProps<typeof HeaderSettingsPopover>> = {}
 ) =>
@@ -23,6 +29,11 @@ const renderSettingsPopover = (
   );
 
 describe('HeaderSettingsPopover', () => {
+  beforeEach(() => {
+    mockUseReducedMotion.mockReset();
+    mockUseReducedMotion.mockReturnValue(false);
+  });
+
   it('renders the settings trigger button', () => {
     renderSettingsPopover();
 
@@ -97,14 +108,46 @@ describe('HeaderSettingsPopover', () => {
     expect(onChangeAppearance).toHaveBeenCalledWith('ember');
   });
 
+  it('moves focus and changes appearance with arrow-key navigation', () => {
+    const onChangeAppearance = jest.fn();
+    renderSettingsPopover({ onChangeAppearance });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
+
+    const currentSwatch = screen.getByRole('radio', { name: 'Evergreen (active)' });
+    fireEvent.focus(currentSwatch);
+
+    fireEvent.keyDown(currentSwatch, { key: 'ArrowRight' });
+
+    expect(onChangeAppearance).toHaveBeenCalledTimes(1);
+    expect(onChangeAppearance).toHaveBeenCalledWith('ember');
+    expect(screen.getByRole('radio', { name: 'Ember' })).toHaveFocus();
+  });
+
+  it('shows the reduced-motion notice and disables motion controls when the OS preference is active', () => {
+    const onChangeMotionIntensity = jest.fn();
+    mockUseReducedMotion.mockReturnValue(true);
+    renderSettingsPopover({ onChangeMotionIntensity });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
+
+    expect(screen.getByTestId('reduced-motion-notice')).toBeInTheDocument();
+
+    ['Off', 'Subtle', 'Default', 'Expressive'].forEach((label) => {
+      expect(screen.getByRole('button', { name: label })).toBeDisabled();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Expressive' }));
+
+    expect(onChangeMotionIntensity).not.toHaveBeenCalled();
+  });
+
   it('renders audio controls when showAudioControl is true', () => {
     renderSettingsPopover({ showAudioControl: true, isPlaying: false });
 
     fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
 
-    expect(
-      screen.getByRole('button', { name: 'Play welcome audio' })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Play welcome audio' })).toBeInTheDocument();
   });
 
   it('calls onToggleAudio when the audio button is clicked', () => {
@@ -122,8 +165,6 @@ describe('HeaderSettingsPopover', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
 
-    expect(
-      screen.queryByRole('button', { name: 'Play welcome audio' })
-    ).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Play welcome audio' })).not.toBeInTheDocument();
   });
 });

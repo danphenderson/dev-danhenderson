@@ -10,10 +10,11 @@ import {
 import {
   LEGACY_AUDIO_PROMPT_STORAGE_KEY,
   PREFERENCE_STORAGE_KEYS,
-} from './constants/preferences';
-import type { AudioConsent } from './types/preferences';
+  isAudioConsent,
+} from './theme/preferences';
+import type { AudioConsent } from './types/ui';
 
-export type { AudioConsent } from './types/preferences';
+export type { AudioConsent } from './types/ui';
 
 type SoundCloudWidget = {
   play: () => void;
@@ -118,7 +119,7 @@ const getStoredAudioConsent = (): AudioConsent => {
   if (typeof window === 'undefined') return 'unknown';
 
   const storedConsent = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.audioConsent);
-  if (storedConsent === 'granted' || storedConsent === 'declined') {
+  if (isAudioConsent(storedConsent) && storedConsent !== 'unknown') {
     return storedConsent;
   }
 

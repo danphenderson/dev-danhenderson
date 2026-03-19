@@ -2,14 +2,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { PaletteMode } from '@mui/material';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
+import { DEFAULT_PREFERENCES, isPaletteMode, PREFERENCE_STORAGE_KEYS } from './theme/preferences';
 import {
-  DEFAULT_PREFERENCES,
-  isPaletteMode,
-  PREFERENCE_STORAGE_KEYS,
-} from './constants/preferences';
-import {
-  defaultAppAppearanceKey,
-  defaultMotionIntensity,
   isAppAppearanceKey,
   isMotionIntensityLevel,
   type AppAppearanceKey,
@@ -28,8 +22,8 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue>({
   mode: DEFAULT_PREFERENCES.theme,
-  appearance: defaultAppAppearanceKey,
-  motionIntensity: defaultMotionIntensity,
+  appearance: DEFAULT_PREFERENCES.appearance,
+  motionIntensity: DEFAULT_PREFERENCES.motionIntensity,
   setAppearance: () => {},
   setMotionIntensity: () => {},
   toggleTheme: () => {},
@@ -45,16 +39,16 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
     return isPaletteMode(stored) ? stored : DEFAULT_PREFERENCES.theme;
   });
   const [appearance, setAppearance] = useState<AppAppearanceKey>(() => {
-    if (typeof window === 'undefined') return defaultAppAppearanceKey;
+    if (typeof window === 'undefined') return DEFAULT_PREFERENCES.appearance;
 
     const storedAppearance = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.appearance);
-    return isAppAppearanceKey(storedAppearance) ? storedAppearance : defaultAppAppearanceKey;
+    return isAppAppearanceKey(storedAppearance) ? storedAppearance : DEFAULT_PREFERENCES.appearance;
   });
   const [motionIntensity, setMotionIntensity] = useState<MotionIntensityLevel>(() => {
-    if (typeof window === 'undefined') return defaultMotionIntensity;
+    if (typeof window === 'undefined') return DEFAULT_PREFERENCES.motionIntensity;
 
     const stored = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.motionIntensity);
-    return isMotionIntensityLevel(stored) ? stored : defaultMotionIntensity;
+    return isMotionIntensityLevel(stored) ? stored : DEFAULT_PREFERENCES.motionIntensity;
   });
   const theme = useMemo(
     () => createAppTheme(mode, appearance, motionIntensity),
