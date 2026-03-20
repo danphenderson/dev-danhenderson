@@ -209,7 +209,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
     },
     surface: {
       light: {
-        backgroundOverlayOpacity: 0.46,
+        backgroundOverlayOpacity: 0.52,
         cardGradientStartAlpha: 0.94,
         cardGradientEndAlpha: 0.88,
         cardBorderAlpha: 0.24,
@@ -228,7 +228,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         sectionBorderSweepOpacity: 0.46,
       },
       dark: {
-        backgroundOverlayOpacity: 0.58,
+        backgroundOverlayOpacity: 0.64,
         cardGradientStartAlpha: 0.86,
         cardGradientEndAlpha: 0.9,
         cardBorderAlpha: 0.36,
@@ -309,7 +309,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
     },
     surface: {
       light: {
-        backgroundOverlayOpacity: 0.56,
+        backgroundOverlayOpacity: 0.62,
         cardGradientStartAlpha: 0.96,
         cardGradientEndAlpha: 0.92,
         cardBorderAlpha: 0.18,
@@ -328,7 +328,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         sectionBorderSweepOpacity: 0,
       },
       dark: {
-        backgroundOverlayOpacity: 0.68,
+        backgroundOverlayOpacity: 0.74,
         cardGradientStartAlpha: 0.92,
         cardGradientEndAlpha: 0.94,
         cardBorderAlpha: 0.26,
@@ -409,7 +409,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
     },
     surface: {
       light: {
-        backgroundOverlayOpacity: 0.36,
+        backgroundOverlayOpacity: 0.42,
         cardGradientStartAlpha: 0.95,
         cardGradientEndAlpha: 0.86,
         cardBorderAlpha: 0.3,
@@ -428,7 +428,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         sectionBorderSweepOpacity: 0.78,
       },
       dark: {
-        backgroundOverlayOpacity: 0.5,
+        backgroundOverlayOpacity: 0.56,
         cardGradientStartAlpha: 0.82,
         cardGradientEndAlpha: 0.9,
         cardBorderAlpha: 0.46,
@@ -509,7 +509,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
     },
     surface: {
       light: {
-        backgroundOverlayOpacity: 0.5,
+        backgroundOverlayOpacity: 0.56,
         cardGradientStartAlpha: 0.95,
         cardGradientEndAlpha: 0.9,
         cardBorderAlpha: 0.22,
@@ -528,7 +528,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         sectionBorderSweepOpacity: 0.32,
       },
       dark: {
-        backgroundOverlayOpacity: 0.62,
+        backgroundOverlayOpacity: 0.68,
         cardGradientStartAlpha: 0.88,
         cardGradientEndAlpha: 0.92,
         cardBorderAlpha: 0.32,
@@ -609,7 +609,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
     },
     surface: {
       light: {
-        backgroundOverlayOpacity: 0.48,
+        backgroundOverlayOpacity: 0.54,
         cardGradientStartAlpha: 0.94,
         cardGradientEndAlpha: 0.88,
         cardBorderAlpha: 0.2,
@@ -628,7 +628,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         sectionBorderSweepOpacity: 0.38,
       },
       dark: {
-        backgroundOverlayOpacity: 0.6,
+        backgroundOverlayOpacity: 0.66,
         cardGradientStartAlpha: 0.86,
         cardGradientEndAlpha: 0.9,
         cardBorderAlpha: 0.34,
@@ -709,7 +709,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
     },
     surface: {
       light: {
-        backgroundOverlayOpacity: 0.52,
+        backgroundOverlayOpacity: 0.58,
         cardGradientStartAlpha: 0.96,
         cardGradientEndAlpha: 0.9,
         cardBorderAlpha: 0.2,
@@ -728,7 +728,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
         sectionBorderSweepOpacity: 0.28,
       },
       dark: {
-        backgroundOverlayOpacity: 0.64,
+        backgroundOverlayOpacity: 0.7,
         cardGradientStartAlpha: 0.9,
         cardGradientEndAlpha: 0.94,
         cardBorderAlpha: 0.3,
