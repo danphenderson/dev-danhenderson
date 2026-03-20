@@ -80,7 +80,11 @@ export const VscodeTabBar: React.FC<VscodeTabBarProps> = ({
         backgroundColor: VSCODE_COLORS.tabBarBg,
         borderBottom: `1px solid ${VSCODE_COLORS.tabBorder}`,
         flexShrink: 0,
-        overflow: 'hidden',
+        overflowX: 'auto',
+        overflowY: 'hidden',
+        // Hide scrollbar to keep the VS Code aesthetic
+        '&::-webkit-scrollbar': { display: 'none' },
+        scrollbarWidth: 'none',
       }}
     >
       {VSCODE_EDITOR_TABS.map((tab) => {

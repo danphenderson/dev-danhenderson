@@ -242,7 +242,7 @@ export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({
       aria-hidden="true"
       onPointerDown={stopDragStartPropagation}
       sx={{
-        display: 'flex',
+        display: { xs: 'none', sm: 'flex' },
         alignItems: 'center',
         gap: 0.25,
         ml: 'auto',

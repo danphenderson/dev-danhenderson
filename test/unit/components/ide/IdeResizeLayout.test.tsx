@@ -149,4 +149,25 @@ describe('VscodeExplorerSidebar resize layout', () => {
       view.unmount();
     }
   });
+
+  it('hides child entries when a folder is collapsed', () => {
+    renderInShell(<VscodeExplorerSidebar visible />, { flexDirection: 'row' });
+
+    expect(screen.getByText('server.py')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('src'));
+
+    expect(screen.queryByText('server.py')).not.toBeInTheDocument();
+    expect(screen.queryByText('client.ts')).not.toBeInTheDocument();
+  });
+
+  it('restores child entries when a collapsed folder is expanded again', () => {
+    renderInShell(<VscodeExplorerSidebar visible />, { flexDirection: 'row' });
+
+    fireEvent.click(screen.getByText('src'));
+    fireEvent.click(screen.getByText('src'));
+
+    expect(screen.getByText('server.py')).toBeInTheDocument();
+    expect(screen.getByText('client.ts')).toBeInTheDocument();
+  });
 });

@@ -12,6 +12,7 @@ import type { TerminalSessionTab, VscodeEditorTab } from '../types/ui';
 
 export type BootPhase =
   | 'idle'
+  | 'explorer-open'
   | 'server-typing'
   | 'server-enter'
   | 'server-output'
@@ -50,6 +51,7 @@ const ZSH_SESSION: TerminalSessionTab = { id: 'zsh', label: 'zsh' };
 // ---------------------------------------------------------------------------
 
 const EXPAND_SETTLE_MS = 300;
+const EXPLORER_OPEN_MS = 600;
 const PAUSE_BEFORE_OUTPUT_MS = 400;
 const SERVER_OBSERVE_MS = 900;
 const CLIENT_OBSERVE_MS = 1000;
@@ -68,6 +70,8 @@ export interface TerminalBootResult {
   showCursor: boolean;
   complete: boolean;
   editorTab: VscodeEditorTab;
+  /** When true, the explorer sidebar should be revealed during the boot sequence. */
+  explorerOpen: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -95,10 +99,19 @@ export const useTerminalBootSequence = (active: boolean): TerminalBootResult => 
       return;
     }
 
-    const id = window.setTimeout(() => setPhase('server-typing'), scale(EXPAND_SETTLE_MS));
+    const id = window.setTimeout(() => setPhase('explorer-open'), scale(EXPAND_SETTLE_MS));
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, durationScale]);
+
+  // ---- Explorer open ----
+  useEffect(() => {
+    if (phase !== 'explorer-open') return;
+
+    const id = window.setTimeout(() => setPhase('server-typing'), scale(EXPLORER_OPEN_MS));
+    return () => window.clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, durationScale]);
 
   // ---- Server: typing ----
   useEffect(() => {
@@ -223,6 +236,8 @@ export const useTerminalBootSequence = (active: boolean): TerminalBootResult => 
 
   if (phase === 'idle' || phase === 'complete') {
     sessions = [ZSH_SESSION];
+  } else if (phase === 'explorer-open') {
+    sessions = [ZSH_SESSION];
   } else if (isServer) {
     sessions = [SERVER_SESSION];
   } else if (isClient) {
@@ -231,6 +246,9 @@ export const useTerminalBootSequence = (active: boolean): TerminalBootResult => 
     // handoff
     sessions = [SERVER_SESSION, CLIENT_SESSION, ZSH_SESSION];
   }
+
+  // Explorer is open from the explorer-open phase onward
+  const explorerOpen = phase !== 'idle';
 
   return {
     phase,
@@ -241,5 +259,6 @@ export const useTerminalBootSequence = (active: boolean): TerminalBootResult => 
     showCursor,
     complete: phase === 'complete',
     editorTab,
+    explorerOpen,
   };
 };

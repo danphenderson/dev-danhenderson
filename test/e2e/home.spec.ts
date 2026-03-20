@@ -249,7 +249,7 @@ test.describe('Home page', () => {
     await expect(settingsPopover.getByRole('button', { name: 'Play welcome audio' })).toBeVisible();
   });
 
-  test('matches a stable screenshot for the default home terminal hero tab', async ({ page }) => {
+  test('matches a stable screenshot for the post-boot home terminal hero tab', async ({ page }) => {
     await resetWelcomeState(page);
     await page.clock.install({ time: HOME_SCREENSHOT_CLOCK_START });
     await page.goto('/');
@@ -262,6 +262,7 @@ test.describe('Home page', () => {
 
     await resetHomeScrollForScreenshot(page, terminalHero);
     await expect(terminalHero).toContainText('Ping Pong Server', { timeout: 20000 });
+    await expect(terminalHero.getByText('Explorer')).toBeVisible();
     await advanceClockUntilTerminalBodyContains(
       page,
       terminalHero,
@@ -526,7 +527,7 @@ test.describe('Home page', () => {
     expect(Math.abs(serverWidth - initialWidth)).toBeLessThanOrEqual(2);
   });
 
-  test('keeps the hero window width stable when toggling the explorer sidebar', async ({
+  test('keeps the hero window width stable when toggling the explorer sidebar after boot', async ({
     page,
   }) => {
     await resetWelcomeState(page);
@@ -541,10 +542,6 @@ test.describe('Home page', () => {
     const explorerSidebarLabel = terminalHero.getByText('Explorer');
 
     await expect(explorerToggle).toBeVisible();
-
-    const initialWidth = await getElementLayoutWidth(terminalHero);
-
-    await explorerToggle.click();
     await expect(explorerSidebarLabel).toBeVisible();
 
     const explorerOpenWidth = await getElementLayoutWidth(terminalHero);
@@ -554,8 +551,13 @@ test.describe('Home page', () => {
 
     const explorerClosedWidth = await getElementLayoutWidth(terminalHero);
 
-    expect(Math.abs(explorerOpenWidth - initialWidth)).toBeLessThanOrEqual(2);
-    expect(Math.abs(explorerClosedWidth - initialWidth)).toBeLessThanOrEqual(2);
+    await explorerToggle.click();
+    await expect(explorerSidebarLabel).toBeVisible();
+
+    const explorerReopenedWidth = await getElementLayoutWidth(terminalHero);
+
+    expect(Math.abs(explorerClosedWidth - explorerOpenWidth)).toBeLessThanOrEqual(2);
+    expect(Math.abs(explorerReopenedWidth - explorerOpenWidth)).toBeLessThanOrEqual(2);
   });
 
   test('keeps the hero window height stable during horizontal resize', async ({ page }) => {

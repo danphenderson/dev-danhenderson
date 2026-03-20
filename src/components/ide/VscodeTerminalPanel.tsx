@@ -97,17 +97,26 @@ const colorizeOutputLine = (text: string): React.ReactNode => {
 
 /** First line of the two-line zsh prompt — renders cwd and git status */
 const GitStatusLine: React.FC = () => (
-  <Box sx={{ display: 'flex', alignItems: 'center', lineHeight: 1.7 }}>
-    <Box component="span" sx={{ color: VSCODE_COLORS.syntaxTypeAnnotation }}>
+  <Box sx={{ display: 'flex', alignItems: 'center', lineHeight: 1.7, minWidth: 0 }}>
+    <Box
+      component="span"
+      sx={{
+        color: VSCODE_COLORS.syntaxTypeAnnotation,
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+        minWidth: 0,
+      }}
+    >
       {'~/dev-danhenderson'}
     </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.promptBranch, ml: '0.5ch' }}>
+    <Box component="span" sx={{ color: VSCODE_COLORS.promptBranch, ml: '0.5ch', flexShrink: 0 }}>
       {'v1'}
     </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.promptBranch, ml: '0.4ch' }}>
+    <Box component="span" sx={{ color: VSCODE_COLORS.promptBranch, ml: '0.4ch', flexShrink: 0 }}>
       {'*1'}
     </Box>
-    <Box component="span" sx={{ color: VSCODE_COLORS.promptDollar, ml: '0.4ch' }}>
+    <Box component="span" sx={{ color: VSCODE_COLORS.promptDollar, ml: '0.4ch', flexShrink: 0 }}>
       {'+3'}
     </Box>
     <Box
@@ -351,11 +360,11 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
           flexShrink: 0,
           backgroundColor: VSCODE_COLORS.terminalBg,
           fontFamily: monoFontFamily,
-          fontSize: { xs: '0.80rem', sm: '0.88rem', md: '0.95rem' },
+          fontSize: { xs: '0.78rem', sm: '0.84rem', md: '0.88rem' },
           lineHeight: 1.7,
           color: VSCODE_COLORS.foreground,
-          px: 1.5,
-          py: 0.75,
+          px: { xs: 1, sm: 1.5 },
+          py: { xs: 0.5, sm: 0.75 },
           overflowX: 'hidden',
           overflowY: 'auto',
           // Fade out during clear-screen phase to simulate Control+L flash
@@ -389,11 +398,11 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
 
         {/* Active prompt */}
         <GitStatusLine />
-        <Box sx={{ display: 'flex', alignItems: 'baseline' }}>
-          <Box component="span" sx={{ color: VSCODE_COLORS.lineNumber }}>
+        <Box sx={{ display: 'flex', alignItems: 'baseline', minWidth: 0 }}>
+          <Box component="span" sx={{ color: VSCODE_COLORS.lineNumber, flexShrink: 0 }}>
             {'○ '}
           </Box>
-          <Box component="span" sx={{ color: VSCODE_COLORS.promptArrow }}>
+          <Box component="span" sx={{ color: VSCODE_COLORS.promptArrow, flexShrink: 0 }}>
             {'❯ '}
           </Box>
           {commandText}
