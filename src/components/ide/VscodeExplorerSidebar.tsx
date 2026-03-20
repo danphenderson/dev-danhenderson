@@ -20,6 +20,8 @@ interface FileEntry {
 
 const FILES: FileEntry[] = [
   { name: '.editorconfig', kind: 'file', indent: 0 },
+  { name: '.env', kind: 'file', indent: 0 },
+  { name: '.pre-commit-config.yaml', kind: 'file', indent: 0 },
   { name: '.github', kind: 'folder', indent: 0, open: true },
   { name: 'ISSUE_TEMPLATE', kind: 'folder', indent: 1, parent: '.github' },
   { name: 'hooks', kind: 'folder', indent: 1, parent: '.github' },
@@ -28,7 +30,6 @@ const FILES: FileEntry[] = [
   { name: 'src', kind: 'folder', indent: 0, open: true },
   { name: 'client.ts', kind: 'file', indent: 1, parent: 'src' },
   { name: 'server.py', kind: 'file', indent: 1, parent: 'src' },
-  { name: '.pre-commit-config.yaml', kind: 'file', indent: 0 },
   { name: 'Pipfile', kind: 'file', indent: 0 },
   { name: 'docker-compose.yml', kind: 'file', indent: 0 },
   { name: 'package.json', kind: 'file', indent: 0 },
@@ -149,9 +150,7 @@ export const VscodeExplorerSidebar: React.FC<VscodeExplorerSidebarProps> = ({
                 cursor: isFolder ? 'pointer' : 'default',
                 minWidth: 0,
                 backgroundColor:
-                  entry.name === activeFileName
-                    ? VSCODE_COLORS.explorerItemActive
-                    : 'transparent',
+                  entry.name === activeFileName ? VSCODE_COLORS.explorerItemActive : 'transparent',
                 '&:hover': {
                   backgroundColor: VSCODE_COLORS.explorerItemHover,
                 },
