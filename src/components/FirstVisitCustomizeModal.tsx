@@ -51,6 +51,8 @@ export type FirstVisitCustomizeModalProps = {
   motionIntensity: MotionIntensityLevel;
   onChangeMotionIntensity: (level: MotionIntensityLevel) => void;
   isAudioPlaying: boolean;
+  isAudioLoading?: boolean;
+  audioError?: string;
   onToggleAudio: () => void;
 };
 
@@ -60,6 +62,8 @@ export const FirstVisitCustomizeModal = ({
   motionIntensity,
   onChangeMotionIntensity,
   isAudioPlaying,
+  isAudioLoading = false,
+  audioError,
   onToggleAudio,
 }: FirstVisitCustomizeModalProps) => {
   const handleMotionChange = (
@@ -124,22 +128,30 @@ export const FirstVisitCustomizeModal = ({
             </Typography>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
               <Typography variant="body2" color="text.primary">
-                {isAudioPlaying ? 'Playing' : 'Off'}
+                {isAudioLoading ? 'Loading…' : isAudioPlaying ? 'Playing' : 'Off'}
               </Typography>
               <Tooltip title={isAudioPlaying ? 'Pause welcome audio' : 'Play welcome audio'}>
-                <IconButton
-                  size="small"
-                  onClick={onToggleAudio}
-                  aria-label={isAudioPlaying ? 'Pause welcome audio' : 'Play welcome audio'}
-                >
-                  {isAudioPlaying ? (
-                    <PauseCircleOutlineIcon sx={{ fontSize: 18 }} />
-                  ) : (
-                    <PlayCircleOutlineIcon sx={{ fontSize: 18 }} />
-                  )}
-                </IconButton>
+                <span>
+                  <IconButton
+                    size="small"
+                    onClick={onToggleAudio}
+                    aria-label={isAudioPlaying ? 'Pause welcome audio' : 'Play welcome audio'}
+                    disabled={isAudioLoading}
+                  >
+                    {isAudioPlaying ? (
+                      <PauseCircleOutlineIcon sx={{ fontSize: 18 }} />
+                    ) : (
+                      <PlayCircleOutlineIcon sx={{ fontSize: 18 }} />
+                    )}
+                  </IconButton>
+                </span>
               </Tooltip>
             </Stack>
+            {audioError ? (
+              <CaptionText color="error" sx={{ display: 'block' }}>
+                {audioError}
+              </CaptionText>
+            ) : null}
           </Stack>
         </Stack>
 

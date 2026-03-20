@@ -15,13 +15,6 @@ const getStoredOnboardingCompleted = (): boolean => {
 };
 
 type WelcomeOnboardingContextValue = {
-  showPauseHint: boolean;
-  showDarkModeHint: boolean;
-  openPauseHint: () => void;
-  dismissPauseHint: () => void;
-  openDarkModeHint: () => void;
-  dismissDarkModeHint: () => void;
-  resetHints: () => void;
   onboardingCompleted: boolean;
   showCustomizeModal: boolean;
   openCustomizeModal: () => void;
@@ -29,13 +22,6 @@ type WelcomeOnboardingContextValue = {
 };
 
 const WelcomeOnboardingContext = createContext<WelcomeOnboardingContextValue>({
-  showPauseHint: false,
-  showDarkModeHint: false,
-  openPauseHint: () => {},
-  dismissPauseHint: () => {},
-  openDarkModeHint: () => {},
-  dismissDarkModeHint: () => {},
-  resetHints: () => {},
   onboardingCompleted: false,
   showCustomizeModal: false,
   openCustomizeModal: () => {},
@@ -43,31 +29,8 @@ const WelcomeOnboardingContext = createContext<WelcomeOnboardingContextValue>({
 });
 
 export const WelcomeOnboardingProvider = ({ children }: PropsWithChildren) => {
-  const [showPauseHint, setShowPauseHint] = useState(false);
-  const [showDarkModeHint, setShowDarkModeHint] = useState(false);
   const [onboardingCompleted, setOnboardingCompleted] = useState(getStoredOnboardingCompleted);
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
-
-  const openPauseHint = useCallback(() => {
-    setShowPauseHint(true);
-  }, []);
-
-  const dismissPauseHint = useCallback(() => {
-    setShowPauseHint(false);
-  }, []);
-
-  const openDarkModeHint = useCallback(() => {
-    setShowDarkModeHint(true);
-  }, []);
-
-  const dismissDarkModeHint = useCallback(() => {
-    setShowDarkModeHint(false);
-  }, []);
-
-  const resetHints = useCallback(() => {
-    setShowPauseHint(false);
-    setShowDarkModeHint(false);
-  }, []);
 
   const openCustomizeModal = useCallback(() => {
     setShowCustomizeModal(true);
@@ -83,31 +46,12 @@ export const WelcomeOnboardingProvider = ({ children }: PropsWithChildren) => {
 
   const value = useMemo(
     () => ({
-      showPauseHint,
-      showDarkModeHint,
-      openPauseHint,
-      dismissPauseHint,
-      openDarkModeHint,
-      dismissDarkModeHint,
-      resetHints,
       onboardingCompleted,
       showCustomizeModal,
       openCustomizeModal,
       completeOnboarding,
     }),
-    [
-      completeOnboarding,
-      dismissDarkModeHint,
-      dismissPauseHint,
-      onboardingCompleted,
-      openCustomizeModal,
-      openDarkModeHint,
-      openPauseHint,
-      resetHints,
-      showCustomizeModal,
-      showDarkModeHint,
-      showPauseHint,
-    ]
+    [completeOnboarding, onboardingCompleted, openCustomizeModal, showCustomizeModal]
   );
 
   return (

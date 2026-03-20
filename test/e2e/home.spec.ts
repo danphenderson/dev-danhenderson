@@ -1,10 +1,5 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import {
-  dismissHeaderSettingsHint,
-  dismissWelcomeSequence,
-  expectHeaderSettingsHint,
-  resetWelcomeState,
-} from './helpers/header';
+import { dismissWelcomeSequence, resetWelcomeState } from './helpers/header';
 
 const HOME_SCREENSHOT_CLOCK_START = new Date('2026-03-17T12:00:00.000Z');
 const STABLE_TERMINAL_OUTPUT_COMMAND = 'npm run build';
@@ -175,7 +170,7 @@ test.describe('Home page', () => {
     await waitForStableTerminalHero(page, expandedHero);
   });
 
-  test('renders the desktop AppBar navigation and consolidated settings popover', async ({
+  test('renders the desktop AppBar navigation and keeps audio recovery available after onboarding', async ({
     page,
   }) => {
     await resetWelcomeState(page);
@@ -189,6 +184,11 @@ test.describe('Home page', () => {
     await welcomePrompt.getByRole('button', { name: 'No thanks' }).click();
     await expect(welcomePrompt).toBeHidden();
 
+    const customizeDialog = page.getByTestId('customize-experience-dialog');
+    await expect(customizeDialog).toBeVisible();
+    await customizeDialog.getByRole('button', { name: 'Get started' }).click();
+    await expect(customizeDialog).toBeHidden();
+
     await expect(siteNavigation).toBeVisible();
     await expect(siteNavigation.getByText('CV', { exact: true })).toBeVisible();
     await expect(siteNavigation.getByText('Climbing', { exact: true })).toBeVisible();
@@ -200,9 +200,6 @@ test.describe('Home page', () => {
     }
 
     await expect(settingsTrigger).toBeVisible();
-
-    await expectHeaderSettingsHint(page);
-    await dismissHeaderSettingsHint(page);
 
     await settingsTrigger.click();
 
@@ -220,6 +217,8 @@ test.describe('Home page', () => {
     await expect(settingsPopover.getByRole('radio', { name: 'Graphite' })).toBeVisible();
     await expect(settingsPopover.getByRole('button', { name: 'Default' })).toBeVisible();
     await expect(settingsPopover.getByRole('button', { name: 'Expressive' })).toBeVisible();
+    await expect(settingsPopover.getByText('Audio', { exact: true })).toBeVisible();
+    await expect(settingsPopover.getByRole('button', { name: 'Play welcome audio' })).toBeVisible();
   });
 
   test('matches a stable screenshot for the default home terminal hero tab', async ({ page }) => {
@@ -576,10 +575,13 @@ test.describe('Home page', () => {
   test('welcome audio prompt can be dismissed', async ({ page }) => {
     await resetWelcomeState(page);
     await page.goto('/');
-    const dialog = page.getByRole('dialog');
-    await expect(dialog).toBeVisible();
-    await expect(dialog.getByText('Play welcome audio?')).toBeVisible();
-    await dialog.getByRole('button', { name: 'No thanks' }).click();
-    await expect(dialog).toBeHidden();
+    const audioDialog = page.getByRole('dialog', { name: 'Play welcome audio?' });
+    await expect(audioDialog).toBeVisible();
+    await expect(audioDialog.getByText('Play welcome audio?')).toBeVisible();
+    await audioDialog.getByRole('button', { name: 'No thanks' }).click();
+    await expect(audioDialog).toBeHidden();
+
+    const customizeDialog = page.getByTestId('customize-experience-dialog');
+    await expect(customizeDialog).toBeVisible();
   });
 });

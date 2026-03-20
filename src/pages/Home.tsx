@@ -74,7 +74,12 @@ export default function Home() {
   const { cardResetSx } = useComponentStyles();
   useDocumentMetadata({ ...siteRouteMap.home, canonicalPath: siteRouteMap.home.path });
   const { motionIntensity, setMotionIntensity } = useAppTheme();
-  const { isPlaying: isAudioPlaying, play: playAudio, pause: pauseAudio } = useWelcomeAudio();
+  const {
+    isPlaying: isAudioPlaying,
+    play: playAudio,
+    pause: pauseAudio,
+    error: audioError,
+  } = useWelcomeAudio();
   const {
     error,
     isHeroAnimationReady,
@@ -85,16 +90,21 @@ export default function Home() {
     handlePlay,
     handleCustomizeDismiss,
   } = useHomeWelcomeSequence();
+  const [isCustomizeAudioLoading, setIsCustomizeAudioLoading] = useState(false);
 
   const handleCustomizeAudioToggle = useCallback(async () => {
     if (isAudioPlaying) {
       pauseAudio();
       return;
     }
+
     try {
+      setIsCustomizeAudioLoading(true);
       await playAudio();
     } catch (err) {
       console.error('Unable to play welcome audio', err);
+    } finally {
+      setIsCustomizeAudioLoading(false);
     }
   }, [isAudioPlaying, pauseAudio, playAudio]);
   const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);
@@ -534,6 +544,8 @@ export default function Home() {
             motionIntensity={motionIntensity}
             onChangeMotionIntensity={setMotionIntensity}
             isAudioPlaying={isAudioPlaying}
+            isAudioLoading={isCustomizeAudioLoading}
+            audioError={audioError}
             onToggleAudio={handleCustomizeAudioToggle}
           />
         </BackgroundPaper>

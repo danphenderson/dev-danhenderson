@@ -214,29 +214,13 @@ jest.mock('../../../src/components/BackgroundPaper', () => ({
 }));
 
 const OnboardingStateProbe = () => {
-  const {
-    showPauseHint,
-    showDarkModeHint,
-    dismissPauseHint,
-    dismissDarkModeHint,
-    onboardingCompleted,
-    showCustomizeModal,
-    completeOnboarding,
-  } = useWelcomeOnboarding();
+  const { onboardingCompleted, showCustomizeModal, completeOnboarding } = useWelcomeOnboarding();
 
   return (
     <>
-      <button onClick={dismissPauseHint} type="button">
-        Dismiss pause hint
-      </button>
-      <button onClick={dismissDarkModeHint} type="button">
-        Dismiss dark mode hint
-      </button>
       <button onClick={completeOnboarding} type="button">
         Complete onboarding
       </button>
-      <div data-testid="pause-hint-open">{String(showPauseHint)}</div>
-      <div data-testid="dark-mode-hint-open">{String(showDarkModeHint)}</div>
       <div data-testid="onboarding-completed">{String(onboardingCompleted)}</div>
       <div data-testid="customize-modal-open">{String(showCustomizeModal)}</div>
     </>

@@ -16,13 +16,6 @@ const createMockAudioState = (overrides: Record<string, unknown> = {}) => ({
 });
 
 const createMockOnboardingState = (overrides: Record<string, unknown> = {}) => ({
-  showPauseHint: false,
-  showDarkModeHint: false,
-  openPauseHint: jest.fn(),
-  dismissPauseHint: jest.fn(),
-  openDarkModeHint: jest.fn(),
-  dismissDarkModeHint: jest.fn(),
-  resetHints: jest.fn(),
   onboardingCompleted: false,
   showCustomizeModal: false,
   openCustomizeModal: jest.fn(),
