@@ -21,7 +21,7 @@ flowchart TB
     Entrance["Entrance<br/>fadeInUp · fadeIn · scaleIn"]
     Container["Container<br/>staggerContainer"]
     Hover["Hover/tap<br/>hoverLift · tapShrink · hoverZoom"]
-    Story["Story mode<br/>storySlideVariants · slideContentContainer<br/>storyLabelReveal · storyTitleReveal · storyBodyReveal"]
+    Story["Story mode<br/>storyContentContainer · storyDividerReveal<br/>storyLabelReveal · storyTitleReveal<br/>storyMetaReveal · storyBodyReveal"]
   end
 
   subgraph Components["Layer 3 — Animated primitives (src/motion/components.tsx)"]
@@ -136,11 +136,11 @@ stateDiagram-v2
 
 ### CV story mode variants
 
-Cinematic directional animations for the immersive story viewer:
+Continuous-scroll section reveals for the immersive story viewer:
 
-- `storySlideVariants` — direction-aware enter/center/exit with scale, rotation, blur
-- `slideContentContainer` — stagger children 0.12s after 0.18s delay
-- Per-element reveals: `storyLabelReveal` (x slide), `storyTitleReveal` (scale + blur), `storyBodyReveal` (y slide), `storyChipsReveal` (scale), `storyBulletItem` (x slide with tight stagger)
+- `storyContentContainer` — section container reveal for each story chapter as it enters the viewport
+- `storyDividerReveal` — subtle divider reveal between chapter transitions
+- Per-element reveals: `storyLabelReveal`, `storyTitleReveal`, `storyMetaReveal`, `storyBodyReveal`, `storyChipsReveal`, `storyLinkReveal`, and `storyBulletItem`
 
 ## Animated primitive layer
 
@@ -319,35 +319,19 @@ sequenceDiagram
 
 ## CV story mode motion
 
-The story viewer uses directional, cinematic transitions:
+The story viewer now uses scroll-driven chapter tracking instead of directional slide swaps:
 
 ```mermaid
-stateDiagram-v2
-  [*] --> center: Initial slide render
-
-  center --> exit_forward: Next slide (direction=1)
-  center --> exit_backward: Previous slide (direction=-1)
-
-  exit_forward --> enter_forward: New slide enters
-  exit_backward --> enter_backward: New slide enters
-
-  enter_forward --> center: Settle (spring easing)
-  enter_backward --> center: Settle (spring easing)
-
-  state enter_forward {
-    [*] --> scale088_opacity0_blur4_x60_rotate4
-  }
-
-  state center {
-    [*] --> scale1_opacity1_blur0_x0_rotate0
-  }
-
-  state exit_forward {
-    [*] --> scale088_opacity0_blur4_xn60_rotaten4
-  }
+flowchart TB
+  Scroll["Story scroll container"] --> Progress["CVStoryProgress updates continuously"]
+  Scroll --> Observer["IntersectionObserver tracks intersecting sections"]
+  Observer --> Active["CVStoryViewer picks the lowest visible story index"]
+  Active --> Header["Header label updates to the active chapter"]
+  Section["CVStorySectionRenderer"] --> Reveal["storyContentContainer + storyDividerReveal"]
+  Reveal --> Content["Label, title, meta, body, chips, links, and bullets reveal in sequence"]
 ```
 
-Within each slide, content reveals with stagger:
+Within each section, content reveals with stagger:
 
 1. Label reveal (x -30 → 0)
 2. Title reveal (scale 0.92, blur 6px → clear)

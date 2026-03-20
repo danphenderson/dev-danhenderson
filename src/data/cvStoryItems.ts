@@ -4,7 +4,6 @@ import type {
   CVStoryItem,
   Certificate,
   CodingExample,
-  EducationEntry,
   EducationInfo,
   Experience,
   VolunteeringEntry,
@@ -81,11 +80,19 @@ type CVStoryInput = {
   endData: CVStoryEndData;
 };
 
-type SortableItem = {
-  kind: 'experience' | 'education' | 'certificate' | 'volunteering';
-  data: Experience | EducationEntry | Certificate | VolunteeringEntry;
-  sortDate: Date;
-};
+type NarrativeChapterKind = 'experience' | 'education' | 'volunteering' | 'certificate';
+type SortableItem = Extract<CVStoryItem, { kind: NarrativeChapterKind }>;
+
+// Story mode follows the existing CV section flow without the GitHub sidebar section.
+const STORY_CHAPTER_ORDER: NarrativeChapterKind[] = [
+  'experience',
+  'education',
+  'volunteering',
+  'certificate',
+];
+
+const sortStoryChapterItems = (left: SortableItem, right: SortableItem) =>
+  left.sortDate.getTime() - right.sortDate.getTime();
 
 export const buildCVStoryItems = (input: CVStoryInput): CVStoryItem[] => {
   const items: CVStoryItem[] = [];
@@ -93,28 +100,46 @@ export const buildCVStoryItems = (input: CVStoryInput): CVStoryItem[] => {
   // 1. About — always first
   items.push({ kind: 'about', data: input.about });
 
-  // 2. Time-bounded items — sorted ascending (oldest first)
-  const sortable: SortableItem[] = [];
+  // 2. Time-bounded items — grouped by narrative chapter and sorted within each chapter
+  const chapters: Record<NarrativeChapterKind, SortableItem[]> = {
+    experience: [],
+    education: [],
+    volunteering: [],
+    certificate: [],
+  };
 
   for (const exp of input.experiences) {
-    sortable.push({ kind: 'experience', data: exp, sortDate: parseCVSortDate(exp.startDate) });
+    chapters.experience.push({
+      kind: 'experience',
+      data: exp,
+      sortDate: parseCVSortDate(exp.startDate),
+    });
   }
   for (const entry of input.education.entries) {
-    sortable.push({
+    chapters.education.push({
       kind: 'education',
       data: entry,
       sortDate: parseCVSortDate(entry.dateRange ?? entry.expectedCompletion ?? ''),
     });
   }
   for (const cert of input.certificates) {
-    sortable.push({ kind: 'certificate', data: cert, sortDate: parseCVSortDate(cert.date) });
+    chapters.certificate.push({
+      kind: 'certificate',
+      data: cert,
+      sortDate: parseCVSortDate(cert.date),
+    });
   }
   for (const vol of input.volunteering) {
-    sortable.push({ kind: 'volunteering', data: vol, sortDate: parseCVSortDate(vol.dateRange) });
+    chapters.volunteering.push({
+      kind: 'volunteering',
+      data: vol,
+      sortDate: parseCVSortDate(vol.dateRange),
+    });
   }
 
-  sortable.sort((a, b) => a.sortDate.getTime() - b.sortDate.getTime());
-  items.push(...(sortable as CVStoryItem[]));
+  for (const kind of STORY_CHAPTER_ORDER) {
+    items.push(...chapters[kind].sort(sortStoryChapterItems));
+  }
 
   // 3. Coding — appended after date-sorted items
   for (const example of input.codingExamples) {

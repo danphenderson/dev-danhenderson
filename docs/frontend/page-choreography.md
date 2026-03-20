@@ -155,21 +155,22 @@ Each `CVSection*` component wraps a `CVSectionCard` which contains:
 
 ### Story mode (`?mode=story`)
 
-Activated via query parameter. Replaces the grid layout with `CVStoryViewer`:
+Activated via query parameter. Replaces the grid layout with `CVStoryViewer`, a fullscreen scroll container that renders the ordered story chapters from `buildCVStoryItems()`.
 
 ```mermaid
 sequenceDiagram
-  participant Nav as CVStoryNavBar
   participant Viewer as CVStoryViewer
-  participant Slide as CVStorySlideRenderer
-  participant Content as Slide content
+  participant Scroll as Story scroll container
+  participant Section as CVStorySectionRenderer
+  participant Observer as IntersectionObserver
+  participant Header as Active label + CVStoryProgress
 
-  Nav->>Viewer: Next / Previous
-  Viewer->>Viewer: Update slide index + direction
-  Viewer->>Slide: AnimatePresence swap
-  Note over Slide: Enter: scale 0.88, blur 4px, x ±60<br/>Center: scale 1, blur 0, x 0<br/>Exit: scale 0.88, blur 4px, x ∓60
-  Slide->>Content: Stagger content reveals
-  Note over Content: 1. Label (x -30→0)<br/>2. Title (scale+blur→clear)<br/>3. Meta (x +20→0)<br/>4. Body (y +12→0)<br/>5. Chips (scale 0.9→1)<br/>6. Bullets (x -16→0, 60ms stagger)
+  Viewer->>Section: Render ordered narrative sections
+  Scroll->>Header: Update scroll progress on scroll
+  Scroll->>Observer: Evaluate intersecting sections
+  Observer->>Viewer: Report current visible section set
+  Viewer->>Viewer: Pick the lowest visible story index
+  Viewer->>Header: Update the active chapter label
 ```
 
 ## Climbing (`/climbing`)
@@ -297,19 +298,19 @@ flowchart TB
 
 ## Page-level vs component-level concerns
 
-| Concern                           | Belongs at page level           | Belongs in component      |
-| --------------------------------- | ------------------------------- | ------------------------- |
-| Section ordering and delay timing | ✓                               |                           |
-| `delayMs` for each section        | ✓ (via layout metadata)         |                           |
-| `triggerOnView` per section       | ✓ (via layout metadata)         |                           |
-| Tab/accordion open state          |                                 | ✓ (feature component)     |
-| Search/filter state               | ✓ (page-local state)            |                           |
-| Stagger timing within a section   |                                 | ✓ (`AnimatedContentList`) |
-| Hover/tilt interactions           |                                 | ✓ (motion primitives)     |
-| Window drag/resize (Home)         | ✓                               |                           |
-| Story mode slide navigation       |                                 | ✓ (`CVStoryViewer`)       |
-| Background image selection        | ✓ (passed to `PageFrame`)       |                           |
-| SEO metadata                      | ✓ (via `useDocumentMetadata()`) |                           |
+| Concern                                              | Belongs at page level           | Belongs in component      |
+| ---------------------------------------------------- | ------------------------------- | ------------------------- |
+| Section ordering and delay timing                    | ✓                               |                           |
+| `delayMs` for each section                           | ✓ (via layout metadata)         |                           |
+| `triggerOnView` per section                          | ✓ (via layout metadata)         |                           |
+| Tab/accordion open state                             |                                 | ✓ (feature component)     |
+| Search/filter state                                  | ✓ (page-local state)            |                           |
+| Stagger timing within a section                      |                                 | ✓ (`AnimatedContentList`) |
+| Hover/tilt interactions                              |                                 | ✓ (motion primitives)     |
+| Window drag/resize (Home)                            | ✓                               |                           |
+| Story mode scroll progress + active chapter tracking |                                 | ✓ (`CVStoryViewer`)       |
+| Background image selection                           | ✓ (passed to `PageFrame`)       |                           |
+| SEO metadata                                         | ✓ (via `useDocumentMetadata()`) |                           |
 
 ## Choreography rules for new pages
 

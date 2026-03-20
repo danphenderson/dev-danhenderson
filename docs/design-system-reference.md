@@ -268,7 +268,7 @@ Primary consumers:
 - [src/components/cv/ExperienceList.tsx](../src/components/cv/ExperienceList.tsx)
 - [src/components/cv/EducationSection.tsx](../src/components/cv/EducationSection.tsx)
 - [src/components/cv/CodingExamplesSection.tsx](../src/components/cv/CodingExamplesSection.tsx)
-- [src/components/cv/CVStorySlideRenderer.tsx](../src/components/cv/CVStorySlideRenderer.tsx)
+- [src/components/cv/CVStorySectionRenderer.tsx](../src/components/cv/CVStorySectionRenderer.tsx)
 
 ### 4. Grid and media lists
 

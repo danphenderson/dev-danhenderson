@@ -23,12 +23,55 @@ const kindLabel: Record<CVStoryItem['kind'], string> = {
   end: 'Connect',
 };
 
+const getInitialActiveKind = (items: CVStoryItem[]): CVStoryItem['kind'] =>
+  items[0]?.kind ?? 'about';
+
+const getActiveStoryIndex = (items: CVStoryItem[], visibleIndices: Set<number>): number | null => {
+  let nextActiveIndex: number | null = null;
+
+  visibleIndices.forEach((index) => {
+    if (!items[index]) {
+      return;
+    }
+
+    if (nextActiveIndex === null || index < nextActiveIndex) {
+      nextActiveIndex = index;
+    }
+  });
+
+  return nextActiveIndex;
+};
+
+const getStoryItemKey = (item: CVStoryItem): string => {
+  switch (item.kind) {
+    case 'about':
+      return `about:${item.data.name}:${item.data.title}`;
+    case 'experience':
+      return `experience:${item.data.company}:${item.data.title}:${item.data.startDate}:${item.data.endDate}`;
+    case 'education':
+      return `education:${item.data.university}:${item.data.program}:${
+        item.data.dateRange ?? item.data.expectedCompletion ?? ''
+      }`;
+    case 'certificate':
+      return `certificate:${item.data.issuer}:${item.data.title}:${item.data.date}`;
+    case 'volunteering':
+      return `volunteering:${item.data.organization}:${item.data.role}:${item.data.dateRange}`;
+    case 'coding':
+      return `coding:${item.data.title}:${item.data.links[0] ?? ''}`;
+    case 'end':
+      return `end:${item.data.headline}:${item.data.channels[0]?.url ?? ''}`;
+  }
+};
+
 export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
   const theme = useTheme();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [activeKind, setActiveKind] = useState<CVStoryItem['kind']>('about');
+  const [activeKind, setActiveKind] = useState<CVStoryItem['kind']>(() =>
+    getInitialActiveKind(items)
+  );
   const sectionRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const visibleSectionIndicesRef = useRef<Set<number>>(new Set());
 
   // Track scroll progress
   const handleScroll = useCallback(() => {
@@ -39,20 +82,52 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
     setScrollProgress(maxScroll > 0 ? scrollTop / maxScroll : 0);
   }, []);
 
+  const updateActiveKindFromVisibleSections = useCallback(() => {
+    const nextActiveIndex = getActiveStoryIndex(items, visibleSectionIndicesRef.current);
+
+    if (nextActiveIndex === null) {
+      return;
+    }
+
+    const nextKind = items[nextActiveIndex].kind;
+    setActiveKind((currentKind) => (currentKind === nextKind ? currentKind : nextKind));
+  }, [items]);
+
+  useEffect(() => {
+    visibleSectionIndicesRef.current.clear();
+    setActiveKind(getInitialActiveKind(items));
+  }, [items]);
+
   // Track which section is active based on scroll position
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
 
+    const visibleSectionIndices = visibleSectionIndicesRef.current;
+    visibleSectionIndices.clear();
+
     const observer = new IntersectionObserver(
       (entries) => {
+        let shouldResolveActiveKind = false;
+
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const index = Number(entry.target.getAttribute('data-story-index'));
-            if (!isNaN(index) && items[index]) {
-              setActiveKind(items[index].kind);
-            }
+          const index = Number(entry.target.getAttribute('data-story-index'));
+
+          if (isNaN(index) || !items[index]) {
+            continue;
           }
+
+          shouldResolveActiveKind = true;
+
+          if (entry.isIntersecting) {
+            visibleSectionIndices.add(index);
+          } else {
+            visibleSectionIndices.delete(index);
+          }
+        }
+
+        if (shouldResolveActiveKind) {
+          updateActiveKindFromVisibleSections();
         }
       },
       { root: el, rootMargin: '-30% 0px -60% 0px', threshold: 0 }
@@ -62,8 +137,11 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
       observer.observe(ref);
     });
 
-    return () => observer.disconnect();
-  }, [items]);
+    return () => {
+      observer.disconnect();
+      visibleSectionIndices.clear();
+    };
+  }, [items, updateActiveKindFromVisibleSections]);
 
   // Escape key exits
   useEffect(() => {
@@ -166,7 +244,7 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
 
           {items.map((item, index) => (
             <Box
-              key={index}
+              key={getStoryItemKey(item)}
               ref={(el: HTMLDivElement | null) => registerRef(index, el)}
               data-story-index={index}
               sx={{ mb: { xs: 6, sm: 8 } }}

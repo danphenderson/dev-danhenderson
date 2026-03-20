@@ -121,6 +121,12 @@ const renderViewer = (items = buildItems()) =>
     </ThemeProvider>
   );
 
+const getObservedTarget = (
+  observer: MockIntersectionObserverInstance,
+  index: number
+): Element | undefined =>
+  observer.observedTargets.find((target) => target.getAttribute('data-story-index') === `${index}`);
+
 describe('CVStoryViewer', () => {
   let originalIntersectionObserver: typeof IntersectionObserver | undefined;
 
@@ -173,9 +179,7 @@ describe('CVStoryViewer', () => {
     expect(screen.getByText('About')).toBeInTheDocument();
 
     const observer = mockIntersectionObserverInstances[0];
-    const endTarget = observer.observedTargets.find(
-      (target) => target.getAttribute('data-story-index') === '4'
-    );
+    const endTarget = getObservedTarget(observer, 4);
 
     expect(endTarget).toBeDefined();
 
@@ -184,6 +188,32 @@ describe('CVStoryViewer', () => {
     });
 
     expect(screen.getByText('Connect')).toBeInTheDocument();
+  });
+
+  it('resolves the active kind from the full visible section set instead of entry order', () => {
+    renderViewer();
+
+    const observer = mockIntersectionObserverInstances[0];
+    const experienceTarget = getObservedTarget(observer, 1);
+    const codingTarget = getObservedTarget(observer, 3);
+
+    expect(experienceTarget).toBeDefined();
+    expect(codingTarget).toBeDefined();
+
+    act(() => {
+      observer.trigger([
+        { target: experienceTarget!, isIntersecting: true },
+        { target: codingTarget!, isIntersecting: true },
+      ]);
+    });
+
+    expect(screen.getByText('Experience')).toBeInTheDocument();
+
+    act(() => {
+      observer.trigger([{ target: experienceTarget!, isIntersecting: false }]);
+    });
+
+    expect(screen.getByText('Project')).toBeInTheDocument();
   });
 
   it('calls onExit when Escape is pressed', () => {
