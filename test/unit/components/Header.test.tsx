@@ -101,13 +101,10 @@ const createAudioState = (
 const createOnboardingState = (
   overrides: Partial<ReturnType<typeof useWelcomeOnboarding>> = {}
 ): ReturnType<typeof useWelcomeOnboarding> => ({
-  showPauseHint: false,
-  showDarkModeHint: false,
-  openPauseHint: jest.fn(),
-  dismissPauseHint: jest.fn(),
-  openDarkModeHint: jest.fn(),
-  dismissDarkModeHint: jest.fn(),
-  resetHints: jest.fn(),
+  onboardingCompleted: false,
+  showCustomizeModal: false,
+  openCustomizeModal: jest.fn(),
+  completeOnboarding: jest.fn(),
   ...overrides,
 });
 
@@ -159,7 +156,7 @@ describe('Header controls', () => {
     expect(pause).toHaveBeenCalledTimes(1);
   });
 
-  it('hides the audio control when welcome audio consent was declined', () => {
+  it('hides the audio control when welcome audio consent was declined before onboarding completed', () => {
     mockUseWelcomeAudio.mockReturnValue(createAudioState({ audioConsent: 'declined' }));
 
     renderHeader('/cv');
@@ -168,10 +165,18 @@ describe('Header controls', () => {
     expect(screen.queryByRole('button', { name: 'Pause welcome audio' })).not.toBeInTheDocument();
   });
 
-  it('toggles theme and dismisses dark mode hint when the theme action is clicked', () => {
+  it('shows the audio control after onboarding is completed even when audio was declined', () => {
+    mockUseWelcomeAudio.mockReturnValue(createAudioState({ audioConsent: 'declined' }));
+    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ onboardingCompleted: true }));
+
+    renderHeader('/cv');
+
+    expect(screen.getByRole('button', { name: 'Play welcome audio' })).toBeInTheDocument();
+  });
+
+  it('toggles theme when the theme action is clicked', () => {
     const toggleTheme = jest.fn();
     const setAppearance = jest.fn();
-    const dismissDarkModeHint = jest.fn();
     mockUseAppTheme.mockReturnValue({
       mode: 'light',
       appearance: 'evergreen',
@@ -180,12 +185,6 @@ describe('Header controls', () => {
       motionIntensity: 'default' as const,
       setMotionIntensity: jest.fn(),
     });
-    mockUseWelcomeOnboarding.mockReturnValue(
-      createOnboardingState({
-        showDarkModeHint: true,
-        dismissDarkModeHint,
-      })
-    );
 
     renderHeader('/cv');
 

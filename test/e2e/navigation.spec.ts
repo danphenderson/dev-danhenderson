@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { declineWelcomeAudio, dismissHeaderSettingsHint } from './helpers/header';
+import { declineWelcomeAudio } from './helpers/header';
 import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
 /**
@@ -17,8 +17,6 @@ test.describe('Cross-route navigation', () => {
   test('Home → CV via header link', async ({ page }) => {
     await page.goto('/');
     await expect(page.locator('#main-content')).toBeVisible();
-
-    await dismissHeaderSettingsHint(page);
 
     await page.getByRole('link', { name: 'CV' }).first().click();
 

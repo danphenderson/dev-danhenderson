@@ -27,6 +27,7 @@ import {
 } from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
+import { FirstVisitCustomizeModal } from '../components/FirstVisitCustomizeModal';
 import { HeroMotionPath } from '../components/HeroMotionPath';
 import { TerminalHeroContent } from '../components/TerminalHeroContent';
 import type { IdeResizeEdge, IdeWindowSize, IdeWindowState, TerminalLine } from '../types/ui';
@@ -35,6 +36,8 @@ import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
+import { useAppTheme } from '../ThemeProvider';
+import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { BodyText, CaptionText } from '../components/text';
 import { MotionTiltCard } from '../motion';
 import { duration } from '../motion/tokens';
@@ -70,8 +73,40 @@ export default function Home() {
   const appStyles = useAppStyles();
   const { cardResetSx } = useComponentStyles();
   useDocumentMetadata({ ...siteRouteMap.home, canonicalPath: siteRouteMap.home.path });
-  const { error, isHeroAnimationReady, isLoading, isPromptOpen, handleOptOut, handlePlay } =
-    useHomeWelcomeSequence();
+  const { motionIntensity, setMotionIntensity } = useAppTheme();
+  const {
+    isPlaying: isAudioPlaying,
+    play: playAudio,
+    pause: pauseAudio,
+    error: audioError,
+  } = useWelcomeAudio();
+  const {
+    error,
+    isHeroAnimationReady,
+    isLoading,
+    isPromptOpen,
+    isCustomizeOpen,
+    handleOptOut,
+    handlePlay,
+    handleCustomizeDismiss,
+  } = useHomeWelcomeSequence();
+  const [isCustomizeAudioLoading, setIsCustomizeAudioLoading] = useState(false);
+
+  const handleCustomizeAudioToggle = useCallback(async () => {
+    if (isAudioPlaying) {
+      pauseAudio();
+      return;
+    }
+
+    try {
+      setIsCustomizeAudioLoading(true);
+      await playAudio();
+    } catch (err) {
+      console.error('Unable to play welcome audio', err);
+    } finally {
+      setIsCustomizeAudioLoading(false);
+    }
+  }, [isAudioPlaying, pauseAudio, playAudio]);
   const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);
   const [canDragHeroWindow, setCanDragHeroWindow] = useState(false);
   const [isHeroWindowDragging, setIsHeroWindowDragging] = useState(false);
@@ -502,6 +537,17 @@ export default function Home() {
               </Button>
             </DialogActions>
           </Dialog>
+
+          <FirstVisitCustomizeModal
+            open={isCustomizeOpen}
+            onClose={handleCustomizeDismiss}
+            motionIntensity={motionIntensity}
+            onChangeMotionIntensity={setMotionIntensity}
+            isAudioPlaying={isAudioPlaying}
+            isAudioLoading={isCustomizeAudioLoading}
+            audioError={audioError}
+            onToggleAudio={handleCustomizeAudioToggle}
+          />
         </BackgroundPaper>
       </motion.div>
 

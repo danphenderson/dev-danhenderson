@@ -6,6 +6,7 @@ import { duration } from '../../../src/motion/tokens';
 import {
   WelcomeOnboardingProvider,
   useWelcomeOnboarding,
+  ONBOARDING_COMPLETED_STORAGE_KEY,
 } from '../../../src/WelcomeOnboardingProvider';
 
 const AUTO_EXPAND_PULSE_DURATION_MS = Math.round(duration.slow * 1000);
@@ -213,54 +214,30 @@ jest.mock('../../../src/components/BackgroundPaper', () => ({
 }));
 
 const OnboardingStateProbe = () => {
-  const { showPauseHint, showDarkModeHint, dismissPauseHint, dismissDarkModeHint } =
-    useWelcomeOnboarding();
+  const { onboardingCompleted, showCustomizeModal, completeOnboarding } = useWelcomeOnboarding();
 
   return (
     <>
-      <button onClick={dismissPauseHint} type="button">
-        Dismiss pause hint
+      <button onClick={completeOnboarding} type="button">
+        Complete onboarding
       </button>
-      <button onClick={dismissDarkModeHint} type="button">
-        Dismiss dark mode hint
-      </button>
-      <div data-testid="pause-hint-open">{String(showPauseHint)}</div>
-      <div data-testid="dark-mode-hint-open">{String(showDarkModeHint)}</div>
+      <div data-testid="onboarding-completed">{String(onboardingCompleted)}</div>
+      <div data-testid="customize-modal-open">{String(showCustomizeModal)}</div>
     </>
   );
-};
-
-const OnboardingBootstrap = ({
-  openPauseHintOnMount = false,
-}: {
-  openPauseHintOnMount?: boolean;
-}) => {
-  const { openPauseHint } = useWelcomeOnboarding();
-
-  React.useEffect(() => {
-    if (!openPauseHintOnMount) {
-      return;
-    }
-
-    openPauseHint();
-  }, [openPauseHintOnMount, openPauseHint]);
-
-  return null;
 };
 
 const HomeHarness = ({
   initialAudioConsent = 'unknown',
   error,
-  openPauseHintOnMount = false,
 }: {
   initialAudioConsent?: MockWelcomeAudioState['audioConsent'];
   error?: string;
-  openPauseHintOnMount?: boolean;
 }) => {
   const [audioConsent, setAudioConsent] =
     React.useState<MockWelcomeAudioState['audioConsent']>(initialAudioConsent);
   const [isPlaying, setIsPlaying] = React.useState(initialAudioConsent === 'granted');
-  const pause = React.useMemo(() => jest.fn(), []);
+  const pause = React.useMemo(() => jest.fn(() => setIsPlaying(false)), []);
   const grantAudioConsent = React.useMemo(() => jest.fn(), []);
 
   const play = React.useCallback(async () => {
@@ -287,7 +264,6 @@ const HomeHarness = ({
     >
       <ThemeProvider>
         <WelcomeOnboardingProvider>
-          <OnboardingBootstrap openPauseHintOnMount={openPauseHintOnMount} />
           <Home />
           <OnboardingStateProbe />
         </WelcomeOnboardingProvider>
@@ -307,6 +283,10 @@ const expectTerminalLinesStructure = (el: HTMLElement) => {
 };
 
 describe('Home audio prompt', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
   it('renders the welcome audio dialog with prompt text and action buttons', async () => {
     render(<HomeHarness />);
 
@@ -345,42 +325,11 @@ describe('Home audio prompt', () => {
 });
 
 describe('Home welcome flow', () => {
-  it('waits for the pause and theme hints to close before showing the hero card after audio starts', async () => {
-    render(<HomeHarness initialAudioConsent="granted" openPauseHintOnMount />);
-
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
-    await waitFor(() => expect(screen.getByTestId('pause-hint-open')).toHaveTextContent('true'));
-
-    expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
-    expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
-    expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Dismiss pause hint' }));
-
-    await waitFor(() =>
-      expect(screen.getByTestId('dark-mode-hint-open')).toHaveTextContent('true')
-    );
-    expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
-
-    fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
-
-    await waitFor(() =>
-      expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
-    );
-    expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
-    expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-active', 'true');
-    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'false');
-    expectTerminalLinesStructure(screen.getByTestId('terminal-hero'));
-
-    fireEvent.click(screen.getByTestId('complete-hero-motion'));
-
-    await waitFor(() =>
-      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'true')
-    );
+  beforeEach(() => {
+    window.localStorage.clear();
   });
 
-  it('waits for the theme hint to close before showing the hero card after opting out of audio', async () => {
+  it('shows customize modal after declining audio, then reveals hero on dismiss', async () => {
     render(<HomeHarness />);
 
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
@@ -392,12 +341,12 @@ describe('Home welcome flow', () => {
     });
 
     await waitFor(() =>
-      expect(screen.getByTestId('dark-mode-hint-open')).toHaveTextContent('true')
+      expect(screen.getByTestId('customize-modal-open')).toHaveTextContent('true')
     );
-    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    expect(screen.getByText('Customize your experience')).toBeInTheDocument();
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Get started' }));
 
     await waitFor(() =>
       expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
@@ -414,16 +363,38 @@ describe('Home welcome flow', () => {
     );
   });
 
-  it('skips the dialog when audio consent is already declined and shows hero after dark mode hint', async () => {
-    render(<HomeHarness initialAudioConsent="declined" />);
+  it('shows customize modal after playing audio, then reveals hero on dismiss', async () => {
+    render(<HomeHarness />);
 
-    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await act(async () => {
+      fireEvent.click(await screen.findByRole('button', { name: 'Play welcome audio' }));
+    });
 
     await waitFor(() =>
-      expect(screen.getByTestId('dark-mode-hint-open')).toHaveTextContent('true')
+      expect(screen.getByTestId('customize-modal-open')).toHaveTextContent('true')
     );
+    expect(screen.getByText('Customize your experience')).toBeInTheDocument();
+    expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Get started' }));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
+    );
+    expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
+    expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-active', 'true');
+    expectTerminalLinesStructure(screen.getByTestId('terminal-hero'));
+  });
+
+  it('shows customize modal when audio consent is already declined but onboarding not completed', async () => {
+    render(<HomeHarness initialAudioConsent="declined" />);
+
+    await waitFor(() =>
+      expect(screen.getByTestId('customize-modal-open')).toHaveTextContent('true')
+    );
+    expect(screen.getByText('Customize your experience')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Get started' }));
 
     await waitFor(() =>
       expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
@@ -438,13 +409,61 @@ describe('Home welcome flow', () => {
       expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'true')
     );
   });
+
+  it('skips all modals for returning visitors with onboarding already completed', async () => {
+    window.localStorage.setItem(ONBOARDING_COMPLETED_STORAGE_KEY, 'true');
+    window.localStorage.setItem('danhenderson-welcome-audio-consent', 'declined');
+
+    render(<HomeHarness initialAudioConsent="declined" />);
+
+    expect(screen.queryByText('Play welcome audio?')).not.toBeInTheDocument();
+    expect(screen.queryByText('Customize your experience')).not.toBeInTheDocument();
+
+    await waitFor(() =>
+      expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
+    );
+    expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
+    expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-active', 'true');
+    expectTerminalLinesStructure(screen.getByTestId('terminal-hero'));
+  });
+
+  it('persists onboarding completion to localStorage after completing the customize modal', async () => {
+    render(<HomeHarness initialAudioConsent="declined" />);
+
+    await waitFor(() =>
+      expect(screen.getByTestId('customize-modal-open')).toHaveTextContent('true')
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Get started' }));
+
+    await waitFor(() =>
+      expect(screen.getByTestId('onboarding-completed')).toHaveTextContent('true')
+    );
+    expect(window.localStorage.getItem(ONBOARDING_COMPLETED_STORAGE_KEY)).toBe('true');
+  });
+
+  it('customize modal includes motion and audio controls with AppBar hint', async () => {
+    render(<HomeHarness initialAudioConsent="declined" />);
+
+    await waitFor(() =>
+      expect(screen.getByTestId('customize-modal-open')).toHaveTextContent('true')
+    );
+
+    expect(screen.getByText('Motion')).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Motion intensity' })).toBeInTheDocument();
+    expect(screen.getByText('Audio')).toBeInTheDocument();
+    expect(
+      screen.getByText(/You can adjust these settings anytime from the .* icon in the header/)
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Get started' })).toBeInTheDocument();
+  });
 });
 
 /** Helper: render Home, dismiss dialogs / hints, and wait for the hero to be visible. */
 const renderHomeWithHeroVisible = async () => {
+  window.localStorage.setItem(ONBOARDING_COMPLETED_STORAGE_KEY, 'true');
+  window.localStorage.setItem('danhenderson-welcome-audio-consent', 'declined');
   render(<HomeHarness initialAudioConsent="declined" />);
-
-  fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
 
   await waitFor(() =>
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
@@ -525,6 +544,7 @@ const dispatchPointerUp = () => {
 afterEach(() => {
   document.getElementById('site-navigation')?.remove();
   document.getElementById('main-content')?.remove();
+  window.localStorage.clear();
 });
 
 describe('Home IDE window actions', () => {
@@ -682,6 +702,8 @@ describe('Home auto-expand after motion', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     setViewportSize(1280, 800);
+    window.localStorage.setItem(ONBOARDING_COMPLETED_STORAGE_KEY, 'true');
+    window.localStorage.setItem('danhenderson-welcome-audio-consent', 'declined');
   });
 
   afterEach(() => {
@@ -697,7 +719,6 @@ describe('Home auto-expand after motion', () => {
 
     render(<HomeHarness initialAudioConsent="declined" />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
     await waitFor(() =>
       expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
     );
@@ -737,7 +758,6 @@ describe('Home auto-expand after motion', () => {
   it('cancels the auto-expand when the user manually closes the IDE before the delay', async () => {
     render(<HomeHarness initialAudioConsent="declined" />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
     await waitFor(() =>
       expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
     );
@@ -767,7 +787,6 @@ describe('Home auto-expand after motion', () => {
   it('does not re-trigger auto-expand after the IDE is manually restored', async () => {
     render(<HomeHarness initialAudioConsent="declined" />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Dismiss dark mode hint' }));
     await waitFor(() =>
       expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
     );

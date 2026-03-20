@@ -16,13 +16,10 @@ const createMockAudioState = (overrides: Record<string, unknown> = {}) => ({
 });
 
 const createMockOnboardingState = (overrides: Record<string, unknown> = {}) => ({
-  showPauseHint: false,
-  showDarkModeHint: false,
-  openPauseHint: jest.fn(),
-  dismissPauseHint: jest.fn(),
-  openDarkModeHint: jest.fn(),
-  dismissDarkModeHint: jest.fn(),
-  resetHints: jest.fn(),
+  onboardingCompleted: false,
+  showCustomizeModal: false,
+  openCustomizeModal: jest.fn(),
+  completeOnboarding: jest.fn(),
   ...overrides,
 });
 
@@ -43,7 +40,7 @@ describe('useHomeWelcomeSequence', () => {
     mockOnboardingState = createMockOnboardingState();
   });
 
-  it('opens prompt when audioConsent is unknown', () => {
+  it('opens prompt when audioConsent is unknown and onboarding has not been completed', () => {
     const { result } = renderHook(() => useHomeWelcomeSequence());
     expect(result.current.isPromptOpen).toBe(true);
   });
@@ -60,6 +57,12 @@ describe('useHomeWelcomeSequence', () => {
     expect(result.current.isPromptOpen).toBe(false);
   });
 
+  it('does not open prompt when onboarding is already completed', () => {
+    mockOnboardingState = createMockOnboardingState({ onboardingCompleted: true });
+    const { result } = renderHook(() => useHomeWelcomeSequence());
+    expect(result.current.isPromptOpen).toBe(false);
+  });
+
   it('handleOptOut calls declineAudioConsent and closes prompt', () => {
     const { result } = renderHook(() => useHomeWelcomeSequence());
     expect(result.current.isPromptOpen).toBe(true);
@@ -72,7 +75,7 @@ describe('useHomeWelcomeSequence', () => {
     expect(result.current.isPromptOpen).toBe(false);
   });
 
-  it('handlePlay calls play, closes prompt, and shows pause hint', async () => {
+  it('handlePlay calls play and closes prompt', async () => {
     const { result } = renderHook(() => useHomeWelcomeSequence());
     expect(result.current.isPromptOpen).toBe(true);
 
@@ -82,8 +85,6 @@ describe('useHomeWelcomeSequence', () => {
 
     expect(mockAudioState.play).toHaveBeenCalledTimes(1);
     expect(result.current.isPromptOpen).toBe(false);
-    expect(mockOnboardingState.dismissDarkModeHint).toHaveBeenCalledTimes(1);
-    expect(mockOnboardingState.openPauseHint).toHaveBeenCalledTimes(1);
   });
 
   it('handlePlay sets isLoading during play', async () => {
@@ -132,24 +133,59 @@ describe('useHomeWelcomeSequence', () => {
     consoleSpy.mockRestore();
   });
 
-  it('cleans up pause and dark mode hints on unmount', () => {
-    const { unmount } = renderHook(() => useHomeWelcomeSequence());
-    unmount();
-
-    expect(mockOnboardingState.resetHints).toHaveBeenCalledTimes(1);
-  });
-
   it('returns error from audio context', () => {
     mockAudioState = createMockAudioState({ error: 'Something went wrong' });
     const { result } = renderHook(() => useHomeWelcomeSequence());
     expect(result.current.error).toBe('Something went wrong');
   });
 
-  it('opens the dark mode hint once the audio prompt has been handled and no pause hint is visible', () => {
+  it('opens the customize modal once the audio prompt has been handled', () => {
     mockAudioState = createMockAudioState({ audioConsent: 'declined' });
     const { result } = renderHook(() => useHomeWelcomeSequence());
 
     expect(result.current.isPromptOpen).toBe(false);
-    expect(mockOnboardingState.openDarkModeHint).toHaveBeenCalledTimes(1);
+    expect(mockOnboardingState.openCustomizeModal).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not open customize modal when onboarding is already completed', () => {
+    mockAudioState = createMockAudioState({ audioConsent: 'declined' });
+    mockOnboardingState = createMockOnboardingState({ onboardingCompleted: true });
+    const { result } = renderHook(() => useHomeWelcomeSequence());
+
+    expect(result.current.isPromptOpen).toBe(false);
+    expect(mockOnboardingState.openCustomizeModal).not.toHaveBeenCalled();
+  });
+
+  it('handleCustomizeDismiss calls completeOnboarding', () => {
+    mockAudioState = createMockAudioState({ audioConsent: 'declined' });
+    const { result } = renderHook(() => useHomeWelcomeSequence());
+
+    act(() => {
+      result.current.handleCustomizeDismiss();
+    });
+
+    expect(mockOnboardingState.completeOnboarding).toHaveBeenCalledTimes(1);
+  });
+
+  it('isHeroAnimationReady is true when onboarding is completed', () => {
+    mockAudioState = createMockAudioState({ audioConsent: 'declined' });
+    mockOnboardingState = createMockOnboardingState({ onboardingCompleted: true });
+    const { result } = renderHook(() => useHomeWelcomeSequence());
+
+    expect(result.current.isHeroAnimationReady).toBe(true);
+  });
+
+  it('isHeroAnimationReady is false while customize modal is showing', () => {
+    mockAudioState = createMockAudioState({ audioConsent: 'declined' });
+    mockOnboardingState = createMockOnboardingState({ showCustomizeModal: true });
+    const { result } = renderHook(() => useHomeWelcomeSequence());
+
+    expect(result.current.isHeroAnimationReady).toBe(false);
+  });
+
+  it('isHeroAnimationReady is false while audio prompt is open', () => {
+    const { result } = renderHook(() => useHomeWelcomeSequence());
+    expect(result.current.isPromptOpen).toBe(true);
+    expect(result.current.isHeroAnimationReady).toBe(false);
   });
 });

@@ -45,7 +45,13 @@ type SwatchProps = {
   onClick: () => void;
 };
 
-const AppearanceSwatch = ({ primaryColor, secondaryColor, selected, label, onClick }: SwatchProps) => (
+const AppearanceSwatch = ({
+  primaryColor,
+  secondaryColor,
+  selected,
+  label,
+  onClick,
+}: SwatchProps) => (
   <Tooltip title={label} placement="top">
     <Box
       component="button"
@@ -142,9 +148,6 @@ export type HeaderSettingsPopoverProps = {
   showAudioControl: boolean;
   isPlaying: boolean;
   onToggleAudio: () => void;
-  /* Refs & hints */
-  settingsButtonRef?: MutableRefObject<HTMLButtonElement | null>;
-  triggerHighlightSx?: SxProps<Theme>;
 };
 
 export const HeaderSettingsPopover = ({
@@ -157,8 +160,6 @@ export const HeaderSettingsPopover = ({
   showAudioControl,
   isPlaying,
   onToggleAudio,
-  settingsButtonRef,
-  triggerHighlightSx,
 }: HeaderSettingsPopoverProps) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
@@ -172,7 +173,10 @@ export const HeaderSettingsPopover = ({
     setAnchorEl(null);
   };
 
-  const handleMotionChange = (_event: React.MouseEvent<HTMLElement>, value: MotionIntensityLevel | null) => {
+  const handleMotionChange = (
+    _event: React.MouseEvent<HTMLElement>,
+    value: MotionIntensityLevel | null
+  ) => {
     if (value !== null) {
       onChangeMotionIntensity(value);
     }
@@ -210,27 +214,19 @@ export const HeaderSettingsPopover = ({
     <>
       <Tooltip title="Settings">
         <IconButton
-          ref={settingsButtonRef}
           onClick={handleOpen}
           aria-label="Open settings"
           aria-haspopup="true"
           aria-expanded={open ? 'true' : undefined}
           size="small"
-          sx={[
-            {
-              color: (theme) => alpha(theme.palette.common.white, 0.82),
-              transition: `color ${cssDuration.quick} ${SPRING_EASING_CSS}, background-color ${cssDuration.quick} ${SPRING_EASING_CSS}`,
-              '&:hover': {
-                color: 'common.white',
-                backgroundColor: (theme) => alpha(theme.palette.common.white, 0.1),
-              },
+          sx={{
+            color: (theme) => alpha(theme.palette.common.white, 0.82),
+            transition: `color ${cssDuration.quick} ${SPRING_EASING_CSS}, background-color ${cssDuration.quick} ${SPRING_EASING_CSS}`,
+            '&:hover': {
+              color: 'common.white',
+              backgroundColor: (theme) => alpha(theme.palette.common.white, 0.1),
             },
-            ...(triggerHighlightSx
-              ? Array.isArray(triggerHighlightSx)
-                ? triggerHighlightSx
-                : [triggerHighlightSx]
-              : []),
-          ]}
+          }}
         >
           <SettingsOutlinedIcon sx={{ fontSize: 20 }} />
         </IconButton>
@@ -251,7 +247,10 @@ export const HeaderSettingsPopover = ({
               maxWidth: 300,
               p: 2.5,
               boxShadow: (theme) =>
-                `0 8px 32px ${alpha(theme.palette.common.black, theme.palette.mode === 'light' ? 0.12 : 0.4)}`,
+                `0 8px 32px ${alpha(
+                  theme.palette.common.black,
+                  theme.palette.mode === 'light' ? 0.12 : 0.4
+                )}`,
             },
           },
         }}
@@ -313,11 +312,7 @@ export const HeaderSettingsPopover = ({
                     primaryColor={optionPalette.primary.main}
                     secondaryColor={optionPalette.secondary.main}
                     selected={option.key === appearance}
-                    label={
-                      option.key === appearance
-                        ? `${option.label} (active)`
-                        : option.label
-                    }
+                    label={option.key === appearance ? `${option.label} (active)` : option.label}
                     onClick={() => onChangeAppearance(option.key)}
                   />
                 );
@@ -348,11 +343,7 @@ export const HeaderSettingsPopover = ({
               }}
             >
               {MOTION_LEVELS.map((level) => (
-                <ToggleButton
-                  key={level.key}
-                  value={level.key}
-                  aria-label={level.label}
-                >
+                <ToggleButton key={level.key} value={level.key} aria-label={level.label}>
                   {level.icon}
                   {level.label}
                 </ToggleButton>

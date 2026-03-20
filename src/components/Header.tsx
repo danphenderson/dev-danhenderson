@@ -10,14 +10,12 @@ import { primaryNavigationRoutes } from '../constants/siteRoutes';
 import { useAppTheme } from '../ThemeProvider';
 import { avatar as avatarSrc } from '../data/cv';
 import { useAppStyles } from '../styles/appStyles';
-import { pulseRing } from '../styles/animations';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
 import { HEADER_HIDE_SCROLL_TRIGGER_OPTIONS } from './header/headerScroll';
 import { HeaderNav } from './header/HeaderNav';
 import { HeaderSettingsPopover } from './header/HeaderSettingsPopover';
-import { HintPopover } from './header/HintPopover';
 
 const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
   const trigger = useScrollTrigger(HEADER_HIDE_SCROLL_TRIGGER_OPTIONS);
@@ -41,21 +39,12 @@ export default function Header() {
   const muiTheme = useMuiTheme();
   const location = useLocation();
   const { isPlaying, pause, play, audioConsent } = useWelcomeAudio();
-  const { showPauseHint, dismissPauseHint, showDarkModeHint, dismissDarkModeHint } =
-    useWelcomeOnboarding();
+  const { onboardingCompleted } = useWelcomeOnboarding();
   const path = location.pathname.toLowerCase();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const iconButtonSize = isMobile ? 'medium' : ('large' as const);
   const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState<null | HTMLElement>(null);
   const mobileMenuOpen = Boolean(mobileMenuAnchor);
-  const settingsButtonRef = React.useRef<HTMLButtonElement | null>(null);
-  const themeHintTitle = 'Customize your experience';
-  const themeHintBody =
-    'Open settings to switch theme, change appearance, and adjust motion preferences.';
-  const settingsHighlightSx =
-    showDarkModeHint || showPauseHint
-      ? appStyles.getHeaderHighlightSx('primary', `${pulseRing} 1.6s ease-out infinite`)
-      : {};
 
   React.useEffect(() => {
     if (!isMobile && mobileMenuOpen) {
@@ -83,13 +72,6 @@ export default function Header() {
     }
   };
 
-  const handleThemeToggle = () => {
-    if (showDarkModeHint) {
-      dismissDarkModeHint();
-    }
-    toggleTheme();
-  };
-
   return (
     <>
       <HideOnScroll>
@@ -110,29 +92,16 @@ export default function Header() {
             <Box sx={appStyles.headerActionsContainerSx}>
               <HeaderSettingsPopover
                 mode={mode}
-                onToggleTheme={handleThemeToggle}
+                onToggleTheme={toggleTheme}
                 appearance={appearance}
                 onChangeAppearance={setAppearance}
                 motionIntensity={motionIntensity}
                 onChangeMotionIntensity={setMotionIntensity}
-                showAudioControl={audioConsent !== 'declined'}
+                showAudioControl={audioConsent === 'granted' || onboardingCompleted}
                 isPlaying={isPlaying}
                 onToggleAudio={handleAudioToggle}
-                settingsButtonRef={settingsButtonRef}
-                triggerHighlightSx={settingsHighlightSx}
               />
             </Box>
-            <HintPopover
-              id="settings-hint-popover"
-              open={(showPauseHint || showDarkModeHint) && Boolean(settingsButtonRef.current)}
-              anchorEl={settingsButtonRef.current}
-              onClose={() => {
-                if (showPauseHint) dismissPauseHint();
-                if (showDarkModeHint) dismissDarkModeHint();
-              }}
-              title={themeHintTitle}
-              body={themeHintBody}
-            />
           </Toolbar>
         </AppBar>
       </HideOnScroll>
