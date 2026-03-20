@@ -13,12 +13,16 @@ const INVALID_BLOG_SLUG_QUERY = 'nonexistent post';
 
 const waitForBlogIndex = async (page: Page) => {
   const main = page.locator('main');
-  await waitForAnimatedSectionReadiness({
-    anchor: main.getByText(
+
+  await expect(main.getByText('Blog').first()).toBeVisible();
+  await expect(
+    main.getByText(
       'Technical writing on frontend architecture, React patterns, and software engineering.'
-    ),
-    readyLocators: [main.getByText(/\d+ articles?/)],
-  });
+    )
+  ).toBeVisible();
+  await expect(main.getByText(/\d+ articles?/)).toBeVisible();
+  await expect(main.getByRole('button', { name: 'All' })).toBeVisible();
+  await expect(main.getByText(FEATURED_POST_TITLE).first()).toBeVisible();
 };
 
 const waitForBlogFallback = async (page: Page) => {

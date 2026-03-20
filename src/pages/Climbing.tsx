@@ -13,7 +13,7 @@ import type { TickRow, TodoRow } from '../types/data';
 import { useFuzzySearch } from '../hooks/useFuzzySearch';
 import { useAppStyles } from '../styles/appStyles';
 import { SectionLeadText } from '../components/text';
-import { MotionSection, MotionFadeIn } from '../motion';
+import { MotionSection, MotionFadeIn, MotionTiltCard } from '../motion';
 
 const renderRouteLink = (label: string, href: string) => (
   <CommonLink
@@ -37,7 +37,6 @@ const columns: GridColDef<TickRow>[] = [
     minWidth: 200,
     renderCell: (params) => renderRouteLink(String(params.value), params.row.url),
   },
-  { field: 'date', headerName: 'Date', flex: 0.7, minWidth: 120 },
   { field: 'grade', headerName: 'Grade', flex: 0.6, minWidth: 100 },
   { field: 'location', headerName: 'Location', flex: 1, minWidth: 150 },
 ];
@@ -71,7 +70,8 @@ export default function Climbing() {
           <Stack spacing={2}>
             <SectionHeading overline="Climbing" />
             <SectionLeadText>
-              A collection of routes I've remembered to tick on Mountain Project.
+              A collection of routes I've remembered to tick on Mountain Project, including some
+              top-rope ascents — I don't climb 5.14.
             </SectionLeadText>
             <ClimbingAnalytics analytics={analytics} status={status} />
             <TextField
@@ -87,20 +87,22 @@ export default function Climbing() {
                 ),
               }}
             />
-            <Box sx={appStyles.dataGridContainerSx}>
-              <DataGrid
-                rows={tickSearch.filtered}
-                columns={columns}
-                autoHeight
-                disableRowSelectionOnClick
-                pageSizeOptions={[5, 10, 25, 50]}
-                initialState={{
-                  pagination: {
-                    paginationModel: { pageSize: 10, page: 0 },
-                  },
-                }}
-              />
-            </Box>
+            <MotionTiltCard intensity={0.4}>
+              <Box sx={appStyles.dataGridContainerSx}>
+                <DataGrid
+                  rows={tickSearch.filtered}
+                  columns={columns}
+                  autoHeight
+                  disableRowSelectionOnClick
+                  pageSizeOptions={[5, 10, 25, 50]}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { pageSize: 10, page: 0 },
+                    },
+                  }}
+                />
+              </Box>
+            </MotionTiltCard>
             <MotionFadeIn>
               <SectionHeading overline="TODO Routes" sx={appStyles.sectionHeadingOffsetSx} />
             </MotionFadeIn>
@@ -118,20 +120,22 @@ export default function Climbing() {
                 ),
               }}
             />
-            <Box sx={appStyles.dataGridContainerSx}>
-              <DataGrid
-                rows={todoSearch.filtered}
-                columns={todoColumns}
-                autoHeight
-                disableRowSelectionOnClick
-                pageSizeOptions={[5, 10, 25, 50]}
-                initialState={{
-                  pagination: {
-                    paginationModel: { pageSize: 10, page: 0 },
-                  },
-                }}
-              />
-            </Box>
+            <MotionTiltCard intensity={0.4}>
+              <Box sx={appStyles.dataGridContainerSx}>
+                <DataGrid
+                  rows={todoSearch.filtered}
+                  columns={todoColumns}
+                  autoHeight
+                  disableRowSelectionOnClick
+                  pageSizeOptions={[5, 10, 25, 50]}
+                  initialState={{
+                    pagination: {
+                      paginationModel: { pageSize: 10, page: 0 },
+                    },
+                  }}
+                />
+              </Box>
+            </MotionTiltCard>
           </Stack>
         </SectionCard>
       </MotionSection>

@@ -45,13 +45,15 @@ jest.mock('../../../src/components/header/HeaderSettingsPopover', () => ({
         Open settings
       </button>
       {onToggleTheme ? (
-        <button
-          type="button"
-          aria-label={`Switch to ${mode === 'dark' ? 'light' : 'dark'} mode`}
-          onClick={() => onToggleTheme()}
-        >
-          Toggle theme
-        </button>
+        <label>
+          <input
+            type="checkbox"
+            aria-label="Toggle dark mode"
+            checked={mode === 'dark'}
+            onChange={() => onToggleTheme()}
+          />
+          Toggle dark mode
+        </label>
       ) : null}
       {onChangeAppearance ? (
         <button
@@ -186,7 +188,8 @@ describe('Header controls', () => {
 
     renderHeader('/cv');
 
-    fireEvent.click(screen.getByLabelText('Switch to dark mode'));
+    fireEvent.click(screen.getByLabelText('Toggle dark mode'));
+    expect(dismissDarkModeHint).toHaveBeenCalledTimes(1);
     expect(toggleTheme).toHaveBeenCalledTimes(1);
   });
 

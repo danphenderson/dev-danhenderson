@@ -2,8 +2,9 @@ import { test, expect, type Locator, type Page } from '@playwright/test';
 import { dismissWelcomeSequence, resetWelcomeState } from './helpers/header';
 
 const HOME_SCREENSHOT_CLOCK_START = new Date('2026-03-17T12:00:00.000Z');
-const STABLE_TERMINAL_OUTPUT_COMMAND = 'npm run build';
-const STABLE_TERMINAL_OUTPUT_TEXT = 'Compiled successfully in 2.4s';
+const STABLE_TERMINAL_OUTPUT_TEXT =
+  /v22\.14\.0|9ab2238 polish: terminal UI chrome|Compiled successfully in 2\.4s|mathematics|julia version 1\.10\.10|==> Formulae/;
+const SCREENSHOT_TERMINAL_COMMAND_TEXT = 'brew';
 const TERMINAL_NOTIFICATION_TEXT = 'server.py — No problems detected ✓';
 const WELCOME_AUDIO_PROMPT_BODY =
   'Would you like to hear a short verse while browsing the site? Use the pause button in the header to stop it anytime.';
@@ -114,11 +115,40 @@ const dismissTerminalNotificationToast = async (page: Page) => {
 };
 
 const waitForStableTerminalHero = async (page: Page, terminalHero: Locator) => {
-  await expect(terminalHero).toContainText(STABLE_TERMINAL_OUTPUT_COMMAND, { timeout: 20000 });
-  await expect(terminalHero).toContainText(STABLE_TERMINAL_OUTPUT_TEXT, { timeout: 20000 });
+  const terminalPanelBody = terminalHero.getByTestId('terminal-panel-body');
+
+  await expect(terminalHero.getByTestId('vscode-tab-server')).toHaveAttribute(
+    'aria-selected',
+    'true',
+    { timeout: 20000 }
+  );
+  await expect(terminalHero).toContainText('Ping Pong Server', { timeout: 20000 });
+  await expect(terminalPanelBody).toContainText(STABLE_TERMINAL_OUTPUT_TEXT, { timeout: 20000 });
   await dismissTerminalNotificationToast(page);
 
   await moveMouseAwayFromHero(page);
+};
+
+const advanceClockUntilTerminalBodyContains = async (
+  page: Page,
+  terminalHero: Locator,
+  expectedText: string,
+  maxElapsedMs = 12_000,
+  stepMs = 250
+) => {
+  const terminalPanelBody = terminalHero.getByTestId('terminal-panel-body');
+
+  for (let elapsedMs = 0; elapsedMs <= maxElapsedMs; elapsedMs += stepMs) {
+    const panelText = (await terminalPanelBody.textContent()) ?? '';
+
+    if (panelText.includes(expectedText)) {
+      return;
+    }
+
+    await page.clock.runFor(stepMs);
+  }
+
+  await expect(terminalPanelBody).toContainText(expectedText, { timeout: 1000 });
 };
 
 const pausePageClock = async (page: Page) => {
@@ -207,9 +237,7 @@ test.describe('Home page', () => {
     await expect(settingsPopover).toBeVisible();
     await expect(settingsPopover.getByText('Theme', { exact: true })).toBeVisible();
     await expect(settingsPopover.getByText(/Dark mode|Light mode/)).toBeVisible();
-    await expect(
-      settingsPopover.getByRole('button', { name: /Switch to (dark|light) mode/i })
-    ).toBeVisible();
+    await expect(settingsPopover.getByRole('checkbox', { name: 'Dark mode' })).toBeVisible();
     await expect(
       settingsPopover.getByRole('radiogroup', { name: 'Appearance presets' })
     ).toBeVisible();
@@ -234,6 +262,11 @@ test.describe('Home page', () => {
 
     await resetHomeScrollForScreenshot(page, terminalHero);
     await expect(terminalHero).toContainText('Ping Pong Server', { timeout: 20000 });
+    await advanceClockUntilTerminalBodyContains(
+      page,
+      terminalHero,
+      SCREENSHOT_TERMINAL_COMMAND_TEXT
+    );
     await stabilizeHeroForScreenshot(terminalHero);
     await pausePageClock(page);
 

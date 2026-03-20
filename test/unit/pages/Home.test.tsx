@@ -599,11 +599,14 @@ describe('Home IDE window actions', () => {
 
     const initialInstanceId = screen.getByTestId('terminal-hero').getAttribute('data-instance-id');
 
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-boot-active', 'false');
+
     fireEvent.click(screen.getByTestId('ide-expand-btn'));
 
     await waitFor(() => {
       expect(screen.getByTestId('home-ide-expanded')).toBeInTheDocument();
       expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'true');
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-boot-active', 'true');
       expect(screen.getByTestId('terminal-hero')).toHaveAttribute(
         'data-instance-id',
         initialInstanceId ?? ''
@@ -615,6 +618,7 @@ describe('Home IDE window actions', () => {
     await waitFor(() => {
       expect(screen.queryByTestId('home-ide-expanded')).not.toBeInTheDocument();
       expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'false');
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-boot-active', 'false');
       expect(screen.getByTestId('terminal-hero')).toHaveAttribute(
         'data-instance-id',
         initialInstanceId ?? ''
@@ -747,7 +751,7 @@ describe('Home auto-expand after motion', () => {
     );
     expect(within(expandedPortal).getByTestId('terminal-hero')).toHaveAttribute(
       'data-boot-active',
-      'false'
+      'true'
     );
   });
 

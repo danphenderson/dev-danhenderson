@@ -1,6 +1,38 @@
 import { act, render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { GitHubContributionCalendar } from '../../../../src/components/cv/GitHubContributionCalendar';
+
+jest.mock('../../../../src/components/ContentCard', () => ({
+  ContentCard: ({ children }: { children: ReactNode }) => (
+    <div data-testid="github-calendar-content-card">{children}</div>
+  ),
+}));
+
+jest.mock('../../../../src/motion', () => {
+  const actual = jest.requireActual('../../../../src/motion');
+
+  return {
+    ...actual,
+    MotionTiltCard: ({
+      children,
+      intensity,
+      disabled,
+    }: {
+      children: ReactNode;
+      intensity?: number;
+      disabled?: boolean;
+    }) => (
+      <div
+        data-testid="github-calendar-tilt-card"
+        data-intensity={String(intensity ?? '')}
+        data-disabled={String(Boolean(disabled))}
+      >
+        {children}
+      </div>
+    ),
+  };
+});
 
 jest.mock('react-github-calendar', () => ({
   GitHubCalendar: ({ username }: { username: string }) => (
@@ -194,6 +226,29 @@ describe('GitHubContributionCalendar', () => {
     expect(screen.getByText('Contribution calendar')).toBeInTheDocument();
     expect(screen.getByText('Yearly GitHub activity at a glance.')).toBeInTheDocument();
     expect(screen.getByTestId('github-calendar')).toHaveAttribute('data-username', 'testuser');
+    expect(screen.getByTestId('github-calendar-tilt-card')).toHaveAttribute(
+      'data-intensity',
+      '0.5'
+    );
+    expect(screen.getByTestId('github-calendar-content-card')).toBeInTheDocument();
+    expect(screen.getByTestId('github-calendar-tilt-card')).toContainElement(
+      screen.getByTestId('github-calendar')
+    );
+  });
+
+  it('keeps the tilt wrapper when contained mode is disabled', () => {
+    render(
+      <ThemeProvider>
+        <GitHubContributionCalendar username="testuser" contained={false} />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('github-calendar-tilt-card')).toHaveAttribute(
+      'data-intensity',
+      '0.5'
+    );
+    expect(screen.queryByTestId('github-calendar-content-card')).not.toBeInTheDocument();
+    expect(screen.getByTestId('github-calendar')).toBeInTheDocument();
   });
 
   it('animates the calendar to the newest weeks the first time it enters view', () => {

@@ -1,4 +1,5 @@
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
@@ -13,16 +14,19 @@ import {
   IconButton,
   Popover,
   Stack,
+  Switch,
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
   Typography,
 } from '@mui/material';
 import type { PaletteMode } from '@mui/material';
-import { alpha } from '@mui/material/styles';
-import { type ReactNode, useState } from 'react';
+import { alpha, type SxProps, type Theme } from '@mui/material/styles';
+import { type MutableRefObject, type ReactNode, useCallback, useState } from 'react';
+import { useReducedMotion } from 'motion/react';
 import {
   type AppAppearanceKey,
+  appAppearancePresets,
   appAppearanceOptions,
   type MotionIntensityLevel,
 } from '../../theme/appAppearance';
@@ -56,6 +60,7 @@ const AppearanceSwatch = ({
       aria-checked={selected}
       aria-label={label}
       onClick={onClick}
+      tabIndex={selected ? 0 : -1}
       sx={{
         width: 28,
         height: 28,
@@ -158,6 +163,7 @@ export const HeaderSettingsPopover = ({
 }: HeaderSettingsPopoverProps) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
+  const prefersReducedMotion = useReducedMotion();
 
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -175,6 +181,34 @@ export const HeaderSettingsPopover = ({
       onChangeMotionIntensity(value);
     }
   };
+
+  const activePreset = appAppearancePresets[appearance];
+
+  /* Arrow-key navigation for the appearance radiogroup */
+  const handleSwatchKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLDivElement>) => {
+      const keys: Record<string, number> = {
+        ArrowRight: 1,
+        ArrowDown: 1,
+        ArrowLeft: -1,
+        ArrowUp: -1,
+      };
+      const delta = keys[event.key];
+      if (delta === undefined) return;
+
+      event.preventDefault();
+      const currentIndex = appAppearanceOptions.findIndex((o) => o.key === appearance);
+      const nextIndex = (currentIndex + delta + appAppearanceOptions.length) % appAppearanceOptions.length;
+      const nextKey = appAppearanceOptions[nextIndex].key;
+      onChangeAppearance(nextKey);
+
+      /* Move focus to the newly selected swatch */
+      const group = event.currentTarget;
+      const radios = group.querySelectorAll<HTMLElement>('[role="radio"]');
+      radios[nextIndex]?.focus();
+    },
+    [appearance, onChangeAppearance]
+  );
 
   return (
     <>
@@ -226,22 +260,25 @@ export const HeaderSettingsPopover = ({
           <Stack spacing={1}>
             <SectionLabel>Theme</SectionLabel>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <Typography variant="body2" color="text.primary">
-                {mode === 'dark' ? 'Dark mode' : 'Light mode'}
-              </Typography>
-              <Tooltip title={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}>
-                <IconButton
-                  size="small"
-                  onClick={onToggleTheme}
-                  aria-label={`Switch to ${mode === 'light' ? 'dark' : 'light'} mode`}
-                >
-                  {mode === 'light' ? (
-                    <DarkModeOutlinedIcon sx={{ fontSize: 18 }} />
-                  ) : (
-                    <LightModeOutlinedIcon sx={{ fontSize: 18 }} />
-                  )}
-                </IconButton>
-              </Tooltip>
+              <Stack direction="row" alignItems="center" spacing={1}>
+                {mode === 'dark' ? (
+                  <DarkModeOutlinedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                ) : (
+                  <LightModeOutlinedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                )}
+                <Typography variant="body2" color="text.primary" id="theme-switch-label">
+                  Dark mode
+                </Typography>
+              </Stack>
+              <Switch
+                checked={mode === 'dark'}
+                onChange={onToggleTheme}
+                size="small"
+                inputProps={{
+                  'aria-labelledby': 'theme-switch-label',
+                  'aria-label': 'Toggle dark mode',
+                }}
+              />
             </Stack>
           </Stack>
 
@@ -249,12 +286,22 @@ export const HeaderSettingsPopover = ({
 
           {/* ---- Appearance presets ---- */}
           <Stack spacing={1}>
-            <SectionLabel>Appearance</SectionLabel>
+            <Stack direction="row" alignItems="baseline" justifyContent="space-between">
+              <SectionLabel>Appearance</SectionLabel>
+              <Typography
+                variant="caption"
+                sx={{ color: 'text.secondary', fontSize: '0.6875rem' }}
+                data-testid="active-appearance-label"
+              >
+                {activePreset.label}
+              </Typography>
+            </Stack>
             <Stack
               direction="row"
               spacing={1}
               role="radiogroup"
               aria-label="Appearance presets"
+              onKeyDown={handleSwatchKeyDown}
               sx={{ flexWrap: 'wrap', gap: 1 }}
             >
               {appAppearanceOptions.map((option) => {
@@ -285,6 +332,7 @@ export const HeaderSettingsPopover = ({
               aria-label="Motion intensity"
               size="small"
               fullWidth
+              disabled={!!prefersReducedMotion}
               sx={{
                 '& .MuiToggleButton-root': {
                   textTransform: 'none',
@@ -301,6 +349,19 @@ export const HeaderSettingsPopover = ({
                 </ToggleButton>
               ))}
             </ToggleButtonGroup>
+            {prefersReducedMotion && (
+              <Stack
+                direction="row"
+                spacing={0.5}
+                alignItems="flex-start"
+                data-testid="reduced-motion-notice"
+              >
+                <InfoOutlinedIcon sx={{ fontSize: 14, color: 'text.secondary', mt: '1px' }} />
+                <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.3 }}>
+                  Reduced motion is active (OS&nbsp;setting)
+                </Typography>
+              </Stack>
+            )}
           </Stack>
 
           {/* ---- Audio control ---- */}
@@ -308,10 +369,10 @@ export const HeaderSettingsPopover = ({
             <>
               <Divider />
               <Stack spacing={1}>
-                <SectionLabel>Audio</SectionLabel>
+                <SectionLabel>Welcome audio</SectionLabel>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                   <Typography variant="body2" color="text.primary">
-                    {isPlaying ? 'Playing' : 'Off'}
+                    {isPlaying ? 'Now playing' : 'Paused'}
                   </Typography>
                   <Tooltip title={isPlaying ? 'Pause welcome audio' : 'Play welcome audio'}>
                     <IconButton

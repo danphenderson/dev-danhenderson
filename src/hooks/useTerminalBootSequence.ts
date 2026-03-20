@@ -51,9 +51,9 @@ const ZSH_SESSION: TerminalSessionTab = { id: 'zsh', label: 'zsh' };
 
 const EXPAND_SETTLE_MS = 300;
 const PAUSE_BEFORE_OUTPUT_MS = 400;
-const SERVER_OBSERVE_MS = 1200;
-const CLIENT_OBSERVE_MS = 1500;
-const HANDOFF_PAUSE_MS = 600;
+const SERVER_OBSERVE_MS = 900;
+const CLIENT_OBSERVE_MS = 1000;
+const HANDOFF_PAUSE_MS = 250;
 
 // ---------------------------------------------------------------------------
 // Result interface

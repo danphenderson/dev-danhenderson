@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Stack } from '@mui/material';
 import { GitHubCalendar } from 'react-github-calendar';
-import { DEFAULT_INTERSECTION_ROOT_MARGIN } from '../../motion';
+import { DEFAULT_INTERSECTION_ROOT_MARGIN, MotionTiltCard } from '../../motion';
 import { ContentCard } from '../ContentCard';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { BodyText, SubsectionTitle } from '../text';
@@ -368,9 +368,11 @@ export const GitHubContributionCalendar = ({
     </Stack>
   );
 
-  return contained ? (
+  const calendarSurface = contained ? (
     <ContentCard sx={contentCardInsetSx}>{calendarContent}</ContentCard>
   ) : (
     calendarContent
   );
+
+  return <MotionTiltCard intensity={0.5}>{calendarSurface}</MotionTiltCard>;
 };

@@ -556,6 +556,7 @@ export default function Home() {
             <TerminalHeroContent
               key={ideSessionKey}
               expanded={ideWindowState === 'expanded'}
+              bootActive={isTypewriterPlaying && ideWindowState === 'expanded'}
               lines={heroLines}
               onWindowDragPointerDown={
                 ideWindowState === 'normal' ? handleTitleBarPointerDown : undefined

@@ -86,7 +86,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
     prompt: '~ $ ',
     timingPreset: 'headline',
     pauseBeforeOutputMs: 400,
-    pauseAfterOutputMs: 2400,
+    pauseAfterOutputMs: 1200,
   });
 
   // Merge boot vs loop display values

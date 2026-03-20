@@ -30,6 +30,12 @@ Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript po
 - `npm run build` creates the production bundle and disables production-hidden feature flags such as `blog`.
 - `npm run build:e2e` creates the test-runtime bundle used for Playwright so gated routes remain available during browser coverage.
 
+## E2E Workflows
+
+- `npm run test:e2e` runs the full local Playwright suite by building the test-runtime bundle for `chromium` first and then rebuilding the production bundle for `smoke`.
+- `npm run build:e2e && npm run test:e2e:chromium` is the targeted path for gated route and blog-enabled browser coverage.
+- `npm run build && npm run test:e2e:smoke` is the targeted path for production smoke coverage.
+
 ## Stack
 
 - React 18

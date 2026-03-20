@@ -42,11 +42,11 @@ test.describe('Production smoke', () => {
 
     const main = page.locator('#main-content');
     await waitForAnimatedSectionReadiness({
-      anchor: main.getByText("A collection of routes I've remembered to tick on Mountain Project."),
-      readyLocators: [main.getByText('Overview')],
+      anchor: main.getByRole('heading', { name: 'Overview' }),
+      readyLocators: [main.getByRole('grid').first()],
     });
 
-    await expect(main.getByText('Overview')).toBeVisible();
+    await expect(main.getByRole('heading', { name: 'Overview' })).toBeVisible();
   });
 
   test('/photography loads album cards', async ({ page }) => {
