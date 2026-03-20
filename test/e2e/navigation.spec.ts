@@ -41,17 +41,18 @@ test.describe('Cross-route navigation', () => {
 
     await expect(page).toHaveURL(/\/climbing$/);
     await waitForAnimatedSectionReadiness({
-      anchor: main.getByText("A collection of routes I've remembered to tick on Mountain Project."),
-      readyLocators: [main.getByText('Overview')],
+      anchor: main.getByRole('heading', { name: 'Overview' }),
+      readyLocators: [main.getByRole('grid').first()],
     });
-    await expect(main.getByText('Overview')).toBeVisible();
+    await expect(main.getByRole('heading', { name: 'Overview' })).toBeVisible();
   });
 
   test('Climbing → Photography via header link', async ({ page }) => {
     await page.goto('/climbing');
     const main = page.locator('#main-content');
     await waitForAnimatedSectionReadiness({
-      anchor: main.getByText("A collection of routes I've remembered to tick on Mountain Project."),
+      anchor: main.getByRole('heading', { name: 'Overview' }),
+      readyLocators: [main.getByRole('grid').first()],
     });
 
     // Scroll to top to ensure HideOnScroll header is visible
@@ -90,7 +91,8 @@ test.describe('Cross-route navigation', () => {
     await page.getByRole('link', { name: 'Climbing' }).first().click();
     await expect(page).toHaveURL(/\/climbing$/);
     await waitForAnimatedSectionReadiness({
-      anchor: main.getByText("A collection of routes I've remembered to tick on Mountain Project."),
+      anchor: main.getByRole('heading', { name: 'Overview' }),
+      readyLocators: [main.getByRole('grid').first()],
     });
 
     await page.goBack();

@@ -28,11 +28,13 @@ This document covers the actual test organization, harness patterns, and coverag
 - Retries: 2 in CI, 0 locally
 - Build variant: `npm run build:e2e` sets `REACT_APP_RUNTIME_ENV=test` so feature-gated routes (blog) are available
 - Standard command shapes:
-  - full suite: `npm run test:e2e`
-  - headed debugging: `npm run test:e2e:headed`
-  - UI runner: `npm run test:e2e:ui`
-  - specific spec: `npm run test:e2e -- test/e2e/<spec>.ts`
-  - specific project: `npm run test:e2e -- --project=<project-name>`
+  - full local suite: `npm run test:e2e`
+  - chromium project: `npm run build:e2e && npm run test:e2e:chromium`
+  - smoke project: `npm run build && npm run test:e2e:smoke`
+  - headed debugging for chromium coverage: `npm run test:e2e:headed`
+  - UI runner for chromium coverage: `npm run test:e2e:ui`
+  - specific chromium spec: `npm run build:e2e && npm run test:e2e:chromium -- test/e2e/<spec>.ts`
+  - specific smoke spec: `npm run build && npm run test:e2e:smoke -- test/e2e/smoke.spec.ts`
 
 ## Validation ownership
 
@@ -263,18 +265,27 @@ CI=true npm test -- --watch=false --testPathPattern=AnimatedContentList
 # Build verification
 npm run build
 
-# E2E tests (requires build first)
-npm run build:e2e
+# E2E tests (full local suite; rebuilds between chromium and smoke)
 npm run test:e2e
 
-# E2E tests (headed, for debugging)
+# E2E tests (chromium project)
+npm run build:e2e
+npm run test:e2e:chromium
+
+# E2E tests (production smoke project)
+npm run build
+npm run test:e2e:smoke
+
+# E2E tests (headed chromium debugging)
 npm run test:e2e:headed
 
-# E2E tests (specific spec)
-npm run test:e2e -- test/e2e/cv.github.spec.ts
+# E2E tests (specific chromium spec)
+npm run build:e2e
+npm run test:e2e:chromium -- test/e2e/cv.github.spec.ts
 
-# E2E tests (specific project)
-npm run test:e2e -- --project=chromium
+# E2E tests (specific smoke run)
+npm run build
+npm run test:e2e:smoke
 ```
 
 **Note:** `CI=true npm test -- --watch=false` may show baseline failures in existing CV tests unrelated to your changes. Focus on regressions in the files you changed.
