@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../../src/ThemeProvider';
-import { CVStorySectionRenderer } from '../../../../src/components/cv/CVStorySlideRenderer';
+import { CVStorySectionRenderer } from '../../../../src/components/cv/CVStorySectionRenderer';
 import type { CVStoryItem } from '../../../../src/data/cvStoryItems';
 
 jest.mock('motion/react', () => ({
@@ -50,6 +50,13 @@ const experienceItem: CVStoryItem = {
     startDate: 'Jan 2023',
     endDate: 'Present',
     description: 'Built things.',
+    projects: [
+      [
+        { text: 'Built ' },
+        { text: 'BlockOpt.jl', link: 'https://github.com/example/blockopt' },
+        { text: ' for trust-region experiments.' },
+      ],
+    ],
     skills: ['Go', 'Kubernetes'],
   },
 };
@@ -133,7 +140,7 @@ describe('CVStorySectionRenderer', () => {
     expect(screen.getByText('Portfolio')).toHaveAttribute('href', 'https://example.com');
   });
 
-  it('renders experience section with company link, title, date range, description, and skills', () => {
+  it('renders experience section with company link, title, date range, description, structured project links, and skills', () => {
     render(
       <ThemeProvider>
         <CVStorySectionRenderer item={experienceItem} index={1} />
@@ -144,6 +151,10 @@ describe('CVStorySectionRenderer', () => {
     expect(screen.getByText('Senior Engineer')).toBeInTheDocument();
     expect(screen.getByText('Jan 2023 – Present')).toBeInTheDocument();
     expect(screen.getByText('Built things.')).toBeInTheDocument();
+    expect(screen.getByText('BlockOpt.jl')).toHaveAttribute(
+      'href',
+      'https://github.com/example/blockopt'
+    );
     expect(screen.getByText('Go')).toBeInTheDocument();
     expect(screen.getByText('Kubernetes')).toBeInTheDocument();
   });

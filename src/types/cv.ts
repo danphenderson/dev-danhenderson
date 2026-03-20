@@ -114,13 +114,6 @@ export type CVSectionKey =
   | 'certificates'
   | 'coding';
 
-export type CVStoryChapter = {
-  key: string;
-  sectionKey: CVSectionKey;
-  title: string;
-  narrative: string;
-};
-
 export type CVStoryContactChannel = {
   label: string;
   url: string;

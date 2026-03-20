@@ -155,19 +155,25 @@ test.describe('CV page – GitHub integration', () => {
   test('renders story mode layout when navigating with ?mode=story', async ({ page }) => {
     await page.goto('/cv?mode=story');
 
-    // Story mode uses the immersive viewer controls instead of the default CV header.
     await expect(page.getByRole('button', { name: 'Exit story mode' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Previous slide' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Next slide' })).toBeVisible();
-    await expect(page.getByText(/1\s*\/\s*\d+/)).toBeVisible();
-
-    // Story navigation should advance within the immersive viewer.
-    await page.getByRole('button', { name: 'Next slide' }).click();
-    await expect(page.getByText(/2\s*\/\s*\d+/)).toBeVisible();
-
-    // Section navigator should NOT be present in story mode
+    await expect(page.getByRole('button', { name: 'Previous slide' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Next slide' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'CV section navigation' })).toHaveCount(0);
     await expect(page.getByTestId('cv-mode-toggle')).toHaveCount(0);
+    await expect(page.locator('#site-navigation')).toHaveCount(0);
+    await expect(page.getByText('Daniel Henderson')).toBeVisible();
+
+    const blockOptLink = page.getByRole('link', { name: 'BlockOpt.jl' }).first();
+    await blockOptLink.scrollIntoViewIfNeeded();
+    await expect(blockOptLink).toBeVisible();
+    await expect(blockOptLink).toHaveAttribute(
+      'href',
+      'https://github.com/danphenderson/BlockOpt.jl'
+    );
+
+    const endHeading = page.getByRole('heading', { name: "Let's Connect" });
+    await endHeading.scrollIntoViewIfNeeded();
+    await expect(endHeading).toBeVisible();
   });
 
   test('default CV renders a story mode toggle', async ({ page }) => {

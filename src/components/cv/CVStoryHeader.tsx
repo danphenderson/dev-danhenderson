@@ -9,16 +9,10 @@ import { SectionLeadText } from '../text';
 type CVStoryHeaderProps = {
   mode: CVMode;
   onToggleMode: () => void;
-  chapterLabel?: string;
   variant?: 'page' | 'embedded';
 };
 
-export const CVStoryHeader = ({
-  mode,
-  onToggleMode,
-  chapterLabel,
-  variant = 'page',
-}: CVStoryHeaderProps) => {
+export const CVStoryHeader = ({ mode, onToggleMode, variant = 'page' }: CVStoryHeaderProps) => {
   const { compactSidebarSectionSpacing } = useComponentStyles();
   const isStory = mode === 'story';
   const isEmbedded = variant === 'embedded';
@@ -46,11 +40,6 @@ export const CVStoryHeader = ({
           color={isStory ? 'primary' : 'default'}
           variant="outlined"
         />
-        {!isEmbedded && isStory && chapterLabel && (
-          <Typography variant="caption" color="text.secondary">
-            {chapterLabel}
-          </Typography>
-        )}
       </Box>
       {!isEmbedded && isStory && <SectionLeadText>{cvStoryIntro}</SectionLeadText>}
       <Box

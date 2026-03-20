@@ -104,4 +104,19 @@ describe('App', () => {
     expect(screen.getByTestId('not-found-page')).toBeInTheDocument();
     expect(screen.queryByTestId('blog-page')).not.toBeInTheDocument();
   });
+
+  it('suppresses app chrome for /cv?mode=story while keeping shared overlays mounted', () => {
+    window.history.pushState({}, '', '/cv?mode=story');
+
+    render(
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('cv-page')).toBeInTheDocument();
+    expect(screen.queryByTestId('header')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('footer')).not.toBeInTheDocument();
+    expect(screen.getByTestId('common-link-tooltip')).toBeInTheDocument();
+  });
 });

@@ -1,17 +1,14 @@
-import { Fragment } from 'react';
 import { Box } from '@mui/material';
-import type {
-  Experience,
-  ExperienceDescription,
-  ExperienceProject,
-  ExperienceProjectSegment,
-} from '../../types/cv';
+import type { Experience, ExperienceProject } from '../../types/cv';
 import { AnimatedSlideList, getAnimatedSlideListCloseDelayMs } from '../AnimatedSlideList';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem, TabPanelRenderContext } from '../TabPanel';
-import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
+import {
+  renderExperienceDescriptionContent,
+  renderExperienceProjectContent,
+} from './experienceContent';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { BodyText, ListItemText } from '../text';
 import { CVEntryHeader } from './CVEntryHeader';
@@ -21,35 +18,6 @@ type ExperienceListProps = {
   startDelayMs?: number;
   skipEntranceAnimation?: boolean;
 };
-
-const renderInlineSegments = (segments: ExperienceProjectSegment[]) =>
-  segments.map((segment, segmentIndex) => {
-    const content = segment.link ? (
-      <CommonLink
-        href={segment.link}
-        target="_blank"
-        rel="noopener noreferrer"
-        underline="hover"
-        data-tooltip-id={segment.tooltip ? COMMON_LINK_TOOLTIP_ID : undefined}
-        data-tooltip-content={segment.tooltip}
-        data-tooltip-place={segment.tooltip ? 'top' : undefined}
-      >
-        {segment.text}
-      </CommonLink>
-    ) : (
-      <Box component="span">{segment.text}</Box>
-    );
-
-    return (
-      <Fragment key={segmentIndex}>
-        {segment.lineBreakBefore ? <br /> : null}
-        {content}
-      </Fragment>
-    );
-  });
-
-const renderExperienceDescription = (description: ExperienceDescription) =>
-  typeof description === 'string' ? description : renderInlineSegments(description);
 
 const ExperienceProjects = ({
   projects,
@@ -78,31 +46,8 @@ const ExperienceProjects = ({
       containerSx={getDetailListSx(0, 0)}
       itemComponent="li"
       renderItem={(project) => {
-        if (typeof project === 'string') {
-          return <ListItemText component="span">{project}</ListItemText>;
-        }
-
-        if (Array.isArray(project)) {
-          return <ListItemText component="span">{renderInlineSegments(project)}</ListItemText>;
-        }
-
-        const linkLabel = project.text.replace(/:\s*$/, '');
-
         return (
-          <ListItemText component="span">
-            {project.link ? (
-              <CommonLink
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                underline="hover"
-              >
-                {linkLabel}
-              </CommonLink>
-            ) : (
-              project.text
-            )}
-          </ListItemText>
+          <ListItemText component="span">{renderExperienceProjectContent(project)}</ListItemText>
         );
       }}
     />
@@ -185,7 +130,7 @@ export const ExperienceList = ({
             />
             {experience.description && (
               <BodyText sx={experienceDescriptionSx}>
-                {renderExperienceDescription(experience.description)}
+                {renderExperienceDescriptionContent(experience.description)}
               </BodyText>
             )}
             {experienceTabs.length ? (

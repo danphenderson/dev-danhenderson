@@ -397,6 +397,3 @@ export const CVStorySectionRenderer = ({ item, index }: CVStorySectionRendererPr
     </>
   );
 };
-
-/** @deprecated Use CVStorySectionRenderer instead */
-export const CVStorySlideRenderer = CVStorySectionRenderer;

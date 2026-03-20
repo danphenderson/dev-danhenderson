@@ -5,7 +5,7 @@ import { useTheme, alpha } from '@mui/material/styles';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { duration, easing } from '../../motion/tokens';
 import { CVStoryProgress } from './CVStoryProgress';
-import { CVStorySectionRenderer } from './CVStorySlideRenderer';
+import { CVStorySectionRenderer } from './CVStorySectionRenderer';
 import type { CVStoryItem } from '../../types/cv';
 
 type CVStoryViewerProps = {

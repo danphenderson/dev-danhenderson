@@ -1,5 +1,5 @@
 import type { ReactNode, HTMLAttributes, Ref } from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { CVStoryViewer } from '../../../../src/components/cv/CVStoryViewer';
 import type { CVStoryItem } from '../../../../src/data/cvStoryItems';
@@ -25,7 +25,6 @@ jest.mock('motion/react', () => {
         )
       ),
     },
-    AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
     useMotionValue: () => ({ get: () => 0, on: () => () => {} }),
   };
 });
@@ -38,11 +37,40 @@ jest.mock('../../../../src/components/cv/CVStoryProgress', () => ({
 }));
 
 // Stub the section renderer so we can identify items by kind
-jest.mock('../../../../src/components/cv/CVStorySlideRenderer', () => ({
+jest.mock('../../../../src/components/cv/CVStorySectionRenderer', () => ({
   CVStorySectionRenderer: ({ item, index }: { item: CVStoryItem; index: number }) => (
     <div data-testid="cv-story-section" data-kind={item.kind} data-index={index} />
   ),
 }));
+
+type MockIntersectionObserverInstance = IntersectionObserver & {
+  observedTargets: Element[];
+  trigger: (entries: Array<{ target: Element; isIntersecting: boolean }>) => void;
+};
+
+const mockIntersectionObserverInstances: MockIntersectionObserverInstance[] = [];
+
+const MockIntersectionObserver = function (
+  this: MockIntersectionObserverInstance,
+  callback: IntersectionObserverCallback
+) {
+  this.root = null;
+  this.rootMargin = '';
+  this.thresholds = [];
+  this.observedTargets = [];
+  this.observe = (target: Element) => {
+    this.observedTargets.push(target);
+  };
+  this.unobserve = () => {};
+  this.disconnect = () => {};
+  this.takeRecords = () => [];
+  this.trigger = (entries: Array<{ target: Element; isIntersecting: boolean }>) => {
+    callback(entries as IntersectionObserverEntry[], this);
+  };
+  mockIntersectionObserverInstances.push(this);
+} as unknown as {
+  new (callback: IntersectionObserverCallback): MockIntersectionObserverInstance;
+};
 
 const makeAboutItem = (): CVStoryItem => ({
   kind: 'about',
@@ -94,8 +122,41 @@ const renderViewer = (items = buildItems()) =>
   );
 
 describe('CVStoryViewer', () => {
+  let originalIntersectionObserver: typeof IntersectionObserver | undefined;
+
+  beforeAll(() => {
+    originalIntersectionObserver = window.IntersectionObserver;
+  });
+
   beforeEach(() => {
     mockOnExit.mockClear();
+    mockIntersectionObserverInstances.length = 0;
+
+    Object.defineProperty(window, 'IntersectionObserver', {
+      configurable: true,
+      writable: true,
+      value: MockIntersectionObserver,
+    });
+
+    Object.defineProperty(global, 'IntersectionObserver', {
+      configurable: true,
+      writable: true,
+      value: MockIntersectionObserver,
+    });
+  });
+
+  afterAll(() => {
+    Object.defineProperty(window, 'IntersectionObserver', {
+      configurable: true,
+      writable: true,
+      value: originalIntersectionObserver,
+    });
+
+    Object.defineProperty(global, 'IntersectionObserver', {
+      configurable: true,
+      writable: true,
+      value: originalIntersectionObserver,
+    });
   });
 
   it('renders all items in the scrollable narrative', () => {
@@ -110,6 +171,19 @@ describe('CVStoryViewer', () => {
   it('shows the active kind label', () => {
     renderViewer();
     expect(screen.getByText('About')).toBeInTheDocument();
+
+    const observer = mockIntersectionObserverInstances[0];
+    const endTarget = observer.observedTargets.find(
+      (target) => target.getAttribute('data-story-index') === '4'
+    );
+
+    expect(endTarget).toBeDefined();
+
+    act(() => {
+      observer.trigger([{ target: endTarget!, isIntersecting: true }]);
+    });
+
+    expect(screen.getByText('Connect')).toBeInTheDocument();
   });
 
   it('calls onExit when Escape is pressed', () => {
@@ -124,9 +198,31 @@ describe('CVStoryViewer', () => {
     expect(mockOnExit).toHaveBeenCalledTimes(1);
   });
 
-  it('renders the progress bar with initial progress 0', () => {
+  it('renders the progress bar with initial progress 0 and updates on scroll', () => {
     renderViewer();
     expect(screen.getByTestId('cv-story-progress')).toHaveAttribute('data-progress', '0');
+
+    const firstSection = screen.getAllByTestId('cv-story-section')[0];
+    const scrollContainer = firstSection.closest('[data-story-index]')
+      ?.parentElement as HTMLDivElement;
+
+    Object.defineProperty(scrollContainer, 'scrollHeight', {
+      configurable: true,
+      value: 1000,
+    });
+    Object.defineProperty(scrollContainer, 'clientHeight', {
+      configurable: true,
+      value: 500,
+    });
+    Object.defineProperty(scrollContainer, 'scrollTop', {
+      configurable: true,
+      writable: true,
+      value: 200,
+    });
+
+    fireEvent.scroll(scrollContainer);
+
+    expect(screen.getByTestId('cv-story-progress')).toHaveAttribute('data-progress', '0.4');
   });
 
   it('renders with a single item without crashing', () => {

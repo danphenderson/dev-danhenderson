@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import Footer from './components/Footer';
 import { GlobalCommandPalette } from './components/GlobalCommandPalette';
 import Header from './components/Header';
@@ -41,18 +41,26 @@ const skipLinkSx = {
 
 function AppContent() {
   const isBlogEnabled = isFeatureEnabled('blog');
+  const location = useLocation();
+  const isCvStoryRoute =
+    location.pathname === siteRouteMap.cv.path &&
+    new URLSearchParams(location.search).get('mode') === 'story';
 
   return (
     <CommandPaletteProvider>
       <Box>
-        <Box component="a" href="#main-content" sx={skipLinkSx}>
-          Skip to main content
-        </Box>
-        <Box component="a" href="#site-navigation" sx={skipLinkSx}>
-          Skip to site navigation
-        </Box>
-        <ScrollProgressBar />
-        <Header />
+        {!isCvStoryRoute && (
+          <>
+            <Box component="a" href="#main-content" sx={skipLinkSx}>
+              Skip to main content
+            </Box>
+            <Box component="a" href="#site-navigation" sx={skipLinkSx}>
+              Skip to site navigation
+            </Box>
+            <ScrollProgressBar />
+            <Header />
+          </>
+        )}
         <Box component="main" id="main-content" tabIndex={-1}>
           <PageTransition>
             <Routes>
@@ -72,7 +80,7 @@ function AppContent() {
             </Routes>
           </PageTransition>
         </Box>
-        <Footer />
+        {!isCvStoryRoute && <Footer />}
         <CommonLinkTooltip />
         <GlobalCommandPalette />
       </Box>

@@ -1,6 +1,5 @@
 import type {
   AboutMe,
-  CVStoryChapter,
   CVStoryEndData,
   Certificate,
   CodingExample,
@@ -647,57 +646,6 @@ export const MAX_CONTRIBUTION_ENRICHMENTS = 8;
 
 export const cvStoryIntro =
   'A guided walk through my career — from mathematics through scientific computing to full-stack engineering and open-source work.';
-
-export const cvStoryChapters: CVStoryChapter[] = [
-  {
-    key: 'origin',
-    sectionKey: 'about',
-    title: 'The Starting Point',
-    narrative:
-      'Mathematics gave me a way to think about problems precisely. That foundation shaped everything that followed.',
-  },
-  {
-    key: 'academics',
-    sectionKey: 'education',
-    title: 'Academic Foundations',
-    narrative:
-      'From applied mathematics to a graduate focus on computation, each program built on the last.',
-  },
-  {
-    key: 'career',
-    sectionKey: 'experience',
-    title: 'Professional Path',
-    narrative:
-      'Roles across scientific computing, data engineering, and full-stack development turned theory into practice.',
-  },
-  {
-    key: 'community',
-    sectionKey: 'volunteering',
-    title: 'Giving Back',
-    narrative:
-      'Mentoring and community work keep the work grounded in purpose beyond the technical.',
-  },
-  {
-    key: 'open-source',
-    sectionKey: 'github',
-    title: 'Open-Source & Activity',
-    narrative:
-      'Live GitHub data shows what I have been working on recently and the open-source projects I contribute to.',
-  },
-  {
-    key: 'credentials',
-    sectionKey: 'certificates',
-    title: 'Credentials',
-    narrative: 'Certifications that validate specific skills beyond day-to-day engineering work.',
-  },
-  {
-    key: 'craft',
-    sectionKey: 'coding',
-    title: 'Code in Practice',
-    narrative:
-      'Selected projects and code samples that illustrate how I approach real-world problems.',
-  },
-];
 
 export const cvStoryEndData: CVStoryEndData = {
   headline: "Let's Connect",
