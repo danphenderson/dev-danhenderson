@@ -33,7 +33,9 @@ jest.mock('@mui/material', () => {
         data-timeout={
           typeof props.timeout === 'number'
             ? String(props.timeout)
-            : JSON.stringify(props.timeout ?? '')
+            : typeof props.timeout === 'object'
+              ? JSON.stringify(props.timeout)
+              : String(props.timeout ?? '')
         }
         data-has-container={String(Boolean(props.container))}
       >

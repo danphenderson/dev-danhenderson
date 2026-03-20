@@ -118,7 +118,12 @@ export const AnimatedSlideList = <Item,>({
     enterTimerIdsRef.current = [];
 
     if (!inProp) {
-      if (!reverseExitStagger || resolvedItemStaggerMs === 0) {
+      if (resolvedItemStaggerMs === 0) {
+        setEnteredKeys(new Set());
+        return undefined;
+      }
+
+      if (!reverseExitStagger) {
         setEnteredKeys(new Set());
         return undefined;
       }
