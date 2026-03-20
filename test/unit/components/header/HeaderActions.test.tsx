@@ -124,6 +124,20 @@ describe('HeaderSettingsPopover', () => {
     expect(screen.getByRole('radio', { name: 'Ember' })).toHaveFocus();
   });
 
+  it('renders icon-only motion toggles and shows tooltips on hover', async () => {
+    renderSettingsPopover();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
+
+    const expressiveButton = screen.getByRole('button', { name: 'Expressive' });
+
+    expect(expressiveButton).toHaveTextContent('');
+
+    fireEvent.mouseOver(expressiveButton);
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Expressive');
+  });
+
   it('shows the reduced-motion notice and disables motion controls when the OS preference is active', () => {
     const onChangeMotionIntensity = jest.fn();
     mockUseReducedMotion.mockReturnValue(true);

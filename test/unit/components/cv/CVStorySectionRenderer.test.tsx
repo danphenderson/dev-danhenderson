@@ -3,27 +3,39 @@ import ThemeProvider from '../../../../src/ThemeProvider';
 import { CVStorySectionRenderer } from '../../../../src/components/cv/CVStorySectionRenderer';
 import type { CVStoryItem } from '../../../../src/data/cvStoryItems';
 
+const mockSkillsChipList = jest.fn();
+const mockUseInView = jest.fn();
+
 jest.mock('motion/react', () => ({
   motion: {
     div: ({ children, ...rest }: any) => <div {...rest}>{children}</div>,
     ul: ({ children, ...rest }: any) => <ul {...rest}>{children}</ul>,
     li: ({ children, ...rest }: any) => <li {...rest}>{children}</li>,
   },
+  useInView: (...args: any[]) => mockUseInView(...args),
 }));
 
 jest.mock('../../../../src/motion', () => ({
   MotionItem: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   MotionSection: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  useMotionScale: () => ({ duration: 1, stagger: 1, tilt: 1 }),
+  duration: { normal: 0.35 },
+  DEFAULT_INTERSECTION_ROOT_MARGIN: '0px 0px -10% 0px',
+  DEFAULT_INTERSECTION_THRESHOLD: 0,
 }));
 
 jest.mock('../../../../src/components/SkillsChipList', () => ({
-  SkillsChipList: ({ skills }: { skills?: string[] }) => (
-    <div data-testid="skills-chip-list">
-      {(skills ?? []).map((s: string) => (
-        <span key={s}>{s}</span>
-      ))}
-    </div>
-  ),
+  SkillsChipList: ({ skills, ...rest }: { skills?: string[] }) => {
+    mockSkillsChipList({ skills, ...rest });
+
+    return (
+      <div data-testid="skills-chip-list">
+        {(skills ?? []).map((s: string) => (
+          <span key={s}>{s}</span>
+        ))}
+      </div>
+    );
+  },
 }));
 
 const aboutItem: CVStoryItem = {
@@ -123,6 +135,12 @@ const endItem: CVStoryItem = {
 };
 
 describe('CVStorySectionRenderer', () => {
+  beforeEach(() => {
+    mockSkillsChipList.mockClear();
+    mockUseInView.mockReset();
+    mockUseInView.mockReturnValue(true);
+  });
+
   it('renders about section with name, title, location, bio, and opportunities', () => {
     render(
       <ThemeProvider>
@@ -138,6 +156,35 @@ describe('CVStorySectionRenderer', () => {
     expect(screen.getByText('React')).toBeInTheDocument();
     expect(screen.getByText('TypeScript')).toBeInTheDocument();
     expect(screen.getByText('Portfolio')).toHaveAttribute('href', 'https://example.com');
+
+    expect(mockSkillsChipList.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ animation: 'slide', in: true, startDelayMs: 350 })
+    );
+  });
+
+  it('keeps story skills chips closed until the row enters view', () => {
+    mockUseInView.mockReturnValue(false);
+
+    const { rerender } = render(
+      <ThemeProvider>
+        <CVStorySectionRenderer item={aboutItem} index={0} />
+      </ThemeProvider>
+    );
+
+    expect(mockSkillsChipList.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ animation: 'slide', in: false, startDelayMs: 350 })
+    );
+
+    mockUseInView.mockReturnValue(true);
+    rerender(
+      <ThemeProvider>
+        <CVStorySectionRenderer item={aboutItem} index={0} />
+      </ThemeProvider>
+    );
+
+    expect(mockSkillsChipList.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ animation: 'slide', in: true, startDelayMs: 350 })
+    );
   });
 
   it('renders experience section with company link, title, date range, description, structured project links, and skills', () => {

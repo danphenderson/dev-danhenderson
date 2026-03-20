@@ -171,7 +171,7 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
               data-story-index={index}
               sx={{ mb: { xs: 6, sm: 8 } }}
             >
-              <CVStorySectionRenderer item={item} index={index} />
+              <CVStorySectionRenderer item={item} index={index} scrollContainerRef={scrollRef} />
             </Box>
           ))}
 

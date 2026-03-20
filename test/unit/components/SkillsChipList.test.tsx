@@ -9,6 +9,7 @@ jest.mock('../../../src/components/AnimatedZoomList', () => ({
   AnimatedZoomList: (props: {
     items: string[];
     in: boolean;
+    startDelayMs?: number;
     renderItem: (item: string, index: number) => React.ReactNode;
   }) => {
     mockAnimatedZoomList(props);
@@ -22,6 +23,7 @@ jest.mock('../../../src/components/AnimatedSlideList', () => ({
     items: string[];
     in: boolean;
     layout?: 'stack' | 'wrap';
+    startDelayMs?: number;
     renderItem: (item: string, index: number) => React.ReactNode;
   }) => {
     mockAnimatedSlideList(props);
@@ -82,5 +84,17 @@ describe('SkillsChipList', () => {
     expect(screen.getByTestId('animated-slide-list')).toHaveAttribute('data-layout', 'wrap');
     expect(screen.getByText('React')).toBeInTheDocument();
     expect(screen.getByText('TypeScript')).toBeInTheDocument();
+  });
+
+  it('forwards explicit start delays to slide animations', () => {
+    render(
+      <ThemeProvider>
+        <SkillsChipList skills={['React', 'TypeScript']} in animation="slide" startDelayMs={480} />
+      </ThemeProvider>
+    );
+
+    expect(mockAnimatedSlideList.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ in: true, layout: 'wrap', startDelayMs: 480 })
+    );
   });
 });

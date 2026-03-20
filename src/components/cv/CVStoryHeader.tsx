@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Stack, Typography } from '@mui/material';
+import { Box, Button, Chip, Stack } from '@mui/material';
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';
 import ViewModuleOutlinedIcon from '@mui/icons-material/ViewModuleOutlined';
 import { useComponentStyles } from '../../styles/componentStyles';
