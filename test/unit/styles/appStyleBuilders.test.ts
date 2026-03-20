@@ -14,7 +14,7 @@ describe('createAppStyleMap', () => {
     const backgroundOverlaySx = backgroundImageSx['&::before'] as Record<string, unknown>;
 
     expect(theme.appearanceTreatment.key).toBe(defaultAppAppearanceKey);
-    expect(backgroundOverlaySx.backgroundColor).toBe(alpha(theme.palette.common.black, 0.56));
+    expect(backgroundOverlaySx.backgroundColor).toBe(alpha(theme.palette.common.black, 0.62));
     expect(styleMap.backgroundShellSx).toMatchObject({
       backgroundColor: alpha(theme.palette.background.paper, 0.88),
       border: `1px solid ${alpha(
@@ -33,7 +33,7 @@ describe('createAppStyleMap', () => {
     >;
     const backgroundOverlaySx = backgroundImageSx['&::before'] as Record<string, unknown>;
 
-    expect(backgroundOverlaySx.backgroundColor).toBe(alpha(theme.palette.common.black, 0.56));
+    expect(backgroundOverlaySx.backgroundColor).toBe(alpha(theme.palette.common.black, 0.62));
     expect(styleMap.backgroundShellSx).toMatchObject({
       backgroundColor: alpha(theme.palette.background.paper, 0.88),
       border: `1px solid ${alpha(
@@ -52,7 +52,7 @@ describe('createAppStyleMap', () => {
     >;
     const backgroundOverlaySx = backgroundImageSx['&::before'] as Record<string, unknown>;
 
-    expect(backgroundOverlaySx.backgroundColor).toBe(alpha(theme.palette.common.black, 0.46));
+    expect(backgroundOverlaySx.backgroundColor).toBe(alpha(theme.palette.common.black, 0.52));
     expect(styleMap.backgroundShellSx).toMatchObject({
       backgroundColor: alpha(theme.palette.background.paper, 0.8),
       border: `1px solid ${alpha(
@@ -71,7 +71,7 @@ describe('createAppStyleMap', () => {
     >;
     const backgroundOverlaySx = backgroundImageSx['&::before'] as Record<string, unknown>;
 
-    expect(backgroundOverlaySx.backgroundColor).toBe(alpha(theme.palette.common.black, 0.5));
+    expect(backgroundOverlaySx.backgroundColor).toBe(alpha(theme.palette.common.black, 0.56));
     expect(styleMap.backgroundShellSx).toMatchObject({
       backgroundColor: alpha(theme.palette.background.paper, 0.6),
       border: `1px solid ${alpha(
