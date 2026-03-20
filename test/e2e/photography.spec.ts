@@ -98,8 +98,8 @@ test.describe('Photography page', () => {
 
     await landscapeAction.click();
     await expect(page).toHaveURL(/\/photography\/landscape$/);
-    await expect(dialog).toHaveCount(0);
     await waitForPhotographyCategoryPage(page, 'Landscape', 'Landscape photo collection');
+    await expect(dialog).toBeHidden();
   });
 
   test('redirects legacy slugs to the canonical album path', async ({ page }) => {
