@@ -91,29 +91,37 @@ const getSxValue = (
   return sx?.[key];
 };
 
-jest.mock('../../../../src/components/AnimatedChipSlideList', () => ({
-  AnimatedChipSlideList: ({
+jest.mock('../../../../src/components/AnimatedSlideList', () => ({
+  AnimatedSlideList: ({
     children,
     items,
     renderItem,
+    layout,
+    getItemDirection,
     startDelayMs,
     itemStaggerMs,
-    containerSx,
+    stackSpacing,
+    wrapGap,
   }: {
     children?: ReactNode;
     items: Array<{ key: string }>;
     renderItem: (item: { key: string }, index: number) => ReactNode;
+    layout?: 'stack' | 'wrap';
+    getItemDirection?: (item: { key: string }, index: number) => string;
     startDelayMs?: number;
     itemStaggerMs?: number;
-    containerSx?: Record<string, unknown> | Array<Record<string, unknown>>;
+    stackSpacing?: number;
+    wrapGap?: number;
   }) => (
     <div
-      data-testid="animated-chip-slide-list"
+      data-testid="animated-slide-list"
       data-start-delay={String(startDelayMs ?? 0)}
       data-stagger={String(itemStaggerMs ?? '')}
-      data-display={String(getSxValue(containerSx, 'display') ?? '')}
-      data-flex-direction={String(getSxValue(containerSx, 'flexDirection') ?? '')}
-      data-flex-wrap={String(getSxValue(containerSx, 'flexWrap') ?? '')}
+      data-layout={String(layout ?? 'stack')}
+      data-stack-spacing={String(stackSpacing ?? '')}
+      data-wrap-gap={String(wrapGap ?? '')}
+      data-first-direction={String(getItemDirection?.(items[0], 0) ?? '')}
+      data-second-direction={String(getItemDirection?.(items[1], 1) ?? '')}
     >
       {children}
       {items.map((item, index) => renderItem(item, index))}
@@ -122,7 +130,7 @@ jest.mock('../../../../src/components/AnimatedChipSlideList', () => ({
 }));
 
 describe('GitHubLinkChipList', () => {
-  it('animates wrap-layout chips with the compact zoom list while preserving accessible links', () => {
+  it('animates wrap-layout chips with alternating slide directions while preserving accessible links', () => {
     render(
       <ThemeProvider>
         <GitHubLinkChipList
@@ -148,10 +156,12 @@ describe('GitHubLinkChipList', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-start-delay', '40');
-    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-stagger', '20');
-    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-display', 'flex');
-    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-flex-wrap', 'wrap');
+    expect(screen.getByTestId('animated-slide-list')).toHaveAttribute('data-start-delay', '40');
+    expect(screen.getByTestId('animated-slide-list')).toHaveAttribute('data-stagger', '20');
+    expect(screen.getByTestId('animated-slide-list')).toHaveAttribute('data-layout', 'wrap');
+    expect(screen.getByTestId('animated-slide-list')).toHaveAttribute('data-wrap-gap', '0.75');
+    expect(screen.getByTestId('animated-slide-list')).toHaveAttribute('data-first-direction', 'right');
+    expect(screen.getByTestId('animated-slide-list')).toHaveAttribute('data-second-direction', 'left');
     expect(screen.getAllByTestId('github-chip-tilt')).toHaveLength(2);
     screen.getAllByTestId('github-chip-tilt').forEach((wrapper) => {
       expect(wrapper).toHaveAttribute('data-intensity', '0.5');
@@ -211,13 +221,12 @@ describe('GitHubLinkChipList', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-start-delay', '120');
-    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-stagger', '30');
-    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute('data-display', 'flex');
-    expect(screen.getByTestId('animated-chip-slide-list')).toHaveAttribute(
-      'data-flex-direction',
-      'column'
-    );
+    expect(screen.getByTestId('animated-slide-list')).toHaveAttribute('data-start-delay', '120');
+    expect(screen.getByTestId('animated-slide-list')).toHaveAttribute('data-stagger', '30');
+    expect(screen.getByTestId('animated-slide-list')).toHaveAttribute('data-layout', 'stack');
+    expect(screen.getByTestId('animated-slide-list')).toHaveAttribute('data-stack-spacing', '0.5');
+    expect(screen.getByTestId('animated-slide-list')).toHaveAttribute('data-first-direction', 'right');
+    expect(screen.getByTestId('animated-slide-list')).toHaveAttribute('data-second-direction', 'left');
     expect(screen.getAllByTestId('github-chip-tilt')).toHaveLength(2);
     screen.getAllByTestId('github-chip-tilt').forEach((wrapper) => {
       expect(wrapper).toHaveAttribute('data-width', '100%');
@@ -237,7 +246,7 @@ describe('GitHubLinkChipList', () => {
       </ThemeProvider>
     );
 
-    expect(screen.queryByTestId('animated-chip-slide-list')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('animated-slide-list')).not.toBeInTheDocument();
     expect(screen.getAllByTestId('github-chip-tilt')).toHaveLength(2);
   });
 });

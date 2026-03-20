@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { MotionTiltCard } from '../../motion';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { normalizeSxProp } from '../../utils/sx';
-import { AnimatedChipSlideList } from '../AnimatedChipSlideList';
+import { AnimatedSlideList } from '../AnimatedSlideList';
 import { COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 
 export type GitHubLinkChipItem = {
@@ -40,14 +40,6 @@ export const GitHubLinkChipList = ({
   const customChipSx = normalizeSxProp(chipSx);
   const baseChipSx: SxProps<Theme> = getGitHubChipSx(layout);
   const chipTiltStyle = layout === 'stack' ? { width: '100%' } : undefined;
-  const animatedContainerSx: SxProps<Theme> =
-    layout === 'wrap'
-      ? getWrapListSx(wrapGap)
-      : {
-          display: 'flex',
-          flexDirection: 'column',
-          gap: stackSpacing,
-        };
 
   const renderChip = (item: GitHubLinkChipItem, index: number) => {
     const isLink = Boolean(item.href);
@@ -91,15 +83,20 @@ export const GitHubLinkChipList = ({
     </MotionTiltCard>
   );
 
+  const getAlternatingDirection = (_item: GitHubLinkChipItem, index: number) =>
+    index % 2 === 0 ? 'right' : 'left';
+
   if (layout === 'wrap') {
     return animateItems ? (
-      <AnimatedChipSlideList
+      <AnimatedSlideList
         items={items}
         getItemKey={(item) => item.key}
         in
+        layout="wrap"
         startDelayMs={startDelayMs}
-        containerSx={animatedContainerSx}
         itemStaggerMs={itemStaggerMs}
+        wrapGap={wrapGap}
+        getItemDirection={getAlternatingDirection}
         renderItem={renderTiltChip}
       />
     ) : (
@@ -108,13 +105,15 @@ export const GitHubLinkChipList = ({
   }
 
   return animateItems ? (
-    <AnimatedChipSlideList
+    <AnimatedSlideList
       items={items}
       getItemKey={(item) => item.key}
       in
+      layout="stack"
       startDelayMs={startDelayMs}
-      containerSx={animatedContainerSx}
       itemStaggerMs={itemStaggerMs}
+      stackSpacing={stackSpacing}
+      getItemDirection={getAlternatingDirection}
       renderItem={renderTiltChip}
     />
   ) : (
