@@ -59,6 +59,8 @@ Refresh the Home spec to assert the current settings popover control shape and r
 - 2026-03-19: Updated the Home settings assertion, switched the steady-state helper to the current server-tab plus loop-output contract, and refreshed the Home screenshot snapshots for the current `brew` frame.
 - 2026-03-19: Replaced the brittle Climbing subtitle locator in navigation and smoke coverage with the `Overview` heading plus grid readiness.
 - 2026-03-19: Added split local Playwright scripts, aligned CI commands with the new script names, and verified the full local suite via `npm run test:e2e`.
+- 2026-03-20: Replaced the remaining timing-dependent Home screenshot wait with fake-clock advancement to the target loop frame, simplified the blog index readiness helper to direct content visibility checks, and added a reusable photography category-page helper so recovery and legacy-slug navigation wait for the rendered album contract rather than transient route timing.
+- 2026-03-20: Verified the follow-up fixes with `npm run build:e2e && npm run test:e2e:chromium -- test/e2e/home.spec.ts test/e2e/blog.spec.ts test/e2e/photography.spec.ts` and a full `npm run build:e2e && npm run test:e2e:chromium` pass.
 
 ## Completion Status
 

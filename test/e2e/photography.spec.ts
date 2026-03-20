@@ -5,6 +5,18 @@ const PHOTOGRAPHY_NOT_FOUND_COPY =
   /This album does not exist or has been moved\. The command palette opens with a recovery search so you can jump to another gallery or route quickly\./;
 const INVALID_PHOTOGRAPHY_SLUG_QUERY = 'landscap';
 
+const waitForPhotographyCategoryPage = async (page: Page, name: string, description?: string) => {
+  await expect(page.getByRole('heading', { name, exact: true })).toBeVisible({ timeout: 15000 });
+  await expect(page.getByRole('link', { name: 'Back to photography' })).toBeVisible();
+  await expect(page.getByRole('list', { name: `${name} photo gallery` })).toBeVisible({
+    timeout: 15000,
+  });
+
+  if (description) {
+    await expect(page.getByText(description)).toBeVisible({ timeout: 15000 });
+  }
+};
+
 const waitForPhotographySection = async (page: Page) => {
   await waitForAnimatedSectionReadiness({
     anchor: page.getByText('A selection of field work, climbing days, and stargazing nights.'),
@@ -58,8 +70,7 @@ test.describe('Photography page', () => {
 
   test('navigates to a category via slug', async ({ page }) => {
     await page.goto('/photography/landscape');
-    await expect(page.getByRole('heading', { name: 'Landscape', exact: true })).toBeVisible();
-    await expect(page.getByText('Landscape photo collection')).toBeVisible();
+    await waitForPhotographyCategoryPage(page, 'Landscape', 'Landscape photo collection');
 
     await page.evaluate(() => window.scrollTo({ top: 1200, behavior: 'auto' }));
     await expect(page.getByRole('button', { name: 'Back to top' })).toBeVisible();
@@ -87,12 +98,13 @@ test.describe('Photography page', () => {
 
     await landscapeAction.click();
     await expect(page).toHaveURL(/\/photography\/landscape$/);
-    await expect(page.getByRole('heading', { name: 'Landscape', exact: true })).toBeVisible();
+    await expect(dialog).toHaveCount(0);
+    await waitForPhotographyCategoryPage(page, 'Landscape', 'Landscape photo collection');
   });
 
   test('redirects legacy slugs to the canonical album path', async ({ page }) => {
     await page.goto('/photography/new%20mexico');
     await expect(page).toHaveURL(/\/photography\/new-mexico$/);
-    await expect(page.getByRole('heading', { name: 'New Mexico', exact: true })).toBeVisible();
+    await waitForPhotographyCategoryPage(page, 'New Mexico', 'New Mexico in November.');
   });
 });

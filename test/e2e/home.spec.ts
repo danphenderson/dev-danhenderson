@@ -134,6 +134,28 @@ const waitForStableTerminalHero = async (page: Page, terminalHero: Locator) => {
   await moveMouseAwayFromHero(page);
 };
 
+const advanceClockUntilTerminalBodyContains = async (
+  page: Page,
+  terminalHero: Locator,
+  expectedText: string,
+  maxElapsedMs = 12_000,
+  stepMs = 250
+) => {
+  const terminalPanelBody = terminalHero.getByTestId('terminal-panel-body');
+
+  for (let elapsedMs = 0; elapsedMs <= maxElapsedMs; elapsedMs += stepMs) {
+    const panelText = (await terminalPanelBody.textContent()) ?? '';
+
+    if (panelText.includes(expectedText)) {
+      return;
+    }
+
+    await page.clock.runFor(stepMs);
+  }
+
+  await expect(terminalPanelBody).toContainText(expectedText, { timeout: 1000 });
+};
+
 const pausePageClock = async (page: Page) => {
   const currentTime = await page.evaluate(() => Date.now());
   await page.clock.pauseAt(new Date(currentTime + 100));
@@ -241,9 +263,10 @@ test.describe('Home page', () => {
 
     await resetHomeScrollForScreenshot(page, terminalHero);
     await expect(terminalHero).toContainText('Ping Pong Server', { timeout: 20000 });
-    await expect(terminalHero.getByTestId('terminal-panel-body')).toContainText(
-      SCREENSHOT_TERMINAL_COMMAND_TEXT,
-      { timeout: 20000 }
+    await advanceClockUntilTerminalBodyContains(
+      page,
+      terminalHero,
+      SCREENSHOT_TERMINAL_COMMAND_TEXT
     );
     await stabilizeHeroForScreenshot(terminalHero);
     await pausePageClock(page);
