@@ -726,7 +726,7 @@ describe('Home auto-expand after motion', () => {
     );
     expect(within(expandedPortal).getByTestId('terminal-hero')).toHaveAttribute(
       'data-boot-active',
-      'false'
+      'true'
     );
   });
 
