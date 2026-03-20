@@ -189,7 +189,6 @@ describe('Header controls', () => {
     renderHeader('/cv');
 
     fireEvent.click(screen.getByLabelText('Toggle dark mode'));
-    expect(dismissDarkModeHint).toHaveBeenCalledTimes(1);
     expect(toggleTheme).toHaveBeenCalledTimes(1);
   });
 

@@ -245,7 +245,7 @@ test.describe('Home page', () => {
     await expect(settingsPopover.getByRole('radio', { name: 'Graphite' })).toBeVisible();
     await expect(settingsPopover.getByRole('button', { name: 'Default' })).toBeVisible();
     await expect(settingsPopover.getByRole('button', { name: 'Expressive' })).toBeVisible();
-    await expect(settingsPopover.getByText('Audio', { exact: true })).toBeVisible();
+    await expect(settingsPopover.getByText('Welcome audio', { exact: true })).toBeVisible();
     await expect(settingsPopover.getByRole('button', { name: 'Play welcome audio' })).toBeVisible();
   });
 

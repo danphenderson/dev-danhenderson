@@ -21,8 +21,8 @@ import {
   Typography,
 } from '@mui/material';
 import type { PaletteMode } from '@mui/material';
-import { alpha, type SxProps, type Theme } from '@mui/material/styles';
-import { type MutableRefObject, type ReactNode, useCallback, useState } from 'react';
+import { alpha } from '@mui/material/styles';
+import { type ReactNode, useCallback, useState } from 'react';
 import { useReducedMotion } from 'motion/react';
 import {
   type AppAppearanceKey,
@@ -198,7 +198,8 @@ export const HeaderSettingsPopover = ({
 
       event.preventDefault();
       const currentIndex = appAppearanceOptions.findIndex((o) => o.key === appearance);
-      const nextIndex = (currentIndex + delta + appAppearanceOptions.length) % appAppearanceOptions.length;
+      const nextIndex =
+        (currentIndex + delta + appAppearanceOptions.length) % appAppearanceOptions.length;
       const nextKey = appAppearanceOptions[nextIndex].key;
       onChangeAppearance(nextKey);
 
