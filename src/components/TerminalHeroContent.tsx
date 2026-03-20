@@ -128,14 +128,20 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   // Explorer sidebar toggle
   const [explorerVisible, setExplorerVisible] = React.useState(false);
   const [activityBarIndex, setActivityBarIndex] = React.useState(0);
+  const hasAutoOpenedExplorerRef = React.useRef(false);
 
   // During boot, auto-open the explorer when the boot sequence signals it
   React.useEffect(() => {
-    if (isBoot && boot.explorerOpen && !explorerVisible) {
+    if (!isBoot || boot.phase !== 'explorer-open' || hasAutoOpenedExplorerRef.current) {
+      return;
+    }
+
+    if (!explorerVisible) {
+      hasAutoOpenedExplorerRef.current = true;
       setExplorerVisible(true);
       setActivityBarIndex(0);
     }
-  }, [isBoot, boot.explorerOpen, explorerVisible]);
+  }, [boot.phase, explorerVisible, isBoot]);
 
   const handleActivityBarClick = React.useCallback((index: number) => {
     if (index === 0) {

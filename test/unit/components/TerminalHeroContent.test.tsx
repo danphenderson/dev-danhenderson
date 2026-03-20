@@ -325,6 +325,7 @@ describe('TerminalHeroContent', () => {
             showCursor: true,
             complete: false,
             editorTab: 'server',
+            explorerOpen: true,
           }
         : {
             phase: 'idle',
@@ -335,6 +336,7 @@ describe('TerminalHeroContent', () => {
             showCursor: false,
             complete: false,
             editorTab: 'server',
+            explorerOpen: false,
           }
     );
   });
@@ -525,6 +527,55 @@ describe('TerminalHeroContent', () => {
         'uvicorn'
       );
       expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-active-tab', 'server');
+    });
+
+    it('auto-opens the explorer once when boot reaches the explorer-open phase', () => {
+      mockUseTerminalBootSequence.mockReturnValue({
+        phase: 'explorer-open',
+        sessions: [{ id: 'zsh', label: 'zsh' }],
+        activeSessionId: 'zsh',
+        commandText: '',
+        outputText: '',
+        showCursor: false,
+        complete: false,
+        editorTab: 'server',
+        explorerOpen: true,
+      });
+
+      renderHero({ bootActive: true });
+
+      expect(screen.getByTestId('explorer-sidebar')).toHaveAttribute('data-visible', 'true');
+    });
+
+    it('does not force the explorer back open after the user closes it during boot', () => {
+      mockUseTerminalBootSequence.mockReturnValue({
+        phase: 'explorer-open',
+        sessions: [{ id: 'zsh', label: 'zsh' }],
+        activeSessionId: 'zsh',
+        commandText: '',
+        outputText: '',
+        showCursor: false,
+        complete: false,
+        editorTab: 'server',
+        explorerOpen: true,
+      });
+
+      const view = renderHero({ bootActive: true });
+
+      expect(screen.getByTestId('explorer-sidebar')).toHaveAttribute('data-visible', 'true');
+
+      fireEvent.click(screen.getByLabelText('Activity icon 0'));
+
+      expect(screen.getByTestId('explorer-sidebar')).toHaveAttribute('data-visible', 'false');
+      expect(screen.getByTestId('activity-bar')).toHaveAttribute('data-active-index', '-1');
+
+      view.rerender(
+        <ThemeProvider>
+          <TerminalHeroContent lines={SAMPLE_LINES} bootActive />
+        </ThemeProvider>
+      );
+
+      expect(screen.getByTestId('explorer-sidebar')).toHaveAttribute('data-visible', 'false');
     });
   });
 
