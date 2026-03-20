@@ -2,20 +2,14 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { PaletteMode } from '@mui/material';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
+import { DEFAULT_PREFERENCES, isPaletteMode, PREFERENCE_STORAGE_KEYS } from './theme/preferences';
 import {
-  APP_APPEARANCE_STORAGE_KEY,
-  MOTION_INTENSITY_STORAGE_KEY,
-  defaultAppAppearanceKey,
-  defaultMotionIntensity,
   isAppAppearanceKey,
   isMotionIntensityLevel,
   type AppAppearanceKey,
   type MotionIntensityLevel,
 } from './theme/appAppearance';
 import { createAppTheme } from './theme/createAppTheme';
-
-const THEME_STORAGE_KEY = 'danhenderson-theme';
-const DEFAULT_THEME_MODE: PaletteMode = 'dark';
 
 type ThemeContextValue = {
   mode: PaletteMode;
@@ -27,9 +21,9 @@ type ThemeContextValue = {
 };
 
 const ThemeContext = createContext<ThemeContextValue>({
-  mode: DEFAULT_THEME_MODE,
-  appearance: defaultAppAppearanceKey,
-  motionIntensity: defaultMotionIntensity,
+  mode: DEFAULT_PREFERENCES.theme,
+  appearance: DEFAULT_PREFERENCES.appearance,
+  motionIntensity: DEFAULT_PREFERENCES.motionIntensity,
   setAppearance: () => {},
   setMotionIntensity: () => {},
   toggleTheme: () => {},
@@ -39,26 +33,22 @@ interface ThemeProviderProps extends PropsWithChildren<{}> {}
 
 const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [mode, setMode] = useState<PaletteMode>(() => {
-    if (typeof window === 'undefined') return DEFAULT_THEME_MODE;
+    if (typeof window === 'undefined') return DEFAULT_PREFERENCES.theme;
 
-    const stored = window.localStorage.getItem(THEME_STORAGE_KEY) as PaletteMode | null;
-    if (stored === 'light' || stored === 'dark') {
-      return stored;
-    }
-
-    return DEFAULT_THEME_MODE;
+    const stored = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.theme);
+    return isPaletteMode(stored) ? stored : DEFAULT_PREFERENCES.theme;
   });
   const [appearance, setAppearance] = useState<AppAppearanceKey>(() => {
-    if (typeof window === 'undefined') return defaultAppAppearanceKey;
+    if (typeof window === 'undefined') return DEFAULT_PREFERENCES.appearance;
 
-    const storedAppearance = window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY);
-    return isAppAppearanceKey(storedAppearance) ? storedAppearance : defaultAppAppearanceKey;
+    const storedAppearance = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.appearance);
+    return isAppAppearanceKey(storedAppearance) ? storedAppearance : DEFAULT_PREFERENCES.appearance;
   });
   const [motionIntensity, setMotionIntensity] = useState<MotionIntensityLevel>(() => {
-    if (typeof window === 'undefined') return defaultMotionIntensity;
+    if (typeof window === 'undefined') return DEFAULT_PREFERENCES.motionIntensity;
 
-    const stored = window.localStorage.getItem(MOTION_INTENSITY_STORAGE_KEY);
-    return isMotionIntensityLevel(stored) ? stored : defaultMotionIntensity;
+    const stored = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.motionIntensity);
+    return isMotionIntensityLevel(stored) ? stored : DEFAULT_PREFERENCES.motionIntensity;
   });
   const theme = useMemo(
     () => createAppTheme(mode, appearance, motionIntensity),
@@ -67,17 +57,17 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    window.localStorage.setItem(THEME_STORAGE_KEY, mode);
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.theme, mode);
   }, [mode]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    window.localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, appearance);
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.appearance, appearance);
   }, [appearance]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    window.localStorage.setItem(MOTION_INTENSITY_STORAGE_KEY, motionIntensity);
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.motionIntensity, motionIntensity);
   }, [motionIntensity]);
 
   const toggleTheme = () => {

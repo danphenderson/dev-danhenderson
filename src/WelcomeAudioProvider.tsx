@@ -7,6 +7,14 @@ import {
   useRef,
   useState,
 } from 'react';
+import {
+  LEGACY_AUDIO_PROMPT_STORAGE_KEY,
+  PREFERENCE_STORAGE_KEYS,
+  isAudioConsent,
+} from './theme/preferences';
+import type { AudioConsent } from './types/ui';
+
+export type { AudioConsent } from './types/ui';
 
 type SoundCloudWidget = {
   play: () => void;
@@ -16,8 +24,6 @@ type SoundCloudWidget = {
   isPaused: (callback: (paused: boolean) => void) => void;
   setLoop: (loop: boolean) => void;
 };
-
-export type AudioConsent = 'unknown' | 'granted' | 'declined';
 
 type WelcomeAudioContextValue = {
   play: () => Promise<void>;
@@ -44,8 +50,6 @@ const WelcomeAudioContext = createContext<WelcomeAudioContextValue>({
 const WIDGET_SCRIPT_SRC = 'https://w.soundcloud.com/player/api.js';
 const TRACK_EMBED_URL =
   'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A298021432&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true';
-const AUDIO_CONSENT_STORAGE_KEY = 'danhenderson-welcome-audio-consent';
-const LEGACY_AUDIO_PROMPT_STORAGE_KEY = 'danhenderson-welcome-audio-prompt';
 const WIDGET_BOOT_TIMEOUT_MS = 8000;
 const hiddenAudioIframeStyle = {
   position: 'absolute',
@@ -114,8 +118,8 @@ const withTimeout = <T,>(
 const getStoredAudioConsent = (): AudioConsent => {
   if (typeof window === 'undefined') return 'unknown';
 
-  const storedConsent = window.localStorage.getItem(AUDIO_CONSENT_STORAGE_KEY);
-  if (storedConsent === 'granted' || storedConsent === 'declined') {
+  const storedConsent = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.audioConsent);
+  if (isAudioConsent(storedConsent) && storedConsent !== 'unknown') {
     return storedConsent;
   }
 
@@ -129,7 +133,7 @@ const getStoredAudioConsent = (): AudioConsent => {
 const persistAudioConsent = (consent: Exclude<AudioConsent, 'unknown'>) => {
   if (typeof window === 'undefined') return;
 
-  window.localStorage.setItem(AUDIO_CONSENT_STORAGE_KEY, consent);
+  window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.audioConsent, consent);
   window.localStorage.removeItem(LEGACY_AUDIO_PROMPT_STORAGE_KEY);
 };
 
