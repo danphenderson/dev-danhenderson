@@ -1,5 +1,7 @@
 # danhenderson.dev
 
+[![Codecov](https://codecov.io/github/danphenderson/dev-danhenderson/branch/main/graph/badge.svg)](https://app.codecov.io/github/danphenderson/dev-danhenderson?branch=main)
+
 Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript portfolio site with an interactive CV, climbing log, photography galleries, and a feature-flagged blog available in development and test builds.
 
 ## Sections
@@ -36,6 +38,14 @@ Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript po
 - `npm run test:e2e` runs the full local Playwright suite by building the test-runtime bundle for `chromium` first and then rebuilding the production bundle for `smoke`.
 - `npm run build:e2e && npm run test:e2e:chromium` is the targeted path for gated route and blog-enabled browser coverage.
 - `npm run build && npm run test:e2e:smoke` is the targeted path for production smoke coverage.
+
+## Coverage
+
+[![Codecov](https://codecov.io/github/danpherson/dev-danhenderson/branch/main/graph/badge.svg)](https://app.codecov.io/github/danpherson/dev-danhenderson?branch=main)
+
+- Default-branch coverage is published to Codecov from the Jest coverage run in `.github/workflows/codecov.yml`.
+- The uploaded report comes from `CI=true npm test -- --watch=false --passWithNoTests --coverage`, so it reflects the unit and component test suite rather than the Playwright `e2e` and `smoke` jobs.
+- Browse line, patch, and commit-level coverage details in the [Codecov project dashboard](https://app.codecov.io/github/danpherson/dev-danhenderson?branch=main).
 
 ## Stack
 
