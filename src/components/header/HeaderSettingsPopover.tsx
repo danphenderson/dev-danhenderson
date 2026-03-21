@@ -23,7 +23,6 @@ import {
 import type { PaletteMode } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { type ReactNode, useCallback, useState } from 'react';
-import { useReducedMotion } from 'motion/react';
 import {
   type AppAppearanceKey,
   appAppearancePresets,
@@ -31,6 +30,7 @@ import {
   type MotionIntensityLevel,
 } from '../../theme/appAppearance';
 import { cssDuration } from '../../motion/tokens';
+import { useMotionScale } from '../../motion';
 import { SPRING_EASING_CSS } from '../../styles/springEasing';
 
 /* ------------------------------------------------------------------ */
@@ -143,6 +143,8 @@ export type HeaderSettingsPopoverProps = {
   onChangeAppearance: (appearance: AppAppearanceKey) => void;
   /* Motion */
   motionIntensity: MotionIntensityLevel;
+  effectiveMotionIntensity: MotionIntensityLevel;
+  isSystemMotionOverrideActive: boolean;
   onChangeMotionIntensity: (level: MotionIntensityLevel) => void;
   /* Audio */
   showAudioControl: boolean;
@@ -156,6 +158,8 @@ export const HeaderSettingsPopover = ({
   appearance,
   onChangeAppearance,
   motionIntensity,
+  effectiveMotionIntensity,
+  isSystemMotionOverrideActive,
   onChangeMotionIntensity,
   showAudioControl,
   isPlaying,
@@ -163,7 +167,7 @@ export const HeaderSettingsPopover = ({
 }: HeaderSettingsPopoverProps) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
-  const prefersReducedMotion = useReducedMotion();
+  const { duration: dFactor } = useMotionScale();
 
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -183,8 +187,11 @@ export const HeaderSettingsPopover = ({
   };
 
   const activePreset = appAppearancePresets[appearance];
-  const activeMotionLevel =
-    MOTION_LEVELS.find((level) => level.key === motionIntensity) ?? MOTION_LEVELS[0];
+  const effectiveMotionLevel =
+    MOTION_LEVELS.find((level) => level.key === effectiveMotionIntensity) ?? MOTION_LEVELS[0];
+  const POPOVER_BASE_DURATION_MS = 200;
+  const popoverTransitionDuration =
+    dFactor === 0 ? 0 : Math.round(POPOVER_BASE_DURATION_MS * dFactor);
 
   /* Arrow-key navigation for the appearance radiogroup */
   const handleSwatchKeyDown = useCallback(
@@ -239,6 +246,7 @@ export const HeaderSettingsPopover = ({
         open={open}
         anchorEl={anchorEl}
         onClose={handleClose}
+        transitionDuration={popoverTransitionDuration}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         slotProps={{
@@ -334,7 +342,7 @@ export const HeaderSettingsPopover = ({
                 sx={{ color: 'text.secondary', fontSize: '0.6875rem' }}
                 data-testid="active-motion-label"
               >
-                {activeMotionLevel.label}
+                {effectiveMotionLevel.label}
               </Typography>
             </Stack>
             <ToggleButtonGroup
@@ -343,7 +351,7 @@ export const HeaderSettingsPopover = ({
               onChange={handleMotionChange}
               aria-label="Motion intensity"
               size="small"
-              disabled={!!prefersReducedMotion}
+              disabled={isSystemMotionOverrideActive}
               sx={{
                 display: 'flex',
                 flexWrap: 'wrap',
@@ -385,7 +393,7 @@ export const HeaderSettingsPopover = ({
                 );
               })}
             </ToggleButtonGroup>
-            {prefersReducedMotion && (
+            {isSystemMotionOverrideActive && (
               <Stack
                 direction="row"
                 spacing={0.5}

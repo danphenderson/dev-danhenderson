@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import { Box, Collapse, Tab, Tabs } from '@mui/material';
 import type { SyntheticEvent } from 'react';
 import { cssDuration } from '../motion/tokens';
+import { useMotionScale } from '../motion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { InteractiveLabel } from './text';
@@ -48,6 +49,7 @@ export const TabPanel = ({
 }: TabPanelProps) => {
   const { getTabListSx, getTabPanelBodySx, getTabPanelSx, getTabSx, interactiveSurfaceSx } =
     useComponentStyles();
+  const { duration: dFactor } = useMotionScale();
   const fallbackId = useId();
   const tabPanelId = idProp ?? fallbackId;
   const enabledItems = useMemo(() => items.filter((item) => !item.disabled), [items]);
@@ -260,7 +262,7 @@ export const TabPanel = ({
               <Collapse
                 in={isSelected}
                 appear={false}
-                timeout="auto"
+                timeout={dFactor === 0 ? 0 : 'auto'}
                 sx={{ width: '100%' }}
                 onEntered={() => {
                   setEnteredPanels((currentEnteredPanels) => ({
@@ -272,7 +274,8 @@ export const TabPanel = ({
                 <Box
                   sx={{
                     opacity: isContentVisible ? 1 : 0,
-                    transition: `opacity ${cssDuration.quick} ${SPRING_EASING_CSS}`,
+                    transition:
+                      dFactor === 0 ? 'none' : `opacity ${cssDuration.quick} ${SPRING_EASING_CSS}`,
                   }}
                 >
                   {item.renderContent(isContentReady, renderContext)}

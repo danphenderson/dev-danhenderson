@@ -16,6 +16,8 @@ type ThemeContextValue = {
   mode: PaletteMode;
   appearance: AppAppearanceKey;
   motionIntensity: MotionIntensityLevel;
+  effectiveMotionIntensity: MotionIntensityLevel;
+  isSystemMotionOverrideActive: boolean;
   setAppearance: (appearance: AppAppearanceKey) => void;
   setMotionIntensity: (level: MotionIntensityLevel) => void;
   toggleTheme: () => void;
@@ -25,6 +27,8 @@ const ThemeContext = createContext<ThemeContextValue>({
   mode: DEFAULT_PREFERENCES.theme,
   appearance: DEFAULT_PREFERENCES.appearance,
   motionIntensity: DEFAULT_PREFERENCES.motionIntensity,
+  effectiveMotionIntensity: DEFAULT_PREFERENCES.motionIntensity,
+  isSystemMotionOverrideActive: false,
   setAppearance: () => {},
   setMotionIntensity: () => {},
   toggleTheme: () => {},
@@ -109,7 +113,16 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   return (
     <ThemeContext.Provider
-      value={{ mode, appearance, motionIntensity, setAppearance, setMotionIntensity, toggleTheme }}
+      value={{
+        mode,
+        appearance,
+        motionIntensity,
+        effectiveMotionIntensity,
+        isSystemMotionOverrideActive: prefersReducedMotion,
+        setAppearance,
+        setMotionIntensity,
+        toggleTheme,
+      }}
     >
       <MuiThemeProvider theme={theme}>
         <CssBaseline />

@@ -126,6 +126,8 @@ describe('Header controls', () => {
       setAppearance: jest.fn(),
       toggleTheme: jest.fn(),
       motionIntensity: 'default' as const,
+      effectiveMotionIntensity: 'default' as const,
+      isSystemMotionOverrideActive: false,
       setMotionIntensity: jest.fn(),
     });
     mockUseWelcomeAudio.mockReturnValue(createAudioState());
@@ -183,6 +185,8 @@ describe('Header controls', () => {
       setAppearance,
       toggleTheme,
       motionIntensity: 'default' as const,
+      effectiveMotionIntensity: 'default' as const,
+      isSystemMotionOverrideActive: false,
       setMotionIntensity: jest.fn(),
     });
 
@@ -200,6 +204,8 @@ describe('Header controls', () => {
       setAppearance,
       toggleTheme: jest.fn(),
       motionIntensity: 'default' as const,
+      effectiveMotionIntensity: 'default' as const,
+      isSystemMotionOverrideActive: false,
       setMotionIntensity: jest.fn(),
     });
 
@@ -293,6 +299,8 @@ describe('Header mobile layout', () => {
       setAppearance: jest.fn(),
       toggleTheme: jest.fn(),
       motionIntensity: 'default' as const,
+      effectiveMotionIntensity: 'default' as const,
+      isSystemMotionOverrideActive: false,
       setMotionIntensity: jest.fn(),
     });
     mockUseWelcomeAudio.mockReturnValue(createAudioState());

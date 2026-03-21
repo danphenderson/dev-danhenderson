@@ -19,6 +19,8 @@ const renderSettingsPopover = (
         appearance="evergreen"
         onChangeAppearance={jest.fn()}
         motionIntensity="default"
+        effectiveMotionIntensity="default"
+        isSystemMotionOverrideActive={false}
         onChangeMotionIntensity={jest.fn()}
         showAudioControl={false}
         isPlaying={false}
@@ -141,7 +143,11 @@ describe('HeaderSettingsPopover', () => {
   it('shows the reduced-motion notice and disables motion controls when the OS preference is active', () => {
     const onChangeMotionIntensity = jest.fn();
     mockUseReducedMotion.mockReturnValue(true);
-    renderSettingsPopover({ onChangeMotionIntensity });
+    renderSettingsPopover({
+      onChangeMotionIntensity,
+      effectiveMotionIntensity: 'off',
+      isSystemMotionOverrideActive: true,
+    });
 
     fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
 

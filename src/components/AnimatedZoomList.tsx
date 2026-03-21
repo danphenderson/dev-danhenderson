@@ -5,6 +5,8 @@ import { useComponentStyles } from '../styles/componentStyles';
 import { useMotionScale, scaleStagger } from '../motion';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 
+const ZOOM_BASE_TIMEOUT_MS = 220;
+
 type AnimatedZoomListProps<Item> = {
   items: Item[];
   getItemKey: (item: Item, index: number) => string;
@@ -25,11 +27,12 @@ export const AnimatedZoomList = <Item,>({
   itemStaggerMs,
 }: AnimatedZoomListProps<Item>) => {
   const { getSectionDelayMs, motionTokens } = useComponentStyles();
-  const { stagger: sFactor } = useMotionScale();
+  const { stagger: sFactor, duration: dFactor } = useMotionScale();
   const resolvedStartDelayMs = Math.round(scaleStagger(startDelayMs, sFactor));
   const resolvedItemStaggerMs = Math.round(
     scaleStagger(itemStaggerMs ?? motionTokens.itemStaggerMs, sFactor)
   );
+  const zoomTimeout = dFactor === 0 ? 0 : Math.round(ZOOM_BASE_TIMEOUT_MS * dFactor);
 
   return (
     <Box sx={containerSx}>
@@ -38,6 +41,7 @@ export const AnimatedZoomList = <Item,>({
           key={getItemKey(item, index)}
           in={inProp}
           appear={false}
+          timeout={zoomTimeout}
           easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
           style={{
             transitionDelay: `${getSectionDelayMs(

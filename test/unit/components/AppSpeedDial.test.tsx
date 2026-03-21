@@ -5,6 +5,7 @@ import { AppSpeedDial } from '../../../src/components/AppSpeedDial';
 import { createAppTheme } from '../../../src/theme/createAppTheme';
 
 const mockSpeedDial = jest.fn();
+let mockDuration = 1;
 
 jest.mock('@mui/material/SpeedDial', () => ({
   __esModule: true,
@@ -16,6 +17,7 @@ jest.mock('@mui/material/SpeedDial', () => ({
     onOpen,
     open,
     sx,
+    transitionDuration,
   }: {
     ariaLabel: string;
     children: ReactNode;
@@ -24,9 +26,11 @@ jest.mock('@mui/material/SpeedDial', () => ({
     onOpen?: (event: SyntheticEvent, reason: string) => void;
     open?: boolean;
     sx?: unknown;
-  }) => (
-    mockSpeedDial({ ariaLabel, children, icon, onClose, onOpen, open, sx }),
-    (
+    transitionDuration?: number;
+  }) => {
+    mockSpeedDial({ ariaLabel, children, icon, onClose, onOpen, open, sx, transitionDuration });
+
+    return (
       <div data-testid="speed-dial-root" data-open={String(Boolean(open))}>
         <button
           type="button"
@@ -38,8 +42,8 @@ jest.mock('@mui/material/SpeedDial', () => ({
         </button>
         {open ? <div data-testid="speed-dial-actions">{children}</div> : null}
       </div>
-    )
-  ),
+    );
+  },
 }));
 
 jest.mock('@mui/material/SpeedDialAction', () => ({
@@ -110,9 +114,30 @@ jest.mock('@mui/material/SpeedDialIcon', () => ({
   ),
 }));
 
+jest.mock('../../../src/motion', () => ({
+  ...jest.requireActual('../../../src/motion'),
+  useMotionScale: () => ({
+    duration: mockDuration,
+    stagger: 1,
+    tilt: 1,
+    cssAnimations: mockDuration !== 0,
+  }),
+}));
+
 describe('AppSpeedDial', () => {
   afterEach(() => {
+    mockDuration = 1;
     jest.clearAllMocks();
+  });
+
+  it('collapses transitionDuration when motion is off', () => {
+    mockDuration = 0;
+
+    render(<AppSpeedDial ariaLabel="Open shared actions" icon={<span>Open</span>} actions={[]} />);
+
+    const speedDialProps = mockSpeedDial.mock.calls.at(-1)?.[0] as { transitionDuration: number };
+
+    expect(speedDialProps.transitionDuration).toBe(0);
   });
 
   it('maps external, mailto, and download actions onto action links', () => {

@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { useWebVitals, type WebVitalEntry } from '../hooks/useWebVitals';
+import { useMotionScale } from '../motion';
 import { BodyText, HeaderLabel, SecondaryBodyText, SecondaryCaptionText } from './text';
 import { buildInfo } from '../utils/buildInfo';
 
@@ -100,9 +101,14 @@ function VitalPlaceholder({ name }: { name: string }) {
   );
 }
 
+const DIALOG_BASE_DURATION_MS = 225;
+
 export function PerformanceScorecard() {
   const [open, setOpen] = useState(false);
   const { metrics } = useWebVitals();
+  const { duration: dFactor } = useMotionScale();
+  const dialogTransitionDuration =
+    dFactor === 0 ? 0 : Math.round(DIALOG_BASE_DURATION_MS * dFactor);
 
   return (
     <>
@@ -122,6 +128,7 @@ export function PerformanceScorecard() {
         onClose={() => setOpen(false)}
         fullWidth
         maxWidth="sm"
+        transitionDuration={dialogTransitionDuration}
         aria-labelledby="performance-scorecard-title"
       >
         <DialogTitle id="performance-scorecard-title">Performance & Build Info</DialogTitle>

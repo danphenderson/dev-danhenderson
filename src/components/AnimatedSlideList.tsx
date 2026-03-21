@@ -8,6 +8,8 @@ import { useMotionScale, scaleStagger } from '../motion';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { normalizeSxProp } from '../utils/sx';
 
+const SLIDE_BASE_TIMEOUT_MS = 220;
+
 const SlideWithNodeRef = Slide as unknown as (
   props: SlideProps & { nodeRef?: RefObject<HTMLElement> }
 ) => JSX.Element;
@@ -63,7 +65,7 @@ export const AnimatedSlideList = <Item,>({
   reverseExitStagger = false,
 }: AnimatedSlideListProps<Item>) => {
   const { motionTokens } = useComponentStyles();
-  const { stagger: sFactor } = useMotionScale();
+  const { stagger: sFactor, duration: dFactor } = useMotionScale();
   const resolvedStartDelayMs = Math.round(scaleStagger(startDelayMs, sFactor));
   const [enteredKeys, setEnteredKeys] = useState<Set<string>>(() => new Set());
   const nodeRefs = useRef(new Map<string, RefObject<HTMLElement>>());
@@ -71,6 +73,7 @@ export const AnimatedSlideList = <Item,>({
   const resolvedItemStaggerMs = Math.round(
     scaleStagger(itemStaggerMs ?? motionTokens.itemStaggerMs, sFactor)
   );
+  const slideTimeout = dFactor === 0 ? 0 : Math.round(SLIDE_BASE_TIMEOUT_MS * dFactor);
   const itemKeys = useMemo(
     () => items.map((item, index) => getItemKey(item, index)),
     [getItemKey, items]
@@ -178,6 +181,7 @@ export const AnimatedSlideList = <Item,>({
             in={enteredKeys.has(key)}
             appear={false}
             direction="up"
+            timeout={slideTimeout}
             mountOnEnter={!keepMountedWhenExited}
             unmountOnExit={!keepMountedWhenExited}
             easing={{ enter: SPRING_EASING_CSS, exit: undefined }}

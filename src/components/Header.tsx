@@ -8,6 +8,7 @@ import { useTheme as useMuiTheme } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
 import { primaryNavigationRoutes } from '../constants/siteRoutes';
 import { useAppTheme } from '../ThemeProvider';
+import { useMotionScale } from '../motion';
 import { avatar as avatarSrc } from '../data/cv';
 import { useAppStyles } from '../styles/appStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
@@ -17,14 +18,26 @@ import { HEADER_HIDE_SCROLL_TRIGGER_OPTIONS } from './header/headerScroll';
 import { HeaderNav } from './header/HeaderNav';
 import { HeaderSettingsPopover } from './header/HeaderSettingsPopover';
 
+const SLIDE_BASE_ENTER_MS = 225;
+const SLIDE_BASE_EXIT_MS = 195;
+
 const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
   const trigger = useScrollTrigger(HEADER_HIDE_SCROLL_TRIGGER_OPTIONS);
+  const { duration: dFactor } = useMotionScale();
+  const timeout =
+    dFactor === 0
+      ? 0
+      : {
+          enter: Math.round(SLIDE_BASE_ENTER_MS * dFactor),
+          exit: Math.round(SLIDE_BASE_EXIT_MS * dFactor),
+        };
 
   return (
     <Slide
       appear={false}
       direction="down"
       in={!trigger}
+      timeout={timeout}
       easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
     >
       {children}
@@ -33,8 +46,16 @@ const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
 };
 
 export default function Header() {
-  const { mode, appearance, motionIntensity, setAppearance, setMotionIntensity, toggleTheme } =
-    useAppTheme();
+  const {
+    mode,
+    appearance,
+    motionIntensity,
+    effectiveMotionIntensity,
+    isSystemMotionOverrideActive,
+    setAppearance,
+    setMotionIntensity,
+    toggleTheme,
+  } = useAppTheme();
   const appStyles = useAppStyles();
   const muiTheme = useMuiTheme();
   const location = useLocation();
@@ -96,6 +117,8 @@ export default function Header() {
                 appearance={appearance}
                 onChangeAppearance={setAppearance}
                 motionIntensity={motionIntensity}
+                effectiveMotionIntensity={effectiveMotionIntensity}
+                isSystemMotionOverrideActive={isSystemMotionOverrideActive}
                 onChangeMotionIntensity={setMotionIntensity}
                 showAudioControl={audioConsent === 'granted' || onboardingCompleted}
                 isPlaying={isPlaying}

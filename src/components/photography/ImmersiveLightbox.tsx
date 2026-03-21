@@ -6,6 +6,7 @@ import PlaceIcon from '@mui/icons-material/Place';
 import { Box, Dialog, IconButton, Stack } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import type { PhotoItem } from '../../types/data';
+import { useMotionScale } from '../../motion';
 import { EntryTitle, SecondaryBodyText } from '../text';
 
 type ImmersiveLightboxProps = {
@@ -30,6 +31,10 @@ export function ImmersiveLightbox({
   albumLabel,
 }: ImmersiveLightboxProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const { duration: dFactor } = useMotionScale();
+  const DIALOG_BASE_DURATION_MS = 225;
+  const dialogTransitionDuration =
+    dFactor === 0 ? 0 : Math.round(DIALOG_BASE_DURATION_MS * dFactor);
 
   useEffect(() => {
     if (open) {
@@ -80,6 +85,7 @@ export function ImmersiveLightbox({
       open={open}
       onClose={onClose}
       fullScreen
+      transitionDuration={dialogTransitionDuration}
       aria-label={`Immersive photo viewer: ${displayTitle}`}
       PaperProps={{
         sx: {

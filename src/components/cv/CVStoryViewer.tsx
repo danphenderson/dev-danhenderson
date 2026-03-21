@@ -4,6 +4,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useTheme, alpha } from '@mui/material/styles';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { duration, easing } from '../../motion/tokens';
+import { useMotionScale } from '../../motion';
 import { CVStoryProgress } from './CVStoryProgress';
 import { CVStorySectionRenderer } from './CVStorySectionRenderer';
 import type { CVStoryItem } from '../../types/cv';
@@ -65,6 +66,7 @@ const getStoryItemKey = (item: CVStoryItem): string => {
 
 export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
   const theme = useTheme();
+  const { duration: dFactor } = useMotionScale();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeKind, setActiveKind] = useState<CVStoryItem['kind']>(() =>
@@ -178,7 +180,7 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: duration.fast }}
+        transition={{ duration: duration.fast * dFactor }}
       >
         <CVStoryProgress progress={scrollProgress} />
 
@@ -197,9 +199,9 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
         >
           <motion.div
             key={activeKind}
-            initial={{ opacity: 0, y: -8 }}
+            initial={{ opacity: 0, y: dFactor === 0 ? 0 : -8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: duration.fast, ease: easing.decel }}
+            transition={{ duration: duration.fast * dFactor, ease: easing.decel }}
           >
             <Typography
               variant="overline"
@@ -217,9 +219,9 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
               top: '50%',
               transform: 'translateY(-50%)',
             }}
-            initial={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0, scale: dFactor === 0 ? 1 : 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: duration.fast, delay: 0.2 }}
+            transition={{ duration: duration.fast * dFactor, delay: 0.2 * dFactor }}
           >
             <IconButton onClick={onExit} aria-label="Exit story mode" size="small">
               <CloseIcon />
@@ -236,7 +238,7 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
             overflowY: 'auto',
             overflowX: 'hidden',
             WebkitOverflowScrolling: 'touch',
-            scrollBehavior: 'smooth',
+            scrollBehavior: dFactor === 0 ? 'auto' : 'smooth',
           }}
         >
           {/* Top spacing */}

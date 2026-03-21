@@ -111,7 +111,7 @@ export const createAppTheme = (
             textRendering: 'optimizeLegibility',
             WebkitFontSmoothing: 'antialiased',
             MozOsxFontSmoothing: 'grayscale',
-            scrollBehavior: 'smooth',
+            scrollBehavior: motionIntensity === 'off' ? 'auto' : 'smooth',
           },
           body: {
             height: '100%',

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import ThemeProvider from '../../../../src/ThemeProvider';
@@ -8,7 +9,53 @@ import {
 } from '../../../../src/components/cv/cvSectionMetadata';
 import { CVSectionNavigator } from '../../../../src/components/cv/CVSectionNavigator';
 
+let mockDuration = 1;
+
+jest.mock('@mui/material', () => {
+  const actual = jest.requireActual('@mui/material');
+
+  return {
+    ...actual,
+    Zoom: ({
+      children,
+      in: inProp,
+      timeout,
+      unmountOnExit,
+    }: {
+      children: ReactNode;
+      in: boolean;
+      timeout?: number | { enter?: number; exit?: number };
+      unmountOnExit?: boolean;
+    }) => {
+      if (!inProp && unmountOnExit) {
+        return null;
+      }
+
+      return (
+        <div
+          data-testid="cv-section-navigator-zoom"
+          data-timeout={
+            typeof timeout === 'number' ? String(timeout) : JSON.stringify(timeout ?? null)
+          }
+        >
+          {children}
+        </div>
+      );
+    },
+  };
+});
+
 jest.mock('@mui/material/useScrollTrigger', () => jest.fn());
+
+jest.mock('../../../../src/motion', () => ({
+  ...jest.requireActual('../../../../src/motion'),
+  useMotionScale: () => ({
+    duration: mockDuration,
+    stagger: 1,
+    tilt: 1,
+    cssAnimations: mockDuration !== 0,
+  }),
+}));
 
 jest.mock('../../../../src/components/AppSpeedDial', () => ({
   AppSpeedDial: ({
@@ -82,6 +129,7 @@ describe('CVSectionNavigator', () => {
   });
 
   beforeEach(() => {
+    mockDuration = 1;
     mockUseScrollTrigger.mockReturnValue(true);
     scrollIntoViewMock.mockClear();
     getElementByIdSpy = jest.spyOn(document, 'getElementById');
@@ -187,6 +235,38 @@ describe('CVSectionNavigator', () => {
     expect(scrollToMock).toHaveBeenCalledWith(expect.objectContaining({ top: 0 }));
   });
 
+  it('uses instant scroll behavior and collapsed zoom timing when motion is off', () => {
+    mockDuration = 0;
+
+    appendSection(cvSectionMetadata.experience.id, { top: 200, height: 400 });
+
+    const scrollToMock = jest.fn();
+    Object.defineProperty(window, 'scrollTo', {
+      configurable: true,
+      value: scrollToMock,
+    });
+
+    render(
+      <ThemeProvider>
+        <CVSectionNavigator sections={['experience']} testId="cv-section-navigator" />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('cv-section-navigator-zoom')).toHaveAttribute('data-timeout', '0');
+
+    act(() => {
+      screen.getByTestId('dial-action-section-experience').click();
+    });
+
+    expect(scrollIntoViewMock).toHaveBeenCalledWith({ behavior: 'auto', block: 'start' });
+
+    act(() => {
+      screen.getByTestId('dial-action-back-to-top').click();
+    });
+
+    expect(scrollToMock).toHaveBeenCalledWith({ top: 0, behavior: 'auto' });
+  });
+
   it('updates active section based on scroll position', () => {
     Object.defineProperty(window, 'innerHeight', {
       configurable: true,
@@ -259,9 +339,7 @@ describe('CVSectionNavigator', () => {
       const dimmedClassName = nav.className;
       expect(dimmedClassName).not.toBe(initialClassName);
 
-      act(() => {
-        fireEvent.mouseEnter(nav);
-      });
+      fireEvent.mouseEnter(nav);
 
       // After hover, opacity returns to 1 — className should revert
       expect(nav.className).toBe(initialClassName);
@@ -277,9 +355,7 @@ describe('CVSectionNavigator', () => {
       const nav = screen.getByTestId('cv-section-navigator');
       const initialClassName = nav.className;
 
-      act(() => {
-        fireEvent.mouseEnter(nav);
-      });
+      fireEvent.mouseEnter(nav);
 
       act(() => {
         jest.advanceTimersByTime(5000);
@@ -299,9 +375,7 @@ describe('CVSectionNavigator', () => {
       const nav = screen.getByTestId('cv-section-navigator');
       const initialClassName = nav.className;
 
-      act(() => {
-        fireEvent.focus(nav);
-      });
+      fireEvent.focus(nav);
 
       act(() => {
         jest.advanceTimersByTime(5000);

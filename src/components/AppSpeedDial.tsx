@@ -8,6 +8,7 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import type { SpeedDialActionProps } from '@mui/material/SpeedDialAction';
 import type { SpeedDialProps } from '@mui/material/SpeedDial';
 import { Link } from 'react-router-dom';
+import { useMotionScale } from '../motion';
 import { InteractiveLabel } from './text';
 import type { AppSpeedDialAction, AppSpeedDialLayer } from '../types/ui';
 
@@ -58,6 +59,10 @@ export const AppSpeedDial = ({
   sx,
 }: AppSpeedDialProps) => {
   const [open, setOpen] = useState(false);
+  const { duration: dFactor } = useMotionScale();
+  const SPEED_DIAL_BASE_DURATION_MS = 200;
+  const speedDialTransitionDuration =
+    dFactor === 0 ? 0 : Math.round(SPEED_DIAL_BASE_DURATION_MS * dFactor);
 
   const handleOpen: NonNullable<SpeedDialProps['onOpen']> = () => {
     setOpen(true);
@@ -105,6 +110,7 @@ export const AppSpeedDial = ({
       open={open}
       onOpen={handleOpen}
       onClose={handleClose}
+      transitionDuration={speedDialTransitionDuration}
       icon={openIcon ? <SpeedDialIcon icon={icon} openIcon={openIcon} /> : icon}
       FabProps={FabProps}
       sx={mergeLayerSx(layer, sx)}

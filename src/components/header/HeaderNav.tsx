@@ -8,6 +8,7 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import { MouseEvent, ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import { siteRouteMap, type SiteRouteDefinition } from '../../constants/siteRoutes';
+import { useMotionScale } from '../../motion';
 import { useAppStyles } from '../../styles/appStyles';
 import { NavigationLabel } from '../text';
 
@@ -40,6 +41,9 @@ export const HeaderNav = ({
   onMobileMenuClose,
 }: HeaderNavProps) => {
   const appStyles = useAppStyles();
+  const { duration: dFactor } = useMotionScale();
+  const MENU_BASE_DURATION_MS = 200;
+  const menuTransitionDuration = dFactor === 0 ? 0 : Math.round(MENU_BASE_DURATION_MS * dFactor);
   const showHomeAvatar = !isMobile && !isActivePage(currentPath, '/');
   const mobilePages = [...pages, siteRouteMap.home].filter(
     ({ path }) => !isActivePage(currentPath, path)
@@ -124,6 +128,7 @@ export const HeaderNav = ({
         anchorEl={mobileMenuAnchor}
         open={mobileMenuOpen}
         onClose={onMobileMenuClose}
+        transitionDuration={menuTransitionDuration}
         MenuListProps={{ 'aria-labelledby': 'mobile-nav-button' }}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'left' }}

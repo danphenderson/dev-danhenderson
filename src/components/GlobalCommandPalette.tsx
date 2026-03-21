@@ -20,6 +20,8 @@ import { useCommandPalette } from '../CommandPaletteProvider';
 import { CaptionText, EntryTitle, SecondaryBodyText } from './text';
 import { matchesCommandPaletteAction } from '../utils/commandPaletteSearch';
 
+const DIALOG_BASE_DURATION_MS = 225;
+
 const isEditableTarget = (target: EventTarget | null): boolean => {
   if (!(target instanceof HTMLElement)) {
     return false;
@@ -78,6 +80,8 @@ export const GlobalCommandPalette = () => {
   const { isOpen, query, openPalette, closePalette, setQuery } = useCommandPalette();
   const previousPathnameRef = useRef(location.pathname);
   const disableScrollAnimation = durationFactor === 0;
+  const dialogTransitionDuration =
+    durationFactor === 0 ? 0 : Math.round(DIALOG_BASE_DURATION_MS * durationFactor);
 
   const filteredActions = useMemo(
     () => commandPaletteActions.filter((action) => matchesCommandPaletteAction(action, query)),
@@ -177,6 +181,7 @@ export const GlobalCommandPalette = () => {
       onClose={handleClose}
       fullWidth
       maxWidth="sm"
+      transitionDuration={dialogTransitionDuration}
       aria-labelledby="command-palette-title"
     >
       <DialogContent sx={{ px: { xs: 2, sm: 3 }, py: 2.5 }}>

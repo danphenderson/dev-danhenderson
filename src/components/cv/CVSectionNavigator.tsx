@@ -13,6 +13,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import CodeIcon from '@mui/icons-material/Code';
 import { cssDuration } from '../../motion/tokens';
+import { useMotionScale } from '../../motion';
 import { SPRING_EASING_CSS } from '../../styles/springEasing';
 import { AppSpeedDial, AppSpeedDialAction } from '../AppSpeedDial';
 import { CVSectionKey, cvSectionMetadata, cvSectionViewportMetrics } from './cvSectionMetadata';
@@ -41,6 +42,7 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const appStyles = useAppStyles();
+  const { duration: dFactor } = useMotionScale();
   const [activeSection, setActiveSection] = useState<CVSectionKey | null>(sections[0] ?? null);
   const [idle, setIdle] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -133,17 +135,19 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
     };
   }, [activeLinePx, sections, resetIdleTimer]);
 
+  const scrollBehavior: ScrollBehavior = dFactor === 0 ? 'auto' : 'smooth';
+
   const handleBackToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth',
+      behavior: scrollBehavior,
     });
   };
 
   const handleJumpToSection = (sectionKey: CVSectionKey) => {
     setActiveSection(sectionKey);
     document.getElementById(cvSectionMetadata[sectionKey].id)?.scrollIntoView({
-      behavior: 'smooth',
+      behavior: scrollBehavior,
       block: 'start',
     });
   };
@@ -166,12 +170,18 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
   const dimmed = idle && !hovered;
   const activeSectionSx = activeSection ? appStyles.cvFloatingDialActiveFabSx : undefined;
 
+  const ZOOM_BASE_ENTER_MS = 180;
+  const ZOOM_BASE_EXIT_MS = 140;
+  const zoomTimeout =
+    dFactor === 0
+      ? 0
+      : {
+          enter: Math.round(ZOOM_BASE_ENTER_MS * dFactor),
+          exit: Math.round(ZOOM_BASE_EXIT_MS * dFactor),
+        };
+
   return (
-    <Zoom
-      in={scrolledPastThreshold}
-      timeout={{ enter: 180, exit: 140 }}
-      unmountOnExit
-    >
+    <Zoom in={scrolledPastThreshold} timeout={zoomTimeout} unmountOnExit>
       <Box
         component="nav"
         aria-label="CV section navigation"
@@ -188,7 +198,7 @@ export const CVSectionNavigator = ({ sections, testId }: CVSectionNavigatorProps
         onBlur={() => setHovered(false)}
         sx={{
           opacity: dimmed ? IDLE_OPACITY : 1,
-          transition: `opacity ${cssDuration.normal} ${SPRING_EASING_CSS}`,
+          transition: dFactor === 0 ? 'none' : `opacity ${cssDuration.normal} ${SPRING_EASING_CSS}`,
           '&:hover': { opacity: 1 },
         }}
       >

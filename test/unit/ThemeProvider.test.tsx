@@ -13,7 +13,15 @@ jest.mock('motion/react', () => ({
 const legacyCvAppearanceStorageKey = 'danhenderson-cv-appearance';
 
 const ThemeConsumer = () => {
-  const { mode, appearance, motionIntensity, setAppearance, toggleTheme } = useAppTheme();
+  const {
+    mode,
+    appearance,
+    motionIntensity,
+    effectiveMotionIntensity,
+    isSystemMotionOverrideActive,
+    setAppearance,
+    toggleTheme,
+  } = useAppTheme();
   const theme = useTheme();
 
   return (
@@ -21,6 +29,8 @@ const ThemeConsumer = () => {
       <span data-testid="mode">{mode}</span>
       <span data-testid="appearance">{appearance}</span>
       <span data-testid="motion-intensity">{motionIntensity}</span>
+      <span data-testid="effective-motion-intensity">{effectiveMotionIntensity}</span>
+      <span data-testid="system-motion-override">{String(isSystemMotionOverrideActive)}</span>
       <span data-testid="theme-css-animations">
         {theme.appearanceTreatment.motionScale.cssAnimations ? 'enabled' : 'disabled'}
       </span>
@@ -134,9 +144,25 @@ describe('ThemeProvider', () => {
     );
 
     expect(screen.getByTestId('motion-intensity')).toHaveTextContent('expressive');
+    expect(screen.getByTestId('effective-motion-intensity')).toHaveTextContent('off');
+    expect(screen.getByTestId('system-motion-override')).toHaveTextContent('true');
     expect(screen.getByTestId('theme-css-animations')).toHaveTextContent('disabled');
     expect(screen.getByTestId('theme-pill-pulse')).toHaveTextContent('disabled');
     expect(window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.motionIntensity)).toBe('expressive');
+  });
+
+  it('exposes effectiveMotionIntensity matching motionIntensity when reduced motion is inactive', () => {
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.motionIntensity, 'subtle');
+
+    render(
+      <ThemeProvider>
+        <ThemeConsumer />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('motion-intensity')).toHaveTextContent('subtle');
+    expect(screen.getByTestId('effective-motion-intensity')).toHaveTextContent('subtle');
+    expect(screen.getByTestId('system-motion-override')).toHaveTextContent('false');
   });
 
   it('returns null when no children are provided', () => {
