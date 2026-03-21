@@ -1,10 +1,26 @@
-import { Fragment, type ReactNode, useState } from 'react';
-import { motion } from 'motion/react';
-import { Box, Stack, Tabs, Tab } from '@mui/material';
+import type { ReactNode, RefObject } from 'react';
+import { useRef, useState } from 'react';
+import { motion, useInView } from 'motion/react';
+import { Box, Divider, Stack, Tabs, Tab } from '@mui/material';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import LanguageIcon from '@mui/icons-material/Language';
 import { HeaderLabel, HeaderTitle, StrongMetaText, MetaText, BodyText } from '../text';
 import { SkillsChipList } from '../SkillsChipList';
 import { CommonLink } from '../CommonLink';
-import { MotionItem } from '../../motion';
+import {
+  MotionSection,
+  MotionItem,
+  useMotionScale,
+  duration,
+  DEFAULT_INTERSECTION_ROOT_MARGIN,
+  DEFAULT_INTERSECTION_THRESHOLD,
+} from '../../motion';
+import {
+  renderExperienceDescriptionContent,
+  renderExperienceProjectContent,
+} from './experienceContent';
 import {
   storyContentContainer,
   storyLabelReveal,
@@ -15,37 +31,51 @@ import {
   storyLinkReveal,
   storyBulletContainer,
   storyBulletItem,
+  storyDividerReveal,
 } from '../../motion/variants';
-import type { CVStoryItem } from '../../types/cv';
-import type { ExperienceDescription, ExperienceProjectSegment } from '../../types/cv';
+import type { CVStoryItem, CVStoryContactChannel } from '../../types/cv';
 
-type CVStorySlideRendererProps = { item: CVStoryItem };
+type CVStorySectionRendererProps = {
+  item: CVStoryItem;
+  index: number;
+  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+};
 
-/* ── Rendering helpers (not exported) ── */
+const asMotionMargin = (margin: string) =>
+  margin as Parameters<typeof useInView>[1] extends { margin?: infer Margin } ? Margin : never;
 
-const renderExperienceDescription = (desc: ExperienceDescription): ReactNode => {
-  if (typeof desc === 'string') {
-    return <BodyText>{desc}</BodyText>;
-  }
+const StorySkillsChipList = ({
+  skills,
+  scrollContainerRef,
+}: {
+  skills: string[];
+  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+}) => {
+  const rowRef = useRef<HTMLDivElement>(null);
+  const { duration: durationFactor } = useMotionScale();
+  const isRowInView = useInView(rowRef, {
+    once: true,
+    root: scrollContainerRef,
+    margin: asMotionMargin(DEFAULT_INTERSECTION_ROOT_MARGIN),
+    amount: DEFAULT_INTERSECTION_THRESHOLD || undefined,
+  });
+
   return (
-    <BodyText>
-      {desc.map((seg: ExperienceProjectSegment, i: number) => (
-        <Fragment key={i}>
-          {seg.lineBreakBefore && <br />}
-          {seg.link ? (
-            <CommonLink href={seg.link} target="_blank" rel="noopener noreferrer">
-              {seg.text}
-            </CommonLink>
-          ) : (
-            seg.text
-          )}
-        </Fragment>
-      ))}
-    </BodyText>
+    <MotionItem variants={storyChipsReveal}>
+      <Box ref={rowRef}>
+        <SkillsChipList
+          skills={skills}
+          in={durationFactor === 0 || isRowInView}
+          animation="slide"
+          startDelayMs={Math.round(duration.normal * 1000)}
+        />
+      </Box>
+    </MotionItem>
   );
 };
 
-const renderBulletList = (items: string[], max?: number): ReactNode => {
+/* ── Rendering helpers (not exported) ── */
+const renderBulletList = (items: ReactNode[], max?: number): ReactNode => {
   const visible = max ? items.slice(0, max) : items;
   return (
     <motion.ul
@@ -63,10 +93,39 @@ const renderBulletList = (items: string[], max?: number): ReactNode => {
   );
 };
 
-/* ── Per-kind slide layouts ── */
+const channelIcon: Record<CVStoryContactChannel['icon'], ReactNode> = {
+  email: <EmailOutlinedIcon sx={{ fontSize: 20 }} />,
+  github: <GitHubIcon sx={{ fontSize: 20 }} />,
+  linkedin: <LinkedInIcon sx={{ fontSize: 20 }} />,
+  web: <LanguageIcon sx={{ fontSize: 20 }} />,
+};
 
-const AboutSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'about' }> }) => {
+/* ── Section divider between kind transitions ── */
+
+const StorySectionDivider = () => (
+  <MotionSection variants={storyDividerReveal} rootMargin="0px 0px -5% 0px">
+    <Divider
+      sx={{
+        maxWidth: 120,
+        mx: 'auto',
+        my: { xs: 2, sm: 3 },
+        borderColor: 'divider',
+      }}
+    />
+  </MotionSection>
+);
+
+/* ── Per-kind section layouts ── */
+
+const AboutSection = ({
+  item,
+  scrollContainerRef,
+}: {
+  item: Extract<CVStoryItem, { kind: 'about' }>;
+  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+}) => {
   const { data: about } = item;
+
   return (
     <Stack spacing={3}>
       <Stack spacing={0.5}>
@@ -86,9 +145,7 @@ const AboutSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'about' }> })
         <BodyText sx={{ whiteSpace: 'pre-line', lineHeight: 1.75 }}>{about.bio}</BodyText>
       </MotionItem>
       {about.opportunities && about.opportunities.length > 0 && (
-        <MotionItem variants={storyChipsReveal}>
-          <SkillsChipList skills={about.opportunities} animation="slide" />
-        </MotionItem>
+        <StorySkillsChipList skills={about.opportunities} scrollContainerRef={scrollContainerRef} />
       )}
       {about.bioLink && (
         <MotionItem variants={storyLinkReveal}>
@@ -101,8 +158,15 @@ const AboutSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'about' }> })
   );
 };
 
-const ExperienceSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'experience' }> }) => {
+const ExperienceSection = ({
+  item,
+  scrollContainerRef,
+}: {
+  item: Extract<CVStoryItem, { kind: 'experience' }>;
+  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+}) => {
   const { data: exp } = item;
+
   return (
     <Stack spacing={2.5}>
       <Stack spacing={0.5}>
@@ -129,24 +193,35 @@ const ExperienceSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'experie
       <MotionItem variants={storyMetaReveal}>
         <MetaText>
           {exp.startDate} – {exp.endDate}
+          {exp.industry ? ` · ${exp.industry}` : ''}
         </MetaText>
       </MotionItem>
       {exp.description && (
         <MotionItem variants={storyBodyReveal}>
-          {renderExperienceDescription(exp.description)}
+          <BodyText>{renderExperienceDescriptionContent(exp.description)}</BodyText>
+        </MotionItem>
+      )}
+      {exp.projects && exp.projects.length > 0 && (
+        <MotionItem variants={storyBodyReveal}>
+          {renderBulletList(exp.projects.map(renderExperienceProjectContent))}
         </MotionItem>
       )}
       {exp.skills && exp.skills.length > 0 && (
-        <MotionItem variants={storyChipsReveal}>
-          <SkillsChipList skills={exp.skills} animation="slide" />
-        </MotionItem>
+        <StorySkillsChipList skills={exp.skills} scrollContainerRef={scrollContainerRef} />
       )}
     </Stack>
   );
 };
 
-const EducationSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'education' }> }) => {
+const EducationSection = ({
+  item,
+  scrollContainerRef,
+}: {
+  item: Extract<CVStoryItem, { kind: 'education' }>;
+  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+}) => {
   const { data: entry } = item;
+
   return (
     <Stack spacing={2.5}>
       <Stack spacing={0.5}>
@@ -171,18 +246,16 @@ const EducationSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'educatio
         <BodyText>{entry.summary}</BodyText>
       </MotionItem>
       {entry.highlights && entry.highlights.length > 0 && (
-        <MotionItem variants={storyBodyReveal}>{renderBulletList(entry.highlights, 4)}</MotionItem>
+        <MotionItem variants={storyBodyReveal}>{renderBulletList(entry.highlights)}</MotionItem>
       )}
       {entry.skills && entry.skills.length > 0 && (
-        <MotionItem variants={storyChipsReveal}>
-          <SkillsChipList skills={entry.skills} animation="slide" />
-        </MotionItem>
+        <StorySkillsChipList skills={entry.skills} scrollContainerRef={scrollContainerRef} />
       )}
     </Stack>
   );
 };
 
-const CertificateSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'certificate' }> }) => {
+const CertificateSection = ({ item }: { item: Extract<CVStoryItem, { kind: 'certificate' }> }) => {
   const { data: cert } = item;
   return (
     <Stack spacing={2} sx={{ alignItems: 'center', textAlign: 'center' }}>
@@ -206,7 +279,11 @@ const CertificateSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'certif
   );
 };
 
-const VolunteeringSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'volunteering' }> }) => {
+const VolunteeringSection = ({
+  item,
+}: {
+  item: Extract<CVStoryItem, { kind: 'volunteering' }>;
+}) => {
   const { data: entry } = item;
   return (
     <Stack spacing={2.5}>
@@ -242,7 +319,13 @@ const VolunteeringSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'volun
   );
 };
 
-const CodingSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'coding' }> }) => {
+const CodingSection = ({
+  item,
+  scrollContainerRef,
+}: {
+  item: Extract<CVStoryItem, { kind: 'coding' }>;
+  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+}) => {
   const { data: example } = item;
   const [activeTab, setActiveTab] = useState(0);
 
@@ -283,9 +366,10 @@ const CodingSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'coding' }> 
         </MotionItem>
       )}
       {allTabs.length === 1 && skillsTabs.length === 1 && (
-        <MotionItem variants={storyChipsReveal}>
-          <SkillsChipList skills={skillsTabs[0].skills} animation="slide" />
-        </MotionItem>
+        <StorySkillsChipList
+          skills={skillsTabs[0].skills}
+          scrollContainerRef={scrollContainerRef}
+        />
       )}
       {allTabs.length > 1 && (
         <MotionItem variants={storyBodyReveal}>
@@ -315,30 +399,79 @@ const CodingSlide = ({ item }: { item: Extract<CVStoryItem, { kind: 'coding' }> 
   );
 };
 
-/* ── Main renderer ── */
-
-export const CVStorySlideRenderer = ({ item }: CVStorySlideRendererProps) => {
+const EndSection = ({ item }: { item: Extract<CVStoryItem, { kind: 'end' }> }) => {
+  const { data: endData } = item;
   return (
-    <motion.div
-      variants={storyContentContainer}
-      initial="hidden"
-      animate="visible"
-      style={{
-        maxWidth: 720,
-        margin: '0 auto',
-        display: 'flex',
-        alignItems: 'center',
-        minHeight: '100%',
-      }}
-    >
-      <Box sx={{ px: { xs: 3, sm: 4 }, py: { xs: 4, sm: 5 }, width: '100%' }}>
-        {item.kind === 'about' && <AboutSlide item={item} />}
-        {item.kind === 'experience' && <ExperienceSlide item={item} />}
-        {item.kind === 'education' && <EducationSlide item={item} />}
-        {item.kind === 'certificate' && <CertificateSlide item={item} />}
-        {item.kind === 'volunteering' && <VolunteeringSlide item={item} />}
-        {item.kind === 'coding' && <CodingSlide item={item} />}
-      </Box>
-    </motion.div>
+    <Stack spacing={3} sx={{ alignItems: 'center', textAlign: 'center' }}>
+      <MotionItem variants={storyTitleReveal}>
+        <HeaderTitle>{endData.headline}</HeaderTitle>
+      </MotionItem>
+      <MotionItem variants={storyBodyReveal}>
+        <BodyText sx={{ maxWidth: 520, mx: 'auto', lineHeight: 1.75 }}>{endData.body}</BodyText>
+      </MotionItem>
+      <MotionItem variants={storyChipsReveal}>
+        <Stack spacing={1.5} sx={{ alignItems: 'center', mt: 1 }}>
+          {endData.channels.map((channel) => (
+            <CommonLink
+              key={channel.url}
+              href={channel.url}
+              target={channel.icon === 'email' ? undefined : '_blank'}
+              rel={channel.icon === 'email' ? undefined : 'noopener noreferrer'}
+              sx={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 1,
+              }}
+            >
+              {channelIcon[channel.icon]}
+              {channel.label}
+            </CommonLink>
+          ))}
+        </Stack>
+      </MotionItem>
+    </Stack>
+  );
+};
+
+/* ── Main renderer — scroll-triggered section wrapper ── */
+
+export const CVStorySectionRenderer = ({
+  item,
+  index,
+  scrollContainerRef,
+}: CVStorySectionRendererProps) => {
+  const isFirstItem = index === 0;
+
+  return (
+    <>
+      {!isFirstItem && <StorySectionDivider />}
+      <MotionSection
+        variants={storyContentContainer}
+        rootMargin="0px 0px -8% 0px"
+        once
+        style={{
+          maxWidth: 720,
+          margin: '0 auto',
+        }}
+      >
+        <Box sx={{ px: { xs: 3, sm: 4 }, py: { xs: 3, sm: 4 }, width: '100%' }}>
+          {item.kind === 'about' && (
+            <AboutSection item={item} scrollContainerRef={scrollContainerRef} />
+          )}
+          {item.kind === 'experience' && (
+            <ExperienceSection item={item} scrollContainerRef={scrollContainerRef} />
+          )}
+          {item.kind === 'education' && (
+            <EducationSection item={item} scrollContainerRef={scrollContainerRef} />
+          )}
+          {item.kind === 'certificate' && <CertificateSection item={item} />}
+          {item.kind === 'volunteering' && <VolunteeringSection item={item} />}
+          {item.kind === 'coding' && (
+            <CodingSection item={item} scrollContainerRef={scrollContainerRef} />
+          )}
+          {item.kind === 'end' && <EndSection item={item} />}
+        </Box>
+      </MotionSection>
+    </>
   );
 };

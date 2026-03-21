@@ -26,6 +26,7 @@ export const AnimatedZoomList = <Item,>({
 }: AnimatedZoomListProps<Item>) => {
   const { getSectionDelayMs, motionTokens } = useComponentStyles();
   const { stagger: sFactor } = useMotionScale();
+  const resolvedStartDelayMs = Math.round(scaleStagger(startDelayMs, sFactor));
   const resolvedItemStaggerMs = Math.round(
     scaleStagger(itemStaggerMs ?? motionTokens.itemStaggerMs, sFactor)
   );
@@ -39,7 +40,11 @@ export const AnimatedZoomList = <Item,>({
           appear={false}
           easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
           style={{
-            transitionDelay: `${getSectionDelayMs(index, startDelayMs, resolvedItemStaggerMs)}ms`,
+            transitionDelay: `${getSectionDelayMs(
+              index,
+              resolvedStartDelayMs,
+              resolvedItemStaggerMs
+            )}ms`,
           }}
         >
           <Box>{renderItem(item, index)}</Box>

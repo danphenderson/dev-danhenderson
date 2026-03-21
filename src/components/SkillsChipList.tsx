@@ -9,6 +9,8 @@ type SkillsChipListProps = {
   dense?: boolean;
   in?: boolean;
   animation?: 'zoom' | 'slide';
+  startDelayMs?: number;
+  itemStaggerMs?: number;
   drawerContainer?: () => Element | null;
   keepMountedWhenExited?: boolean;
   reverseExitStagger?: boolean;
@@ -19,6 +21,8 @@ export const SkillsChipList = ({
   dense = false,
   in: inProp = true,
   animation = 'zoom',
+  startDelayMs = 0,
+  itemStaggerMs,
   drawerContainer,
   keepMountedWhenExited = false,
   reverseExitStagger = false,
@@ -38,6 +42,8 @@ export const SkillsChipList = ({
         items={filteredSkills}
         getItemKey={(skill, index) => `${skill}-${index}`}
         in={inProp}
+        startDelayMs={startDelayMs}
+        itemStaggerMs={itemStaggerMs}
         layout="wrap"
         container={drawerContainer}
         keepMountedWhenExited={keepMountedWhenExited}
@@ -61,6 +67,8 @@ export const SkillsChipList = ({
       items={filteredSkills}
       getItemKey={(skill, index) => `${skill}-${index}`}
       in={inProp}
+      startDelayMs={startDelayMs}
+      itemStaggerMs={itemStaggerMs}
       containerSx={skillsWrapSx}
       renderItem={(skill, index) => (
         <Chip

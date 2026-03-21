@@ -278,6 +278,15 @@ describe('CVAboutSection', () => {
     );
   });
 
+  it('renders footer controls in a left-aligned footer row', () => {
+    renderAboutSection({ footerControls: <div data-testid="about-footer-controls">Footer</div> });
+
+    const footerRow = screen.getByTestId('about-footer-controls').parentElement;
+
+    expect(footerRow).not.toBeNull();
+    expect(footerRow).toHaveStyle({ justifyContent: 'flex-start', width: '100%' });
+  });
+
   it('starts the opportunities heading immediately when the bio is empty and resets reveal state when the content changes', () => {
     jest.useFakeTimers();
 

@@ -1,4 +1,4 @@
-import { Box, Button, Chip, Stack, Typography } from '@mui/material';
+import { Box, Button, Chip, Stack } from '@mui/material';
 import AutoStoriesOutlinedIcon from '@mui/icons-material/AutoStoriesOutlined';
 import ViewModuleOutlinedIcon from '@mui/icons-material/ViewModuleOutlined';
 import { useComponentStyles } from '../../styles/componentStyles';
@@ -9,25 +9,52 @@ import { SectionLeadText } from '../text';
 type CVStoryHeaderProps = {
   mode: CVMode;
   onToggleMode: () => void;
-  chapterLabel?: string;
   variant?: 'page' | 'embedded';
 };
 
-export const CVStoryHeader = ({
-  mode,
-  onToggleMode,
-  chapterLabel,
-  variant = 'page',
-}: CVStoryHeaderProps) => {
+export const CVStoryHeader = ({ mode, onToggleMode, variant = 'page' }: CVStoryHeaderProps) => {
   const { compactSidebarSectionSpacing } = useComponentStyles();
   const isStory = mode === 'story';
   const isEmbedded = variant === 'embedded';
 
+  if (isEmbedded) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          gap: 1.5,
+          flexWrap: 'wrap',
+          width: '100%',
+        }}
+        data-testid="cv-story-header"
+      >
+        <Chip
+          icon={isStory ? <AutoStoriesOutlinedIcon /> : <ViewModuleOutlinedIcon />}
+          label={isStory ? 'Story Mode' : 'Full CV'}
+          size="small"
+          color={isStory ? 'primary' : 'default'}
+          variant="outlined"
+        />
+        <Button
+          size="small"
+          variant="text"
+          startIcon={isStory ? <ViewModuleOutlinedIcon /> : <AutoStoriesOutlinedIcon />}
+          onClick={onToggleMode}
+          data-testid="cv-mode-toggle"
+          sx={{ minWidth: 0, justifyContent: 'flex-start', textAlign: 'left', px: 0 }}
+        >
+          {isStory ? cvStoryCta.switchToDefault : cvStoryCta.switchToStory}
+        </Button>
+      </Box>
+    );
+  }
+
   return (
     <Stack
-      spacing={isEmbedded ? 0.75 : compactSidebarSectionSpacing}
-      alignItems={isEmbedded ? 'flex-end' : 'stretch'}
-      sx={isEmbedded ? { width: '100%' } : undefined}
+      spacing={compactSidebarSectionSpacing}
+      alignItems="stretch"
       data-testid="cv-story-header"
     >
       <Box
@@ -36,7 +63,7 @@ export const CVStoryHeader = ({
           alignItems: 'center',
           gap: 1.5,
           flexWrap: 'wrap',
-          justifyContent: isEmbedded ? 'flex-end' : 'flex-start',
+          justifyContent: 'flex-start',
         }}
       >
         <Chip
@@ -46,25 +73,15 @@ export const CVStoryHeader = ({
           color={isStory ? 'primary' : 'default'}
           variant="outlined"
         />
-        {!isEmbedded && isStory && chapterLabel && (
-          <Typography variant="caption" color="text.secondary">
-            {chapterLabel}
-          </Typography>
-        )}
       </Box>
-      {!isEmbedded && isStory && <SectionLeadText>{cvStoryIntro}</SectionLeadText>}
-      <Box
-        sx={isEmbedded ? { display: 'flex', justifyContent: 'flex-end', width: '100%' } : undefined}
-      >
+      {isStory && <SectionLeadText>{cvStoryIntro}</SectionLeadText>}
+      <Box>
         <Button
           size="small"
           variant="text"
           startIcon={isStory ? <ViewModuleOutlinedIcon /> : <AutoStoriesOutlinedIcon />}
           onClick={onToggleMode}
           data-testid="cv-mode-toggle"
-          sx={
-            isEmbedded ? { minWidth: 0, justifyContent: 'flex-end', textAlign: 'right' } : undefined
-          }
         >
           {isStory ? cvStoryCta.switchToDefault : cvStoryCta.switchToStory}
         </Button>

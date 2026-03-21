@@ -5,8 +5,8 @@ import {
   codingExamples,
   currentWorkflowTools,
   cvBackgroundImage,
-  cvStoryChapters,
   cvStoryCta,
+  cvStoryEndData,
   cvStoryIntro,
   educationInfo,
   experiences,
@@ -202,19 +202,21 @@ describe('cv.ts schema', () => {
       expect(cvStoryIntro.length).toBeGreaterThan(0);
     });
 
-    it('cvStoryChapters is a non-empty array with required fields', () => {
-      expect(cvStoryChapters.length).toBeGreaterThan(0);
-      for (const chapter of cvStoryChapters) {
-        expect(typeof chapter.key).toBe('string');
-        expect(typeof chapter.sectionKey).toBe('string');
-        expect(typeof chapter.title).toBe('string');
-        expect(typeof chapter.narrative).toBe('string');
-      }
-    });
+    it('cvStoryEndData contains a headline, body, and contact channels', () => {
+      expect(typeof cvStoryEndData.headline).toBe('string');
+      expect(cvStoryEndData.headline.length).toBeGreaterThan(0);
+      expect(typeof cvStoryEndData.body).toBe('string');
+      expect(cvStoryEndData.body.length).toBeGreaterThan(0);
+      expect(Array.isArray(cvStoryEndData.channels)).toBe(true);
+      expect(cvStoryEndData.channels.length).toBeGreaterThan(0);
 
-    it('cvStoryChapters have unique keys', () => {
-      const keys = cvStoryChapters.map((c) => c.key);
-      expect(new Set(keys).size).toBe(keys.length);
+      for (const channel of cvStoryEndData.channels) {
+        expect(typeof channel.label).toBe('string');
+        expect(channel.label.length).toBeGreaterThan(0);
+        expect(typeof channel.url).toBe('string');
+        expect(channel.url.length).toBeGreaterThan(0);
+        expect(['email', 'github', 'linkedin', 'web']).toContain(channel.icon);
+      }
     });
 
     it('cvStoryCta has switchToDefault and switchToStory labels', () => {

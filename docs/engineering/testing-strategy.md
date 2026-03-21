@@ -160,18 +160,18 @@ Each route spec covers:
 
 ### Currently tested
 
-| Category                      | What's covered                                                           | Test layer       |
-| ----------------------------- | ------------------------------------------------------------------------ | ---------------- |
-| Provider state                | Theme toggle, appearance, motion intensity, audio consent, palette state | Unit             |
-| Route rendering               | All 6 routes render expected content                                     | Unit + E2E       |
-| Component APIs                | Props, conditional rendering, data-driven content                        | Unit             |
-| Data hooks                    | Sorting, lookup, transformation, edge cases                              | Unit             |
-| GitHub fallback               | Success and error API states, fallback rendering                         | E2E              |
-| Feature gating                | Blog routes present/absent based on runtime env                          | Unit (constants) |
-| CV story mode                 | Story mode activation, slide navigation, controls                        | Unit             |
-| Not-found recovery            | Recovery panel renders with contextual suggestions                       | Unit + E2E       |
-| Animation component contracts | Delay props, tilt flag, visibility callbacks                             | Unit             |
-| Style builder outputs         | Builder functions execute without error against theme                    | Unit             |
+| Category                      | What's covered                                                                 | Test layer       |
+| ----------------------------- | ------------------------------------------------------------------------------ | ---------------- |
+| Provider state                | Theme toggle, appearance, motion intensity, audio consent, palette state       | Unit             |
+| Route rendering               | All 6 routes render expected content                                           | Unit + E2E       |
+| Component APIs                | Props, conditional rendering, data-driven content                              | Unit             |
+| Data hooks                    | Sorting, lookup, transformation, edge cases                                    | Unit             |
+| GitHub fallback               | Success and error API states, fallback rendering                               | E2E              |
+| Feature gating                | Blog routes present/absent based on runtime env                                | Unit (constants) |
+| CV story mode                 | Story mode activation, scroll progress, active-section tracking, exit controls | Unit             |
+| Not-found recovery            | Recovery panel renders with contextual suggestions                             | Unit + E2E       |
+| Animation component contracts | Delay props, tilt flag, visibility callbacks                                   | Unit             |
+| Style builder outputs         | Builder functions execute without error against theme                          | Unit             |
 
 ### Not currently tested (gaps)
 
@@ -204,7 +204,7 @@ Motion is the highest regression risk in this codebase. Key principles:
 
 - Tab open/close transitions
 - Accordion expand/collapse
-- Story mode forward/backward navigation
+- Story mode scroll progress + active-section transitions
 - IDE window state changes (normal → minimized → expanded)
 
 ### Use the IntersectionObserver stub
@@ -214,6 +214,7 @@ Motion is the highest regression risk in this codebase. Key principles:
 - Viewport-triggered animations fire immediately in tests
 - You don't need to scroll or wait for intersection
 - Tests see the final visible state, not the hidden initial state
+- Story-mode tests can simulate multiple intersecting sections in one callback to verify deterministic active-section selection
 
 ## Testing boundaries
 

@@ -183,6 +183,8 @@ export const HeaderSettingsPopover = ({
   };
 
   const activePreset = appAppearancePresets[appearance];
+  const activeMotionLevel =
+    MOTION_LEVELS.find((level) => level.key === motionIntensity) ?? MOTION_LEVELS[0];
 
   /* Arrow-key navigation for the appearance radiogroup */
   const handleSwatchKeyDown = useCallback(
@@ -325,30 +327,63 @@ export const HeaderSettingsPopover = ({
 
           {/* ---- Motion intensity ---- */}
           <Stack spacing={1}>
-            <SectionLabel>Motion</SectionLabel>
+            <Stack direction="row" alignItems="baseline" justifyContent="space-between">
+              <SectionLabel>Motion</SectionLabel>
+              <Typography
+                variant="caption"
+                sx={{ color: 'text.secondary', fontSize: '0.6875rem' }}
+                data-testid="active-motion-label"
+              >
+                {activeMotionLevel.label}
+              </Typography>
+            </Stack>
             <ToggleButtonGroup
               value={motionIntensity}
               exclusive
               onChange={handleMotionChange}
               aria-label="Motion intensity"
               size="small"
-              fullWidth
               disabled={!!prefersReducedMotion}
               sx={{
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 1,
                 '& .MuiToggleButton-root': {
-                  textTransform: 'none',
-                  fontSize: '0.75rem',
-                  py: 0.5,
-                  gap: 0.5,
+                  width: 36,
+                  minWidth: 36,
+                  height: 32,
+                  p: 0,
+                  borderRadius: 1.25,
+                  border: (theme) => `1px solid ${alpha(theme.palette.divider, 0.3)}`,
+                  color: 'text.secondary',
+                  '&.Mui-selected': {
+                    color: 'primary.main',
+                    backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.08),
+                    borderColor: (theme) => alpha(theme.palette.primary.main, 0.45),
+                  },
+                  '&.Mui-selected:hover': {
+                    backgroundColor: (theme) => alpha(theme.palette.primary.main, 0.14),
+                  },
+                },
+                '& .MuiToggleButtonGroup-grouped': {
+                  margin: 0,
                 },
               }}
             >
-              {MOTION_LEVELS.map((level) => (
-                <ToggleButton key={level.key} value={level.key} aria-label={level.label}>
-                  {level.icon}
-                  {level.label}
-                </ToggleButton>
-              ))}
+              {MOTION_LEVELS.map((level) => {
+                const tooltipLabel =
+                  level.key === motionIntensity ? `${level.label} (active)` : level.label;
+
+                return (
+                  <Tooltip key={level.key} title={tooltipLabel} placement="top">
+                    <span>
+                      <ToggleButton value={level.key} aria-label={level.label}>
+                        {level.icon}
+                      </ToggleButton>
+                    </span>
+                  </Tooltip>
+                );
+              })}
             </ToggleButtonGroup>
             {prefersReducedMotion && (
               <Stack

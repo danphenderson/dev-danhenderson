@@ -114,11 +114,16 @@ export type CVSectionKey =
   | 'certificates'
   | 'coding';
 
-export type CVStoryChapter = {
-  key: string;
-  sectionKey: CVSectionKey;
-  title: string;
-  narrative: string;
+export type CVStoryContactChannel = {
+  label: string;
+  url: string;
+  icon: 'email' | 'github' | 'linkedin' | 'web';
+};
+
+export type CVStoryEndData = {
+  headline: string;
+  body: string;
+  channels: CVStoryContactChannel[];
 };
 
 export type CVStoryItem =
@@ -127,7 +132,8 @@ export type CVStoryItem =
   | { kind: 'education'; data: EducationEntry; sortDate: Date }
   | { kind: 'certificate'; data: Certificate; sortDate: Date }
   | { kind: 'volunteering'; data: VolunteeringEntry; sortDate: Date }
-  | { kind: 'coding'; data: CodingExample };
+  | { kind: 'coding'; data: CodingExample }
+  | { kind: 'end'; data: CVStoryEndData };
 
 export type GitHubProfileData = {
   activity: GitHubActivityItem[];

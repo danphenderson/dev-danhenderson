@@ -1,10 +1,7 @@
-import {
-  parseCVSortDate,
-  buildCVStoryItems,
-  type CVStoryItem,
-} from '../../../src/data/cvStoryItems';
+import { parseCVSortDate, buildCVStoryItems } from '../../../src/data/cvStoryItems';
 import type {
   AboutMe,
+  CVStoryEndData,
   Certificate,
   CodingExample,
   EducationEntry,
@@ -67,6 +64,12 @@ const makeCoding = (title = 'Project'): CodingExample => ({
   title,
   description: 'desc',
   links: [],
+});
+
+const makeEndData = (): CVStoryEndData => ({
+  headline: "Let's Connect",
+  body: 'Thanks for reading.',
+  channels: [{ label: 'Email', url: 'mailto:test@example.com', icon: 'email' }],
 });
 
 /* ── parseCVSortDate ── */
@@ -185,6 +188,7 @@ describe('buildCVStoryItems', () => {
     certificates: [],
     volunteering: [],
     codingExamples: [],
+    endData: makeEndData(),
   };
 
   it('always places the about item first', () => {
@@ -197,7 +201,17 @@ describe('buildCVStoryItems', () => {
     expect(items[0].kind).toBe('about');
   });
 
-  it('always places coding items after all time-bounded items', () => {
+  it('always places the end item last', () => {
+    const items = buildCVStoryItems({
+      ...defaultInput,
+      experiences: [makeExperience('Jan 2020')],
+      codingExamples: [makeCoding()],
+    });
+
+    expect(items[items.length - 1].kind).toBe('end');
+  });
+
+  it('always places coding items after all time-bounded items but before end', () => {
     const items = buildCVStoryItems({
       ...defaultInput,
       experiences: [makeExperience('Jan 2025')],
@@ -207,7 +221,9 @@ describe('buildCVStoryItems', () => {
     const kinds = items.map((i) => i.kind);
     const lastExperienceIdx = kinds.lastIndexOf('experience');
     const firstCodingIdx = kinds.indexOf('coding');
+    const endIdx = kinds.indexOf('end');
     expect(firstCodingIdx).toBeGreaterThan(lastExperienceIdx);
+    expect(endIdx).toBeGreaterThan(firstCodingIdx);
   });
 
   it('sorts time-bounded items chronologically oldest-first', () => {
@@ -224,18 +240,41 @@ describe('buildCVStoryItems', () => {
     expect((experienceItems[1].data as Experience).company).toBe('Later');
   });
 
-  it('interleaves different time-bounded kinds by date', () => {
+  it('groups time-bounded items by narrative chapter and sorts within each chapter', () => {
     const items = buildCVStoryItems({
       ...defaultInput,
-      experiences: [makeExperience('Jun 2020', { company: 'Middle' })],
-      certificates: [makeCertificate('Jan 2019', { title: 'Early Cert' })],
+      experiences: [
+        makeExperience('Jun 2020', { company: 'Later Experience' }),
+        makeExperience('Jan 2018', { company: 'Earlier Experience' }),
+      ],
+      education: {
+        entries: [makeEducation('May 2016', { program: 'Earlier Degree' })],
+      } as EducationInfo,
       volunteering: [makeVolunteering('Dec 2021', { organization: 'Late Vol' })],
+      certificates: [makeCertificate('Jan 2010', { title: 'Early Cert' })],
     });
 
-    const timeBounded = items.filter((i) => i.kind !== 'about' && i.kind !== 'coding');
-    expect(timeBounded[0].kind).toBe('certificate');
-    expect(timeBounded[1].kind).toBe('experience');
-    expect(timeBounded[2].kind).toBe('volunteering');
+    const timeBounded = items.filter(
+      (i) => i.kind !== 'about' && i.kind !== 'coding' && i.kind !== 'end'
+    );
+
+    expect(timeBounded.map((item) => item.kind)).toEqual([
+      'experience',
+      'experience',
+      'education',
+      'volunteering',
+      'certificate',
+    ]);
+
+    const experienceItems = timeBounded.filter(
+      (item): item is Extract<(typeof timeBounded)[number], { kind: 'experience' }> =>
+        item.kind === 'experience'
+    );
+
+    expect(experienceItems.map((item) => item.data.company)).toEqual([
+      'Earlier Experience',
+      'Later Experience',
+    ]);
   });
 
   it('includes education entries with dateRange', () => {
@@ -264,10 +303,11 @@ describe('buildCVStoryItems', () => {
     ).toBe(2026);
   });
 
-  it('returns only about when all arrays are empty', () => {
+  it('returns about and end when all arrays are empty', () => {
     const items = buildCVStoryItems(defaultInput);
-    expect(items).toHaveLength(1);
+    expect(items).toHaveLength(2);
     expect(items[0].kind).toBe('about');
+    expect(items[1].kind).toBe('end');
   });
 
   it('preserves the full item structure through the builder', () => {

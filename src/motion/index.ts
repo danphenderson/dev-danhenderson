@@ -32,9 +32,6 @@ export {
   hoverLift,
   tapShrink,
   hoverZoom,
-  storySlideVariants,
-  slideContentContainer,
-  slideContentItem,
   storyContentContainer,
   storyLabelReveal,
   storyTitleReveal,
@@ -44,6 +41,7 @@ export {
   storyLinkReveal,
   storyBulletContainer,
   storyBulletItem,
+  storyDividerReveal,
 } from './variants';
 
 export {

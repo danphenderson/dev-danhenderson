@@ -339,22 +339,19 @@ describe('CV page section navigation', () => {
   it('renders story mode viewer when ?mode=story is set', () => {
     renderCV(['/cv?mode=story']);
 
-    // New immersive viewer renders instead of old chapter-based layout
     expect(screen.getByLabelText('Exit story mode')).toBeInTheDocument();
-    expect(screen.getByLabelText('Previous slide')).toBeInTheDocument();
-    expect(screen.getByLabelText('Next slide')).toBeInTheDocument();
-    // No section navigator or desktop regions in story mode
+    expect(screen.queryByLabelText('Previous slide')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Next slide')).not.toBeInTheDocument();
     expect(screen.queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
     expect(screen.queryByTestId('cv-desktop-top-region')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('cv-story-header')).not.toBeInTheDocument();
   });
 
-  it('renders about slide first and shows navigation counter in story mode', () => {
+  it('renders the full continuous-scroll narrative in story mode', () => {
     renderCV(['/cv?mode=story']);
 
-    // First slide is about — should show the user name
     expect(screen.getByText('Daniel Henderson')).toBeInTheDocument();
-    // Navigation counter should start at 1
-    expect(screen.getByText(/1\s*\/\s*\d+/)).toBeInTheDocument();
+    expect(screen.getByText("Let's Connect")).toBeInTheDocument();
   });
 
   it('renders the default mode with a story toggle when ?mode is absent', () => {
@@ -382,10 +379,10 @@ describe('CV page section navigation', () => {
     // Click the toggle to enter story mode
     fireEvent.click(screen.getByTestId('cv-mode-toggle'));
 
-    // Story viewer should now render
     expect(screen.getByLabelText('Exit story mode')).toBeInTheDocument();
-    expect(screen.getByLabelText('Previous slide')).toBeInTheDocument();
-    expect(screen.getByLabelText('Next slide')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Previous slide')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Next slide')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('cv-mode-toggle')).not.toBeInTheDocument();
   });
 
   it('exits story mode when Escape key is pressed', () => {

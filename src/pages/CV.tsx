@@ -34,6 +34,7 @@ import {
   codingExamples,
   currentWorkflowTools,
   cvBackgroundImage,
+  cvStoryEndData,
   educationInfo,
   experiences,
   githubSectionLead,
@@ -362,6 +363,7 @@ const CVRouteContent = () => {
           certificates,
           volunteering,
           codingExamples,
+          endData: cvStoryEndData,
         })}
         onExit={handleToggleMode}
       />

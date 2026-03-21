@@ -1,5 +1,5 @@
 import type { ReactNode, HTMLAttributes, Ref } from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { CVStoryViewer } from '../../../../src/components/cv/CVStoryViewer';
 import type { CVStoryItem } from '../../../../src/data/cvStoryItems';
@@ -13,19 +13,9 @@ jest.mock('motion/react', () => {
         (
           {
             children,
-            drag,
-            dragConstraints,
-            dragElastic,
-            dragDirectionLock,
-            onDragEnd,
             ...rest
           }: {
             children?: ReactNode;
-            drag?: string;
-            dragConstraints?: unknown;
-            dragElastic?: number;
-            dragDirectionLock?: boolean;
-            onDragEnd?: unknown;
           } & HTMLAttributes<HTMLDivElement>,
           ref: Ref<HTMLDivElement>
         ) => (
@@ -35,7 +25,6 @@ jest.mock('motion/react', () => {
         )
       ),
     },
-    AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
     useMotionValue: () => ({ get: () => 0, on: () => () => {} }),
   };
 });
@@ -47,39 +36,41 @@ jest.mock('../../../../src/components/cv/CVStoryProgress', () => ({
   ),
 }));
 
-jest.mock('../../../../src/components/cv/CVStoryNavBar', () => ({
-  CVStoryNavBar: ({
-    currentIndex,
-    onPrev,
-    onNext,
-    onJumpTo,
-  }: {
-    items: CVStoryItem[];
-    currentIndex: number;
-    onPrev: () => void;
-    onNext: () => void;
-    onJumpTo: (index: number) => void;
-  }) => (
-    <div data-testid="cv-story-nav-bar" data-current-index={currentIndex}>
-      <button type="button" aria-label="Prev" onClick={onPrev}>
-        Prev
-      </button>
-      <button type="button" aria-label="Next" onClick={onNext}>
-        Next
-      </button>
-      <button type="button" aria-label="JumpTo2" onClick={() => onJumpTo(2)}>
-        Jump to 2
-      </button>
-    </div>
+// Stub the section renderer so we can identify items by kind
+jest.mock('../../../../src/components/cv/CVStorySectionRenderer', () => ({
+  CVStorySectionRenderer: ({ item, index }: { item: CVStoryItem; index: number }) => (
+    <div data-testid="cv-story-section" data-kind={item.kind} data-index={index} />
   ),
 }));
 
-// Stub the slide renderer so we can identify the current item by kind
-jest.mock('../../../../src/components/cv/CVStorySlideRenderer', () => ({
-  CVStorySlideRenderer: ({ item }: { item: CVStoryItem }) => (
-    <div data-testid="cv-story-slide" data-kind={item.kind} />
-  ),
-}));
+type MockIntersectionObserverInstance = IntersectionObserver & {
+  observedTargets: Element[];
+  trigger: (entries: Array<{ target: Element; isIntersecting: boolean }>) => void;
+};
+
+const mockIntersectionObserverInstances: MockIntersectionObserverInstance[] = [];
+
+const MockIntersectionObserver = function (
+  this: MockIntersectionObserverInstance,
+  callback: IntersectionObserverCallback
+) {
+  this.root = null;
+  this.rootMargin = '';
+  this.thresholds = [];
+  this.observedTargets = [];
+  this.observe = (target: Element) => {
+    this.observedTargets.push(target);
+  };
+  this.unobserve = () => {};
+  this.disconnect = () => {};
+  this.takeRecords = () => [];
+  this.trigger = (entries: Array<{ target: Element; isIntersecting: boolean }>) => {
+    callback(entries as IntersectionObserverEntry[], this);
+  };
+  mockIntersectionObserverInstances.push(this);
+} as unknown as {
+  new (callback: IntersectionObserverCallback): MockIntersectionObserverInstance;
+};
 
 const makeAboutItem = (): CVStoryItem => ({
   kind: 'about',
@@ -104,11 +95,21 @@ const makeCodingItem = (): CVStoryItem => ({
   data: { title: 'Project', description: 'Desc', links: [] },
 });
 
+const makeEndItem = (): CVStoryItem => ({
+  kind: 'end',
+  data: {
+    headline: "Let's Connect",
+    body: 'Thanks for reading.',
+    channels: [{ label: 'Email', url: 'mailto:test@example.com', icon: 'email' as const }],
+  },
+});
+
 const buildItems = (): CVStoryItem[] => [
   makeAboutItem(),
   makeExperienceItem('ACME'),
   makeExperienceItem('Beta'),
   makeCodingItem(),
+  makeEndItem(),
 ];
 
 const mockOnExit = jest.fn();
@@ -120,44 +121,99 @@ const renderViewer = (items = buildItems()) =>
     </ThemeProvider>
   );
 
+const getObservedTarget = (
+  observer: MockIntersectionObserverInstance,
+  index: number
+): Element | undefined =>
+  observer.observedTargets.find((target) => target.getAttribute('data-story-index') === `${index}`);
+
 describe('CVStoryViewer', () => {
+  let originalIntersectionObserver: typeof IntersectionObserver | undefined;
+
+  beforeAll(() => {
+    originalIntersectionObserver = window.IntersectionObserver;
+  });
+
   beforeEach(() => {
     mockOnExit.mockClear();
+    mockIntersectionObserverInstances.length = 0;
+
+    Object.defineProperty(window, 'IntersectionObserver', {
+      configurable: true,
+      writable: true,
+      value: MockIntersectionObserver,
+    });
+
+    Object.defineProperty(global, 'IntersectionObserver', {
+      configurable: true,
+      writable: true,
+      value: MockIntersectionObserver,
+    });
   });
 
-  it('renders the first item on mount (index 0)', () => {
+  afterAll(() => {
+    Object.defineProperty(window, 'IntersectionObserver', {
+      configurable: true,
+      writable: true,
+      value: originalIntersectionObserver,
+    });
+
+    Object.defineProperty(global, 'IntersectionObserver', {
+      configurable: true,
+      writable: true,
+      value: originalIntersectionObserver,
+    });
+  });
+
+  it('renders all items in the scrollable narrative', () => {
     renderViewer();
-    expect(screen.getByTestId('cv-story-slide')).toHaveAttribute('data-kind', 'about');
+    const sections = screen.getAllByTestId('cv-story-section');
+    expect(sections).toHaveLength(5);
+    expect(sections[0]).toHaveAttribute('data-kind', 'about');
+    expect(sections[1]).toHaveAttribute('data-kind', 'experience');
+    expect(sections[4]).toHaveAttribute('data-kind', 'end');
   });
 
-  it('shows the kind label for the current item', () => {
+  it('shows the active kind label', () => {
     renderViewer();
     expect(screen.getByText('About')).toBeInTheDocument();
+
+    const observer = mockIntersectionObserverInstances[0];
+    const endTarget = getObservedTarget(observer, 4);
+
+    expect(endTarget).toBeDefined();
+
+    act(() => {
+      observer.trigger([{ target: endTarget!, isIntersecting: true }]);
+    });
+
+    expect(screen.getByText('Connect')).toBeInTheDocument();
   });
 
-  it('advances to the next item on ArrowRight', () => {
+  it('resolves the active kind from the full visible section set instead of entry order', () => {
     renderViewer();
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
-    expect(screen.getByTestId('cv-story-slide')).toHaveAttribute('data-kind', 'experience');
-  });
 
-  it('advances to the next item on ArrowDown', () => {
-    renderViewer();
-    fireEvent.keyDown(window, { key: 'ArrowDown' });
-    expect(screen.getByTestId('cv-story-slide')).toHaveAttribute('data-kind', 'experience');
-  });
+    const observer = mockIntersectionObserverInstances[0];
+    const experienceTarget = getObservedTarget(observer, 1);
+    const codingTarget = getObservedTarget(observer, 3);
 
-  it('does not retreat past the first item on ArrowLeft', () => {
-    renderViewer();
-    fireEvent.keyDown(window, { key: 'ArrowLeft' }); // should be no-op at index 0
-    expect(screen.getByTestId('cv-story-slide')).toHaveAttribute('data-kind', 'about');
-  });
+    expect(experienceTarget).toBeDefined();
+    expect(codingTarget).toBeDefined();
 
-  it('retreats to the previous item on ArrowLeft after advancing', () => {
-    renderViewer();
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
-    fireEvent.keyDown(window, { key: 'ArrowLeft' });
-    expect(screen.getByTestId('cv-story-slide')).toHaveAttribute('data-kind', 'about');
+    act(() => {
+      observer.trigger([
+        { target: experienceTarget!, isIntersecting: true },
+        { target: codingTarget!, isIntersecting: true },
+      ]);
+    });
+
+    expect(screen.getByText('Experience')).toBeInTheDocument();
+
+    act(() => {
+      observer.trigger([{ target: experienceTarget!, isIntersecting: false }]);
+    });
+
+    expect(screen.getByText('Project')).toBeInTheDocument();
   });
 
   it('calls onExit when Escape is pressed', () => {
@@ -172,52 +228,37 @@ describe('CVStoryViewer', () => {
     expect(mockOnExit).toHaveBeenCalledTimes(1);
   });
 
-  it('updates the progress bar as items advance', () => {
-    renderViewer(buildItems());
-    const items = buildItems();
-    const totalItems = items.length;
-
-    // Initially at index 0: progress = 1 / totalItems
-    expect(screen.getByTestId('cv-story-progress')).toHaveAttribute(
-      'data-progress',
-      String(1 / totalItems)
-    );
-
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
-
-    expect(screen.getByTestId('cv-story-progress')).toHaveAttribute(
-      'data-progress',
-      String(2 / totalItems)
-    );
-  });
-
-  it('passes the current index to the nav bar', () => {
+  it('renders the progress bar with initial progress 0 and updates on scroll', () => {
     renderViewer();
-    expect(screen.getByTestId('cv-story-nav-bar')).toHaveAttribute('data-current-index', '0');
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
-    expect(screen.getByTestId('cv-story-nav-bar')).toHaveAttribute('data-current-index', '1');
-  });
+    expect(screen.getByTestId('cv-story-progress')).toHaveAttribute('data-progress', '0');
 
-  it('jumps to a specific index via onJumpTo from the nav bar', () => {
-    renderViewer();
-    fireEvent.click(screen.getByLabelText('JumpTo2'));
-    expect(screen.getByTestId('cv-story-slide')).toHaveAttribute('data-kind', 'experience');
-  });
+    const firstSection = screen.getAllByTestId('cv-story-section')[0];
+    const scrollContainer = firstSection.closest('[data-story-index]')
+      ?.parentElement as HTMLDivElement;
 
-  it('does not advance past the last item on ArrowRight', () => {
-    const items = buildItems();
-    renderViewer(items);
-    // Advance to last item
-    for (let i = 0; i < items.length - 1; i++) {
-      fireEvent.keyDown(window, { key: 'ArrowRight' });
-    }
-    // Try to advance past last
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
-    expect(screen.getByTestId('cv-story-slide')).toHaveAttribute('data-kind', 'coding');
+    Object.defineProperty(scrollContainer, 'scrollHeight', {
+      configurable: true,
+      value: 1000,
+    });
+    Object.defineProperty(scrollContainer, 'clientHeight', {
+      configurable: true,
+      value: 500,
+    });
+    Object.defineProperty(scrollContainer, 'scrollTop', {
+      configurable: true,
+      writable: true,
+      value: 200,
+    });
+
+    fireEvent.scroll(scrollContainer);
+
+    expect(screen.getByTestId('cv-story-progress')).toHaveAttribute('data-progress', '0.4');
   });
 
   it('renders with a single item without crashing', () => {
     expect(() => renderViewer([makeAboutItem()])).not.toThrow();
-    expect(screen.getByTestId('cv-story-slide')).toHaveAttribute('data-kind', 'about');
+    const sections = screen.getAllByTestId('cv-story-section');
+    expect(sections).toHaveLength(1);
+    expect(sections[0]).toHaveAttribute('data-kind', 'about');
   });
 });

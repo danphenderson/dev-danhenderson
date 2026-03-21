@@ -60,7 +60,7 @@ These are reusable across multiple routes. They define the site's shared visual 
 | `AnimatedContentList`   | Staggered card list orchestrator                                    | 5 CV list renderers                                                |
 | `AnimatedSlideList`     | Direction-aware slide reveal for tab/accordion content              | CV tab panels                                                      |
 | `AnimatedZoomList`      | Zoom-in stagger list                                                | Supplemental lists                                                 |
-| `SkillsChipList`        | Skill/tool chip wrap list                                           | CV about, experience, education, coding, story slides              |
+| `SkillsChipList`        | Skill/tool chip wrap list                                           | CV about, experience, education, coding, story sections            |
 | `TabPanel`              | Collapsible tab panel wrapper                                       | CV experience, education, coding, volunteering                     |
 | `TypographyPrimitives`  | Semantic text components (HeaderLabel, EntryTitle, BodyText, etc.)  | Site-wide                                                          |
 | `InlineLabelPrimitives` | Span-based label components for chips/tabs                          | AppSpeedDial, TabPanel, SkillsChipList                             |
@@ -74,7 +74,7 @@ flowchart LR
   subgraph cv["cv/ — 25 components"]
     Sections["Section wrappers<br/>CVAboutSection · CVExperienceSection<br/>CVEducationSection · CVCertificatesSection<br/>CVCodingSection · CVVolunteeringSection<br/>CVGitHubSection"]
     Lists["List renderers<br/>ExperienceList · EducationSection<br/>CertificatesList · CodingExamplesSection<br/>VolunteeringList"]
-    Story["Story mode<br/>CVStoryViewer · CVStoryNavBar<br/>CVStorySlideRenderer · CVStoryProgress<br/>CVStoryHeader · CVStoryChapterHeading"]
+    Story["Story mode<br/>CVStoryViewer · CVStorySectionRenderer<br/>CVStoryProgress · CVStoryHeader"]
     GitHub["GitHub integration<br/>GitHubContributions · GitHubContributionCalendar<br/>GitHubActivityList · GitHubLinkChipList<br/>CVGitHubStatusTooltip"]
     Shared["Shared CV<br/>ProfileCard · CVEntryHeader<br/>CVSectionCard · CVSectionStack<br/>CVSectionNavigator · cvSectionMetadata"]
   end
@@ -96,12 +96,12 @@ flowchart LR
 
 Four subsystems intentionally bypass the shared design-system primitives. These are not drift — they are purpose-built alternative design languages:
 
-| Subsystem                        | Components                                               | Why it differs                                                                                                                                                                        |
-| -------------------------------- | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Home faux-VS Code hero**       | `TerminalHeroContent` + `src/components/ide/*`           | Simulates a desktop IDE chrome; uses its own token file (`vscodeTokens.ts`), custom window controls, and terminal typewriter — none of this belongs in the shared card/section system |
-| **Blog editorial surfaces**      | `BlogHero`, `BlogArticleBody`, `BlogArticleHeader`       | Uses display-scale typography, image-first hero treatment, and custom content block rendering that doesn't fit the standard `SectionCard` + `SectionHeading` pattern                  |
-| **Photography overlay/lightbox** | `ImmersiveLightbox`, `AlbumCard`, `PhotoAlbum`           | Image-first surfaces with full-bleed overlays, quilted layouts, and download/share actions — intentionally not wrapped in standard card surfaces                                      |
-| **CV story mode**                | `CVStoryViewer`, `CVStorySlideRenderer`, `CVStoryNavBar` | Full-screen immersive slide experience with directional enter/exit animations, progress bar, and cinematic variants                                                                   |
+| Subsystem                        | Components                                                   | Why it differs                                                                                                                                                                        |
+| -------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Home faux-VS Code hero**       | `TerminalHeroContent` + `src/components/ide/*`               | Simulates a desktop IDE chrome; uses its own token file (`vscodeTokens.ts`), custom window controls, and terminal typewriter — none of this belongs in the shared card/section system |
+| **Blog editorial surfaces**      | `BlogHero`, `BlogArticleBody`, `BlogArticleHeader`           | Uses display-scale typography, image-first hero treatment, and custom content block rendering that doesn't fit the standard `SectionCard` + `SectionHeading` pattern                  |
+| **Photography overlay/lightbox** | `ImmersiveLightbox`, `AlbumCard`, `PhotoAlbum`               | Image-first surfaces with full-bleed overlays, quilted layouts, and download/share actions — intentionally not wrapped in standard card surfaces                                      |
+| **CV story mode**                | `CVStoryViewer`, `CVStorySectionRenderer`, `CVStoryProgress` | Full-screen continuous-scroll narrative with per-section reveals, scroll progress tracking, and deterministic active-section labels                                                   |
 
 **Rule:** Do not attempt to "normalize" these into the shared primitive system. They exist for a reason.
 

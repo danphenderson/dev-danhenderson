@@ -140,4 +140,58 @@ describe('AnimatedSlideList', () => {
       expect(slide).toHaveAttribute('data-in', 'false');
     });
   });
+
+  it('keeps an in-progress stagger running when rerendered with the same open items', () => {
+    const items = ['React', 'TypeScript', 'MUI'];
+    const { rerender } = render(
+      <AnimatedSlideList
+        items={items}
+        getItemKey={(item) => item}
+        in
+        startDelayMs={40}
+        layout="wrap"
+        renderItem={(item) => <div>{item}</div>}
+      />
+    );
+
+    screen.getAllByTestId('slide-item').forEach((slide) => {
+      expect(slide).toHaveAttribute('data-in', 'false');
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(40);
+    });
+
+    expect(screen.getAllByTestId('slide-item')[0]).toHaveAttribute('data-in', 'true');
+    expect(screen.getAllByTestId('slide-item')[1]).toHaveAttribute('data-in', 'false');
+    expect(screen.getAllByTestId('slide-item')[2]).toHaveAttribute('data-in', 'false');
+
+    rerender(
+      <AnimatedSlideList
+        items={[...items]}
+        getItemKey={(item) => item}
+        in
+        startDelayMs={40}
+        layout="wrap"
+        renderItem={(item) => <div>{item}</div>}
+      />
+    );
+
+    expect(screen.getAllByTestId('slide-item')[0]).toHaveAttribute('data-in', 'true');
+    expect(screen.getAllByTestId('slide-item')[1]).toHaveAttribute('data-in', 'false');
+    expect(screen.getAllByTestId('slide-item')[2]).toHaveAttribute('data-in', 'false');
+
+    act(() => {
+      jest.advanceTimersByTime(20);
+    });
+
+    expect(screen.getAllByTestId('slide-item')[1]).toHaveAttribute('data-in', 'true');
+    expect(screen.getAllByTestId('slide-item')[2]).toHaveAttribute('data-in', 'false');
+
+    act(() => {
+      jest.advanceTimersByTime(20);
+    });
+
+    expect(screen.getAllByTestId('slide-item')[2]).toHaveAttribute('data-in', 'true');
+  });
 });

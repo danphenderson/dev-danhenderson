@@ -64,6 +64,7 @@ export const AnimatedSlideList = <Item,>({
 }: AnimatedSlideListProps<Item>) => {
   const { motionTokens } = useComponentStyles();
   const { stagger: sFactor } = useMotionScale();
+  const resolvedStartDelayMs = Math.round(scaleStagger(startDelayMs, sFactor));
   const [enteredKeys, setEnteredKeys] = useState<Set<string>>(() => new Set());
   const nodeRefs = useRef(new Map<string, RefObject<HTMLElement>>());
   const enterTimerIdsRef = useRef<number[]>([]);
@@ -74,6 +75,8 @@ export const AnimatedSlideList = <Item,>({
     () => items.map((item, index) => getItemKey(item, index)),
     [getItemKey, items]
   );
+  const itemKeysSignature = useMemo(() => JSON.stringify(itemKeys), [itemKeys]);
+  const latestItemKeysRef = useRef(itemKeys);
   const baseContainerSx: SxProps<Theme> =
     layout === 'wrap'
       ? {
@@ -87,6 +90,10 @@ export const AnimatedSlideList = <Item,>({
           },
         };
   const resolvedContainerSx: SxProps<Theme> = [baseContainerSx, ...normalizeSxProp(containerSx)];
+
+  useEffect(() => {
+    latestItemKeysRef.current = itemKeys;
+  }, [itemKeys]);
 
   const getNodeRef = (key: string) => {
     const existingNodeRef = nodeRefs.current.get(key);
@@ -103,6 +110,8 @@ export const AnimatedSlideList = <Item,>({
   };
 
   useEffect(() => {
+    const nextItemKeys = latestItemKeysRef.current;
+
     enterTimerIdsRef.current.forEach((timerId) => {
       window.clearTimeout(timerId);
     });
@@ -114,8 +123,8 @@ export const AnimatedSlideList = <Item,>({
         return undefined;
       }
 
-      [...itemKeys].reverse().forEach((key, index) => {
-        const delayMs = startDelayMs + index * resolvedItemStaggerMs;
+      [...nextItemKeys].reverse().forEach((key, index) => {
+        const delayMs = resolvedStartDelayMs + index * resolvedItemStaggerMs;
         const timerId = window.setTimeout(() => {
           setEnteredKeys((currentKeys) => {
             const nextKeys = new Set(currentKeys);
@@ -134,8 +143,8 @@ export const AnimatedSlideList = <Item,>({
 
     setEnteredKeys(new Set());
 
-    itemKeys.forEach((key, index) => {
-      const delayMs = startDelayMs + index * resolvedItemStaggerMs;
+    nextItemKeys.forEach((key, index) => {
+      const delayMs = resolvedStartDelayMs + index * resolvedItemStaggerMs;
       const timerId = window.setTimeout(() => {
         setEnteredKeys((currentKeys) => {
           const nextKeys = new Set(currentKeys);
@@ -155,7 +164,7 @@ export const AnimatedSlideList = <Item,>({
       });
       enterTimerIdsRef.current = [];
     };
-  }, [inProp, itemKeys, resolvedItemStaggerMs, reverseExitStagger, startDelayMs]);
+  }, [inProp, itemKeysSignature, resolvedItemStaggerMs, resolvedStartDelayMs, reverseExitStagger]);
 
   return (
     <Box component={containerComponent} sx={resolvedContainerSx}>
