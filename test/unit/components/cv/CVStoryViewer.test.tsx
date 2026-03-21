@@ -43,9 +43,13 @@ jest.mock('../../../../src/components/cv/CVStorySectionRenderer', () => ({
   ),
 }));
 
-type MockIntersectionObserverInstance = {
-  -readonly [K in keyof IntersectionObserver]: IntersectionObserver[K];
-} & {
+type MockIntersectionObserverInstance = Omit<
+  IntersectionObserver,
+  'root' | 'rootMargin' | 'thresholds'
+> & {
+  root: Element | Document | null;
+  rootMargin: string;
+  thresholds: readonly number[];
   observedTargets: Element[];
   trigger: (entries: Array<{ target: Element; isIntersecting: boolean }>) => void;
 };
