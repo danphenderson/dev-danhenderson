@@ -9,6 +9,7 @@ jest.mock('motion/react', () => {
   const React = require('react');
 
   return {
+    useReducedMotion: () => false,
     useScroll: () => ({
       scrollYProgress: mockScrollYProgress,
     }),

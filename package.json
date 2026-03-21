@@ -26,8 +26,8 @@
   },
   "scripts": {
     "start": "PORT=${PORT:-3001} react-scripts start",
-    "build": "react-scripts build",
-    "build:e2e": "REACT_APP_RUNTIME_ENV=test react-scripts build",
+    "build": "node scripts/buildWithMetadata.js",
+    "build:e2e": "node scripts/buildWithMetadata.js --runtime-env=test",
     "test": "react-scripts test --roots test/unit src",
     "eject": "react-scripts eject",
     "serve:e2e": "serve -s build -l 3100",

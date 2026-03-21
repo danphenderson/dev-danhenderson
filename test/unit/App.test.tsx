@@ -1,3 +1,5 @@
+import { isValidElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
 import ThemeProvider from '../../src/ThemeProvider';
 import App from '../../src/App';
@@ -61,11 +63,22 @@ jest.mock('../../src/components/CommonLinkTooltip', () => ({
   CommonLinkTooltip: () => <div data-testid="common-link-tooltip" />,
 }));
 
+let mockPageTransitionChildren: ReactNode = null;
+
+jest.mock('../../src/components/PageTransition', () => ({
+  PageTransition: ({ children }: { children: ReactNode }) => {
+    mockPageTransitionChildren = children;
+
+    return <div data-testid="page-transition">{children}</div>;
+  },
+}));
+
 const mockedIsFeatureEnabled = isFeatureEnabled as jest.MockedFunction<typeof isFeatureEnabled>;
 
 describe('App', () => {
   beforeEach(() => {
     mockedIsFeatureEnabled.mockReturnValue(true);
+    mockPageTransitionChildren = null;
     window.history.pushState({}, '', '/');
   });
 
@@ -89,6 +102,22 @@ describe('App', () => {
     );
 
     expect(screen.getByTestId('home-page')).toBeInTheDocument();
+  });
+
+  it('passes the current location to Routes inside PageTransition', () => {
+    render(
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    );
+
+    expect(isValidElement(mockPageTransitionChildren)).toBe(true);
+
+    const routesElement = mockPageTransitionChildren as ReactElement<{
+      location?: { pathname?: string };
+    }>;
+
+    expect(routesElement.props.location).toEqual(expect.objectContaining({ pathname: '/' }));
   });
 
   it('falls through to NotFound for /blog when the blog feature is disabled', () => {

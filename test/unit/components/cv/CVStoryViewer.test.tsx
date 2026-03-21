@@ -26,6 +26,7 @@ jest.mock('motion/react', () => {
       ),
     },
     useMotionValue: () => ({ get: () => 0, on: () => () => {} }),
+    useReducedMotion: () => false,
   };
 });
 

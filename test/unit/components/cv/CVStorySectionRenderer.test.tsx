@@ -13,6 +13,7 @@ jest.mock('motion/react', () => ({
     li: ({ children, ...rest }: any) => <li {...rest}>{children}</li>,
   },
   useInView: (...args: any[]) => mockUseInView(...args),
+  useReducedMotion: () => false,
 }));
 
 jest.mock('../../../../src/motion', () => ({

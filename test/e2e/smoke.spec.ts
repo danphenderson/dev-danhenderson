@@ -1,4 +1,6 @@
-import { test, expect, type Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
 /**
@@ -8,11 +10,20 @@ import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
  * and SPA direct-link routing works against the production build output.
  */
 
+const PACKAGE_VERSION = JSON.parse(
+  readFileSync(resolve(process.cwd(), 'package.json'), 'utf8')
+) as {
+  version: string;
+};
+
 const suppressWelcomeDialog = async (page: Page) => {
   await page.addInitScript(() => {
     window.localStorage.setItem('danhenderson-welcome-audio-consent', 'declined');
   });
 };
+
+const getScorecardValue = (dialog: Locator, label: string) =>
+  dialog.locator(`xpath=.//span[normalize-space()="${label}"]/following-sibling::span[1]`);
 
 test.describe('Production smoke', () => {
   test.beforeEach(async ({ page }) => {
@@ -23,6 +34,29 @@ test.describe('Production smoke', () => {
     await page.goto('/');
 
     await expect(page.locator('#main-content')).toBeVisible();
+  });
+
+  test('production footer scorecard shows stamped build metadata', async ({ page }) => {
+    await page.goto('/climbing');
+
+    const main = page.locator('#main-content');
+    await waitForAnimatedSectionReadiness({
+      anchor: main.getByRole('heading', { name: 'Overview' }),
+      readyLocators: [main.getByRole('grid').first()],
+    });
+
+    const scorecardTrigger = page.getByRole('button', { name: 'Open performance scorecard' });
+    await scorecardTrigger.scrollIntoViewIfNeeded();
+    await expect(scorecardTrigger).toBeVisible();
+    await scorecardTrigger.click();
+
+    const dialog = page.getByRole('dialog', { name: 'Performance & Build Info' });
+    await expect(dialog).toBeVisible();
+
+    await expect(getScorecardValue(dialog, 'Version')).toHaveText(PACKAGE_VERSION.version);
+    await expect(getScorecardValue(dialog, 'Commit')).toHaveText(/^[0-9a-f]{7,}$/);
+    await expect(getScorecardValue(dialog, 'Built')).not.toHaveText('unknown');
+    await expect(getScorecardValue(dialog, 'Environment')).toHaveText('production');
   });
 
   test('/cv loads core sections', async ({ page }) => {
