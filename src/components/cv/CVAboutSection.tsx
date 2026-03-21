@@ -295,7 +295,7 @@ export const CVAboutSection = ({
             <Box
               sx={{
                 display: 'flex',
-                justifyContent: 'flex-end',
+                justifyContent: 'flex-start',
                 width: '100%',
                 pt: 0.5,
               }}

@@ -40,7 +40,7 @@ export const currentWorkflowTools = [
 
 export const aboutMe: AboutMe = {
   name: 'Daniel Henderson',
-  title: 'Software Engineer',
+  title: 'MS in Applied/Computational Math',
   email: 'me@danhenderson.dev',
   phone: '',
   location: 'Seattle, WA',
@@ -50,11 +50,11 @@ export const aboutMe: AboutMe = {
     url: mtuMathGraduateBioUrl,
     tooltip: 'View the Michigan Tech graduate mathematics student page.',
   },
-  bio: `Software engineer building scientific, data, and AI-enabled systems. I'm drawn to problems where mathematics meets computation — from modeling blood flow in arteries to building production data pipelines that handle terabytes of healthcare records.
+  bio: `Software developer building scientific, data, and AI-enabled systems. I'm drawn to problems where mathematics meets computation — from modeling blood flow in arteries to building production data pipelines that handle petabytes of healthcare records.
 
 I previously built ingestion, analytics, and ML solutions for a healthcare data platform. Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software.
 
-Outside of work, I climb rocks, ride bikes, and tinker with side projects that keep me learning.`,
+Outside of work, I engage with side projects that keep me learning and I seek adventure in the mountains to keep me grounded.`,
 };
 
 export const codingExamples: CodingExample[] = [
@@ -302,7 +302,7 @@ export const experiences: Experience[] = [
     endDate: 'Current',
     description: [
       {
-        text: 'Researching blood-flow and transport models governed by Navier–Stokes and convection-diffusion PDEs using traditional numerical and machine-learning approaches. The work bridges continuum mechanics theory with modern scientific ML to model hemodynamics in the human cardiovascular system.',
+        text: 'Researching blood-flow and transport models governed by Navier–Stokes and convection-diffusion PDEs using traditional numerical and machine-learning approaches.',
       },
       {
         text: ' Advisor: ',
@@ -324,7 +324,6 @@ export const experiences: Experience[] = [
       'Computational Fluid Dynamics',
       'Julia',
       'Python',
-      'PyTorch',
       'DeepXDE',
       'SciML',
       'SciPy',
@@ -393,7 +392,7 @@ export const experiences: Experience[] = [
       'Repartitioned 50TB datalake, yielding improved query performance to accelerate nightly DBT builds and support analytics and reporting.',
       'Reduced AWS ETL cost by 50% from upgrading ETL jobs to Glue 3.0 and moving batch workloads to EMR on transient EC2 fleets, supported by an internal platform library for provisioning, networking, security, monitoring, and scaling EMR clusters.',
       'Built a reconciliation service across PostgreSQL, AWS Glue Data Catalog, Redshift, and S3 to identify and resolve data inconsistencies, reducing tenant-state investigations from hours to minutes.',
-      'Centralized infrastructure delivery by building an internal CDK library through a major refactor that removed technical debt and git submodules, while introducing semantic versioning practices, enabling more reliable and efficient deployments.',
+      'Centralized infrastructure delivery   by building an internal CDK library through a major refactor that removed technical debt and git submodules, while introducing semantic versioning practices, enabling more reliable and efficient deployments.',
       'Migrated data team’s software assets from Bitbucket to GitHub Enterprise, standardizing CI/CD into GitHub Actions and hooks.',
       'Processed AWS CloudTrail logs into Parquet and built a dashboard to support security analytics and HITRUST compliance.',
       'Supported hiring and onboarding during an organizational transition, including new engineering and data leadership and interns, and helped ensure continuity through a reorganization that included my departure.',
@@ -464,7 +463,7 @@ export const experiences: Experience[] = [
     startDate: 'May 2021',
     endDate: 'Nov 2021 (7 mos)',
     description:
-      'Led numerical experiments for quasi-Newton optimization research that resulted in a published paper (Azzam, Henderson, Ong, Struthers; 2022). Designed and implemented the software artifacts in Julia, combining trust-region methods with automatic differentiation to solve high-dimensional unconstrained optimization problems.',
+      'Led numerical experiments for quasi-Newton optimization research that resulted in a published pre-print paper (Azzam, Henderson, Ong, Struthers; 2022). Designed and implemented the software artifacts in Julia, combining trust-region methods with automatic differentiation to solve high-dimensional unconstrained optimization problems.',
     projects: [
       [
         { text: '2022, Azzam J, Henderson D, Ong BW, and Struthers AA, ' },
@@ -535,7 +534,7 @@ export const educationInfo: EducationInfo = {
       university: 'Michigan Technological University',
       program: 'MS Mathematics, Applied/Computational',
       summary:
-        'Graduate work centered on applied mathematics, numerical methods, and computational modeling for hemodynamics research. Coursework spans theoretical and computational PDE analysis, numerical optimization, and error-correcting codes, while research focuses on bridging classical fluid dynamics with scientific machine learning.',
+        'Graduate studies in applied/computational mathematics, while research bridges classical fluid dynamics with scientific machine learning.',
       dateRange: 'Fall 2024 – Present',
       expectedCompletion: 'Expected Summer 2026',
       gpa: [{ label: 'Cumulative', value: '3.44' }],
