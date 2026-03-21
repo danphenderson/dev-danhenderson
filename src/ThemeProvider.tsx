@@ -1,6 +1,7 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { PaletteMode } from '@mui/material';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import { useReducedMotion } from 'motion/react';
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo, useState } from 'react';
 import { DEFAULT_PREFERENCES, isPaletteMode, PREFERENCE_STORAGE_KEYS } from './theme/preferences';
 import {
@@ -64,9 +65,13 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
       return DEFAULT_PREFERENCES.motionIntensity;
     }
   });
+  const prefersReducedMotion = !!useReducedMotion();
+  const effectiveMotionIntensity: MotionIntensityLevel = prefersReducedMotion
+    ? 'off'
+    : motionIntensity;
   const theme = useMemo(
-    () => createAppTheme(mode, appearance, motionIntensity),
-    [appearance, mode, motionIntensity]
+    () => createAppTheme(mode, appearance, effectiveMotionIntensity),
+    [appearance, effectiveMotionIntensity, mode]
   );
 
   useEffect(() => {

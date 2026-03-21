@@ -64,7 +64,7 @@ function AppContent() {
         )}
         <Box component="main" id="main-content" tabIndex={-1}>
           <PageTransition>
-            <Routes>
+            <Routes location={location}>
               <Route path={siteRouteMap.home.path} element={<Home />} />
               <Route path={siteRouteMap.cv.path} element={<CV />} />
               <Route path={siteRouteMap.climbing.path} element={<Climbing />} />

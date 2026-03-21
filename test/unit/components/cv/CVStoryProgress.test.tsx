@@ -8,6 +8,7 @@ jest.mock('motion/react', () => ({
       <div data-testid="progress-bar" data-scale-x={animate?.scaleX} style={style} {...rest} />
     ),
   },
+  useReducedMotion: () => false,
   useTheme: jest.fn(),
 }));
 

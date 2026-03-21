@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { useEffect, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useMotionScale } from '../motion';
 import {
   commandPaletteActions,
   type CommandPaletteAction,
@@ -32,7 +33,30 @@ const isEditableTarget = (target: EventTarget | null): boolean => {
   return tagName === 'input' || tagName === 'textarea' || tagName === 'select';
 };
 
-const scrollToHashTarget = (hashFragment: string): boolean => {
+const scrollWindowTo = (top: number, disableScrollAnimation: boolean) => {
+  const clampedTop = Math.max(0, top);
+
+  if (!disableScrollAnimation) {
+    window.scrollTo({
+      top: clampedTop,
+      behavior: 'smooth',
+    });
+    return;
+  }
+
+  const root = document.documentElement;
+  const previousScrollBehavior = root.style.scrollBehavior;
+
+  // Override the global smooth-scroll baseline so reduced-motion jumps instantly.
+  root.style.scrollBehavior = 'auto';
+  window.scrollTo({
+    top: clampedTop,
+    behavior: 'auto',
+  });
+  root.style.scrollBehavior = previousScrollBehavior;
+};
+
+const scrollToHashTarget = (hashFragment: string, disableScrollAnimation: boolean): boolean => {
   const target = document.getElementById(hashFragment);
 
   if (!target) {
@@ -42,10 +66,7 @@ const scrollToHashTarget = (hashFragment: string): boolean => {
   const headerOffsetPx = window.matchMedia('(max-width: 899.95px)').matches ? 88 : 112;
   const top = target.getBoundingClientRect().top + window.scrollY - headerOffsetPx;
 
-  window.scrollTo({
-    top: Math.max(0, top),
-    behavior: 'smooth',
-  });
+  scrollWindowTo(top, disableScrollAnimation);
 
   return true;
 };
@@ -53,8 +74,10 @@ const scrollToHashTarget = (hashFragment: string): boolean => {
 export const GlobalCommandPalette = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { duration: durationFactor } = useMotionScale();
   const { isOpen, query, openPalette, closePalette, setQuery } = useCommandPalette();
   const previousPathnameRef = useRef(location.pathname);
+  const disableScrollAnimation = durationFactor === 0;
 
   const filteredActions = useMemo(
     () => commandPaletteActions.filter((action) => matchesCommandPaletteAction(action, query)),
@@ -103,7 +126,7 @@ export const GlobalCommandPalette = () => {
     let timeoutId: number | undefined;
 
     const syncHashScroll = () => {
-      if (scrollToHashTarget(hashFragment)) {
+      if (scrollToHashTarget(hashFragment, disableScrollAnimation)) {
         return;
       }
 
@@ -122,7 +145,7 @@ export const GlobalCommandPalette = () => {
         window.clearTimeout(timeoutId);
       }
     };
-  }, [location.hash, location.pathname]);
+  }, [disableScrollAnimation, location.hash, location.pathname]);
 
   const handleClose = () => {
     closePalette();
@@ -138,7 +161,7 @@ export const GlobalCommandPalette = () => {
       }
 
       requestAnimationFrame(() => {
-        scrollToHashTarget(hashFragment);
+        scrollToHashTarget(hashFragment, disableScrollAnimation);
       });
       handleClose();
       return;

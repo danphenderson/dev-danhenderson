@@ -29,6 +29,7 @@ Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript po
 
 - `npm run build` creates the production bundle and disables production-hidden feature flags such as `blog`.
 - `npm run build:e2e` creates the test-runtime bundle used for Playwright so gated routes remain available during browser coverage.
+- Both build variants stamp git SHA, build time, and package version into the bundle so the footer scorecard reflects the built artifact instead of runtime placeholders.
 
 ## E2E Workflows
 

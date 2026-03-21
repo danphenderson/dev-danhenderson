@@ -3,6 +3,13 @@ import { MemoryRouter } from 'react-router-dom';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { CommandPaletteProvider } from '../../../src/CommandPaletteProvider';
 
+const mockUseReducedMotion = jest.fn().mockReturnValue(false);
+
+jest.mock('motion/react', () => ({
+  ...jest.requireActual('motion/react'),
+  useReducedMotion: () => mockUseReducedMotion(),
+}));
+
 // Use the actual useNavigate so RouteTrigger can genuinely change the route
 // (the module-level mock replaces useNavigate only for GlobalCommandPalette's navigate calls)
 const { useNavigate: realUseNavigate } =
@@ -45,9 +52,30 @@ const openViaCtrlK = () => {
   fireEvent.keyDown(window, { key: 'k', ctrlKey: true });
 };
 
+const createHashTarget = (id: string, top = 200) => {
+  const target = document.createElement('div');
+  target.id = id;
+  target.getBoundingClientRect = () => ({
+    x: 0,
+    y: top,
+    width: 0,
+    height: 0,
+    top,
+    right: 0,
+    bottom: top,
+    left: 0,
+    toJSON: () => ({}),
+  });
+  document.body.appendChild(target);
+  return target;
+};
+
 describe('GlobalCommandPalette', () => {
   beforeEach(() => {
     mockNavigate.mockClear();
+    mockUseReducedMotion.mockReset();
+    mockUseReducedMotion.mockReturnValue(false);
+    document.documentElement.style.scrollBehavior = '';
   });
 
   afterEach(() => {
@@ -146,6 +174,89 @@ describe('GlobalCommandPalette', () => {
       expect(mockNavigate).toHaveBeenCalled();
       // Dialog closes after the Fade exit transition completes
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('uses smooth scrolling for same-route hash actions when motion is enabled', () => {
+      const target = createHashTarget('cv-about');
+      const scrollToMock = jest.fn();
+      const originalScrollTo = window.scrollTo;
+      const originalRequestAnimationFrame = window.requestAnimationFrame;
+
+      Object.defineProperty(window, 'scrollTo', {
+        configurable: true,
+        writable: true,
+        value: scrollToMock,
+      });
+      Object.defineProperty(window, 'requestAnimationFrame', {
+        configurable: true,
+        writable: true,
+        value: (callback: FrameRequestCallback) => {
+          callback(0);
+          return 0;
+        },
+      });
+
+      renderPalette('/cv');
+      openViaCmdK();
+      fireEvent.click(screen.getByText('CV: About'));
+
+      expect(scrollToMock).toHaveBeenCalledWith({ top: 88, behavior: 'smooth' });
+
+      target.remove();
+      Object.defineProperty(window, 'scrollTo', {
+        configurable: true,
+        writable: true,
+        value: originalScrollTo,
+      });
+      Object.defineProperty(window, 'requestAnimationFrame', {
+        configurable: true,
+        writable: true,
+        value: originalRequestAnimationFrame,
+      });
+    });
+
+    it('disables animated scrolling for same-route hash actions when reduced motion is active', () => {
+      mockUseReducedMotion.mockReturnValue(true);
+
+      const target = createHashTarget('cv-about');
+      const scrollToMock = jest.fn();
+      const originalScrollTo = window.scrollTo;
+      const originalRequestAnimationFrame = window.requestAnimationFrame;
+
+      document.documentElement.style.scrollBehavior = 'smooth';
+
+      Object.defineProperty(window, 'scrollTo', {
+        configurable: true,
+        writable: true,
+        value: scrollToMock,
+      });
+      Object.defineProperty(window, 'requestAnimationFrame', {
+        configurable: true,
+        writable: true,
+        value: (callback: FrameRequestCallback) => {
+          callback(0);
+          return 0;
+        },
+      });
+
+      renderPalette('/cv');
+      openViaCmdK();
+      fireEvent.click(screen.getByText('CV: About'));
+
+      expect(scrollToMock).toHaveBeenCalledWith({ top: 88, behavior: 'auto' });
+      expect(document.documentElement.style.scrollBehavior).toBe('smooth');
+
+      target.remove();
+      Object.defineProperty(window, 'scrollTo', {
+        configurable: true,
+        writable: true,
+        value: originalScrollTo,
+      });
+      Object.defineProperty(window, 'requestAnimationFrame', {
+        configurable: true,
+        writable: true,
+        value: originalRequestAnimationFrame,
+      });
     });
   });
 

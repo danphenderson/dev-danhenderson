@@ -32,6 +32,14 @@ describe('buildInfo', () => {
     expect(buildInfo.gitSha).toBe('dev');
   });
 
+  it('defaults buildTime to "unknown" in a test environment', () => {
+    expect(buildInfo.buildTime).toBe('unknown');
+  });
+
+  it('defaults version to "dev" in a test environment', () => {
+    expect(buildInfo.version).toBe('dev');
+  });
+
   it('defaults nodeEnv to "test" in a Jest environment', () => {
     expect(buildInfo.nodeEnv).toBe('test');
   });

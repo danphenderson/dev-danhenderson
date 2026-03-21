@@ -2,8 +2,8 @@
  * Minimal service worker registration for PWA installability.
  *
  * Uses the production build's built-in service worker when available.
- * Keeps caching conservative — network-first for navigation, cache-first for
- * static assets — to avoid misrepresenting content freshness.
+ * Keeps caching conservative — network-first for navigation and runtime
+ * assets, with cache fallback for offline use.
  */
 
 const isLocalhost = Boolean(

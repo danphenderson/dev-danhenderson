@@ -1,10 +1,9 @@
 /**
  * Build-time metadata injected via CRA's REACT_APP_* environment variables.
  *
- * Populate at build time by setting environment variables, e.g.:
- *   REACT_APP_GIT_SHA=$(git rev-parse --short HEAD) \
- *   REACT_APP_BUILD_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
- *   npm run build
+ * npm run build and npm run build:e2e populate these values for bundled artifacts.
+ * The fallbacks below are intentionally explicit placeholders for local development
+ * and test sessions that do not stamp build metadata.
  */
 
 export type BuildInfo = {
@@ -16,7 +15,7 @@ export type BuildInfo = {
 
 export const buildInfo: BuildInfo = {
   gitSha: process.env.REACT_APP_GIT_SHA ?? 'dev',
-  buildTime: process.env.REACT_APP_BUILD_TIME ?? new Date().toISOString(),
-  version: process.env.REACT_APP_VERSION ?? '1.0.0',
+  buildTime: process.env.REACT_APP_BUILD_TIME ?? 'unknown',
+  version: process.env.REACT_APP_VERSION ?? 'dev',
   nodeEnv: process.env.NODE_ENV ?? 'development',
 };
