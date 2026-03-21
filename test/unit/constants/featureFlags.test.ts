@@ -1,3 +1,5 @@
+export {};
+
 const loadFeatureFlagsForEnv = (env: { REACT_APP_RUNTIME_ENV?: string; NODE_ENV?: string }) => {
   const previousRuntimeEnv = process.env.REACT_APP_RUNTIME_ENV;
   const previousNodeEnv = process.env.NODE_ENV;

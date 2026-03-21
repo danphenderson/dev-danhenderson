@@ -1,4 +1,5 @@
 import { parseCVSortDate, buildCVStoryItems } from '../../../src/data/cvStoryItems';
+import type { CVStoryItem } from '../../../src/data/cvStoryItems';
 import type {
   AboutMe,
   CVStoryEndData,

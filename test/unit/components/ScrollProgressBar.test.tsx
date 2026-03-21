@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../src/ThemeProvider';
 
 const mockScrollYProgress = { get: () => 0, on: () => () => {} };
-const mockUseSpring = jest.fn((value: unknown) => value);
+const mockUseSpring = jest.fn((..._args: unknown[]) => _args[0]);
 
 jest.mock('motion/react', () => {
   const React = require('react');
@@ -12,7 +12,7 @@ jest.mock('motion/react', () => {
     useScroll: () => ({
       scrollYProgress: mockScrollYProgress,
     }),
-    useSpring: (...args: unknown[]) => mockUseSpring(...args),
+    useSpring: (...args: [unknown, ...unknown[]]) => mockUseSpring(...args),
     motion: {
       div: React.forwardRef(
         (

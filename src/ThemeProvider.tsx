@@ -35,20 +35,34 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [mode, setMode] = useState<PaletteMode>(() => {
     if (typeof window === 'undefined') return DEFAULT_PREFERENCES.theme;
 
-    const stored = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.theme);
-    return isPaletteMode(stored) ? stored : DEFAULT_PREFERENCES.theme;
+    try {
+      const stored = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.theme);
+      return isPaletteMode(stored) ? stored : DEFAULT_PREFERENCES.theme;
+    } catch {
+      return DEFAULT_PREFERENCES.theme;
+    }
   });
   const [appearance, setAppearance] = useState<AppAppearanceKey>(() => {
     if (typeof window === 'undefined') return DEFAULT_PREFERENCES.appearance;
 
-    const storedAppearance = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.appearance);
-    return isAppAppearanceKey(storedAppearance) ? storedAppearance : DEFAULT_PREFERENCES.appearance;
+    try {
+      const storedAppearance = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.appearance);
+      return isAppAppearanceKey(storedAppearance)
+        ? storedAppearance
+        : DEFAULT_PREFERENCES.appearance;
+    } catch {
+      return DEFAULT_PREFERENCES.appearance;
+    }
   });
   const [motionIntensity, setMotionIntensity] = useState<MotionIntensityLevel>(() => {
     if (typeof window === 'undefined') return DEFAULT_PREFERENCES.motionIntensity;
 
-    const stored = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.motionIntensity);
-    return isMotionIntensityLevel(stored) ? stored : DEFAULT_PREFERENCES.motionIntensity;
+    try {
+      const stored = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.motionIntensity);
+      return isMotionIntensityLevel(stored) ? stored : DEFAULT_PREFERENCES.motionIntensity;
+    } catch {
+      return DEFAULT_PREFERENCES.motionIntensity;
+    }
   });
   const theme = useMemo(
     () => createAppTheme(mode, appearance, motionIntensity),
@@ -57,17 +71,29 @@ const ThemeProvider = ({ children }: ThemeProviderProps) => {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.theme, mode);
+    try {
+      window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.theme, mode);
+    } catch {
+      /* localStorage unavailable */
+    }
   }, [mode]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.appearance, appearance);
+    try {
+      window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.appearance, appearance);
+    } catch {
+      /* localStorage unavailable */
+    }
   }, [appearance]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.motionIntensity, motionIntensity);
+    try {
+      window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.motionIntensity, motionIntensity);
+    } catch {
+      /* localStorage unavailable */
+    }
   }, [motionIntensity]);
 
   const toggleTheme = () => {

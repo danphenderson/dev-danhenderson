@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { AppErrorBoundary } from './components/AppErrorBoundary';
 import Footer from './components/Footer';
 import { GlobalCommandPalette } from './components/GlobalCommandPalette';
 import Header from './components/Header';
@@ -91,7 +92,9 @@ function AppContent() {
 export default function App() {
   return (
     <BrowserRouter basename={process.env.PUBLIC_URL} future={routerFuture}>
-      <AppContent />
+      <AppErrorBoundary>
+        <AppContent />
+      </AppErrorBoundary>
     </BrowserRouter>
   );
 }

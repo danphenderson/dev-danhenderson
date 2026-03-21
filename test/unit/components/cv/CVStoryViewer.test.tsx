@@ -43,7 +43,9 @@ jest.mock('../../../../src/components/cv/CVStorySectionRenderer', () => ({
   ),
 }));
 
-type MockIntersectionObserverInstance = IntersectionObserver & {
+type MockIntersectionObserverInstance = {
+  -readonly [K in keyof IntersectionObserver]: IntersectionObserver[K];
+} & {
   observedTargets: Element[];
   trigger: (entries: Array<{ target: Element; isIntersecting: boolean }>) => void;
 };

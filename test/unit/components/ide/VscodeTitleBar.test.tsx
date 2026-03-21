@@ -8,6 +8,7 @@ const renderTitleBar = (
     onClose: () => void;
     onMinimize: () => void;
     onExpand: () => void;
+    showAuxiliaryControls: boolean;
   }> = {}
 ) =>
   render(

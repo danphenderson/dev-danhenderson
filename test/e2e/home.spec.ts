@@ -157,7 +157,9 @@ const pausePageClock = async (page: Page) => {
 };
 
 const resetHomeScrollForScreenshot = async (page: Page, terminalHero: Locator) => {
-  await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+  await page.evaluate(() =>
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior })
+  );
   await expect(terminalHero).toBeVisible();
 };
 

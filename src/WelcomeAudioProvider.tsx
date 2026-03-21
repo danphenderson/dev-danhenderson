@@ -118,13 +118,17 @@ const withTimeout = <T,>(
 const getStoredAudioConsent = (): AudioConsent => {
   if (typeof window === 'undefined') return 'unknown';
 
-  const storedConsent = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.audioConsent);
-  if (isAudioConsent(storedConsent) && storedConsent !== 'unknown') {
-    return storedConsent;
-  }
+  try {
+    const storedConsent = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.audioConsent);
+    if (isAudioConsent(storedConsent) && storedConsent !== 'unknown') {
+      return storedConsent;
+    }
 
-  if (window.localStorage.getItem(LEGACY_AUDIO_PROMPT_STORAGE_KEY) === 'dismissed') {
-    return 'declined';
+    if (window.localStorage.getItem(LEGACY_AUDIO_PROMPT_STORAGE_KEY) === 'dismissed') {
+      return 'declined';
+    }
+  } catch {
+    // localStorage may be unavailable in restricted browsing contexts
   }
 
   return 'unknown';
@@ -133,8 +137,12 @@ const getStoredAudioConsent = (): AudioConsent => {
 const persistAudioConsent = (consent: Exclude<AudioConsent, 'unknown'>) => {
   if (typeof window === 'undefined') return;
 
-  window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.audioConsent, consent);
-  window.localStorage.removeItem(LEGACY_AUDIO_PROMPT_STORAGE_KEY);
+  try {
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.audioConsent, consent);
+    window.localStorage.removeItem(LEGACY_AUDIO_PROMPT_STORAGE_KEY);
+  } catch {
+    // localStorage may be unavailable in restricted browsing contexts
+  }
 };
 
 const loadWidgetScript = (signal: AbortSignal): Promise<void> => {

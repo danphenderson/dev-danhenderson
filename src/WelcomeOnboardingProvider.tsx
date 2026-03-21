@@ -11,7 +11,11 @@ export const ONBOARDING_COMPLETED_STORAGE_KEY = 'danhenderson-onboarding-complet
 
 const getStoredOnboardingCompleted = (): boolean => {
   if (typeof window === 'undefined') return false;
-  return window.localStorage.getItem(ONBOARDING_COMPLETED_STORAGE_KEY) === 'true';
+  try {
+    return window.localStorage.getItem(ONBOARDING_COMPLETED_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
 };
 
 type WelcomeOnboardingContextValue = {
@@ -40,7 +44,11 @@ export const WelcomeOnboardingProvider = ({ children }: PropsWithChildren) => {
     setShowCustomizeModal(false);
     setOnboardingCompleted(true);
     if (typeof window !== 'undefined') {
-      window.localStorage.setItem(ONBOARDING_COMPLETED_STORAGE_KEY, 'true');
+      try {
+        window.localStorage.setItem(ONBOARDING_COMPLETED_STORAGE_KEY, 'true');
+      } catch {
+        /* localStorage unavailable */
+      }
     }
   }, []);
 

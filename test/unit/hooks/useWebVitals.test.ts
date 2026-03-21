@@ -25,11 +25,9 @@ describe('useWebVitals', () => {
   /* Polyfill the Performance APIs that JSDOM lacks so supportsWebVitals() passes */
   beforeAll(() => {
     if (typeof globalThis.PerformanceObserver === 'undefined') {
-      // @ts-expect-error — minimal stub for the environment guard
-      globalThis.PerformanceObserver = class {};
+      globalThis.PerformanceObserver = class {} as unknown as typeof PerformanceObserver;
     }
     if (typeof performance.getEntriesByType !== 'function') {
-      // @ts-expect-error — minimal stub
       performance.getEntriesByType = () => [];
     }
   });

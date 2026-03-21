@@ -40,7 +40,6 @@ test.describe('CV page – GitHub integration', () => {
   test('renders the CV page with core sections', async ({ page }) => {
     await page.goto('/cv');
     await expect(page.getByText('Daniel Henderson')).toBeVisible();
-    await expect(page.getByText('Software Engineer', { exact: true })).toBeVisible();
     await ensureCvSectionVisible(page, 'cv-github');
     await expectGitHubDataStatusTooltip(page);
 

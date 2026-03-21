@@ -1,7 +1,8 @@
 import { render, fireEvent } from '@testing-library/react';
 import { TiltCard } from '../../../../src/components/photography/TiltCard';
 
-const mockUseSpring = jest.fn((source: unknown) => source);
+const mockMotionDivRender = jest.fn();
+const mockUseSpring = jest.fn((source: unknown, _config?: unknown) => source);
 const mockUseReducedMotion = jest.fn().mockReturnValue(false);
 
 jest.mock('../../../../src/motion/hooks', () => ({
@@ -11,19 +12,23 @@ jest.mock('../../../../src/motion/hooks', () => ({
 jest.mock('motion/react', () => ({
   motion: {
     div: require('react').forwardRef(
-      ({ children, style, onMouseMove, onMouseLeave, className, ...rest }: any, ref: any) => (
-        <div
-          ref={ref}
-          data-testid="tilt-card"
-          className={className}
-          style={style}
-          onMouseMove={onMouseMove}
-          onMouseLeave={onMouseLeave}
-          {...rest}
-        >
-          {children}
-        </div>
-      )
+      ({ children, style, onMouseMove, onMouseLeave, className, ...rest }: any, ref: any) => {
+        mockMotionDivRender({ style, onMouseMove, onMouseLeave, className, ...rest });
+
+        return (
+          <div
+            ref={ref}
+            data-testid="tilt-card"
+            className={className}
+            style={style}
+            onMouseMove={onMouseMove}
+            onMouseLeave={onMouseLeave}
+            {...rest}
+          >
+            {children}
+          </div>
+        );
+      }
     ),
   },
   useMotionValue: (initial: number) => ({ get: () => initial, set: jest.fn() }),
@@ -33,6 +38,7 @@ jest.mock('motion/react', () => ({
 
 describe('TiltCard', () => {
   afterEach(() => {
+    mockMotionDivRender.mockClear();
     mockUseSpring.mockClear();
     mockUseReducedMotion.mockReset();
     mockUseReducedMotion.mockReturnValue(false);
@@ -65,8 +71,13 @@ describe('TiltCard', () => {
     const { getByTestId } = render(<TiltCard>Content</TiltCard>);
 
     const card = getByTestId('tilt-card');
+    const motionProps = mockMotionDivRender.mock.calls[0]?.[0] as
+      | { style?: Record<string, unknown> }
+      | undefined;
 
-    expect(card.style.transformPerspective).toBe('900px');
+    expect(motionProps?.style).toEqual(
+      expect.objectContaining({ transformPerspective: 900, transformStyle: 'preserve-3d' })
+    );
     expect(card.style.transformStyle).toBe('preserve-3d');
     expect(mockUseSpring).toHaveBeenCalledTimes(2);
     expect(mockUseSpring).toHaveBeenNthCalledWith(
