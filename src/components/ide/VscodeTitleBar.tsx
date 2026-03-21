@@ -127,6 +127,7 @@ interface VscodeTitleBarProps {
   onMinimize?: () => void;
   onExpand?: () => void;
   expandHighlighted?: boolean;
+  showAuxiliaryControls?: boolean;
 }
 
 export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({
@@ -138,6 +139,7 @@ export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({
   onMinimize,
   onExpand,
   expandHighlighted,
+  showAuxiliaryControls = true,
 }) => (
   <Box
     data-testid="vscode-title-bar"
@@ -240,9 +242,10 @@ export const VscodeTitleBar: React.FC<VscodeTitleBarProps> = ({
     {/* Right-side action cluster */}
     <Box
       aria-hidden="true"
+      data-testid="vscode-title-bar-aux-controls"
       onPointerDown={stopDragStartPropagation}
       sx={{
-        display: { xs: 'none', sm: 'flex' },
+        display: showAuxiliaryControls ? { xs: 'none', sm: 'flex' } : 'none',
         alignItems: 'center',
         gap: 0.25,
         ml: 'auto',

@@ -34,6 +34,7 @@ jest.mock('../../../src/components/ide/VscodeTitleBar', () => ({
     onClose,
     onMinimize,
     onExpand,
+    showAuxiliaryControls,
   }: {
     onCommandPaletteToggle?: () => void;
     onWindowDragPointerDown?: React.PointerEventHandler<HTMLButtonElement>;
@@ -42,11 +43,13 @@ jest.mock('../../../src/components/ide/VscodeTitleBar', () => ({
     onClose?: () => void;
     onMinimize?: () => void;
     onExpand?: () => void;
+    showAuxiliaryControls?: boolean;
   }) => (
     <div
       data-testid="vscode-title-bar"
       data-drag-enabled={String(Boolean(windowDragEnabled))}
       data-dragging={String(Boolean(windowDragging))}
+      data-aux-controls={String(Boolean(showAuxiliaryControls))}
     >
       <button
         type="button"
@@ -388,6 +391,7 @@ describe('TerminalHeroContent', () => {
       renderHero();
       expect(screen.getByTestId('vscode-title-bar')).toHaveAttribute('data-drag-enabled', 'false');
       expect(screen.getByTestId('vscode-title-bar')).toHaveAttribute('data-dragging', 'false');
+      expect(screen.getByTestId('vscode-title-bar')).toHaveAttribute('data-aux-controls', 'false');
     });
 
     it('renders with server.py as the active tab by default', () => {
@@ -488,6 +492,7 @@ describe('TerminalHeroContent', () => {
       renderHero({ expanded: true });
 
       expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'true');
+      expect(screen.getByTestId('vscode-title-bar')).toHaveAttribute('data-aux-controls', 'true');
       expect(screen.getByTestId('tab-bar')).toHaveAttribute('data-expanded', 'true');
       expect(screen.getByTestId('editor-pane')).toHaveAttribute('data-expanded', 'true');
       expect(screen.getByTestId('terminal-panel')).toHaveAttribute('data-expanded', 'true');

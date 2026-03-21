@@ -95,9 +95,24 @@ describe('EducationSection', () => {
   });
 
   it('groups highlights and skills into the shared tab panel', async () => {
+    const primaryEducationEntry = educationInfo.entries[0];
+    const firstHighlight = primaryEducationEntry.highlights?.[0];
+    const firstSkill = primaryEducationEntry.skills?.[0];
+    const courseworkItems =
+      primaryEducationEntry.highlights
+        ?.find((highlight) => highlight.startsWith('Coursework:'))
+        ?.replace(/^Coursework:\s*/, '')
+        .split(',')
+        .map((course) => course.trim())
+        .filter((course) => course.length > 0) ?? [];
+
+    expect(firstHighlight).toBeDefined();
+    expect(firstSkill).toBeDefined();
+    expect(courseworkItems.length).toBeGreaterThanOrEqual(2);
+
     render(
       <ThemeProvider>
-        <EducationSection education={{ entries: [educationInfo.entries[0]] }} />
+        <EducationSection education={{ entries: [primaryEducationEntry] }} />
       </ThemeProvider>
     );
 
@@ -109,54 +124,38 @@ describe('EducationSection', () => {
       'Coursework',
       'Skills',
     ]);
-    expect(
-      screen.getByText(
-        'Graduate work centered on applied mathematics, numerical methods, and computational modeling for hemodynamics research.'
-      )
-    ).toBeVisible();
-    expect(
-      screen.queryByText(
-        'Pedagogical training in curriculum design, assessment, and evidence-based instruction.'
-      )
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
-    expect(screen.queryByText('LaTeX')).not.toBeInTheDocument();
+    expect(screen.getByText(primaryEducationEntry.summary)).toBeVisible();
+    expect(screen.queryByText(firstHighlight!)).not.toBeInTheDocument();
+    expect(screen.queryByText(courseworkItems[0]!)).not.toBeInTheDocument();
+    expect(screen.queryByText(firstSkill!)).not.toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(screen.getByRole('tab', { name: 'Highlights' }));
     });
 
-    expect(
-      screen.getByText(
-        'Pedagogical training in curriculum design, assessment, and evidence-based instruction.'
-      )
-    ).toBeVisible();
+    expect(screen.getByText(firstHighlight!)).toBeVisible();
     expect(
       mockAnimatedSlideList.mock.calls.some(
         ([props]) => props.containerComponent === 'ul' && props.itemComponent === 'li'
       )
     ).toBe(true);
-    expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
+    expect(screen.queryByText(courseworkItems[0]!)).not.toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(screen.getByRole('tab', { name: 'Coursework' }));
     });
 
-    expect(screen.getByText('Linear Algebra')).toBeVisible();
-    expect(screen.getByText('Numerical Optimization')).toBeVisible();
-    expect(
-      screen.queryByText(
-        'Pedagogical training in curriculum design, assessment, and evidence-based instruction.'
-      )
-    ).not.toBeInTheDocument();
+    expect(screen.getByText(courseworkItems[0]!)).toBeVisible();
+    expect(screen.getByText(courseworkItems[1]!)).toBeVisible();
+    expect(screen.queryByText(firstHighlight!)).not.toBeInTheDocument();
 
     await act(async () => {
       fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
     });
 
-    expect(screen.getByText('LaTeX')).toBeVisible();
+    expect(screen.getByText(firstSkill!)).toBeVisible();
     expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.layout === 'wrap')).toBe(true);
-    expect(screen.queryByText('Linear Algebra')).not.toBeInTheDocument();
+    expect(screen.queryByText(courseworkItems[0]!)).not.toBeInTheDocument();
   });
 
   it('renders the program as title and university as secondary label with explicit metadata', () => {

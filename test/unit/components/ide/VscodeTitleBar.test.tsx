@@ -25,6 +25,18 @@ describe('VscodeTitleBar', () => {
     expect(screen.getByLabelText('Expand window')).toBeInTheDocument();
   });
 
+  it('renders the auxiliary controls by default', () => {
+    renderTitleBar();
+    expect(screen.getByTestId('vscode-title-bar-aux-controls')).toBeVisible();
+    expect(screen.getByText('46')).toBeVisible();
+  });
+
+  it('hides the auxiliary controls when requested', () => {
+    renderTitleBar({ showAuxiliaryControls: false });
+    expect(screen.getByTestId('vscode-title-bar-aux-controls')).not.toBeVisible();
+    expect(screen.queryByText('46')).not.toBeVisible();
+  });
+
   describe('traffic dot onClick actions', () => {
     it('calls onClose when the red dot is clicked', () => {
       const onClose = jest.fn();

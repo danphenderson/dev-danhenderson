@@ -216,6 +216,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
           onMinimize={onMinimize}
           onExpand={onExpand}
           expandHighlighted={expandHighlighted}
+          showAuxiliaryControls={expanded}
         />
 
         {/* Editor + activity bar row */}

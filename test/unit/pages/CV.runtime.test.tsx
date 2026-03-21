@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ThemeProvider from '../../../src/ThemeProvider';
+import { aboutMe } from '../../../src/data/cv';
 import CV from '../../../src/pages/CV';
 
 jest.mock('../../../src/hooks/useGithubProfile', () => ({
@@ -44,7 +45,7 @@ describe('CV runtime render', () => {
     renderCV();
 
     expect(screen.getByText('About')).toBeInTheDocument();
-    expect(screen.getByText('Daniel Henderson')).toBeInTheDocument();
+    expect(screen.getByText(aboutMe.name)).toBeInTheDocument();
     expect(screen.getAllByText('Experience').length).toBeGreaterThan(0);
     expect(screen.getAllByText('GitHub').length).toBeGreaterThan(0);
   });
@@ -63,8 +64,8 @@ describe('CV runtime render', () => {
   it('renders the profile card with name, title, and program link', () => {
     renderCV();
 
-    expect(screen.getByText('Daniel Henderson')).toBeInTheDocument();
-    expect(screen.getByText('Software Engineer')).toBeInTheDocument();
+    expect(screen.getByText(aboutMe.name)).toBeInTheDocument();
+    expect(screen.getByText(aboutMe.title)).toBeInTheDocument();
   });
 
   it('renders GitHub section content from mock data', () => {

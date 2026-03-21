@@ -30,6 +30,10 @@ jest.mock('@mui/material', () => {
 const mockAnimatedSlideList = jest.fn();
 const mockAnimatedContentList = jest.fn();
 
+const getExperienceSummaryText = (
+  description: NonNullable<(typeof experiences)[number]['description']>
+) => (Array.isArray(description) ? description[0]?.text ?? '' : description);
+
 jest.mock('../../../../src/components/AnimatedContentList', () => ({
   AnimatedContentList: ({
     items,
@@ -107,6 +111,10 @@ describe('ExperienceList', () => {
 
     expect(hemodynamicsExperience).toBeDefined();
 
+    const summaryText = getExperienceSummaryText(hemodynamicsExperience!.description!);
+
+    expect(summaryText).toBeTruthy();
+
     render(
       <ThemeProvider>
         <ExperienceList experiences={[hemodynamicsExperience!]} />
@@ -128,11 +136,7 @@ describe('ExperienceList', () => {
     expect(advisorLink.closest('p')?.querySelectorAll('br')).toHaveLength(0);
     expect(screen.getByRole('tab', { name: 'Highlights' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Skills' })).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'Researching blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.'
-      )
-    ).toBeVisible();
+    expect(screen.getByText(summaryText)).toBeVisible();
   });
 
   it('switches between highlights and skills within the shared tab panel while keeping the summary visible', async () => {
@@ -141,6 +145,12 @@ describe('ExperienceList', () => {
     );
 
     expect(hemodynamicsExperience).toBeDefined();
+
+    const summaryText = getExperienceSummaryText(hemodynamicsExperience!.description!);
+    const firstSkill = hemodynamicsExperience!.skills?.[0];
+
+    expect(summaryText).toBeTruthy();
+    expect(firstSkill).toBeDefined();
 
     render(
       <ThemeProvider>
@@ -153,29 +163,21 @@ describe('ExperienceList', () => {
         'Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).'
       )
     ).not.toBeInTheDocument();
-    expect(screen.queryByText('PyTorch')).not.toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'Researching blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.'
-      )
-    ).toBeVisible();
+    expect(screen.queryByText(firstSkill!)).not.toBeInTheDocument();
+    expect(screen.getByText(summaryText)).toBeVisible();
 
     await act(async () => {
       fireEvent.click(screen.getByRole('tab', { name: 'Skills' }));
     });
 
-    expect(screen.getByText('PyTorch')).toBeVisible();
+    expect(screen.getByText(firstSkill!)).toBeVisible();
     expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.layout === 'wrap')).toBe(true);
     expect(
       screen.queryByText(
         'Formalized continuum mechanics foundations to derive vascular flow conservation laws (Eulerian and Lagrangian).'
       )
     ).not.toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'Researching blood-flow and transport models governed by Navier--Stokes and convection-diffusion PDEs using traditional and machine-learning approaches.'
-      )
-    ).toBeVisible();
+    expect(screen.getByText(summaryText)).toBeVisible();
   });
 
   it('keeps a visible skills tab when skills are the only supplemental content', async () => {
