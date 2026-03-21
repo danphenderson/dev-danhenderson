@@ -3,7 +3,7 @@ import { TiltCard } from '../../../../src/components/photography/TiltCard';
 
 const mockUseSpring = jest.fn((source: unknown, _config?: unknown) => source);
 const mockUseReducedMotion = jest.fn().mockReturnValue(false);
-let lastMotionDivStyle: Record<string, unknown> | undefined;
+let capturedMotionDivStyle: Record<string, unknown> | undefined;
 
 jest.mock('../../../../src/motion/hooks', () => ({
   useMotionScale: () => ({ duration: 1, stagger: 1, tilt: mockUseReducedMotion() ? 0 : 1 }),
@@ -13,8 +13,7 @@ jest.mock('motion/react', () => ({
   motion: {
     div: require('react').forwardRef(
       ({ children, style, onMouseMove, onMouseLeave, className, ...rest }: any, ref: any) => {
-        lastMotionDivStyle = style;
-
+        capturedMotionDivStyle = style;
         return (
           <div
             ref={ref}
@@ -38,7 +37,7 @@ jest.mock('motion/react', () => ({
 
 describe('TiltCard', () => {
   afterEach(() => {
-    lastMotionDivStyle = undefined;
+    capturedMotionDivStyle = undefined;
     mockUseSpring.mockClear();
     mockUseReducedMotion.mockReset();
     mockUseReducedMotion.mockReturnValue(false);
@@ -72,7 +71,7 @@ describe('TiltCard', () => {
 
     const card = getByTestId('tilt-card');
 
-    expect(lastMotionDivStyle).toMatchObject({
+    expect(capturedMotionDivStyle).toMatchObject({
       transformPerspective: 900,
       transformStyle: 'preserve-3d',
     });
