@@ -47,8 +47,7 @@ describe('CVGitHubSection', () => {
     expect(screen.getByText('microsoft/playwright')).toBeInTheDocument();
     expect(screen.queryByText('Projects')).not.toBeInTheDocument();
     expect(screen.queryByText('Public Projects')).not.toBeInTheDocument();
-    expect(screen.getByText('Recent Activity').tagName).toBe('H6');
-    expect(screen.getByText('Recent Activity')).toHaveClass('MuiTypography-subtitle2');
+    expect(screen.getByRole('heading', { level: 6, name: 'Recent Activity' })).toBeVisible();
   });
 
   it('renders the section structure even when loading is true', () => {
