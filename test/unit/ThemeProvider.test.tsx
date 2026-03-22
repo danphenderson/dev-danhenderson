@@ -133,6 +133,19 @@ describe('ThemeProvider', () => {
     expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe(defaultAppAppearanceKey);
   });
 
+  it('defaults to evergreen when the stored appearance matches an inherited object property', () => {
+    window.localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, 'toString');
+
+    render(
+      <ThemeProvider>
+        <ThemeConsumer />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('appearance')).toHaveTextContent(defaultAppAppearanceKey);
+    expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe(defaultAppAppearanceKey);
+  });
+
   it('disables theme CSS motion when reduced motion is enabled without overwriting the stored preference', () => {
     mockUseReducedMotion.mockReturnValue(true);
     window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.motionIntensity, 'expressive');

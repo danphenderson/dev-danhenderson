@@ -352,7 +352,7 @@ export const appAppearancePresets: Record<AppAppearanceKey, AppAppearancePreset>
   ember: {
     key: 'ember',
     label: 'Ember',
-    shortDescription: 'Richer copper surfaces with expressive motion.',
+    shortDescription: 'Richer copper surfaces',
     palette: {
       light: {
         primary: {
@@ -784,4 +784,4 @@ export const resolveAppearanceTreatment = (
 };
 
 export const isAppAppearanceKey = (value: string | null): value is AppAppearanceKey =>
-  value !== null && value in appAppearancePresets;
+  value !== null && Object.prototype.hasOwnProperty.call(appAppearancePresets, value);
