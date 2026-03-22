@@ -33,6 +33,9 @@ export default function Blog() {
     [nonFeaturedMeta, activeTag]
   );
 
+  const filteredFeaturedPost =
+    activeTag && featuredPost && !featuredPost.tags.includes(activeTag) ? null : featuredPost;
+
   return (
     <PageFrame image="assets/photography/landscape/landscape-lime-kiln.jpg">
       <Stack spacing={3}>
@@ -51,7 +54,7 @@ export default function Blog() {
           </SectionCard>
         </MotionSection>
 
-        {featuredPost && <BlogHero post={featuredPost} />}
+        {filteredFeaturedPost && <BlogHero post={filteredFeaturedPost} />}
 
         <BlogTagFilter tags={tags} activeTag={activeTag} onTagChange={setActiveTag} />
 

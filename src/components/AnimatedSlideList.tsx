@@ -179,7 +179,7 @@ export const AnimatedSlideList = <Item,>({
           <SlideWithNodeRef
             key={key}
             in={enteredKeys.has(key)}
-            appear={false}
+            appear={true}
             direction="up"
             timeout={slideTimeout}
             mountOnEnter={!keepMountedWhenExited}

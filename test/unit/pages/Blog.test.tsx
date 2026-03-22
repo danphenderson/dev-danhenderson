@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { routerFuture } from '../../../src/routerFuture';
@@ -149,6 +149,23 @@ describe('Blog', () => {
       </ThemeProvider>
     );
 
+    expect(screen.getByText('Second Article')).toBeInTheDocument();
+  });
+
+  it('hides the featured hero when the active tag does not match it', () => {
+    render(
+      <ThemeProvider>
+        <MemoryRouter future={routerFuture}>
+          <Blog />
+        </MemoryRouter>
+      </ThemeProvider>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /typescript \(1\)/i }));
+
+    expect(
+      screen.queryByRole('heading', { level: 2, name: 'Featured Article' })
+    ).not.toBeInTheDocument();
     expect(screen.getByText('Second Article')).toBeInTheDocument();
   });
 });

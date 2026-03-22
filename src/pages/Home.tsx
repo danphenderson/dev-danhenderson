@@ -39,7 +39,7 @@ import { useComponentStyles } from '../styles/componentStyles';
 import { useAppTheme } from '../ThemeProvider';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { BodyText, CaptionText } from '../components/text';
-import { MotionTiltCard } from '../motion';
+import { MotionTiltCard, useMotionScale } from '../motion';
 import { duration } from '../motion/tokens';
 import { VSCODE_COLORS, VSCODE_RESIZE, VSCODE_WINDOW_RADIUS } from '../components/ide/vscodeTokens';
 
@@ -137,7 +137,10 @@ export default function Home() {
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.6]);
+  const { duration: motionDurationScale } = useMotionScale();
   const prefersReducedMotion = useReducedMotion();
+  const heroMotionStyle =
+    motionDurationScale > 0 ? { scale: heroScale, opacity: heroOpacity } : { scale: 1, opacity: 1 };
   const [expandDotHighlighted, setExpandDotHighlighted] = useState(false);
 
   const attachIdeWindowContainer = useCallback(
@@ -447,7 +450,7 @@ export default function Home() {
 
   return (
     <>
-      <motion.div ref={heroRef} style={{ scale: heroScale, opacity: heroOpacity }}>
+      <motion.div ref={heroRef} style={heroMotionStyle}>
         <BackgroundPaper
           contentRef={heroBoundsRef}
           image="assets/home.jpg"

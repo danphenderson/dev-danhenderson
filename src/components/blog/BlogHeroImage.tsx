@@ -1,5 +1,6 @@
 import { Box } from '@mui/material';
 import { alpha } from '@mui/material/styles';
+import { resolvePublicAssetPath } from '../../utils/assets';
 
 type BlogHeroImageProps = {
   src: string;
@@ -20,6 +21,8 @@ export function BlogHeroImage({
   borderRadius,
   loading = 'eager',
 }: BlogHeroImageProps) {
+  const resolvedSrc = resolvePublicAssetPath(src);
+
   return (
     <Box
       sx={{
@@ -32,7 +35,7 @@ export function BlogHeroImage({
     >
       <Box
         component="img"
-        src={src}
+        src={resolvedSrc}
         alt={alt}
         loading={loading}
         sx={{
@@ -47,7 +50,10 @@ export function BlogHeroImage({
           position: 'absolute',
           inset: 0,
           background: (theme) =>
-            `linear-gradient(to top, ${alpha(theme.palette.background.default, overlayOpacity)} 0%, transparent ${overlayFadeStop})`,
+            `linear-gradient(to top, ${alpha(
+              theme.palette.background.default,
+              overlayOpacity
+            )} 0%, transparent ${overlayFadeStop})`,
         }}
       />
     </Box>

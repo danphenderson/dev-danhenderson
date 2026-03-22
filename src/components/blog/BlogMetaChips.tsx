@@ -1,6 +1,7 @@
 import { Chip, Stack } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import type { MouseEvent } from 'react';
 import { CaptionText } from '../text';
 import { useComponentStyles } from '../../styles/componentStyles';
 
@@ -35,6 +36,12 @@ export function BlogMetaChips({
   const componentStyles = useComponentStyles();
   const displayTags = maxTags && tags ? tags.slice(0, maxTags) : tags;
 
+  const handleTagClick = (tag: string) => (event: MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onTagClick?.(tag);
+  };
+
   return (
     <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
       <Stack direction="row" spacing={0.5} alignItems="center">
@@ -53,7 +60,7 @@ export function BlogMetaChips({
               label={tag}
               size="small"
               variant="outlined"
-              onClick={onTagClick ? () => onTagClick(tag) : undefined}
+              onClick={onTagClick ? handleTagClick(tag) : undefined}
               sx={[
                 {
                   height: 22,

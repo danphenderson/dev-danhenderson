@@ -58,6 +58,29 @@ describe('BlogMetaChips', () => {
     expect(onTagClick).toHaveBeenCalledWith('react');
   });
 
+  it('prevents tag clicks from bubbling to a parent link', () => {
+    const onTagClick = jest.fn();
+    const onParentClick = jest.fn();
+
+    render(
+      <ThemeProvider>
+        <a href="/blog/test-post" onClick={onParentClick}>
+          <BlogMetaChips
+            publishedAt="2026-01-01"
+            readingTimeMinutes={5}
+            tags={['react', 'typescript']}
+            onTagClick={onTagClick}
+          />
+        </a>
+      </ThemeProvider>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'react' }));
+
+    expect(onTagClick).toHaveBeenCalledWith('react');
+    expect(onParentClick).not.toHaveBeenCalled();
+  });
+
   it('respects maxTags to limit displayed tags', () => {
     render(
       <ThemeProvider>

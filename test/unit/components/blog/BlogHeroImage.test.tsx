@@ -3,7 +3,15 @@ import ThemeProvider from '../../../../src/ThemeProvider';
 import { BlogHeroImage } from '../../../../src/components/blog/BlogHeroImage';
 
 describe('BlogHeroImage', () => {
-  it('renders the shared blog hero image with the provided accessibility and loading props', () => {
+  const originalPublicUrl = process.env.PUBLIC_URL;
+
+  afterEach(() => {
+    process.env.PUBLIC_URL = originalPublicUrl;
+  });
+
+  it('resolves local blog hero image paths through PUBLIC_URL while preserving accessibility and loading props', () => {
+    process.env.PUBLIC_URL = '/portfolio';
+
     render(
       <ThemeProvider>
         <BlogHeroImage
@@ -20,7 +28,7 @@ describe('BlogHeroImage', () => {
 
     const image = screen.getByRole('img', { name: 'Shared blog hero' });
 
-    expect(image).toHaveAttribute('src', '/assets/blog/hero.jpg');
+    expect(image).toHaveAttribute('src', '/portfolio/assets/blog/hero.jpg');
     expect(image).toHaveAttribute('loading', 'lazy');
   });
 });

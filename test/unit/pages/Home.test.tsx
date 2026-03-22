@@ -3,6 +3,7 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import ThemeProvider from '../../../src/ThemeProvider';
 import Home from '../../../src/pages/Home';
 import { duration } from '../../../src/motion/tokens';
+import { PREFERENCE_STORAGE_KEYS } from '../../../src/theme/preferences';
 import {
   WelcomeOnboardingProvider,
   useWelcomeOnboarding,
@@ -10,6 +11,107 @@ import {
 } from '../../../src/WelcomeOnboardingProvider';
 
 const AUTO_EXPAND_PULSE_DURATION_MS = Math.round(duration.slow * 1000);
+const mockScrollYProgress = { get: () => 0, on: () => () => {} };
+const mockHeroScaleMotionValue = { get: () => 1.08, on: () => () => {} };
+const mockHeroOpacityMotionValue = { get: () => 0.6, on: () => () => {} };
+let mockPrefersReducedMotion = false;
+
+jest.mock('motion/react', () => {
+  const React = require('react');
+  const actual = jest.requireActual('motion/react');
+
+  const MotionDiv = React.forwardRef(
+    (
+      {
+        children,
+        style,
+        drag,
+        dragConstraints,
+        dragControls,
+        dragElastic,
+        dragListener,
+        dragMomentum,
+        initial,
+        animate,
+        exit,
+        layout,
+        transition,
+        variants,
+        viewport,
+        whileHover,
+        whileInView,
+        whileTap,
+        ...rest
+      }: {
+        children?: React.ReactNode;
+        style?: React.CSSProperties & { scale?: unknown; opacity?: unknown };
+        drag?: unknown;
+        dragConstraints?: unknown;
+        dragControls?: unknown;
+        dragElastic?: unknown;
+        dragListener?: unknown;
+        dragMomentum?: unknown;
+        initial?: unknown;
+        animate?: unknown;
+        exit?: unknown;
+        layout?: unknown;
+        transition?: unknown;
+        variants?: unknown;
+        viewport?: unknown;
+        whileHover?: unknown;
+        whileInView?: unknown;
+        whileTap?: unknown;
+      } & React.HTMLAttributes<HTMLDivElement>,
+      ref: React.Ref<HTMLDivElement>
+    ) => (
+      <div
+        ref={ref}
+        data-scale-source={
+          style?.scale === 1
+            ? 'static'
+            : style?.scale === mockHeroScaleMotionValue
+              ? 'motion-value'
+              : 'other'
+        }
+        data-opacity-source={
+          style?.opacity === 1
+            ? 'static'
+            : style?.opacity === mockHeroOpacityMotionValue
+              ? 'motion-value'
+              : 'other'
+        }
+        style={style as React.CSSProperties}
+        {...rest}
+      >
+        {children}
+      </div>
+    )
+  );
+
+  return {
+    ...actual,
+    AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    motion: {
+      div: MotionDiv,
+    },
+    useDragControls: () => ({ start: jest.fn() }),
+    useReducedMotion: () => mockPrefersReducedMotion,
+    useScroll: () => ({
+      scrollYProgress: mockScrollYProgress,
+    }),
+    useTransform: (_value: unknown, _input: number[], output: number[]) => {
+      if (output[0] === 1 && output[1] === 1.08) {
+        return mockHeroScaleMotionValue;
+      }
+
+      if (output[0] === 1 && output[1] === 0.6) {
+        return mockHeroOpacityMotionValue;
+      }
+
+      return { get: () => output[0], on: () => () => {} };
+    },
+  };
+});
 
 type MockWelcomeAudioState = {
   play: () => Promise<void>;
@@ -476,6 +578,14 @@ const renderHomeWithHeroVisible = async () => {
   );
 };
 
+const expectHeroParallaxSource = (scaleSource: 'motion-value' | 'static') => {
+  const heroMotionWrapper = screen.getByTestId('background-paper').parentElement;
+
+  expect(heroMotionWrapper).not.toBeNull();
+  expect(heroMotionWrapper).toHaveAttribute('data-scale-source', scaleSource);
+  expect(heroMotionWrapper).toHaveAttribute('data-opacity-source', scaleSource);
+};
+
 const setViewportSize = (width: number, height: number) => {
   Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: width });
   Object.defineProperty(window, 'innerHeight', {
@@ -542,9 +652,26 @@ const dispatchPointerUp = () => {
 };
 
 afterEach(() => {
+  mockPrefersReducedMotion = false;
   document.getElementById('site-navigation')?.remove();
   document.getElementById('main-content')?.remove();
   window.localStorage.clear();
+});
+
+describe('Home hero motion', () => {
+  it('keeps the hero parallax scroll-linked when motion is enabled', async () => {
+    await renderHomeWithHeroVisible();
+
+    expectHeroParallaxSource('motion-value');
+  });
+
+  it('disables the hero parallax when motion intensity is off', async () => {
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.motionIntensity, 'off');
+
+    await renderHomeWithHeroVisible();
+
+    expectHeroParallaxSource('static');
+  });
 });
 
 describe('Home IDE window actions', () => {

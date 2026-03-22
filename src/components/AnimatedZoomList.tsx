@@ -34,6 +34,20 @@ export const AnimatedZoomList = <Item,>({
   );
   const zoomTimeout = dFactor === 0 ? 0 : Math.round(ZOOM_BASE_TIMEOUT_MS * dFactor);
 
+  if (dFactor === 0) {
+    return (
+      <Box
+        sx={containerSx}
+        aria-hidden={!inProp ? true : undefined}
+        style={!inProp ? { visibility: 'hidden' } : undefined}
+      >
+        {items.map((item, index) => (
+          <Box key={getItemKey(item, index)}>{renderItem(item, index)}</Box>
+        ))}
+      </Box>
+    );
+  }
+
   return (
     <Box sx={containerSx}>
       {items.map((item, index) => (

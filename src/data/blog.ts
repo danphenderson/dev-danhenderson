@@ -12,9 +12,6 @@ export const blogPosts: BlogPost[] = [
     readingTimeMinutes: 12,
     tags: ['design-systems', 'react', 'architecture', 'frontend'],
     featured: true,
-    heroImage: '/assets/blog/design-system-hero.jpg',
-    heroImageAlt:
-      'Abstract layered geometric shapes representing design tokens and component composition.',
     content: [
       {
         type: 'paragraph',

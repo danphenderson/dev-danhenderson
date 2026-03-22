@@ -78,6 +78,7 @@ test.describe('Blog index page', () => {
 
     // Click the "performance" tag — only the React Performance post includes it
     await main.getByRole('button', { name: 'performance (1)' }).click();
+    await expect(main.getByText(FEATURED_POST_TITLE)).toHaveCount(0);
     await expect(main.getByText(SECOND_POST_TITLE)).toBeVisible();
     await expect(main.getByText(THIRD_POST_TITLE)).toHaveCount(0);
 
@@ -85,6 +86,22 @@ test.describe('Blog index page', () => {
     await main.getByRole('button', { name: 'All' }).click();
     await expect(main.getByText(SECOND_POST_TITLE)).toBeVisible();
     await expect(main.getByText(THIRD_POST_TITLE)).toBeVisible();
+  });
+
+  test('filters from a post card tag chip without navigating to the article', async ({ page }) => {
+    await page.goto('/blog');
+    await waitForBlogIndex(page);
+
+    const main = page.locator('main');
+    const performancePostCard = main
+      .getByRole('link', { name: new RegExp(SECOND_POST_TITLE) })
+      .first();
+
+    await performancePostCard.getByRole('button', { name: 'performance' }).click();
+
+    await expect(page).toHaveURL(/\/blog$/);
+    await expect(main.getByText(SECOND_POST_TITLE)).toBeVisible();
+    await expect(main.getByText(THIRD_POST_TITLE)).toHaveCount(0);
   });
 
   test('navigates from the featured article to the post detail', async ({ page }) => {
