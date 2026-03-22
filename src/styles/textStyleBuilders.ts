@@ -1,3 +1,4 @@
+import { alpha } from '@mui/material/styles';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { TextRole, TextTone, TextContext } from '../types/text';
 
@@ -46,7 +47,7 @@ export const createTextStyleMap = (theme: Theme) => {
       case 'accent':
         return theme.palette.primary.main;
       case 'inverse':
-        return `rgba(255,255,255,0.7)`;
+        return alpha(theme.palette.common.white, 0.7);
     }
   };
 

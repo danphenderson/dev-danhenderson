@@ -36,8 +36,16 @@ type UnsafeTypographyProps = TypographyProps & {
  * ```
  */
 export const UnsafeTypography = ({ _unsafe, ...props }: UnsafeTypographyProps) => {
-  if (process.env.NODE_ENV === 'development' && !_unsafe.reason) {
-    console.warn('[UnsafeTypography] missing required "reason" in _unsafe metadata');
+  if (process.env.NODE_ENV === 'development') {
+    if (!_unsafe.reason) {
+      console.warn('[UnsafeTypography] missing required "reason" in _unsafe metadata');
+    }
+    if (!_unsafe.owner) {
+      console.warn('[UnsafeTypography] missing required "owner" in _unsafe metadata');
+    }
+    if (!_unsafe.expiresBy) {
+      console.warn('[UnsafeTypography] missing required "expiresBy" in _unsafe metadata');
+    }
   }
 
   return <Typography {...props} />;

@@ -110,4 +110,26 @@ describe('createTextStyleMap', () => {
 
     expect(sx.fontFamily).toBe(lightTheme.typography.h1.fontFamily);
   });
+
+  /* ── Cross-preset coverage ──────────────────────────── */
+
+  const presets = ['atlas', 'evergreen', 'ember', 'solstice', 'drift', 'graphite'] as const;
+
+  it.each(presets)('resolves sectionTitle for %s preset in light mode', (preset) => {
+    const theme = createAppTheme('light', preset);
+    const { resolveTypeset } = createTextStyleMap(theme);
+    const ts = resolveTypeset('sectionTitle');
+
+    expect(ts.variant).toBe('h4');
+    expect(ts.sx).toBeDefined();
+  });
+
+  it.each(presets)('resolves inverse tone for %s preset', (preset) => {
+    const theme = createAppTheme('dark', preset);
+    const { resolveTypeset } = createTextStyleMap(theme);
+    const ts = resolveTypeset('cardTitle', 'inverse');
+    const sx = ts.sx as Record<string, unknown>;
+
+    expect(sx.color).toBe(theme.palette.common.white);
+  });
 });

@@ -54,8 +54,6 @@ export type TextProps = {
   id?: string;
   /** Standard HTML className for external integrations. */
   className?: string;
-  /** Standard HTML color attribute (for MUI Typography compatibility). */
-  color?: string;
   /** Gutterless mode — remove default margins. */
   gutterBottom?: boolean;
   /** Paragraph mode — add mb spacing. */
