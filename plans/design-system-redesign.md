@@ -499,4 +499,18 @@ Rollback approach:
 
 - [ ] Not started
 - [ ] In progress
-- [x] Complete
+- [x] Complete — Implemented in PR onto `copilot/redesign-v1-branch-design-system`
+
+### Implementation summary
+
+All 7 phases have been implemented:
+
+1. **Text typeset foundation**: `src/types/text.ts` (24 roles, 4 tones, 3 contexts), `src/styles/textStyleBuilders.ts` (pure builder), `src/styles/textStyles.ts` (memoized hook)
+2. **Canonical Text API**: `src/components/text/Text.tsx` with role-based typeset resolution, `src/components/text/UNSAFE_Typography.tsx` with required metadata
+3. **Shared surface migration**: AppErrorBoundary, FirstVisitCustomizeModal, HeaderSettingsPopover, CVStoryViewer
+4. **Blog migration**: All 10 blog components migrated to prose-context Text roles
+5. **Photography migration**: AlbumCard, AlbumLocationSummary, ImmersiveLightbox migrated to inverse-tone overlay context
+6. **ESLint enforcement**: `no-restricted-imports` for `@mui/material/Typography` with allowlist for `src/components/text/**`
+7. **Documentation**: design-system-reference.md, agent-guide.md, component-architecture.md, blog AGENTS.md, components AGENTS.md updated
+
+Validation: 929 tests pass across 130 suites; zero raw Typography imports outside the text layer.
