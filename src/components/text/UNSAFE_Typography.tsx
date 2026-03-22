@@ -4,7 +4,7 @@ import type { UnsafeTypographyMeta } from '../../types/text';
 
 /* ── Props ──────────────────────────────────────────────── */
 
-type UNSAFE_TypographyProps = TypographyProps & {
+type UnsafeTypographyProps = TypographyProps & {
   /** Required metadata explaining why the escape hatch is used. */
   _unsafe: UnsafeTypographyMeta;
 };
@@ -23,7 +23,7 @@ type UNSAFE_TypographyProps = TypographyProps & {
  *
  * @example
  * ```tsx
- * <UNSAFE_Typography
+ * <UnsafeTypography
  *   variant="overline"
  *   _unsafe={{
  *     reason: 'IDE chrome simulation requires custom letter-spacing',
@@ -32,12 +32,12 @@ type UNSAFE_TypographyProps = TypographyProps & {
  *   }}
  * >
  *   Terminal
- * </UNSAFE_Typography>
+ * </UnsafeTypography>
  * ```
  */
-export const UNSAFE_Typography = ({ _unsafe, ...props }: UNSAFE_TypographyProps) => {
+export const UnsafeTypography = ({ _unsafe, ...props }: UnsafeTypographyProps) => {
   if (process.env.NODE_ENV === 'development' && !_unsafe.reason) {
-    console.warn('[UNSAFE_Typography] missing required "reason" in _unsafe metadata');
+    console.warn('[UnsafeTypography] missing required "reason" in _unsafe metadata');
   }
 
   return <Typography {...props} />;

@@ -8,7 +8,7 @@ import { useMotionScale } from '../../motion';
 import { CVStoryProgress } from './CVStoryProgress';
 import { CVStorySectionRenderer } from './CVStorySectionRenderer';
 import type { CVStoryItem } from '../../types/cv';
-import { UNSAFE_Typography } from '../text';
+import { UnsafeTypography } from '../text';
 
 type CVStoryViewerProps = {
   items: CVStoryItem[];
@@ -204,7 +204,7 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: duration.fast * dFactor, ease: easing.decel }}
           >
-            <UNSAFE_Typography
+            <UnsafeTypography
               variant="overline"
               color="text.secondary"
               sx={{ letterSpacing: 3, userSelect: 'none' }}
@@ -215,7 +215,7 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
               }}
             >
               {kindLabel[activeKind]}
-            </UNSAFE_Typography>
+            </UnsafeTypography>
           </motion.div>
 
           <motion.div
