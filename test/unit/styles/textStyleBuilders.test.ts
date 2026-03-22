@@ -27,6 +27,13 @@ describe('createTextStyleMap', () => {
     expect(ts.variant).toBe('body1');
   });
 
+  it('resolves proseMinorHeading with a distinct variant', () => {
+    const { resolveTypeset } = createTextStyleMap(lightTheme);
+    const ts = resolveTypeset('proseMinorHeading');
+
+    expect(ts.variant).toBe('subtitle1');
+  });
+
   it('returns a fallback for unknown combinations', () => {
     const { resolveTypeset } = createTextStyleMap(lightTheme);
     // @ts-expect-error testing fallback behavior
@@ -93,6 +100,28 @@ describe('createTextStyleMap', () => {
     const sx = ts.sx as Record<string, unknown>;
 
     expect(sx.color).toBe(lightTheme.palette.text.secondary);
+  });
+
+  it('prose context changes shared body typesets', () => {
+    const { resolveTypeset } = createTextStyleMap(lightTheme);
+    const uiBody = resolveTypeset('body');
+    const proseBody = resolveTypeset('body', 'default', 'prose');
+    const uiSx = uiBody.sx as Record<string, unknown>;
+    const proseSx = proseBody.sx as Record<string, unknown>;
+
+    expect(proseSx.lineHeight).not.toBe(uiSx.lineHeight);
+    expect(proseSx.fontSize).toBe('1.02rem');
+  });
+
+  it('overlay context changes cardTitle typesets', () => {
+    const { resolveTypeset } = createTextStyleMap(lightTheme);
+    const uiCardTitle = resolveTypeset('cardTitle');
+    const overlayCardTitle = resolveTypeset('cardTitle', 'inverse', 'overlay');
+    const uiSx = uiCardTitle.sx as Record<string, unknown>;
+    const overlaySx = overlayCardTitle.sx as Record<string, unknown>;
+
+    expect(overlaySx.lineHeight).not.toBe(uiSx.lineHeight);
+    expect(overlaySx.letterSpacing).toBe('-0.01em');
   });
 
   it('sectionEyebrow includes letterSpacing', () => {

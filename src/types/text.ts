@@ -31,6 +31,7 @@ export type TextProseRole =
   | 'proseLead'
   | 'proseHeading'
   | 'proseSubheading'
+  | 'proseMinorHeading'
   | 'proseParagraph'
   | 'proseCaption'
   | 'proseQuote'
@@ -58,7 +59,20 @@ export type TextContext = 'ui' | 'prose' | 'overlay';
  * Constrained set of semantic HTML elements that Text may render as.
  * This is intentionally smaller than TypographyProps['component'].
  */
-export type TextElement = 'p' | 'span' | 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'li' | 'dt' | 'dd' | 'label' | 'figcaption';
+export type TextElement =
+  | 'p'
+  | 'span'
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'h5'
+  | 'h6'
+  | 'li'
+  | 'dt'
+  | 'dd'
+  | 'label'
+  | 'figcaption';
 
 /* ── UNSAFE_Typography metadata ─────────────────────────── */
 

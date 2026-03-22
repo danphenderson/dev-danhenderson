@@ -36,6 +36,26 @@ describe('BlogArticleBody', () => {
     expect(heading).toHaveTextContent('Subsection');
   });
 
+  it('renders a heading block with level 4', () => {
+    renderBody([{ type: 'heading', level: 4, text: 'Minor heading' }]);
+
+    const heading = screen.getByRole('heading', { level: 4 });
+    expect(heading).toHaveTextContent('Minor heading');
+  });
+
+  it('renders level 3 and level 4 headings with distinct typesets', () => {
+    renderBody([
+      { type: 'heading', level: 3, text: 'Subsection' },
+      { type: 'heading', level: 4, text: 'Minor heading' },
+    ]);
+
+    const level3 = screen.getByRole('heading', { level: 3 });
+    const level4 = screen.getByRole('heading', { level: 4 });
+
+    expect(level3).toHaveClass('MuiTypography-h6');
+    expect(level4).toHaveClass('MuiTypography-subtitle1');
+  });
+
   it('renders a heading block with a custom id', () => {
     renderBody([{ type: 'heading', level: 2, text: 'Custom ID Heading', id: 'custom-heading' }]);
 

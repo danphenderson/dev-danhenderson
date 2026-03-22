@@ -29,6 +29,7 @@ const defaultElements: Partial<Record<TextRole, TextElement>> = {
   proseLead: 'p',
   proseHeading: 'h2',
   proseSubheading: 'h3',
+  proseMinorHeading: 'h4',
   proseParagraph: 'p',
   proseCaption: 'figcaption',
   proseQuote: 'p',

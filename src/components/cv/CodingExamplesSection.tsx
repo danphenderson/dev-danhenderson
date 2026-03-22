@@ -1,5 +1,5 @@
 import { Box, Stack } from '@mui/material';
-import type { CodingExample } from '../../types/cv';
+import type { CodingExample, ExperienceProjectSegment } from '../../types/cv';
 import { AnimatedSlideList, getAnimatedSlideListCloseDelayMs } from '../AnimatedSlideList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
@@ -8,6 +8,7 @@ import { AnimatedContentList } from '../AnimatedContentList';
 import { CommonLink } from '../CommonLink';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { EntryTitle, BodyText, ListItemText } from '../text';
+import { renderExperienceSegments } from './experienceContent';
 
 type CodingExamplesSectionProps = {
   examples: CodingExample[];
@@ -20,7 +21,7 @@ const CodingExampleDetailList = ({
   selected,
   renderContext,
 }: {
-  items: string[];
+  items: Array<string | ExperienceProjectSegment[]>;
   selected: boolean;
   renderContext: TabPanelRenderContext;
 }) => {
@@ -29,7 +30,7 @@ const CodingExampleDetailList = ({
   return (
     <AnimatedSlideList
       items={items}
-      getItemKey={(item, index) => `${item}-${index}`}
+      getItemKey={(_item, index) => `coding-example-item-${index}`}
       in={selected}
       container={renderContext.getDrawerContainer}
       keepMountedWhenExited
@@ -37,7 +38,11 @@ const CodingExampleDetailList = ({
       containerComponent="ul"
       containerSx={getDetailListSx(0, 0)}
       itemComponent="li"
-      renderItem={(item) => <ListItemText component="span">{item}</ListItemText>}
+      renderItem={(item) => (
+        <ListItemText component="span">
+          {Array.isArray(item) ? renderExperienceSegments(item) : item}
+        </ListItemText>
+      )}
     />
   );
 };
@@ -64,7 +69,9 @@ export const CodingExamplesSection = ({
         const primaryLink = example.links[0];
         const exampleTabs = (example.tabs ?? []).reduce<TabPanelItem[]>((tabs, tab) => {
           if (tab.kind === 'list') {
-            const items = tab.items.filter((item) => item.trim().length > 0);
+            const items = tab.items.filter((item) =>
+              Array.isArray(item) ? item.length > 0 : item.trim().length > 0
+            );
 
             if (items.length === 0) {
               return tabs;

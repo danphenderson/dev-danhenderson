@@ -223,7 +223,15 @@ export const codingExamples: CodingExample[] = [
         items: [
           'Expose `Programs`, `SelectProgram`, `adjdim!`, `obj`, `grad`, `objgrad`, and `hessAD` as the main workflow.',
           'Support gradient and Hessian evaluation with `ForwardDiff` in Julia-native experiments.',
-          'Position the package as a lightweight benchmark set inspired by `NLPModels`.',
+          [
+            { text: 'Position the package as a lightweight benchmark set inspired by ' },
+            {
+              text: 'NLPModels',
+              link: 'https://github.com/JuliaSmoothOptimizers/NLPModels.jl',
+              tooltip: 'JuliaSmoothOptimizers/NLPModels.jl',
+            },
+            { text: '.' },
+          ],
         ],
       },
       {

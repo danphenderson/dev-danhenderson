@@ -23,6 +23,9 @@ const key = (role: TextRole, tone: TextTone, ctx: TextContext): TypesetKey =>
 export const createTextStyleMap = (theme: Theme) => {
   const headingFontFamily = theme.typography.h1.fontFamily;
 
+  const isObjectSx = (sx: SxProps<Theme>): sx is Record<string, unknown> =>
+    typeof sx === 'object' && sx !== null && !Array.isArray(sx);
+
   /* ── Tone color helpers ─────────────────────────────── */
 
   const toneColor = (tone: TextTone): string => {
@@ -214,6 +217,14 @@ export const createTextStyleMap = (theme: Theme) => {
         lineHeight: 1.3,
       },
     },
+    proseMinorHeading: {
+      variant: 'subtitle1',
+      sx: {
+        fontFamily: headingFontFamily,
+        fontWeight: 700,
+        lineHeight: 1.35,
+      },
+    },
     proseParagraph: {
       variant: 'body1',
       sx: {
@@ -259,15 +270,62 @@ export const createTextStyleMap = (theme: Theme) => {
     return toneSecondaryColor(tone === 'default' ? 'muted' : tone);
   };
 
+  const getContextAdjustments = (roleName: string, ctx: TextContext): SxProps<Theme> => {
+    if (ctx === 'overlay') {
+      switch (roleName) {
+        case 'cardTitle':
+          return {
+            lineHeight: 1.2,
+            letterSpacing: '-0.01em',
+          };
+        case 'body':
+        case 'bodyMuted':
+          return {
+            lineHeight: 1.48,
+          };
+        case 'caption':
+          return {
+            lineHeight: 1.25,
+            letterSpacing: '0.01em',
+          };
+        default:
+          return {};
+      }
+    }
+
+    if (ctx === 'prose') {
+      switch (roleName) {
+        case 'body':
+        case 'bodyMuted':
+          return {
+            lineHeight: 1.75,
+            fontSize: '1.02rem',
+          };
+        case 'caption':
+          return {
+            lineHeight: 1.45,
+            fontStyle: 'italic',
+          };
+        default:
+          return {};
+      }
+    }
+
+    return {};
+  };
+
   for (const [roleName, base] of Object.entries(allRoles)) {
     for (const tone of tones) {
       for (const ctx of contexts) {
         const color = resolveColor(roleName, tone);
+        const baseSx = isObjectSx(base.sx) ? base.sx : {};
+        const contextSx = getContextAdjustments(roleName, ctx);
 
         map.set(key(roleName as TextRole, tone, ctx), {
           variant: base.variant,
           sx: {
-            ...(typeof base.sx === 'object' && !Array.isArray(base.sx) ? base.sx : {}),
+            ...baseSx,
+            ...(isObjectSx(contextSx) ? contextSx : {}),
             color,
           },
         });

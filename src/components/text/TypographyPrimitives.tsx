@@ -1,7 +1,9 @@
-import Typography from '@mui/material/Typography';
-import type { TypographyProps } from '@mui/material/Typography';
+import type { TypographyProps } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { useComponentStyles } from '../../styles/componentStyles';
+import type { TextElement, TextRole, TextTone, TextContext } from '../../types/text';
+import type { TextProps } from './Text';
+import { Text } from './Text';
 import { mergeSx } from './textFactory';
 
 /* ────────────────────────────────────────────────────────── *
@@ -12,6 +14,52 @@ type TextPrimitiveProps = Omit<TypographyProps, 'variant'> & {
   sx?: SxProps<Theme>;
 };
 
+type ForwardedTextProps = Omit<
+  TextProps,
+  'role' | 'tone' | 'context' | 'children' | 'sx' | 'component'
+>;
+
+type CompatibilityOptions = {
+  role: TextRole;
+  defaultComponent: TextElement;
+  tone?: TextTone;
+  context?: TextContext;
+  baseSx?: SxProps<Theme> | SxProps<Theme>[];
+};
+
+const subtitle2ScaleSx = {
+  fontSize: (theme: Theme) => theme.typography.subtitle2.fontSize,
+  lineHeight: (theme: Theme) => theme.typography.subtitle2.lineHeight,
+};
+
+const displayTitleSx = {
+  fontFamily: (theme: Theme) => theme.typography.h1.fontFamily,
+  fontSize: (theme: Theme) => theme.typography.h1.fontSize,
+  fontWeight: (theme: Theme) => theme.typography.h1.fontWeight,
+  lineHeight: (theme: Theme) => theme.typography.h1.lineHeight,
+};
+
+const renderCompatibilityText = (
+  { role, defaultComponent, tone = 'default', context = 'ui', baseSx = [] }: CompatibilityOptions,
+  { children, component, color, sx, ...rest }: TextPrimitiveProps
+) => {
+  const defaults = Array.isArray(baseSx) ? baseSx : [baseSx];
+  const colorSx = color ? [{ color }] : [];
+
+  return (
+    <Text
+      role={role}
+      tone={tone}
+      context={context}
+      component={(component as TextElement | undefined) ?? defaultComponent}
+      sx={mergeSx([...defaults, ...colorSx], sx)}
+      {...(rest as unknown as ForwardedTextProps)}
+    >
+      {children}
+    </Text>
+  );
+};
+
 /**
  * Overline label used by `SectionHeading` and section navigators.
  * Renders as a `<span>` with `variant="overline"`.
@@ -19,14 +67,13 @@ type TextPrimitiveProps = Omit<TypographyProps, 'variant'> & {
 export const HeaderLabel = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { overlineSx, supportOverlineSx, sectionHeadingOverlineTextSx } = useComponentStyles();
 
-  return (
-    <Typography
-      variant="overline"
-      sx={mergeSx([overlineSx, supportOverlineSx, sectionHeadingOverlineTextSx], sx)}
-      {...rest}
-    >
-      {children}
-    </Typography>
+  return renderCompatibilityText(
+    {
+      role: 'sectionEyebrow',
+      defaultComponent: 'span',
+      baseSx: [overlineSx, supportOverlineSx, sectionHeadingOverlineTextSx],
+    },
+    { children, sx, ...rest }
   );
 };
 
@@ -41,14 +88,13 @@ export const HeaderTitle = ({
 }: TextPrimitiveProps & { subtitle?: string }) => {
   const { sectionHeadingTitleSx, sectionHeadingTitleTextSx } = useComponentStyles();
 
-  return (
-    <Typography
-      variant="h4"
-      sx={mergeSx([sectionHeadingTitleSx(subtitle), sectionHeadingTitleTextSx], sx)}
-      {...rest}
-    >
-      {children}
-    </Typography>
+  return renderCompatibilityText(
+    {
+      role: 'sectionTitle',
+      defaultComponent: 'h4',
+      baseSx: [sectionHeadingTitleSx(subtitle), sectionHeadingTitleTextSx],
+    },
+    { children, sx, ...rest }
   );
 };
 
@@ -58,32 +104,38 @@ export const HeaderTitle = ({
 export const HeaderSubtitle = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { sectionHeadingSubtitleSx, sectionHeadingSubtitleTextSx } = useComponentStyles();
 
-  return (
-    <Typography
-      variant="subtitle1"
-      sx={mergeSx([sectionHeadingSubtitleSx, sectionHeadingSubtitleTextSx], sx)}
-      {...rest}
-    >
-      {children}
-    </Typography>
+  return renderCompatibilityText(
+    {
+      role: 'sectionSubtitle',
+      defaultComponent: 'h6',
+      baseSx: [sectionHeadingSubtitleSx, sectionHeadingSubtitleTextSx],
+    },
+    { children, sx, ...rest }
   );
 };
 
 /** Home hero title – `variant="h1"`. */
-export const DisplayTitle = ({ children, sx, ...rest }: TextPrimitiveProps) => (
-  <Typography variant="h1" sx={sx} {...rest}>
-    {children}
-  </Typography>
-);
+export const DisplayTitle = ({ children, sx, ...rest }: TextPrimitiveProps) =>
+  renderCompatibilityText(
+    {
+      role: 'pageTitle',
+      defaultComponent: 'h1',
+      baseSx: [displayTitleSx],
+    },
+    { children, sx, ...rest }
+  );
 
 /** Entry-level heading – `variant="h6"`, primary color, bold. */
 export const EntryTitle = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { sectionTitleSx } = useComponentStyles();
 
-  return (
-    <Typography variant="h6" sx={mergeSx([sectionTitleSx], sx)} {...rest}>
-      {children}
-    </Typography>
+  return renderCompatibilityText(
+    {
+      role: 'cardTitle',
+      defaultComponent: 'h6',
+      baseSx: [sectionTitleSx],
+    },
+    { children, sx, ...rest }
   );
 };
 
@@ -91,10 +143,13 @@ export const EntryTitle = ({ children, sx, ...rest }: TextPrimitiveProps) => {
 export const MetricValueText = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { metricValueTextSx } = useComponentStyles();
 
-  return (
-    <Typography variant="body2" sx={mergeSx([metricValueTextSx], sx)} {...rest}>
-      {children}
-    </Typography>
+  return renderCompatibilityText(
+    {
+      role: 'metricValue',
+      defaultComponent: 'p',
+      baseSx: [metricValueTextSx],
+    },
+    { children, sx, ...rest }
   );
 };
 
@@ -102,10 +157,13 @@ export const MetricValueText = ({ children, sx, ...rest }: TextPrimitiveProps) =
 export const EntrySubtitle = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { secondaryItalicSx } = useComponentStyles();
 
-  return (
-    <Typography component="p" variant="subtitle1" sx={mergeSx([secondaryItalicSx], sx)} {...rest}>
-      {children}
-    </Typography>
+  return renderCompatibilityText(
+    {
+      role: 'sectionSubtitle',
+      defaultComponent: 'p',
+      baseSx: [secondaryItalicSx],
+    },
+    { children, sx, ...rest }
   );
 };
 
@@ -113,14 +171,13 @@ export const EntrySubtitle = ({ children, sx, ...rest }: TextPrimitiveProps) => 
 export const SectionLabel = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { sectionNavigatorLeadSx, supportOverlineSx } = useComponentStyles();
 
-  return (
-    <Typography
-      variant="overline"
-      sx={mergeSx([sectionNavigatorLeadSx, supportOverlineSx], sx)}
-      {...rest}
-    >
-      {children}
-    </Typography>
+  return renderCompatibilityText(
+    {
+      role: 'sectionEyebrow',
+      defaultComponent: 'span',
+      baseSx: [sectionNavigatorLeadSx, supportOverlineSx],
+    },
+    { children, sx, ...rest }
   );
 };
 
@@ -128,10 +185,13 @@ export const SectionLabel = ({ children, sx, ...rest }: TextPrimitiveProps) => {
 export const MetaText = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { secondaryTextSx } = useComponentStyles();
 
-  return (
-    <Typography component="p" variant="subtitle2" sx={mergeSx([secondaryTextSx], sx)} {...rest}>
-      {children}
-    </Typography>
+  return renderCompatibilityText(
+    {
+      role: 'meta',
+      defaultComponent: 'p',
+      baseSx: [subtitle2ScaleSx, secondaryTextSx],
+    },
+    { children, sx, ...rest }
   );
 };
 
@@ -139,64 +199,80 @@ export const MetaText = ({ children, sx, ...rest }: TextPrimitiveProps) => {
 export const StrongMetaText = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { secondaryStrongSx } = useComponentStyles();
 
-  return (
-    <Typography component="p" variant="subtitle2" sx={mergeSx([secondaryStrongSx], sx)} {...rest}>
-      {children}
-    </Typography>
+  return renderCompatibilityText(
+    {
+      role: 'metaStrong',
+      defaultComponent: 'p',
+      baseSx: [subtitle2ScaleSx, secondaryStrongSx],
+    },
+    { children, sx, ...rest }
   );
 };
 
 /** Caption-level text – `variant="caption"`. */
-export const CaptionText = ({ children, sx, ...rest }: TextPrimitiveProps) => (
-  <Typography variant="caption" sx={sx} {...rest}>
-    {children}
-  </Typography>
-);
+export const CaptionText = ({ children, sx, ...rest }: TextPrimitiveProps) =>
+  renderCompatibilityText(
+    {
+      role: 'caption',
+      defaultComponent: 'span',
+    },
+    { children, sx, ...rest }
+  );
 
 /** Body copy – `variant="body2"`. */
-export const BodyText = ({ children, sx, ...rest }: TextPrimitiveProps) => (
-  <Typography variant="body2" sx={sx} {...rest}>
-    {children}
-  </Typography>
-);
+export const BodyText = ({ children, sx, ...rest }: TextPrimitiveProps) =>
+  renderCompatibilityText(
+    {
+      role: 'body',
+      defaultComponent: 'p',
+    },
+    { children, sx, ...rest }
+  );
 
 /** Secondary body copy – `variant="body2"` with secondary text styling. */
 export const SecondaryBodyText = ({ children, sx, ...rest }: TextPrimitiveProps) => {
-  const { secondaryTextSx } = useComponentStyles();
-
-  return (
-    <Typography variant="body2" sx={mergeSx([secondaryTextSx], sx)} {...rest}>
-      {children}
-    </Typography>
+  return renderCompatibilityText(
+    {
+      role: 'bodyMuted',
+      defaultComponent: 'p',
+    },
+    { children, sx, ...rest }
   );
 };
 
 /** Secondary caption copy – `variant="caption"` with secondary text styling. */
 export const SecondaryCaptionText = ({ children, sx, ...rest }: TextPrimitiveProps) => {
-  const { secondaryTextSx } = useComponentStyles();
-
-  return (
-    <Typography variant="caption" sx={mergeSx([secondaryTextSx], sx)} {...rest}>
-      {children}
-    </Typography>
+  return renderCompatibilityText(
+    {
+      role: 'caption',
+      tone: 'muted',
+      defaultComponent: 'span',
+    },
+    { children, sx, ...rest }
   );
 };
 
 /** List item body copy – `variant="body2"`, `component="li"`. */
-export const ListItemText = ({ children, sx, ...rest }: TextPrimitiveProps) => (
-  <Typography component="li" variant="body2" sx={sx} {...rest}>
-    {children}
-  </Typography>
-);
+export const ListItemText = ({ children, sx, ...rest }: TextPrimitiveProps) =>
+  renderCompatibilityText(
+    {
+      role: 'body',
+      defaultComponent: 'li',
+    },
+    { children, sx, ...rest }
+  );
 
 /** Section lead/subtitle text – `variant="subtitle2"` with secondary text styling. */
 export const SectionLeadText = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { secondaryStrongSx } = useComponentStyles();
 
-  return (
-    <Typography component="p" variant="subtitle2" sx={mergeSx([secondaryStrongSx], sx)} {...rest}>
-      {children}
-    </Typography>
+  return renderCompatibilityText(
+    {
+      role: 'metaStrong',
+      defaultComponent: 'p',
+      baseSx: [subtitle2ScaleSx, secondaryStrongSx],
+    },
+    { children, sx, ...rest }
   );
 };
 
@@ -204,9 +280,12 @@ export const SectionLeadText = ({ children, sx, ...rest }: TextPrimitiveProps) =
 export const SubsectionTitle = ({ children, sx, ...rest }: TextPrimitiveProps) => {
   const { sectionTitleSx } = useComponentStyles();
 
-  return (
-    <Typography variant="subtitle2" sx={mergeSx([sectionTitleSx], sx)} {...rest}>
-      {children}
-    </Typography>
+  return renderCompatibilityText(
+    {
+      role: 'metaStrong',
+      defaultComponent: 'h6',
+      baseSx: [subtitle2ScaleSx, sectionTitleSx],
+    },
+    { children, sx, ...rest }
   );
 };

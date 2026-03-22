@@ -65,7 +65,9 @@
             },
             {
               "name": "@mui/material",
-              "importNames": ["Typography"],
+              "importNames": [
+                "Typography"
+              ],
               "message": "Use Text from src/components/text instead. If you need raw Typography, use UnsafeTypography with required metadata."
             }
           ]
@@ -74,7 +76,10 @@
     },
     "overrides": [
       {
-        "files": ["src/components/text/**/*.ts", "src/components/text/**/*.tsx"],
+        "files": [
+          "src/components/text/Text.tsx",
+          "src/components/text/UNSAFE_Typography.tsx"
+        ],
         "rules": {
           "no-restricted-imports": "off"
         }

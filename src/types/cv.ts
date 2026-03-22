@@ -27,7 +27,7 @@ export type CodingExampleTab =
       value: string;
       label: string;
       kind: 'list';
-      items: string[];
+      items: Array<string | ExperienceProjectSegment[]>;
     }
   | {
       value: string;

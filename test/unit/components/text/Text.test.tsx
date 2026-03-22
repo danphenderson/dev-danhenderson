@@ -33,6 +33,15 @@ describe('Text component', () => {
     expect(el.tagName).toBe('H1');
   });
 
+  it('renders proseMinorHeading as h4 by default', () => {
+    render(<Text role="proseMinorHeading">Minor heading</Text>, { wrapper });
+
+    const el = screen.getByText('Minor heading');
+
+    expect(el.tagName).toBe('H4');
+    expect(el).toHaveClass('MuiTypography-subtitle1');
+  });
+
   it('renders caption as a span', () => {
     render(<Text role="caption">Tiny text</Text>, { wrapper });
 
@@ -184,6 +193,36 @@ describe('Text component', () => {
     expect(screen.getByText('Overlay Title')).toBeInTheDocument();
   });
 
+  it('changes body styling when prose context is used', () => {
+    render(
+      <>
+        <Text role="body">Interface copy</Text>
+        <Text role="body" context="prose">
+          Reading copy
+        </Text>
+      </>,
+      { wrapper }
+    );
+
+    expect(screen.getByText('Interface copy')).toHaveStyle({ lineHeight: '1.58' });
+    expect(screen.getByText('Reading copy')).toHaveStyle({ lineHeight: '1.75' });
+  });
+
+  it('changes cardTitle styling when overlay context is used', () => {
+    render(
+      <>
+        <Text role="cardTitle">Card title</Text>
+        <Text role="cardTitle" context="overlay" tone="inverse">
+          Overlay title
+        </Text>
+      </>,
+      { wrapper }
+    );
+
+    expect(screen.getByText('Card title')).toHaveStyle({ lineHeight: '1.3' });
+    expect(screen.getByText('Overlay title')).toHaveStyle({ lineHeight: '1.2' });
+  });
+
   /* ── All UI roles render without error ──────────────── */
 
   const uiRoles = [
@@ -218,6 +257,7 @@ describe('Text component', () => {
     'proseLead',
     'proseHeading',
     'proseSubheading',
+    'proseMinorHeading',
     'proseParagraph',
     'proseCaption',
     'proseQuote',

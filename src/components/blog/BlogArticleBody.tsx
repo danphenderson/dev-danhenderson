@@ -23,7 +23,7 @@ function HeadingBlock({ level, text, id }: { level: 2 | 3 | 4; text: string; id?
 
   return (
     <Text
-      role={level === 2 ? 'proseHeading' : 'proseSubheading'}
+      role={level === 2 ? 'proseHeading' : level === 3 ? 'proseSubheading' : 'proseMinorHeading'}
       component={component}
       id={anchorId}
       sx={{
