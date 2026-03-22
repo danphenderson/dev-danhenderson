@@ -18,7 +18,6 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
-  Typography,
 } from '@mui/material';
 import type { PaletteMode } from '@mui/material';
 import { alpha } from '@mui/material/styles';
@@ -32,6 +31,7 @@ import {
 import { cssDuration } from '../../motion/tokens';
 import { useMotionScale } from '../../motion';
 import { SPRING_EASING_CSS } from '../../styles/springEasing';
+import { Text } from '../text';
 
 /* ------------------------------------------------------------------ */
 /*  Appearance swatch                                                 */
@@ -116,8 +116,9 @@ const MOTION_LEVELS: {
 /* ------------------------------------------------------------------ */
 
 const SectionLabel = ({ children }: { children: ReactNode }) => (
-  <Typography
-    variant="overline"
+  <Text
+    role="sectionEyebrow"
+    component="span"
     sx={{
       fontSize: '0.625rem',
       fontWeight: 600,
@@ -127,7 +128,7 @@ const SectionLabel = ({ children }: { children: ReactNode }) => (
     }}
   >
     {children}
-  </Typography>
+  </Text>
 );
 
 /* ------------------------------------------------------------------ */
@@ -277,9 +278,9 @@ export const HeaderSettingsPopover = ({
                 ) : (
                   <LightModeOutlinedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
                 )}
-                <Typography variant="body2" color="text.primary" id="theme-switch-label">
+                <Text role="body" component="span" id="theme-switch-label">
                   Dark mode
-                </Typography>
+                </Text>
               </Stack>
               <Switch
                 checked={mode === 'dark'}
@@ -299,13 +300,14 @@ export const HeaderSettingsPopover = ({
           <Stack spacing={1}>
             <Stack direction="row" alignItems="baseline" justifyContent="space-between">
               <SectionLabel>Appearance</SectionLabel>
-              <Typography
-                variant="caption"
+              <Text
+                role="caption"
+                component="span"
                 sx={{ color: 'text.secondary', fontSize: '0.6875rem' }}
                 data-testid="active-appearance-label"
               >
                 {activePreset.label}
-              </Typography>
+              </Text>
             </Stack>
             <Stack
               direction="row"
@@ -337,13 +339,14 @@ export const HeaderSettingsPopover = ({
           <Stack spacing={1}>
             <Stack direction="row" alignItems="baseline" justifyContent="space-between">
               <SectionLabel>Motion</SectionLabel>
-              <Typography
-                variant="caption"
+              <Text
+                role="caption"
+                component="span"
                 sx={{ color: 'text.secondary', fontSize: '0.6875rem' }}
                 data-testid="active-motion-label"
               >
                 {effectiveMotionLevel.label}
-              </Typography>
+              </Text>
             </Stack>
             <ToggleButtonGroup
               value={motionIntensity}
@@ -401,9 +404,9 @@ export const HeaderSettingsPopover = ({
                 data-testid="reduced-motion-notice"
               >
                 <InfoOutlinedIcon sx={{ fontSize: 14, color: 'text.secondary', mt: '1px' }} />
-                <Typography variant="caption" color="text.secondary" sx={{ lineHeight: 1.3 }}>
+                <Text role="caption" component="span" tone="muted" sx={{ lineHeight: 1.3 }}>
                   Reduced motion is active (OS&nbsp;setting)
-                </Typography>
+                </Text>
               </Stack>
             )}
           </Stack>
@@ -415,9 +418,9 @@ export const HeaderSettingsPopover = ({
               <Stack spacing={1}>
                 <SectionLabel>Welcome audio</SectionLabel>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
-                  <Typography variant="body2" color="text.primary">
+                  <Text role="body" component="span">
                     {isPlaying ? 'Now playing' : 'Paused'}
-                  </Typography>
+                  </Text>
                   <Tooltip title={isPlaying ? 'Pause welcome audio' : 'Play welcome audio'}>
                     <IconButton
                       size="small"

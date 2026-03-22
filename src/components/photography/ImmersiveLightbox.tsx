@@ -7,7 +7,7 @@ import { Box, Dialog, IconButton, Stack } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import type { PhotoItem } from '../../types/data';
 import { useMotionScale } from '../../motion';
-import { EntryTitle, SecondaryBodyText } from '../text';
+import { Text } from '../text';
 
 type ImmersiveLightboxProps = {
   photos: PhotoItem[];
@@ -119,9 +119,9 @@ export function ImmersiveLightbox({
             background: 'linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%)',
           }}
         >
-          <SecondaryBodyText sx={{ color: 'common.white', opacity: 0.8 }}>
+          <Text role="body" tone="inverse" context="overlay" sx={{ opacity: 0.8 }}>
             {currentIndex + 1} / {photos.length}
-          </SecondaryBodyText>
+          </Text>
           <Stack direction="row" spacing={0.5}>
             <IconButton
               component="a"
@@ -217,18 +217,21 @@ export function ImmersiveLightbox({
           }}
         >
           <Stack spacing={0.25}>
-            <EntryTitle
+            <Text
+              role="cardTitle"
+              tone="inverse"
+              context="overlay"
               component="p"
-              sx={{ color: 'common.white', fontSize: '1rem', fontWeight: 600, lineHeight: 1.3 }}
+              sx={{ fontSize: '1rem', fontWeight: 600, lineHeight: 1.3 }}
             >
               {displayTitle}
-            </EntryTitle>
+            </Text>
             {photo.location && (
               <Stack direction="row" spacing={0.5} alignItems="center">
                 <PlaceIcon sx={{ color: 'common.white', opacity: 0.7, fontSize: 16 }} />
-                <SecondaryBodyText sx={{ color: 'common.white', opacity: 0.7 }}>
+                <Text role="body" tone="inverse" context="overlay" sx={{ opacity: 0.7 }}>
                   {photo.location}
-                </SecondaryBodyText>
+                </Text>
               </Stack>
             )}
           </Stack>

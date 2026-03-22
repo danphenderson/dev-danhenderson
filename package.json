@@ -53,6 +53,37 @@
     "extends": [
       "react-app",
       "react-app/jest"
+    ],
+    "rules": {
+      "no-restricted-imports": [
+        "error",
+        {
+          "paths": [
+            {
+              "name": "@mui/material/Typography",
+              "message": "Use Text from src/components/text instead. If you need raw Typography, use UnsafeTypography with required metadata."
+            },
+            {
+              "name": "@mui/material",
+              "importNames": [
+                "Typography"
+              ],
+              "message": "Use Text from src/components/text instead. If you need raw Typography, use UnsafeTypography with required metadata."
+            }
+          ]
+        }
+      ]
+    },
+    "overrides": [
+      {
+        "files": [
+          "src/components/text/Text.tsx",
+          "src/components/text/UNSAFE_Typography.tsx"
+        ],
+        "rules": {
+          "no-restricted-imports": "off"
+        }
+      }
     ]
   },
   "browserslist": {

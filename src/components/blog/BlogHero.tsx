@@ -1,5 +1,6 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+import { Text } from '../text';
 import { BlogHeroImage } from './BlogHeroImage';
 import { BlogMetaChips } from './BlogMetaChips';
 import { useComponentStyles } from '../../styles/componentStyles';
@@ -59,20 +60,20 @@ export function BlogHero({ post }: BlogHeroProps) {
             zIndex: 1,
           }}
         >
-          <Typography
+          <Text
+            role="sectionEyebrow"
+            tone="accent"
             component="p"
-            variant="overline"
             sx={{
-              color: 'primary.main',
               fontWeight: 700,
               letterSpacing: '0.08em',
             }}
           >
             Featured Article
-          </Typography>
+          </Text>
 
-          <Typography
-            variant="h3"
+          <Text
+            role="proseTitle"
             component="h2"
             sx={{
               fontWeight: 800,
@@ -81,31 +82,31 @@ export function BlogHero({ post }: BlogHeroProps) {
             }}
           >
             {post.title}
-          </Typography>
+          </Text>
 
           {post.subtitle && (
-            <Typography
-              variant="subtitle1"
+            <Text
+              role="proseLead"
+              tone="muted"
               sx={{
-                color: 'text.secondary',
                 fontStyle: 'italic',
                 maxWidth: 640,
               }}
             >
               {post.subtitle}
-            </Typography>
+            </Text>
           )}
 
-          <Typography
-            variant="body1"
+          <Text
+            role="body"
+            tone="muted"
             sx={{
-              color: 'text.secondary',
               maxWidth: 680,
               lineHeight: 1.7,
             }}
           >
             {post.excerpt}
-          </Typography>
+          </Text>
 
           <BlogMetaChips
             publishedAt={post.publishedAt}

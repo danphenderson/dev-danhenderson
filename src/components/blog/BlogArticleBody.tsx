@@ -1,4 +1,5 @@
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Divider } from '@mui/material';
+import { Text } from '../text';
 import { BlogCodeBlock } from './BlogCodeBlock';
 import { BlogBlockquote } from './BlogBlockquote';
 import { BlogCallout } from './BlogCallout';
@@ -18,14 +19,13 @@ function slugify(text: string): string {
 
 function HeadingBlock({ level, text, id }: { level: 2 | 3 | 4; text: string; id?: string }) {
   const anchorId = id ?? slugify(text);
-  const variant = level === 2 ? 'h4' : level === 3 ? 'h5' : 'h6';
   const component = `h${level}` as 'h2' | 'h3' | 'h4';
 
   return (
-    <Typography
-      id={anchorId}
-      variant={variant}
+    <Text
+      role={level === 2 ? 'proseHeading' : level === 3 ? 'proseSubheading' : 'proseMinorHeading'}
       component={component}
+      id={anchorId}
       sx={{
         fontWeight: 700,
         mt: level === 2 ? 4 : 3,
@@ -39,7 +39,7 @@ function HeadingBlock({ level, text, id }: { level: 2 | 3 | 4; text: string; id?
       }}
     >
       <a href={`#${anchorId}`}>{text}</a>
-    </Typography>
+    </Text>
   );
 }
 
@@ -47,9 +47,9 @@ function renderBlock(block: BlogContentBlock, index: number) {
   switch (block.type) {
     case 'paragraph':
       return (
-        <Typography
+        <Text
           key={index}
-          variant="body1"
+          role="proseParagraph"
           sx={{
             lineHeight: 1.8,
             mb: 2,
@@ -58,7 +58,7 @@ function renderBlock(block: BlogContentBlock, index: number) {
           }}
         >
           {block.text}
-        </Typography>
+        </Text>
       );
 
     case 'heading':
@@ -101,17 +101,18 @@ function renderBlock(block: BlogContentBlock, index: number) {
             }}
           />
           {block.caption && (
-            <Typography
-              variant="caption"
+            <Text
+              role="proseCaption"
+              tone="muted"
+              component="figcaption"
               sx={{
                 display: 'block',
                 mt: 1,
-                color: 'text.secondary',
                 fontStyle: 'italic',
               }}
             >
               {block.caption}
-            </Typography>
+            </Text>
           )}
         </Box>
       );

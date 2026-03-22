@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import { Button, Chip, Tab, Tabs } from '@mui/material';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import {
   HeaderLabel,
@@ -58,7 +57,7 @@ describe('Typography primitives', () => {
     const el = screen.getByText('Hello World');
 
     expect(el.tagName).toBe('H1');
-    expect(el).toHaveClass('MuiTypography-h1');
+    expect(el).toHaveClass('MuiTypography-h2');
   });
 
   it('renders EntryTitle as an h6 heading', () => {
@@ -103,7 +102,8 @@ describe('Typography primitives', () => {
 
     const el = screen.getByText('2025');
 
-    expect(el).toHaveClass('MuiTypography-subtitle2');
+    expect(el.tagName).toBe('P');
+    expect(el).toHaveClass('MuiTypography-body2');
   });
 
   it('renders StrongMetaText as a bold subtitle2 element', () => {
@@ -111,7 +111,8 @@ describe('Typography primitives', () => {
 
     const el = screen.getByText('Important');
 
-    expect(el).toHaveClass('MuiTypography-subtitle2');
+    expect(el).toHaveClass('MuiTypography-body2');
+    expect(el).toHaveStyle({ fontWeight: '700' });
   });
 
   it('renders CaptionText as a caption element', () => {
@@ -166,7 +167,7 @@ describe('Typography primitives', () => {
     const el = screen.getByText('Intro text');
 
     expect(el.tagName).toBe('P');
-    expect(el).toHaveClass('MuiTypography-subtitle2');
+    expect(el).toHaveClass('MuiTypography-body2');
   });
 
   it('renders SectionLeadText with strong secondary emphasis', () => {
@@ -181,7 +182,7 @@ describe('Typography primitives', () => {
     const el = screen.getByText('Recent Activity');
 
     expect(el.tagName).toBe('H6');
-    expect(el).toHaveClass('MuiTypography-subtitle2');
+    expect(el).toHaveClass('MuiTypography-body2');
   });
 
   it('merges caller sx with default styles', () => {

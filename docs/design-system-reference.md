@@ -1,5 +1,38 @@
 # Design System Reference
 
+## Non-negotiable rules
+
+1. **All UI copy must use `Text` (semantic roles) or a composition primitive that uses `Text` internally.**
+2. **Direct MUI `Typography` imports are banned outside `src/components/text/**`.** Enforced by ESLint `no-restricted-imports`.
+3. **Blog and photography are not design-system exceptions.** Blog uses prose context. Photography uses inverse-tone overlay context.
+4. **When a text role is missing, add it to the typeset registry** — do not work around the system with local `sx` overrides.
+
+## Text authoring decision tree
+
+- **UI chrome** (nav, button labels, chips) → `Text role="label"` or `InlineLabel` primitives
+- **Structural UI** (section/card headings, meta, body) → `Text role="..."` with the appropriate role
+- **Long-form reading** (blog articles) → `Text` with prose roles (`proseParagraph`, `proseHeading`, etc.)
+- **Text on imagery** (photography overlays) → `Text tone="inverse" context="overlay"` with the appropriate role
+- **Exception boundary** (IDE hero, CV story mode) → `UnsafeTypography` with required `_unsafe` metadata
+
+## How to extend roles and typesets
+
+When a needed role does not exist:
+
+1. Add the role to the `TextRole` union in `src/types/text.ts`
+2. Add the typeset definition in `src/styles/textStyleBuilders.ts`
+3. Add a default semantic element mapping in `src/components/text/Text.tsx`
+4. Update the role table in this document
+5. Add at least one usage example
+
+## Enforcement mechanisms
+
+- **ESLint `no-restricted-imports`**: Blocks `@mui/material/Typography` and `Typography` barrel import from `@mui/material`. Override only in `src/components/text/**`.
+- **`UnsafeTypography` wrapper**: Requires `_unsafe` metadata with `reason`, `owner`, and `expiresBy`. Only used in explicitly sanctioned exception modules.
+- **Typeset builder**: Typography styling is centralized in `src/styles/textStyleBuilders.ts`, not in ad-hoc `sx` on text consumers.
+
+---
+
 This is the concrete catalog of established UI surfaces, primitives, and patterns. Before introducing a new pattern, start with the existing foundations below and adapt the narrowest existing layer that fits.
 
 For architecture-level context, see [Component architecture](frontend/component-architecture.md) and [Theme and styling](frontend/theme-and-styling.md).
@@ -11,7 +44,7 @@ For architecture-level context, see [Component architecture](frontend/component-
 - Prefer shared card and panel surfaces before inventing a new container.
 - Prefer `Stack`, shared gap helpers, and shared padding profiles before ad hoc spacing.
 - Prefer the existing animated list and chip-list primitives for repeated content.
-- Treat the Home hero, blog editorial surfaces, and photography overlays as intentional exceptions, not defaults.
+- Treat the Home IDE hero as an intentional design-system exception; CV story mode is a bounded exception via `UnsafeTypography`.
 
 ## Foundations
 
@@ -57,9 +90,17 @@ Common consumers:
 - [src/components/SkillsChipList.tsx](../src/components/SkillsChipList.tsx)
 - [src/components/cv/GitHubLinkChipList.tsx](../src/components/cv/GitHubLinkChipList.tsx)
 
-### 3. Editorial and image-overlay typography
+### 3. `Text` component — canonical text authoring API
 
-Blog hero/article surfaces and photography overlays intentionally use custom typography for larger display scale, tighter tracking, and white-on-image presentation. Photography overlay copy should still start from the shared semantic text primitives in [src/components/text/TypographyPrimitives.tsx](../src/components/text/TypographyPrimitives.tsx), with local `sx` overrides for white-on-image treatments rather than a photography-local text primitive layer.
+All UI text is authored through the `Text` component using semantic `role`, `tone`, and `context` props. The typeset builder in `src/styles/textStyleBuilders.ts` maps role×tone×context to styled output. Direct MUI `Typography` imports are banned outside `src/components/text/**` (enforced by ESLint).
+
+Defined in [src/components/text/Text.tsx](../src/components/text/Text.tsx). Shared types in [src/types/text.ts](../src/types/text.ts).
+
+**Blog** uses prose roles (`proseParagraph`, `proseHeading`, etc.) via `Text` — not a separate editorial typography system.
+
+**Photography overlays** use `Text tone="inverse" context="overlay"` — not local `sx` overrides on raw `Typography`.
+
+**Escape hatch:** `UnsafeTypography` in [src/components/text/UNSAFE_Typography.tsx](../src/components/text/UNSAFE_Typography.tsx) requires `_unsafe` metadata (`reason`, `owner`, `expiresBy`). Used only in explicitly sanctioned exception modules (IDE hero, CV story mode).
 
 Common consumers:
 

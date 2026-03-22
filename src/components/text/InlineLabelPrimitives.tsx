@@ -1,7 +1,8 @@
-import Typography from '@mui/material/Typography';
-import type { TypographyProps } from '@mui/material/Typography';
+import type { TypographyProps } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { useComponentStyles } from '../../styles/componentStyles';
+import type { TextProps } from './Text';
+import { Text } from './Text';
 import { mergeSx } from './textFactory';
 
 /* ────────────────────────────────────────────────────────── *
@@ -19,10 +20,29 @@ type InlineLabelProps = Omit<TypographyProps<'span'>, 'variant' | 'component'> &
   sx?: SxProps<Theme>;
 };
 
-const InlineLabel = ({ children, sx, ...rest }: InlineLabelProps) => (
-  <Typography component="span" variant="inherit" sx={sx} {...rest}>
+type ForwardedInlineTextProps = Omit<
+  TextProps,
+  'role' | 'tone' | 'context' | 'children' | 'sx' | 'component'
+>;
+
+const inheritTypographySx = {
+  color: 'inherit',
+  fontFamily: 'inherit',
+  fontSize: 'inherit',
+  fontWeight: 'inherit',
+  letterSpacing: 'inherit',
+  lineHeight: 'inherit',
+};
+
+const InlineLabel = ({ children, sx, color, ...rest }: InlineLabelProps) => (
+  <Text
+    role="body"
+    component="span"
+    sx={mergeSx([inheritTypographySx, ...(color ? [{ color }] : [])], sx)}
+    {...(rest as unknown as ForwardedInlineTextProps)}
+  >
     {children}
-  </Typography>
+  </Text>
 );
 
 /** Generic interactive label for tabs, speed-dial tooltips, etc. */
@@ -43,14 +63,14 @@ export const ChipMetaLabel = ({ children, sx, ...rest }: InlineLabelProps) => {
   const { contributionInlineLabelSx } = useComponentStyles();
 
   return (
-    <Typography
+    <Text
+      role="body"
       component="span"
-      variant="inherit"
-      sx={mergeSx([contributionInlineLabelSx], sx)}
-      {...rest}
+      sx={mergeSx([inheritTypographySx, contributionInlineLabelSx], sx)}
+      {...(rest as unknown as ForwardedInlineTextProps)}
     >
       {children}
-    </Typography>
+    </Text>
   );
 };
 
@@ -62,13 +82,13 @@ export const StatusInlineText = ({ children, sx, ...rest }: InlineLabelProps) =>
   const { supportAccentTextSx, statusBreatheSx } = useComponentStyles();
 
   return (
-    <Typography
+    <Text
+      role="body"
       component="span"
-      variant="inherit"
-      sx={mergeSx([supportAccentTextSx, statusBreatheSx], sx)}
-      {...rest}
+      sx={mergeSx([inheritTypographySx, supportAccentTextSx, statusBreatheSx], sx)}
+      {...(rest as unknown as ForwardedInlineTextProps)}
     >
       {children}
-    </Typography>
+    </Text>
   );
 };

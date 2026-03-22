@@ -1,4 +1,5 @@
-import { Chip, Stack, Typography } from '@mui/material';
+import { Chip, Stack } from '@mui/material';
+import { Text } from '../text';
 import { MotionSection } from '../../motion';
 import { useComponentStyles } from '../../styles/componentStyles';
 
@@ -16,12 +17,14 @@ export function BlogTagFilter({ tags, activeTag, onTagChange }: BlogTagFilterPro
   return (
     <MotionSection>
       <Stack spacing={1}>
-        <Typography
-          variant="overline"
-          sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.08em' }}
+        <Text
+          role="sectionEyebrow"
+          tone="muted"
+          component="span"
+          sx={{ fontWeight: 700, letterSpacing: '0.08em' }}
         >
           Topics
-        </Typography>
+        </Text>
         <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
           <Chip
             label="All"

@@ -1,5 +1,6 @@
 import { Link as RouterLink } from 'react-router-dom';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
+import { Text } from '../text';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { MotionSection, StaggerChildren, MotionItem, cssDuration } from '../../motion';
 import type { BlogPostMeta } from '../../types/blog';
@@ -17,8 +18,8 @@ export function BlogRelatedPosts({ posts }: BlogRelatedPostsProps) {
   return (
     <Box sx={{ maxWidth: 720, mx: 'auto', mt: 6 }}>
       <MotionSection>
-        <Typography
-          variant="h5"
+        <Text
+          role="subsectionTitle"
           component="h2"
           sx={{
             fontWeight: 700,
@@ -27,7 +28,7 @@ export function BlogRelatedPosts({ posts }: BlogRelatedPostsProps) {
           }}
         >
           Related articles
-        </Typography>
+        </Text>
         <StaggerChildren>
           <Stack spacing={2}>
             {posts.map((post) => (
@@ -47,8 +48,9 @@ export function BlogRelatedPosts({ posts }: BlogRelatedPostsProps) {
                     },
                   }}
                 >
-                  <Typography
-                    variant="subtitle1"
+                  <Text
+                    role="cardTitle"
+                    component="p"
                     sx={{
                       fontWeight: 600,
                       color: 'text.primary',
@@ -57,11 +59,11 @@ export function BlogRelatedPosts({ posts }: BlogRelatedPostsProps) {
                     }}
                   >
                     {post.title}
-                  </Typography>
-                  <Typography
-                    variant="body2"
+                  </Text>
+                  <Text
+                    role="body"
+                    tone="muted"
                     sx={{
-                      color: 'text.secondary',
                       mb: 1.5,
                       display: '-webkit-box',
                       WebkitBoxOrient: 'vertical',
@@ -70,7 +72,7 @@ export function BlogRelatedPosts({ posts }: BlogRelatedPostsProps) {
                     }}
                   >
                     {post.excerpt}
-                  </Typography>
+                  </Text>
                   <BlogMetaChips
                     publishedAt={post.publishedAt}
                     readingTimeMinutes={post.readingTimeMinutes}

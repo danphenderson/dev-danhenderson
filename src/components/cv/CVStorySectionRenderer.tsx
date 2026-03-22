@@ -20,6 +20,7 @@ import {
 import {
   renderExperienceDescriptionContent,
   renderExperienceProjectContent,
+  renderExperienceSegments,
 } from './experienceContent';
 import {
   storyContentContainer,
@@ -389,7 +390,12 @@ const CodingSection = ({
               {tab.kind === 'skills' ? (
                 <SkillsChipList skills={tab.skills} animation="slide" />
               ) : (
-                renderBulletList(tab.items, 3)
+                renderBulletList(
+                  tab.items.map((item) =>
+                    Array.isArray(item) ? renderExperienceSegments(item) : item
+                  ),
+                  3
+                )
               )}
             </Box>
           ))}

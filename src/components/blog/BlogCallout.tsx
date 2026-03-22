@@ -1,7 +1,8 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import TipsAndUpdatesOutlinedIcon from '@mui/icons-material/TipsAndUpdatesOutlined';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import { Text } from '../text';
 
 type BlogCalloutProps = {
   variant: 'note' | 'tip' | 'warning';
@@ -54,13 +55,13 @@ export function BlogCallout({ variant, title, text }: BlogCalloutProps) {
     >
       <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.75 }}>
         <Icon sx={{ fontSize: 18, color: config.color }} />
-        <Typography variant="subtitle2" sx={{ fontWeight: 700, color: config.color }}>
+        <Text role="metaStrong" component="span" sx={{ fontWeight: 700, color: config.color }}>
           {title ?? config.defaultTitle}
-        </Typography>
+        </Text>
       </Stack>
-      <Typography variant="body2" sx={{ lineHeight: 1.7, color: 'text.secondary' }}>
+      <Text role="body" tone="muted" sx={{ lineHeight: 1.7 }}>
         {text}
-      </Typography>
+      </Text>
     </Box>
   );
 }

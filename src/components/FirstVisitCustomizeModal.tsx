@@ -16,11 +16,10 @@ import {
   ToggleButton,
   ToggleButtonGroup,
   Tooltip,
-  Typography,
 } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { MotionIntensityLevel } from '../theme/appAppearance';
-import { BodyText, CaptionText } from './text';
+import { BodyText, CaptionText, Text } from './text';
 
 const sectionLabelSx = {
   fontSize: '0.625rem',
@@ -91,9 +90,9 @@ export const FirstVisitCustomizeModal = ({
         <Stack spacing={2.5}>
           {/* Motion intensity */}
           <Stack spacing={1}>
-            <Typography variant="overline" sx={sectionLabelSx}>
+            <Text role="sectionEyebrow" component="span" sx={sectionLabelSx}>
               Motion
-            </Typography>
+            </Text>
             <ToggleButtonGroup
               value={motionIntensity}
               exclusive
@@ -123,13 +122,13 @@ export const FirstVisitCustomizeModal = ({
 
           {/* Audio */}
           <Stack spacing={1}>
-            <Typography variant="overline" sx={sectionLabelSx}>
+            <Text role="sectionEyebrow" component="span" sx={sectionLabelSx}>
               Audio
-            </Typography>
+            </Text>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
-              <Typography variant="body2" color="text.primary">
+              <Text role="body" component="span">
                 {isAudioLoading ? 'Loading…' : isAudioPlaying ? 'Playing' : 'Off'}
-              </Typography>
+              </Text>
               <Tooltip title={isAudioPlaying ? 'Pause welcome audio' : 'Play welcome audio'}>
                 <span>
                   <IconButton

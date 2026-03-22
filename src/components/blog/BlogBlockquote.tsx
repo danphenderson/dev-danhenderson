@@ -1,4 +1,5 @@
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
+import { Text } from '../text';
 
 type BlogBlockquoteProps = {
   text: string;
@@ -19,20 +20,21 @@ export function BlogBlockquote({ text, attribution }: BlogBlockquoteProps) {
         position: 'relative',
       }}
     >
-      <Typography
-        variant="body1"
+      <Text
+        role="proseQuote"
+        tone="muted"
         sx={{
           fontStyle: 'italic',
           lineHeight: 1.75,
-          color: 'text.secondary',
           fontSize: '1.05rem',
         }}
       >
         {text}
-      </Typography>
+      </Text>
       {attribution && (
-        <Typography
-          variant="caption"
+        <Text
+          role="proseCaption"
+          tone="muted"
           sx={{
             display: 'block',
             mt: 1,
@@ -41,7 +43,7 @@ export function BlogBlockquote({ text, attribution }: BlogBlockquoteProps) {
           }}
         >
           — {attribution}
-        </Typography>
+        </Text>
       )}
     </Box>
   );
