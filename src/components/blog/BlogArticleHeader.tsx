@@ -1,4 +1,5 @@
-import { Stack, Typography } from '@mui/material';
+import { Stack } from '@mui/material';
+import { Text } from '../text';
 import { BlogHeroImage } from './BlogHeroImage';
 import { BlogMetaChips } from './BlogMetaChips';
 import { MotionSection } from '../../motion';
@@ -31,8 +32,8 @@ export function BlogArticleHeader({ post }: BlogArticleHeaderProps) {
             zIndex: 1,
           }}
         >
-          <Typography
-            variant="h2"
+          <Text
+            role="proseTitle"
             component="h1"
             sx={{
               fontWeight: 800,
@@ -42,14 +43,13 @@ export function BlogArticleHeader({ post }: BlogArticleHeaderProps) {
             }}
           >
             {post.title}
-          </Typography>
+          </Text>
 
           {post.subtitle && (
-            <Typography
-              variant="h6"
-              component="p"
+            <Text
+              role="proseLead"
+              tone="muted"
               sx={{
-                color: 'text.secondary',
                 fontStyle: 'italic',
                 fontWeight: 400,
                 lineHeight: 1.4,
@@ -57,7 +57,7 @@ export function BlogArticleHeader({ post }: BlogArticleHeaderProps) {
               }}
             >
               {post.subtitle}
-            </Typography>
+            </Text>
           )}
 
           <BlogMetaChips

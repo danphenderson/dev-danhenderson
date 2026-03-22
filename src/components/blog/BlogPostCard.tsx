@@ -1,5 +1,6 @@
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
+import { Text } from '../text';
 import { BlogMetaChips } from './BlogMetaChips';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { MotionCard, MotionTiltCard, hoverLift, tapShrink, cssDuration } from '../../motion';
@@ -61,8 +62,8 @@ export function BlogPostCard({ post, onTagClick }: BlogPostCardProps) {
           )}
 
           <Stack spacing={1} sx={{ p: { xs: 2, sm: 2.5 }, flex: 1 }}>
-            <Typography
-              variant="h6"
+            <Text
+              role="cardTitle"
               component="h3"
               sx={{
                 fontWeight: 700,
@@ -71,12 +72,12 @@ export function BlogPostCard({ post, onTagClick }: BlogPostCardProps) {
               }}
             >
               {post.title}
-            </Typography>
+            </Text>
 
-            <Typography
-              variant="body2"
+            <Text
+              role="body"
+              tone="muted"
               sx={{
-                color: 'text.secondary',
                 lineHeight: 1.6,
                 display: '-webkit-box',
                 WebkitLineClamp: 3,
@@ -86,7 +87,7 @@ export function BlogPostCard({ post, onTagClick }: BlogPostCardProps) {
               }}
             >
               {post.excerpt}
-            </Typography>
+            </Text>
 
             <BlogMetaChips
               publishedAt={post.publishedAt}

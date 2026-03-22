@@ -1,7 +1,8 @@
 import { Link as RouterLink } from 'react-router-dom';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { Text } from '../text';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { MotionCard, hoverLift, tapShrink, cssDuration } from '../../motion';
 import type { BlogPostMeta } from '../../types/blog';
@@ -44,21 +45,23 @@ function NavCard({ post, direction }: { post: BlogPostMeta; direction: 'prev' | 
         >
           <Stack direction="row" spacing={0.5} alignItems="center" sx={{ color: 'primary.main' }}>
             {isPrev && <ArrowBackIcon sx={{ fontSize: 16 }} />}
-            <Typography
-              variant="caption"
+            <Text
+              role="label"
+              tone="accent"
+              component="span"
               sx={{
                 fontWeight: 600,
                 textTransform: 'uppercase',
                 letterSpacing: '0.08em',
-                color: 'primary.main',
               }}
             >
               {isPrev ? 'Previous' : 'Next'}
-            </Typography>
+            </Text>
             {!isPrev && <ArrowForwardIcon sx={{ fontSize: 16 }} />}
           </Stack>
-          <Typography
-            variant="subtitle2"
+          <Text
+            role="cardTitle"
+            component="p"
             sx={{
               fontWeight: 600,
               color: 'text.primary',
@@ -66,7 +69,7 @@ function NavCard({ post, direction }: { post: BlogPostMeta; direction: 'prev' | 
             }}
           >
             {post.title}
-          </Typography>
+          </Text>
         </Stack>
       </Box>
     </MotionCard>

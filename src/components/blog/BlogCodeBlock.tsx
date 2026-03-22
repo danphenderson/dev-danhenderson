@@ -1,7 +1,8 @@
 import { useState, useCallback } from 'react';
-import { Box, IconButton, Stack, Typography, Tooltip } from '@mui/material';
+import { Box, IconButton, Stack, Tooltip } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
+import { Text } from '../text';
 import { useComponentStyles } from '../../styles/componentStyles';
 
 type BlogCodeBlockProps = {
@@ -45,8 +46,9 @@ export function BlogCodeBlock({ language, code, filename, caption }: BlogCodeBlo
         >
           <Stack direction="row" spacing={1} alignItems="center">
             {filename && (
-              <Typography
-                variant="caption"
+              <Text
+                role="caption"
+                component="span"
                 sx={{
                   fontFamily: 'monospace',
                   fontWeight: 600,
@@ -55,10 +57,11 @@ export function BlogCodeBlock({ language, code, filename, caption }: BlogCodeBlo
                 }}
               >
                 {filename}
-              </Typography>
+              </Text>
             )}
-            <Typography
-              variant="caption"
+            <Text
+              role="caption"
+              component="span"
               sx={{
                 fontFamily: 'monospace',
                 color: 'text.disabled',
@@ -68,7 +71,7 @@ export function BlogCodeBlock({ language, code, filename, caption }: BlogCodeBlo
               }}
             >
               {language}
-            </Typography>
+            </Text>
           </Stack>
           <Tooltip title={copied ? 'Copied!' : 'Copy code'}>
             <IconButton
@@ -112,19 +115,20 @@ export function BlogCodeBlock({ language, code, filename, caption }: BlogCodeBlo
       </Box>
 
       {caption && (
-        <Typography
-          variant="caption"
+        <Text
+          role="proseCaption"
+          tone="muted"
+          component="span"
           sx={{
             display: 'block',
             mt: 1,
-            color: 'text.secondary',
             fontStyle: 'italic',
             textAlign: 'center',
             lineHeight: 1.5,
           }}
         >
           {caption}
-        </Typography>
+        </Text>
       )}
     </Box>
   );
