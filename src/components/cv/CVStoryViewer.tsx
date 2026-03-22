@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Box, IconButton, Typography } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTheme, alpha } from '@mui/material/styles';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -8,6 +8,7 @@ import { useMotionScale } from '../../motion';
 import { CVStoryProgress } from './CVStoryProgress';
 import { CVStorySectionRenderer } from './CVStorySectionRenderer';
 import type { CVStoryItem } from '../../types/cv';
+import { UNSAFE_Typography } from '../text';
 
 type CVStoryViewerProps = {
   items: CVStoryItem[];
@@ -203,13 +204,18 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: duration.fast * dFactor, ease: easing.decel }}
           >
-            <Typography
+            <UNSAFE_Typography
               variant="overline"
               color="text.secondary"
               sx={{ letterSpacing: 3, userSelect: 'none' }}
+              _unsafe={{
+                reason: 'CV story mode is an intentional design-system exception boundary',
+                owner: 'cv-story',
+                expiresBy: '2026-12-01',
+              }}
             >
               {kindLabel[activeKind]}
-            </Typography>
+            </UNSAFE_Typography>
           </motion.div>
 
           <motion.div
