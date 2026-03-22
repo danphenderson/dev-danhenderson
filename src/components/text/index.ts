@@ -1,3 +1,7 @@
+export { Text } from './Text';
+export type { TextProps } from './Text';
+export { UNSAFE_Typography } from './UNSAFE_Typography';
+
 export { mergeSx } from './textFactory';
 
 export {
