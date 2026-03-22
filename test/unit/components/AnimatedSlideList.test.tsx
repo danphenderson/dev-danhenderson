@@ -72,7 +72,7 @@ describe('AnimatedSlideList', () => {
     screen.getAllByTestId('slide-item').forEach((slide) => {
       expect(slide).toHaveAttribute('data-in', 'false');
       expect(slide).toHaveAttribute('data-direction', 'up');
-      expect(slide).toHaveAttribute('data-appear', 'false');
+      expect(slide).toHaveAttribute('data-appear', 'true');
       expect(slide).toHaveAttribute('data-has-container', 'true');
     });
 
