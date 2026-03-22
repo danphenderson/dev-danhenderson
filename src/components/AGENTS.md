@@ -30,7 +30,7 @@ Source-of-truth docs:
 - Prefer semantic text primitives over styling raw `Typography` for standard labels, headings, metadata, and body copy.
 - Reuse existing patterns for typography, spacing, cards, section containers, lists, and data display before introducing a new UI pattern.
 - Follow existing MUI usage and styling conventions already present in the component family being edited.
-- Treat the Home IDE hero, blog editorial surfaces, photography overlays/lightbox, and CV story mode as intentional exceptions. Do not normalize them into the default shared card-and-section system.
+- Treat the Home IDE hero as an intentional design-system exception. CV story mode is a bounded exception via `UnsafeTypography`. Blog uses the shared `Text` component with prose roles; photography uses `Text` with inverse-tone overlay context. Do not normalize the IDE hero or CV story mode into the default shared card-and-section system.
 
 ## Type handling
 

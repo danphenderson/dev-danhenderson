@@ -166,14 +166,14 @@ flowchart TB
 
 ## Intentional exceptions
 
-Four subsystems intentionally deviate from the shared design system. Do not "fix" these:
+Two subsystems intentionally deviate from the shared design system. Do not "fix" these:
 
-| Subsystem            | Where                            | Why it's different                                               |
-| -------------------- | -------------------------------- | ---------------------------------------------------------------- |
-| IDE hero chrome      | `src/components/ide/`            | Must look like VS Code, not like the portfolio                   |
-| Blog editorial       | `src/components/blog/`           | Display-scale typography and custom layout for long-form reading |
-| Photography lightbox | `src/components/photography/`    | Image-first overlay with minimal UI chrome                       |
-| CV story mode        | `src/components/cv/CVStory*.tsx` | Full-screen immersive experience with its own motion system      |
+| Subsystem       | Where                            | Why it's different                                                                             |
+| --------------- | -------------------------------- | ---------------------------------------------------------------------------------------------- |
+| IDE hero chrome | `src/components/ide/`            | Must look like VS Code, not like the portfolio                                                 |
+| CV story mode   | `src/components/cv/CVStory*.tsx` | Full-screen immersive experience with its own motion system; bounded through `UnsafeTypography` |
+
+Blog uses prose context via `Text` roles and is **not** a design-system exception. Photography uses inverse-tone overlay context via `Text` and is **not** a design-system exception.
 
 ## Validation handoff
 

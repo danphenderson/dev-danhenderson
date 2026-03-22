@@ -94,16 +94,16 @@ flowchart LR
 
 ## Intentional design-system exceptions
 
-Four subsystems intentionally bypass the shared design-system primitives. These are not drift — they are purpose-built alternative design languages:
+Two subsystems intentionally bypass the shared design-system primitives. These are not drift — they are purpose-built alternative design languages:
 
-| Subsystem                        | Components                                                   | Why it differs                                                                                                                                                                        |
-| -------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Home faux-VS Code hero**       | `TerminalHeroContent` + `src/components/ide/*`               | Simulates a desktop IDE chrome; uses its own token file (`vscodeTokens.ts`), custom window controls, and terminal typewriter — none of this belongs in the shared card/section system |
-| **Blog editorial surfaces**      | `BlogHero`, `BlogArticleBody`, `BlogArticleHeader`           | Uses display-scale typography, image-first hero treatment, and custom content block rendering that doesn't fit the standard `SectionCard` + `SectionHeading` pattern                  |
-| **Photography overlay/lightbox** | `ImmersiveLightbox`, `AlbumCard`, `PhotoAlbum`               | Image-first surfaces with full-bleed overlays, quilted layouts, and download/share actions — intentionally not wrapped in standard card surfaces                                      |
-| **CV story mode**                | `CVStoryViewer`, `CVStorySectionRenderer`, `CVStoryProgress` | Full-screen continuous-scroll narrative with per-section reveals, scroll progress tracking, and deterministic active-section labels                                                   |
+| Subsystem                  | Components                                                   | Why it differs                                                                                                                                                                        |
+| -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Home faux-VS Code hero** | `TerminalHeroContent` + `src/components/ide/*`               | Simulates a desktop IDE chrome; uses its own token file (`vscodeTokens.ts`), custom window controls, and terminal typewriter — none of this belongs in the shared card/section system |
+| **CV story mode**          | `CVStoryViewer`, `CVStorySectionRenderer`, `CVStoryProgress` | Full-screen continuous-scroll narrative with per-section reveals, scroll progress tracking, and deterministic active-section labels; bounded through `UnsafeTypography`                |
 
-**Rule:** Do not attempt to "normalize" these into the shared primitive system. They exist for a reason.
+Blog uses the shared `Text` component with prose roles (`proseParagraph`, `proseHeading`, etc.) and is not a design-system exception. Photography uses `Text` with `tone="inverse"` and `context="overlay"` and is not a design-system exception.
+
+**Rule:** Do not attempt to "normalize" the IDE hero or CV story mode into the shared primitive system. They exist for a reason.
 
 ## Composition patterns
 

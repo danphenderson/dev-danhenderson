@@ -6,14 +6,14 @@ These instructions apply to files under `src/components/blog/`.
 
 ## Purpose
 
-Documents conventions, data model, and validation requirements for the editorial blog feature (`/blog`, `/blog/:slug`).
-This directory is one of the documented intentional design-system exceptions; preserve its editorial typography and layout language instead of forcing it back into the standard section-card stack.
+Documents conventions, data model, and validation requirements for the blog feature (`/blog`, `/blog/:slug`).
+Blog is not a design-system exception — it uses the shared `Text` component with prose roles (`proseParagraph`, `proseHeading`, etc.) and the centralized typeset builder for all typography.
 
 ## Component conventions
 
 - All blog UI components live in `src/components/blog/`.
 - Use existing motion, theme, and typography primitives — do not introduce parallel animation or style systems.
-- Preserve the editorial exception: custom display typography and article-layout treatment are expected here, even when standard routes use `SectionHeading` and `SectionCard`.
+- Use the shared `Text` component with prose roles for all blog text content; do not introduce local typography overrides or raw `Typography` imports.
 - Prefer composition over inheritance; keep components focused and reusable.
 - Use `MotionSection`, `StaggerChildren`, and `MotionCard` for scroll-triggered and interactive motion.
 - Use `contentCardSx` for glassmorphism surface treatments.
