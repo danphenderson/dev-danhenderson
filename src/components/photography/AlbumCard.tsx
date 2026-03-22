@@ -5,7 +5,7 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import type { PhotoCategory } from '../../types/data';
 import { useAppStyles } from '../../styles/appStyles';
 import { MotionImage } from '../../motion';
-import { EntryTitle, SecondaryBodyText, SecondaryCaptionText } from '../text';
+import { Text } from '../text';
 
 type AlbumCardVariant = 'hero' | 'grid';
 
@@ -33,40 +33,43 @@ export function AlbumCard({ category, variant, onImageReady, sx }: AlbumCardProp
         style={{ position: 'absolute', inset: 0, zIndex: 0 }}
       />
       <Box sx={appStyles.photographyCardOverlaySx}>
-        <EntryTitle
+        <Text
+          role="cardTitle"
+          tone="inverse"
+          context="overlay"
+          component="h3"
           sx={{
-            color: 'common.white',
             fontSize: variant === 'hero' ? { xs: '1.5rem', md: '2rem' } : undefined,
           }}
         >
           {category.name}
-        </EntryTitle>
+        </Text>
 
-        <SecondaryBodyText sx={{ color: 'rgba(255,255,255,0.82)' }}>
+        <Text role="body" tone="inverse" context="overlay" sx={{ opacity: 0.82 }}>
           {category.description}
-        </SecondaryBodyText>
+        </Text>
 
         {(category.location || category.dateRange) && (
           <Stack direction="row" spacing={0.75} alignItems="center" flexWrap="wrap">
             {category.location && (
               <Stack direction="row" spacing={0.25} alignItems="center">
                 <PlaceIcon sx={{ color: 'rgba(255,255,255,0.6)', fontSize: 14 }} />
-                <SecondaryCaptionText sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                <Text role="caption" tone="inverse" context="overlay" sx={{ opacity: 0.7 }}>
                   {category.location}
-                </SecondaryCaptionText>
+                </Text>
               </Stack>
             )}
             {category.dateRange && (
-              <SecondaryCaptionText sx={{ color: 'rgba(255,255,255,0.7)' }}>
+              <Text role="caption" tone="inverse" context="overlay" sx={{ opacity: 0.7 }}>
                 · {category.dateRange}
-              </SecondaryCaptionText>
+              </Text>
             )}
           </Stack>
         )}
 
-        <SecondaryCaptionText sx={{ color: 'rgba(255,255,255,0.6)' }}>
+        <Text role="caption" tone="inverse" context="overlay" sx={{ opacity: 0.6 }}>
           {category.album.length} photos
-        </SecondaryCaptionText>
+        </Text>
 
         <Button
           component={RouterLink}
