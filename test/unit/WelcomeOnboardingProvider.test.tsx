@@ -6,14 +6,22 @@ import {
 } from '../../src/WelcomeOnboardingProvider';
 
 const TestConsumer = () => {
-  const { onboardingCompleted, showCustomizeModal, openCustomizeModal, completeOnboarding } =
-    useWelcomeOnboarding();
+  const {
+    onboardingCompleted,
+    showCustomizeModal,
+    showSettingsHint,
+    openCustomizeModal,
+    advanceToSettingsHint,
+    completeOnboarding,
+  } = useWelcomeOnboarding();
 
   return (
     <div>
       <span data-testid="onboarding-completed">{String(onboardingCompleted)}</span>
       <span data-testid="customize-modal">{String(showCustomizeModal)}</span>
+      <span data-testid="settings-hint">{String(showSettingsHint)}</span>
       <button onClick={openCustomizeModal}>Open customize</button>
+      <button onClick={advanceToSettingsHint}>Advance to settings hint</button>
       <button onClick={completeOnboarding}>Complete onboarding</button>
     </div>
   );
@@ -33,6 +41,7 @@ describe('WelcomeOnboardingProvider', () => {
 
     expect(screen.getByTestId('onboarding-completed')).toHaveTextContent('false');
     expect(screen.getByTestId('customize-modal')).toHaveTextContent('false');
+    expect(screen.getByTestId('settings-hint')).toHaveTextContent('false');
   });
 
   it('reads onboardingCompleted from localStorage on mount', () => {
@@ -56,9 +65,10 @@ describe('WelcomeOnboardingProvider', () => {
 
     act(() => screen.getByText('Open customize').click());
     expect(screen.getByTestId('customize-modal')).toHaveTextContent('true');
+    expect(screen.getByTestId('settings-hint')).toHaveTextContent('false');
   });
 
-  it('completeOnboarding closes modal, sets completed, and persists to localStorage', () => {
+  it('advanceToSettingsHint closes customize modal and opens the settings hint', () => {
     render(
       <WelcomeOnboardingProvider>
         <TestConsumer />
@@ -68,9 +78,27 @@ describe('WelcomeOnboardingProvider', () => {
     act(() => screen.getByText('Open customize').click());
     expect(screen.getByTestId('customize-modal')).toHaveTextContent('true');
 
+    act(() => screen.getByText('Advance to settings hint').click());
+
+    expect(screen.getByTestId('customize-modal')).toHaveTextContent('false');
+    expect(screen.getByTestId('settings-hint')).toHaveTextContent('true');
+    expect(screen.getByTestId('onboarding-completed')).toHaveTextContent('false');
+  });
+
+  it('completeOnboarding closes onboarding surfaces, sets completed, and persists to localStorage', () => {
+    render(
+      <WelcomeOnboardingProvider>
+        <TestConsumer />
+      </WelcomeOnboardingProvider>
+    );
+
+    act(() => screen.getByText('Open customize').click());
+    act(() => screen.getByText('Advance to settings hint').click());
+
     act(() => screen.getByText('Complete onboarding').click());
 
     expect(screen.getByTestId('customize-modal')).toHaveTextContent('false');
+    expect(screen.getByTestId('settings-hint')).toHaveTextContent('false');
     expect(screen.getByTestId('onboarding-completed')).toHaveTextContent('true');
     expect(window.localStorage.getItem(ONBOARDING_COMPLETED_STORAGE_KEY)).toBe('true');
   });

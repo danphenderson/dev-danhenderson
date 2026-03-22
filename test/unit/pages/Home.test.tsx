@@ -4,6 +4,7 @@ import ThemeProvider from '../../../src/ThemeProvider';
 import Home from '../../../src/pages/Home';
 import { duration } from '../../../src/motion/tokens';
 import { PREFERENCE_STORAGE_KEYS } from '../../../src/theme/preferences';
+import { HEADER_SETTINGS_TRIGGER_ID } from '../../../src/components/header/HeaderSettingsPopover';
 import {
   WelcomeOnboardingProvider,
   useWelcomeOnboarding,
@@ -69,14 +70,14 @@ jest.mock('motion/react', () => {
         data-scale-source={
           style?.scale === 1
             ? 'static'
-            : style?.scale === mockHeroScaleMotionValue
+            : (style?.scale as unknown) === mockHeroScaleMotionValue
               ? 'motion-value'
               : 'other'
         }
         data-opacity-source={
           style?.opacity === 1
             ? 'static'
-            : style?.opacity === mockHeroOpacityMotionValue
+            : (style?.opacity as unknown) === mockHeroOpacityMotionValue
               ? 'motion-value'
               : 'other'
         }
@@ -316,7 +317,8 @@ jest.mock('../../../src/components/BackgroundPaper', () => ({
 }));
 
 const OnboardingStateProbe = () => {
-  const { onboardingCompleted, showCustomizeModal, completeOnboarding } = useWelcomeOnboarding();
+  const { onboardingCompleted, showCustomizeModal, showSettingsHint, completeOnboarding } =
+    useWelcomeOnboarding();
 
   return (
     <>
@@ -325,6 +327,7 @@ const OnboardingStateProbe = () => {
       </button>
       <div data-testid="onboarding-completed">{String(onboardingCompleted)}</div>
       <div data-testid="customize-modal-open">{String(showCustomizeModal)}</div>
+      <div data-testid="settings-hint-open">{String(showSettingsHint)}</div>
     </>
   );
 };
@@ -366,6 +369,9 @@ const HomeHarness = ({
     >
       <ThemeProvider>
         <WelcomeOnboardingProvider>
+          <button id={HEADER_SETTINGS_TRIGGER_ID} type="button">
+            Header settings anchor
+          </button>
           <Home />
           <OnboardingStateProbe />
         </WelcomeOnboardingProvider>
@@ -448,6 +454,12 @@ describe('Home welcome flow', () => {
     expect(screen.getByText('Customize your experience')).toBeInTheDocument();
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
 
+    fireEvent.click(screen.getByRole('button', { name: 'Okay' }));
+
+    await waitFor(() => expect(screen.getByTestId('settings-hint-open')).toHaveTextContent('true'));
+    expect(screen.getByTestId('first-visit-settings-hint-popover')).toBeInTheDocument();
+    expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
+
     fireEvent.click(screen.getByRole('button', { name: 'Get started' }));
 
     await waitFor(() =>
@@ -478,6 +490,11 @@ describe('Home welcome flow', () => {
     expect(screen.getByText('Customize your experience')).toBeInTheDocument();
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
 
+    fireEvent.click(screen.getByRole('button', { name: 'Okay' }));
+
+    await waitFor(() => expect(screen.getByTestId('settings-hint-open')).toHaveTextContent('true'));
+    expect(screen.getByTestId('first-visit-settings-hint-popover')).toBeInTheDocument();
+
     fireEvent.click(screen.getByRole('button', { name: 'Get started' }));
 
     await waitFor(() =>
@@ -495,6 +512,11 @@ describe('Home welcome flow', () => {
       expect(screen.getByTestId('customize-modal-open')).toHaveTextContent('true')
     );
     expect(screen.getByText('Customize your experience')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Okay' }));
+
+    await waitFor(() => expect(screen.getByTestId('settings-hint-open')).toHaveTextContent('true'));
+    expect(screen.getByTestId('first-visit-settings-hint-popover')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Get started' }));
 
@@ -520,6 +542,7 @@ describe('Home welcome flow', () => {
 
     expect(screen.queryByText('Play welcome audio?')).not.toBeInTheDocument();
     expect(screen.queryByText('Customize your experience')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('first-visit-settings-hint-popover')).not.toBeInTheDocument();
 
     await waitFor(() =>
       expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
@@ -535,6 +558,11 @@ describe('Home welcome flow', () => {
     await waitFor(() =>
       expect(screen.getByTestId('customize-modal-open')).toHaveTextContent('true')
     );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Okay' }));
+
+    await waitFor(() => expect(screen.getByTestId('settings-hint-open')).toHaveTextContent('true'));
+    expect(screen.getByTestId('onboarding-completed')).toHaveTextContent('false');
 
     fireEvent.click(screen.getByRole('button', { name: 'Get started' }));
 
@@ -557,6 +585,24 @@ describe('Home welcome flow', () => {
     expect(
       screen.getByText(/You can adjust these settings anytime from the .* icon in the header/)
     ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Okay' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Get started' })).not.toBeInTheDocument();
+  });
+
+  it('shows the settings hint after the customize modal is acknowledged', async () => {
+    render(<HomeHarness initialAudioConsent="declined" />);
+
+    await waitFor(() =>
+      expect(screen.getByTestId('customize-modal-open')).toHaveTextContent('true')
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Okay' }));
+
+    await waitFor(() => expect(screen.getByTestId('settings-hint-open')).toHaveTextContent('true'));
+
+    expect(screen.getByTestId('first-visit-settings-hint-popover')).toHaveTextContent(
+      'You can always update motion and welcome audio from the settings button in the header.'
+    );
     expect(screen.getByRole('button', { name: 'Get started' })).toBeInTheDocument();
   });
 });

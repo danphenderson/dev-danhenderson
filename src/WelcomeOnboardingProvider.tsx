@@ -21,27 +21,39 @@ const getStoredOnboardingCompleted = (): boolean => {
 type WelcomeOnboardingContextValue = {
   onboardingCompleted: boolean;
   showCustomizeModal: boolean;
+  showSettingsHint: boolean;
   openCustomizeModal: () => void;
+  advanceToSettingsHint: () => void;
   completeOnboarding: () => void;
 };
 
 const WelcomeOnboardingContext = createContext<WelcomeOnboardingContextValue>({
   onboardingCompleted: false,
   showCustomizeModal: false,
+  showSettingsHint: false,
   openCustomizeModal: () => {},
+  advanceToSettingsHint: () => {},
   completeOnboarding: () => {},
 });
 
 export const WelcomeOnboardingProvider = ({ children }: PropsWithChildren) => {
   const [onboardingCompleted, setOnboardingCompleted] = useState(getStoredOnboardingCompleted);
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
+  const [showSettingsHint, setShowSettingsHint] = useState(false);
 
   const openCustomizeModal = useCallback(() => {
     setShowCustomizeModal(true);
+    setShowSettingsHint(false);
+  }, []);
+
+  const advanceToSettingsHint = useCallback(() => {
+    setShowCustomizeModal(false);
+    setShowSettingsHint(true);
   }, []);
 
   const completeOnboarding = useCallback(() => {
     setShowCustomizeModal(false);
+    setShowSettingsHint(false);
     setOnboardingCompleted(true);
     if (typeof window !== 'undefined') {
       try {
@@ -56,10 +68,19 @@ export const WelcomeOnboardingProvider = ({ children }: PropsWithChildren) => {
     () => ({
       onboardingCompleted,
       showCustomizeModal,
+      showSettingsHint,
       openCustomizeModal,
+      advanceToSettingsHint,
       completeOnboarding,
     }),
-    [completeOnboarding, onboardingCompleted, openCustomizeModal, showCustomizeModal]
+    [
+      advanceToSettingsHint,
+      completeOnboarding,
+      onboardingCompleted,
+      openCustomizeModal,
+      showCustomizeModal,
+      showSettingsHint,
+    ]
   );
 
   return (

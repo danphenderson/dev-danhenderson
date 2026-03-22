@@ -28,10 +28,12 @@ import {
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { FirstVisitCustomizeModal } from '../components/FirstVisitCustomizeModal';
+import { FirstVisitSettingsHintPopover } from '../components/FirstVisitSettingsHintPopover';
 import { HeroMotionPath } from '../components/HeroMotionPath';
 import { TerminalHeroContent } from '../components/TerminalHeroContent';
 import type { IdeResizeEdge, IdeWindowSize, IdeWindowState, TerminalLine } from '../types/ui';
 import { siteRouteMap } from '../constants/siteRoutes';
+import { HEADER_SETTINGS_TRIGGER_ID } from '../components/header/HeaderSettingsPopover';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useAppStyles } from '../styles/appStyles';
@@ -86,9 +88,11 @@ export default function Home() {
     isLoading,
     isPromptOpen,
     isCustomizeOpen,
+    isSettingsHintOpen,
     handleOptOut,
     handlePlay,
     handleCustomizeDismiss,
+    handleSettingsHintComplete,
   } = useHomeWelcomeSequence();
   const [isCustomizeAudioLoading, setIsCustomizeAudioLoading] = useState(false);
 
@@ -141,6 +145,8 @@ export default function Home() {
   const prefersReducedMotion = useReducedMotion();
   const heroMotionStyle =
     motionDurationScale > 0 ? { scale: heroScale, opacity: heroOpacity } : { scale: 1, opacity: 1 };
+  const settingsHintAnchorEl =
+    typeof document === 'undefined' ? null : document.getElementById(HEADER_SETTINGS_TRIGGER_ID);
   const [expandDotHighlighted, setExpandDotHighlighted] = useState(false);
 
   const attachIdeWindowContainer = useCallback(
@@ -550,6 +556,12 @@ export default function Home() {
             isAudioLoading={isCustomizeAudioLoading}
             audioError={audioError}
             onToggleAudio={handleCustomizeAudioToggle}
+          />
+
+          <FirstVisitSettingsHintPopover
+            open={isSettingsHintOpen}
+            anchorEl={settingsHintAnchorEl}
+            onGetStarted={handleSettingsHintComplete}
           />
         </BackgroundPaper>
       </motion.div>

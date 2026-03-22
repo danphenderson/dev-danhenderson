@@ -23,7 +23,7 @@ export const CVStoryHeader = ({ mode, onToggleMode, variant = 'page' }: CVStoryH
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'flex-start',
+          justifyContent: 'flex-end',
           gap: 1.5,
           flexWrap: 'wrap',
           width: '100%',

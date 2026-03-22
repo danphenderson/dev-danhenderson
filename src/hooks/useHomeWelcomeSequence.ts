@@ -8,15 +8,23 @@ type HomeWelcomeSequence = {
   isLoading: boolean;
   isPromptOpen: boolean;
   isCustomizeOpen: boolean;
+  isSettingsHintOpen: boolean;
   handleOptOut: () => void;
   handlePlay: () => Promise<void>;
   handleCustomizeDismiss: () => void;
+  handleSettingsHintComplete: () => void;
 };
 
 export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
   const { play, isPlaying, error, audioConsent, declineAudioConsent } = useWelcomeAudio();
-  const { onboardingCompleted, showCustomizeModal, openCustomizeModal, completeOnboarding } =
-    useWelcomeOnboarding();
+  const {
+    onboardingCompleted,
+    showCustomizeModal,
+    showSettingsHint,
+    openCustomizeModal,
+    advanceToSettingsHint,
+    completeOnboarding,
+  } = useWelcomeOnboarding();
   const [isPromptOpen, setIsPromptOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const hasHandledAudioPrompt = audioConsent !== 'unknown';
@@ -37,9 +45,25 @@ export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
 
   /* After the audio prompt is handled, show the customize modal. */
   useEffect(() => {
-    if (onboardingCompleted || !hasHandledAudioPrompt || isPromptOpen || showCustomizeModal) return;
+    if (
+      onboardingCompleted ||
+      !hasHandledAudioPrompt ||
+      isPromptOpen ||
+      showCustomizeModal ||
+      showSettingsHint
+    ) {
+      return;
+    }
+
     openCustomizeModal();
-  }, [onboardingCompleted, hasHandledAudioPrompt, isPromptOpen, showCustomizeModal, openCustomizeModal]);
+  }, [
+    onboardingCompleted,
+    hasHandledAudioPrompt,
+    isPromptOpen,
+    showCustomizeModal,
+    showSettingsHint,
+    openCustomizeModal,
+  ]);
 
   const handleOptOut = () => {
     declineAudioConsent();
@@ -59,17 +83,24 @@ export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
   };
 
   const handleCustomizeDismiss = () => {
+    advanceToSettingsHint();
+  };
+
+  const handleSettingsHintComplete = () => {
     completeOnboarding();
   };
 
   return {
     error,
-    isHeroAnimationReady: onboardingCompleted && !isPromptOpen && !showCustomizeModal,
+    isHeroAnimationReady:
+      onboardingCompleted && !isPromptOpen && !showCustomizeModal && !showSettingsHint,
     isLoading,
     isPromptOpen,
     isCustomizeOpen: showCustomizeModal,
+    isSettingsHintOpen: showSettingsHint,
     handleOptOut,
     handlePlay,
     handleCustomizeDismiss,
+    handleSettingsHintComplete,
   };
 };

@@ -111,6 +111,8 @@ const MOTION_LEVELS: {
   },
 ];
 
+export const HEADER_SETTINGS_TRIGGER_ID = 'header-settings-trigger';
+
 /* ------------------------------------------------------------------ */
 /*  Section heading                                                   */
 /* ------------------------------------------------------------------ */
@@ -225,6 +227,8 @@ export const HeaderSettingsPopover = ({
     <>
       <Tooltip title="Settings">
         <IconButton
+          id={HEADER_SETTINGS_TRIGGER_ID}
+          data-testid={HEADER_SETTINGS_TRIGGER_ID}
           onClick={handleOpen}
           aria-label="Open settings"
           aria-haspopup="true"

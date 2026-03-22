@@ -20,6 +20,13 @@ const renderCustomizeModal = (
   );
 
 describe('FirstVisitCustomizeModal', () => {
+  it('uses Okay as the primary acknowledgment button', () => {
+    renderCustomizeModal();
+
+    expect(screen.getByRole('button', { name: 'Okay' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Get started' })).not.toBeInTheDocument();
+  });
+
   it('calls onToggleAudio when the audio button is clicked', () => {
     const onToggleAudio = jest.fn();
     renderCustomizeModal({ onToggleAudio });

@@ -188,18 +188,21 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
         {/* Header bar */}
         <Box
           sx={{
-            position: 'relative',
-            display: 'flex',
+            display: 'grid',
+            gridTemplateColumns: '1fr auto 1fr',
             alignItems: 'center',
-            justifyContent: 'center',
-            px: 2,
+            columnGap: 1,
+            px: { xs: 1.5, sm: 2 },
             py: 1,
-            minHeight: 48,
+            minHeight: 56,
             borderBottom: `1px solid ${alpha(theme.palette.divider, 0.08)}`,
           }}
         >
+          <Box aria-hidden="true" />
+
           <motion.div
             key={activeKind}
+            style={{ justifySelf: 'center' }}
             initial={{ opacity: 0, y: dFactor === 0 ? 0 : -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: duration.fast * dFactor, ease: easing.decel }}
@@ -219,18 +222,17 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
           </motion.div>
 
           <motion.div
-            style={{
-              position: 'absolute',
-              right: 16,
-              top: '50%',
-              transform: 'translateY(-50%)',
-            }}
+            style={{ justifySelf: 'end' }}
             initial={{ opacity: 0, scale: dFactor === 0 ? 1 : 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: duration.fast * dFactor, delay: 0.2 * dFactor }}
           >
-            <IconButton onClick={onExit} aria-label="Exit story mode" size="small">
-              <CloseIcon />
+            <IconButton
+              onClick={onExit}
+              aria-label="Exit story mode"
+              sx={{ color: 'text.primary', p: 0.75 }}
+            >
+              <CloseIcon sx={{ fontSize: { xs: '1.875rem', sm: '2rem' } }} />
             </IconButton>
           </motion.div>
         </Box>

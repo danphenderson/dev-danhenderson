@@ -18,7 +18,9 @@ const createMockAudioState = (overrides: Record<string, unknown> = {}) => ({
 const createMockOnboardingState = (overrides: Record<string, unknown> = {}) => ({
   onboardingCompleted: false,
   showCustomizeModal: false,
+  showSettingsHint: false,
   openCustomizeModal: jest.fn(),
+  advanceToSettingsHint: jest.fn(),
   completeOnboarding: jest.fn(),
   ...overrides,
 });
@@ -156,12 +158,33 @@ describe('useHomeWelcomeSequence', () => {
     expect(mockOnboardingState.openCustomizeModal).not.toHaveBeenCalled();
   });
 
-  it('handleCustomizeDismiss calls completeOnboarding', () => {
+  it('does not reopen the customize modal while the settings hint is already showing', () => {
+    mockAudioState = createMockAudioState({ audioConsent: 'declined' });
+    mockOnboardingState = createMockOnboardingState({ showSettingsHint: true });
+    const { result } = renderHook(() => useHomeWelcomeSequence());
+
+    expect(result.current.isPromptOpen).toBe(false);
+    expect(mockOnboardingState.openCustomizeModal).not.toHaveBeenCalled();
+  });
+
+  it('handleCustomizeDismiss advances to the settings hint', () => {
     mockAudioState = createMockAudioState({ audioConsent: 'declined' });
     const { result } = renderHook(() => useHomeWelcomeSequence());
 
     act(() => {
       result.current.handleCustomizeDismiss();
+    });
+
+    expect(mockOnboardingState.advanceToSettingsHint).toHaveBeenCalledTimes(1);
+    expect(mockOnboardingState.completeOnboarding).not.toHaveBeenCalled();
+  });
+
+  it('handleSettingsHintComplete calls completeOnboarding', () => {
+    mockAudioState = createMockAudioState({ audioConsent: 'declined' });
+    const { result } = renderHook(() => useHomeWelcomeSequence());
+
+    act(() => {
+      result.current.handleSettingsHintComplete();
     });
 
     expect(mockOnboardingState.completeOnboarding).toHaveBeenCalledTimes(1);
@@ -181,6 +204,15 @@ describe('useHomeWelcomeSequence', () => {
     const { result } = renderHook(() => useHomeWelcomeSequence());
 
     expect(result.current.isHeroAnimationReady).toBe(false);
+  });
+
+  it('isHeroAnimationReady is false while the settings hint is showing', () => {
+    mockAudioState = createMockAudioState({ audioConsent: 'declined' });
+    mockOnboardingState = createMockOnboardingState({ showSettingsHint: true });
+    const { result } = renderHook(() => useHomeWelcomeSequence());
+
+    expect(result.current.isHeroAnimationReady).toBe(false);
+    expect(result.current.isSettingsHintOpen).toBe(true);
   });
 
   it('isHeroAnimationReady is false while audio prompt is open', () => {

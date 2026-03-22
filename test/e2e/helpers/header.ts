@@ -23,6 +23,11 @@ export const dismissWelcomeSequence = async (page: Page) => {
 
   const customizeDialog = page.getByTestId('customize-experience-dialog');
   await expect(customizeDialog).toBeVisible();
-  await customizeDialog.getByRole('button', { name: 'Get started' }).click();
+  await customizeDialog.getByRole('button', { name: 'Okay' }).click();
   await expect(customizeDialog).toBeHidden();
+
+  const settingsHint = page.getByTestId('first-visit-settings-hint-popover');
+  await expect(settingsHint).toBeVisible();
+  await settingsHint.getByRole('button', { name: 'Get started' }).click();
+  await expect(settingsHint).toBeHidden();
 };

@@ -103,7 +103,9 @@ const createOnboardingState = (
 ): ReturnType<typeof useWelcomeOnboarding> => ({
   onboardingCompleted: false,
   showCustomizeModal: false,
+  showSettingsHint: false,
   openCustomizeModal: jest.fn(),
+  advanceToSettingsHint: jest.fn(),
   completeOnboarding: jest.fn(),
   ...overrides,
 });

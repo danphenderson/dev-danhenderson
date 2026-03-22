@@ -207,7 +207,7 @@ test.describe('Home page', () => {
     await page.goto('/');
 
     const siteNavigation = page.locator('#site-navigation');
-    const settingsTrigger = siteNavigation.locator('button').first();
+    const settingsTrigger = page.getByTestId('header-settings-trigger');
 
     const welcomePrompt = page.getByRole('dialog', { name: 'Play welcome audio?' });
     await expect(welcomePrompt).toBeVisible();
@@ -216,8 +216,16 @@ test.describe('Home page', () => {
 
     const customizeDialog = page.getByTestId('customize-experience-dialog');
     await expect(customizeDialog).toBeVisible();
-    await customizeDialog.getByRole('button', { name: 'Get started' }).click();
+    await customizeDialog.getByRole('button', { name: 'Okay' }).click();
     await expect(customizeDialog).toBeHidden();
+
+    const settingsHint = page.getByTestId('first-visit-settings-hint-popover');
+    await expect(settingsHint).toBeVisible();
+    await expect(settingsHint).toContainText(
+      'You can always update motion and welcome audio from the settings button in the header.'
+    );
+    await settingsHint.getByRole('button', { name: 'Get started' }).click();
+    await expect(settingsHint).toBeHidden();
 
     await expect(siteNavigation).toBeVisible();
     await expect(siteNavigation.getByText('CV', { exact: true })).toBeVisible();

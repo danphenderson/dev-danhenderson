@@ -159,8 +159,8 @@ export const FirstVisitCustomizeModal = ({
         </CaptionText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant="contained" aria-label="Get started">
-          Get started
+        <Button onClick={onClose} variant="contained" aria-label="Okay">
+          Okay
         </Button>
       </DialogActions>
     </Dialog>
