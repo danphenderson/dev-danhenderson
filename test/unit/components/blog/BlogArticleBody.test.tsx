@@ -59,13 +59,19 @@ describe('BlogArticleBody', () => {
   it('renders a heading block with a custom id', () => {
     renderBody([{ type: 'heading', level: 2, text: 'Custom ID Heading', id: 'custom-heading' }]);
 
-    expect(document.getElementById('custom-heading')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Custom ID Heading' })).toHaveAttribute(
+      'id',
+      'custom-heading'
+    );
   });
 
   it('renders a heading block with an auto-generated slug id when no id is provided', () => {
     renderBody([{ type: 'heading', level: 2, text: 'Auto Slug Heading' }]);
 
-    expect(document.getElementById('auto-slug-heading')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Auto Slug Heading' })).toHaveAttribute(
+      'id',
+      'auto-slug-heading'
+    );
   });
 
   it('renders a code block with language and code content', () => {
@@ -120,7 +126,7 @@ describe('BlogArticleBody', () => {
   it('renders a divider block', () => {
     renderBody([{ type: 'divider' }]);
 
-    expect(document.querySelector('hr')).toBeInTheDocument();
+    expect(screen.getByRole('separator')).toBeInTheDocument();
   });
 
   it('renders multiple block types in order', () => {

@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import { Button, Chip, Tab, Tabs } from '@mui/material';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import {
   HeaderLabel,

@@ -1,4 +1,3 @@
-import { createTheme } from '@mui/material/styles';
 import { createTextStyleMap } from '../../../src/styles/textStyleBuilders';
 import { createAppTheme } from '../../../src/theme/createAppTheme';
 

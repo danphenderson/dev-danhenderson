@@ -50,9 +50,14 @@ describe('Inline label primitives', () => {
     expect(screen.getByText('repo-name')).toBeInTheDocument();
     expect(screen.getByText('★ 42')).toBeInTheDocument();
 
-    const container = screen.getByText('repo-name').parentElement;
+    const container = screen.getByText(
+      (_content, element) =>
+        element?.tagName === 'SPAN' &&
+        element.textContent?.includes('repo-name') === true &&
+        element.textContent?.includes('★ 42') === true
+    );
 
-    expect(container?.tagName).toBe('SPAN');
+    expect(container.tagName).toBe('SPAN');
   });
 
   it('renders StatusInlineText as an inline span with breathing animation', () => {
