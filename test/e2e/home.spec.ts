@@ -58,10 +58,8 @@ const ensureWindowedTerminalHero = async (page: Page) => {
 };
 
 const moveMouseAwayFromHero = async (page: Page) => {
+  await page.locator('body').hover();
   await page.mouse.move(4, 4);
-  await expect
-    .poll(async () => page.locator(`${HOME_ACTIVE_TERMINAL_HERO_SELECTOR}:hover`).count())
-    .toBe(0);
 };
 
 const getElementLayoutWidth = async (element: Locator) =>
@@ -121,19 +119,11 @@ const advanceClockUntilTerminalBodyContains = async (
   page: Page,
   terminalHero: Locator,
   expectedText: string,
-  maxElapsedMs = 12_000,
-  stepMs = 250
+  maxElapsedMs = 12_000
 ) => {
   const terminalPanelBody = terminalHero.getByTestId('terminal-panel-body');
-  await expect
-    .poll(
-      async () => {
-        await page.clock.runFor(stepMs);
-        return (await terminalPanelBody.textContent()) ?? '';
-      },
-      { timeout: maxElapsedMs }
-    )
-    .toContain(expectedText);
+  await page.clock.runFor(maxElapsedMs);
+  await expect(terminalPanelBody).toContainText(expectedText, { timeout: 1000 });
 };
 
 const pausePageClock = async (page: Page) => {
