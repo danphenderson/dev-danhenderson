@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { CommandPaletteProvider } from '../../../src/CommandPaletteProvider';
 import { RouteRecoveryPanel } from '../../../src/components/RouteRecoveryPanel';
@@ -76,7 +77,7 @@ const renderPanel = (
 ) =>
   render(
     <ThemeProvider>
-      <MemoryRouter>
+      <MemoryRouter future={routerFuture}>
         <CommandPaletteProvider>
           <RouteRecoveryPanel
             attemptedPathLabel={overrides.attemptedPathLabel ?? '/cv/unknown'}

@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
 import {
   CVSectionKey,
@@ -86,9 +87,10 @@ jest.mock('../../../src/components/AppSpeedDial', () => ({
       onClick?: () => void;
     }>;
     sx?: unknown;
-  }) => (
-    mockAppSpeedDial({ ariaLabel, actions, sx }),
-    (
+  }) => {
+    mockAppSpeedDial({ ariaLabel, actions, sx });
+
+    return (
       <section data-testid={`speed-dial-${ariaLabel.toLowerCase().replace(/\s+/g, '-')}`}>
         {actions.map((action) =>
           action.href ? (
@@ -114,8 +116,8 @@ jest.mock('../../../src/components/AppSpeedDial', () => ({
           )
         )}
       </section>
-    )
-  ),
+    );
+  },
 }));
 
 jest.mock('../../../src/components/cv/CVSectionNavigator', () => ({
@@ -134,7 +136,7 @@ describe('CV page section navigation', () => {
 
   const renderCV = (initialEntries = ['/cv']) =>
     render(
-      <MemoryRouter initialEntries={initialEntries}>
+      <MemoryRouter initialEntries={initialEntries} future={routerFuture}>
         <ThemeProvider>
           <CV />
         </ThemeProvider>
@@ -195,7 +197,7 @@ describe('CV page section navigation', () => {
     renderCV();
 
     const aboutDial = screen.getByTestId('speed-dial-open-about-actions');
-    const aboutSection = document.getElementById(cvSectionMetadata.about.id);
+    const aboutSection = getAnimatedSectionCard('about');
 
     expect(
       within(aboutDial)
@@ -218,7 +220,7 @@ describe('CV page section navigation', () => {
       'download',
       'Daniel-Henderson-Resume.pdf'
     );
-    expect(within(aboutSection!).getByText('Daniel Henderson')).toBeInTheDocument();
+    expect(within(aboutSection).getByText('Daniel Henderson')).toBeInTheDocument();
     expect(mockAppSpeedDial).toHaveBeenCalledWith(
       expect.objectContaining({
         ariaLabel: 'Open about actions',
@@ -227,13 +229,11 @@ describe('CV page section navigation', () => {
         }),
       })
     );
-    expect(aboutSection).not.toBeNull();
-
     const navigator = screen.getByTestId('cv-section-navigator');
     const desktopSidebarRegion = screen.getByTestId('cv-desktop-sidebar-region');
 
     expect(screen.queryByTestId('cv-sticky-section-navigator')).not.toBeInTheDocument();
-    expect(within(aboutSection!).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
+    expect(within(aboutSection).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
     expect(
       within(desktopSidebarRegion).queryByTestId('cv-section-navigator')
     ).not.toBeInTheDocument();
@@ -254,25 +254,24 @@ describe('CV page section navigation', () => {
   it('renders the GitHub section without the removed projects subsection', () => {
     renderCV();
 
-    const githubSection = document.getElementById(cvSectionMetadata.github.id);
+    const githubSection = getAnimatedSectionCard('github');
 
-    expect(githubSection).not.toBeNull();
     expect(
-      within(githubSection!).getByTestId('cv-github-status-tooltip-trigger')
+      within(githubSection).getByTestId('cv-github-status-tooltip-trigger')
     ).toBeInTheDocument();
-    expect(within(githubSection!).getByText('GitHub')).toBeInTheDocument();
+    expect(within(githubSection).getByText('GitHub')).toBeInTheDocument();
     expect(
-      within(githubSection!).getByText(
+      within(githubSection).getByText(
         'Recent activity, open-source contributions, and contribution history from GitHub.'
       )
     ).toBeVisible();
-    expect(within(githubSection!).getByText('Recent Activity')).toBeInTheDocument();
-    expect(within(githubSection!).getByText('Contributions')).toBeInTheDocument();
-    expect(within(githubSection!).getByText('Contribution calendar')).toBeInTheDocument();
-    expect(within(githubSection!).getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
-    expect(within(githubSection!).getByText('microsoft/playwright')).toBeInTheDocument();
-    expect(within(githubSection!).queryByText('Projects')).not.toBeInTheDocument();
-    expect(within(githubSection!).queryByText('Public Projects')).not.toBeInTheDocument();
+    expect(within(githubSection).getByText('Recent Activity')).toBeInTheDocument();
+    expect(within(githubSection).getByText('Contributions')).toBeInTheDocument();
+    expect(within(githubSection).getByText('Contribution calendar')).toBeInTheDocument();
+    expect(within(githubSection).getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
+    expect(within(githubSection).getByText('microsoft/playwright')).toBeInTheDocument();
+    expect(within(githubSection).queryByText('Projects')).not.toBeInTheDocument();
+    expect(within(githubSection).queryByText('Public Projects')).not.toBeInTheDocument();
   });
 
   it('ignores the legacy CV appearance key and uses the global default appearance key', () => {
@@ -280,10 +279,9 @@ describe('CV page section navigation', () => {
 
     renderCV();
 
-    const aboutSection = document.getElementById(cvSectionMetadata.about.id);
+    const aboutSection = getAnimatedSectionCard('about');
 
-    expect(aboutSection).not.toBeNull();
-    expect(within(aboutSection!).queryByText('Style Preview')).not.toBeInTheDocument();
+    expect(within(aboutSection).queryByText('Style Preview')).not.toBeInTheDocument();
     expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe(defaultAppAppearanceKey);
   });
 
@@ -292,10 +290,9 @@ describe('CV page section navigation', () => {
 
     renderCV();
 
-    const aboutSection = document.getElementById(cvSectionMetadata.about.id);
+    const aboutSection = getAnimatedSectionCard('about');
 
-    expect(aboutSection).not.toBeNull();
-    expect(within(aboutSection!).queryByText('Style Preview')).not.toBeInTheDocument();
+    expect(within(aboutSection).queryByText('Style Preview')).not.toBeInTheDocument();
     expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe('atlas');
   });
 
@@ -318,18 +315,16 @@ describe('CV page section navigation', () => {
       );
     });
 
-    const aboutSection = document.getElementById(cvSectionMetadata.about.id);
-    const experienceSection = document.getElementById(cvSectionMetadata.experience.id);
+    const aboutSection = getAnimatedSectionCard('about');
+    const experienceSection = getAnimatedSectionCard('experience');
     const aboutDial = screen.getByTestId('speed-dial-open-about-actions');
     const navigator = screen.getByTestId('cv-section-navigator');
 
-    expect(aboutSection).not.toBeNull();
-    expect(experienceSection).not.toBeNull();
     expect(
-      aboutSection!.compareDocumentPosition(experienceSection!) & Node.DOCUMENT_POSITION_FOLLOWING
+      aboutSection.compareDocumentPosition(experienceSection) & Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy();
     expect(screen.queryByTestId('cv-sticky-section-navigator')).not.toBeInTheDocument();
-    expect(within(aboutSection!).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
+    expect(within(aboutSection).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
     expect(
       aboutDial.compareDocumentPosition(navigator) & Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy();
@@ -360,10 +355,9 @@ describe('CV page section navigation', () => {
     expect(screen.getByTestId('cv-story-header')).toBeInTheDocument();
     expect(screen.getByText('Full CV')).toBeInTheDocument();
 
-    const githubSectionForMode = document.getElementById(cvSectionMetadata.github.id);
-    expect(githubSectionForMode).not.toBeNull();
+    const githubSectionForMode = getAnimatedSectionCard('github');
     expect(
-      within(githubSectionForMode!).getByTestId('cv-github-status-tooltip-trigger')
+      within(githubSectionForMode).getByTestId('cv-github-status-tooltip-trigger')
     ).toBeInTheDocument();
     expect(screen.getByTestId('cv-mode-toggle')).toHaveTextContent('Read my story');
     expect(screen.queryByTestId('cv-story-layout')).not.toBeInTheDocument();

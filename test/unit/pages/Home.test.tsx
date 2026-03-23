@@ -16,6 +16,7 @@ const mockScrollYProgress = { get: () => 0, on: () => () => {} };
 const mockHeroScaleMotionValue = { get: () => 1.08, on: () => () => {} };
 const mockHeroOpacityMotionValue = { get: () => 0.6, on: () => () => {} };
 let mockPrefersReducedMotion = false;
+let mountedLayoutAnchors: HTMLElement[] = [];
 
 jest.mock('motion/react', () => {
   const React = require('react');
@@ -67,6 +68,9 @@ jest.mock('motion/react', () => {
     ) => (
       <div
         ref={ref}
+        data-testid={
+          style?.scale != null || style?.opacity != null ? 'hero-parallax-wrapper' : undefined
+        }
         data-scale-source={
           style?.scale === 1
             ? 'static'
@@ -444,9 +448,7 @@ describe('Home welcome flow', () => {
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
     expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument();
 
-    await act(async () => {
-      fireEvent.click(await screen.findByRole('button', { name: 'No thanks' }));
-    });
+    fireEvent.click(await screen.findByRole('button', { name: 'No thanks' }));
 
     await waitFor(() =>
       expect(screen.getByTestId('customize-modal-open')).toHaveTextContent('true')
@@ -480,9 +482,7 @@ describe('Home welcome flow', () => {
   it('shows customize modal after playing audio, then reveals hero on dismiss', async () => {
     render(<HomeHarness />);
 
-    await act(async () => {
-      fireEvent.click(await screen.findByRole('button', { name: 'Play welcome audio' }));
-    });
+    fireEvent.click(await screen.findByRole('button', { name: 'Play welcome audio' }));
 
     await waitFor(() =>
       expect(screen.getByTestId('customize-modal-open')).toHaveTextContent('true')
@@ -625,9 +625,8 @@ const renderHomeWithHeroVisible = async () => {
 };
 
 const expectHeroParallaxSource = (scaleSource: 'motion-value' | 'static') => {
-  const heroMotionWrapper = screen.getByTestId('background-paper').parentElement;
+  const heroMotionWrapper = screen.getByTestId('hero-parallax-wrapper');
 
-  expect(heroMotionWrapper).not.toBeNull();
   expect(heroMotionWrapper).toHaveAttribute('data-scale-source', scaleSource);
   expect(heroMotionWrapper).toHaveAttribute('data-opacity-source', scaleSource);
 };
@@ -671,6 +670,7 @@ const mountLayoutAnchors = () => {
   mainContent.id = 'main-content';
 
   document.body.append(header, mainContent);
+  mountedLayoutAnchors.push(header, mainContent);
 
   return { header, mainContent };
 };
@@ -699,8 +699,8 @@ const dispatchPointerUp = () => {
 
 afterEach(() => {
   mockPrefersReducedMotion = false;
-  document.getElementById('site-navigation')?.remove();
-  document.getElementById('main-content')?.remove();
+  mountedLayoutAnchors.forEach((anchor) => anchor.remove());
+  mountedLayoutAnchors = [];
   window.localStorage.clear();
 });
 
@@ -737,12 +737,10 @@ describe('Home IDE window actions', () => {
 
     const expandedOverlay = await screen.findByTestId('home-ide-expanded');
 
-    await waitFor(() => {
-      const hero = screen.getByTestId('terminal-hero');
-
-      expect(hero).toHaveAttribute('data-expanded', 'true');
-      expect(hero).toHaveAttribute('data-width', '100%');
-    });
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'true')
+    );
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-width', '100%');
     expect(expandedOverlay).toHaveStyle({
       top: '64px',
       left: '24px',
@@ -752,13 +750,9 @@ describe('Home IDE window actions', () => {
 
     fireEvent.click(screen.getByTestId('ide-expand-btn'));
 
-    await waitFor(() => {
-      const hero = screen.getByTestId('terminal-hero');
-
-      expect(screen.queryByTestId('home-ide-expanded')).not.toBeInTheDocument();
-      expect(hero).toHaveAttribute('data-expanded', 'false');
-      expect(hero).toHaveAttribute('data-width', '');
-    });
+    await waitFor(() => expect(screen.queryByTestId('home-ide-expanded')).not.toBeInTheDocument());
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'false');
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-width', '');
   });
 
   it('preserves the same hero instance across expand and collapse', async () => {
@@ -776,27 +770,25 @@ describe('Home IDE window actions', () => {
 
     fireEvent.click(screen.getByTestId('ide-expand-btn'));
 
-    await waitFor(() => {
-      expect(screen.getByTestId('home-ide-expanded')).toBeInTheDocument();
-      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'true');
-      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-boot-active', 'true');
-      expect(screen.getByTestId('terminal-hero')).toHaveAttribute(
-        'data-instance-id',
-        initialInstanceId ?? ''
-      );
-    });
+    await screen.findByTestId('home-ide-expanded');
+    await waitFor(() =>
+      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'true')
+    );
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-boot-active', 'true');
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute(
+      'data-instance-id',
+      initialInstanceId ?? ''
+    );
 
     fireEvent.click(screen.getByTestId('ide-expand-btn'));
 
-    await waitFor(() => {
-      expect(screen.queryByTestId('home-ide-expanded')).not.toBeInTheDocument();
-      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'false');
-      expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-boot-active', 'false');
-      expect(screen.getByTestId('terminal-hero')).toHaveAttribute(
-        'data-instance-id',
-        initialInstanceId ?? ''
-      );
-    });
+    await waitFor(() => expect(screen.queryByTestId('home-ide-expanded')).not.toBeInTheDocument());
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-expanded', 'false');
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-boot-active', 'false');
+    expect(screen.getByTestId('terminal-hero')).toHaveAttribute(
+      'data-instance-id',
+      initialInstanceId ?? ''
+    );
   });
 
   it('hides the IDE and shows the restore button when close is clicked', async () => {
@@ -819,11 +811,9 @@ describe('Home IDE window actions', () => {
 
     fireEvent.click(screen.getByTestId('ide-close-btn'));
 
-    await waitFor(() => expect(screen.getByTestId('ide-restore-button')).toBeInTheDocument());
+    fireEvent.click(await screen.findByTestId('ide-restore-button'));
 
-    fireEvent.click(screen.getByTestId('ide-restore-button'));
-
-    await waitFor(() => expect(screen.getByTestId('terminal-hero')).toBeInTheDocument());
+    await screen.findByTestId('terminal-hero');
     expect(screen.getByTestId('home-hero-window')).not.toHaveAttribute(
       'data-session-key',
       firstSessionKey ?? ''
@@ -851,11 +841,9 @@ describe('Home IDE window actions', () => {
 
     fireEvent.click(screen.getByTestId('ide-minimize-btn'));
 
-    await waitFor(() => expect(screen.getByTestId('ide-minimized-bar')).toBeInTheDocument());
+    fireEvent.click(await screen.findByTestId('ide-minimized-bar'));
 
-    fireEvent.click(screen.getByTestId('ide-minimized-bar'));
-
-    await waitFor(() => expect(screen.getByTestId('terminal-hero')).toBeInTheDocument());
+    await screen.findByTestId('terminal-hero');
     expect(screen.getByTestId('home-hero-window')).not.toHaveAttribute(
       'data-session-key',
       firstSessionKey ?? ''
@@ -941,12 +929,10 @@ describe('Home auto-expand after motion', () => {
     );
 
     // Close IDE before the auto-expand delay fires
-    act(() => {
-      fireEvent.click(screen.getByTestId('ide-close-btn'));
-    });
+    fireEvent.click(screen.getByTestId('ide-close-btn'));
 
     // The restore button should appear (IDE closed)
-    await waitFor(() => expect(screen.getByTestId('ide-restore-button')).toBeInTheDocument());
+    await screen.findByTestId('ide-restore-button');
 
     act(() => {
       jest.advanceTimersByTime(AUTO_EXPAND_PULSE_DURATION_MS);
@@ -971,9 +957,8 @@ describe('Home auto-expand after motion', () => {
 
     // Close and restore — simulates user interaction cycle
     fireEvent.click(screen.getByTestId('ide-close-btn'));
-    await waitFor(() => expect(screen.getByTestId('ide-restore-button')).toBeInTheDocument());
-    fireEvent.click(screen.getByTestId('ide-restore-button'));
-    await waitFor(() => expect(screen.getByTestId('terminal-hero')).toBeInTheDocument());
+    fireEvent.click(await screen.findByTestId('ide-restore-button'));
+    await screen.findByTestId('terminal-hero');
 
     // Advance well past the auto-expand delay
     act(() => {
@@ -1138,7 +1123,7 @@ describe('Home IDE resize', () => {
     await waitFor(() => expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument());
 
     fireEvent.click(screen.getByTestId('ide-restore-button'));
-    await waitFor(() => expect(screen.getByTestId('terminal-hero')).toBeInTheDocument());
+    await screen.findByTestId('terminal-hero');
 
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-resize-width', '');
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-resize-height', '');
@@ -1163,7 +1148,7 @@ describe('Home IDE resize', () => {
     await waitFor(() => expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument());
 
     fireEvent.click(screen.getByTestId('ide-minimized-bar'));
-    await waitFor(() => expect(screen.getByTestId('terminal-hero')).toBeInTheDocument());
+    await screen.findByTestId('terminal-hero');
 
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-resize-width', '');
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-resize-height', '');

@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { aboutMe } from '../../../src/data/cv';
 import CV from '../../../src/pages/CV';
@@ -34,7 +35,7 @@ jest.mock('react-github-calendar', () => ({
 describe('CV runtime render', () => {
   const renderCV = (initialEntries = ['/cv']) =>
     render(
-      <MemoryRouter initialEntries={initialEntries}>
+      <MemoryRouter initialEntries={initialEntries} future={routerFuture}>
         <ThemeProvider>
           <CV />
         </ThemeProvider>

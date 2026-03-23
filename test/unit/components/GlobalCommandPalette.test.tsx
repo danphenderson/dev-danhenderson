@@ -1,7 +1,9 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { CommandPaletteProvider } from '../../../src/CommandPaletteProvider';
+import { GlobalCommandPalette } from '../../../src/components/GlobalCommandPalette';
 
 const mockUseReducedMotion = jest.fn().mockReturnValue(false);
 
@@ -28,13 +30,10 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
-// Import after mocks
-import { GlobalCommandPalette } from '../../../src/components/GlobalCommandPalette';
-
 const renderPalette = (initialEntry = '/') =>
   render(
     <ThemeProvider>
-      <MemoryRouter initialEntries={[initialEntry]}>
+      <MemoryRouter initialEntries={[initialEntry]} future={routerFuture}>
         <CommandPaletteProvider>
           <GlobalCommandPalette />
         </CommandPaletteProvider>
@@ -264,7 +263,7 @@ describe('GlobalCommandPalette', () => {
     it('closes the palette when the route changes', async () => {
       render(
         <ThemeProvider>
-          <MemoryRouter initialEntries={['/cv']}>
+          <MemoryRouter initialEntries={['/cv']} future={routerFuture}>
             <CommandPaletteProvider>
               <GlobalCommandPalette />
               {/* NavButton uses the real router navigate so clicking it actually changes location */}

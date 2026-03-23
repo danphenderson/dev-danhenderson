@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
 import CV from '../../../src/pages/CV';
 
@@ -138,7 +139,7 @@ const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQu
 describe('CV reveal persistence across responsive remounts', () => {
   const renderCV = () =>
     render(
-      <MemoryRouter initialEntries={['/cv']}>
+      <MemoryRouter initialEntries={['/cv']} future={routerFuture}>
         <ThemeProvider>
           <CV />
         </ThemeProvider>
@@ -173,7 +174,7 @@ describe('CV reveal persistence across responsive remounts', () => {
 
     mockUseMediaQuery.mockReturnValue(true);
     rerender(
-      <MemoryRouter initialEntries={['/cv']}>
+      <MemoryRouter initialEntries={['/cv']} future={routerFuture}>
         <ThemeProvider>
           <CV />
         </ThemeProvider>
