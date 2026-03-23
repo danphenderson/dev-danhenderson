@@ -440,7 +440,6 @@ const CodeLine: React.FC<CodeLineProps> = ({
           ? 'rgba(255,255,255,0.02)'
           : 'transparent',
       transition: 'background-color 0.08s',
-      // Current-line left accent
       ...(active && {
         borderLeft: '2px solid rgba(255,255,255,0.12)',
       }),
@@ -449,7 +448,6 @@ const CodeLine: React.FC<CodeLineProps> = ({
       }),
     }}
   >
-    {/* Fold gutter */}
     <Box
       component="span"
       sx={{
@@ -480,7 +478,6 @@ const CodeLine: React.FC<CodeLineProps> = ({
     >
       {lineNumber}
     </Box>
-    {/* Git diff gutter marker */}
     <Box
       component="span"
       sx={{
@@ -507,7 +504,6 @@ const CodeLine: React.FC<CodeLineProps> = ({
   </Box>
 );
 
-/** Renders a single CodeToken as the appropriate syntax-highlight span. */
 const renderToken = (token: CodeToken, i: number): React.ReactNode => {
   switch (token.kind) {
     case 'kw':
@@ -552,11 +548,8 @@ const renderToken = (token: CodeToken, i: number): React.ReactNode => {
 interface VscodeEditorPaneProps {
   activeTab?: VscodeEditorTab;
   expanded?: boolean;
-  /** When true, fill the remaining editor column width instead of using the fixed demo width. */
   fluidLayout?: boolean;
-  /** When true, the outer IDE window has been user-resized; use flex layout. */
   resized?: boolean;
-  /** When true, show a blinking I-beam cursor after the last line. */
   playing?: boolean;
 }
 
@@ -572,8 +565,6 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
 
   const tabMetadata = getVscodeEditorTabMetadata(activeTab);
   const codeLines = EDITOR_TAB_LINES[activeTab] ?? EDITOR_TAB_LINES.server;
-
-  // Active (cursor) line is one past the last code line
   const activeLine: number | null = playing ? codeLines.length + 1 : null;
 
   return (
@@ -593,7 +584,6 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
         ...(flexLayout ? { flex: 1, minHeight: 0 } : { flexShrink: 0 }),
       }}
     >
-      {/* Breadcrumb bar */}
       <Box
         sx={{
           display: 'flex',
@@ -642,7 +632,6 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
         ))}
       </Box>
 
-      {/* Editor body with code + minimap */}
       <Box
         sx={{
           display: 'flex',
@@ -653,7 +642,6 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
           overflow: 'hidden',
         }}
       >
-        {/* Scrollable code area — shows LINES_VISIBLE rows then scrolls */}
         <Box
           sx={{
             flex: 1,
@@ -665,7 +653,6 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
             overflowX: 'hidden',
             overflowY: 'auto',
             maxHeight: expanded || resized ? 'none' : `calc(${LINES_VISIBLE} * 1.55em + 12px)`,
-            // Thin custom scrollbar to keep the VS Code aesthetic
             '&::-webkit-scrollbar': { width: '6px' },
             '&::-webkit-scrollbar-track': { background: 'transparent' },
             '&::-webkit-scrollbar-thumb': {
@@ -695,7 +682,6 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
             );
           })}
 
-          {/* Blinking I-beam cursor row */}
           {playing && (
             <Box
               component="div"
@@ -742,7 +728,6 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
           )}
         </Box>
 
-        {/* Minimap column — decorative, md+ only */}
         <Box
           sx={{
             display: { xs: 'none', md: 'flex' },
@@ -757,7 +742,6 @@ export const VscodeEditorPane: React.FC<VscodeEditorPaneProps> = ({
             position: 'relative',
           }}
         >
-          {/* Viewport highlight slab */}
           <Box
             sx={{
               position: 'absolute',

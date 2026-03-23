@@ -1,3 +1,4 @@
+import { Fragment, type ReactNode } from 'react';
 import { Box, Divider } from '@mui/material';
 import { Text } from '../text';
 import { BlogCodeBlock } from './BlogCodeBlock';
@@ -9,6 +10,8 @@ import type { BlogContentBlock } from '../../types/blog';
 type BlogArticleBodyProps = {
   content: BlogContentBlock[];
 };
+
+const inlineCodePattern = /(`[^`]+`)/g;
 
 function slugify(text: string): string {
   return text
@@ -43,6 +46,27 @@ function HeadingBlock({ level, text, id }: { level: 2 | 3 | 4; text: string; id?
   );
 }
 
+function renderParagraphText(text: string): ReactNode {
+  if (!text.includes('`')) {
+    return text;
+  }
+
+  return text
+    .split(inlineCodePattern)
+    .filter((segment) => segment.length > 0)
+    .map((segment, index) => {
+      if (segment.startsWith('`') && segment.endsWith('`')) {
+        return (
+          <Text key={index} role="proseInlineCode">
+            {segment.slice(1, -1)}
+          </Text>
+        );
+      }
+
+      return <Fragment key={index}>{segment}</Fragment>;
+    });
+}
+
 function renderBlock(block: BlogContentBlock, index: number) {
   switch (block.type) {
     case 'paragraph':
@@ -57,7 +81,7 @@ function renderBlock(block: BlogContentBlock, index: number) {
             fontSize: '1.02rem',
           }}
         >
-          {block.text}
+          {renderParagraphText(block.text)}
         </Text>
       );
 

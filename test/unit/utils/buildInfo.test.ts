@@ -1,4 +1,4 @@
-import { buildInfo } from '../../../src/utils/buildInfo';
+import { buildInfo, hasBuildMetadata } from '../../../src/utils/buildInfo';
 import type { BuildInfo } from '../../../src/utils/buildInfo';
 
 describe('buildInfo', () => {
@@ -7,19 +7,10 @@ describe('buildInfo', () => {
     expect(info).toBeDefined();
   });
 
-  it('has a non-empty gitSha string', () => {
-    expect(typeof buildInfo.gitSha).toBe('string');
-    expect(buildInfo.gitSha.length).toBeGreaterThan(0);
-  });
-
-  it('has a non-empty buildTime string', () => {
-    expect(typeof buildInfo.buildTime).toBe('string');
-    expect(buildInfo.buildTime.length).toBeGreaterThan(0);
-  });
-
-  it('has a non-empty version string', () => {
-    expect(typeof buildInfo.version).toBe('string');
-    expect(buildInfo.version.length).toBeGreaterThan(0);
+  it('exposes stamped metadata fields as optional strings', () => {
+    expect(buildInfo.gitSha === undefined || typeof buildInfo.gitSha === 'string').toBe(true);
+    expect(buildInfo.buildTime === undefined || typeof buildInfo.buildTime === 'string').toBe(true);
+    expect(buildInfo.version === undefined || typeof buildInfo.version === 'string').toBe(true);
   });
 
   it('has a non-empty nodeEnv string', () => {
@@ -27,20 +18,23 @@ describe('buildInfo', () => {
     expect(buildInfo.nodeEnv.length).toBeGreaterThan(0);
   });
 
-  it('defaults gitSha to "dev" in a test environment', () => {
-    // In tests REACT_APP_GIT_SHA is not set, so the fallback applies
-    expect(buildInfo.gitSha).toBe('dev');
+  it('omits gitSha in a test environment when metadata is not stamped', () => {
+    expect(buildInfo.gitSha).toBeUndefined();
   });
 
-  it('defaults buildTime to "unknown" in a test environment', () => {
-    expect(buildInfo.buildTime).toBe('unknown');
+  it('omits buildTime in a test environment when metadata is not stamped', () => {
+    expect(buildInfo.buildTime).toBeUndefined();
   });
 
-  it('defaults version to "dev" in a test environment', () => {
-    expect(buildInfo.version).toBe('dev');
+  it('omits version in a test environment when metadata is not stamped', () => {
+    expect(buildInfo.version).toBeUndefined();
   });
 
   it('defaults nodeEnv to "test" in a Jest environment', () => {
     expect(buildInfo.nodeEnv).toBe('test');
+  });
+
+  it('reports that stamped build metadata is unavailable in a Jest environment', () => {
+    expect(hasBuildMetadata).toBe(false);
   });
 });

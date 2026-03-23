@@ -69,6 +69,17 @@ describe('CV runtime render', () => {
     expect(screen.getByText(aboutMe.title)).toBeInTheDocument();
   });
 
+  it('renders the updated about bio copy', () => {
+    const { container } = renderCV();
+
+    const accessibleLayer = container.querySelector('[data-typewriter-layer="accessible"]');
+
+    expect(accessibleLayer).not.toBeNull();
+    expect(accessibleLayer).toHaveTextContent(
+      'Software developer building scientific, data, and AI-enabled systems. Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software. I previously built ingestion, analytics, and ML solutions for a healthcare data platform.'
+    );
+  });
+
   it('renders GitHub section content from mock data', () => {
     renderCV();
 

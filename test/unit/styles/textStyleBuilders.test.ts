@@ -33,6 +33,15 @@ describe('createTextStyleMap', () => {
     expect(ts.variant).toBe('subtitle1');
   });
 
+  it('resolves proseInlineCode with inherited typography and monospace styling', () => {
+    const { resolveTypeset } = createTextStyleMap(lightTheme);
+    const ts = resolveTypeset('proseInlineCode');
+    const sx = ts.sx as Record<string, unknown>;
+
+    expect(ts.variant).toBe('inherit');
+    expect(sx.fontFamily).toBe('monospace');
+  });
+
   it('throws for unknown roles instead of silently falling back', () => {
     const { resolveTypeset } = createTextStyleMap(lightTheme);
     expect(() => {

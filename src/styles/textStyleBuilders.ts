@@ -268,6 +268,27 @@ export const createTextStyleMap = (theme: Theme) => {
         fontSize: '1.02rem',
       },
     },
+    proseInlineCode: {
+      variant: 'inherit',
+      sx: {
+        fontFamily: 'monospace',
+        fontSize: '0.92em',
+        fontWeight: 600,
+        px: 0.45,
+        py: 0.08,
+        borderRadius: 0.75,
+        bgcolor:
+          theme.palette.mode === 'dark'
+            ? alpha(theme.palette.text.primary, 0.14)
+            : alpha(theme.palette.text.primary, 0.06),
+        border: '1px solid',
+        borderColor:
+          theme.palette.mode === 'dark'
+            ? alpha(theme.palette.divider, 0.7)
+            : alpha(theme.palette.divider, 0.9),
+        boxDecorationBreak: 'clone',
+      },
+    },
     proseCaption: {
       variant: 'caption',
       sx: {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type PointerEventHandler } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Box,
@@ -24,7 +24,7 @@ import { FirstVisitCustomizeModal } from '../components/FirstVisitCustomizeModal
 import { FirstVisitSettingsHintPopover } from '../components/FirstVisitSettingsHintPopover';
 import { HeroMotionPath } from '../components/HeroMotionPath';
 import { TerminalHeroContent } from '../components/TerminalHeroContent';
-import type { IdeResizeEdge, IdeWindowSize, TerminalLine } from '../types/ui';
+import type { TerminalLine } from '../types/ui';
 import { siteRouteMap } from '../constants/siteRoutes';
 import { HEADER_SETTINGS_TRIGGER_ID } from '../components/header/HeaderSettingsPopover';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
@@ -36,13 +36,13 @@ import { useAppTheme } from '../ThemeProvider';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { Text } from '../components/text';
 import { MotionTiltCard, useMotionScale } from '../motion';
-import { VSCODE_COLORS, VSCODE_RESIZE, VSCODE_WINDOW_RADIUS } from '../components/ide/vscodeTokens';
+import { VSCODE_COLORS, VSCODE_WINDOW_RADIUS } from '../components/ide/vscodeTokens';
 
 const heroLines: TerminalLine[] = [
   { command: 'node --version', output: 'v22.14.0' },
   { command: 'git log --oneline -1', output: '9ab2238 polish: terminal UI chrome' },
-  { command: 'npm run build', output: '\u2713 Compiled successfully in 2.4s' },
-  { command: 'whoami --passions', output: 'mathematics \u00b7 computers \u00b7 adventures' },
+  { command: 'npm run build', output: '✓ Compiled successfully in 2.4s' },
+  { command: 'whoami --passions', output: 'mathematics · computers · adventures' },
   {
     command: 'for cmd ({julia,python,node}) $cmd --version',
     output: 'julia version 1.10.10\nPython 3.14.3\nv22.14.0',
@@ -94,14 +94,6 @@ export default function Home() {
       setIsCustomizeAudioLoading(false);
     }
   }, [isAudioPlaying, pauseAudio, playAudio]);
-  const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);
-  const [canDragHeroWindow, setCanDragHeroWindow] = useState(false);
-  const [isHeroWindowDragging, setIsHeroWindowDragging] = useState(false);
-  const [ideWindowSize, setIdeWindowSize] = useState<IdeWindowSize>(null);
-  const [isResizing, setIsResizing] = useState(false);
-  const resizeEdgeRef = useRef<IdeResizeEdge | null>(null);
-  const resizeInitialPointerRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
-  const resizeInitialSizeRef = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
 
   const heroRef = useRef<HTMLDivElement>(null);
   const heroBoundsRef = useRef<HTMLDivElement>(null);
@@ -116,10 +108,6 @@ export default function Home() {
   const settingsHintAnchorEl =
     typeof document === 'undefined' ? null : document.getElementById(HEADER_SETTINGS_TRIGGER_ID);
 
-  const resetIdeWindowSize = useCallback(() => {
-    setIdeWindowSize(null);
-  }, []);
-
   const {
     ideWindowState,
     ideSessionKey,
@@ -127,133 +115,30 @@ export default function Home() {
     expandedIdeViewport,
     ideWindowPortalContainer,
     expandDotHighlighted,
+    isTypewriterPlaying,
+    windowDragEnabled,
+    isHeroWindowDragging,
+    resizeWidth,
+    resizeHeight,
+    resizeEnabled,
+    isResizing,
     setInlineIdeHost,
     setExpandedIdeHost,
+    handleHeroMotionComplete,
+    handleTitleBarPointerDown,
+    handleHeroDragStart,
+    handleHeroDragEnd,
+    handleResizeStart,
     handleIdeClose,
     handleIdeMinimize,
     handleIdeExpand,
     handleIdeRestore,
-    scheduleAutoExpand,
   } = useHomeIdeOrchestration({
     prefersReducedMotion,
-    onResetWindowSize: resetIdeWindowSize,
+    dragControls: heroDragControls,
+    heroRef,
+    heroBoundsRef,
   });
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-      return undefined;
-    }
-
-    const mediaQueryList = window.matchMedia('(hover: hover) and (pointer: fine)');
-
-    const updateCanDragHeroWindow = () => {
-      setCanDragHeroWindow(mediaQueryList.matches);
-    };
-
-    updateCanDragHeroWindow();
-
-    if (typeof mediaQueryList.addEventListener === 'function') {
-      mediaQueryList.addEventListener('change', updateCanDragHeroWindow);
-      return () => mediaQueryList.removeEventListener('change', updateCanDragHeroWindow);
-    }
-
-    mediaQueryList.addListener(updateCanDragHeroWindow);
-    return () => mediaQueryList.removeListener(updateCanDragHeroWindow);
-  }, []);
-
-  const handleMotionComplete = useCallback(() => {
-    setIsTypewriterPlaying(true);
-    scheduleAutoExpand();
-  }, [scheduleAutoExpand]);
-
-  const windowDragEnabled = canDragHeroWindow && isTypewriterPlaying;
-
-  const handleTitleBarPointerDown = useCallback<PointerEventHandler<HTMLDivElement>>(
-    (event) => {
-      if (!windowDragEnabled || event.button !== 0) {
-        return;
-      }
-
-      heroDragControls.start(event);
-    },
-    [heroDragControls, windowDragEnabled]
-  );
-
-  const handleHeroDragStart = useCallback(() => {
-    setIsHeroWindowDragging(true);
-  }, []);
-
-  const handleHeroDragEnd = useCallback(() => {
-    setIsHeroWindowDragging(false);
-  }, []);
-
-  const resizeEnabled = canDragHeroWindow && ideWindowState === 'normal' && !isHeroWindowDragging;
-
-  const handleResizeStart = useCallback(
-    (edge: IdeResizeEdge, event: React.PointerEvent<HTMLDivElement>) => {
-      if (!resizeEnabled) return;
-
-      const heroEl = heroRef.current?.querySelector<HTMLElement>('[data-testid="terminal-hero"]');
-      if (!heroEl) return;
-
-      const rect = heroEl.getBoundingClientRect();
-      const boundsRect = heroBoundsRef.current?.getBoundingClientRect();
-      const startClientX = Number.isFinite(event.clientX) ? event.clientX : rect.right;
-      const startClientY = Number.isFinite(event.clientY) ? event.clientY : rect.bottom;
-      const maxWidth = Math.max(
-        VSCODE_RESIZE.minWidth,
-        boundsRect ? boundsRect.right - rect.left : window.innerWidth - rect.left
-      );
-      const maxHeight = Math.max(
-        VSCODE_RESIZE.minHeight,
-        boundsRect ? boundsRect.bottom - rect.top : window.innerHeight - rect.top
-      );
-      const lockedWidth = Math.min(Math.max(rect.width, VSCODE_RESIZE.minWidth), maxWidth);
-      const lockedHeight = Math.min(Math.max(rect.height, VSCODE_RESIZE.minHeight), maxHeight);
-
-      resizeEdgeRef.current = edge;
-      resizeInitialPointerRef.current = { x: startClientX, y: startClientY };
-      resizeInitialSizeRef.current = { width: lockedWidth, height: lockedHeight };
-      setIdeWindowSize({ width: lockedWidth, height: lockedHeight });
-      setIsResizing(true);
-
-      const handleMove = (e: PointerEvent) => {
-        const currentClientX = Number.isFinite(e.clientX)
-          ? e.clientX
-          : resizeInitialPointerRef.current.x;
-        const currentClientY = Number.isFinite(e.clientY)
-          ? e.clientY
-          : resizeInitialPointerRef.current.y;
-        const dx = currentClientX - resizeInitialPointerRef.current.x;
-        const dy = currentClientY - resizeInitialPointerRef.current.y;
-        const activeEdge = resizeEdgeRef.current;
-        const initial = resizeInitialSizeRef.current;
-
-        let newWidth = initial.width;
-        let newHeight = initial.height;
-
-        if (activeEdge === 'right' || activeEdge === 'corner') {
-          newWidth = Math.min(Math.max(initial.width + dx, VSCODE_RESIZE.minWidth), maxWidth);
-        }
-        if (activeEdge === 'bottom' || activeEdge === 'corner') {
-          newHeight = Math.min(Math.max(initial.height + dy, VSCODE_RESIZE.minHeight), maxHeight);
-        }
-
-        setIdeWindowSize({ width: newWidth, height: newHeight });
-      };
-
-      const handleUp = () => {
-        document.removeEventListener('pointermove', handleMove);
-        document.removeEventListener('pointerup', handleUp);
-        setIsResizing(false);
-        resizeEdgeRef.current = null;
-      };
-
-      document.addEventListener('pointermove', handleMove);
-      document.addEventListener('pointerup', handleUp);
-    },
-    [resizeEnabled]
-  );
 
   return (
     <>
@@ -266,7 +151,7 @@ export default function Home() {
           showShell={isHeroAnimationReady}
           shellSx={appStyles.homeHeroShellSx}
           shellWrapper={(shell) => (
-            <HeroMotionPath active={isHeroAnimationReady} onComplete={handleMotionComplete}>
+            <HeroMotionPath active={isHeroAnimationReady} onComplete={handleHeroMotionComplete}>
               <motion.div
                 data-testid="home-hero-window"
                 data-session-key={String(ideSessionKey)}
@@ -384,8 +269,8 @@ export default function Home() {
               onMinimize={handleIdeMinimize}
               onExpand={handleIdeExpand}
               expandHighlighted={expandDotHighlighted}
-              resizeWidth={ideWindowSize?.width}
-              resizeHeight={ideWindowSize?.height}
+              resizeWidth={resizeWidth}
+              resizeHeight={resizeHeight}
               resizeEnabled={resizeEnabled}
               isResizing={isResizing}
               onResizeStart={ideWindowState === 'normal' ? handleResizeStart : undefined}

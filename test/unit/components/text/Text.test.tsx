@@ -89,6 +89,15 @@ describe('Text component', () => {
     expect(el.tagName).toBe('LI');
   });
 
+  it('renders proseInlineCode as a code element with inherited typography semantics', () => {
+    render(<Text role="proseInlineCode">inline-code</Text>, { wrapper });
+
+    const el = screen.getByText('inline-code');
+
+    expect(el.tagName).toBe('CODE');
+    expect(el).toHaveClass('MuiTypography-inherit');
+  });
+
   /* ── Component override ─────────────────────────────── */
 
   it('allows overriding the default element via component prop', () => {
@@ -325,6 +334,7 @@ describe('Text component', () => {
     'proseSubheading',
     'proseMinorHeading',
     'proseParagraph',
+    'proseInlineCode',
     'proseCaption',
     'proseQuote',
     'proseListItem',

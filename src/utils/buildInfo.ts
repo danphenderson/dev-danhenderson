@@ -10,17 +10,27 @@
 import { readBuildMetadata, readNodeEnvironment } from './appEnvironment';
 
 export type BuildInfo = {
-  gitSha: string;
-  buildTime: string;
-  version: string;
+  gitSha?: string;
+  buildTime?: string;
+  version?: string;
   nodeEnv: string;
 };
 
 const buildMetadata = readBuildMetadata();
 
+const readStampedValue = (value: string | undefined): string | undefined => {
+  const trimmedValue = value?.trim();
+  return trimmedValue ? trimmedValue : undefined;
+};
+
 export const buildInfo: BuildInfo = {
-  gitSha: buildMetadata.gitSha ?? 'dev',
-  buildTime: buildMetadata.buildTime ?? 'unknown',
-  version: buildMetadata.version ?? 'dev',
+  gitSha: readStampedValue(buildMetadata.gitSha),
+  buildTime: readStampedValue(buildMetadata.buildTime),
+  version: readStampedValue(buildMetadata.version),
   nodeEnv: readNodeEnvironment(),
 };
+
+export const hasBuildMetadata =
+  buildInfo.gitSha !== undefined &&
+  buildInfo.buildTime !== undefined &&
+  buildInfo.version !== undefined;

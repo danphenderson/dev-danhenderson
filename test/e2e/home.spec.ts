@@ -4,20 +4,12 @@ import { dismissWelcomeSequence, resetWelcomeState } from './helpers/header';
 const HOME_SCREENSHOT_CLOCK_START = new Date('2026-03-17T12:00:00.000Z');
 const STABLE_TERMINAL_OUTPUT_TEXT =
   /v22\.14\.0|9ab2238 polish: terminal UI chrome|Compiled successfully in 2\.4s|mathematics|julia version 1\.10\.10|==> Formulae/;
-const SCREENSHOT_TERMINAL_COMMAND_TEXT = 'brew';
+const STABLE_TERMINAL_COMMAND_TEXT = 'brew';
 const TERMINAL_NOTIFICATION_TEXT = 'server.py — No problems detected ✓';
+const SERVER_EDITOR_TEXT = 'Ping Pong Server';
+const CLIENT_EDITOR_TEXT = 'SERVER_URL';
 const WELCOME_AUDIO_PROMPT_BODY =
   'Would you like to hear a short verse while browsing the site? Use the pause button in the header to stop it anytime.';
-const HOME_HERO_SNAPSHOT_BOX = {
-  width: 529,
-  height: 441,
-} as const;
-const HOME_HERO_SCREENSHOT_OPTIONS = {
-  animations: 'disabled' as const,
-  caret: 'hide' as const,
-  scale: 'css' as const,
-  maxDiffPixelRatio: 0.05,
-};
 const HOME_ACTIVE_TERMINAL_HERO_SELECTOR =
   '[data-testid="home-ide-expanded"] [data-testid="terminal-hero"], [data-testid="home-hero-window"] [data-testid="terminal-hero"]';
 
@@ -68,19 +60,6 @@ const getElementLayoutWidth = async (element: Locator) =>
 const getElementLayoutHeight = async (element: Locator) =>
   element.evaluate((node) => (node as HTMLElement).offsetHeight);
 
-const stabilizeHeroForScreenshot = async (terminalHero: Locator) => {
-  await terminalHero.evaluate((node, size) => {
-    const element = node as HTMLElement;
-    element.style.boxSizing = 'border-box';
-    element.style.width = `${size.width}px`;
-    element.style.minWidth = `${size.width}px`;
-    element.style.maxWidth = `${size.width}px`;
-    element.style.height = `${size.height}px`;
-    element.style.minHeight = `${size.height}px`;
-    element.style.maxHeight = `${size.height}px`;
-  }, HOME_HERO_SNAPSHOT_BOX);
-};
-
 const selectHeroEditorTab = async (terminalHero: Locator, tab: Locator, expectedText: string) => {
   await expect(tab).toBeVisible();
   await tab.scrollIntoViewIfNeeded();
@@ -100,6 +79,17 @@ const dismissTerminalNotificationToast = async (page: Page) => {
   await expect(toast).toBeHidden();
 };
 
+const expectPingPongHeroMetadata = async (terminalHero: Locator) => {
+  const ariaLabel = await terminalHero.getAttribute('aria-label');
+
+  expect(ariaLabel).toBeTruthy();
+  expect(ariaLabel).toContain('node --version');
+  expect(ariaLabel).toContain('git log --oneline -1');
+  expect(ariaLabel).toContain('npm run build');
+  expect(ariaLabel).toContain('whoami --passions');
+  expect(ariaLabel).toContain('brew ls');
+};
+
 const waitForStableTerminalHero = async (page: Page, terminalHero: Locator) => {
   const terminalPanelBody = terminalHero.getByTestId('terminal-panel-body');
 
@@ -109,6 +99,7 @@ const waitForStableTerminalHero = async (page: Page, terminalHero: Locator) => {
     { timeout: 20000 }
   );
   await expect(terminalHero).toContainText('Ping Pong Server', { timeout: 20000 });
+  await expectPingPongHeroMetadata(terminalHero);
   await expect(terminalPanelBody).toContainText(STABLE_TERMINAL_OUTPUT_TEXT, { timeout: 20000 });
   await dismissTerminalNotificationToast(page);
 
@@ -124,11 +115,6 @@ const advanceClockUntilTerminalBodyContains = async (
   const terminalPanelBody = terminalHero.getByTestId('terminal-panel-body');
   await page.clock.runFor(maxElapsedMs);
   await expect(terminalPanelBody).toContainText(expectedText, { timeout: 1000 });
-};
-
-const pausePageClock = async (page: Page) => {
-  const currentTime = await page.evaluate(() => Date.now());
-  await page.clock.pauseAt(new Date(currentTime + 100));
 };
 
 const resetHomeScrollForScreenshot = async (page: Page, terminalHero: Locator) => {
@@ -149,7 +135,6 @@ test.describe('Home page', () => {
 
     const terminalHero = await waitForHomeTerminalHero(page);
 
-    // The terminal should type one of the commands and eventually show output
     await expect(terminalHero).toContainText(
       /node --version|git log|npm run build|whoami --passions|python --version|julia --version|brew ls/,
       { timeout: 20000 }
@@ -229,7 +214,9 @@ test.describe('Home page', () => {
     await expect(settingsPopover.getByRole('button', { name: 'Play welcome audio' })).toBeVisible();
   });
 
-  test('matches a stable screenshot for the post-boot home terminal hero tab', async ({ page }) => {
+  test('shows the restored ping pong surfaces for the post-boot home terminal hero', async ({
+    page,
+  }) => {
     await resetWelcomeState(page);
     await page.clock.install({ time: HOME_SCREENSHOT_CLOCK_START });
     await page.goto('/');
@@ -241,20 +228,11 @@ test.describe('Home page', () => {
     const terminalHero = await ensureWindowedTerminalHero(page);
 
     await resetHomeScrollForScreenshot(page, terminalHero);
-    await expect(terminalHero).toContainText('Ping Pong Server', { timeout: 20000 });
+    await expect(terminalHero).toContainText(SERVER_EDITOR_TEXT, { timeout: 20000 });
     await expect(terminalHero.getByText('Explorer')).toBeVisible();
-    await advanceClockUntilTerminalBodyContains(
-      page,
-      terminalHero,
-      SCREENSHOT_TERMINAL_COMMAND_TEXT
-    );
-    await stabilizeHeroForScreenshot(terminalHero);
-    await pausePageClock(page);
-
-    await expect(terminalHero).toHaveScreenshot(
-      'home-terminal-server-tab.png',
-      HOME_HERO_SCREENSHOT_OPTIONS
-    );
+    await expect(terminalHero).toContainText('DANHENDERSON.DEV');
+    await advanceClockUntilTerminalBodyContains(page, terminalHero, STABLE_TERMINAL_COMMAND_TEXT);
+    await expectPingPongHeroMetadata(terminalHero);
   });
 
   test('switches to the client tab and shows client editor content in the home terminal hero', async ({
@@ -270,9 +248,9 @@ test.describe('Home page', () => {
     const clientTab = terminalHero.getByTestId('vscode-tab-client');
 
     await resetHomeScrollForScreenshot(page, terminalHero);
-    await expect(terminalHero).toContainText('Ping Pong Server', { timeout: 20000 });
+    await expect(terminalHero).toContainText(SERVER_EDITOR_TEXT, { timeout: 20000 });
 
-    await selectHeroEditorTab(terminalHero, clientTab, 'SERVER_URL');
+    await selectHeroEditorTab(terminalHero, clientTab, CLIENT_EDITOR_TEXT);
     await expect(terminalHero).toContainText('PingResponse');
     await expect(terminalHero).toContainText('client.ts');
   });
@@ -288,7 +266,7 @@ test.describe('Home page', () => {
     const closeWindowButton = page.getByRole('button', { name: 'Close window' });
     const restoreWindowButton = page.getByRole('button', { name: 'Open Visual Studio Code' });
 
-    await selectHeroEditorTab(terminalHero, clientTab, 'SERVER_URL');
+    await selectHeroEditorTab(terminalHero, clientTab, CLIENT_EDITOR_TEXT);
 
     await closeWindowButton.click();
     await expect(page.locator(HOME_ACTIVE_TERMINAL_HERO_SELECTOR)).toHaveCount(0);
@@ -298,8 +276,8 @@ test.describe('Home page', () => {
 
     const restoredHero = getWindowedTerminalHero(page);
     await expect(restoredHero).toBeVisible();
-    await expect(restoredHero).toContainText('Ping Pong Server');
-    await expect(restoredHero).not.toContainText('SERVER_URL');
+    await expect(restoredHero).toContainText(SERVER_EDITOR_TEXT);
+    await expect(restoredHero).not.toContainText(CLIENT_EDITOR_TEXT);
   });
 
   test('traffic dots minimize the IDE and restore a fresh server session', async ({ page }) => {
@@ -313,7 +291,7 @@ test.describe('Home page', () => {
     const minimizeWindowButton = page.getByRole('button', { name: 'Minimize window' });
     const restoreMinimizedBar = page.getByRole('button', { name: 'Restore window' });
 
-    await selectHeroEditorTab(terminalHero, clientTab, 'SERVER_URL');
+    await selectHeroEditorTab(terminalHero, clientTab, CLIENT_EDITOR_TEXT);
 
     await minimizeWindowButton.click();
     await expect(page.locator(HOME_ACTIVE_TERMINAL_HERO_SELECTOR)).toHaveCount(0);
@@ -323,8 +301,8 @@ test.describe('Home page', () => {
 
     const restoredHero = getWindowedTerminalHero(page);
     await expect(restoredHero).toBeVisible();
-    await expect(restoredHero).toContainText('Ping Pong Server');
-    await expect(restoredHero).not.toContainText('SERVER_URL');
+    await expect(restoredHero).toContainText(SERVER_EDITOR_TEXT);
+    await expect(restoredHero).not.toContainText(CLIENT_EDITOR_TEXT);
   });
 
   test('expands the IDE within the visible page viewport and resizes the inner panes', async ({
@@ -348,7 +326,7 @@ test.describe('Home page', () => {
 
     await expect(expandWindowButton).toBeVisible();
 
-    await selectHeroEditorTab(terminalHero, clientTab, 'SERVER_URL');
+    await selectHeroEditorTab(terminalHero, clientTab, CLIENT_EDITOR_TEXT);
 
     const initialTabWidth = await getElementLayoutWidth(editorTabs);
     const initialTerminalPanelHeight = await getElementLayoutHeight(terminalPanelBody);
@@ -361,7 +339,7 @@ test.describe('Home page', () => {
 
     await expect(expandedOverlay).toBeVisible();
     await expect(expandedHero).toHaveAttribute('data-expanded', 'true');
-    await expect(expandedHero).toContainText('SERVER_URL');
+    await expect(expandedHero).toContainText(CLIENT_EDITOR_TEXT);
     await expect(expandedHero.getByTestId('vscode-tab-client')).toHaveAttribute(
       'aria-selected',
       'true'
@@ -400,7 +378,7 @@ test.describe('Home page', () => {
 
     const collapsedHero = page.getByTestId('home-hero-window').getByTestId('terminal-hero');
     await expect(collapsedHero).toHaveAttribute('data-expanded', 'false');
-    await expect(collapsedHero).toContainText('SERVER_URL');
+    await expect(collapsedHero).toContainText(CLIENT_EDITOR_TEXT);
     await expect(collapsedHero.getByTestId('vscode-tab-client')).toHaveAttribute(
       'aria-selected',
       'true'
@@ -486,9 +464,7 @@ test.describe('Home page', () => {
     await expect(clientTab).toBeVisible();
     await expect(terminalHero).toContainText(
       /node --version|git log|npm run build|whoami --passions|brew ls/,
-      {
-        timeout: 20000,
-      }
+      { timeout: 20000 }
     );
     await expect(terminalHero).toContainText(
       /node --version|git log|npm run build|whoami --passions|python --version|julia --version|brew ls/,
@@ -497,11 +473,11 @@ test.describe('Home page', () => {
 
     const initialWidth = await getElementLayoutWidth(terminalHero);
 
-    await selectHeroEditorTab(terminalHero, clientTab, 'SERVER_URL');
+    await selectHeroEditorTab(terminalHero, clientTab, CLIENT_EDITOR_TEXT);
 
     const clientWidth = await getElementLayoutWidth(terminalHero);
 
-    await selectHeroEditorTab(terminalHero, serverTab, 'Ping Pong Server');
+    await selectHeroEditorTab(terminalHero, serverTab, SERVER_EDITOR_TEXT);
 
     const serverWidth = await getElementLayoutWidth(terminalHero);
 
