@@ -193,7 +193,7 @@ test.describe('Blog post detail page', () => {
     const dialog = page.getByRole('dialog', { name: 'Command palette' });
     await expect(dialog).toBeVisible();
     await expect(
-      dialog.getByRole('textbox', { name: 'Search routes, albums, and CV sections' })
+      dialog.getByRole('combobox', { name: 'Search routes, albums, and CV sections' })
     ).toHaveValue(INVALID_BLOG_SLUG_QUERY);
   });
 });
