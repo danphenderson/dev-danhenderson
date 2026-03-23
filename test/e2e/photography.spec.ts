@@ -19,7 +19,7 @@ const waitForPhotographyCategoryPage = async (page: Page, name: string, descript
 
 const waitForPhotographySection = async (page: Page) => {
   await waitForAnimatedSectionReadiness({
-    anchor: page.getByText('A selection of field work, climbing days, and stargazing nights.'),
+    anchor: page.getByText('A selection of photo albums.'),
     readyLocators: [page.getByText('4 albums')],
     hiddenLocators: [page.getByRole('status', { name: 'Loading photography albums' })],
   });
@@ -56,7 +56,7 @@ test.describe('Photography page', () => {
     await page.setViewportSize({ width: 1440, height: 1200 });
     await page.goto('/photography');
     await expect(
-      page.getByText('A selection of field work, climbing days, and stargazing nights.')
+      page.getByText('A selection of photo albums.')
     ).toBeVisible({ timeout: 15000 });
     await expect(page.getByText('4 albums')).toBeVisible({ timeout: 15000 });
 

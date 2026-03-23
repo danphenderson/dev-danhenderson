@@ -91,7 +91,7 @@ describe('Photography', () => {
 
     expect(screen.getByText('Photography')).toBeInTheDocument();
     expect(
-      screen.getByText('A selection of field work, climbing days, and stargazing nights.')
+      screen.getByText('A selection of photo albums.')
     ).toBeInTheDocument();
   });
 });

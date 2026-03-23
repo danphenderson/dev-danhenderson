@@ -87,7 +87,7 @@ test.describe('Production smoke', () => {
     await page.goto('/photography');
 
     await waitForAnimatedSectionReadiness({
-      anchor: page.getByText('A selection of field work, climbing days, and stargazing nights.'),
+      anchor: page.getByText('A selection of photo albums.'),
       readyLocators: [page.getByText('4 albums')],
     });
 

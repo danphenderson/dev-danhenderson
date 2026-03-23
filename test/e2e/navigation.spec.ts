@@ -61,7 +61,7 @@ test.describe('Cross-route navigation', () => {
 
     await expect(page).toHaveURL(/\/photography$/);
     await waitForAnimatedSectionReadiness({
-      anchor: page.getByText('A selection of field work, climbing days, and stargazing nights.'),
+      anchor: page.getByText('A selection of photo albums.'),
       readyLocators: [page.getByText('4 albums')],
     });
     await expect(page.getByRole('heading', { name: 'Landscape' })).toBeVisible();
@@ -70,7 +70,7 @@ test.describe('Cross-route navigation', () => {
   test('Photography → Home via logo link', async ({ page }) => {
     await page.goto('/photography');
     await waitForAnimatedSectionReadiness({
-      anchor: page.getByText('A selection of field work, climbing days, and stargazing nights.'),
+      anchor: page.getByText('A selection of photo albums.'),
     });
 
     await page.getByRole('link', { name: 'Home' }).first().click();
