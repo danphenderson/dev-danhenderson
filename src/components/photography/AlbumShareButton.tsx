@@ -2,6 +2,9 @@ import DoneIcon from '@mui/icons-material/Done';
 import ShareIcon from '@mui/icons-material/Share';
 import { IconButton, Tooltip } from '@mui/material';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { siteRouteMap } from '../../constants/siteRoutes';
+import { readPublicUrl } from '../../utils/appEnvironment';
+import { resolvePublicAssetPath } from '../../utils/assets';
 
 type AlbumShareButtonProps = {
   albumName: string;
@@ -11,8 +14,8 @@ type AlbumShareButtonProps = {
 
 function getCanonicalAlbumUrl(slug: string): string {
   const origin = window.location.origin;
-  const base = process.env.PUBLIC_URL || '';
-  return `${origin}${base}/photography/${slug}`;
+  const albumPath = `${siteRouteMap.photography.path}/${slug}`;
+  return `${origin}${resolvePublicAssetPath(albumPath, readPublicUrl())}`;
 }
 
 export function AlbumShareButton({

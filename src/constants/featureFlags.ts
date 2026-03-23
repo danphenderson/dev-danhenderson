@@ -1,3 +1,5 @@
+import { readNodeEnvironment, readRuntimeEnvironmentOverride } from '../utils/appEnvironment';
+
 export type AppRuntimeEnvironment = 'development' | 'test' | 'production';
 
 export type FeatureFlagId = 'blog';
@@ -18,12 +20,12 @@ const isRuntimeEnvironment = (value: string | undefined): value is AppRuntimeEnv
   Boolean(value && runtimeEnvironmentValues.includes(value as AppRuntimeEnvironment));
 
 export const resolveAppRuntimeEnvironment = (): AppRuntimeEnvironment => {
-  const runtimeOverride = process.env.REACT_APP_RUNTIME_ENV;
+  const runtimeOverride = readRuntimeEnvironmentOverride();
   if (isRuntimeEnvironment(runtimeOverride)) {
     return runtimeOverride;
   }
 
-  const nodeEnvironment = process.env.NODE_ENV;
+  const nodeEnvironment = readNodeEnvironment();
   if (nodeEnvironment === 'production') {
     return 'production';
   }

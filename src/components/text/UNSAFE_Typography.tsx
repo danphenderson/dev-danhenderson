@@ -1,6 +1,7 @@
 import Typography from '@mui/material/Typography';
 import type { TypographyProps } from '@mui/material/Typography';
 import type { UnsafeTypographyMeta } from '../../types/text';
+import { readNodeEnvironment } from '../../utils/appEnvironment';
 
 /* ── Props ──────────────────────────────────────────────── */
 
@@ -36,7 +37,7 @@ type UnsafeTypographyProps = TypographyProps & {
  * ```
  */
 export const UnsafeTypography = ({ _unsafe, ...props }: UnsafeTypographyProps) => {
-  if (process.env.NODE_ENV === 'development') {
+  if (readNodeEnvironment() === 'development') {
     if (!_unsafe.reason) {
       console.warn('[UnsafeTypography] missing required "reason" in _unsafe metadata');
     }

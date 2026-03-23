@@ -6,6 +6,9 @@
  * assets, with cache fallback for offline use.
  */
 
+import { readNodeEnvironment, readPublicUrl } from './appEnvironment';
+import { resolvePublicAssetPath } from './assets';
+
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
     window.location.hostname === '[::1]' ||
@@ -61,18 +64,18 @@ function checkValidServiceWorker(swUrl: string, config?: ServiceWorkerConfig) {
 }
 
 export function register(config?: ServiceWorkerConfig): void {
-  if (process.env.NODE_ENV !== 'production' || !('serviceWorker' in navigator)) {
+  if (readNodeEnvironment() !== 'production' || !('serviceWorker' in navigator)) {
     return;
   }
 
-  const publicUrl = new URL(process.env.PUBLIC_URL ?? '', window.location.href);
+  const publicUrl = new URL(readPublicUrl(), window.location.href);
 
   if (publicUrl.origin !== window.location.origin) {
     return;
   }
 
   window.addEventListener('load', () => {
-    const swUrl = `${process.env.PUBLIC_URL}/service-worker.js`;
+    const swUrl = resolvePublicAssetPath('/service-worker.js', readPublicUrl());
 
     if (isLocalhost) {
       checkValidServiceWorker(swUrl, config);

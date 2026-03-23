@@ -106,18 +106,18 @@ flowchart LR
 
 ## Stack
 
-| Concern           | Technology                         |
-| ----------------- | ---------------------------------- |
-| Framework         | React 18                           |
-| Language          | TypeScript                         |
-| Routing           | React Router v6                    |
-| Component library | MUI (Material UI) + Emotion        |
-| Data tables       | MUI X DataGrid                     |
-| Animation         | Framer Motion (via `motion/react`) |
-| Build tooling     | Create React App (`react-scripts`) |
-| Unit testing      | Jest + React Testing Library       |
-| E2E testing       | Playwright                         |
-| CI runtime        | Node 20                            |
+| Concern           | Technology                                                   |
+| ----------------- | ------------------------------------------------------------ |
+| Framework         | React 18                                                     |
+| Language          | TypeScript 5.6                                               |
+| Routing           | React Router v6                                              |
+| Component library | MUI (Material UI) + Emotion                                  |
+| Data tables       | MUI X DataGrid                                               |
+| Animation         | Framer Motion (via `motion/react`)                           |
+| Build tooling     | Vite for dev/build; standalone Jest/ESLint/typecheck tooling |
+| Unit testing      | Jest + React Testing Library                                 |
+| E2E testing       | Playwright                                                   |
+| CI runtime        | Node 20                                                      |
 
 ## Further reading
 

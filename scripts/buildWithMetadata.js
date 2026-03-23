@@ -3,6 +3,7 @@ const { readFileSync } = require('node:fs');
 const path = require('node:path');
 
 const rootDir = path.resolve(__dirname, '..');
+const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
 const runtimeEnvArg = process.argv.find((arg) => arg.startsWith('--runtime-env='));
 const runtimeEnv = runtimeEnvArg?.slice('--runtime-env='.length);
@@ -36,7 +37,7 @@ if (runtimeEnv) {
   env.REACT_APP_RUNTIME_ENV = runtimeEnv;
 }
 
-const result = spawnSync(process.execPath, [require.resolve('react-scripts/scripts/build')], {
+const result = spawnSync(npmCommand, ['exec', 'vite', 'build'], {
   cwd: rootDir,
   env,
   stdio: 'inherit',

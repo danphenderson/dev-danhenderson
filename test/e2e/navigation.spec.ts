@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { declineWelcomeAudio } from './helpers/header';
 import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 

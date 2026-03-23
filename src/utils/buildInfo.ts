@@ -1,10 +1,13 @@
 /**
- * Build-time metadata injected via CRA's REACT_APP_* environment variables.
+ * Build-time metadata injected via the shared app-environment compatibility layer.
  *
- * npm run build and npm run build:e2e populate these values for bundled artifacts.
+ * npm run build and npm run build:e2e currently populate these values from
+ * CRA-style REACT_APP_* environment variables before bundling.
  * The fallbacks below are intentionally explicit placeholders for local development
  * and test sessions that do not stamp build metadata.
  */
+
+import { readBuildMetadata, readNodeEnvironment } from './appEnvironment';
 
 export type BuildInfo = {
   gitSha: string;
@@ -13,9 +16,11 @@ export type BuildInfo = {
   nodeEnv: string;
 };
 
+const buildMetadata = readBuildMetadata();
+
 export const buildInfo: BuildInfo = {
-  gitSha: process.env.REACT_APP_GIT_SHA ?? 'dev',
-  buildTime: process.env.REACT_APP_BUILD_TIME ?? 'unknown',
-  version: process.env.REACT_APP_VERSION ?? 'dev',
-  nodeEnv: process.env.NODE_ENV ?? 'development',
+  gitSha: buildMetadata.gitSha ?? 'dev',
+  buildTime: buildMetadata.buildTime ?? 'unknown',
+  version: buildMetadata.version ?? 'dev',
+  nodeEnv: readNodeEnvironment(),
 };

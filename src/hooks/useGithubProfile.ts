@@ -60,7 +60,7 @@ export const useGithubProfile = () => {
             setStatus(nextStatus);
           }
         }
-      } catch (err) {
+      } catch (_error) {
         if (!cancelled) {
           const message =
             'Unable to load GitHub activity right now. Showing recent highlights instead.';

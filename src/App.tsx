@@ -21,6 +21,7 @@ import { Box } from '@mui/material';
 import { CommandPaletteProvider } from './CommandPaletteProvider';
 import { cssDuration } from './motion/tokens';
 import { routerFuture } from './routerFuture';
+import { readPublicUrl } from './utils/appEnvironment';
 
 const skipLinkSx = {
   position: 'absolute',
@@ -91,7 +92,7 @@ function AppContent() {
 
 export default function App() {
   return (
-    <BrowserRouter basename={process.env.PUBLIC_URL} future={routerFuture}>
+    <BrowserRouter basename={readPublicUrl()} future={routerFuture}>
       <AppErrorBoundary>
         <AppContent />
       </AppErrorBoundary>

@@ -44,9 +44,11 @@ Prefer changes that preserve the current single-page-app architecture and static
 - React Router v6
 - MUI + Emotion
 - MUI X DataGrid
+- TypeScript 5.6 baseline
 - Framer Motion (via `motion/react`)
-- Create React App (`react-scripts`)
-- Node 20 in CI
+- Vite for dev/build
+- Standalone Jest + ESLint configuration
+- Node 20+ for the main app toolchain; CI remains pinned to Node 20
 - webdev MCP server available for browser-based UI validation and screenshots
 
 ## Decision priority
@@ -109,14 +111,16 @@ Quick reference:
 - dev server: `npm start`
 - build: `npm run build`
 - gated E2E build: `npm run build:e2e`
-- unit/component tests: `CI=true npm test -- --watch=false`
+- unit/component tests: `CI=true npm test -- --watchAll=false`
+- lint: `npm run lint`
+- typecheck: `npm run typecheck`
 - Playwright: `npm run test:e2e`
 
 Notes:
 
 - The dev server defaults to port `3001` in this repository.
 - Playwright serves the `build/` directory on port `3100`.
-- `CI=true npm test -- --watch=false` currently has unrelated baseline failures in existing CV tests, so prefer the narrowest relevant validation for the files you change and separate unrelated failures from regressions you introduce.
+- `CI=true npm test -- --watchAll=false` currently has unrelated baseline failures in existing CV tests, so prefer the narrowest relevant validation for the files you change and separate unrelated failures from regressions you introduce.
 - Do not claim a command or validation step was run unless it was actually run.
 
 ## Repository map

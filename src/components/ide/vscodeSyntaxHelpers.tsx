@@ -4,7 +4,6 @@
  * VSCODE_COLORS token, so consuming components don't repeat the
  * same Box-import + color-lookup pattern for every token type.
  */
-import * as React from 'react';
 import Box from '@mui/material/Box';
 import { VSCODE_COLORS } from './vscodeTokens';
 
