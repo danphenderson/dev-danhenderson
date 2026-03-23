@@ -253,11 +253,15 @@ export const GlobalCommandPalette = () => {
             onKeyDown={handleQueryKeyDown}
             placeholder="Search routes, albums, and CV sections"
             inputProps={{
+              role: 'combobox',
               'aria-label': 'Search routes, albums, and CV sections',
               'aria-activedescendant': activeAction
                 ? `command-palette-action-${activeAction.id}`
                 : undefined,
               'aria-controls': 'command-palette-results',
+              'aria-autocomplete': 'list',
+              'aria-expanded': filteredActions.length > 0,
+              'aria-haspopup': 'listbox',
             }}
             InputProps={{
               startAdornment: (
@@ -268,14 +272,20 @@ export const GlobalCommandPalette = () => {
             }}
           />
           <List
+            component="ul"
             id="command-palette-results"
+            role="listbox"
+            aria-label="Command palette results"
             sx={{ p: 0, display: 'flex', flexDirection: 'column', gap: 0.75 }}
           >
             {filteredActions.length > 0 ? (
               filteredActions.map((action, index) => (
                 <ListItemButton
+                  component="li"
                   key={action.id}
                   id={`command-palette-action-${action.id}`}
+                  role="option"
+                  aria-selected={index === activeIndex}
                   onClick={() => handleSelect(action)}
                   onMouseEnter={() => setActiveIndex(index)}
                   selected={index === activeIndex}
@@ -292,7 +302,7 @@ export const GlobalCommandPalette = () => {
                 </ListItemButton>
               ))
             ) : (
-              <Box sx={{ px: 1, py: 2 }}>
+              <Box role="status" sx={{ px: 1, py: 2 }}>
                 <Text role="bodyMuted">No matching routes or sections.</Text>
               </Box>
             )}
