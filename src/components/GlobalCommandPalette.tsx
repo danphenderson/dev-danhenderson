@@ -93,17 +93,21 @@ export const GlobalCommandPalette = () => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (isEditableTarget(event.target)) {
-        return;
-      }
-
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        if (!isOpen && isEditableTarget(event.target)) {
+          return;
+        }
+
         event.preventDefault();
         if (isOpen) {
           closePalette();
         } else {
           openPalette();
         }
+        return;
+      }
+
+      if (isEditableTarget(event.target)) {
         return;
       }
 

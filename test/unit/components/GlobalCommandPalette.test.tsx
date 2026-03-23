@@ -98,9 +98,12 @@ describe('GlobalCommandPalette', () => {
     it('toggles closed when Cmd+K is pressed while the palette is already open', async () => {
       renderPalette();
       openViaCmdK();
-      expect(screen.getByRole('textbox')).toBeInTheDocument();
+      const searchBox = screen.getByRole('textbox', {
+        name: 'Search routes, albums, and CV sections',
+      });
+      expect(searchBox).toBeInTheDocument();
 
-      openViaCmdK();
+      fireEvent.keyDown(searchBox, { key: 'k', metaKey: true });
 
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
