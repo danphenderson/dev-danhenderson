@@ -59,8 +59,8 @@ Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript po
 ## Tooling Notes
 
 - The main app now uses Vite for `npm start`, `npm run build`, and `npm run build:e2e`.
-- The main app toolchain baseline is Node 20 or newer and TypeScript 5.6.x.
-- Jest configuration is owned by `jest.config.cjs`, ESLint configuration is owned by `.eslintrc.cjs`, and `npm run typecheck` uses `tsconfig.typecheck.json`.
+- The main app toolchain baseline is Node 20.19 or newer and TypeScript 5.6.x.
+- Jest configuration is owned by `jest.config.cjs`, ESLint configuration is owned by `eslint.config.cjs`, and `npm run typecheck` uses `tsconfig.typecheck.json`.
 
 ## Contributing
 

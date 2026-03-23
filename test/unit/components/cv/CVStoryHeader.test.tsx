@@ -15,12 +15,12 @@ const renderStoryHeader = (overrides?: Partial<Parameters<typeof CVStoryHeader>[
 };
 
 describe('CVStoryHeader', () => {
-  it('renders the embedded variant as a single left-aligned row', () => {
+  it('renders the embedded variant as a single row with trailing actions', () => {
     renderStoryHeader();
 
     const header = screen.getByTestId('cv-story-header');
 
-    expect(header).toHaveStyle({ justifyContent: 'flex-start', width: '100%' });
+    expect(header).toHaveStyle({ justifyContent: 'flex-end', width: '100%' });
     expect(screen.getByText('Full CV')).toBeInTheDocument();
     expect(screen.getByTestId('cv-mode-toggle')).toHaveTextContent('Read my story');
     expect(screen.queryByText(/software engineer building/i)).not.toBeInTheDocument();

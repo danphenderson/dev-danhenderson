@@ -48,7 +48,7 @@ Prefer changes that preserve the current single-page-app architecture and static
 - Framer Motion (via `motion/react`)
 - Vite for dev/build
 - Standalone Jest + ESLint configuration
-- Node 20+ for the main app toolchain; CI remains pinned to Node 20
+- Node 20.19+ for the main app toolchain; CI remains pinned to Node 20
 - webdev MCP server available for browser-based UI validation and screenshots
 
 ## Decision priority

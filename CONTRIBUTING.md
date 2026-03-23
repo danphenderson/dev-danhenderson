@@ -4,7 +4,7 @@ Thanks for contributing to `danhenderson.dev`. This repository is a client-side 
 
 ## Prerequisites
 
-- Node.js 20 or newer
+- Node.js 20.19 or newer
 - npm
 
 ## Local setup
@@ -62,6 +62,8 @@ GitHub Actions currently runs three workflows:
 - `Codecov`: runs `CI=true npm test -- --watchAll=false --passWithNoTests --coverage`, uploads the `coverage/` artifact, and reports to Codecov when configured.
 - `Build`: runs `npm run build`, uploads the production `build/` artifact, then runs Playwright against that build artifact.
 - `CodeQL`: analyzes the JavaScript/TypeScript codebase on pushes, pull requests, and the weekly schedule.
+
+These workflows validate pushes to `main` and `v1`, plus pull requests targeting either branch.
 
 Docs-only, `plans/`, `resume/`, `LICENSE`, and formatting-config-only changes do not trigger the `Codecov` or `Build` workflows.
 

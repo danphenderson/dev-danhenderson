@@ -18,7 +18,7 @@ Files:
 - `sx.ts` — `normalizeSxProp`: normalizes a `SxProps<Theme>` value into an array for safe spreading in MUI `sx` array composition.
 - `buildInfo.ts` — `buildInfo`: build-time constants read from `REACT_APP_*` env vars (`gitSha`, `buildTime`, `version`, `nodeEnv`).
 - `commandPaletteSearch.ts` — `normalizeCommandPaletteSearchValue` and `matchesCommandPaletteAction`: search-matching logic for the command palette, kept separate from the action registry so it can be tested in isolation.
-- `serviceWorkerRegistration.ts` — CRA service-worker registration helpers. Do not modify unless explicitly working on PWA or offline behavior.
+- `serviceWorkerRegistration.ts` — service-worker registration helpers that use the shared app-environment abstraction and public-asset resolver. Do not modify unless explicitly working on PWA or offline behavior.
 
 ## Rules
 
