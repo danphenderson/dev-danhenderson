@@ -1,5 +1,13 @@
-import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { lazy, useLayoutEffect, useMemo, useState } from 'react';
+import type { ComponentType, LazyExoticComponent } from 'react';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  matchPath,
+  useLocation,
+  type Location,
+} from 'react-router-dom';
 import { AppErrorBoundary } from './components/AppErrorBoundary';
 import Footer from './components/Footer';
 import { GlobalCommandPalette } from './components/GlobalCommandPalette';
@@ -17,14 +25,82 @@ import { cssDuration } from './motion/tokens';
 import { routerFuture } from './routerFuture';
 import { readPublicUrl } from './utils/appEnvironment';
 
-const Home = lazy(() => import('./pages/Home'));
-const Photography = lazy(() => import('./pages/Photography'));
-const PhotographyCategory = lazy(() => import('./pages/PhotographyCategory'));
-const CV = lazy(() => import('./pages/CV'));
-const Climbing = lazy(() => import('./pages/Climbing'));
-const Blog = lazy(() => import('./pages/Blog'));
-const BlogPost = lazy(() => import('./pages/BlogPost'));
-const NotFound = lazy(() => import('./pages/NotFound'));
+type LazyRouteModule = {
+  Component: LazyExoticComponent<ComponentType>;
+  isLoaded: () => boolean;
+  preload: () => Promise<void>;
+};
+
+const createLazyRouteModule = (importer: Parameters<typeof lazy>[0]): LazyRouteModule => {
+  let hasLoaded = false;
+  let pendingImport: ReturnType<typeof importer> | null = null;
+
+  const load = () => {
+    if (!pendingImport) {
+      pendingImport = importer().then((module) => {
+        hasLoaded = true;
+        return module;
+      });
+    }
+
+    return pendingImport;
+  };
+
+  return {
+    Component: lazy(load),
+    isLoaded: () => hasLoaded,
+    preload: async () => {
+      await load();
+    },
+  };
+};
+
+const homeRoute = createLazyRouteModule(() => import('./pages/Home'));
+const photographyRoute = createLazyRouteModule(() => import('./pages/Photography'));
+const photographyCategoryRoute = createLazyRouteModule(() => import('./pages/PhotographyCategory'));
+const cvRoute = createLazyRouteModule(() => import('./pages/CV'));
+const climbingRoute = createLazyRouteModule(() => import('./pages/Climbing'));
+const blogRoute = createLazyRouteModule(() => import('./pages/Blog'));
+const blogPostRoute = createLazyRouteModule(() => import('./pages/BlogPost'));
+const notFoundRoute = createLazyRouteModule(() => import('./pages/NotFound'));
+
+const resolveRouteModule = (pathname: string, isBlogEnabled: boolean) => {
+  if (matchPath({ path: siteRouteMap.home.path, end: true }, pathname)) {
+    return homeRoute;
+  }
+
+  if (matchPath({ path: siteRouteMap.cv.path, end: true }, pathname)) {
+    return cvRoute;
+  }
+
+  if (matchPath({ path: siteRouteMap.climbing.path, end: true }, pathname)) {
+    return climbingRoute;
+  }
+
+  if (matchPath({ path: siteRouteMap.photography.path, end: true }, pathname)) {
+    return photographyRoute;
+  }
+
+  if (matchPath({ path: `${siteRouteMap.photography.path}/:slug`, end: true }, pathname)) {
+    return photographyCategoryRoute;
+  }
+
+  if (isBlogEnabled && matchPath({ path: siteRouteMap.blog.path, end: true }, pathname)) {
+    return blogRoute;
+  }
+
+  if (isBlogEnabled && matchPath({ path: `${siteRouteMap.blog.path}/:slug`, end: true }, pathname)) {
+    return blogPostRoute;
+  }
+
+  return notFoundRoute;
+};
+
+const RouteLoadingFallback = () => (
+  <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 3, sm: 4 } }}>
+    <LoadingBars label="Loading route content" compact />
+  </Box>
+);
 
 const skipLinkSx = {
   position: 'absolute',
@@ -47,9 +123,41 @@ const skipLinkSx = {
 function AppContent() {
   const isBlogEnabled = isFeatureEnabled('blog');
   const location = useLocation();
+  const activeRouteModule = useMemo(
+    () => resolveRouteModule(location.pathname, isBlogEnabled),
+    [isBlogEnabled, location.pathname]
+  );
+  const [displayLocation, setDisplayLocation] = useState<Location | null>(() =>
+    activeRouteModule.isLoaded() ? location : null
+  );
+
+  useLayoutEffect(() => {
+    let cancelled = false;
+
+    if (activeRouteModule.isLoaded()) {
+      setDisplayLocation(location);
+    } else {
+      void activeRouteModule
+        .preload()
+        .catch((error) => {
+          console.error('Failed to preload route module.', error);
+        })
+        .finally(() => {
+          if (!cancelled) {
+            setDisplayLocation(location);
+          }
+        });
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeRouteModule, location]);
+
+  const renderedLocation = displayLocation ?? location;
   const isCvStoryRoute =
-    location.pathname === siteRouteMap.cv.path &&
-    new URLSearchParams(location.search).get('mode') === 'story';
+    renderedLocation.pathname === siteRouteMap.cv.path &&
+    new URLSearchParams(renderedLocation.search).get('mode') === 'story';
 
   return (
     <CommandPaletteProvider>
@@ -67,31 +175,35 @@ function AppContent() {
           </>
         )}
         <Box component="main" id="main-content" tabIndex={-1}>
-          <PageTransition>
-            <Suspense
-              fallback={
-                <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 3, sm: 4 } }}>
-                  <LoadingBars label="Loading route content" compact />
-                </Box>
-              }
-            >
-              <Routes location={location}>
-                <Route path={siteRouteMap.home.path} element={<Home />} />
-                <Route path={siteRouteMap.cv.path} element={<CV />} />
-                <Route path={siteRouteMap.climbing.path} element={<Climbing />} />
-                <Route path={siteRouteMap.photography.path} element={<Photography />} />
+          {displayLocation ? (
+            <PageTransition pathname={displayLocation.pathname}>
+              <Routes location={displayLocation}>
+                <Route path={siteRouteMap.home.path} element={<homeRoute.Component />} />
+                <Route path={siteRouteMap.cv.path} element={<cvRoute.Component />} />
+                <Route path={siteRouteMap.climbing.path} element={<climbingRoute.Component />} />
+                <Route
+                  path={siteRouteMap.photography.path}
+                  element={<photographyRoute.Component />}
+                />
                 <Route
                   path={`${siteRouteMap.photography.path}/:slug`}
-                  element={<PhotographyCategory />}
+                  element={<photographyCategoryRoute.Component />}
                 />
-                {isBlogEnabled ? <Route path={siteRouteMap.blog.path} element={<Blog />} /> : null}
                 {isBlogEnabled ? (
-                  <Route path={`${siteRouteMap.blog.path}/:slug`} element={<BlogPost />} />
+                  <Route path={siteRouteMap.blog.path} element={<blogRoute.Component />} />
                 ) : null}
-                <Route path={siteRouteMap['not-found'].path} element={<NotFound />} />
+                {isBlogEnabled ? (
+                  <Route
+                    path={`${siteRouteMap.blog.path}/:slug`}
+                    element={<blogPostRoute.Component />}
+                  />
+                ) : null}
+                <Route path={siteRouteMap['not-found'].path} element={<notFoundRoute.Component />} />
               </Routes>
-            </Suspense>
-          </PageTransition>
+            </PageTransition>
+          ) : (
+            <RouteLoadingFallback />
+          )}
         </Box>
         {!isCvStoryRoute && <Footer />}
         <CommonLinkTooltip />

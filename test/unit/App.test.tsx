@@ -1,4 +1,4 @@
-import { isValidElement, Suspense } from 'react';
+import { isValidElement } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
 import ThemeProvider from '../../src/ThemeProvider';
@@ -64,10 +64,18 @@ jest.mock('../../src/components/CommonLinkTooltip', () => ({
 }));
 
 let mockPageTransitionChildren: ReactNode = null;
+let mockPageTransitionPathname: string | undefined;
 
 jest.mock('../../src/components/PageTransition', () => ({
-  PageTransition: ({ children }: { children: ReactNode }) => {
+  PageTransition: ({
+    children,
+    pathname,
+  }: {
+    children: ReactNode;
+    pathname?: string;
+  }) => {
     mockPageTransitionChildren = children;
+    mockPageTransitionPathname = pathname;
 
     return <div data-testid="page-transition">{children}</div>;
   },
@@ -79,6 +87,7 @@ describe('App', () => {
   beforeEach(() => {
     mockedIsFeatureEnabled.mockReturnValue(true);
     mockPageTransitionChildren = null;
+    mockPageTransitionPathname = undefined;
     window.history.pushState({}, '', '/');
   });
 
@@ -105,22 +114,34 @@ describe('App', () => {
     expect(await screen.findByTestId('home-page')).toBeInTheDocument();
   });
 
-  it('passes the current location to Routes inside PageTransition', () => {
+  it('shows the route loading fallback before an uncached lazy page is ready', async () => {
+    window.history.pushState({}, '', '/photography');
+
     render(
       <ThemeProvider>
         <App />
       </ThemeProvider>
     );
 
+    expect(screen.getByRole('status', { name: 'Loading route content' })).toBeInTheDocument();
+    expect(screen.queryByTestId('page-transition')).not.toBeInTheDocument();
+
+    expect(await screen.findByTestId('photography-page')).toBeInTheDocument();
+    expect(screen.getByTestId('page-transition')).toBeInTheDocument();
+  });
+
+  it('passes the displayed route location directly into PageTransition and Routes', async () => {
+    render(
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    );
+
+    expect(await screen.findByTestId('home-page')).toBeInTheDocument();
     expect(isValidElement(mockPageTransitionChildren)).toBe(true);
+    expect(mockPageTransitionPathname).toBe('/');
 
-    const suspenseElement = mockPageTransitionChildren as ReactElement<{
-      children?: ReactNode;
-    }>;
-    expect(suspenseElement.type).toBe(Suspense);
-    expect(isValidElement(suspenseElement.props.children)).toBe(true);
-
-    const routesElement = suspenseElement.props.children as ReactElement<{
+    const routesElement = mockPageTransitionChildren as ReactElement<{
       location?: { pathname?: string };
     }>;
 
