@@ -35,6 +35,16 @@ describe('cv.ts schema', () => {
       expect(typeof aboutMe.bio).toBe('string');
       expect(aboutMe.bio.length).toBeGreaterThan(0);
     });
+
+    it('matches the current about bio copy', () => {
+      expect(aboutMe.bio).toBe(
+        `Software developer building scientific, data, and AI-enabled systems.
+
+Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software.
+
+I previously built ingestion, analytics, and ML solutions for a healthcare data platform.`
+      );
+    });
   });
 
   /* ── scalar exports ── */

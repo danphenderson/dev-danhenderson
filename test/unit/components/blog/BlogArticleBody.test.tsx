@@ -22,6 +22,22 @@ describe('BlogArticleBody', () => {
     expect(screen.getByText('Hello world paragraph.')).toBeInTheDocument();
   });
 
+  it('renders inline code spans inside a paragraph block', () => {
+    renderBody([{ type: 'paragraph', text: 'Use `Optional[T]` instead of `Union[T, None]`.' }]);
+
+    const paragraph = screen.getByText(
+      (_, element) =>
+        element?.tagName === 'P' &&
+        element.textContent === 'Use Optional[T] instead of Union[T, None].'
+    );
+    const optionalCode = screen.getByText('Optional[T]');
+    const unionCode = screen.getByText('Union[T, None]');
+
+    expect(paragraph.tagName).toBe('P');
+    expect(optionalCode.tagName).toBe('CODE');
+    expect(unionCode.tagName).toBe('CODE');
+  });
+
   it('renders a heading block with the correct level', () => {
     renderBody([{ type: 'heading', level: 2, text: 'Section Title' }]);
 

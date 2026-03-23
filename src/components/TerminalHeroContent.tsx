@@ -30,8 +30,6 @@ export interface TerminalHeroContentProps {
   expanded?: boolean;
   /** When true the post-expand boot sequence runs before the loop starts. */
   bootActive?: boolean;
-  /** @deprecated sessionLabel is no longer rendered; kept for API compatibility */
-  sessionLabel?: string;
   onWindowDragPointerDown?: React.PointerEventHandler<HTMLDivElement>;
   windowDragEnabled?: boolean;
   windowDragging?: boolean;
@@ -130,7 +128,7 @@ export const TerminalHeroContent: React.FC<TerminalHeroContentProps> = ({
   const [activityBarIndex, setActivityBarIndex] = React.useState(0);
   const hasAutoOpenedExplorerRef = React.useRef(false);
 
-  // During boot, auto-open the explorer when the boot sequence signals it
+  // During boot, auto-open the explorer at the explorer-open phase.
   React.useEffect(() => {
     if (!isBoot || boot.phase !== 'explorer-open' || hasAutoOpenedExplorerRef.current) {
       return;

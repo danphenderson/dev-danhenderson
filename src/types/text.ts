@@ -38,6 +38,7 @@ export type TextProseRole =
   | 'proseSubheading'
   | 'proseMinorHeading'
   | 'proseParagraph'
+  | 'proseInlineCode'
   | 'proseCaption'
   | 'proseQuote'
   | 'proseListItem';
@@ -67,6 +68,7 @@ export type TextContext = 'ui' | 'prose' | 'overlay';
 export type TextElement =
   | 'p'
   | 'span'
+  | 'code'
   | 'h1'
   | 'h2'
   | 'h3'

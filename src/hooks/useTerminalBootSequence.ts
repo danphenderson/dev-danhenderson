@@ -57,6 +57,66 @@ const SERVER_OBSERVE_MS = 900;
 const CLIENT_OBSERVE_MS = 1000;
 const HANDOFF_PAUSE_MS = 250;
 
+type BootTransitionConfig =
+  | {
+      kind: 'delay';
+      durationMs: number;
+      nextPhase: BootPhase;
+      resetCharIndex?: boolean;
+    }
+  | {
+      kind: 'typing';
+      command: string;
+      nextPhase: BootPhase;
+    };
+
+const BOOT_PHASE_TRANSITIONS: Record<
+  Exclude<BootPhase, 'idle' | 'complete'>,
+  BootTransitionConfig
+> = {
+  'explorer-open': {
+    kind: 'delay',
+    durationMs: EXPLORER_OPEN_MS,
+    nextPhase: 'server-typing',
+  },
+  'server-typing': {
+    kind: 'typing',
+    command: SERVER_COMMAND,
+    nextPhase: 'server-enter',
+  },
+  'server-enter': {
+    kind: 'delay',
+    durationMs: PAUSE_BEFORE_OUTPUT_MS,
+    nextPhase: 'server-output',
+  },
+  'server-output': {
+    kind: 'delay',
+    durationMs: SERVER_OBSERVE_MS,
+    nextPhase: 'client-typing',
+    resetCharIndex: true,
+  },
+  'client-typing': {
+    kind: 'typing',
+    command: CLIENT_COMMAND,
+    nextPhase: 'client-enter',
+  },
+  'client-enter': {
+    kind: 'delay',
+    durationMs: PAUSE_BEFORE_OUTPUT_MS,
+    nextPhase: 'client-output',
+  },
+  'client-output': {
+    kind: 'delay',
+    durationMs: CLIENT_OBSERVE_MS,
+    nextPhase: 'handoff',
+  },
+  handoff: {
+    kind: 'delay',
+    durationMs: HANDOFF_PAUSE_MS,
+    nextPhase: 'complete',
+  },
+};
+
 // ---------------------------------------------------------------------------
 // Result interface
 // ---------------------------------------------------------------------------
@@ -70,8 +130,6 @@ export interface TerminalBootResult {
   showCursor: boolean;
   complete: boolean;
   editorTab: VscodeEditorTab;
-  /** When true, the explorer sidebar should be revealed during the boot sequence. */
-  explorerOpen: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -104,98 +162,37 @@ export const useTerminalBootSequence = (active: boolean): TerminalBootResult => 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, durationScale]);
 
-  // ---- Explorer open ----
   useEffect(() => {
-    if (phase !== 'explorer-open') return;
-
-    const id = window.setTimeout(() => setPhase('server-typing'), scale(EXPLORER_OPEN_MS));
-    return () => window.clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, durationScale]);
-
-  // ---- Server: typing ----
-  useEffect(() => {
-    if (phase !== 'server-typing') return;
-
-    if (charIndex >= SERVER_COMMAND.length) {
-      setPhase('server-enter');
+    if (phase === 'idle' || phase === 'complete') {
       return;
     }
 
-    const delay = getTypewriterDelay(SERVER_COMMAND, charIndex, timingProfile);
-    const id = window.setTimeout(
-      () => setCharIndex((i) => Math.min(i + 1, SERVER_COMMAND.length)),
-      scale(delay)
-    );
-    return () => window.clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, charIndex, timingProfile, durationScale]);
+    const transition = BOOT_PHASE_TRANSITIONS[phase];
 
-  // ---- Server: enter pause ----
-  useEffect(() => {
-    if (phase !== 'server-enter') return;
+    if (transition.kind === 'typing') {
+      if (charIndex >= transition.command.length) {
+        setPhase(transition.nextPhase);
+        return;
+      }
 
-    const id = window.setTimeout(() => setPhase('server-output'), scale(PAUSE_BEFORE_OUTPUT_MS));
-    return () => window.clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, durationScale]);
-
-  // ---- Server: output observe ----
-  useEffect(() => {
-    if (phase !== 'server-output') return;
+      const delay = getTypewriterDelay(transition.command, charIndex, timingProfile);
+      const id = window.setTimeout(
+        () => setCharIndex((index) => Math.min(index + 1, transition.command.length)),
+        scale(delay)
+      );
+      return () => window.clearTimeout(id);
+    }
 
     const id = window.setTimeout(() => {
-      setCharIndex(0);
-      setPhase('client-typing');
-    }, scale(SERVER_OBSERVE_MS));
+      if (transition.resetCharIndex) {
+        setCharIndex(0);
+      }
+
+      setPhase(transition.nextPhase);
+    }, scale(transition.durationMs));
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, durationScale]);
-
-  // ---- Client: typing ----
-  useEffect(() => {
-    if (phase !== 'client-typing') return;
-
-    if (charIndex >= CLIENT_COMMAND.length) {
-      setPhase('client-enter');
-      return;
-    }
-
-    const delay = getTypewriterDelay(CLIENT_COMMAND, charIndex, timingProfile);
-    const id = window.setTimeout(
-      () => setCharIndex((i) => Math.min(i + 1, CLIENT_COMMAND.length)),
-      scale(delay)
-    );
-    return () => window.clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, charIndex, timingProfile, durationScale]);
-
-  // ---- Client: enter pause ----
-  useEffect(() => {
-    if (phase !== 'client-enter') return;
-
-    const id = window.setTimeout(() => setPhase('client-output'), scale(PAUSE_BEFORE_OUTPUT_MS));
-    return () => window.clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, durationScale]);
-
-  // ---- Client: output observe ----
-  useEffect(() => {
-    if (phase !== 'client-output') return;
-
-    const id = window.setTimeout(() => setPhase('handoff'), scale(CLIENT_OBSERVE_MS));
-    return () => window.clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, durationScale]);
-
-  // ---- Handoff to loop ----
-  useEffect(() => {
-    if (phase !== 'handoff') return;
-
-    const id = window.setTimeout(() => setPhase('complete'), scale(HANDOFF_PAUSE_MS));
-    return () => window.clearTimeout(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, durationScale]);
+  }, [charIndex, phase, timingProfile, durationScale]);
 
   // ---------------------------------------------------------------------------
   // Derive display state
@@ -247,9 +244,6 @@ export const useTerminalBootSequence = (active: boolean): TerminalBootResult => 
     sessions = [SERVER_SESSION, CLIENT_SESSION, ZSH_SESSION];
   }
 
-  // Explorer is open from the explorer-open phase onward
-  const explorerOpen = phase !== 'idle';
-
   return {
     phase,
     sessions,
@@ -259,6 +253,5 @@ export const useTerminalBootSequence = (active: boolean): TerminalBootResult => 
     showCursor,
     complete: phase === 'complete',
     editorTab,
-    explorerOpen,
   };
 };

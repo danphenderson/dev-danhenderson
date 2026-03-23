@@ -328,7 +328,6 @@ describe('TerminalHeroContent', () => {
             showCursor: true,
             complete: false,
             editorTab: 'server',
-            explorerOpen: true,
           }
         : {
             phase: 'idle',
@@ -339,7 +338,6 @@ describe('TerminalHeroContent', () => {
             showCursor: false,
             complete: false,
             editorTab: 'server',
-            explorerOpen: false,
           }
     );
   });
@@ -544,7 +542,6 @@ describe('TerminalHeroContent', () => {
         showCursor: false,
         complete: false,
         editorTab: 'server',
-        explorerOpen: true,
       });
 
       renderHero({ bootActive: true });
@@ -562,7 +559,6 @@ describe('TerminalHeroContent', () => {
         showCursor: false,
         complete: false,
         editorTab: 'server',
-        explorerOpen: true,
       });
 
       const view = renderHero({ bootActive: true });

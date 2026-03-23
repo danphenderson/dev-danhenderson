@@ -50,11 +50,11 @@ export const aboutMe: AboutMe = {
     url: mtuMathGraduateBioUrl,
     tooltip: 'View the Michigan Tech graduate mathematics student page.',
   },
-  bio: `Software developer building scientific, data, and AI-enabled systems. I'm drawn to problems where mathematics meets computation — from modeling blood flow in arteries to building production data pipelines that handle petabytes of healthcare records.
+  bio: `Software developer building scientific, data, and AI-enabled systems.
 
-I previously built ingestion, analytics, and ML solutions for a healthcare data platform. Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software.
+Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software.
 
-Outside of work, I engage with side projects that keep me learning and I seek adventure in the mountains to keep me grounded.`,
+I previously built ingestion, analytics, and ML solutions for a healthcare data platform.`,
 };
 
 export const codingExamples: CodingExample[] = [

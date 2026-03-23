@@ -36,7 +36,6 @@ const FILES: FileEntry[] = [
   { name: 'tsconfig.json', kind: 'file', indent: 0 },
 ];
 
-/** Derive initial expanded state from the static tree. */
 const getInitialExpanded = (): Record<string, boolean> => {
   const expanded: Record<string, boolean> = {};
   for (const entry of FILES) {

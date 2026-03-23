@@ -75,7 +75,6 @@ describe('useTerminalBootSequence', () => {
     advance(300);
 
     expect(result.current.phase).toBe('explorer-open');
-    expect(result.current.explorerOpen).toBe(true);
     expect(result.current.activeSessionId).toBe('zsh');
     expect(result.current.sessions).toEqual([{ id: 'zsh', label: 'zsh' }]);
 
@@ -113,7 +112,6 @@ describe('useTerminalBootSequence', () => {
 
     // idle → explorer-open
     advanceUntilPhase(result, 'explorer-open');
-    expect(result.current.explorerOpen).toBe(true);
 
     // explorer-open → server-typing
     advanceUntilPhase(result, 'server-typing');

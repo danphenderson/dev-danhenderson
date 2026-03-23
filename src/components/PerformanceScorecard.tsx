@@ -13,7 +13,10 @@ import { useState } from 'react';
 import { useWebVitals, type WebVitalEntry } from '../hooks/useWebVitals';
 import { useMotionScale } from '../motion';
 import { Text } from './text';
-import { buildInfo } from '../utils/buildInfo';
+import { buildInfo, hasBuildMetadata } from '../utils/buildInfo';
+
+const UNSTAMPED_BUILD_VALUE = 'not stamped in this session';
+const LOCAL_WORKSPACE_VALUE = 'local workspace';
 
 const ratingColor: Record<WebVitalEntry['rating'], 'success' | 'warning' | 'error'> = {
   good: 'success',
@@ -138,11 +141,21 @@ export function PerformanceScorecard() {
             Build
           </Text>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 3 }}>
-            <InfoRow label="Version" value={buildInfo.version} />
-            <InfoRow label="Commit" value={buildInfo.gitSha} mono />
-            <InfoRow label="Built" value={formatBuildTime(buildInfo.buildTime)} />
+            <InfoRow label="Version" value={buildInfo.version ?? UNSTAMPED_BUILD_VALUE} />
+            <InfoRow label="Commit" value={buildInfo.gitSha ?? LOCAL_WORKSPACE_VALUE} mono />
+            <InfoRow
+              label="Built"
+              value={
+                buildInfo.buildTime ? formatBuildTime(buildInfo.buildTime) : UNSTAMPED_BUILD_VALUE
+              }
+            />
             <InfoRow label="Environment" value={buildInfo.nodeEnv} />
           </Box>
+          <Text role="caption" tone="muted" sx={{ mb: 3, display: 'block' }}>
+            {hasBuildMetadata
+              ? 'Build details were injected during the current build.'
+              : 'This session is using local or test fallbacks; stamped metadata appears after npm run build.'}
+          </Text>
 
           {/* Web Vitals section */}
           <Text role="settingsSectionLabel" component="p">

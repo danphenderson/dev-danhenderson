@@ -2,8 +2,8 @@ import { test, expect, type Page } from '@playwright/test';
 import { dismissWelcomeSequence } from './helpers/header';
 import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
-const FEATURED_POST_TITLE = 'Building a Design System That Scales';
-const FEATURED_POST_SLUG = 'building-a-design-system-that-scales';
+const FEATURED_POST_TITLE = 'Fixing and Enforcing None-Type Drift with a Codemod';
+const FEATURED_POST_SLUG = 'fixing-and-enforcing-none-type-drift-with-a-codemod';
 const SECOND_POST_TITLE = 'React Performance Patterns Beyond React.memo';
 const SECOND_POST_SLUG = 'react-performance-patterns-beyond-memo';
 const THIRD_POST_TITLE = 'TypeScript Discriminated Unions for UI State Machines';
@@ -132,7 +132,7 @@ test.describe('Blog post detail page', () => {
     // Article body renders content — scroll down to trigger scroll-animated sections
     await page.evaluate(() => window.scrollTo({ top: 600, behavior: 'auto' }));
     await expect(
-      main.getByRole('heading', { name: 'Start with tokens, not components' })
+      main.getByRole('heading', { name: 'The problem with None annotations in Python' })
     ).toBeVisible({ timeout: 15000 });
 
     // Article navigation — scroll to the bottom to reach nav and related sections
@@ -172,14 +172,24 @@ test.describe('Blog post detail page', () => {
     await expect(page.getByText('3 articles')).toBeVisible();
   });
 
-  test('renders a callout block with the note role', async ({ page }) => {
+  test('renders a code block from the featured article', async ({ page }) => {
     await page.goto(`/blog/${FEATURED_POST_SLUG}`);
 
-    // The featured post has a tip callout — scroll to it since it's below the fold
-    const callout = page.locator('[role="note"]').first();
-    await callout.scrollIntoViewIfNeeded();
-    await expect(callout).toBeVisible();
-    await expect(callout).toContainText('Design for the caller');
+    const codeExample = page.getByText('def f(x: Optional[int] = None) -> Optional[str]:').first();
+    await codeExample.scrollIntoViewIfNeeded();
+    await expect(codeExample).toBeVisible();
+  });
+
+  test('renders inline code spans inside prose paragraphs', async ({ page }) => {
+    await page.goto(`/blog/${FEATURED_POST_SLUG}`);
+
+    const unionCode = page.locator('main p code').filter({ hasText: 'Union[..., None]' }).first();
+    await unionCode.scrollIntoViewIfNeeded();
+    await expect(unionCode).toBeVisible();
+
+    const pep604Code = page.locator('main p code').filter({ hasText: 'T | None' }).first();
+    await pep604Code.scrollIntoViewIfNeeded();
+    await expect(pep604Code).toBeVisible();
   });
 
   test('shows recovery panel for an invalid blog slug', async ({ page }) => {

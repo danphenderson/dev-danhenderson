@@ -38,6 +38,7 @@ const defaultElements: Record<TextRole, TextElement> = {
   proseSubheading: 'h3',
   proseMinorHeading: 'h4',
   proseParagraph: 'p',
+  proseInlineCode: 'code',
   proseCaption: 'figcaption',
   proseQuote: 'p',
   proseListItem: 'li',
