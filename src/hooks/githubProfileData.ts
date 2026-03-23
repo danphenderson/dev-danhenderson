@@ -5,6 +5,7 @@ import {
   fallbackGitHubContributions,
   githubUsername,
 } from '../data/cv';
+import { isGitHubApiEnabledInDevelopment, readNodeEnvironment } from '../utils/appEnvironment';
 import type {
   GitHubActivityItem,
   GitHubProfileData,
@@ -117,8 +118,7 @@ export const createBundledGitHubProfileStatus = (): SharedDataStatus =>
   });
 
 export const shouldUseBundledGitHubProfileDataByDefault = () =>
-  process.env.NODE_ENV !== 'production' &&
-  process.env.REACT_APP_ENABLE_GITHUB_API_IN_DEV !== 'true';
+  readNodeEnvironment() !== 'production' && !isGitHubApiEnabledInDevelopment();
 
 export const createLoadingGitHubProfileStatus = (
   previousStatus: SharedDataStatus

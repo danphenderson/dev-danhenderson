@@ -4,7 +4,7 @@ Thanks for contributing to `danhenderson.dev`. This repository is a client-side 
 
 ## Prerequisites
 
-- Node.js 20.x
+- Node.js 20.19 or newer
 - npm
 
 ## Local setup
@@ -31,15 +31,15 @@ PORT=3000 npm start
 
 ## Useful scripts
 
-| Command                             | Purpose                                                      |
-| ----------------------------------- | ------------------------------------------------------------ |
-| `npm start`                         | Start the local dev server on port `3001` by default         |
-| `npm run build`                     | Create the production build in `build/`                      |
-| `CI=true npm test -- --watch=false` | Run the Jest suite in CI-style mode                          |
-| `npm run test:e2e`                  | Run Playwright end-to-end tests                              |
-| `npm run test:e2e:headed`           | Run Playwright in a visible browser                          |
-| `npm run test:e2e:ui`               | Open the Playwright UI runner                                |
-| `npm run serve:e2e`                 | Serve the production build on port `3100` for local E2E work |
+| Command                                | Purpose                                                      |
+| -------------------------------------- | ------------------------------------------------------------ |
+| `npm start`                            | Start the local dev server on port `3001` by default         |
+| `npm run build`                        | Create the production build in `build/`                      |
+| `CI=true npm test -- --watchAll=false` | Run the Jest suite in CI-style mode                          |
+| `npm run test:e2e`                     | Run Playwright end-to-end tests                              |
+| `npm run test:e2e:headed`              | Run Playwright in a visible browser                          |
+| `npm run test:e2e:ui`                  | Open the Playwright UI runner                                |
+| `npm run serve:e2e`                    | Serve the production build on port `3100` for local E2E work |
 
 ## Validation
 
@@ -50,7 +50,7 @@ The canonical validation matrix, build variants, and repo-standard command shape
 Common starting points:
 
 - `npm run build`
-- `CI=true npm test -- --watch=false`
+- `CI=true npm test -- --watchAll=false`
 - `npm run build:e2e` then `npm run test:e2e` for feature-gated blog coverage or Playwright route validation
 
 For layout, navigation, interaction, animation, or responsive changes, validate in a browser on at least one desktop viewport and one mobile viewport.
@@ -59,9 +59,11 @@ For layout, navigation, interaction, animation, or responsive changes, validate 
 
 GitHub Actions currently runs three workflows:
 
-- `Codecov`: runs `CI=true npm test -- --watch=false --passWithNoTests --coverage`, uploads the `coverage/` artifact, and reports to Codecov when configured.
+- `Codecov`: runs `CI=true npm test -- --watchAll=false --passWithNoTests --coverage`, uploads the `coverage/` artifact, and reports to Codecov when configured.
 - `Build`: runs `npm run build`, uploads the production `build/` artifact, then runs Playwright against that build artifact.
 - `CodeQL`: analyzes the JavaScript/TypeScript codebase on pushes, pull requests, and the weekly schedule.
+
+These workflows validate pushes to `main` and `v1`, plus pull requests targeting either branch.
 
 Docs-only, `plans/`, `resume/`, `LICENSE`, and formatting-config-only changes do not trigger the `Codecov` or `Build` workflows.
 

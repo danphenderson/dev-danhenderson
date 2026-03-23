@@ -15,15 +15,6 @@ describe('createComponentStyleMap', () => {
     const sectionPanelSx = styleMap.sectionPanelSx as Record<string, unknown>;
     const sectionGlowSx = sectionCardSx['&::before'] as Record<string, unknown>;
 
-    expect(styleMap.supportOverlineSx).toMatchObject({ color: theme.palette.secondary.main });
-    expect(styleMap.supportAccentTitleSx).toMatchObject({
-      color: theme.palette.secondary.main,
-      fontWeight: 700,
-    });
-    expect(styleMap.supportAccentStrongTextSx).toMatchObject({
-      color: theme.palette.secondary.main,
-      fontWeight: 700,
-    });
     expect((styleMap.statusBreatheSx as Record<string, unknown>).color).toBe(
       theme.palette.secondary.main
     );
@@ -41,6 +32,12 @@ describe('createComponentStyleMap', () => {
     );
     expect((styleMap.contributionCardMetaSx as Record<string, unknown>).color).toBe(
       theme.palette.secondary.main
+    );
+    expect((styleMap.sectionHeadingOverlineTextSx as Record<string, unknown>).animationDelay).toBe(
+      '0ms'
+    );
+    expect((styleMap.sectionHeadingTitleTextSx as Record<string, unknown>).animationDelay).toBe(
+      '120ms'
     );
     expect(contentCardSx.background).toEqual(
       expect.stringContaining(
@@ -110,7 +107,7 @@ describe('createComponentStyleMap', () => {
       expect.stringContaining('linear-gradient')
     );
     expect(gitHubChipHoverAfterSx.animation).toEqual(expect.stringContaining('500ms linear'));
-    expect((styleMap.supportAccentTitleSx as Record<string, unknown>).color).toBe(
+    expect((styleMap.supportAccentInteractiveSurfaceSx as Record<string, unknown>).color).toBe(
       theme.palette.secondary.main
     );
     expect(tabSx.color).toBe(theme.palette.primary.main);
@@ -189,7 +186,12 @@ describe('createComponentStyleMap', () => {
     const contentCardSx = styleMap.contentCardSx as Record<string, unknown>;
 
     expect(theme.appearanceTreatment.key).toBe(defaultAppAppearanceKey);
-    expect(styleMap.supportOverlineSx).toMatchObject({ color: theme.palette.secondary.main });
+    expect((styleMap.sectionHeadingOverlineTextSx as Record<string, unknown>).animationDelay).toBe(
+      '0ms'
+    );
+    expect((styleMap.supportAccentInteractiveSurfaceSx as Record<string, unknown>).color).toBe(
+      theme.palette.secondary.main
+    );
     expect((tabSx['&::after'] as Record<string, unknown>).background).toEqual(
       expect.stringContaining('linear-gradient')
     );

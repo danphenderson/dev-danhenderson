@@ -31,7 +31,7 @@ Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript po
 
 - `npm run build` creates the production bundle and disables production-hidden feature flags such as `blog`.
 - `npm run build:e2e` creates the test-runtime bundle used for Playwright so gated routes remain available during browser coverage.
-- Both build variants stamp git SHA, build time, and package version into the bundle so the footer scorecard reflects the built artifact instead of runtime placeholders.
+- Both build variants route through `scripts/buildWithMetadata.js`, use Vite for bundling, and stamp git SHA, build time, and package version into the bundle so the footer scorecard reflects the built artifact instead of runtime placeholders.
 
 ## E2E Workflows
 
@@ -44,7 +44,7 @@ Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript po
 [![Codecov](https://codecov.io/github/danpherson/dev-danhenderson/branch/main/graph/badge.svg)](https://app.codecov.io/github/danpherson/dev-danhenderson?branch=main)
 
 - Default-branch coverage is published to Codecov from the Jest coverage run in `.github/workflows/codecov.yml`.
-- The uploaded report comes from `CI=true npm test -- --watch=false --passWithNoTests --coverage`, so it reflects the unit and component test suite rather than the Playwright `e2e` and `smoke` jobs.
+- The uploaded report comes from `CI=true npm test -- --watchAll=false --passWithNoTests --coverage`, so it reflects the unit and component test suite rather than the Playwright `e2e` and `smoke` jobs.
 - Browse line, patch, and commit-level coverage details in the [Codecov project dashboard](https://app.codecov.io/github/danpherson/dev-danhenderson?branch=main).
 
 ## Stack
@@ -54,7 +54,13 @@ Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript po
 - React Router v6
 - MUI + Emotion
 - MUI X DataGrid
-- Create React App (`react-scripts`)
+- Vite for local development and production builds
+
+## Tooling Notes
+
+- The main app now uses Vite for `npm start`, `npm run build`, and `npm run build:e2e`.
+- The main app toolchain baseline is Node 20.19 or newer and TypeScript 5.6.x.
+- Jest configuration is owned by `jest.config.cjs`, ESLint configuration is owned by `eslint.config.cjs`, and `npm run typecheck` uses `tsconfig.typecheck.json`.
 
 ## Contributing
 

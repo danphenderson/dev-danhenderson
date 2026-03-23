@@ -4,16 +4,17 @@ This document covers the actual test organization, harness patterns, and coverag
 
 ## Test infrastructure
 
-| Layer              | Framework                         | Location     | Run command                         |
-| ------------------ | --------------------------------- | ------------ | ----------------------------------- |
-| Unit / component   | Jest + React Testing Library      | `test/unit/` | `CI=true npm test -- --watch=false` |
-| End-to-end         | Playwright (`chromium` + `smoke`) | `test/e2e/`  | `npm run test:e2e`                  |
-| Build verification | `react-scripts build`             | —            | `npm run build`                     |
+| Layer              | Framework                         | Location     | Run command                            |
+| ------------------ | --------------------------------- | ------------ | -------------------------------------- |
+| Unit / component   | Jest + React Testing Library      | `test/unit/` | `CI=true npm test -- --watchAll=false` |
+| End-to-end         | Playwright (`chromium` + `smoke`) | `test/e2e/`  | `npm run test:e2e`                     |
+| Build verification | Vite production build             | —            | `npm run build`                        |
 
 ### Jest configuration
 
-- Test root: `test/unit/` (configured in `package.json` `jest.testMatch`)
+- Test root: `test/unit/` (configured in `jest.config.cjs`)
 - Pattern: `**/*.test.{ts,tsx}`
+- Transformer: `ts-jest` via `jest.config.cjs`
 - Setup: `src/setupTests.ts` provides:
   - `@testing-library/jest-dom` matchers
   - `window.matchMedia` polyfill for responsive/media-query code
@@ -258,10 +259,10 @@ flowchart TB
 
 ```bash
 # Unit tests (all)
-CI=true npm test -- --watch=false
+CI=true npm test -- --watchAll=false
 
 # Unit tests (specific file)
-CI=true npm test -- --watch=false --testPathPattern=AnimatedContentList
+CI=true npm test -- --watchAll=false --testPathPattern=AnimatedContentList
 
 # Build verification
 npm run build
@@ -289,7 +290,7 @@ npm run build
 npm run test:e2e:smoke
 ```
 
-**Note:** `CI=true npm test -- --watch=false` may show baseline failures in existing CV tests unrelated to your changes. Focus on regressions in the files you changed.
+**Note:** `CI=true npm test -- --watchAll=false` may show baseline failures in existing CV tests unrelated to your changes. Focus on regressions in the files you changed.
 
 ## Further reading
 
