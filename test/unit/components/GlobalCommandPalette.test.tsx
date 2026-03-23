@@ -95,6 +95,16 @@ describe('GlobalCommandPalette', () => {
       expect(screen.getByRole('textbox')).toBeInTheDocument();
     });
 
+    it('toggles closed when Cmd+K is pressed while the palette is already open', async () => {
+      renderPalette();
+      openViaCmdK();
+      expect(screen.getByRole('textbox')).toBeInTheDocument();
+
+      openViaCmdK();
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
     it('opens via "/" key', () => {
       renderPalette();
       fireEvent.keyDown(window, { key: '/' });
@@ -149,6 +159,14 @@ describe('GlobalCommandPalette', () => {
       });
       expect(screen.getByText(/no matching routes/i)).toBeInTheDocument();
     });
+
+    it('matches queries case-insensitively in the rendered action list', () => {
+      renderPalette();
+      openViaCmdK();
+      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'PHOTOGRAPHY' } });
+
+      expect(screen.getByText('Photography')).toBeInTheDocument();
+    });
   });
 
   describe('close behavior', () => {
@@ -173,6 +191,43 @@ describe('GlobalCommandPalette', () => {
       expect(mockNavigate).toHaveBeenCalled();
       // Dialog closes after the Fade exit transition completes
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('moves the active result with arrow keys and selects it with Enter', async () => {
+      renderPalette('/');
+      openViaCmdK();
+
+      const searchBox = screen.getByRole('textbox', {
+        name: 'Search routes, albums, and CV sections',
+      });
+
+      expect(searchBox).toHaveAttribute('aria-activedescendant', 'command-palette-action-route-home');
+
+      fireEvent.keyDown(searchBox, { key: 'ArrowDown' });
+      expect(searchBox).toHaveAttribute('aria-activedescendant', 'command-palette-action-route-cv');
+
+      fireEvent.keyDown(searchBox, { key: 'Enter' });
+
+      expect(mockNavigate).toHaveBeenCalledWith('/cv');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('wraps active result navigation when using ArrowUp from the first result', () => {
+      renderPalette('/');
+      openViaCmdK();
+
+      const searchBox = screen.getByRole('textbox', {
+        name: 'Search routes, albums, and CV sections',
+      });
+
+      fireEvent.change(searchBox, { target: { value: 'album:' } });
+
+      fireEvent.keyDown(searchBox, { key: 'ArrowUp' });
+
+      expect(searchBox).toHaveAttribute(
+        'aria-activedescendant',
+        'command-palette-action-photo-album-new-mexico'
+      );
     });
 
     it('uses smooth scrolling for same-route hash actions when motion is enabled', () => {

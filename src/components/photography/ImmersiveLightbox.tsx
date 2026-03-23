@@ -50,6 +50,14 @@ export function ImmersiveLightbox({
     setCurrentIndex((prev) => (prev - 1 + photos.length) % photos.length);
   }, [photos.length]);
 
+  const goFirst = useCallback(() => {
+    setCurrentIndex(0);
+  }, []);
+
+  const goLast = useCallback(() => {
+    setCurrentIndex(photos.length - 1);
+  }, [photos.length]);
+
   useEffect(() => {
     if (!open) return;
 
@@ -63,12 +71,24 @@ export function ImmersiveLightbox({
           event.preventDefault();
           goPrev();
           break;
+        case 'Home':
+          event.preventDefault();
+          goFirst();
+          break;
+        case 'End':
+          event.preventDefault();
+          goLast();
+          break;
+        case 'Escape':
+          event.preventDefault();
+          onClose();
+          break;
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [open, goNext, goPrev]);
+  }, [open, goFirst, goLast, goNext, goPrev, onClose]);
 
   if (photos.length === 0) return null;
 

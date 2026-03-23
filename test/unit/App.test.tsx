@@ -1,4 +1,4 @@
-import { isValidElement } from 'react';
+import { isValidElement, Suspense } from 'react';
 import type { ReactElement, ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
 import ThemeProvider from '../../src/ThemeProvider';
@@ -82,7 +82,7 @@ describe('App', () => {
     window.history.pushState({}, '', '/');
   });
 
-  it('renders the Header, Footer, and CommonLinkTooltip on every route', () => {
+  it('renders the Header, Footer, and CommonLinkTooltip on every route', async () => {
     render(
       <ThemeProvider>
         <App />
@@ -92,16 +92,17 @@ describe('App', () => {
     expect(screen.getByTestId('header')).toBeInTheDocument();
     expect(screen.getByTestId('footer')).toBeInTheDocument();
     expect(screen.getByTestId('common-link-tooltip')).toBeInTheDocument();
+    expect(await screen.findByTestId('home-page')).toBeInTheDocument();
   });
 
-  it('renders the Home page by default', () => {
+  it('renders the Home page by default', async () => {
     render(
       <ThemeProvider>
         <App />
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('home-page')).toBeInTheDocument();
+    expect(await screen.findByTestId('home-page')).toBeInTheDocument();
   });
 
   it('passes the current location to Routes inside PageTransition', () => {
@@ -113,14 +114,20 @@ describe('App', () => {
 
     expect(isValidElement(mockPageTransitionChildren)).toBe(true);
 
-    const routesElement = mockPageTransitionChildren as ReactElement<{
+    const suspenseElement = mockPageTransitionChildren as ReactElement<{
+      children?: ReactNode;
+    }>;
+    expect(suspenseElement.type).toBe(Suspense);
+    expect(isValidElement(suspenseElement.props.children)).toBe(true);
+
+    const routesElement = suspenseElement.props.children as ReactElement<{
       location?: { pathname?: string };
     }>;
 
     expect(routesElement.props.location).toEqual(expect.objectContaining({ pathname: '/' }));
   });
 
-  it('falls through to NotFound for /blog when the blog feature is disabled', () => {
+  it('falls through to NotFound for /blog when the blog feature is disabled', async () => {
     mockedIsFeatureEnabled.mockReturnValue(false);
     window.history.pushState({}, '', '/blog');
 
@@ -130,11 +137,11 @@ describe('App', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('not-found-page')).toBeInTheDocument();
+    expect(await screen.findByTestId('not-found-page')).toBeInTheDocument();
     expect(screen.queryByTestId('blog-page')).not.toBeInTheDocument();
   });
 
-  it('suppresses app chrome for /cv?mode=story while keeping shared overlays mounted', () => {
+  it('suppresses app chrome for /cv?mode=story while keeping shared overlays mounted', async () => {
     window.history.pushState({}, '', '/cv?mode=story');
 
     render(
@@ -143,7 +150,7 @@ describe('App', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('cv-page')).toBeInTheDocument();
+    expect(await screen.findByTestId('cv-page')).toBeInTheDocument();
     expect(screen.queryByTestId('header')).not.toBeInTheDocument();
     expect(screen.queryByTestId('footer')).not.toBeInTheDocument();
     expect(screen.getByTestId('common-link-tooltip')).toBeInTheDocument();

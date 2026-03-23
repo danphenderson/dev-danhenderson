@@ -44,27 +44,24 @@ const waitForStableHomeTerminalHero = async (page: Page) => {
 
 const ensureWindowedTerminalHero = async (page: Page) => {
   const expandedOverlay = page.getByTestId('home-ide-expanded');
-  let collapsedExpandedOverlay = false;
-
-  if (await expandedOverlay.isVisible().catch(() => false)) {
-    collapsedExpandedOverlay = true;
-    await expandedOverlay.getByRole('button', { name: 'Expand window' }).click();
-    await expect(expandedOverlay).toBeHidden();
-  }
+  await expandedOverlay
+    .getByRole('button', { name: 'Expand window' })
+    .click({ timeout: 500 })
+    .catch(() => undefined);
+  await expect(expandedOverlay).toBeHidden();
 
   const terminalHero = getWindowedTerminalHero(page);
   await expect(terminalHero).toBeVisible();
-
-  if (collapsedExpandedOverlay) {
-    await waitForStableTerminalHero(page, terminalHero);
-  }
+  await waitForStableTerminalHero(page, terminalHero);
 
   return terminalHero;
 };
 
 const moveMouseAwayFromHero = async (page: Page) => {
   await page.mouse.move(4, 4);
-  await page.waitForTimeout(500);
+  await expect
+    .poll(async () => page.locator(`${HOME_ACTIVE_TERMINAL_HERO_SELECTOR}:hover`).count())
+    .toBe(0);
 };
 
 const getElementLayoutWidth = async (element: Locator) =>
@@ -89,28 +86,19 @@ const stabilizeHeroForScreenshot = async (terminalHero: Locator) => {
 const selectHeroEditorTab = async (terminalHero: Locator, tab: Locator, expectedText: string) => {
   await expect(tab).toBeVisible();
   await tab.scrollIntoViewIfNeeded();
-
-  for (let attempt = 0; attempt < 2; attempt += 1) {
+  await expect(async () => {
     await tab.click();
-
-    if ((await tab.getAttribute('aria-selected')) === 'true') {
-      await expect(terminalHero).toContainText(expectedText);
-      return;
-    }
-  }
-
-  await expect(tab).toHaveAttribute('aria-selected', 'true');
+    await expect(tab).toHaveAttribute('aria-selected', 'true');
+  }).toPass();
   await expect(terminalHero).toContainText(expectedText);
 };
 
 const dismissTerminalNotificationToast = async (page: Page) => {
   const toast = page.getByText(TERMINAL_NOTIFICATION_TEXT);
-
-  if (!(await toast.isVisible().catch(() => false))) {
-    return;
-  }
-
-  await toast.locator('xpath=following-sibling::*[normalize-space()="×"]').click();
+  await toast
+    .locator('xpath=following-sibling::*[normalize-space()="×"]')
+    .click({ timeout: 500 })
+    .catch(() => undefined);
   await expect(toast).toBeHidden();
 };
 
@@ -137,18 +125,15 @@ const advanceClockUntilTerminalBodyContains = async (
   stepMs = 250
 ) => {
   const terminalPanelBody = terminalHero.getByTestId('terminal-panel-body');
-
-  for (let elapsedMs = 0; elapsedMs <= maxElapsedMs; elapsedMs += stepMs) {
-    const panelText = (await terminalPanelBody.textContent()) ?? '';
-
-    if (panelText.includes(expectedText)) {
-      return;
-    }
-
-    await page.clock.runFor(stepMs);
-  }
-
-  await expect(terminalPanelBody).toContainText(expectedText, { timeout: 1000 });
+  await expect
+    .poll(
+      async () => {
+        await page.clock.runFor(stepMs);
+        return (await terminalPanelBody.textContent()) ?? '';
+      },
+      { timeout: maxElapsedMs }
+    )
+    .toContain(expectedText);
 };
 
 const pausePageClock = async (page: Page) => {
@@ -232,10 +217,7 @@ test.describe('Home page', () => {
     await expect(siteNavigation.getByText('Climbing', { exact: true })).toBeVisible();
     await expect(siteNavigation.getByText('Photography', { exact: true })).toBeVisible();
 
-    const blogNavigationLink = siteNavigation.getByText('Blog', { exact: true });
-    if ((await blogNavigationLink.count()) > 0) {
-      await expect(blogNavigationLink).toBeVisible();
-    }
+    await expect(siteNavigation.getByText('Blog', { exact: true })).toBeVisible();
 
     await expect(settingsTrigger).toBeVisible();
 
@@ -402,20 +384,21 @@ test.describe('Home page', () => {
 
     expect(expandedRect).not.toBeNull();
     expect(mainRect).not.toBeNull();
+    expect(headerRect).not.toBeNull();
     expect(viewport).not.toBeNull();
 
-    if (!expandedRect || !mainRect || !viewport) {
-      throw new Error('Expected expanded hero, main content, and viewport bounds to be available.');
-    }
+    const expandedBounds = expandedRect!;
+    const mainBounds = mainRect!;
+    const headerBounds = headerRect!;
+    const viewportSize = viewport!;
+    const topBound = Math.max(0, headerBounds.y + headerBounds.height);
+    const rightBound = Math.min(viewportSize.width, mainBounds.x + mainBounds.width);
+    const bottomBound = Math.min(viewportSize.height, mainBounds.y + mainBounds.height);
 
-    const topBound = headerRect ? Math.max(0, headerRect.y + headerRect.height) : 0;
-    const rightBound = Math.min(viewport.width, mainRect.x + mainRect.width);
-    const bottomBound = Math.min(viewport.height, mainRect.y + mainRect.height);
-
-    expect(expandedRect.x).toBeGreaterThanOrEqual(mainRect.x - 1);
-    expect(expandedRect.y).toBeGreaterThanOrEqual(topBound - 1);
-    expect(expandedRect.x + expandedRect.width).toBeLessThanOrEqual(rightBound + 1);
-    expect(expandedRect.y + expandedRect.height).toBeLessThanOrEqual(bottomBound + 1);
+    expect(expandedBounds.x).toBeGreaterThanOrEqual(mainBounds.x - 1);
+    expect(expandedBounds.y).toBeGreaterThanOrEqual(topBound - 1);
+    expect(expandedBounds.x + expandedBounds.width).toBeLessThanOrEqual(rightBound + 1);
+    expect(expandedBounds.y + expandedBounds.height).toBeLessThanOrEqual(bottomBound + 1);
 
     const expandedTabWidth = await getElementLayoutWidth(expandedEditorTabs);
     const expandedTerminalPanelHeight = await getElementLayoutHeight(expandedTerminalPanelBody);
@@ -464,14 +447,14 @@ test.describe('Home page', () => {
     expect(titleBarBox).not.toBeNull();
     expect(mainBox).not.toBeNull();
 
-    if (!heroBefore || !titleBarBox || !mainBox) {
-      throw new Error('Expected hero, title bar, and main region bounding boxes to be available.');
-    }
+    const heroBoundsBefore = heroBefore!;
+    const titleBarBounds = titleBarBox!;
+    const mainBounds = mainBox!;
 
     // Start from the empty lower-left strip of the title bar so the drag path avoids
     // the interactive traffic dots and centered search affordance.
-    const dragStartX = titleBarBox.x + 28;
-    const dragStartY = titleBarBox.y + titleBarBox.height - 4;
+    const dragStartX = titleBarBounds.x + 28;
+    const dragStartY = titleBarBounds.y + titleBarBounds.height - 4;
 
     await page.mouse.move(dragStartX, dragStartY);
     await page.mouse.down();
@@ -482,18 +465,19 @@ test.describe('Home page', () => {
 
     expect(heroAfter).not.toBeNull();
 
-    if (!heroAfter) {
-      throw new Error('Expected the terminal hero bounding box after dragging.');
-    }
-
-    const xDelta = Math.abs(heroAfter.x - heroBefore.x);
-    const yDelta = Math.abs(heroAfter.y - heroBefore.y);
+    const heroBoundsAfter = heroAfter!;
+    const xDelta = Math.abs(heroBoundsAfter.x - heroBoundsBefore.x);
+    const yDelta = Math.abs(heroBoundsAfter.y - heroBoundsBefore.y);
 
     expect(xDelta + yDelta).toBeGreaterThan(40);
-    expect(heroAfter.x).toBeGreaterThanOrEqual(mainBox.x - 1);
-    expect(heroAfter.y).toBeGreaterThanOrEqual(mainBox.y - 1);
-    expect(heroAfter.x + heroAfter.width).toBeLessThanOrEqual(mainBox.x + mainBox.width + 1);
-    expect(heroAfter.y + heroAfter.height).toBeLessThanOrEqual(mainBox.y + mainBox.height + 1);
+    expect(heroBoundsAfter.x).toBeGreaterThanOrEqual(mainBounds.x - 1);
+    expect(heroBoundsAfter.y).toBeGreaterThanOrEqual(mainBounds.y - 1);
+    expect(heroBoundsAfter.x + heroBoundsAfter.width).toBeLessThanOrEqual(
+      mainBounds.x + mainBounds.width + 1
+    );
+    expect(heroBoundsAfter.y + heroBoundsAfter.height).toBeLessThanOrEqual(
+      mainBounds.y + mainBounds.height + 1
+    );
   });
 
   test('keeps the hero window width stable when switching editor tabs', async ({ page }) => {
@@ -587,12 +571,9 @@ test.describe('Home page', () => {
 
     expect(handleBox).not.toBeNull();
 
-    if (!handleBox) {
-      throw new Error('Expected the right resize handle bounding box to be available.');
-    }
-
-    const dragStartX = handleBox.x + handleBox.width / 2;
-    const dragStartY = handleBox.y + handleBox.height / 2;
+    const handleBounds = handleBox!;
+    const dragStartX = handleBounds.x + handleBounds.width / 2;
+    const dragStartY = handleBounds.y + handleBounds.height / 2;
 
     await resizeHandle.dispatchEvent('pointerdown', {
       button: 0,

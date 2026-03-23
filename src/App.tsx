@@ -1,27 +1,30 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AppErrorBoundary } from './components/AppErrorBoundary';
 import Footer from './components/Footer';
 import { GlobalCommandPalette } from './components/GlobalCommandPalette';
 import Header from './components/Header';
 import { CommonLinkTooltip } from './components/CommonLinkTooltip';
+import { LoadingBars } from './components/LoadingBars';
 import { PageTransition } from './components/PageTransition';
 import { ScrollProgressBar } from './components/ScrollProgressBar';
 import { isFeatureEnabled } from './constants/featureFlags';
 import { siteRouteMap } from './constants/siteRoutes';
-import Home from './pages/Home';
-import Photography from './pages/Photography';
-import PhotographyCategory from './pages/PhotographyCategory';
-import CV from './pages/CV';
-import Climbing from './pages/Climbing';
-import Blog from './pages/Blog';
-import BlogPost from './pages/BlogPost';
-import NotFound from './pages/NotFound';
 
 import { Box } from '@mui/material';
 import { CommandPaletteProvider } from './CommandPaletteProvider';
 import { cssDuration } from './motion/tokens';
 import { routerFuture } from './routerFuture';
 import { readPublicUrl } from './utils/appEnvironment';
+
+const Home = lazy(() => import('./pages/Home'));
+const Photography = lazy(() => import('./pages/Photography'));
+const PhotographyCategory = lazy(() => import('./pages/PhotographyCategory'));
+const CV = lazy(() => import('./pages/CV'));
+const Climbing = lazy(() => import('./pages/Climbing'));
+const Blog = lazy(() => import('./pages/Blog'));
+const BlogPost = lazy(() => import('./pages/BlogPost'));
+const NotFound = lazy(() => import('./pages/NotFound'));
 
 const skipLinkSx = {
   position: 'absolute',
@@ -65,21 +68,29 @@ function AppContent() {
         )}
         <Box component="main" id="main-content" tabIndex={-1}>
           <PageTransition>
-            <Routes location={location}>
-              <Route path={siteRouteMap.home.path} element={<Home />} />
-              <Route path={siteRouteMap.cv.path} element={<CV />} />
-              <Route path={siteRouteMap.climbing.path} element={<Climbing />} />
-              <Route path={siteRouteMap.photography.path} element={<Photography />} />
-              <Route
-                path={`${siteRouteMap.photography.path}/:slug`}
-                element={<PhotographyCategory />}
-              />
-              {isBlogEnabled ? <Route path={siteRouteMap.blog.path} element={<Blog />} /> : null}
-              {isBlogEnabled ? (
-                <Route path={`${siteRouteMap.blog.path}/:slug`} element={<BlogPost />} />
-              ) : null}
-              <Route path={siteRouteMap['not-found'].path} element={<NotFound />} />
-            </Routes>
+            <Suspense
+              fallback={
+                <Box sx={{ px: { xs: 2, sm: 3 }, py: { xs: 3, sm: 4 } }}>
+                  <LoadingBars label="Loading route content" compact />
+                </Box>
+              }
+            >
+              <Routes location={location}>
+                <Route path={siteRouteMap.home.path} element={<Home />} />
+                <Route path={siteRouteMap.cv.path} element={<CV />} />
+                <Route path={siteRouteMap.climbing.path} element={<Climbing />} />
+                <Route path={siteRouteMap.photography.path} element={<Photography />} />
+                <Route
+                  path={`${siteRouteMap.photography.path}/:slug`}
+                  element={<PhotographyCategory />}
+                />
+                {isBlogEnabled ? <Route path={siteRouteMap.blog.path} element={<Blog />} /> : null}
+                {isBlogEnabled ? (
+                  <Route path={`${siteRouteMap.blog.path}/:slug`} element={<BlogPost />} />
+                ) : null}
+                <Route path={siteRouteMap['not-found'].path} element={<NotFound />} />
+              </Routes>
+            </Suspense>
           </PageTransition>
         </Box>
         {!isCvStoryRoute && <Footer />}

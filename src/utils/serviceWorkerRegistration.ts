@@ -20,6 +20,10 @@ type ServiceWorkerConfig = {
   onUpdate?: (registration: ServiceWorkerRegistration) => void;
 };
 
+const logServiceWorkerError = (message: string, error: unknown) => {
+  console.error(message, error);
+};
+
 function registerValidSW(swUrl: string, config?: ServiceWorkerConfig) {
   navigator.serviceWorker
     .register(swUrl)
@@ -41,7 +45,23 @@ function registerValidSW(swUrl: string, config?: ServiceWorkerConfig) {
       };
     })
     .catch((error) => {
-      console.error('Error during service worker registration:', error);
+      logServiceWorkerError('Error during service worker registration:', error);
+    });
+}
+
+function recoverFromInvalidServiceWorker() {
+  navigator.serviceWorker.ready
+    .then((registration) =>
+      registration.unregister().then((didUnregister) => {
+        if (!didUnregister) {
+          throw new Error('Service worker unregister returned false.');
+        }
+
+        window.location.reload();
+      })
+    )
+    .catch((error) => {
+      logServiceWorkerError('Error during service worker recovery:', error);
     });
 }
 
@@ -51,9 +71,7 @@ function checkValidServiceWorker(swUrl: string, config?: ServiceWorkerConfig) {
       const contentType = response.headers.get('content-type');
 
       if (response.status === 404 || (contentType && !contentType.includes('javascript'))) {
-        navigator.serviceWorker.ready.then((registration) => {
-          registration.unregister().then(() => window.location.reload());
-        });
+        recoverFromInvalidServiceWorker();
       } else {
         registerValidSW(swUrl, config);
       }
@@ -74,7 +92,7 @@ export function register(config?: ServiceWorkerConfig): void {
     return;
   }
 
-  window.addEventListener('load', () => {
+  const registerServiceWorker = () => {
     const swUrl = resolvePublicAssetPath('/service-worker.js', readPublicUrl());
 
     if (isLocalhost) {
@@ -82,13 +100,20 @@ export function register(config?: ServiceWorkerConfig): void {
     } else {
       registerValidSW(swUrl, config);
     }
-  });
+  };
+
+  if (document.readyState === 'complete') {
+    registerServiceWorker();
+    return;
+  }
+
+  window.addEventListener('load', registerServiceWorker, { once: true });
 }
 
 export function unregister(): void {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.ready
       .then((registration) => registration.unregister())
-      .catch((error) => console.error(error.message));
+      .catch((error) => logServiceWorkerError('Error during service worker unregister:', error));
   }
 }

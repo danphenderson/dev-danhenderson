@@ -121,12 +121,30 @@ describe('ImmersiveLightbox', () => {
       fireEvent.keyDown(window, { key: 'ArrowLeft' });
       expect(screen.getByRole('img')).toHaveAttribute('src', photos[0].img);
     });
+
+    it('jumps to the first photo on Home', () => {
+      renderLightbox({ initialIndex: 2 });
+      fireEvent.keyDown(window, { key: 'Home' });
+      expect(screen.getByRole('img')).toHaveAttribute('src', photos[0].img);
+    });
+
+    it('jumps to the last photo on End', () => {
+      renderLightbox({ initialIndex: 0 });
+      fireEvent.keyDown(window, { key: 'End' });
+      expect(screen.getByRole('img')).toHaveAttribute('src', photos[2].img);
+    });
   });
 
   describe('close', () => {
     it('calls onClose when the Close button is clicked', () => {
       renderLightbox();
       fireEvent.click(screen.getByLabelText('Close lightbox'));
+      expect(onCloseMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls onClose when Escape is pressed', () => {
+      renderLightbox();
+      fireEvent.keyDown(window, { key: 'Escape' });
       expect(onCloseMock).toHaveBeenCalledTimes(1);
     });
   });
