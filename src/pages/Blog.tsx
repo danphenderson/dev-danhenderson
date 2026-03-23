@@ -11,7 +11,7 @@ import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useBlogData } from '../hooks/useBlogData';
 import { useAppStyles } from '../styles/appStyles';
 import { MotionSection } from '../motion';
-import { SecondaryBodyText } from '../components/text';
+import { Text } from '../components/text';
 
 export default function Blog() {
   const appStyles = useAppStyles();
@@ -47,9 +47,9 @@ export default function Blog() {
                 subtitle="Technical writing on frontend architecture, React patterns, and software engineering."
                 sx={appStyles.compactSectionHeadingSx}
               />
-              <SecondaryBodyText>
+              <Text role="bodyMuted">
                 {posts.length} article{posts.length !== 1 ? 's' : ''}
-              </SecondaryBodyText>
+              </Text>
             </Stack>
           </SectionCard>
         </MotionSection>

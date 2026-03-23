@@ -15,8 +15,8 @@ flowchart TB
   subgraph SharedLayer["Shared components — src/components/"]
     Layout["Layout primitives<br/>PageFrame · BackgroundPaper<br/>SectionCard · SectionPanel · SectionHeading"]
     Cards["Card surfaces<br/>ContentCard · AnimatedContentCard<br/>MotionTiltCard · MotionCard"]
-    Lists["List orchestrators<br/>AnimatedContentList · AnimatedSlideList<br/>AnimatedZoomList · SkillsChipList"]
-    Text["Text primitives<br/>TypographyPrimitives · InlineLabelPrimitives<br/>TypewriterText · TypewriterLoopText"]
+    Lists["List orchestrators<br/>AnimatedSlideList · SkillsChipList<br/>AnimatedContentList"]
+    Text["Text primitives<br/>Text · TypewriterText · TypewriterLoopText<br/>UNSAFE_Typography"]
     Global["Global chrome<br/>Header · Footer · ScrollProgressBar<br/>GlobalCommandPalette · CommonLinkTooltip<br/>PageTransition · RouteRecoveryPanel"]
   end
 
@@ -47,23 +47,22 @@ flowchart TB
 
 These are reusable across multiple routes. They define the site's shared visual language:
 
-| Primitive               | Purpose                                                             | Consumers                                                          |
-| ----------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `PageFrame`             | Route-level scaffold with background image and responsive container | Blog, BlogPost, CV, Climbing, Photography, PhotographyCategory     |
-| `BackgroundPaper`       | Full-bleed scenic backdrop with optional shell overlay              | Home, NotFound, also used internally by PageFrame                  |
-| `SectionCard`           | Viewport-triggered reveal card for content sections                 | Blog, Climbing, Photography, PhotographyCategory                   |
-| `CVSectionCard`         | Extended section card with CV-specific surface treatment            | All CV section wrappers                                            |
-| `SectionPanel`          | Flat inset panel for nested dense data                              | ClimbingAnalytics, CVGitHubSection, AnimatedContentList panel mode |
-| `SectionHeading`        | Overline + title + subtitle composition                             | Blog, Photography, Climbing, CV sections                           |
-| `ContentCard`           | Base frosted card surface (no animation)                            | BlogHero, BlogPostCard, GitHub sections                            |
-| `AnimatedContentCard`   | Viewport-triggered fade-in card with optional tilt                  | CV repeated-card lists (via AnimatedContentList)                   |
-| `AnimatedContentList`   | Staggered card list orchestrator                                    | 5 CV list renderers                                                |
-| `AnimatedSlideList`     | Direction-aware slide reveal for tab/accordion content              | CV tab panels                                                      |
-| `AnimatedZoomList`      | Zoom-in stagger list                                                | Supplemental lists                                                 |
-| `SkillsChipList`        | Skill/tool chip wrap list                                           | CV about, experience, education, coding, story sections            |
-| `TabPanel`              | Collapsible tab panel wrapper                                       | CV experience, education, coding, volunteering                     |
-| `TypographyPrimitives`  | Semantic text components (HeaderLabel, EntryTitle, BodyText, etc.)  | Site-wide                                                          |
-| `InlineLabelPrimitives` | Span-based label components for chips/tabs                          | AppSpeedDial, TabPanel, SkillsChipList                             |
+| Primitive             | Purpose                                                             | Consumers                                                          |
+| --------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `PageFrame`           | Route-level scaffold with background image and responsive container | Blog, BlogPost, CV, Climbing, Photography, PhotographyCategory     |
+| `BackgroundPaper`     | Full-bleed scenic backdrop with optional shell overlay              | Home, NotFound, also used internally by PageFrame                  |
+| `SectionCard`         | Viewport-triggered reveal card for content sections                 | Blog, Climbing, Photography, PhotographyCategory                   |
+| `CVSectionCard`       | Extended section card with CV-specific surface treatment            | All CV section wrappers                                            |
+| `SectionPanel`        | Flat inset panel for nested dense data                              | ClimbingAnalytics, CVGitHubSection, AnimatedContentList panel mode |
+| `SectionHeading`      | Overline + title + subtitle composition                             | Blog, Photography, Climbing, CV sections                           |
+| `ContentCard`         | Base frosted card surface (no animation)                            | BlogHero, BlogPostCard, GitHub sections                            |
+| `AnimatedContentCard` | Viewport-triggered fade-in card with optional tilt                  | CV repeated-card lists (via AnimatedContentList)                   |
+| `AnimatedContentList` | Viewport-triggered card-list wrapper with tilt and surface options  | 5 CV list renderers                                                |
+| `AnimatedSlideList`   | Primary controlled repeated-item animation primitive                | CV tab panels and other controlled reveal lists                    |
+| `SkillsChipList`      | Skill/tool chip wrap list                                           | CV about, experience, education, coding, story sections            |
+| `TabPanel`            | Collapsible tab panel wrapper                                       | CV experience, education, coding, volunteering                     |
+| `Text`                | Canonical semantic text primitive (`role` × `tone` × `context`)     | Site-wide                                                          |
+| `TypewriterText`      | Animated semantic text composition                                  | CV about, home/IDE-adjacent text reveals                           |
 
 ### Feature components (`src/components/{feature}/`)
 
@@ -99,7 +98,7 @@ Two subsystems intentionally bypass the shared design-system primitives. These a
 | Subsystem                  | Components                                                   | Why it differs                                                                                                                                                                        |
 | -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Home faux-VS Code hero** | `TerminalHeroContent` + `src/components/ide/*`               | Simulates a desktop IDE chrome; uses its own token file (`vscodeTokens.ts`), custom window controls, and terminal typewriter — none of this belongs in the shared card/section system |
-| **CV story mode**          | `CVStoryViewer`, `CVStorySectionRenderer`, `CVStoryProgress` | Full-screen continuous-scroll narrative with per-section reveals, scroll progress tracking, and deterministic active-section labels; bounded through `UnsafeTypography`                |
+| **CV story mode**          | `CVStoryViewer`, `CVStorySectionRenderer`, `CVStoryProgress` | Full-screen continuous-scroll narrative with per-section reveals, scroll progress tracking, and deterministic active-section labels; bounded through `UnsafeTypography`               |
 
 Blog uses the shared `Text` component with prose roles (`proseParagraph`, `proseHeading`, etc.) and is not a design-system exception. Photography uses `Text` with `tone="inverse"` and `context="overlay"` and is not a design-system exception.
 
@@ -142,11 +141,10 @@ flowchart TB
 
 ### Animated list variants
 
-| Component             | Trigger                        | Animation                   | Use case                       |
-| --------------------- | ------------------------------ | --------------------------- | ------------------------------ |
-| `AnimatedContentList` | Viewport intersection per card | Zoom-in with optional tilt  | CV repeated sections           |
-| `AnimatedSlideList`   | Boolean `in` prop              | Slide-up with stagger       | Tab/accordion expanded content |
-| `AnimatedZoomList`    | Boolean `in` prop              | Scale-in with stagger delay | Supplemental reveal lists      |
+| Component             | Trigger                        | Animation                         | Use case                       |
+| --------------------- | ------------------------------ | --------------------------------- | ------------------------------ |
+| `AnimatedContentList` | Viewport intersection per card | Zoom-in with optional tilt        | Specialized CV card lists      |
+| `AnimatedSlideList`   | Boolean `in` prop              | Primary controlled stagger reveal | Tab/accordion expanded content |
 
 ### Hook → page → component data flow
 
@@ -199,7 +197,7 @@ sequenceDiagram
 2. Place it in `src/components/` (top-level) or `src/components/layout/` (layout primitive)
 3. Accept controlled props; avoid internal state unless it's presentation-only (hover, focus)
 4. Use existing motion primitives from `src/motion/components.tsx` for animation — do not create parallel wrappers
-5. Use typography primitives from `src/components/text/` — do not style raw `Typography` for standard roles
+5. Use `Text` roles from `src/components/text/` — do not style raw `Typography` for standard roles
 6. Style via the existing style builder system or inline `sx` from theme tokens
 
 ### Adding a new feature component
@@ -221,7 +219,7 @@ sequenceDiagram
 
 ## Further reading
 
-- [Design system reference](../design-system-reference.md) — concrete catalog of surfaces, text primitives, and selection guide
+- [Design system reference](../design-system-reference.md) — concrete catalog of surfaces, text roles, and selection guide
 - [Motion architecture](../frontend/motion-architecture.md) — how animation primitives compose with components
 - [Page choreography](../frontend/page-choreography.md) — how pages assemble and sequence their sections
 - [Agent guide](../engineering/agent-guide.md) — operational rules for safe component extension

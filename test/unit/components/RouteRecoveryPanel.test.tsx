@@ -11,26 +11,6 @@ jest.mock('../../../src/components/layout/SectionPanel', () => ({
   ),
 }));
 
-jest.mock('../../../src/components/text', () => {
-  const actual = jest.requireActual('../../../src/components/text');
-
-  return {
-    ...actual,
-    MetaText: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="meta-text">{children}</div>
-    ),
-    SecondaryBodyText: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="secondary-body-text">{children}</div>
-    ),
-    SecondaryCaptionText: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="secondary-caption-text">{children}</div>
-    ),
-    SubsectionTitle: ({ children }: { children: React.ReactNode }) => (
-      <div data-testid="subsection-title">{children}</div>
-    ),
-  };
-});
-
 const mockOpenPalette = jest.fn();
 
 jest.mock('../../../src/CommandPaletteProvider', () => {
@@ -180,22 +160,14 @@ describe('RouteRecoveryPanel', () => {
     expect(screen.getByRole('link', { name: /^open cv$/i })).toBeInTheDocument();
   });
 
-  it('uses shared panel and text primitives for the recovery content', () => {
+  it('renders the recovery sections and supporting captions', () => {
     renderPanel();
 
-    expect(screen.getByTestId('meta-text')).toHaveTextContent('Attempted path');
+    expect(screen.getByText('Attempted path')).toBeInTheDocument();
     expect(screen.getAllByTestId('section-panel')).toHaveLength(3);
-    expect(screen.getAllByTestId('subsection-title').map((element) => element.textContent)).toEqual(
-      expect.arrayContaining([
-        'Suggested destinations',
-        'Shared recovery routes',
-        'CV: About',
-        'Home',
-        'CV',
-      ])
-    );
-    expect(
-      screen.getAllByTestId('secondary-caption-text').map((element) => element.textContent)
-    ).toEqual(expect.arrayContaining(['Closest matching CV section.']));
+    expect(screen.getByText('Suggested destinations')).toBeInTheDocument();
+    expect(screen.getByText('Shared recovery routes')).toBeInTheDocument();
+    expect(screen.getByText('CV: About')).toBeInTheDocument();
+    expect(screen.getByText('Closest matching CV section.')).toBeInTheDocument();
   });
 });

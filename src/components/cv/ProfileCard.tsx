@@ -2,7 +2,7 @@ import { Avatar, Box, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { AboutMe } from '../../types/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { HeaderTitle, StrongMetaText, MetaText, BodyText } from '../text';
+import { Text } from '../text';
 import { CVAboutBioTypewriter } from './CVAboutBioTypewriter';
 
 type ProfileCardProps = {
@@ -41,7 +41,9 @@ export const ProfileCard = ({
       <Box sx={profileHeaderRowSx}>
         <Stack spacing={0.75} sx={profileHeaderContentSx}>
           <Stack direction="row" sx={profileNameRowSx}>
-            <HeaderTitle sx={[primaryTextSx, { mb: 0 }]}>{about.name}</HeaderTitle>
+            <Text role="sectionTitle" sx={[primaryTextSx, { mb: 0 }]}>
+              {about.name}
+            </Text>
           </Stack>
 
           <Stack direction="row" sx={profileMetaRowSx}>
@@ -52,11 +54,11 @@ export const ProfileCard = ({
               flexWrap="wrap"
               sx={profileMetaContentSx}
             >
-              <StrongMetaText>{about.title}</StrongMetaText>
+              <Text role="metaStrong">{about.title}</Text>
               {about.location && (
                 <>
-                  <MetaText>•</MetaText>
-                  <MetaText>{about.location}</MetaText>
+                  <Text role="meta">•</Text>
+                  <Text role="meta">{about.location}</Text>
                 </>
               )}
             </Stack>
@@ -65,14 +67,14 @@ export const ProfileCard = ({
         {actions && <Box sx={profileInlineActionsSx}>{actions}</Box>}
       </Box>
       {about.bio && (
-        <BodyText sx={[primaryTextSx, profileBioSx]}>
+        <Text role="body" sx={[primaryTextSx, profileBioSx]}>
           <CVAboutBioTypewriter
             about={about}
             revealed={bioRevealed}
             startDelayMs={bioAnimationStartDelayMs}
             onComplete={onBioAnimationComplete}
           />
-        </BodyText>
+        </Text>
       )}
     </Stack>
   );

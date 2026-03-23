@@ -1,13 +1,11 @@
 import { Box, Chip, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { SectionPanel } from '../layout/SectionPanel';
-import { MetricValueText, SubsectionTitle, MetaText, CaptionText } from '../text';
+import { Text } from '../text';
 import type { ClimbingAnalytics as ClimbingAnalyticsType } from '../../types/data';
-import type { SharedDataStatus } from '../../types/data';
 
 type ClimbingAnalyticsProps = {
   analytics: ClimbingAnalyticsType;
-  status: SharedDataStatus;
 };
 
 const metricSx: SxProps<Theme> = {
@@ -44,12 +42,15 @@ const locationTextSx: SxProps<Theme> = {
   minWidth: 0,
 };
 
-export const ClimbingAnalytics = ({ analytics, status }: ClimbingAnalyticsProps) => {
+export const ClimbingAnalytics = ({ analytics }: ClimbingAnalyticsProps) => {
   const { overview, gradeProfile, destinationProfile } = analytics;
+  const freshnessLabel = overview.mostRecentDate
+    ? `Bundled climbing log updated through ${overview.mostRecentDate}.`
+    : 'Bundled climbing log data is available in the client build.';
 
   return (
     <Stack spacing={2}>
-      <SubsectionTitle>Overview</SubsectionTitle>
+      <Text role="subsectionTitle">Overview</Text>
       <SectionPanel>
         <Box
           sx={{
@@ -62,28 +63,38 @@ export const ClimbingAnalytics = ({ analytics, status }: ClimbingAnalyticsProps)
           }}
         >
           <Box sx={metricSx}>
-            <MetricValueText>{overview.tickCount}</MetricValueText>
-            <MetaText>Routes Climbed</MetaText>
+            <Text role="metricValue" tone="accent">
+              {overview.tickCount}
+            </Text>
+            <Text role="metricLabel">Routes Climbed</Text>
           </Box>
           <Box sx={metricSx}>
-            <MetricValueText>{overview.todoCount}</MetricValueText>
-            <MetaText>Routes To Do</MetaText>
+            <Text role="metricValue" tone="accent">
+              {overview.todoCount}
+            </Text>
+            <Text role="metricLabel">Routes to Climb</Text>
           </Box>
           <Box sx={metricSx}>
-            <MetricValueText>{overview.uniqueLocations}</MetricValueText>
-            <MetaText>Unique Locations</MetaText>
+            <Text role="metricValue" tone="accent">
+              {overview.uniqueLocations}
+            </Text>
+            <Text role="metricLabel">Unique Locations</Text>
           </Box>
           <Box sx={metricSx}>
-            <MetricValueText>{overview.mostRecentDate || 'N/A'}</MetricValueText>
-            <MetaText>Most Recent Tick</MetaText>
+            <Text role="metricValue" tone="accent">
+              {overview.mostRecentDate || 'N/A'}
+            </Text>
+            <Text role="metricLabel">Most Recent Tick</Text>
           </Box>
         </Box>
       </SectionPanel>
 
-      <SubsectionTitle>Grade Profile</SubsectionTitle>
+      <Text role="subsectionTitle">Grade Profile</Text>
       <SectionPanel>
         <Stack spacing={1}>
-          <CaptionText>Climbed</CaptionText>
+          <Text role="caption" tone="muted">
+            Climbed
+          </Text>
           <Box sx={gradeSectionSx}>
             {gradeProfile
               .filter((grade) => grade.tickCount > 0)
@@ -97,7 +108,9 @@ export const ClimbingAnalytics = ({ analytics, status }: ClimbingAnalyticsProps)
               ))}
           </Box>
 
-          <CaptionText>To Do</CaptionText>
+          <Text role="caption" tone="muted">
+            To Climb
+          </Text>
           <Box sx={gradeSectionSx}>
             {gradeProfile
               .filter((grade) => grade.todoCount > 0)
@@ -114,28 +127,40 @@ export const ClimbingAnalytics = ({ analytics, status }: ClimbingAnalyticsProps)
         </Stack>
       </SectionPanel>
 
-      <SubsectionTitle>Top Destinations</SubsectionTitle>
+      <Text role="subsectionTitle">Top Destinations</Text>
       <SectionPanel>
         <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ width: '100%' }}>
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <CaptionText>Most Climbed</CaptionText>
+            <Text role="caption" tone="muted">
+              Most Climbed
+            </Text>
             <Box component="ul" sx={locationListSx}>
               {destinationProfile.topTickLocations.map((location) => (
                 <Box component="li" key={location.location} sx={locationItemSx}>
-                  <MetaText sx={locationTextSx}>{location.location}</MetaText>
-                  <MetaText sx={{ flexShrink: 0 }}>{location.count}</MetaText>
+                  <Text role="meta" sx={locationTextSx}>
+                    {location.location}
+                  </Text>
+                  <Text role="meta" sx={{ flexShrink: 0 }}>
+                    {location.count}
+                  </Text>
                 </Box>
               ))}
             </Box>
           </Box>
 
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <CaptionText>Most Wanted</CaptionText>
+            <Text role="caption" tone="muted">
+              Most Wanted
+            </Text>
             <Box component="ul" sx={locationListSx}>
               {destinationProfile.topTodoLocations.map((location) => (
                 <Box component="li" key={location.location} sx={locationItemSx}>
-                  <MetaText sx={locationTextSx}>{location.location}</MetaText>
-                  <MetaText sx={{ flexShrink: 0 }}>{location.count}</MetaText>
+                  <Text role="meta" sx={locationTextSx}>
+                    {location.location}
+                  </Text>
+                  <Text role="meta" sx={{ flexShrink: 0 }}>
+                    {location.count}
+                  </Text>
                 </Box>
               ))}
             </Box>
@@ -143,9 +168,9 @@ export const ClimbingAnalytics = ({ analytics, status }: ClimbingAnalyticsProps)
         </Stack>
       </SectionPanel>
 
-      <CaptionText sx={{ textAlign: 'center', paddingTop: 0.5 }}>
-        {status.freshness.label}
-      </CaptionText>
+      <Text role="caption" tone="muted" sx={{ textAlign: 'center', paddingTop: 0.5 }}>
+        {freshnessLabel}
+      </Text>
     </Stack>
   );
 };

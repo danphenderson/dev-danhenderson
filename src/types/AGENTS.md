@@ -10,8 +10,8 @@ These instructions apply to files under `src/types/`.
 
 Files:
 
-- `data.ts` — data-domain types: `Tick`, `Todo`, `TickRow`, `TodoRow`, `GradeBucket`, `LocationCount`, `ClimbingAnalytics`, `PhotographyAlbumMeta`, `PhotoItem`, `PhotoCategory`, and shared data status primitives (`SharedDataStatus`, `SharedDataFreshness`, etc.)
-- `cv.ts` — CV-domain types: `AboutMe`, `Experience`, `Education*`, `Certificate`, `VolunteeringEntry`, `CodingExample*`, `GitHubActivityItem`, `GitHubContribution`, `GitHubProfileData`, `CVSectionKey`, `CVStoryChapter`, `CVStoryItem`
+- `data.ts` — data-domain types: `Tick`, `Todo`, `TickRow`, `TodoRow`, `GradeBucket`, `LocationCount`, `ClimbingAnalytics`, `PhotographyAlbumMeta`, `PhotoItem`, and `PhotoCategory`
+- `cv.ts` — CV-domain types: `AboutMe`, `Experience`, `Education*`, `Certificate`, `VolunteeringEntry`, `CodingExample*`, `GitHubActivityItem`, `GitHubContribution`, `GitHubProfileData`, `CVSectionKey`, `CVStoryChapter`, `CVStoryItem`, and GitHub/CV data-status primitives (`SharedDataStatus`, `SharedDataFreshness`, etc.)
 - `blog.ts` — blog-domain types: `BlogPost`, `BlogPostMeta`, `BlogContentBlock`
 - `ui.ts` — shared UI primitive types: `AppSpeedDialAction`, `AppSpeedDialLayer`, `TabPanelItem`, `TabPanelRenderContext`, `WebVitalEntry`, `WebVitalsState`, `TerminalLine`
 
@@ -30,7 +30,7 @@ Files:
 
 Files in `src/types/` must not import from `src/components/`, `src/hooks/`, `src/pages/`, or `src/data/`. Permitted imports:
 
-- Other files within `src/types/` (e.g. `cv.ts` imports `SharedDataStatus` from `./data`).
+- Other files within `src/types/` when a lower-level shared domain type is required.
 - External packages where structurally necessary (e.g. `react` for `ReactNode` in `ui.ts`).
 
 This keeps `src/types/` at the bottom of the dependency graph with no circular-import risk.

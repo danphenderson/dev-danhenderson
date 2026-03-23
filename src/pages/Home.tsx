@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type PointerEventHandler,
-} from 'react';
+import { useCallback, useEffect, useRef, useState, type PointerEventHandler } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Box,
@@ -31,22 +24,19 @@ import { FirstVisitCustomizeModal } from '../components/FirstVisitCustomizeModal
 import { FirstVisitSettingsHintPopover } from '../components/FirstVisitSettingsHintPopover';
 import { HeroMotionPath } from '../components/HeroMotionPath';
 import { TerminalHeroContent } from '../components/TerminalHeroContent';
-import type { IdeResizeEdge, IdeWindowSize, IdeWindowState, TerminalLine } from '../types/ui';
+import type { IdeResizeEdge, IdeWindowSize, TerminalLine } from '../types/ui';
 import { siteRouteMap } from '../constants/siteRoutes';
 import { HEADER_SETTINGS_TRIGGER_ID } from '../components/header/HeaderSettingsPopover';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
+import { useHomeIdeOrchestration } from './homeIdeOrchestration';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
 import { useAppTheme } from '../ThemeProvider';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
-import { BodyText, CaptionText } from '../components/text';
+import { Text } from '../components/text';
 import { MotionTiltCard, useMotionScale } from '../motion';
-import { duration } from '../motion/tokens';
 import { VSCODE_COLORS, VSCODE_RESIZE, VSCODE_WINDOW_RADIUS } from '../components/ide/vscodeTokens';
-
-/** Green-dot pulse duration before the IDE auto-expands. */
-const AUTO_EXPAND_PULSE_DURATION_MS = Math.round(duration.slow * 150);
 
 const heroLines: TerminalLine[] = [
   { command: 'node --version', output: 'v22.14.0' },
@@ -63,13 +53,6 @@ const heroLines: TerminalLine[] = [
       '==> Formulae\nopenssl\npipenv\npre-commit\npyenv\npython@3.14\ngitsqlite\ngit-extras\njuliaup\n\n==> Casks\ncodex   iterm2  mactex',
   },
 ];
-
-type ExpandedIdeViewport = {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
-};
 
 export default function Home() {
   const appStyles = useAppStyles();
@@ -114,29 +97,14 @@ export default function Home() {
   const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);
   const [canDragHeroWindow, setCanDragHeroWindow] = useState(false);
   const [isHeroWindowDragging, setIsHeroWindowDragging] = useState(false);
-  const [ideWindowState, setIdeWindowState] = useState<IdeWindowState>('normal');
-  const [expandedIdeViewport, setExpandedIdeViewport] = useState<ExpandedIdeViewport | null>(null);
-  // Close and minimize intentionally reopen a fresh IDE session on restore.
-  const [ideSessionKey, setIdeSessionKey] = useState(0);
   const [ideWindowSize, setIdeWindowSize] = useState<IdeWindowSize>(null);
   const [isResizing, setIsResizing] = useState(false);
   const resizeEdgeRef = useRef<IdeResizeEdge | null>(null);
   const resizeInitialPointerRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const resizeInitialSizeRef = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
-  const [ideWindowPortalContainer] = useState<HTMLDivElement | null>(() => {
-    if (typeof document === 'undefined') {
-      return null;
-    }
-
-    return document.createElement('div');
-  });
 
   const heroRef = useRef<HTMLDivElement>(null);
   const heroBoundsRef = useRef<HTMLDivElement>(null);
-  const inlineIdeHostRef = useRef<HTMLDivElement | null>(null);
-  const expandedIdeHostRef = useRef<HTMLDivElement | null>(null);
-  const hasAutoExpandedRef = useRef(false);
-  const autoExpandTimerRef = useRef<number | null>(null);
   const heroDragControls = useDragControls();
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ['start start', 'end start'] });
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
@@ -147,62 +115,29 @@ export default function Home() {
     motionDurationScale > 0 ? { scale: heroScale, opacity: heroOpacity } : { scale: 1, opacity: 1 };
   const settingsHintAnchorEl =
     typeof document === 'undefined' ? null : document.getElementById(HEADER_SETTINGS_TRIGGER_ID);
-  const [expandDotHighlighted, setExpandDotHighlighted] = useState(false);
 
-  const attachIdeWindowContainer = useCallback(
-    (target: HTMLDivElement | null, mode: 'normal' | 'expanded') => {
-      if (!ideWindowPortalContainer || !target) {
-        return;
-      }
+  const resetIdeWindowSize = useCallback(() => {
+    setIdeWindowSize(null);
+  }, []);
 
-      ideWindowPortalContainer.style.width = mode === 'expanded' ? '100%' : 'auto';
-      ideWindowPortalContainer.style.height = mode === 'expanded' ? '100%' : 'auto';
-      ideWindowPortalContainer.style.maxWidth = '100%';
-
-      if (ideWindowPortalContainer.parentElement !== target) {
-        target.appendChild(ideWindowPortalContainer);
-      }
-    },
-    [ideWindowPortalContainer]
-  );
-
-  const setInlineIdeHost = useCallback(
-    (node: HTMLDivElement | null) => {
-      inlineIdeHostRef.current = node;
-
-      if (node && ideWindowState !== 'expanded') {
-        attachIdeWindowContainer(node, 'normal');
-      }
-    },
-    [attachIdeWindowContainer, ideWindowState]
-  );
-
-  const setExpandedIdeHost = useCallback(
-    (node: HTMLDivElement | null) => {
-      expandedIdeHostRef.current = node;
-
-      if (node && ideWindowState === 'expanded') {
-        attachIdeWindowContainer(node, 'expanded');
-      }
-    },
-    [attachIdeWindowContainer, ideWindowState]
-  );
-
-  useLayoutEffect(() => {
-    if (ideWindowState === 'expanded') {
-      attachIdeWindowContainer(expandedIdeHostRef.current, 'expanded');
-      return;
-    }
-
-    attachIdeWindowContainer(inlineIdeHostRef.current, 'normal');
-  }, [attachIdeWindowContainer, ideWindowState]);
-
-  useEffect(
-    () => () => {
-      ideWindowPortalContainer?.remove();
-    },
-    [ideWindowPortalContainer]
-  );
+  const {
+    ideWindowState,
+    ideSessionKey,
+    ideVisible,
+    expandedIdeViewport,
+    ideWindowPortalContainer,
+    expandDotHighlighted,
+    setInlineIdeHost,
+    setExpandedIdeHost,
+    handleIdeClose,
+    handleIdeMinimize,
+    handleIdeExpand,
+    handleIdeRestore,
+    scheduleAutoExpand,
+  } = useHomeIdeOrchestration({
+    prefersReducedMotion,
+    onResetWindowSize: resetIdeWindowSize,
+  });
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
@@ -226,114 +161,10 @@ export default function Home() {
     return () => mediaQueryList.removeListener(updateCanDragHeroWindow);
   }, []);
 
-  const cancelAutoExpand = useCallback(() => {
-    if (autoExpandTimerRef.current !== null) {
-      window.clearTimeout(autoExpandTimerRef.current);
-      autoExpandTimerRef.current = null;
-    }
-    setExpandDotHighlighted(false);
-  }, []);
-
-  const scheduleAutoExpand = useCallback(() => {
-    if (hasAutoExpandedRef.current) {
-      return;
-    }
-
-    hasAutoExpandedRef.current = true;
-    cancelAutoExpand();
-
-    if (prefersReducedMotion) {
-      setIdeWindowState((prev) => (prev === 'normal' ? 'expanded' : prev));
-      return;
-    }
-
-    setExpandDotHighlighted(true);
-    autoExpandTimerRef.current = window.setTimeout(() => {
-      autoExpandTimerRef.current = null;
-      setExpandDotHighlighted(false);
-      setIdeWindowState((prev) => (prev === 'normal' ? 'expanded' : prev));
-    }, AUTO_EXPAND_PULSE_DURATION_MS);
-  }, [cancelAutoExpand, prefersReducedMotion]);
-
   const handleMotionComplete = useCallback(() => {
     setIsTypewriterPlaying(true);
     scheduleAutoExpand();
   }, [scheduleAutoExpand]);
-
-  useEffect(() => cancelAutoExpand, [cancelAutoExpand]);
-
-  const updateExpandedIdeViewport = useCallback(() => {
-    if (typeof window === 'undefined' || typeof document === 'undefined') {
-      return;
-    }
-
-    const mainContent = document.getElementById('main-content');
-
-    if (!mainContent) {
-      setExpandedIdeViewport({
-        top: 0,
-        left: 0,
-        width: window.innerWidth,
-        height: window.innerHeight,
-      });
-      return;
-    }
-
-    const mainRect = mainContent.getBoundingClientRect();
-    const headerRect = document.getElementById('site-navigation')?.getBoundingClientRect();
-    const footerRect = document.getElementById('site-footer')?.getBoundingClientRect();
-    const top = Math.max(0, mainRect.top, headerRect?.bottom ?? 0);
-    const left = Math.max(0, mainRect.left);
-    const visibleRight = Math.min(window.innerWidth, mainRect.right);
-    const visibleBottom = Math.min(
-      window.innerHeight,
-      mainRect.bottom,
-      footerRect ? footerRect.top : window.innerHeight
-    );
-    const width = Math.max(0, visibleRight - left);
-    const height = Math.max(0, visibleBottom - top);
-
-    if (width === 0 || height === 0) {
-      setExpandedIdeViewport(null);
-      return;
-    }
-
-    setExpandedIdeViewport({ top, left, width, height });
-  }, []);
-
-  useEffect(() => {
-    if (ideWindowState !== 'expanded') {
-      setExpandedIdeViewport(null);
-      return undefined;
-    }
-
-    updateExpandedIdeViewport();
-
-    let frameId: number | null = null;
-
-    const handleViewportChange = () => {
-      if (frameId !== null) {
-        return;
-      }
-
-      frameId = window.requestAnimationFrame(() => {
-        frameId = null;
-        updateExpandedIdeViewport();
-      });
-    };
-
-    window.addEventListener('resize', handleViewportChange);
-    window.addEventListener('scroll', handleViewportChange, { passive: true });
-
-    return () => {
-      if (frameId !== null) {
-        window.cancelAnimationFrame(frameId);
-      }
-
-      window.removeEventListener('resize', handleViewportChange);
-      window.removeEventListener('scroll', handleViewportChange);
-    };
-  }, [ideWindowState, updateExpandedIdeViewport]);
 
   const windowDragEnabled = canDragHeroWindow && isTypewriterPlaying;
 
@@ -355,36 +186,6 @@ export default function Home() {
   const handleHeroDragEnd = useCallback(() => {
     setIsHeroWindowDragging(false);
   }, []);
-
-  const queueFreshIdeSession = useCallback(() => {
-    setIdeSessionKey((prev) => prev + 1);
-  }, []);
-
-  const handleIdeClose = useCallback(() => {
-    cancelAutoExpand();
-    queueFreshIdeSession();
-    setIdeWindowState('closed');
-    setIdeWindowSize(null);
-  }, [cancelAutoExpand, queueFreshIdeSession]);
-
-  const handleIdeMinimize = useCallback(() => {
-    cancelAutoExpand();
-    queueFreshIdeSession();
-    setIdeWindowState('minimized');
-    setIdeWindowSize(null);
-  }, [cancelAutoExpand, queueFreshIdeSession]);
-
-  const handleIdeExpand = useCallback(() => {
-    cancelAutoExpand();
-    setIdeWindowState((prev) => (prev === 'expanded' ? 'normal' : 'expanded'));
-  }, [cancelAutoExpand]);
-
-  const handleIdeRestore = useCallback(() => {
-    setIdeWindowState('normal');
-    setIdeWindowSize(null);
-  }, []);
-
-  const ideVisible = ideWindowState !== 'closed' && ideWindowState !== 'minimized';
 
   const resizeEnabled = canDragHeroWindow && ideWindowState === 'normal' && !isHeroWindowDragging;
 
@@ -522,14 +323,14 @@ export default function Home() {
           <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
             <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
             <DialogContent>
-              <BodyText sx={{ mt: 1 }}>
+              <Text role="body" sx={{ mt: 1 }}>
                 Would you like to hear a short verse while browsing the site? Use the pause button
                 in the header to stop it anytime.
-              </BodyText>
+              </Text>
               {error && (
-                <CaptionText color="error" sx={{ display: 'block', mt: 1 }}>
+                <Text role="caption" sx={{ display: 'block', mt: 1, color: 'error.main' }}>
                   {error}
-                </CaptionText>
+                </Text>
               )}
             </DialogContent>
             <DialogActions>

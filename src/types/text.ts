@@ -1,3 +1,6 @@
+import type { TypographyProps } from '@mui/material';
+import type { HTMLAttributes } from 'react';
+
 /**
  * Shared text-system types consumed by the typeset layer, the Text primitive,
  * and composition primitives. Kept in src/types/ so the dependency flows
@@ -10,6 +13,7 @@
 export type TextUiRole =
   | 'pageTitle'
   | 'pageSubtitle'
+  | 'settingsSectionLabel'
   | 'sectionEyebrow'
   | 'sectionTitle'
   | 'sectionSubtitle'
@@ -22,6 +26,7 @@ export type TextUiRole =
   | 'metaStrong'
   | 'caption'
   | 'label'
+  | 'inlineLabel'
   | 'metricValue'
   | 'metricLabel';
 
@@ -43,7 +48,7 @@ export type TextRole = TextUiRole | TextProseRole;
 /* ── Tone ───────────────────────────────────────────────── */
 
 /** Tone controls color intent independently of role. */
-export type TextTone = 'default' | 'muted' | 'accent' | 'inverse';
+export type TextTone = 'default' | 'muted' | 'accent' | 'support' | 'inverse';
 
 /* ── Context ────────────────────────────────────────────── */
 
@@ -73,6 +78,26 @@ export type TextElement =
   | 'dd'
   | 'label'
   | 'figcaption';
+
+/* ── Text passthrough props ───────────────────────────── */
+
+export type TextDataAttributes = {
+  [Key in `data-${string}`]?: string | number | boolean | undefined;
+};
+
+/**
+ * Safe passthrough props shared by Text and its compatibility wrappers.
+ * This intentionally models DOM/ARIA interaction and the small subset of
+ * MUI layout props that Text already supports, rather than the full
+ * Typography styling surface.
+ */
+export type TextPassthroughProps = {
+  align?: TypographyProps['align'];
+  gutterBottom?: TypographyProps['gutterBottom'];
+  noWrap?: TypographyProps['noWrap'];
+  paragraph?: TypographyProps['paragraph'];
+} & Omit<HTMLAttributes<HTMLElement>, 'color' | 'role' | 'style'> &
+  TextDataAttributes;
 
 /* ── UNSAFE_Typography metadata ─────────────────────────── */
 

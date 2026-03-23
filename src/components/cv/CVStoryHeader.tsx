@@ -4,7 +4,7 @@ import ViewModuleOutlinedIcon from '@mui/icons-material/ViewModuleOutlined';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { cvStoryCta, cvStoryIntro } from '../../data/cv';
 import type { CVMode } from '../../constants/siteRoutes';
-import { SectionLeadText } from '../text';
+import { Text } from '../text';
 
 type CVStoryHeaderProps = {
   mode: CVMode;
@@ -74,7 +74,7 @@ export const CVStoryHeader = ({ mode, onToggleMode, variant = 'page' }: CVStoryH
           variant="outlined"
         />
       </Box>
-      {isStory && <SectionLeadText>{cvStoryIntro}</SectionLeadText>}
+      {isStory && <Text role="metaStrong">{cvStoryIntro}</Text>}
       <Box>
         <Button
           size="small"

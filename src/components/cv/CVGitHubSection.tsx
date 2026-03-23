@@ -12,7 +12,7 @@ import { GitHubContributionCalendar } from './GitHubContributionCalendar';
 import { GitHubContributions } from './GitHubContributions';
 import { SectionHeading } from '../layout/SectionHeading';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
-import { SectionLeadText, SubsectionTitle } from '../text';
+import { Text } from '../text';
 
 type CVGitHubSectionProps = {
   activity: GitHubActivityItem[];
@@ -55,7 +55,6 @@ export const CVGitHubSection = ({
     getSectionDelayMs,
     motionTokens,
     sectionHeadingCompactSx,
-    supportAccentTitleSx,
   } = useComponentStyles();
   const resolvedItemOffsetMs = itemOffsetMs ?? motionTokens.itemOffsetMs;
   const githubActivityDelayMs = getSectionDelayMs(
@@ -106,14 +105,16 @@ export const CVGitHubSection = ({
           <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
           {statusIndicator}
         </Box>
-        {lead && <SectionLeadText>{lead}</SectionLeadText>}
+        {lead && <Text role="metaStrong">{lead}</Text>}
         <SectionCard
           delayMs={githubActivityDelayMs}
           skipEntranceAnimation={revealed}
           sx={githubSubsectionCardSx}
         >
           <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={supportAccentTitleSx}>Recent Activity</SubsectionTitle>
+            <Text role="subsectionTitle" tone="support">
+              Recent Activity
+            </Text>
             <SectionPanel>
               <GitHubActivityList
                 activity={activity}
@@ -131,7 +132,9 @@ export const CVGitHubSection = ({
           sx={githubSubsectionCardSx}
         >
           <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={supportAccentTitleSx}>Contributions</SubsectionTitle>
+            <Text role="subsectionTitle" tone="support">
+              Contributions
+            </Text>
             <SectionPanel>
               <GitHubContributions
                 contributions={contributions}

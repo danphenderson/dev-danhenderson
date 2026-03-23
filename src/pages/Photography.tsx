@@ -9,7 +9,7 @@ import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
-import { SecondaryBodyText } from '../components/text';
+import { Text } from '../components/text';
 import { AlbumCard } from '../components/photography/AlbumCard';
 import { MotionSection, MotionItem, StaggerChildren, scaleIn, MotionTiltCard } from '../motion';
 
@@ -49,9 +49,9 @@ export default function Photography() {
                 subtitle="A selection of field work, climbing days, and stargazing nights."
                 sx={appStyles.compactSectionHeadingSx}
               />
-              <SecondaryBodyText>
+              <Text role="bodyMuted">
                 {totalPhotos} photos · {categories.length} albums
-              </SecondaryBodyText>
+              </Text>
               {isLoading && (
                 <Box sx={appStyles.sectionLoadingSx}>
                   <LoadingBars label="Loading photography albums" compact />

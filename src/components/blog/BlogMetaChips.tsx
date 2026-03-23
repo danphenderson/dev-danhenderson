@@ -2,7 +2,7 @@ import { Chip, Stack } from '@mui/material';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import type { MouseEvent } from 'react';
-import { CaptionText } from '../text';
+import { Text } from '../text';
 import { useComponentStyles } from '../../styles/componentStyles';
 
 type BlogMetaChipsProps = {
@@ -46,11 +46,15 @@ export function BlogMetaChips({
     <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
       <Stack direction="row" spacing={0.5} alignItems="center">
         <CalendarTodayIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-        <CaptionText>{formatDate(publishedAt)}</CaptionText>
+        <Text role="caption" tone="muted">
+          {formatDate(publishedAt)}
+        </Text>
       </Stack>
       <Stack direction="row" spacing={0.5} alignItems="center">
         <AccessTimeIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-        <CaptionText>{readingTimeMinutes} min read</CaptionText>
+        <Text role="caption" tone="muted">
+          {readingTimeMinutes} min read
+        </Text>
       </Stack>
       {displayTags && displayTags.length > 0 && (
         <Stack direction="row" spacing={0.5} flexWrap="wrap" useFlexGap>

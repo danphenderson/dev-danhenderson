@@ -7,7 +7,7 @@ import type { TabPanelItem, TabPanelRenderContext } from '../TabPanel';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { CommonLink } from '../CommonLink';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { EntryTitle, BodyText, ListItemText } from '../text';
+import { Text } from '../text';
 import { renderExperienceSegments } from './experienceContent';
 
 type CodingExamplesSectionProps = {
@@ -39,9 +39,9 @@ const CodingExampleDetailList = ({
       containerSx={getDetailListSx(0, 0)}
       itemComponent="li"
       renderItem={(item) => (
-        <ListItemText component="span">
+        <Text role="body" component="span">
           {Array.isArray(item) ? renderExperienceSegments(item) : item}
-        </ListItemText>
+        </Text>
       )}
     />
   );
@@ -137,14 +137,14 @@ export const CodingExamplesSection = ({
                   underline="hover"
                   sx={{ textDecorationColor: 'currentColor' }}
                 >
-                  <EntryTitle component="span" sx={codingExampleLinkSx}>
+                  <Text role="cardTitle" component="span" sx={codingExampleLinkSx}>
                     {example.title}
-                  </EntryTitle>
+                  </Text>
                 </CommonLink>
               ) : (
-                <EntryTitle>{example.title}</EntryTitle>
+                <Text role="cardTitle">{example.title}</Text>
               )}
-              <BodyText>{example.description}</BodyText>
+              <Text role="body">{example.description}</Text>
             </Stack>
             {exampleTabs.length ? (
               <Box sx={detailBlockSx}>

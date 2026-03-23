@@ -1,16 +1,22 @@
 import Typography from '@mui/material/Typography';
-import type { Variant } from '@mui/material/styles/createTypography';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { ReactNode } from 'react';
-import type { TextRole, TextTone, TextContext, TextElement } from '../../types/text';
+import type {
+  TextRole,
+  TextTone,
+  TextContext,
+  TextElement,
+  TextPassthroughProps,
+} from '../../types/text';
 import { useTextStyles } from '../../styles/textStyles';
 import { mergeSx } from './textFactory';
 
 /* ── Default semantic elements per role ─────────────────── */
 
-const defaultElements: Partial<Record<TextRole, TextElement>> = {
+const defaultElements: Record<TextRole, TextElement> = {
   pageTitle: 'h1',
   pageSubtitle: 'p',
+  settingsSectionLabel: 'span',
   sectionEyebrow: 'span',
   sectionTitle: 'h2',
   sectionSubtitle: 'p',
@@ -23,6 +29,7 @@ const defaultElements: Partial<Record<TextRole, TextElement>> = {
   metaStrong: 'p',
   caption: 'span',
   label: 'span',
+  inlineLabel: 'span',
   metricValue: 'p',
   metricLabel: 'span',
   proseTitle: 'h1',
@@ -38,7 +45,7 @@ const defaultElements: Partial<Record<TextRole, TextElement>> = {
 
 /* ── Props ──────────────────────────────────────────────── */
 
-export type TextProps = {
+type TextOwnProps = {
   /** The semantic role that selects the typeset. Required. */
   role: TextRole;
   /** Color intent. Defaults to 'default'. */
@@ -51,19 +58,9 @@ export type TextProps = {
   sx?: SxProps<Theme>;
   /** Content. */
   children?: ReactNode;
-  /** Standard HTML id for anchor targets and ARIA. */
-  id?: string;
-  /** Standard HTML className for external integrations. */
-  className?: string;
-  /** Gutterless mode — remove default margins. */
-  gutterBottom?: boolean;
-  /** Paragraph mode — add mb spacing. */
-  paragraph?: boolean;
-  /** Align text content. */
-  align?: 'inherit' | 'left' | 'center' | 'right' | 'justify';
-  /** Pass-through for whitespace. */
-  noWrap?: boolean;
 };
+
+export type TextProps = TextPassthroughProps & TextOwnProps;
 
 /* ── Component ──────────────────────────────────────────── */
 
@@ -91,11 +88,11 @@ export const Text = ({
 }: TextProps) => {
   const { resolveTypeset } = useTextStyles();
   const typeset = resolveTypeset(role, tone, context);
-  const element = component ?? defaultElements[role] ?? 'span';
+  const element = component ?? defaultElements[role];
 
   return (
     <Typography
-      variant={typeset.variant as Variant}
+      variant={typeset.variant}
       component={element}
       sx={mergeSx([typeset.sx], sx)}
       {...rest}

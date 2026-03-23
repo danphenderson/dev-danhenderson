@@ -114,26 +114,6 @@ const MOTION_LEVELS: {
 export const HEADER_SETTINGS_TRIGGER_ID = 'header-settings-trigger';
 
 /* ------------------------------------------------------------------ */
-/*  Section heading                                                   */
-/* ------------------------------------------------------------------ */
-
-const SectionLabel = ({ children }: { children: ReactNode }) => (
-  <Text
-    role="sectionEyebrow"
-    component="span"
-    sx={{
-      fontSize: '0.625rem',
-      fontWeight: 600,
-      letterSpacing: '0.1em',
-      color: 'text.secondary',
-      lineHeight: 1,
-    }}
-  >
-    {children}
-  </Text>
-);
-
-/* ------------------------------------------------------------------ */
 /*  HeaderSettingsPopover                                              */
 /* ------------------------------------------------------------------ */
 
@@ -274,7 +254,9 @@ export const HeaderSettingsPopover = ({
         <Stack spacing={2.5} data-testid="settings-popover-content">
           {/* ---- Theme mode ---- */}
           <Stack spacing={1}>
-            <SectionLabel>Theme</SectionLabel>
+            <Text role="settingsSectionLabel" component="span">
+              Theme
+            </Text>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
               <Stack direction="row" alignItems="center" spacing={1}>
                 {mode === 'dark' ? (
@@ -303,7 +285,9 @@ export const HeaderSettingsPopover = ({
           {/* ---- Appearance presets ---- */}
           <Stack spacing={1}>
             <Stack direction="row" alignItems="baseline" justifyContent="space-between">
-              <SectionLabel>Appearance</SectionLabel>
+              <Text role="settingsSectionLabel" component="span">
+                Appearance
+              </Text>
               <Text
                 role="caption"
                 component="span"
@@ -342,7 +326,9 @@ export const HeaderSettingsPopover = ({
           {/* ---- Motion intensity ---- */}
           <Stack spacing={1}>
             <Stack direction="row" alignItems="baseline" justifyContent="space-between">
-              <SectionLabel>Motion</SectionLabel>
+              <Text role="settingsSectionLabel" component="span">
+                Motion
+              </Text>
               <Text
                 role="caption"
                 component="span"
@@ -420,7 +406,9 @@ export const HeaderSettingsPopover = ({
             <>
               <Divider />
               <Stack spacing={1}>
-                <SectionLabel>Welcome audio</SectionLabel>
+                <Text role="settingsSectionLabel" component="span">
+                  Welcome audio
+                </Text>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
                   <Text role="body" component="span">
                     {isPlaying ? 'Now playing' : 'Paused'}

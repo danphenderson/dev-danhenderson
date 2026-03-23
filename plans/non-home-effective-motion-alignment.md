@@ -52,7 +52,8 @@ The remaining drift is concentrated in active visible surfaces that still bypass
 - `src/components/Header.tsx`: pass stored and effective motion state through the active header settings UI and scale the hide-on-scroll `Slide`.
 - `src/components/header/HeaderSettingsPopover.tsx`: render active motion state from the effective level, keep stored preference selection available for user edits, and control popover transition timing explicitly.
 - `src/components/header/HeaderNav.tsx`: align mobile navigation menu transition timing with effective motion.
-- `src/components/AnimatedZoomList.tsx`: scale `Zoom` timeouts in addition to stagger delays.
+- `src/components/SkillsChipList.tsx`: scale the local zoom-chip timeouts in addition to stagger delays.
+- `src/components/cv/GitHubLinkChipList.tsx`: scale the local GitHub-chip zoom timeouts in addition to stagger delays.
 - `src/components/AnimatedSlideList.tsx`: scale `Slide` timeouts in addition to stagger delays.
 - `src/components/BackToTopButton.tsx`: scale `Zoom` timing and switch `window.scrollTo()` behavior to `auto` when effective motion is off.
 - `src/components/TabPanel.tsx`: make `Collapse` and content opacity respect effective motion.
@@ -68,7 +69,8 @@ The remaining drift is concentrated in active visible surfaces that still bypass
 - `test/unit/components/Header.test.tsx`: cover additive header wiring to effective motion state.
 - `test/unit/components/header/HeaderActions.test.tsx`: cover effective-motion display, stored-preference controls, and OS override behavior.
 - `test/unit/components/header/HeaderNav.test.tsx`: cover menu transition timing plumbing.
-- `test/unit/components/AnimatedZoomList.test.tsx`: assert timeout scaling and collapse.
+- `test/unit/components/SkillsChipList.test.tsx`: assert local zoom-chip timeout scaling and collapse behavior.
+- `test/unit/components/cv/GitHubLinkChipList.test.tsx`: assert local GitHub-chip zoom timeout scaling and collapse behavior.
 - `test/unit/components/AnimatedSlideList.test.tsx`: assert timeout scaling and collapse.
 - `test/unit/components/BackToTopButton.test.tsx`: assert instant versus smooth scroll and timeout behavior.
 - `test/unit/components/TabPanel.test.tsx`: assert collapse behavior and opacity transition behavior when motion is off.
@@ -131,7 +133,7 @@ Residual scope boundary:
    Update `Header.tsx` and `HeaderSettingsPopover.tsx` so the UI can show effective motion state while preserving stored-preference editing semantics, then scale the hide-on-scroll `Slide`.
 
 4. Patch shared non-home primitives and wrappers.
-   Update `AnimatedZoomList.tsx`, `AnimatedSlideList.tsx`, `BackToTopButton.tsx`, `TabPanel.tsx`, `ScrollProgressBar.tsx`, `HeaderNav.tsx`, `GlobalCommandPalette.tsx`, and `AppSpeedDial.tsx` in that order.
+   Update `SkillsChipList.tsx`, `GitHubLinkChipList.tsx`, `AnimatedSlideList.tsx`, `BackToTopButton.tsx`, `TabPanel.tsx`, `ScrollProgressBar.tsx`, `HeaderNav.tsx`, `GlobalCommandPalette.tsx`, and `AppSpeedDial.tsx` in that order.
 
 5. Patch route-specific non-home consumers.
    Update `createAppTheme.ts`, `pages/CV.tsx`, `CVSectionNavigator.tsx`, `CVStoryViewer.tsx`, `PerformanceScorecard.tsx`, and `ImmersiveLightbox.tsx`.
@@ -145,7 +147,7 @@ Residual scope boundary:
 ## Validation plan
 
 - `npm run build`
-- `CI=true npm test -- --watch=false --runTestsByPath test/unit/ThemeProvider.test.tsx test/unit/components/Header.test.tsx test/unit/components/header/HeaderActions.test.tsx test/unit/components/header/HeaderNav.test.tsx test/unit/components/AnimatedZoomList.test.tsx test/unit/components/AnimatedSlideList.test.tsx test/unit/components/BackToTopButton.test.tsx test/unit/components/ScrollProgressBar.test.tsx test/unit/components/TabPanel.test.tsx test/unit/components/GlobalCommandPalette.test.tsx test/unit/components/AppSpeedDial.test.tsx test/unit/components/cv/CVSectionNavigator.test.tsx test/unit/components/cv/CVStoryViewer.test.tsx test/unit/components/photography/ImmersiveLightbox.test.tsx`
+- `CI=true npm test -- --watch=false --runTestsByPath test/unit/ThemeProvider.test.tsx test/unit/components/Header.test.tsx test/unit/components/header/HeaderActions.test.tsx test/unit/components/header/HeaderNav.test.tsx test/unit/components/SkillsChipList.test.tsx test/unit/components/cv/GitHubLinkChipList.test.tsx test/unit/components/AnimatedSlideList.test.tsx test/unit/components/BackToTopButton.test.tsx test/unit/components/ScrollProgressBar.test.tsx test/unit/components/TabPanel.test.tsx test/unit/components/GlobalCommandPalette.test.tsx test/unit/components/AppSpeedDial.test.tsx test/unit/components/cv/CVSectionNavigator.test.tsx test/unit/components/cv/CVStoryViewer.test.tsx test/unit/components/photography/ImmersiveLightbox.test.tsx`
 - `npm run build:e2e && npm run test:e2e:chromium -- test/e2e/home.spec.ts test/e2e/navigation.spec.ts test/e2e/cv.github.spec.ts test/e2e/photography.spec.ts test/e2e/climbing.spec.ts test/e2e/blog.spec.ts test/e2e/not-found.spec.ts`
 - `npm run build && npm run test:e2e:smoke -- test/e2e/smoke.spec.ts`
 

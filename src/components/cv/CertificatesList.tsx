@@ -2,7 +2,7 @@ import { Button } from '@mui/material';
 import type { Certificate } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { EntryTitle, MetaText } from '../text';
+import { Text } from '../text';
 
 type CertificatesListProps = {
   certificates: Certificate[];
@@ -30,10 +30,10 @@ export const CertificatesList = ({
       tiltItems
       renderItem={(certificate) => (
         <>
-          <EntryTitle>{certificate.title}</EntryTitle>
-          <MetaText>
+          <Text role="cardTitle">{certificate.title}</Text>
+          <Text role="meta">
             {certificate.issuer} issued on {certificate.date}
-          </MetaText>
+          </Text>
           {certificate.link && (
             <Button
               href={certificate.link}

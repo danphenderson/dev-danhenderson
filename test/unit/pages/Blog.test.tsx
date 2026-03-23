@@ -78,14 +78,6 @@ jest.mock('../../../src/hooks/useBlogData', () => ({
     getPostBySlug: jest.fn(),
     getRelatedPosts: jest.fn(() => []),
     getAdjacentPosts: jest.fn(() => ({})),
-    status: {
-      source: 'static',
-      loading: false,
-      error: null,
-      isFallback: false,
-      reason: 'bundled-content',
-      freshness: { label: 'Bundled', isStale: false },
-    },
   }),
 }));
 

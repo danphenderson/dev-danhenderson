@@ -1,6 +1,5 @@
 import { Box, Grid } from '@mui/material';
-import type { ReactNode } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme as useMuiTheme } from '@mui/material/styles';
@@ -10,23 +9,12 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { AppSpeedDial, AppSpeedDialAction } from '../components/AppSpeedDial';
-import { CVAboutSection } from '../components/cv/CVAboutSection';
-import { CVCertificatesSection } from '../components/cv/CVCertificatesSection';
-import { CVCodingSection } from '../components/cv/CVCodingSection';
-import { CVEducationSection } from '../components/cv/CVEducationSection';
-import { CVExperienceSection } from '../components/cv/CVExperienceSection';
 import { CVSectionNavigator } from '../components/cv/CVSectionNavigator';
 import { CVSectionStack } from '../components/cv/CVSectionStack';
 import { CVStoryHeader } from '../components/cv/CVStoryHeader';
 import { CVStoryViewer } from '../components/cv/CVStoryViewer';
 import { CVGitHubStatusTooltip } from '../components/cv/CVGitHubStatusTooltip';
-import { CVVolunteeringSection } from '../components/cv/CVVolunteeringSection';
-import {
-  cvSectionNavigationOrder,
-  CVSectionKey,
-  cvSectionMetadata,
-} from '../components/cv/cvSectionMetadata';
-import { CVGitHubSection } from '../components/cv/CVGitHubSection';
+import { cvSectionNavigationOrder } from '../components/cv/cvSectionMetadata';
 import { PageFrame } from '../components/layout/PageFrame';
 import {
   aboutMe,
@@ -37,7 +25,6 @@ import {
   cvStoryEndData,
   educationInfo,
   experiences,
-  githubSectionLead,
   githubProfileUrl,
   linkedinProfileUrl,
   volunteering,
@@ -49,39 +36,17 @@ import { siteRouteMap, cvStoryModeMetadata } from '../constants/siteRoutes';
 import type { CVMode } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useGithubProfile } from '../hooks/useGithubProfile';
-import { CVLayoutMode, CVSectionRegion, cvPageSectionLayout } from './cvPageLayout';
+import { CVLayoutMode } from './cvPageLayout';
+import {
+  buildCVSectionDescriptors,
+  getSectionDescriptorsForRegion,
+  useCVRevealState,
+  type CVResolvedSectionDescriptor,
+} from './cvRouteOrchestration';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
 
-type CVResolvedSectionDescriptor = {
-  id: string;
-  key: CVSectionKey;
-  node: ReactNode;
-  placement: {
-    order: number;
-    region: CVSectionRegion;
-  };
-  delayMs: number;
-  triggerOnView: boolean;
-};
-
-type CVSectionDefinition = {
-  key: CVSectionKey;
-  render: (layout: { delayMs: number; triggerOnView: boolean }) => ReactNode;
-};
-
 const parseCVMode = (value: string | null): CVMode => (value === 'story' ? 'story' : 'default');
-
-const ABOUT_CONTENT_DELIMITER = '|bio|';
-const OPPORTUNITY_DELIMITER = '|opportunity|';
-const WORKFLOW_CONTENT_DELIMITER = '|workflow|';
-
-const getAboutRevealKey = (bio: string, opportunities: string[], workflowTools: string[]) =>
-  `${bio.trim()}${ABOUT_CONTENT_DELIMITER}${opportunities
-    .filter((opportunity) => opportunity.trim().length > 0)
-    .join(OPPORTUNITY_DELIMITER)}${WORKFLOW_CONTENT_DELIMITER}${workflowTools
-    .filter((tool) => tool.trim().length > 0)
-    .join(WORKFLOW_CONTENT_DELIMITER)}`;
 
 export default function CV() {
   return <CVRouteContent />;
@@ -108,39 +73,11 @@ const CVRouteContent = () => {
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const layoutMode: CVLayoutMode = isMobile ? 'mobile' : 'desktop';
-  const githubNestedDelayOffsetMs = motionTokens.sectionStaggerMs / 2;
-  const itemOffsetMs = motionTokens.itemOffsetMs;
-  const [revealedSections, setRevealedSections] = useState<Partial<Record<CVSectionKey, boolean>>>(
-    {}
-  );
-  const [revealedAboutKey, setRevealedAboutKey] = useState<string | null>(null);
-  const [hasSettledGithubCalendar, setHasSettledGithubCalendar] = useState(false);
-  const aboutRevealKey = getAboutRevealKey(
-    aboutMe.bio,
-    aboutMe.opportunities ?? [],
-    currentWorkflowTools
-  );
-  const isAboutRevealed = revealedAboutKey === aboutRevealKey;
-  const isGithubRevealed = Boolean(revealedSections.github);
-
-  useEffect(() => {
-    setRevealedAboutKey((currentKey) => (currentKey === aboutRevealKey ? currentKey : null));
-  }, [aboutRevealKey]);
-
-  const markSectionRevealed = useCallback((sectionKey: CVSectionKey) => {
-    setRevealedSections((currentSections) =>
-      currentSections[sectionKey]
-        ? currentSections
-        : {
-            ...currentSections,
-            [sectionKey]: true,
-          }
-    );
-  }, []);
-
-  const markGithubCalendarSettled = useCallback(() => {
-    setHasSettledGithubCalendar(true);
-  }, []);
+  const revealState = useCVRevealState({
+    bio: aboutMe.bio,
+    opportunities: aboutMe.opportunities ?? [],
+    workflowTools: currentWorkflowTools,
+  });
 
   const handleToggleMode = useCallback(() => {
     setSearchParams(
@@ -206,133 +143,25 @@ const CVRouteContent = () => {
   );
   const githubStatusTooltip = <CVGitHubStatusTooltip status={status} />;
 
-  const sectionDefinitions: CVSectionDefinition[] = [
-    {
-      key: 'about',
-      render: (layout) => (
-        <CVAboutSection
-          about={aboutMe}
-          actions={aboutSpeedDial}
-          footerControls={aboutModeControls}
-          currentWorkflowTools={currentWorkflowTools}
-          delayMs={layout.delayMs}
-          triggerOnView={layout.triggerOnView}
-          revealed={isAboutRevealed}
-          onRevealComplete={() => setRevealedAboutKey(aboutRevealKey)}
-          sectionId={cvSectionMetadata.about.id}
-        />
-      ),
-    },
-    {
-      key: 'experience',
-      render: (layout) => (
-        <CVExperienceSection
-          experiences={experiences}
-          delayMs={layout.delayMs}
-          triggerOnView={layout.triggerOnView}
-          revealed={Boolean(revealedSections.experience)}
-          onReveal={() => markSectionRevealed('experience')}
-          itemOffsetMs={itemOffsetMs}
-          sectionId={cvSectionMetadata.experience.id}
-        />
-      ),
-    },
-    {
-      key: 'education',
-      render: (layout) => (
-        <CVEducationSection
-          education={educationInfo}
-          delayMs={layout.delayMs}
-          triggerOnView={layout.triggerOnView}
-          revealed={Boolean(revealedSections.education)}
-          onReveal={() => markSectionRevealed('education')}
-          itemOffsetMs={itemOffsetMs}
-          sectionId={cvSectionMetadata.education.id}
-        />
-      ),
-    },
-    {
-      key: 'volunteering',
-      render: (layout) => (
-        <CVVolunteeringSection
-          volunteering={volunteering}
-          delayMs={layout.delayMs}
-          triggerOnView={layout.triggerOnView}
-          revealed={Boolean(revealedSections.volunteering)}
-          onReveal={() => markSectionRevealed('volunteering')}
-          itemOffsetMs={itemOffsetMs}
-          sectionId={cvSectionMetadata.volunteering.id}
-        />
-      ),
-    },
-    {
-      key: 'github',
-      render: (layout) => (
-        <CVGitHubSection
-          activity={activity}
-          contributions={contributions}
-          loading={loading}
-          error={error}
-          statusIndicator={githubStatusTooltip}
-          revealed={isGithubRevealed}
-          onReveal={() => markSectionRevealed('github')}
-          calendarSettled={hasSettledGithubCalendar}
-          onCalendarSettled={markGithubCalendarSettled}
-          sectionDelayMs={layout.delayMs}
-          nestedDelayOffsetMs={githubNestedDelayOffsetMs}
-          itemOffsetMs={itemOffsetMs}
-          lead={githubSectionLead}
-          sectionId={cvSectionMetadata.github.id}
-        />
-      ),
-    },
-    {
-      key: 'certificates',
-      render: (layout) => (
-        <CVCertificatesSection
-          certificates={certificates}
-          delayMs={layout.delayMs}
-          triggerOnView={layout.triggerOnView}
-          revealed={Boolean(revealedSections.certificates)}
-          onReveal={() => markSectionRevealed('certificates')}
-          itemOffsetMs={itemOffsetMs}
-          sectionId={cvSectionMetadata.certificates.id}
-        />
-      ),
-    },
-    {
-      key: 'coding',
-      render: (layout) => (
-        <CVCodingSection
-          examples={codingExamples}
-          delayMs={layout.delayMs}
-          triggerOnView={layout.triggerOnView}
-          revealed={Boolean(revealedSections.coding)}
-          onReveal={() => markSectionRevealed('coding')}
-          itemOffsetMs={itemOffsetMs}
-          sectionId={cvSectionMetadata.coding.id}
-        />
-      ),
-    },
-  ];
-
-  const sectionDescriptors: CVResolvedSectionDescriptor[] = sectionDefinitions.map(
-    ({ key, render }) => {
-      const layout = cvPageSectionLayout[key][layoutMode];
-
-      return {
-        id: cvSectionMetadata[key].id,
-        key,
-        node: render(layout),
-        placement: {
-          order: layout.order,
-          region: layout.region,
-        },
-        delayMs: layout.delayMs,
-        triggerOnView: layout.triggerOnView,
-      };
-    }
-  );
+  const sectionDescriptors: CVResolvedSectionDescriptor[] = buildCVSectionDescriptors({
+    layoutMode,
+    about: aboutMe,
+    aboutActions: aboutSpeedDial,
+    aboutFooterControls: aboutModeControls,
+    currentWorkflowTools,
+    experiences,
+    education: educationInfo,
+    volunteering,
+    certificates,
+    codingExamples,
+    githubActivity: activity,
+    githubContributions: contributions,
+    githubLoading: loading,
+    githubError: error,
+    githubStatusTooltip,
+    motionTokens,
+    revealState,
+  });
 
   const renderSectionDescriptor = (descriptor: CVResolvedSectionDescriptor) => (
     <Box
@@ -345,11 +174,8 @@ const CVRouteContent = () => {
     </Box>
   );
 
-  const getSectionNodesForRegion = (region: CVSectionRegion) =>
-    sectionDescriptors
-      .filter((descriptor) => descriptor.placement.region === region)
-      .sort((left, right) => left.placement.order - right.placement.order)
-      .map(renderSectionDescriptor);
+  const getSectionNodesForRegion = (region: 'top' | 'sidebar' | 'main') =>
+    getSectionDescriptorsForRegion(sectionDescriptors, region).map(renderSectionDescriptor);
 
   // ── Story mode ─────────────────────────────────────────────────────
 
@@ -373,9 +199,7 @@ const CVRouteContent = () => {
   // ── Default exploratory mode ───────────────────────────────────────
 
   if (isMobile) {
-    const mobileSections = sectionDescriptors
-      .filter((descriptor) => descriptor.placement.region === 'stack')
-      .sort((left, right) => left.placement.order - right.placement.order);
+    const mobileSections = getSectionDescriptorsForRegion(sectionDescriptors, 'stack');
     const mobileAboutSection = mobileSections.find((descriptor) => descriptor.key === 'about');
     const mobileBodySections = mobileSections.filter((descriptor) => descriptor.key !== 'about');
 

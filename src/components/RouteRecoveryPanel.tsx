@@ -3,7 +3,7 @@ import { Box, Button, Chip, Stack } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import { useCommandPalette } from '../CommandPaletteProvider';
 import { SectionPanel } from './layout/SectionPanel';
-import { MetaText, SecondaryBodyText, SecondaryCaptionText, SubsectionTitle } from './text';
+import { Text } from './text';
 import type { RecoverySuggestion } from '../constants/recoveryContext';
 import type { SharedRouteAction } from '../constants/routeActions';
 
@@ -45,39 +45,45 @@ export const RouteRecoveryPanel = ({
     <Stack spacing={2.5} sx={{ width: '100%', maxWidth: 720 }}>
       <Stack spacing={1}>
         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
-          <MetaText component="span" sx={{ opacity: 0.78 }}>
+          <Text role="meta" component="span" sx={{ opacity: 0.78 }}>
             Attempted path
-          </MetaText>
+          </Text>
           <Chip label={attemptedPathLabel} size="small" sx={{ maxWidth: '100%' }} />
         </Stack>
         {routeHintLabel && (
-          <SecondaryBodyText sx={{ opacity: 0.82 }}>{routeHintLabel}</SecondaryBodyText>
+          <Text role="bodyMuted" sx={{ opacity: 0.82 }}>
+            {routeHintLabel}
+          </Text>
         )}
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1.25}>
           <Button variant="contained" startIcon={<SearchIcon />} onClick={handleOpenPalette}>
             Open command palette
           </Button>
-          <SecondaryCaptionText sx={{ alignSelf: 'center', opacity: 0.7 }}>
+          <Text role="caption" tone="muted" sx={{ alignSelf: 'center', opacity: 0.7 }}>
             {suggestedPaletteQuery
               ? `Prefilled with "${suggestedPaletteQuery}" for faster recovery.`
               : 'Search all routes, albums, and CV sections.'}
-          </SecondaryCaptionText>
+          </Text>
         </Stack>
       </Stack>
 
       {contextualSuggestions.length > 0 && (
         <Stack spacing={1.25}>
-          <SubsectionTitle component="h2">Suggested destinations</SubsectionTitle>
+          <Text role="subsectionTitle" component="h2">
+            Suggested destinations
+          </Text>
           {contextualSuggestions.map((suggestion) => (
             <SectionPanel key={suggestion.id} sx={rowPanelSx}>
               <Box sx={{ flex: 1, minWidth: 0 }}>
-                <SubsectionTitle component="p">{suggestion.label}</SubsectionTitle>
-                <SecondaryBodyText sx={{ opacity: 0.82 }}>
+                <Text role="cardTitle" component="p">
+                  {suggestion.label}
+                </Text>
+                <Text role="bodyMuted" sx={{ opacity: 0.82 }}>
                   {suggestion.description}
-                </SecondaryBodyText>
-                <SecondaryCaptionText sx={{ display: 'block', mt: 0.5, opacity: 0.68 }}>
+                </Text>
+                <Text role="caption" tone="muted" sx={{ display: 'block', mt: 0.5, opacity: 0.68 }}>
                   {suggestion.matchReason}
-                </SecondaryCaptionText>
+                </Text>
               </Box>
               <Button variant="outlined" component={RouterLink} to={suggestion.path}>
                 Open {suggestion.label}
@@ -88,16 +94,22 @@ export const RouteRecoveryPanel = ({
       )}
 
       <Stack spacing={1.25}>
-        <SubsectionTitle component="h2">Shared recovery routes</SubsectionTitle>
+        <Text role="subsectionTitle" component="h2">
+          Shared recovery routes
+        </Text>
         {recoveryActions.map((action, index) => (
           <SectionPanel key={action.id} sx={rowPanelSx}>
             <Box sx={{ flex: 1, minWidth: 0 }}>
-              <SubsectionTitle component="p">{action.label}</SubsectionTitle>
-              <SecondaryBodyText sx={{ opacity: 0.82 }}>{action.description}</SecondaryBodyText>
+              <Text role="cardTitle" component="p">
+                {action.label}
+              </Text>
+              <Text role="bodyMuted" sx={{ opacity: 0.82 }}>
+                {action.description}
+              </Text>
               {action.routeStatusLabel && (
-                <SecondaryCaptionText sx={{ display: 'block', mt: 0.5, opacity: 0.68 }}>
+                <Text role="caption" tone="muted" sx={{ display: 'block', mt: 0.5, opacity: 0.68 }}>
                   {action.routeStatusLabel}
-                </SecondaryCaptionText>
+                </Text>
               )}
             </Box>
             <Button

@@ -5,7 +5,7 @@ import { AnimatedContentList } from '../AnimatedContentList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem, TabPanelRenderContext } from '../TabPanel';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { BodyText, ListItemText } from '../text';
+import { Text } from '../text';
 import { CVEntryHeader } from './CVEntryHeader';
 
 type VolunteeringListProps = {
@@ -36,7 +36,11 @@ const VolunteeringDetailList = ({
       containerComponent="ul"
       containerSx={getDetailListSx(0, 0)}
       itemComponent="li"
-      renderItem={(item) => <ListItemText component="span">{item}</ListItemText>}
+      renderItem={(item) => (
+        <Text role="body" component="span">
+          {item}
+        </Text>
+      )}
     />
   );
 };
@@ -94,7 +98,7 @@ export const VolunteeringList = ({
               supportingMeta={entry.location ? [entry.location] : undefined}
             />
 
-            <BodyText>{entry.summary}</BodyText>
+            <Text role="body">{entry.summary}</Text>
 
             {volunteeringTabs.length ? (
               <Box sx={detailBlockSx}>

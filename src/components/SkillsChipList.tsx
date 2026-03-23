@@ -1,8 +1,11 @@
-import { Chip } from '@mui/material';
+import { Box, Chip, Zoom } from '@mui/material';
 import { AnimatedSlideList } from './AnimatedSlideList';
-import { AnimatedZoomList } from './AnimatedZoomList';
+import { useControlledAnimatedList } from './animatedListShared';
 import { useComponentStyles } from '../styles/componentStyles';
-import { ChipLabel } from './text';
+import { SPRING_EASING_CSS } from '../styles/springEasing';
+import { Text } from './text';
+
+const ZOOM_BASE_TIMEOUT_MS = 220;
 
 type SkillsChipListProps = {
   skills?: string[];
@@ -14,6 +17,81 @@ type SkillsChipListProps = {
   drawerContainer?: () => Element | null;
   keepMountedWhenExited?: boolean;
   reverseExitStagger?: boolean;
+};
+
+const ZoomSkillsChipList = ({
+  skills,
+  dense,
+  in: inProp,
+  startDelayMs,
+  itemStaggerMs,
+}: Required<Pick<SkillsChipListProps, 'dense' | 'in' | 'startDelayMs'>> & {
+  skills: string[];
+  itemStaggerMs?: number;
+}) => {
+  const { chipWaveSx, getChipWaveDelaySx, skillsChipSx, skillsWrapSx } = useComponentStyles();
+  const { durationFactor, isMotionDisabled, itemEntries, resolvedContainerSx } =
+    useControlledAnimatedList({
+      items: skills,
+      getItemKey: (skill, index) => `${skill}-${index}`,
+      in: inProp,
+      startDelayMs,
+      itemStaggerMs,
+      containerSx: skillsWrapSx,
+    });
+  const zoomTimeout = isMotionDisabled ? 0 : Math.round(ZOOM_BASE_TIMEOUT_MS * durationFactor);
+
+  if (isMotionDisabled) {
+    return (
+      <Box
+        sx={resolvedContainerSx}
+        aria-hidden={!inProp ? true : undefined}
+        style={!inProp ? { visibility: 'hidden' } : undefined}
+      >
+        {itemEntries.map(({ item: skill, index, key, nodeRef }) => (
+          <Box key={key} ref={nodeRef}>
+            <Chip
+              label={
+                <Text role="inlineLabel" component="span">
+                  {skill}
+                </Text>
+              }
+              size={dense ? 'small' : 'medium'}
+              variant="outlined"
+              sx={[skillsChipSx, chipWaveSx, getChipWaveDelaySx(index)]}
+            />
+          </Box>
+        ))}
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={resolvedContainerSx}>
+      {itemEntries.map(({ item: skill, index, key, isEntered }) => (
+        <Zoom
+          key={key}
+          in={isEntered}
+          appear={false}
+          timeout={zoomTimeout}
+          easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
+        >
+          <Box>
+            <Chip
+              label={
+                <Text role="inlineLabel" component="span">
+                  {skill}
+                </Text>
+              }
+              size={dense ? 'small' : 'medium'}
+              variant="outlined"
+              sx={[skillsChipSx, chipWaveSx, getChipWaveDelaySx(index)]}
+            />
+          </Box>
+        </Zoom>
+      ))}
+    </Box>
+  );
 };
 
 export const SkillsChipList = ({
@@ -52,7 +130,11 @@ export const SkillsChipList = ({
         renderItem={(skill, index) => (
           <Chip
             key={`${skill}-${index}`}
-            label={<ChipLabel>{skill}</ChipLabel>}
+            label={
+              <Text role="inlineLabel" component="span">
+                {skill}
+              </Text>
+            }
             size={dense ? 'small' : 'medium'}
             variant="outlined"
             sx={[skillsChipSx, chipWaveSx, getChipWaveDelaySx(index)]}
@@ -63,22 +145,12 @@ export const SkillsChipList = ({
   }
 
   return (
-    <AnimatedZoomList
-      items={filteredSkills}
-      getItemKey={(skill, index) => `${skill}-${index}`}
+    <ZoomSkillsChipList
+      skills={filteredSkills}
+      dense={dense}
       in={inProp}
       startDelayMs={startDelayMs}
       itemStaggerMs={itemStaggerMs}
-      containerSx={skillsWrapSx}
-      renderItem={(skill, index) => (
-        <Chip
-          key={`${skill}-${index}`}
-          label={<ChipLabel>{skill}</ChipLabel>}
-          size={dense ? 'small' : 'medium'}
-          variant="outlined"
-          sx={[skillsChipSx, chipWaveSx, getChipWaveDelaySx(index)]}
-        />
-      )}
     />
   );
 };

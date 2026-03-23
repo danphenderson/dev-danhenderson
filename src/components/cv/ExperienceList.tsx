@@ -10,7 +10,7 @@ import {
   renderExperienceProjectContent,
 } from './experienceContent';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { BodyText, ListItemText } from '../text';
+import { Text } from '../text';
 import { CVEntryHeader } from './CVEntryHeader';
 
 type ExperienceListProps = {
@@ -47,7 +47,9 @@ const ExperienceProjects = ({
       itemComponent="li"
       renderItem={(project) => {
         return (
-          <ListItemText component="span">{renderExperienceProjectContent(project)}</ListItemText>
+          <Text role="body" component="span">
+            {renderExperienceProjectContent(project)}
+          </Text>
         );
       }}
     />
@@ -129,9 +131,9 @@ export const ExperienceList = ({
               chip={experience.industry ? { label: experience.industry } : undefined}
             />
             {experience.description && (
-              <BodyText sx={experienceDescriptionSx}>
+              <Text role="body" sx={experienceDescriptionSx}>
                 {renderExperienceDescriptionContent(experience.description)}
-              </BodyText>
+              </Text>
             )}
             {experienceTabs.length ? (
               <Box sx={detailBlockSx}>

@@ -4,6 +4,8 @@ import ThemeProvider from '../../../../src/ThemeProvider';
 import { COMMON_LINK_TOOLTIP_ID } from '../../../../src/components/CommonLink';
 import { GitHubLinkChipList } from '../../../../src/components/cv/GitHubLinkChipList';
 
+const mockUseControlledAnimatedList = jest.fn();
+
 jest.mock('../../../../src/motion', () => ({
   MotionTiltCard: ({
     children,
@@ -41,6 +43,11 @@ jest.mock('@mui/material', () => {
 
   return {
     ...actual,
+    Zoom: ({ children, in: inProp }: { children: ReactNode; in?: boolean }) => (
+      <div data-testid="zoom-item" data-in={String(inProp ?? true)}>
+        {children}
+      </div>
+    ),
     Chip: ({
       component,
       href,
@@ -91,38 +98,45 @@ const getSxValue = (
   return sx?.[key];
 };
 
-jest.mock('../../../../src/components/AnimatedZoomList', () => ({
-  AnimatedZoomList: ({
-    children,
-    items,
-    renderItem,
-    startDelayMs,
-    itemStaggerMs,
-    containerSx,
-  }: {
-    children?: ReactNode;
+jest.mock('../../../../src/components/animatedListShared', () => ({
+  useControlledAnimatedList: (options: {
     items: Array<{ key: string }>;
-    renderItem: (item: { key: string }, index: number) => ReactNode;
-    startDelayMs?: number;
-    itemStaggerMs?: number;
+    getItemKey: (item: { key: string }) => string;
     containerSx?: Record<string, unknown> | Array<Record<string, unknown>>;
-  }) => (
-    <div
-      data-testid="animated-zoom-list"
-      data-start-delay={String(startDelayMs ?? 0)}
-      data-stagger={String(itemStaggerMs ?? '')}
-      data-display={String(getSxValue(containerSx, 'display') ?? '')}
-      data-flex-direction={String(getSxValue(containerSx, 'flexDirection') ?? '')}
-      data-flex-wrap={String(getSxValue(containerSx, 'flexWrap') ?? '')}
-    >
-      {children}
-      {items.map((item, index) => renderItem(item, index))}
-    </div>
-  ),
+  }) => mockUseControlledAnimatedList(options),
 }));
 
 describe('GitHubLinkChipList', () => {
-  it('animates wrap-layout chips with the compact zoom list while preserving accessible links', () => {
+  beforeEach(() => {
+    mockUseControlledAnimatedList.mockImplementation(
+      ({
+        items,
+        getItemKey,
+        containerSx,
+      }: {
+        items: Array<{ key: string }>;
+        getItemKey: (item: { key: string }) => string;
+        containerSx?: Record<string, unknown> | Array<Record<string, unknown>>;
+      }) => ({
+        durationFactor: 1,
+        isMotionDisabled: false,
+        itemEntries: items.map((item, index) => ({
+          item,
+          index,
+          key: getItemKey(item),
+          isEntered: true,
+          nodeRef: { current: null },
+        })),
+        resolvedContainerSx: containerSx,
+      })
+    );
+  });
+
+  afterEach(() => {
+    mockUseControlledAnimatedList.mockClear();
+  });
+
+  it('animates wrap-layout chips while preserving accessible links', () => {
     render(
       <ThemeProvider>
         <GitHubLinkChipList
@@ -148,10 +162,16 @@ describe('GitHubLinkChipList', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-start-delay', '40');
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-stagger', '20');
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-display', 'flex');
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-flex-wrap', 'wrap');
+    expect(mockUseControlledAnimatedList.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ startDelayMs: 40, itemStaggerMs: 20 })
+    );
+    expect(getSxValue(mockUseControlledAnimatedList.mock.calls[0][0].containerSx, 'display')).toBe(
+      'flex'
+    );
+    expect(getSxValue(mockUseControlledAnimatedList.mock.calls[0][0].containerSx, 'flexWrap')).toBe(
+      'wrap'
+    );
+    expect(screen.getAllByTestId('zoom-item')).toHaveLength(2);
     expect(screen.getAllByTestId('github-chip-tilt')).toHaveLength(2);
     screen.getAllByTestId('github-chip-tilt').forEach((wrapper) => {
       expect(wrapper).toHaveAttribute('data-intensity', '0.5');
@@ -211,13 +231,15 @@ describe('GitHubLinkChipList', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-start-delay', '120');
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-stagger', '30');
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute('data-display', 'flex');
-    expect(screen.getByTestId('animated-zoom-list')).toHaveAttribute(
-      'data-flex-direction',
-      'column'
+    expect(mockUseControlledAnimatedList.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ startDelayMs: 120, itemStaggerMs: 30 })
     );
+    expect(getSxValue(mockUseControlledAnimatedList.mock.calls[0][0].containerSx, 'display')).toBe(
+      'flex'
+    );
+    expect(
+      getSxValue(mockUseControlledAnimatedList.mock.calls[0][0].containerSx, 'flexDirection')
+    ).toBe('column');
     expect(screen.getAllByTestId('github-chip-tilt')).toHaveLength(2);
     screen.getAllByTestId('github-chip-tilt').forEach((wrapper) => {
       expect(wrapper).toHaveAttribute('data-width', '100%');
@@ -237,7 +259,7 @@ describe('GitHubLinkChipList', () => {
       </ThemeProvider>
     );
 
-    expect(screen.queryByTestId('animated-zoom-list')).not.toBeInTheDocument();
+    expect(mockUseControlledAnimatedList).not.toHaveBeenCalled();
     expect(screen.getAllByTestId('github-chip-tilt')).toHaveLength(2);
   });
 });

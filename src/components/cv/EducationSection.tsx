@@ -6,7 +6,7 @@ import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
 import type { TabPanelItem, TabPanelRenderContext } from '../TabPanel';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { BodyText, ListItemText } from '../text';
+import { Text } from '../text';
 import { CVEntryHeader } from './CVEntryHeader';
 
 type EducationSectionProps = {
@@ -68,7 +68,11 @@ const EducationDetailList = ({
       containerComponent="ul"
       containerSx={getDetailListSx(0, 0)}
       itemComponent="li"
-      renderItem={(item) => <ListItemText component="span">{item}</ListItemText>}
+      renderItem={(item) => (
+        <Text role="body" component="span">
+          {item}
+        </Text>
+      )}
     />
   );
 };
@@ -172,7 +176,7 @@ export const EducationSection = ({
               ].filter(Boolean)}
             />
 
-            <BodyText>{entry.summary}</BodyText>
+            <Text role="body">{entry.summary}</Text>
 
             {educationTabs.length ? (
               <Box sx={detailBlockSx}>

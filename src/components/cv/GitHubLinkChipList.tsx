@@ -1,12 +1,15 @@
 import GitHubIcon from '@mui/icons-material/GitHub';
-import { Box, Chip, Stack } from '@mui/material';
+import { Box, Chip, Stack, Zoom } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { ReactNode } from 'react';
 import { MotionTiltCard } from '../../motion';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { SPRING_EASING_CSS } from '../../styles/springEasing';
 import { normalizeSxProp } from '../../utils/sx';
-import { AnimatedZoomList } from '../AnimatedZoomList';
+import { useControlledAnimatedList } from '../animatedListShared';
 import { COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
+
+const ZOOM_BASE_TIMEOUT_MS = 220;
 
 export type GitHubLinkChipItem = {
   key: string;
@@ -24,6 +27,65 @@ type GitHubLinkChipListProps = {
   chipSx?: SxProps<Theme>;
   stackSpacing?: number;
   wrapGap?: number;
+};
+
+const ZoomGitHubLinkChipList = ({
+  items,
+  in: inProp,
+  startDelayMs,
+  itemStaggerMs,
+  containerSx,
+  renderItem,
+}: {
+  items: GitHubLinkChipItem[];
+  in: boolean;
+  startDelayMs: number;
+  itemStaggerMs?: number;
+  containerSx: SxProps<Theme>;
+  renderItem: (item: GitHubLinkChipItem, index: number) => ReactNode;
+}) => {
+  const { durationFactor, isMotionDisabled, itemEntries, resolvedContainerSx } =
+    useControlledAnimatedList({
+      items,
+      getItemKey: (item) => item.key,
+      in: inProp,
+      startDelayMs,
+      itemStaggerMs,
+      containerSx,
+    });
+  const zoomTimeout = isMotionDisabled ? 0 : Math.round(ZOOM_BASE_TIMEOUT_MS * durationFactor);
+
+  if (isMotionDisabled) {
+    return (
+      <Box
+        sx={resolvedContainerSx}
+        aria-hidden={!inProp ? true : undefined}
+        style={!inProp ? { visibility: 'hidden' } : undefined}
+      >
+        {itemEntries.map(({ item, index, key, nodeRef }) => (
+          <Box key={key} ref={nodeRef}>
+            {renderItem(item, index)}
+          </Box>
+        ))}
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={resolvedContainerSx}>
+      {itemEntries.map(({ item, index, key, isEntered }) => (
+        <Zoom
+          key={key}
+          in={isEntered}
+          appear={false}
+          timeout={zoomTimeout}
+          easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
+        >
+          <Box>{renderItem(item, index)}</Box>
+        </Zoom>
+      ))}
+    </Box>
+  );
 };
 
 export const GitHubLinkChipList = ({
@@ -93,13 +155,12 @@ export const GitHubLinkChipList = ({
 
   if (layout === 'wrap') {
     return animateItems ? (
-      <AnimatedZoomList
+      <ZoomGitHubLinkChipList
         items={items}
-        getItemKey={(item) => item.key}
         in
         startDelayMs={startDelayMs}
-        containerSx={animatedContainerSx}
         itemStaggerMs={itemStaggerMs}
+        containerSx={animatedContainerSx}
         renderItem={renderTiltChip}
       />
     ) : (
@@ -108,13 +169,12 @@ export const GitHubLinkChipList = ({
   }
 
   return animateItems ? (
-    <AnimatedZoomList
+    <ZoomGitHubLinkChipList
       items={items}
-      getItemKey={(item) => item.key}
       in
       startDelayMs={startDelayMs}
-      containerSx={animatedContainerSx}
       itemStaggerMs={itemStaggerMs}
+      containerSx={animatedContainerSx}
       renderItem={renderTiltChip}
     />
   ) : (

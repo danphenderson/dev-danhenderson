@@ -6,7 +6,7 @@ import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import LanguageIcon from '@mui/icons-material/Language';
-import { HeaderLabel, HeaderTitle, StrongMetaText, MetaText, BodyText } from '../text';
+import { Text } from '../text';
 import { SkillsChipList } from '../SkillsChipList';
 import { CommonLink } from '../CommonLink';
 import {
@@ -87,7 +87,7 @@ const renderBulletList = (items: ReactNode[], max?: number): ReactNode => {
     >
       {visible.map((item, i) => (
         <motion.li key={i} variants={storyBulletItem}>
-          <BodyText>{item}</BodyText>
+          <Text role="body">{item}</Text>
         </motion.li>
       ))}
     </motion.ul>
@@ -131,19 +131,30 @@ const AboutSection = ({
     <Stack spacing={3}>
       <Stack spacing={0.5}>
         <MotionItem variants={storyLabelReveal}>
-          <HeaderLabel>About</HeaderLabel>
+          <Text role="sectionEyebrow" tone="support">
+            About
+          </Text>
         </MotionItem>
         <MotionItem variants={storyTitleReveal}>
-          <HeaderTitle>{about.name}</HeaderTitle>
+          <Text role="sectionTitle">{about.name}</Text>
         </MotionItem>
         <MotionItem variants={storyMetaReveal}>
-          <StrongMetaText sx={{ display: 'inline' }}>{about.title}</StrongMetaText>
-          <MetaText sx={{ display: 'inline' }}> • </MetaText>
-          <MetaText sx={{ display: 'inline' }}>{about.location}</MetaText>
+          <Text role="metaStrong" sx={{ display: 'inline' }}>
+            {about.title}
+          </Text>
+          <Text role="meta" sx={{ display: 'inline' }}>
+            {' '}
+            •{' '}
+          </Text>
+          <Text role="meta" sx={{ display: 'inline' }}>
+            {about.location}
+          </Text>
         </MotionItem>
       </Stack>
       <MotionItem variants={storyBodyReveal}>
-        <BodyText sx={{ whiteSpace: 'pre-line', lineHeight: 1.75 }}>{about.bio}</BodyText>
+        <Text role="body" sx={{ whiteSpace: 'pre-line', lineHeight: 1.75 }}>
+          {about.bio}
+        </Text>
       </MotionItem>
       {about.opportunities && about.opportunities.length > 0 && (
         <StorySkillsChipList skills={about.opportunities} scrollContainerRef={scrollContainerRef} />
@@ -172,7 +183,7 @@ const ExperienceSection = ({
     <Stack spacing={2.5}>
       <Stack spacing={0.5}>
         <MotionItem variants={storyLabelReveal}>
-          <HeaderLabel>
+          <Text role="sectionEyebrow" tone="support">
             {exp.companyUrl ? (
               <CommonLink
                 href={exp.companyUrl}
@@ -185,21 +196,21 @@ const ExperienceSection = ({
             ) : (
               exp.company
             )}
-          </HeaderLabel>
+          </Text>
         </MotionItem>
         <MotionItem variants={storyTitleReveal}>
-          <HeaderTitle>{exp.title}</HeaderTitle>
+          <Text role="sectionTitle">{exp.title}</Text>
         </MotionItem>
       </Stack>
       <MotionItem variants={storyMetaReveal}>
-        <MetaText>
+        <Text role="meta">
           {exp.startDate} – {exp.endDate}
           {exp.industry ? ` · ${exp.industry}` : ''}
-        </MetaText>
+        </Text>
       </MotionItem>
       {exp.description && (
         <MotionItem variants={storyBodyReveal}>
-          <BodyText>{renderExperienceDescriptionContent(exp.description)}</BodyText>
+          <Text role="body">{renderExperienceDescriptionContent(exp.description)}</Text>
         </MotionItem>
       )}
       {exp.projects && exp.projects.length > 0 && (
@@ -227,24 +238,26 @@ const EducationSection = ({
     <Stack spacing={2.5}>
       <Stack spacing={0.5}>
         <MotionItem variants={storyLabelReveal}>
-          <HeaderLabel>{entry.university}</HeaderLabel>
+          <Text role="sectionEyebrow" tone="support">
+            {entry.university}
+          </Text>
         </MotionItem>
         <MotionItem variants={storyTitleReveal}>
-          <HeaderTitle>{entry.program}</HeaderTitle>
+          <Text role="sectionTitle">{entry.program}</Text>
         </MotionItem>
       </Stack>
       <Stack spacing={0.5}>
         <MotionItem variants={storyMetaReveal}>
-          <MetaText>{entry.dateRange ?? entry.expectedCompletion ?? ''}</MetaText>
+          <Text role="meta">{entry.dateRange ?? entry.expectedCompletion ?? ''}</Text>
         </MotionItem>
         {entry.gpa && entry.gpa.length > 0 && (
           <MotionItem variants={storyMetaReveal}>
-            <MetaText>{entry.gpa.map((g) => `${g.label}: ${g.value}`).join('  ·  ')}</MetaText>
+            <Text role="meta">{entry.gpa.map((g) => `${g.label}: ${g.value}`).join('  ·  ')}</Text>
           </MotionItem>
         )}
       </Stack>
       <MotionItem variants={storyBodyReveal}>
-        <BodyText>{entry.summary}</BodyText>
+        <Text role="body">{entry.summary}</Text>
       </MotionItem>
       {entry.highlights && entry.highlights.length > 0 && (
         <MotionItem variants={storyBodyReveal}>{renderBulletList(entry.highlights)}</MotionItem>
@@ -261,13 +274,15 @@ const CertificateSection = ({ item }: { item: Extract<CVStoryItem, { kind: 'cert
   return (
     <Stack spacing={2} sx={{ alignItems: 'center', textAlign: 'center' }}>
       <MotionItem variants={storyLabelReveal}>
-        <HeaderLabel>{cert.issuer}</HeaderLabel>
+        <Text role="sectionEyebrow" tone="support">
+          {cert.issuer}
+        </Text>
       </MotionItem>
       <MotionItem variants={storyTitleReveal}>
-        <HeaderTitle>{cert.title}</HeaderTitle>
+        <Text role="sectionTitle">{cert.title}</Text>
       </MotionItem>
       <MotionItem variants={storyMetaReveal}>
-        <MetaText>{cert.date}</MetaText>
+        <Text role="meta">{cert.date}</Text>
       </MotionItem>
       {cert.link && (
         <MotionItem variants={storyLinkReveal}>
@@ -290,7 +305,7 @@ const VolunteeringSection = ({
     <Stack spacing={2.5}>
       <Stack spacing={0.5}>
         <MotionItem variants={storyLabelReveal}>
-          <HeaderLabel>
+          <Text role="sectionEyebrow" tone="support">
             {entry.organizationUrl ? (
               <CommonLink href={entry.organizationUrl} target="_blank" rel="noopener noreferrer">
                 {entry.organization}
@@ -298,20 +313,20 @@ const VolunteeringSection = ({
             ) : (
               entry.organization
             )}
-          </HeaderLabel>
+          </Text>
         </MotionItem>
         <MotionItem variants={storyTitleReveal}>
-          <HeaderTitle>{entry.role}</HeaderTitle>
+          <Text role="sectionTitle">{entry.role}</Text>
         </MotionItem>
       </Stack>
       <MotionItem variants={storyMetaReveal}>
-        <MetaText>
+        <Text role="meta">
           {entry.dateRange}
           {entry.location ? ` · ${entry.location}` : ''}
-        </MetaText>
+        </Text>
       </MotionItem>
       <MotionItem variants={storyBodyReveal}>
-        <BodyText>{entry.summary}</BodyText>
+        <Text role="body">{entry.summary}</Text>
       </MotionItem>
       {entry.highlights && entry.highlights.length > 0 && (
         <MotionItem variants={storyBodyReveal}>{renderBulletList(entry.highlights)}</MotionItem>
@@ -350,14 +365,16 @@ const CodingSection = ({
     <Stack spacing={2.5}>
       <Stack spacing={0.5}>
         <MotionItem variants={storyLabelReveal}>
-          <HeaderLabel>Project</HeaderLabel>
+          <Text role="sectionEyebrow" tone="support">
+            Project
+          </Text>
         </MotionItem>
         <MotionItem variants={storyTitleReveal}>
-          <HeaderTitle>{example.title}</HeaderTitle>
+          <Text role="sectionTitle">{example.title}</Text>
         </MotionItem>
       </Stack>
       <MotionItem variants={storyBodyReveal}>
-        <BodyText>{example.description}</BodyText>
+        <Text role="body">{example.description}</Text>
       </MotionItem>
       {primaryLink && (
         <MotionItem variants={storyLinkReveal}>
@@ -410,10 +427,12 @@ const EndSection = ({ item }: { item: Extract<CVStoryItem, { kind: 'end' }> }) =
   return (
     <Stack spacing={3} sx={{ alignItems: 'center', textAlign: 'center' }}>
       <MotionItem variants={storyTitleReveal}>
-        <HeaderTitle>{endData.headline}</HeaderTitle>
+        <Text role="sectionTitle">{endData.headline}</Text>
       </MotionItem>
       <MotionItem variants={storyBodyReveal}>
-        <BodyText sx={{ maxWidth: 520, mx: 'auto', lineHeight: 1.75 }}>{endData.body}</BodyText>
+        <Text role="body" sx={{ maxWidth: 520, mx: 'auto', lineHeight: 1.75 }}>
+          {endData.body}
+        </Text>
       </MotionItem>
       <MotionItem variants={storyChipsReveal}>
         <Stack spacing={1.5} sx={{ alignItems: 'center', mt: 1 }}>

@@ -1,13 +1,21 @@
 import { alpha } from '@mui/material/styles';
+import type { Variant } from '@mui/material/styles/createTypography';
 import type { SxProps, Theme } from '@mui/material/styles';
-import type { TextRole, TextTone, TextContext } from '../types/text';
+import type { TextRole, TextTone, TextContext, TextUiRole, TextProseRole } from '../types/text';
 
 /* ── Typeset entry ──────────────────────────────────────── */
 
 /** A typeset fully describes the typographic treatment for one role. */
+type TextVariant = Variant | 'inherit';
+
 export type Typeset = {
   /** MUI variant used internally (not exposed to consumers). */
-  variant: string;
+  variant: TextVariant;
+  sx: SxProps<Theme>;
+};
+
+type BaseTypeset = {
+  variant: TextVariant;
   sx: SxProps<Theme>;
 };
 
@@ -22,6 +30,14 @@ const key = (role: TextRole, tone: TextTone, ctx: TextContext): TypesetKey =>
 
 export const createTextStyleMap = (theme: Theme) => {
   const headingFontFamily = theme.typography.h1.fontFamily;
+  const inheritTypographySx = {
+    color: 'inherit',
+    fontFamily: 'inherit',
+    fontSize: 'inherit',
+    fontWeight: 'inherit',
+    letterSpacing: 'inherit',
+    lineHeight: 'inherit',
+  };
 
   const isObjectSx = (sx: SxProps<Theme>): sx is Record<string, unknown> =>
     typeof sx === 'object' && sx !== null && !Array.isArray(sx);
@@ -36,6 +52,8 @@ export const createTextStyleMap = (theme: Theme) => {
         return theme.palette.text.secondary;
       case 'accent':
         return theme.palette.primary.main;
+      case 'support':
+        return theme.palette.secondary.main;
       case 'inverse':
         return theme.palette.common.white;
     }
@@ -49,6 +67,8 @@ export const createTextStyleMap = (theme: Theme) => {
         return theme.palette.text.secondary;
       case 'accent':
         return theme.palette.primary.main;
+      case 'support':
+        return theme.palette.secondary.main;
       case 'inverse':
         return alpha(theme.palette.common.white, 0.7);
     }
@@ -56,13 +76,14 @@ export const createTextStyleMap = (theme: Theme) => {
 
   /* ── Base role definitions (UI context) ─────────────── */
 
-  const uiRoles: Record<string, { variant: string; sx: SxProps<Theme> }> = {
+  const uiRoles: Record<TextUiRole, BaseTypeset> = {
     pageTitle: {
-      variant: 'h2',
+      variant: 'h1',
       sx: {
         fontFamily: headingFontFamily,
         fontWeight: 700,
-        lineHeight: 1.15,
+        lineHeight: theme.typography.h1.lineHeight,
+        fontSize: theme.typography.h1.fontSize,
       },
     },
     pageSubtitle: {
@@ -72,12 +93,23 @@ export const createTextStyleMap = (theme: Theme) => {
         lineHeight: 1.4,
       },
     },
+    settingsSectionLabel: {
+      variant: 'overline',
+      sx: {
+        fontFamily: headingFontFamily,
+        fontSize: '0.625rem',
+        fontWeight: 600,
+        letterSpacing: '0.1em',
+        lineHeight: 1,
+        textTransform: 'uppercase' as const,
+      },
+    },
     sectionEyebrow: {
       variant: 'overline',
       sx: {
         fontFamily: headingFontFamily,
         fontWeight: 700,
-        letterSpacing: '0.14em',
+        letterSpacing: '0.18em',
         textTransform: 'uppercase' as const,
       },
     },
@@ -162,6 +194,10 @@ export const createTextStyleMap = (theme: Theme) => {
         letterSpacing: '0.02em',
       },
     },
+    inlineLabel: {
+      variant: 'inherit',
+      sx: inheritTypographySx,
+    },
     metricValue: {
       variant: 'body2',
       sx: {
@@ -183,7 +219,7 @@ export const createTextStyleMap = (theme: Theme) => {
 
   /* ── Prose role definitions ─────────────────────────── */
 
-  const proseRoles: Record<string, { variant: string; sx: SxProps<Theme> }> = {
+  const proseRoles: Record<TextProseRole, BaseTypeset> = {
     proseTitle: {
       variant: 'h2',
       sx: {
@@ -261,11 +297,20 @@ export const createTextStyleMap = (theme: Theme) => {
   const map = new Map<TypesetKey, Typeset>();
 
   const allRoles = { ...uiRoles, ...proseRoles };
-  const tones: TextTone[] = ['default', 'muted', 'accent', 'inverse'];
+  const tones: TextTone[] = ['default', 'muted', 'accent', 'support', 'inverse'];
   const contexts: TextContext[] = ['ui', 'prose', 'overlay'];
+  const secondaryDefaultRoles = new Set<TextRole>([
+    'pageSubtitle',
+    'settingsSectionLabel',
+    'sectionSubtitle',
+    'cardSubtitle',
+    'bodyMuted',
+    'meta',
+    'metaStrong',
+  ]);
 
   const resolveColor = (roleName: string, tone: TextTone): string => {
-    const usesSecondary = tone === 'muted' || roleName === 'bodyMuted';
+    const usesSecondary = tone === 'muted' || secondaryDefaultRoles.has(roleName as TextRole);
     if (!usesSecondary) return toneColor(tone);
     return toneSecondaryColor(tone === 'default' ? 'muted' : tone);
   };
@@ -314,14 +359,14 @@ export const createTextStyleMap = (theme: Theme) => {
     return {};
   };
 
-  for (const [roleName, base] of Object.entries(allRoles)) {
+  for (const [roleName, base] of Object.entries(allRoles) as Array<[TextRole, BaseTypeset]>) {
     for (const tone of tones) {
       for (const ctx of contexts) {
         const color = resolveColor(roleName, tone);
         const baseSx = isObjectSx(base.sx) ? base.sx : {};
         const contextSx = getContextAdjustments(roleName, ctx);
 
-        map.set(key(roleName as TextRole, tone, ctx), {
+        map.set(key(roleName, tone, ctx), {
           variant: base.variant,
           sx: {
             ...baseSx,
@@ -340,7 +385,13 @@ export const createTextStyleMap = (theme: Theme) => {
     tone: TextTone = 'default',
     context: TextContext = 'ui'
   ): Typeset => {
-    return map.get(key(role, tone, context)) ?? { variant: 'body2', sx: {} };
+    const typeset = map.get(key(role, tone, context));
+
+    if (!typeset) {
+      throw new Error(`Missing text typeset for ${key(role, tone, context)}`);
+    }
+
+    return typeset;
   };
 
   return { resolveTypeset } as const;

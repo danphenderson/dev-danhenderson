@@ -2,7 +2,7 @@ import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 import { CommonLink } from './CommonLink';
 import { PerformanceScorecard } from './PerformanceScorecard';
-import { SecondaryBodyText } from './text';
+import { Text } from './text';
 import { MotionSection, fadeIn } from '../motion';
 
 export default function Footer() {
@@ -17,13 +17,13 @@ export default function Footer() {
             gap: 0.5,
           }}
         >
-          <SecondaryBodyText align="center">
+          <Text role="bodyMuted" align="center">
             {'Copyright © '}
             <CommonLink color="inherit" href="https://danhenderson.dev/">
               danhenderson.dev
             </CommonLink>{' '}
             {new Date().getFullYear()}.
-          </SecondaryBodyText>
+          </Text>
           <PerformanceScorecard />
         </Box>
       </Container>

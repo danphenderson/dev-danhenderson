@@ -1,7 +1,6 @@
 import { useMemo, useCallback } from 'react';
 import { blogPosts } from '../data/blog';
 import type { BlogPost, BlogPostMeta } from '../types/blog';
-import type { SharedDataStatus } from '../types/data';
 
 function toMeta(post: BlogPost): BlogPostMeta {
   return {
@@ -20,18 +19,6 @@ function toMeta(post: BlogPost): BlogPostMeta {
 }
 
 export function useBlogData() {
-  const status: SharedDataStatus = {
-    source: 'static',
-    loading: false,
-    error: null,
-    isFallback: false,
-    reason: 'bundled-content',
-    freshness: {
-      label: 'Bundled blog content available in the client build.',
-      isStale: false,
-    },
-  };
-
   const posts = useMemo(
     () => [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)),
     []
@@ -97,6 +84,5 @@ export function useBlogData() {
     getPostBySlug,
     getRelatedPosts,
     getAdjacentPosts,
-    status,
   };
 }

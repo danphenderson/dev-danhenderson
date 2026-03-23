@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { photographyCategories } from '../data/photography';
-import type { PhotoCategory, PhotographyAlbumMeta, SharedDataStatus } from '../types/data';
+import type { PhotoCategory, PhotographyAlbumMeta } from '../types/data';
 
 function deriveAlbumMeta(category: PhotoCategory): PhotographyAlbumMeta {
   const locationSet = new Set<string>();
@@ -21,19 +21,6 @@ function deriveAlbumMeta(category: PhotoCategory): PhotographyAlbumMeta {
 }
 
 export function usePhotographyData() {
-  const status: SharedDataStatus = {
-    source: 'static',
-    loading: false,
-    error: null,
-    isFallback: false,
-    reason: 'bundled-content',
-    freshness: {
-      label:
-        'Bundled photography album metadata and static image assets are available in the client build.',
-      isStale: false,
-    },
-  };
-
   const albumMeta = useMemo(() => photographyCategories.map(deriveAlbumMeta), []);
 
   const totalPhotos = useMemo(
@@ -46,5 +33,5 @@ export function usePhotographyData() {
     []
   );
 
-  return { categories: photographyCategories, featuredCategory, albumMeta, totalPhotos, status };
+  return { categories: photographyCategories, featuredCategory, albumMeta, totalPhotos };
 }

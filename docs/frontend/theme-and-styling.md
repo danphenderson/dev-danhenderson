@@ -4,6 +4,8 @@ This document covers the MUI theme construction pipeline, the six appearance pre
 
 For the concrete catalog of existing UI surfaces and primitives, see the [Design system reference](../design-system-reference.md).
 
+Semantic typography is owned by [src/styles/textStyleBuilders.ts](../../src/styles/textStyleBuilders.ts) and consumed through [src/components/text/Text.tsx](../../src/components/text/Text.tsx). `componentStyleBuilders.ts` does not define canonical text roles; it only supplies surrounding layout, surfaces, and decorative motion helpers.
+
 ## Theme construction pipeline
 
 ```mermaid
@@ -158,7 +160,7 @@ flowchart LR
   subgraph Component["componentStyleBuilders.ts"]
     CSM["createComponentStyleMap(theme)"]
     Cards["Card gradients<br/>borders · shadows · glows"]
-    Text["Text styles<br/>accent · overline · breathe"]
+    Text["Text-adjacent helpers<br/>heading breathe · status breathe"]
     Layouts["Layout helpers<br/>tab · panel · chip · list"]
     Timings["Motion timing tokens<br/>itemStaggerMs · sectionStaggerMs"]
     Helpers["Delay calculators<br/>getSectionDelayMs · getItemDelayMs"]
@@ -271,15 +273,16 @@ This produces ease-out-back (slight overshoot and settle). It is used across:
 
 ## Where styling should live
 
-| Category                    | Where                                                                           | Example                                              |
-| --------------------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| **Palette colors**          | Appearance preset in `appAppearance.ts`                                         | `primary.main`, `secondary.main`, `background.paper` |
-| **Typography scale**        | `createAppTheme()`                                                              | `h1`–`h6` sizes, body font families                  |
-| **Component defaults**      | MUI component overrides in `createAppTheme()`                                   | Button shape, chip shape, paper border               |
-| **Surface treatments**      | `componentStyleBuilders.ts` → computed from `theme.appearanceTreatment.surface` | Card gradients, glow shadows, border opacity         |
-| **Page-level layout**       | `appStyleBuilders.ts` → consumed via `useAppStyles()`                           | Background overlays, header styling, page containers |
-| **Motion timing**           | `componentStyleBuilders.ts` → exposed as timing tokens                          | Stagger delays, animation durations                  |
-| **Component-local styling** | Inline `sx` prop using theme tokens                                             | One-off spacing, conditional visibility              |
+| Category                    | Where                                                                           | Example                                                 |
+| --------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| **Palette colors**          | Appearance preset in `appAppearance.ts`                                         | `primary.main`, `secondary.main`, `background.paper`    |
+| **Typography scale**        | `createAppTheme()`                                                              | `h1`–`h6` sizes, body font families                     |
+| **Semantic text roles**     | `textStyleBuilders.ts` + `Text.tsx`                                             | `sectionTitle`, `meta`, `inlineLabel`, `proseParagraph` |
+| **Component defaults**      | MUI component overrides in `createAppTheme()`                                   | Button shape, chip shape, paper border                  |
+| **Surface treatments**      | `componentStyleBuilders.ts` → computed from `theme.appearanceTreatment.surface` | Card gradients, glow shadows, border opacity            |
+| **Page-level layout**       | `appStyleBuilders.ts` → consumed via `useAppStyles()`                           | Background overlays, header styling, page containers    |
+| **Motion timing**           | `componentStyleBuilders.ts` → exposed as timing tokens                          | Stagger delays, animation durations                     |
+| **Component-local styling** | Inline `sx` prop using theme tokens                                             | One-off spacing, conditional visibility                 |
 
 ### Where styling should NOT live
 
@@ -297,7 +300,7 @@ This produces ease-out-back (slight overshoot and settle). It is used across:
 
 2. **The IDE chrome (`src/components/ide/`)** maintains its own token file (`vscodeTokens.ts`) with hardcoded colors outside the theme system. This is intentional — the VS Code simulation needs to look like VS Code, not like the portfolio theme.
 
-3. **Blog editorial typography** uses custom display-scale sizing and tracking that is separate from the standard typography primitives. This is an intentional exception for editorial design.
+3. **Some shared components still carry decorative text-adjacent helpers** from `componentStyleBuilders.ts` such as heading-breathe and status-breathe motion. Those helpers are valid only when they do not redefine the canonical role, tone, or context that already lives in `textStyleBuilders.ts`.
 
 ## Further reading
 

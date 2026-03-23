@@ -3,8 +3,9 @@ import Box from '@mui/material/Box';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { AboutMe } from '../../types/cv';
 import { DEFAULT_INTERSECTION_ROOT_MARGIN } from '../../motion';
+import { useComponentStyles } from '../../styles/componentStyles';
 import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
-import { mergeSx, StatusInlineText } from '../text';
+import { mergeSx, Text } from '../text';
 import { useTypewriterProgress, type TypewriterTimingPreset } from '../text/useTypewriterProgress';
 
 const STATUS_MARKER = 'Open to opportunities';
@@ -112,6 +113,7 @@ const renderSegment = (
   text: string,
   about: AboutMe,
   key: string,
+  statusBreatheSx: SxProps<Theme>,
   {
     ariaHidden,
     includeTooltipProps = true,
@@ -150,9 +152,16 @@ const renderSegment = (
 
   if (segment.kind === 'status' && renderStatusSpan) {
     return (
-      <StatusInlineText key={key} aria-hidden={ariaHidden}>
+      <Text
+        key={key}
+        role="inlineLabel"
+        tone="support"
+        component="span"
+        aria-hidden={ariaHidden}
+        sx={statusBreatheSx}
+      >
         {text}
-      </StatusInlineText>
+      </Text>
     );
   }
 
@@ -163,6 +172,7 @@ const renderSegments = (
   segments: BioSegment[],
   about: AboutMe,
   visibleChars: number,
+  statusBreatheSx: SxProps<Theme>,
   options?: RenderSegmentOptions
 ) => {
   let remainingChars = visibleChars;
@@ -171,7 +181,14 @@ const renderSegments = (
     const text = getVisibleSegmentText(segment, remainingChars);
     remainingChars -= segment.text.length;
 
-    return renderSegment(segment, text, about, `${segment.kind}-${index}`, options);
+    return renderSegment(
+      segment,
+      text,
+      about,
+      `${segment.kind}-${index}`,
+      statusBreatheSx,
+      options
+    );
   });
 };
 
@@ -190,6 +207,7 @@ export const CVAboutBioTypewriter = ({
   const startTimeoutRef = React.useRef<number | undefined>(undefined);
   const hasNotifiedCompletionRef = React.useRef(false);
   const [shouldPlay, setShouldPlay] = React.useState(false);
+  const { statusBreatheSx } = useComponentStyles();
   const segments = React.useMemo(() => buildBioSegments(about), [about]);
   const fullText = React.useMemo(
     () => segments.map((segment) => segment.text).join(''),
@@ -281,7 +299,7 @@ export const CVAboutBioTypewriter = ({
         }}
       >
         <Box component="span" data-typewriter-layer="animated" sx={layerSx}>
-          {renderSegments(segments, about, fullText.length)}
+          {renderSegments(segments, about, fullText.length, statusBreatheSx)}
         </Box>
       </Box>
     );
@@ -301,7 +319,7 @@ export const CVAboutBioTypewriter = ({
     >
       {renderAccessibleLayer && (
         <Box component="span" sx={visuallyHiddenSx} data-typewriter-layer="accessible">
-          {renderSegments(segments, about, fullText.length, {
+          {renderSegments(segments, about, fullText.length, statusBreatheSx, {
             includeTooltipProps: false,
             disableLinkFocus: true,
             renderStatusSpan: false,
@@ -320,7 +338,7 @@ export const CVAboutBioTypewriter = ({
             userSelect: 'none',
           })}
         >
-          {renderSegments(segments, about, fullText.length, {
+          {renderSegments(segments, about, fullText.length, statusBreatheSx, {
             includeTooltipProps: false,
             disableLinkFocus: true,
           })}
@@ -333,7 +351,7 @@ export const CVAboutBioTypewriter = ({
         data-typewriter-layer="animated"
         sx={layerSx}
       >
-        {renderSegments(segments, about, visibleChars, {
+        {renderSegments(segments, about, visibleChars, statusBreatheSx, {
           disableLinkFocus: renderAccessibleLayer,
         })}
 

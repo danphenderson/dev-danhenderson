@@ -9,7 +9,7 @@ import type { SpeedDialActionProps } from '@mui/material/SpeedDialAction';
 import type { SpeedDialProps } from '@mui/material/SpeedDial';
 import { Link } from 'react-router-dom';
 import { useMotionScale } from '../motion';
-import { InteractiveLabel } from './text';
+import { Text } from './text';
 import type { AppSpeedDialAction, AppSpeedDialLayer } from '../types/ui';
 
 export type { AppSpeedDialAction, AppSpeedDialLayer };
@@ -119,7 +119,11 @@ export const AppSpeedDial = ({
         <SpeedDialAction
           key={action.id}
           icon={action.icon}
-          tooltipTitle={<InteractiveLabel>{action.label}</InteractiveLabel>}
+          tooltipTitle={
+            <Text role="inlineLabel" component="span">
+              {action.label}
+            </Text>
+          }
           tooltipPlacement={actionTooltipPlacement}
           tooltipOpen={actionLabelsAlwaysOpen && open}
           FabProps={getActionFabProps(action)}

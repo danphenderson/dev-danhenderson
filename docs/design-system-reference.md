@@ -9,7 +9,7 @@
 
 ## Text authoring decision tree
 
-- **UI chrome** (nav, button labels, chips) → `Text role="label"` or `InlineLabel` primitives
+- **UI chrome** (nav, button labels, chips) → `Text role="inlineLabel"` or `Text role="label"`
 - **Structural UI** (section/card headings, meta, body) → `Text role="..."` with the appropriate role
 - **Long-form reading** (blog articles) → `Text` with prose roles (`proseParagraph`, `proseHeading`, etc.)
 - **Text on imagery** (photography overlays) → `Text tone="inverse" context="overlay"` with the appropriate role
@@ -40,7 +40,7 @@ For architecture-level context, see [Component architecture](frontend/component-
 ## Core Rules
 
 - Prefer shared route scaffolds before page-local layout.
-- Prefer semantic text primitives before styling raw `Typography`.
+- Prefer semantic `Text` roles before styling raw `Typography`.
 - Prefer shared card and panel surfaces before inventing a new container.
 - Prefer `Stack`, shared gap helpers, and shared padding profiles before ad hoc spacing.
 - Prefer the existing animated list and chip-list primitives for repeated content.
@@ -57,44 +57,19 @@ For architecture-level context, see [Component architecture](frontend/component-
 
 ## Typography
 
-### 1. Semantic text primitives
-
-Use purpose-named text wrappers instead of styling raw `Typography` when the copy matches an existing semantic role.
-
-- Section labels and titles: `HeaderLabel`, `HeaderTitle`, `HeaderSubtitle`
-- Entry and metadata text: `EntryTitle`, `MetaText`, `StrongMetaText`, `BodyText`, `CaptionText`
-- Dashboard/stat values: `MetricValueText`
-- Secondary copy: `SecondaryBodyText`, `SecondaryCaptionText`
-- List copy: `ListItemText`
-
-Defined in [src/components/text/TypographyPrimitives.tsx](../src/components/text/TypographyPrimitives.tsx).
-
-Common consumers:
-
-- [src/components/layout/SectionHeading.tsx](../src/components/layout/SectionHeading.tsx)
-- [src/components/cv/CVEntryHeader.tsx](../src/components/cv/CVEntryHeader.tsx)
-- [src/components/cv/ProfileCard.tsx](../src/components/cv/ProfileCard.tsx)
-- [src/components/climbing/ClimbingAnalytics.tsx](../src/components/climbing/ClimbingAnalytics.tsx) for metric dashboards
-- [src/components/photography/AlbumCard.tsx](../src/components/photography/AlbumCard.tsx)
-
-### 2. Inline label primitives
-
-For tabs, chips, and compact controls, use the span-based label primitives so labels inherit surrounding typography cleanly.
-
-Defined in [src/components/text/InlineLabelPrimitives.tsx](../src/components/text/InlineLabelPrimitives.tsx).
-
-Common consumers:
-
-- [src/components/AppSpeedDial.tsx](../src/components/AppSpeedDial.tsx)
-- [src/components/TabPanel.tsx](../src/components/TabPanel.tsx)
-- [src/components/SkillsChipList.tsx](../src/components/SkillsChipList.tsx)
-- [src/components/cv/GitHubLinkChipList.tsx](../src/components/cv/GitHubLinkChipList.tsx)
-
-### 3. `Text` component — canonical text authoring API
+### 1. `Text` component — canonical text authoring API
 
 All UI text is authored through the `Text` component using semantic `role`, `tone`, and `context` props. The typeset builder in `src/styles/textStyleBuilders.ts` maps role×tone×context to styled output. Direct MUI `Typography` imports are banned outside `src/components/text/**` (enforced by ESLint).
 
 Defined in [src/components/text/Text.tsx](../src/components/text/Text.tsx). Shared types in [src/types/text.ts](../src/types/text.ts).
+
+Common UI roles:
+
+- Section/page headings: `sectionEyebrow`, `sectionTitle`, `sectionSubtitle`, `subsectionTitle`, `pageTitle`, `settingsSectionLabel`
+- Entry and metadata text: `cardTitle`, `cardSubtitle`, `meta`, `metaStrong`, `body`, `bodyMuted`, `caption`
+- Metrics and compact labels: `metricValue`, `metricLabel`, `inlineLabel`, `label`
+
+Semantic text styling lives in [src/styles/textStyleBuilders.ts](../src/styles/textStyleBuilders.ts). [src/styles/componentStyleBuilders.ts](../src/styles/componentStyleBuilders.ts) only owns layout, surfaces, and decorative motion helpers that sit around text, such as heading-breathe animation hooks.
 
 **Blog** uses prose roles (`proseParagraph`, `proseHeading`, etc.) via `Text` — not a separate editorial typography system.
 
@@ -247,7 +222,7 @@ Defined in [src/components/layout/PageFrame.tsx](../src/components/layout/PageFr
 
 ### 3. `SectionHeading`
 
-Use for standard section intros. It composes the existing text primitives instead of asking each page to build its own overline/title/subtitle stack.
+Use for standard section intros. It composes the canonical `Text` roles instead of asking each page to build its own overline/title/subtitle stack.
 
 Defined in [src/components/layout/SectionHeading.tsx](../src/components/layout/SectionHeading.tsx).
 
@@ -272,7 +247,7 @@ Primary consumer:
 
 ### 1. `AnimatedContentList`
 
-Preferred pattern for repeated CV content blocks. Supports stack or wrap layout and card, panel, or plain item surfaces.
+Preferred pattern for viewport-triggered repeated CV content blocks. Supports stack or wrap layout and card, panel, or plain item surfaces.
 
 Defined in [src/components/AnimatedContentList.tsx](../src/components/AnimatedContentList.tsx).
 
@@ -286,7 +261,7 @@ Primary consumers:
 
 ### 2. `AnimatedSlideList`
 
-Preferred pattern for supplemental detail lists inside tabs and chip drawers.
+Primary controlled repeated-item animation primitive for supplemental detail lists inside tabs, drawers, and similar state-driven reveals.
 
 Defined in [src/components/AnimatedSlideList.tsx](../src/components/AnimatedSlideList.tsx).
 

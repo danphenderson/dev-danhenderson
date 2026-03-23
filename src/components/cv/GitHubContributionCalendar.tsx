@@ -4,7 +4,7 @@ import { GitHubCalendar } from 'react-github-calendar';
 import { DEFAULT_INTERSECTION_ROOT_MARGIN, MotionTiltCard } from '../../motion';
 import { ContentCard } from '../ContentCard';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { BodyText, SubsectionTitle } from '../text';
+import { Text } from '../text';
 import { getMaxScrollLeft, isElementInViewport } from '../../utils/dom';
 import { easeOutCubic } from '../../utils/easing';
 
@@ -34,8 +34,6 @@ export const GitHubContributionCalendar = ({
     githubCalendarContainerSx,
     githubCalendarSizeSx,
     githubCalendarTheme,
-    supportAccentTitleSx,
-    secondaryTextSx,
   } = useComponentStyles();
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(null);
   const [hasIntersectionTrigger, setHasIntersectionTrigger] = useState(skipEntranceAnimation);
@@ -348,8 +346,10 @@ export const GitHubContributionCalendar = ({
 
   const calendarContent = (
     <Stack spacing={1}>
-      <SubsectionTitle sx={supportAccentTitleSx}>Contribution calendar</SubsectionTitle>
-      <BodyText sx={secondaryTextSx}>Yearly GitHub activity at a glance.</BodyText>
+      <Text role="subsectionTitle" tone="support">
+        Contribution calendar
+      </Text>
+      <Text role="bodyMuted">Yearly GitHub activity at a glance.</Text>
       <Box sx={githubCalendarContainerSx}>
         <Box ref={calendarWrapperRef} sx={githubCalendarSizeSx}>
           <GitHubCalendar

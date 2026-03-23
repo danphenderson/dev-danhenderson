@@ -1,6 +1,7 @@
 import { Box } from '@mui/material';
 import type { BoxProps } from '@mui/material';
-import { HeaderLabel, HeaderTitle, HeaderSubtitle } from '../text';
+import { useComponentStyles } from '../../styles/componentStyles';
+import { Text } from '../text';
 
 type SectionHeadingProps = BoxProps & {
   overline: string;
@@ -14,10 +15,30 @@ export const SectionHeading = ({
   subtitle,
   sx,
   ...props
-}: SectionHeadingProps) => (
-  <Box sx={sx} {...props}>
-    <HeaderLabel>{overline}</HeaderLabel>
-    {title && <HeaderTitle subtitle={subtitle}>{title}</HeaderTitle>}
-    {subtitle && <HeaderSubtitle>{subtitle}</HeaderSubtitle>}
-  </Box>
-);
+}: SectionHeadingProps) => {
+  const {
+    sectionHeadingOverlineTextSx,
+    sectionHeadingTitleSx,
+    sectionHeadingTitleTextSx,
+    sectionHeadingSubtitleSx,
+    sectionHeadingSubtitleTextSx,
+  } = useComponentStyles();
+
+  return (
+    <Box sx={sx} {...props}>
+      <Text role="sectionEyebrow" tone="support" sx={sectionHeadingOverlineTextSx}>
+        {overline}
+      </Text>
+      {title && (
+        <Text role="sectionTitle" sx={[sectionHeadingTitleSx(subtitle), sectionHeadingTitleTextSx]}>
+          {title}
+        </Text>
+      )}
+      {subtitle && (
+        <Text role="sectionSubtitle" sx={[sectionHeadingSubtitleSx, sectionHeadingSubtitleTextSx]}>
+          {subtitle}
+        </Text>
+      )}
+    </Box>
+  );
+};

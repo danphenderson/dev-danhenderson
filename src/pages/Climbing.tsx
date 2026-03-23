@@ -12,7 +12,7 @@ import { useClimbingData } from '../hooks/useClimbingData';
 import type { TickRow, TodoRow } from '../types/data';
 import { useFuzzySearch } from '../hooks/useFuzzySearch';
 import { useAppStyles } from '../styles/appStyles';
-import { SectionLeadText } from '../components/text';
+import { Text } from '../components/text';
 import { MotionSection, MotionFadeIn, MotionTiltCard } from '../motion';
 
 const renderRouteLink = (label: string, href: string) => (
@@ -59,9 +59,10 @@ const todoSearchKeys = ['route', 'location'];
 export default function Climbing() {
   const appStyles = useAppStyles();
   useDocumentMetadata({ ...siteRouteMap.climbing, canonicalPath: siteRouteMap.climbing.path });
-  const { ticks, todos, analytics, status } = useClimbingData();
+  const { ticks, todos, analytics } = useClimbingData();
   const tickSearch = useFuzzySearch<TickRow>(ticks, tickSearchKeys);
   const todoSearch = useFuzzySearch<TodoRow>(todos, todoSearchKeys);
+  const hasRoutesToClimb = todos.length > 0;
 
   return (
     <PageFrame image="assets/climbing/climbing-locations.png" maxWidth={1200}>
@@ -69,11 +70,11 @@ export default function Climbing() {
         <SectionCard sx={appStyles.climbingCardSx}>
           <Stack spacing={2}>
             <SectionHeading overline="Climbing" />
-            <SectionLeadText>
+            <Text role="metaStrong">
               A collection of routes I've remembered to tick on Mountain Project, including some
               top-rope ascents — I don't climb 5.14.
-            </SectionLeadText>
-            <ClimbingAnalytics analytics={analytics} status={status} />
+            </Text>
+            <ClimbingAnalytics analytics={analytics} />
             <TextField
               size="small"
               placeholder="Search climbed routes..."
@@ -103,39 +104,46 @@ export default function Climbing() {
                 />
               </Box>
             </MotionTiltCard>
-            <MotionFadeIn>
-              <SectionHeading overline="TODO Routes" sx={appStyles.sectionHeadingOffsetSx} />
-            </MotionFadeIn>
-            <SectionLeadText>A collection of routes I'm interested in climbing.</SectionLeadText>
-            <TextField
-              size="small"
-              placeholder="Search TODO routes..."
-              value={todoSearch.search}
-              onChange={(e) => todoSearch.setSearch(e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon fontSize="small" />
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <MotionTiltCard intensity={0.4}>
-              <Box sx={appStyles.dataGridContainerSx}>
-                <DataGrid
-                  rows={todoSearch.filtered}
-                  columns={todoColumns}
-                  autoHeight
-                  disableRowSelectionOnClick
-                  pageSizeOptions={[5, 10, 25, 50]}
-                  initialState={{
-                    pagination: {
-                      paginationModel: { pageSize: 10, page: 0 },
-                    },
+            {hasRoutesToClimb && (
+              <>
+                <MotionFadeIn>
+                  <SectionHeading
+                    overline="Routes to Climb"
+                    sx={appStyles.sectionHeadingOffsetSx}
+                  />
+                </MotionFadeIn>
+                <Text role="metaStrong">A collection of routes I'd still like to climb.</Text>
+                <TextField
+                  size="small"
+                  placeholder="Search routes to climb..."
+                  value={todoSearch.search}
+                  onChange={(e) => todoSearch.setSearch(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon fontSize="small" />
+                      </InputAdornment>
+                    ),
                   }}
                 />
-              </Box>
-            </MotionTiltCard>
+                <MotionTiltCard intensity={0.4}>
+                  <Box sx={appStyles.dataGridContainerSx}>
+                    <DataGrid
+                      rows={todoSearch.filtered}
+                      columns={todoColumns}
+                      autoHeight
+                      disableRowSelectionOnClick
+                      pageSizeOptions={[5, 10, 25, 50]}
+                      initialState={{
+                        pagination: {
+                          paginationModel: { pageSize: 10, page: 0 },
+                        },
+                      }}
+                    />
+                  </Box>
+                </MotionTiltCard>
+              </>
+            )}
           </Stack>
         </SectionCard>
       </MotionSection>

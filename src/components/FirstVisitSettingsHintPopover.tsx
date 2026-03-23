@@ -1,15 +1,7 @@
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import { Button, Popover, Stack } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { BodyText, Text } from './text';
-
-const sectionLabelSx = {
-  fontSize: '0.625rem',
-  fontWeight: 600,
-  letterSpacing: '0.1em',
-  color: 'text.secondary',
-  lineHeight: 1,
-} as const;
+import { Text } from './text';
 
 export type FirstVisitSettingsHintPopoverProps = {
   open: boolean;
@@ -54,14 +46,14 @@ export const FirstVisitSettingsHintPopover = ({
       <Stack spacing={1.75} data-testid="first-visit-settings-hint-popover">
         <Stack direction="row" spacing={1} alignItems="center">
           <SettingsOutlinedIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
-          <Text role="sectionEyebrow" component="span" sx={sectionLabelSx}>
+          <Text role="settingsSectionLabel" component="span">
             Global settings
           </Text>
         </Stack>
 
-        <BodyText>
+        <Text role="body">
           You can always update motion and welcome audio from the settings button in the header.
-        </BodyText>
+        </Text>
 
         <Button onClick={onGetStarted} variant="contained" fullWidth aria-label="Get started">
           Get started

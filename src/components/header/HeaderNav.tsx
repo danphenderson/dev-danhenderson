@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import { siteRouteMap, type SiteRouteDefinition } from '../../constants/siteRoutes';
 import { useMotionScale } from '../../motion';
 import { useAppStyles } from '../../styles/appStyles';
-import { NavigationLabel } from '../text';
+import { Text } from '../text';
 
 type HeaderNavProps = {
   pages: SiteRouteDefinition[];
@@ -117,7 +117,9 @@ export const HeaderNav = ({
                 aria-label={`Go to ${label}`}
                 aria-current={isActivePage(currentPath, path) ? 'page' : undefined}
               >
-                <NavigationLabel>{label}</NavigationLabel>
+                <Text role="inlineLabel" component="span">
+                  {label}
+                </Text>
               </Button>
             ))}
           </Stack>
@@ -145,7 +147,9 @@ export const HeaderNav = ({
               }}
             >
               {getPageChipIcon(path)}
-              <NavigationLabel sx={{ flex: 1, textAlign: 'left' }}>{label}</NavigationLabel>
+              <Text role="inlineLabel" component="span" sx={{ flex: 1, textAlign: 'left' }}>
+                {label}
+              </Text>
             </Box>
           </MenuItem>
         ))}

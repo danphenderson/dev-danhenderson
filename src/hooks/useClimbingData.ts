@@ -4,7 +4,6 @@ import type {
   ClimbingAnalytics,
   GradeBucket,
   LocationCount,
-  SharedDataStatus,
   TickRow,
   TodoRow,
 } from '../types/data';
@@ -199,37 +198,9 @@ export function useClimbingData() {
     };
   }, []);
 
-  const status = useMemo<SharedDataStatus>(() => {
-    const mostRecentTick = tickData.reduce<string | undefined>((latest, tick) => {
-      if (!latest) {
-        return tick.date;
-      }
-
-      return getIsoDateUtcTimestamp(tick.date) > getIsoDateUtcTimestamp(latest)
-        ? tick.date
-        : latest;
-    }, undefined);
-
-    return {
-      source: 'static',
-      loading: false,
-      error: null,
-      isFallback: false,
-      reason: 'bundled-content',
-      freshness: {
-        label: mostRecentTick
-          ? `Bundled climbing log updated through ${formatIsoDateAsUtcCalendar(mostRecentTick)}.`
-          : 'Bundled climbing log data is available in the client build.',
-        lastUpdated: mostRecentTick,
-        isStale: false,
-      },
-    };
-  }, []);
-
   return {
     ticks,
     todos,
     analytics,
-    status,
   };
 }

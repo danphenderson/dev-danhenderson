@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { Text } from '../../../../src/components/text/Text';
 
@@ -56,6 +56,24 @@ describe('Text component', () => {
     const el = screen.getByText('LABEL');
 
     expect(el.tagName).toBe('SPAN');
+  });
+
+  it('renders settingsSectionLabel as a span', () => {
+    render(<Text role="settingsSectionLabel">Settings</Text>, { wrapper });
+
+    const el = screen.getByText('Settings');
+
+    expect(el.tagName).toBe('SPAN');
+    expect(el).toHaveClass('MuiTypography-overline');
+  });
+
+  it('renders inlineLabel with inherited typography semantics', () => {
+    render(<Text role="inlineLabel">Chip text</Text>, { wrapper });
+
+    const el = screen.getByText('Chip text');
+
+    expect(el.tagName).toBe('SPAN');
+    expect(el).toHaveClass('MuiTypography-inherit');
   });
 
   it('renders proseListItem as an li', () => {
@@ -134,6 +152,17 @@ describe('Text component', () => {
     expect(screen.getByText('Featured')).toBeInTheDocument();
   });
 
+  it('renders with support tone', () => {
+    render(
+      <Text role="sectionEyebrow" tone="support">
+        Support
+      </Text>,
+      { wrapper }
+    );
+
+    expect(screen.getByText('Support')).toBeInTheDocument();
+  });
+
   /* ── Extra props ────────────────────────────────────── */
 
   it('passes id to the rendered element', () => {
@@ -156,6 +185,26 @@ describe('Text component', () => {
     );
 
     expect(screen.getByText('Classed')).toHaveClass('custom-class');
+  });
+
+  it('passes DOM, ARIA, data, and interaction props through to Typography', () => {
+    const handleClick = jest.fn();
+
+    render(
+      <Text role="body" aria-hidden={true} data-surface="summary" onClick={handleClick}>
+        Interactive text
+      </Text>,
+      { wrapper }
+    );
+
+    const el = screen.getByText('Interactive text');
+
+    expect(el).toHaveAttribute('aria-hidden', 'true');
+    expect(el).toHaveAttribute('data-surface', 'summary');
+
+    fireEvent.click(el);
+
+    expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
   it('merges caller sx with typeset defaults', () => {
@@ -223,11 +272,27 @@ describe('Text component', () => {
     expect(screen.getByText('Overlay title')).toHaveStyle({ lineHeight: '1.2' });
   });
 
+  it('uses the same default color for meta text roles', () => {
+    render(
+      <>
+        <Text role="meta">Meta</Text>
+        <Text role="metaStrong">Strong meta</Text>
+      </>,
+      { wrapper }
+    );
+
+    const metaColor = window.getComputedStyle(screen.getByText('Meta')).color;
+    const metaStrongColor = window.getComputedStyle(screen.getByText('Strong meta')).color;
+
+    expect(metaColor).toBe(metaStrongColor);
+  });
+
   /* ── All UI roles render without error ──────────────── */
 
   const uiRoles = [
     'pageTitle',
     'pageSubtitle',
+    'settingsSectionLabel',
     'sectionEyebrow',
     'sectionTitle',
     'sectionSubtitle',
@@ -240,6 +305,7 @@ describe('Text component', () => {
     'metaStrong',
     'caption',
     'label',
+    'inlineLabel',
     'metricValue',
     'metricLabel',
   ] as const;

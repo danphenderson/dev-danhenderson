@@ -16,7 +16,7 @@ import { siteRouteMap } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useBlogData } from '../hooks/useBlogData';
 import { useAppStyles } from '../styles/appStyles';
-import { SecondaryBodyText } from '../components/text';
+import { Text } from '../components/text';
 import { MotionSection } from '../motion';
 
 export default function BlogPost() {
@@ -97,10 +97,10 @@ export default function BlogPost() {
                   title="Post not found"
                   sx={{ maxWidth: { md: 760 } }}
                 />
-                <SecondaryBodyText>
+                <Text role="bodyMuted">
                   This article does not exist or has been moved. Use the command palette or recovery
                   links below to navigate to another page.
-                </SecondaryBodyText>
+                </Text>
                 <RouteRecoveryPanel
                   attemptedPathLabel={recoveryContext.attemptedPathLabel}
                   routeHintLabel={recoveryContext.routeHintLabel}

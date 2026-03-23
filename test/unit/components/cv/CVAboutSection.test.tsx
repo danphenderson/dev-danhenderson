@@ -93,11 +93,6 @@ jest.mock('../../../../src/components/text', () => {
 
   return {
     ...actual,
-    SubsectionTitle: ({ children, sx }: { children: ReactNode; sx?: unknown }) => (
-      <div data-testid="workflow-title" data-has-sx={String(Boolean(sx))}>
-        {children}
-      </div>
-    ),
     TypewriterText: ({
       text,
       playing = true,
@@ -226,7 +221,7 @@ describe('CVAboutSection', () => {
       'data-playing',
       'true'
     );
-    expect(screen.getAllByTestId('workflow-title')[1]).toHaveAttribute('data-has-sx', 'true');
+    expect(screen.getByText('Current workflow:')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Complete Current workflow:' }));
 

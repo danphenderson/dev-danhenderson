@@ -3,12 +3,15 @@ import { act, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { AnimatedSlideList } from '../../../src/components/AnimatedSlideList';
 
+const mockUseMotionScale = jest.fn(() => ({ duration: 1, stagger: 1, tilt: 1 }));
+
 type MockSlideProps = {
   children: ReactNode;
   direction?: string;
   appear?: boolean;
   in?: boolean;
   container?: (() => Element | null) | Element;
+  nodeRef?: React.RefObject<HTMLElement>;
 };
 
 jest.mock('@mui/material', () => {
@@ -16,13 +19,14 @@ jest.mock('@mui/material', () => {
 
   return {
     ...actual,
-    Slide: ({ children, direction, appear, in: inProp, container }: MockSlideProps) => (
+    Slide: ({ children, direction, appear, in: inProp, container, nodeRef }: MockSlideProps) => (
       <div
         data-testid="slide-item"
         data-direction={direction}
         data-appear={String(appear ?? true)}
         data-in={String(inProp ?? true)}
         data-has-container={String(Boolean(container))}
+        data-has-node-ref={String(Boolean(nodeRef))}
       >
         {children}
       </div>
@@ -32,7 +36,7 @@ jest.mock('@mui/material', () => {
 
 jest.mock('../../../src/motion', () => ({
   ...jest.requireActual('../../../src/motion'),
-  useMotionScale: () => ({ duration: 1, stagger: 1, tilt: 1 }),
+  useMotionScale: () => mockUseMotionScale(),
 }));
 
 jest.mock('../../../src/styles/componentStyles', () => ({
@@ -48,11 +52,13 @@ jest.mock('../../../src/styles/componentStyles', () => ({
 describe('AnimatedSlideList', () => {
   beforeEach(() => {
     jest.useFakeTimers();
+    mockUseMotionScale.mockReturnValue({ duration: 1, stagger: 1, tilt: 1 });
   });
 
   afterEach(() => {
     jest.runOnlyPendingTimers();
     jest.useRealTimers();
+    mockUseMotionScale.mockClear();
   });
 
   it('enters slide items sequentially when selected and resets them when closed', () => {
@@ -74,6 +80,7 @@ describe('AnimatedSlideList', () => {
       expect(slide).toHaveAttribute('data-direction', 'up');
       expect(slide).toHaveAttribute('data-appear', 'true');
       expect(slide).toHaveAttribute('data-has-container', 'true');
+      expect(slide).toHaveAttribute('data-has-node-ref', 'true');
     });
 
     rerender(
@@ -193,5 +200,23 @@ describe('AnimatedSlideList', () => {
     });
 
     expect(screen.getAllByTestId('slide-item')[2]).toHaveAttribute('data-in', 'true');
+  });
+
+  it('renders plain list items without Slide transitions when motion is off', () => {
+    mockUseMotionScale.mockReturnValue({ duration: 0, stagger: 0, tilt: 0 });
+
+    render(
+      <AnimatedSlideList
+        items={['React', 'TypeScript']}
+        getItemKey={(item) => item}
+        in={false}
+        keepMountedWhenExited
+        renderItem={(item) => <div>{item}</div>}
+      />
+    );
+
+    expect(screen.queryByTestId('slide-item')).not.toBeInTheDocument();
+    expect(screen.getByText('React')).toBeInTheDocument();
+    expect(screen.getByText('TypeScript')).toBeInTheDocument();
   });
 });

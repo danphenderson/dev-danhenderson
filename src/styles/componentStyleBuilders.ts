@@ -133,20 +133,6 @@ export const createComponentStyleMap = (theme: Theme) => {
   const interactiveAccentTextSx = {
     color: accentColor,
   } satisfies SxProps<Theme>;
-  const supportOverlineSx = {
-    color: supportAccentColor,
-  } satisfies SxProps<Theme>;
-  const supportAccentTextSx = {
-    color: supportAccentColor,
-  } satisfies SxProps<Theme>;
-  const supportAccentStrongTextSx = {
-    color: supportAccentColor,
-    fontWeight: 700,
-  } satisfies SxProps<Theme>;
-  const supportAccentTitleSx = {
-    color: supportAccentColor,
-    fontWeight: 700,
-  } satisfies SxProps<Theme>;
 
   const interactiveSurfaceSx = {
     ...theme.typography.button,
@@ -563,45 +549,7 @@ export const createComponentStyleMap = (theme: Theme) => {
           }
         : {}),
     } satisfies SxProps<Theme>,
-    sectionNavigatorLeadSx: {
-      color: accentColor,
-      display: 'inline-flex',
-      alignItems: 'center',
-      minHeight: 30,
-      flexShrink: 0,
-      whiteSpace: 'nowrap',
-      lineHeight: 1,
-      textTransform: 'none',
-    } satisfies SxProps<Theme>,
-    overlineSx: {
-      color: accentColor,
-      letterSpacing: '0.18em',
-      fontWeight: 700,
-      textTransform: 'uppercase',
-    } satisfies SxProps<Theme>,
-    supportOverlineSx,
     sectionHeadingOverlineTextSx: sectionHeadingOverlineTextSx satisfies SxProps<Theme>,
-    sectionTitleSx: {
-      color: 'text.primary',
-      fontWeight: 700,
-    } satisfies SxProps<Theme>,
-    metricValueTextSx: {
-      color: 'primary.main',
-      fontWeight: 700,
-      fontSize: '1.5rem',
-    } satisfies SxProps<Theme>,
-    supportAccentTitleSx,
-    secondaryStrongSx: {
-      color: 'text.secondary',
-      fontWeight: 700,
-    } satisfies SxProps<Theme>,
-    supportAccentTextSx,
-    supportAccentStrongTextSx,
-    secondaryItalicSx: {
-      color: 'text.secondary',
-      fontStyle: 'italic',
-    } satisfies SxProps<Theme>,
-    secondaryTextSx: { color: 'text.secondary' } satisfies SxProps<Theme>,
     primaryTextSx: { color: 'text.primary' } satisfies SxProps<Theme>,
     sectionHeadingTitleSx: (subtitle?: string) =>
       ({

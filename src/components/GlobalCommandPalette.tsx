@@ -6,7 +6,7 @@ import {
   InputAdornment,
   List,
   ListItemButton,
-  ListItemText,
+  Stack,
   TextField,
 } from '@mui/material';
 import { useEffect, useMemo, useRef } from 'react';
@@ -17,7 +17,7 @@ import {
   type CommandPaletteAction,
 } from '../constants/commandPaletteActions';
 import { useCommandPalette } from '../CommandPaletteProvider';
-import { CaptionText, EntryTitle, SecondaryBodyText } from './text';
+import { Text } from './text';
 import { matchesCommandPaletteAction } from '../utils/commandPaletteSearch';
 
 const DIALOG_BASE_DURATION_MS = 225;
@@ -194,10 +194,12 @@ export const GlobalCommandPalette = () => {
               gap: 2,
             }}
           >
-            <EntryTitle id="command-palette-title" component="h2">
+            <Text role="cardTitle" id="command-palette-title" component="h2">
               Command palette
-            </EntryTitle>
-            <CaptionText color="text.secondary">Press / or Cmd+K</CaptionText>
+            </Text>
+            <Text role="caption" tone="muted">
+              Press / or Cmd+K
+            </Text>
           </Box>
           <TextField
             autoFocus
@@ -221,17 +223,19 @@ export const GlobalCommandPalette = () => {
                   onClick={() => handleSelect(action)}
                   sx={{ borderRadius: 2, alignItems: 'flex-start' }}
                 >
-                  <ListItemText
-                    primary={action.label}
-                    secondary={action.description}
-                    primaryTypographyProps={{ fontWeight: 600 }}
-                    secondaryTypographyProps={{ color: 'text.secondary' }}
-                  />
+                  <Stack spacing={0.375} sx={{ minWidth: 0 }}>
+                    <Text role="label" component="span">
+                      {action.label}
+                    </Text>
+                    <Text role="caption" tone="muted">
+                      {action.description}
+                    </Text>
+                  </Stack>
                 </ListItemButton>
               ))
             ) : (
               <Box sx={{ px: 1, py: 2 }}>
-                <SecondaryBodyText>No matching routes or sections.</SecondaryBodyText>
+                <Text role="bodyMuted">No matching routes or sections.</Text>
               </Box>
             )}
           </List>

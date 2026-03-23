@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { ClimbingAnalytics } from '../../../../src/components/climbing/ClimbingAnalytics';
 import type { ClimbingAnalytics as ClimbingAnalyticsType } from '../../../../src/hooks/useClimbingData';
-import type { SharedDataStatus } from '../../../../src/types/data';
 
 const mockAnalytics: ClimbingAnalyticsType = {
   overview: {
@@ -28,30 +27,18 @@ const mockAnalytics: ClimbingAnalyticsType = {
   },
 };
 
-const mockStatus: SharedDataStatus = {
-  source: 'static',
-  loading: false,
-  error: null,
-  isFallback: false,
-  reason: 'bundled-content',
-  freshness: {
-    label: 'Data sourced from static bundle.',
-    isStale: false,
-  },
-};
-
 describe('ClimbingAnalytics', () => {
   it('renders overview metrics', () => {
     render(
       <ThemeProvider>
-        <ClimbingAnalytics analytics={mockAnalytics} status={mockStatus} />
+        <ClimbingAnalytics analytics={mockAnalytics} />
       </ThemeProvider>
     );
 
     expect(screen.getByText('42')).toHaveStyle({ fontWeight: '700', fontSize: '1.5rem' });
     expect(screen.getByText('Routes Climbed')).toBeInTheDocument();
     expect(screen.getByText('15')).toBeInTheDocument();
-    expect(screen.getByText('Routes To Do')).toBeInTheDocument();
+    expect(screen.getByText('Routes to Climb')).toBeInTheDocument();
     expect(screen.getByText('Unique Locations')).toBeInTheDocument();
     expect(screen.getByText('2024-11-01')).toBeInTheDocument();
     expect(screen.getByText('Most Recent Tick')).toBeInTheDocument();
@@ -60,12 +47,12 @@ describe('ClimbingAnalytics', () => {
   it('renders grade profile chips for climbed and to-do grades', () => {
     render(
       <ThemeProvider>
-        <ClimbingAnalytics analytics={mockAnalytics} status={mockStatus} />
+        <ClimbingAnalytics analytics={mockAnalytics} />
       </ThemeProvider>
     );
 
     expect(screen.getByText('Climbed')).toBeInTheDocument();
-    expect(screen.getByText('To Do')).toBeInTheDocument();
+    expect(screen.getByText('To Climb')).toBeInTheDocument();
     expect(screen.getByText('5.10 (12)')).toBeInTheDocument();
     expect(screen.getByText('5.11 (5)')).toBeInTheDocument();
     // 5.9 has tickCount 0, so no tick chip
@@ -77,7 +64,7 @@ describe('ClimbingAnalytics', () => {
   it('renders top destination locations', () => {
     render(
       <ThemeProvider>
-        <ClimbingAnalytics analytics={mockAnalytics} status={mockStatus} />
+        <ClimbingAnalytics analytics={mockAnalytics} />
       </ThemeProvider>
     );
 
@@ -89,13 +76,35 @@ describe('ClimbingAnalytics', () => {
     expect(screen.getByText('Rifle')).toBeInTheDocument();
   });
 
-  it('renders the freshness status label', () => {
+  it('renders the bundled freshness label from analytics recency', () => {
     render(
       <ThemeProvider>
-        <ClimbingAnalytics analytics={mockAnalytics} status={mockStatus} />
+        <ClimbingAnalytics analytics={mockAnalytics} />
       </ThemeProvider>
     );
 
-    expect(screen.getByText('Data sourced from static bundle.')).toBeInTheDocument();
+    expect(
+      screen.getByText('Bundled climbing log updated through 2024-11-01.')
+    ).toBeInTheDocument();
+  });
+
+  it('renders a fallback bundled freshness label when no recency date exists', () => {
+    render(
+      <ThemeProvider>
+        <ClimbingAnalytics
+          analytics={{
+            ...mockAnalytics,
+            overview: {
+              ...mockAnalytics.overview,
+              mostRecentDate: '',
+            },
+          }}
+        />
+      </ThemeProvider>
+    );
+
+    expect(
+      screen.getByText('Bundled climbing log data is available in the client build.')
+    ).toBeInTheDocument();
   });
 });

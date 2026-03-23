@@ -12,7 +12,7 @@ import {
 import { useState } from 'react';
 import { useWebVitals, type WebVitalEntry } from '../hooks/useWebVitals';
 import { useMotionScale } from '../motion';
-import { BodyText, HeaderLabel, SecondaryBodyText, SecondaryCaptionText } from './text';
+import { Text } from './text';
 import { buildInfo } from '../utils/buildInfo';
 
 const ratingColor: Record<WebVitalEntry['rating'], 'success' | 'warning' | 'error'> = {
@@ -63,18 +63,18 @@ function VitalRow({ entry }: { entry: WebVitalEntry }) {
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 0.75 }}>
       <Tooltip title={meta?.description ?? ''} placement="left" arrow>
         <Box component="span">
-          <BodyText component="span" sx={{ fontWeight: 500 }}>
+          <Text role="body" component="span" sx={{ fontWeight: 500 }}>
             {entry.name}
-            <SecondaryCaptionText component="span" sx={{ ml: 0.75 }}>
+            <Text role="caption" tone="muted" component="span" sx={{ ml: 0.75 }}>
               {meta?.label ?? ''}
-            </SecondaryCaptionText>
-          </BodyText>
+            </Text>
+          </Text>
         </Box>
       </Tooltip>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-        <BodyText component="span" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
+        <Text role="body" component="span" sx={{ fontFamily: 'monospace', fontWeight: 600 }}>
           {formatValue(entry.name, entry.value)}
-        </BodyText>
+        </Text>
         <Chip
           label={entry.rating}
           color={ratingColor[entry.rating]}
@@ -90,12 +90,12 @@ function VitalPlaceholder({ name }: { name: string }) {
   const meta = vitalLabels[name];
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', py: 0.75 }}>
-      <BodyText component="span" sx={{ fontWeight: 500 }}>
+      <Text role="body" component="span" sx={{ fontWeight: 500 }}>
         {name}
-        <SecondaryCaptionText component="span" sx={{ ml: 0.75 }}>
+        <Text role="caption" tone="muted" component="span" sx={{ ml: 0.75 }}>
           {meta?.label ?? ''}
-        </SecondaryCaptionText>
-      </BodyText>
+        </Text>
+      </Text>
       <Skeleton width={80} height={24} />
     </Box>
   );
@@ -134,9 +134,9 @@ export function PerformanceScorecard() {
         <DialogTitle id="performance-scorecard-title">Performance & Build Info</DialogTitle>
         <DialogContent sx={{ px: { xs: 2, sm: 3 }, pb: 3 }}>
           {/* Build info section */}
-          <HeaderLabel component="p" sx={{ color: 'text.secondary' }}>
+          <Text role="settingsSectionLabel" component="p">
             Build
-          </HeaderLabel>
+          </Text>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5, mb: 3 }}>
             <InfoRow label="Version" value={buildInfo.version} />
             <InfoRow label="Commit" value={buildInfo.gitSha} mono />
@@ -145,9 +145,9 @@ export function PerformanceScorecard() {
           </Box>
 
           {/* Web Vitals section */}
-          <HeaderLabel component="p" sx={{ color: 'text.secondary' }}>
+          <Text role="settingsSectionLabel" component="p">
             Core Web Vitals
-          </HeaderLabel>
+          </Text>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.25 }}>
             {EXPECTED_VITALS.map((name) => {
               const entry = metrics.get(name);
@@ -158,10 +158,10 @@ export function PerformanceScorecard() {
               );
             })}
           </Box>
-          <SecondaryCaptionText sx={{ mt: 1.5, display: 'block' }}>
+          <Text role="caption" tone="muted" sx={{ mt: 1.5, display: 'block' }}>
             Vitals are measured in real time for this session. Some metrics (INP) require user
             interaction before they appear.
-          </SecondaryCaptionText>
+          </Text>
         </DialogContent>
       </Dialog>
     </>
@@ -171,13 +171,16 @@ export function PerformanceScorecard() {
 function InfoRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <Box sx={{ display: 'flex', justifyContent: 'space-between', py: 0.25 }}>
-      <SecondaryBodyText component="span">{label}</SecondaryBodyText>
-      <BodyText
+      <Text role="bodyMuted" component="span">
+        {label}
+      </Text>
+      <Text
+        role="body"
         component="span"
         sx={{ fontWeight: 500, ...(mono ? { fontFamily: 'monospace' } : {}) }}
       >
         {value}
-      </BodyText>
+      </Text>
     </Box>
   );
 }

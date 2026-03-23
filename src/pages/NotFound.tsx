@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { RouteRecoveryPanel } from '../components/RouteRecoveryPanel';
-import { SecondaryBodyText, SecondaryCaptionText } from '../components/text';
+import { Text } from '../components/text';
 import { getRecoveryContext } from '../constants/recoveryContext';
 import { recoveryRouteActions } from '../constants/routeActions';
 import { siteRouteMap } from '../constants/siteRoutes';
@@ -43,15 +43,15 @@ export default function NotFound() {
           />
         </MotionItem>
         <MotionItem>
-          <SecondaryBodyText sx={{ maxWidth: 560, opacity: 0.78 }}>
+          <Text role="bodyMuted" sx={{ maxWidth: 560, opacity: 0.78 }}>
             Use the command palette or the contextual suggestions below to recover without leaving
             the shared route and section registry.
-          </SecondaryBodyText>
+          </Text>
         </MotionItem>
         <MotionItem>
-          <SecondaryCaptionText sx={{ display: 'block', maxWidth: 560, opacity: 0.62 }}>
+          <Text role="caption" tone="muted" sx={{ display: 'block', maxWidth: 560, opacity: 0.62 }}>
             Press `/` or `Cmd+K` at any time to reopen the palette after dismissing it.
-          </SecondaryCaptionText>
+          </Text>
         </MotionItem>
         <MotionItem variants={fadeIn}>
           <RouteRecoveryPanel

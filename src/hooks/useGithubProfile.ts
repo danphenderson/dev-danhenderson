@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fallbackGitHubActivity, fallbackGitHubContributions } from '../data/cv';
-import type { SharedDataStatus } from '../types/data';
-import type { GitHubActivityItem, GitHubContribution } from '../types/cv';
+import type { GitHubActivityItem, GitHubContribution, SharedDataStatus } from '../types/cv';
 import {
   createBundledGitHubProfileStatus,
   createGithubHookErrorStatus,

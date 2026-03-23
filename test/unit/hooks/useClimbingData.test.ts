@@ -134,20 +134,11 @@ describe('useClimbingData', () => {
     expect(todos[2].location).toBe('Leavenworth');
   });
 
-  it('reports bundled climbing dataset status and recency', () => {
+  it('does not expose async status metadata for bundled climbing data', () => {
     const { result } = renderHook(() => useClimbingData());
 
-    expect(result.current.status).toMatchObject({
-      source: 'static',
-      loading: false,
-      isFallback: false,
-      reason: 'bundled-content',
-      freshness: {
-        lastUpdated: '2024-06-20',
-        isStale: false,
-      },
-    });
-    expect(result.current.status.freshness.label).toContain('updated through');
+    expect(result.current).not.toHaveProperty('status');
+    expect(result.current.analytics.overview.mostRecentDate).toBeTruthy();
   });
 
   describe('analytics', () => {

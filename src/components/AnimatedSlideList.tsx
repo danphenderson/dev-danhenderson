@@ -1,25 +1,17 @@
-import { createRef, useEffect, useMemo, useRef, useState } from 'react';
 import { Box, Slide } from '@mui/material';
-import type { ElementType, ReactNode, RefObject } from 'react';
+import type { ElementType, ReactNode } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
-import type { SlideProps } from '@mui/material/Slide';
-import { useComponentStyles } from '../styles/componentStyles';
-import { useMotionScale, scaleStagger } from '../motion';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
-import { normalizeSxProp } from '../utils/sx';
+import { useControlledAnimatedList, type AnimatedControlledListLayout } from './animatedListShared';
 
 const SLIDE_BASE_TIMEOUT_MS = 220;
-
-const SlideWithNodeRef = Slide as unknown as (
-  props: SlideProps & { nodeRef?: RefObject<HTMLElement> }
-) => JSX.Element;
 
 type AnimatedSlideListProps<Item> = {
   items: Item[];
   getItemKey: (item: Item, index: number) => string;
   renderItem: (item: Item, index: number) => ReactNode;
   in: boolean;
-  layout?: 'stack' | 'wrap';
+  layout?: AnimatedControlledListLayout;
   startDelayMs?: number;
   itemStaggerMs?: number;
   container?: () => Element | null;
@@ -64,136 +56,60 @@ export const AnimatedSlideList = <Item,>({
   keepMountedWhenExited = false,
   reverseExitStagger = false,
 }: AnimatedSlideListProps<Item>) => {
-  const { motionTokens } = useComponentStyles();
-  const { stagger: sFactor, duration: dFactor } = useMotionScale();
-  const resolvedStartDelayMs = Math.round(scaleStagger(startDelayMs, sFactor));
-  const [enteredKeys, setEnteredKeys] = useState<Set<string>>(() => new Set());
-  const nodeRefs = useRef(new Map<string, RefObject<HTMLElement>>());
-  const enterTimerIdsRef = useRef<number[]>([]);
-  const resolvedItemStaggerMs = Math.round(
-    scaleStagger(itemStaggerMs ?? motionTokens.itemStaggerMs, sFactor)
-  );
-  const slideTimeout = dFactor === 0 ? 0 : Math.round(SLIDE_BASE_TIMEOUT_MS * dFactor);
-  const itemKeys = useMemo(
-    () => items.map((item, index) => getItemKey(item, index)),
-    [getItemKey, items]
-  );
-  const itemKeysSignature = useMemo(() => JSON.stringify(itemKeys), [itemKeys]);
-  const latestItemKeysRef = useRef(itemKeys);
-  const baseContainerSx: SxProps<Theme> =
-    layout === 'wrap'
-      ? {
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: wrapGap,
-        }
-      : {
-          '& > * + *': {
-            mt: stackSpacing,
-          },
-        };
-  const resolvedContainerSx: SxProps<Theme> = [baseContainerSx, ...normalizeSxProp(containerSx)];
-
-  useEffect(() => {
-    latestItemKeysRef.current = itemKeys;
-  }, [itemKeys]);
-
-  const getNodeRef = (key: string) => {
-    const existingNodeRef = nodeRefs.current.get(key);
-
-    if (existingNodeRef) {
-      return existingNodeRef;
-    }
-
-    const nextNodeRef = createRef<HTMLElement>();
-
-    nodeRefs.current.set(key, nextNodeRef);
-
-    return nextNodeRef;
-  };
-
-  useEffect(() => {
-    const nextItemKeys = latestItemKeysRef.current;
-
-    enterTimerIdsRef.current.forEach((timerId) => {
-      window.clearTimeout(timerId);
+  const { durationFactor, isMotionDisabled, itemEntries, resolvedContainerSx } =
+    useControlledAnimatedList({
+      items,
+      getItemKey,
+      in: inProp,
+      startDelayMs,
+      itemStaggerMs,
+      layout,
+      containerSx,
+      stackSpacing,
+      wrapGap,
+      reverseExitStagger,
     });
-    enterTimerIdsRef.current = [];
+  const slideTimeout = isMotionDisabled ? 0 : Math.round(SLIDE_BASE_TIMEOUT_MS * durationFactor);
 
-    if (!inProp) {
-      if (!reverseExitStagger) {
-        setEnteredKeys(new Set());
-        return undefined;
-      }
-
-      [...nextItemKeys].reverse().forEach((key, index) => {
-        const delayMs = resolvedStartDelayMs + index * resolvedItemStaggerMs;
-        const timerId = window.setTimeout(() => {
-          setEnteredKeys((currentKeys) => {
-            const nextKeys = new Set(currentKeys);
-
-            nextKeys.delete(key);
-
-            return nextKeys;
-          });
-        }, delayMs);
-
-        enterTimerIdsRef.current.push(timerId);
-      });
-
-      return undefined;
-    }
-
-    setEnteredKeys(new Set());
-
-    nextItemKeys.forEach((key, index) => {
-      const delayMs = resolvedStartDelayMs + index * resolvedItemStaggerMs;
-      const timerId = window.setTimeout(() => {
-        setEnteredKeys((currentKeys) => {
-          const nextKeys = new Set(currentKeys);
-
-          nextKeys.add(key);
-
-          return nextKeys;
-        });
-      }, delayMs);
-
-      enterTimerIdsRef.current.push(timerId);
-    });
-
-    return () => {
-      enterTimerIdsRef.current.forEach((timerId) => {
-        window.clearTimeout(timerId);
-      });
-      enterTimerIdsRef.current = [];
-    };
-  }, [inProp, itemKeysSignature, resolvedItemStaggerMs, resolvedStartDelayMs, reverseExitStagger]);
+  if (isMotionDisabled) {
+    return (
+      <Box
+        component={containerComponent}
+        sx={resolvedContainerSx}
+        aria-hidden={!inProp && keepMountedWhenExited ? true : undefined}
+        style={!inProp && keepMountedWhenExited ? { visibility: 'hidden' } : undefined}
+      >
+        {inProp || keepMountedWhenExited
+          ? itemEntries.map(({ item, index, key, nodeRef }) => (
+              <Box key={key} ref={nodeRef} component={itemComponent} sx={itemSx}>
+                {renderItem(item, index)}
+              </Box>
+            ))
+          : null}
+      </Box>
+    );
+  }
 
   return (
     <Box component={containerComponent} sx={resolvedContainerSx}>
-      {items.map((item, index) => {
-        const key = getItemKey(item, index);
-        const nodeRef = getNodeRef(key);
-
-        return (
-          <SlideWithNodeRef
-            key={key}
-            in={enteredKeys.has(key)}
-            appear={true}
-            direction="up"
-            timeout={slideTimeout}
-            mountOnEnter={!keepMountedWhenExited}
-            unmountOnExit={!keepMountedWhenExited}
-            easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
-            container={container ? () => container() ?? document.body : undefined}
-            nodeRef={nodeRef}
-          >
-            <Box ref={nodeRef} component={itemComponent} sx={itemSx}>
-              {renderItem(item, index)}
-            </Box>
-          </SlideWithNodeRef>
-        );
-      })}
+      {itemEntries.map(({ item, index, key, isEntered, nodeRef }) => (
+        <Slide
+          key={key}
+          in={isEntered}
+          appear={true}
+          direction="up"
+          timeout={slideTimeout}
+          mountOnEnter={!keepMountedWhenExited}
+          unmountOnExit={!keepMountedWhenExited}
+          easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
+          container={container ? () => container() ?? document.body : undefined}
+          nodeRef={nodeRef}
+        >
+          <Box ref={nodeRef} component={itemComponent} sx={itemSx}>
+            {renderItem(item, index)}
+          </Box>
+        </Slide>
+      ))}
     </Box>
   );
 };

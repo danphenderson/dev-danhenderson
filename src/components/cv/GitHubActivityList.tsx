@@ -1,9 +1,8 @@
 import { Box } from '@mui/material';
 import type { GitHubActivityItem } from '../../types/cv';
 import { LoadingBars } from '../LoadingBars';
-import { useComponentStyles } from '../../styles/componentStyles';
 import { GitHubLinkChipList } from './GitHubLinkChipList';
-import { CaptionText } from '../text';
+import { Text } from '../text';
 
 type GitHubActivityListProps = {
   activity: GitHubActivityItem[];
@@ -20,8 +19,6 @@ export const GitHubActivityList = ({
   startDelayMs = 0,
   itemStaggerMs,
 }: GitHubActivityListProps) => {
-  const { secondaryTextSx } = useComponentStyles();
-
   return (
     <Box>
       {loading ? (
@@ -40,7 +37,11 @@ export const GitHubActivityList = ({
           itemStaggerMs={itemStaggerMs}
         />
       )}
-      {error && <CaptionText sx={secondaryTextSx}>{error}</CaptionText>}
+      {error && (
+        <Text role="caption" tone="muted">
+          {error}
+        </Text>
+      )}
     </Box>
   );
 };

@@ -19,15 +19,7 @@ import {
 } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { MotionIntensityLevel } from '../theme/appAppearance';
-import { BodyText, CaptionText, Text } from './text';
-
-const sectionLabelSx = {
-  fontSize: '0.625rem',
-  fontWeight: 600,
-  letterSpacing: '0.1em',
-  color: 'text.secondary',
-  lineHeight: 1,
-} as const;
+import { Text } from './text';
 
 const MOTION_LEVELS: { key: MotionIntensityLevel; label: string; icon: ReactNode }[] = [
   { key: 'off', label: 'Off', icon: <MotionPhotosOffOutlinedIcon sx={{ fontSize: 16 }} /> },
@@ -83,14 +75,14 @@ export const FirstVisitCustomizeModal = ({
     >
       <DialogTitle id="customize-experience-title">Customize your experience</DialogTitle>
       <DialogContent>
-        <BodyText sx={{ mt: 1, mb: 3 }}>
+        <Text role="body" sx={{ mt: 1, mb: 3 }}>
           Adjust motion and audio preferences to suit your browsing style.
-        </BodyText>
+        </Text>
 
         <Stack spacing={2.5}>
           {/* Motion intensity */}
           <Stack spacing={1}>
-            <Text role="sectionEyebrow" component="span" sx={sectionLabelSx}>
+            <Text role="settingsSectionLabel" component="span">
               Motion
             </Text>
             <ToggleButtonGroup
@@ -122,7 +114,7 @@ export const FirstVisitCustomizeModal = ({
 
           {/* Audio */}
           <Stack spacing={1}>
-            <Text role="sectionEyebrow" component="span" sx={sectionLabelSx}>
+            <Text role="settingsSectionLabel" component="span">
               Audio
             </Text>
             <Stack direction="row" alignItems="center" justifyContent="space-between">
@@ -147,16 +139,16 @@ export const FirstVisitCustomizeModal = ({
               </Tooltip>
             </Stack>
             {audioError ? (
-              <CaptionText color="error" sx={{ display: 'block' }}>
+              <Text role="caption" sx={{ display: 'block', color: 'error.main' }}>
                 {audioError}
-              </CaptionText>
+              </Text>
             ) : null}
           </Stack>
         </Stack>
 
-        <CaptionText sx={{ display: 'block', mt: 3, color: 'text.secondary' }}>
+        <Text role="caption" tone="muted" sx={{ display: 'block', mt: 3 }}>
           You can adjust these settings anytime from the ⚙ icon in the header.
-        </CaptionText>
+        </Text>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} variant="contained" aria-label="Okay">

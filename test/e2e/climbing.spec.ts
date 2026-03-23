@@ -6,27 +6,28 @@ const waitForClimbingRoute = async (page: Page) => {
   const intro = main.getByText(
     /A collection of routes I've remembered to tick on Mountain Project, including some\s+top-rope ascents/
   );
+  const routesToClimbIntro = main.getByText("A collection of routes I'd still like to climb.");
   const firstRouteLink = main.locator('a[href*="mountainproject.com/route/"]').first();
 
   await waitForAnimatedSectionReadiness({
     anchor: intro,
-    readyLocators: [main.getByText('Overview'), main.getByText('TODO Routes'), firstRouteLink],
+    readyLocators: [main.getByText('Overview'), routesToClimbIntro, firstRouteLink],
   });
 
-  return { main, firstRouteLink };
+  return { main, firstRouteLink, routesToClimbIntro };
 };
 
 test.describe('Climbing page', () => {
   test('renders climbing route tables and inline route links', async ({ page }) => {
     await page.goto('/climbing');
-    const { main, firstRouteLink } = await waitForClimbingRoute(page);
+    const { main, firstRouteLink, routesToClimbIntro } = await waitForClimbingRoute(page);
 
     await expect(
       main.getByText(
         /A collection of routes I've remembered to tick on Mountain Project, including some\s+top-rope ascents/
       )
     ).toBeVisible();
-    await expect(main.getByText('TODO Routes')).toBeVisible();
+    await expect(routesToClimbIntro).toBeVisible();
     await expect(firstRouteLink).toBeVisible();
     await expect(firstRouteLink).toHaveAttribute('href', /mountainproject\.com\/route\//);
     await expect(firstRouteLink).toHaveAttribute(
@@ -41,7 +42,7 @@ test.describe('Climbing page', () => {
 
     await expect(main.getByText('Overview')).toBeVisible();
     await expect(main.getByText('Routes Climbed')).toBeVisible();
-    await expect(main.getByText('Routes To Do')).toBeVisible();
+    await expect(main.getByText('Routes to Climb').first()).toBeVisible();
     await expect(main.getByText('Unique Locations')).toBeVisible();
     await expect(main.getByText('Most Recent Tick')).toBeVisible();
   });

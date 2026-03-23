@@ -2,20 +2,28 @@ import { render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { SkillsChipList } from '../../../src/components/SkillsChipList';
 
-const mockAnimatedZoomList = jest.fn();
 const mockAnimatedSlideList = jest.fn();
+const mockUseControlledAnimatedList = jest.fn();
 
-jest.mock('../../../src/components/AnimatedZoomList', () => ({
-  AnimatedZoomList: (props: {
+jest.mock('@mui/material', () => {
+  const actual = jest.requireActual('@mui/material');
+
+  return {
+    ...actual,
+    Zoom: ({ children, in: inProp }: { children: React.ReactNode; in?: boolean }) => (
+      <div data-testid="zoom-chip-item" data-in={String(inProp ?? true)}>
+        {children}
+      </div>
+    ),
+  };
+});
+
+jest.mock('../../../src/components/animatedListShared', () => ({
+  useControlledAnimatedList: (options: {
     items: string[];
+    getItemKey: (item: string, index: number) => string;
     in: boolean;
-    startDelayMs?: number;
-    renderItem: (item: string, index: number) => React.ReactNode;
-  }) => {
-    mockAnimatedZoomList(props);
-
-    return <div data-testid="animated-zoom-list">{props.items.map(props.renderItem)}</div>;
-  },
+  }) => mockUseControlledAnimatedList(options),
 }));
 
 jest.mock('../../../src/components/AnimatedSlideList', () => ({
@@ -37,19 +45,44 @@ jest.mock('../../../src/components/AnimatedSlideList', () => ({
 }));
 
 describe('SkillsChipList', () => {
-  afterEach(() => {
-    mockAnimatedZoomList.mockClear();
-    mockAnimatedSlideList.mockClear();
+  beforeEach(() => {
+    mockUseControlledAnimatedList.mockImplementation(
+      ({
+        items,
+        getItemKey,
+      }: {
+        items: string[];
+        getItemKey: (item: string, index: number) => string;
+      }) => ({
+        durationFactor: 1,
+        isMotionDisabled: false,
+        itemEntries: items.map((item, index) => ({
+          item,
+          index,
+          key: getItemKey(item, index),
+          isEntered: true,
+          nodeRef: { current: null },
+        })),
+        resolvedContainerSx: { display: 'flex', flexWrap: 'wrap' },
+      })
+    );
   });
 
-  it('uses the zoom list by default', () => {
+  afterEach(() => {
+    mockAnimatedSlideList.mockClear();
+    mockUseControlledAnimatedList.mockClear();
+  });
+
+  it('uses the local zoom-specialized path by default', () => {
     const { rerender } = render(
       <ThemeProvider>
         <SkillsChipList skills={['React', 'TypeScript']} in={false} />
       </ThemeProvider>
     );
 
-    expect(mockAnimatedZoomList.mock.calls[0][0]).toEqual(expect.objectContaining({ in: false }));
+    expect(mockUseControlledAnimatedList.mock.calls[0][0]).toEqual(
+      expect.objectContaining({ in: false })
+    );
     expect(mockAnimatedSlideList).not.toHaveBeenCalled();
 
     rerender(
@@ -58,7 +91,10 @@ describe('SkillsChipList', () => {
       </ThemeProvider>
     );
 
-    expect(mockAnimatedZoomList.mock.calls[1][0]).toEqual(expect.objectContaining({ in: true }));
+    expect(mockUseControlledAnimatedList.mock.calls[1][0]).toEqual(
+      expect.objectContaining({ in: true })
+    );
+    expect(screen.getAllByTestId('zoom-chip-item')).toHaveLength(2);
     expect(screen.getByText('React')).toBeInTheDocument();
     expect(screen.getByText('TypeScript')).toBeInTheDocument();
   });
@@ -77,7 +113,7 @@ describe('SkillsChipList', () => {
       </ThemeProvider>
     );
 
-    expect(mockAnimatedZoomList).not.toHaveBeenCalled();
+    expect(mockUseControlledAnimatedList).not.toHaveBeenCalled();
     expect(mockAnimatedSlideList.mock.calls[0][0]).toEqual(
       expect.objectContaining({ in: true, layout: 'wrap', container: drawerContainer })
     );

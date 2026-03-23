@@ -18,7 +18,7 @@ import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
-import { EntryTitle, SecondaryBodyText, SecondaryCaptionText } from '../components/text';
+import { Text } from '../components/text';
 import { MotionSection, MotionScaleIn, MotionImage } from '../motion';
 
 const legacySlugMap: Record<string, string> = {
@@ -119,10 +119,12 @@ export default function PhotographyCategory() {
                   />
                   <Box sx={appStyles.photographyCardOverlaySx}>
                     <Stack direction="row" spacing={1} alignItems="center">
-                      <EntryTitle
+                      <Text
+                        role="pageTitle"
+                        tone="inverse"
+                        context="overlay"
                         component="h1"
                         sx={{
-                          color: 'common.white',
                           fontSize: { xs: '2rem', sm: '2.5rem', md: '3.25rem' },
                           lineHeight: { xs: 1.05, md: 1 },
                           letterSpacing: '-0.04em',
@@ -130,24 +132,24 @@ export default function PhotographyCategory() {
                         }}
                       >
                         {category.name}
-                      </EntryTitle>
+                      </Text>
                       <AlbumShareButton
                         albumName={category.name}
                         albumSlug={category.slug}
                         albumDescription={category.description}
                       />
                     </Stack>
-                    <SecondaryBodyText sx={{ color: 'rgba(255,255,255,0.82)' }}>
+                    <Text role="body" tone="inverse" context="overlay" sx={{ opacity: 0.82 }}>
                       {category.description}
-                    </SecondaryBodyText>
+                    </Text>
                     <AlbumLocationSummary
                       albumLocation={category.location}
                       dateRange={category.dateRange}
                       photos={category.album}
                     />
-                    <SecondaryCaptionText sx={{ color: 'rgba(255,255,255,0.65)' }}>
+                    <Text role="caption" tone="inverse" context="overlay" sx={{ opacity: 0.65 }}>
                       {category.album.length} photos
-                    </SecondaryCaptionText>
+                    </Text>
                   </Box>
                 </Box>
               </MotionSection>
@@ -179,10 +181,10 @@ export default function PhotographyCategory() {
                     title="Album not found"
                     sx={{ minWidth: 0, maxWidth: { md: 760 } }}
                   />
-                  <SecondaryBodyText>
+                  <Text role="bodyMuted">
                     This album does not exist or has been moved. The command palette opens with a
                     recovery search so you can jump to another gallery or route quickly.
-                  </SecondaryBodyText>
+                  </Text>
                   <RouteRecoveryPanel
                     attemptedPathLabel={recoveryContext.attemptedPathLabel}
                     routeHintLabel={recoveryContext.routeHintLabel}

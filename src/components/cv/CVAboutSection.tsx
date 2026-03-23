@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Box, Stack } from '@mui/material';
-import type { SxProps, Theme } from '@mui/material/styles';
 import type { AboutMe } from '../../types/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { MotionTiltCard } from '../../motion';
@@ -10,7 +9,7 @@ import { SectionHeading } from '../layout/SectionHeading';
 import { CVSectionCard } from './CVSectionCard';
 import { ANIMATED_CARD_DURATION_MS } from '../AnimatedContentCard';
 import { SkillsChipList } from '../SkillsChipList';
-import { SubsectionTitle, TypewriterText } from '../text';
+import { Text, TypewriterText } from '../text';
 
 const ABOUT_CONTENT_DELIMITER = '|bio|';
 const OPPORTUNITY_DELIMITER = '|opportunity|';
@@ -29,7 +28,6 @@ type InlineAnimatedSkillsRowProps = {
   onHeadingComplete: () => void;
   skills: string[];
   showSkills: boolean;
-  titleSx: SxProps<Theme>;
 };
 
 const InlineAnimatedSkillsRow = ({
@@ -41,7 +39,6 @@ const InlineAnimatedSkillsRow = ({
   onHeadingComplete,
   skills,
   showSkills,
-  titleSx,
 }: InlineAnimatedSkillsRowProps) => (
   <Stack
     spacing={1}
@@ -52,7 +49,7 @@ const InlineAnimatedSkillsRow = ({
     sx={{ visibility: visible ? 'visible' : 'hidden' }}
   >
     <Box sx={{ width: { sm: headingColumnWidth } }}>
-      <SubsectionTitle sx={titleSx}>
+      <Text role="subsectionTitle" tone="support">
         {revealed ? (
           heading
         ) : (
@@ -63,7 +60,7 @@ const InlineAnimatedSkillsRow = ({
             onComplete={onHeadingComplete}
           />
         )}
-      </SubsectionTitle>
+      </Text>
     </Box>
     <SkillsChipList skills={skills} dense in={revealed || showSkills} />
   </Stack>
@@ -96,7 +93,6 @@ export const CVAboutSection = ({
     compactSidebarSectionSpacing,
     motionTokens,
     sectionHeadingCompactSx,
-    supportAccentTitleSx,
     cvSectionItemSpacing,
   } = useComponentStyles();
   const bioAnimationStartDelayMs = delayMs + ANIMATED_CARD_DURATION_MS;
@@ -273,7 +269,6 @@ export const CVAboutSection = ({
                   onHeadingComplete={handleOpportunitiesHeadingComplete}
                   skills={opportunities}
                   showSkills={shouldShowOpportunities}
-                  titleSx={supportAccentTitleSx}
                 />
               )}
               {workflowTools.length > 0 && (
@@ -286,7 +281,6 @@ export const CVAboutSection = ({
                   onHeadingComplete={handleWorkflowHeadingComplete}
                   skills={workflowTools}
                   showSkills={shouldShowWorkflowTools}
-                  titleSx={supportAccentTitleSx}
                 />
               )}
             </Stack>

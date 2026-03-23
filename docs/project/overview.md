@@ -42,12 +42,13 @@ Pages compose from a layered set of shared primitives:
 PageFrame / BackgroundPaper        ← route scaffold
   SectionCard / CVSectionCard      ← section surface
     SectionHeading                 ← section intro
-      AnimatedContentList          ← repeated items with stagger
+      AnimatedContentList          ← viewport card lists
         AnimatedContentCard        ← individual reveal with optional tilt
-          TypographyPrimitives     ← semantic text
+          Text                     ← semantic text
+      AnimatedSlideList            ← controlled repeated-item reveals
 ```
 
-Each layer has a defined role and clear ownership. Four intentional subsystems — the Home IDE hero, blog editorial surfaces, photography overlay/lightbox, and CV story mode — bypass the default shared design system by design.
+Each layer has a defined role and clear ownership. Two intentional subsystems — the Home IDE hero and CV story mode — bypass the default shared design system by design. Blog and photography stay inside the shared text system through prose and overlay contexts.
 
 See [Component architecture](../frontend/component-architecture.md) and the [Design system reference](../design-system-reference.md).
 

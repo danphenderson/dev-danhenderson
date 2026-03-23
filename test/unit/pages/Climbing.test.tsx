@@ -2,8 +2,57 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { COMMON_LINK_TOOLTIP_ID } from '../../../src/components/CommonLink';
+import { useClimbingData } from '../../../src/hooks/useClimbingData';
 import { MOTION_INTENSITY_STORAGE_KEY } from '../../../src/theme/appAppearance';
 import Climbing from '../../../src/pages/Climbing';
+
+const createMockClimbingData = (overrides = {}) => ({
+  ticks: [
+    {
+      id: 'tick-1',
+      date: '6/26/2025',
+      route: 'Hyperspace',
+      grade: '5.11a',
+      location: 'Leavenworth',
+      url: 'https://mp.com/route/1',
+    },
+    {
+      id: 'tick-2',
+      date: '6/25/2025',
+      route: 'Angel',
+      grade: '5.10b',
+      location: 'Tumwater Canyon',
+      url: 'https://mp.com/route/3',
+    },
+  ],
+  todos: [
+    {
+      id: 'todo-1',
+      route: 'The Tooth',
+      grade: '5.4',
+      location: 'Alpental',
+      url: 'https://mp.com/route/2',
+    },
+  ],
+  analytics: {
+    overview: {
+      tickCount: 2,
+      todoCount: 1,
+      uniqueLocations: 3,
+      mostRecentDate: '6/26/2025',
+    },
+    gradeProfile: [
+      { bucket: '5.4', tickCount: 0, todoCount: 1 },
+      { bucket: '5.10', tickCount: 1, todoCount: 0 },
+      { bucket: '5.11', tickCount: 1, todoCount: 0 },
+    ],
+    destinationProfile: {
+      topTickLocations: [{ location: 'Leavenworth', count: 1 }],
+      topTodoLocations: [{ location: 'Alpental', count: 1 }],
+    },
+  },
+  ...overrides,
+});
 
 jest.mock('../../../src/motion', () => {
   const actual = jest.requireActual('../../../src/motion');
@@ -37,64 +86,7 @@ jest.mock('../../../src/motion', () => {
 });
 
 jest.mock('../../../src/hooks/useClimbingData', () => ({
-  useClimbingData: () => ({
-    ticks: [
-      {
-        id: 'tick-1',
-        date: '6/26/2025',
-        route: 'Hyperspace',
-        grade: '5.11a',
-        location: 'Leavenworth',
-        url: 'https://mp.com/route/1',
-      },
-      {
-        id: 'tick-2',
-        date: '6/25/2025',
-        route: 'Angel',
-        grade: '5.10b',
-        location: 'Tumwater Canyon',
-        url: 'https://mp.com/route/3',
-      },
-    ],
-    todos: [
-      {
-        id: 'todo-1',
-        route: 'The Tooth',
-        grade: '5.4',
-        location: 'Alpental',
-        url: 'https://mp.com/route/2',
-      },
-    ],
-    analytics: {
-      overview: {
-        tickCount: 2,
-        todoCount: 1,
-        uniqueLocations: 3,
-        mostRecentDate: '6/26/2025',
-      },
-      gradeProfile: [
-        { bucket: '5.4', tickCount: 0, todoCount: 1 },
-        { bucket: '5.10', tickCount: 1, todoCount: 0 },
-        { bucket: '5.11', tickCount: 1, todoCount: 0 },
-      ],
-      destinationProfile: {
-        topTickLocations: [{ location: 'Leavenworth', count: 1 }],
-        topTodoLocations: [{ location: 'Alpental', count: 1 }],
-      },
-    },
-    status: {
-      source: 'static',
-      loading: false,
-      error: null,
-      isFallback: false,
-      reason: 'bundled-content',
-      freshness: {
-        label: 'Bundled climbing log updated through 6/26/2025.',
-        lastUpdated: '2025-06-26',
-        isStale: false,
-      },
-    },
-  }),
+  useClimbingData: jest.fn(),
   TickRow: undefined,
   TodoRow: undefined,
 }));
@@ -111,6 +103,7 @@ jest.mock('../../../src/components/AnimatedContentCard', () => ({
 
 describe('Climbing', () => {
   beforeEach(() => {
+    jest.mocked(useClimbingData).mockReturnValue(createMockClimbingData());
     window.localStorage.removeItem(MOTION_INTENSITY_STORAGE_KEY);
   });
 
@@ -126,15 +119,12 @@ describe('Climbing', () => {
     );
 
     expect(screen.getByText('Climbing')).toBeInTheDocument();
-    expect(screen.getByText('TODO Routes')).toBeInTheDocument();
     expect(
       screen.getByText(
         /A collection of routes I've remembered to tick on Mountain Project, including some\s+top-rope ascents — I don't climb 5\.14\./
       )
     ).toBeInTheDocument();
-    expect(
-      screen.getByText("A collection of routes I'm interested in climbing.")
-    ).toBeInTheDocument();
+    expect(screen.getByText("A collection of routes I'd still like to climb.")).toBeInTheDocument();
     const tickLink = screen.getByRole('link', { name: 'Hyperspace' });
     const todoLink = screen.getByRole('link', { name: 'The Tooth' });
 
@@ -224,7 +214,7 @@ describe('Climbing', () => {
     );
 
     expect(screen.getByPlaceholderText('Search climbed routes...')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Search TODO routes...')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search routes to climb...')).toBeInTheDocument();
   });
 
   it('filters ticks grid when typing into the ticks search box', async () => {
@@ -266,7 +256,7 @@ describe('Climbing', () => {
 
     expect(screen.getByText('Overview')).toBeInTheDocument();
     expect(screen.getByText('Routes Climbed')).toBeInTheDocument();
-    expect(screen.getByText('Routes To Do')).toBeInTheDocument();
+    expect(screen.getAllByText('Routes to Climb').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Unique Locations')).toBeInTheDocument();
     expect(screen.getByText('Most Recent Tick')).toBeInTheDocument();
   });
@@ -305,5 +295,42 @@ describe('Climbing', () => {
     );
 
     expect(screen.getByText('Bundled climbing log updated through 6/26/2025.')).toBeInTheDocument();
+  });
+
+  it('hides the routes-to-climb table when there is no wishlist data', () => {
+    jest.mocked(useClimbingData).mockReturnValue(
+      createMockClimbingData({
+        todos: [],
+        analytics: {
+          overview: {
+            tickCount: 2,
+            todoCount: 0,
+            uniqueLocations: 2,
+            mostRecentDate: '6/26/2025',
+          },
+          gradeProfile: [
+            { bucket: '5.10', tickCount: 1, todoCount: 0 },
+            { bucket: '5.11', tickCount: 1, todoCount: 0 },
+          ],
+          destinationProfile: {
+            topTickLocations: [{ location: 'Leavenworth', count: 1 }],
+            topTodoLocations: [],
+          },
+        },
+      })
+    );
+
+    render(
+      <ThemeProvider>
+        <Climbing />
+      </ThemeProvider>
+    );
+
+    expect(
+      screen.queryByText("A collection of routes I'd still like to climb.")
+    ).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Search routes to climb...')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'The Tooth' })).not.toBeInTheDocument();
+    expect(screen.getAllByTestId('climbing-tilt-card')).toHaveLength(1);
   });
 });

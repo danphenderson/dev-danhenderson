@@ -33,13 +33,12 @@ describe('createTextStyleMap', () => {
     expect(ts.variant).toBe('subtitle1');
   });
 
-  it('returns a fallback for unknown combinations', () => {
+  it('throws for unknown roles instead of silently falling back', () => {
     const { resolveTypeset } = createTextStyleMap(lightTheme);
-    // @ts-expect-error testing fallback behavior
-    const ts = resolveTypeset('unknownRole');
-
-    expect(ts.variant).toBe('body2');
-    expect(ts.sx).toBeDefined();
+    expect(() => {
+      // @ts-expect-error testing invalid runtime input
+      resolveTypeset('unknownRole');
+    }).toThrow('Missing text typeset');
   });
 
   it('applies muted tone as secondary color', () => {
@@ -64,6 +63,14 @@ describe('createTextStyleMap', () => {
     const sx = ts.sx as Record<string, unknown>;
 
     expect(sx.color).toBe(lightTheme.palette.primary.main);
+  });
+
+  it('applies support tone as secondary.main', () => {
+    const { resolveTypeset } = createTextStyleMap(lightTheme);
+    const ts = resolveTypeset('sectionEyebrow', 'support');
+    const sx = ts.sx as Record<string, unknown>;
+
+    expect(sx.color).toBe(lightTheme.palette.secondary.main);
   });
 
   it('resolves the same role in dark mode', () => {
@@ -99,6 +106,30 @@ describe('createTextStyleMap', () => {
     const sx = ts.sx as Record<string, unknown>;
 
     expect(sx.color).toBe(lightTheme.palette.text.secondary);
+  });
+
+  it('meta roles resolve with secondary color by default', () => {
+    const { resolveTypeset } = createTextStyleMap(lightTheme);
+    const meta = resolveTypeset('meta');
+    const metaStrong = resolveTypeset('metaStrong');
+    const metaSx = meta.sx as Record<string, unknown>;
+    const metaStrongSx = metaStrong.sx as Record<string, unknown>;
+
+    expect(metaSx.color).toBe(lightTheme.palette.text.secondary);
+    expect(metaStrongSx.color).toBe(lightTheme.palette.text.secondary);
+  });
+
+  it('uses h1 for pageTitle and inherit for inlineLabel', () => {
+    const { resolveTypeset } = createTextStyleMap(lightTheme);
+
+    expect(resolveTypeset('pageTitle').variant).toBe('h1');
+    expect(resolveTypeset('inlineLabel').variant).toBe('inherit');
+  });
+
+  it('resolves settingsSectionLabel as overline', () => {
+    const { resolveTypeset } = createTextStyleMap(lightTheme);
+
+    expect(resolveTypeset('settingsSectionLabel').variant).toBe('overline');
   });
 
   it('prose context changes shared body typesets', () => {

@@ -5,7 +5,7 @@ import { cssDuration } from '../motion/tokens';
 import { useMotionScale } from '../motion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
-import { InteractiveLabel } from './text';
+import { Text } from './text';
 import type { TabPanelItem, TabPanelRenderContext } from '../types/ui';
 
 export type { TabPanelItem, TabPanelRenderContext };
@@ -216,7 +216,11 @@ export const TabPanel = ({
                     )
                   );
                 }}
-                label={<InteractiveLabel>{visibleLabel}</InteractiveLabel>}
+                label={
+                  <Text role="inlineLabel" component="span">
+                    {visibleLabel}
+                  </Text>
+                }
                 value={item.value}
                 sx={[interactiveSurfaceSx, getTabSx(dense)]}
               />

@@ -95,16 +95,10 @@ describe('useBlogData', () => {
     expect(adj.next?.slug).toBe('second-post');
   });
 
-  it('reports static bundled status', () => {
+  it('does not expose async status metadata for bundled blog content', () => {
     const { result } = renderHook(() => useBlogData());
 
-    expect(result.current.status).toMatchObject({
-      source: 'static',
-      loading: false,
-      isFallback: false,
-      reason: 'bundled-content',
-      freshness: { isStale: false },
-    });
+    expect(result.current).not.toHaveProperty('status');
   });
 
   it('returns stable references across re-renders', () => {

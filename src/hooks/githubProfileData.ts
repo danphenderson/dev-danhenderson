@@ -6,11 +6,12 @@ import {
   githubUsername,
 } from '../data/cv';
 import type {
+  GitHubActivityItem,
+  GitHubProfileData,
   SharedDataSourceDetail,
   SharedDataStatus,
   SharedDataStatusReason,
-} from '../types/data';
-import type { GitHubActivityItem, GitHubProfileData } from '../types/cv';
+} from '../types/cv';
 
 export type { GitHubProfileData };
 
