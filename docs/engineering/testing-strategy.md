@@ -176,14 +176,12 @@ Each route spec covers:
 
 ### Not currently tested (gaps)
 
-| Category                            | Why it matters                                                          | Recommended approach                      |
-| ----------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------- |
-| Motion intensity scaling end-to-end | Verifies off/subtle/default/expressive produce visually correct results | E2E visual regression per intensity level |
-| Theme appearance preset switching   | Verifies all 6 presets render without visual breakage                   | E2E screenshot comparison across presets  |
-| IDE window drag/resize/expand       | Complex pointer interaction on home hero                                | E2E with pointer simulation               |
-| Lightbox keyboard navigation        | Accessibility for photography lightbox                                  | E2E keyboard-driven spec                  |
-| Responsive breakpoint behavior      | Layout changes at mobile/tablet/desktop thresholds                      | E2E with viewport resizing                |
-| Command palette search accuracy     | Fuzzy matching across routes and actions                                | Unit for search utility + E2E for modal   |
+| Category                                   | Why it matters                                                                 | Recommended approach                              |
+| ------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------- |
+| Motion intensity visual regression by level | Verifies off/subtle/default/expressive remain visually correct across routes   | E2E screenshot comparison per intensity level     |
+| Theme appearance preset visual regression   | Verifies all 6 presets keep rendering quality across routes and color modes    | E2E screenshot comparison across presets and mode |
+| Full cross-route accessibility audit        | Catches keyboard/focus/semantics issues outside the currently targeted helpers  | Periodic manual or automated a11y sweeps          |
+| Performance budget enforcement              | Prevents route and shared-bundle growth from regressing initial-load experience | CI size budget or Lighthouse/WebPageTest gate     |
 
 ## Testing motion-heavy features
 

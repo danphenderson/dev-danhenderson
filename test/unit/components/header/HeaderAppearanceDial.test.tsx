@@ -89,15 +89,26 @@ describe('HeaderAppearanceDial', () => {
     );
   });
 
-  it('calls onChangeAppearance with the chosen preset', () => {
+  it.each([
+    ['Atlas', 'atlas'],
+    ['Evergreen', 'evergreen'],
+    ['Ember', 'ember'],
+    ['Solstice', 'solstice'],
+    ['Drift', 'drift'],
+    ['Graphite', 'graphite'],
+  ] as const)('calls onChangeAppearance with the chosen %s preset', (label, key) => {
     const onChangeAppearance = jest.fn();
 
     renderDial({ onChangeAppearance });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Use Ember appearance' }));
+    fireEvent.click(
+      screen.getByRole('button', {
+        name: key === 'evergreen' ? `Use ${label} appearance (active)` : `Use ${label} appearance`,
+      })
+    );
 
     expect(onChangeAppearance).toHaveBeenCalledTimes(1);
-    expect(onChangeAppearance).toHaveBeenCalledWith('ember');
+    expect(onChangeAppearance).toHaveBeenCalledWith(key);
   });
 
   it('calls onToggleTheme when the theme action is chosen', () => {

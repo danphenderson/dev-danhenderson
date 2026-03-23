@@ -64,10 +64,18 @@ jest.mock('../../src/components/CommonLinkTooltip', () => ({
 }));
 
 let mockPageTransitionChildren: ReactNode = null;
+let mockPageTransitionPathname: string | undefined;
 
 jest.mock('../../src/components/PageTransition', () => ({
-  PageTransition: ({ children }: { children: ReactNode }) => {
+  PageTransition: ({
+    children,
+    pathname,
+  }: {
+    children: ReactNode;
+    pathname?: string;
+  }) => {
     mockPageTransitionChildren = children;
+    mockPageTransitionPathname = pathname;
 
     return <div data-testid="page-transition">{children}</div>;
   },
@@ -79,10 +87,11 @@ describe('App', () => {
   beforeEach(() => {
     mockedIsFeatureEnabled.mockReturnValue(true);
     mockPageTransitionChildren = null;
+    mockPageTransitionPathname = undefined;
     window.history.pushState({}, '', '/');
   });
 
-  it('renders the Header, Footer, and CommonLinkTooltip on every route', () => {
+  it('renders the Header, Footer, and CommonLinkTooltip on every route', async () => {
     render(
       <ThemeProvider>
         <App />
@@ -92,26 +101,45 @@ describe('App', () => {
     expect(screen.getByTestId('header')).toBeInTheDocument();
     expect(screen.getByTestId('footer')).toBeInTheDocument();
     expect(screen.getByTestId('common-link-tooltip')).toBeInTheDocument();
+    expect(await screen.findByTestId('home-page')).toBeInTheDocument();
   });
 
-  it('renders the Home page by default', () => {
+  it('renders the Home page by default', async () => {
     render(
       <ThemeProvider>
         <App />
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('home-page')).toBeInTheDocument();
+    expect(await screen.findByTestId('home-page')).toBeInTheDocument();
   });
 
-  it('passes the current location to Routes inside PageTransition', () => {
+  it('shows the route loading fallback before an uncached lazy page is ready', async () => {
+    window.history.pushState({}, '', '/photography');
+
     render(
       <ThemeProvider>
         <App />
       </ThemeProvider>
     );
 
+    expect(screen.getByRole('status', { name: 'Loading route content' })).toBeInTheDocument();
+    expect(screen.queryByTestId('page-transition')).not.toBeInTheDocument();
+
+    expect(await screen.findByTestId('photography-page')).toBeInTheDocument();
+    expect(screen.getByTestId('page-transition')).toBeInTheDocument();
+  });
+
+  it('passes the displayed route location directly into PageTransition and Routes', async () => {
+    render(
+      <ThemeProvider>
+        <App />
+      </ThemeProvider>
+    );
+
+    expect(await screen.findByTestId('home-page')).toBeInTheDocument();
     expect(isValidElement(mockPageTransitionChildren)).toBe(true);
+    expect(mockPageTransitionPathname).toBe('/');
 
     const routesElement = mockPageTransitionChildren as ReactElement<{
       location?: { pathname?: string };
@@ -120,7 +148,7 @@ describe('App', () => {
     expect(routesElement.props.location).toEqual(expect.objectContaining({ pathname: '/' }));
   });
 
-  it('falls through to NotFound for /blog when the blog feature is disabled', () => {
+  it('falls through to NotFound for /blog when the blog feature is disabled', async () => {
     mockedIsFeatureEnabled.mockReturnValue(false);
     window.history.pushState({}, '', '/blog');
 
@@ -130,11 +158,11 @@ describe('App', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('not-found-page')).toBeInTheDocument();
+    expect(await screen.findByTestId('not-found-page')).toBeInTheDocument();
     expect(screen.queryByTestId('blog-page')).not.toBeInTheDocument();
   });
 
-  it('suppresses app chrome for /cv?mode=story while keeping shared overlays mounted', () => {
+  it('suppresses app chrome for /cv?mode=story while keeping shared overlays mounted', async () => {
     window.history.pushState({}, '', '/cv?mode=story');
 
     render(
@@ -143,7 +171,7 @@ describe('App', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('cv-page')).toBeInTheDocument();
+    expect(await screen.findByTestId('cv-page')).toBeInTheDocument();
     expect(screen.queryByTestId('header')).not.toBeInTheDocument();
     expect(screen.queryByTestId('footer')).not.toBeInTheDocument();
     expect(screen.getByTestId('common-link-tooltip')).toBeInTheDocument();

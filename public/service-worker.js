@@ -13,14 +13,18 @@ const CACHE_NAME = 'danhenderson-v1';
 const PRECACHE_URLS = ['./', './index.html'];
 const RUNTIME_ASSET_DESTINATIONS = new Set(['image', 'style', 'script', 'font']);
 
-function getCachedAppShell() {
-  return caches.match('./index.html').then((cached) => {
-    if (cached) {
-      return cached;
-    }
-
-    throw new Error('No cached app shell available');
+function createUnavailableResponse(statusText) {
+  return new Response(statusText, {
+    status: 503,
+    statusText,
+    headers: {
+      'Content-Type': 'text/plain; charset=utf-8',
+    },
   });
+}
+
+function getCachedAppShell() {
+  return caches.match('./index.html').then((cached) => cached || createUnavailableResponse('Offline'));
 }
 
 function updateCache(request, response) {
@@ -50,7 +54,7 @@ function networkFirstWithCacheFallback(request) {
           return cached;
         }
 
-        throw new Error(`No cached response available for ${request.url}`);
+        return createUnavailableResponse('Service Unavailable');
       })
     );
 }
@@ -58,7 +62,7 @@ function networkFirstWithCacheFallback(request) {
 function networkFirstNavigationWithShellFallback(request) {
   return fetch(request)
     .then((response) => {
-      if (response.ok || response.status !== 404) {
+      if (response.ok && response.status !== 404) {
         return response;
       }
 

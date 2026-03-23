@@ -15,8 +15,11 @@ jest.mock('@mui/material', () => {
       appear: _appear,
       timeout: _timeout,
       onEntered: _onEntered,
-      ...props
-    }: any) => <div {...props}>{children}</div>,
+    }: any) => (
+      <div data-collapse-in={String(_in)} data-collapse-appear={String(_appear ?? true)}>
+        {children}
+      </div>
+    ),
   };
 });
 

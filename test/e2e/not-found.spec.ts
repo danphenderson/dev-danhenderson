@@ -37,9 +37,9 @@ test.describe('Not Found page', () => {
     const dialog = page.getByRole('dialog', { name: 'Command palette' });
     await expect(dialog).toBeVisible();
     await expect(
-      dialog.getByRole('textbox', { name: 'Search routes, albums, and CV sections' })
+      dialog.getByRole('combobox', { name: 'Search routes, albums, and CV sections' })
     ).toHaveValue('abou');
-    const aboutAction = dialog.getByRole('button', { name: /CV: About/ });
+    const aboutAction = dialog.getByRole('option', { name: /CV: About/ });
     await expect(aboutAction).toBeVisible();
 
     await aboutAction.click();

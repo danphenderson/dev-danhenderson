@@ -254,6 +254,26 @@ describe('Header controls', () => {
     expect(screen.queryByRole('link', { name: 'Go to Home' })).not.toBeInTheDocument();
   });
 
+  it('switches from desktop links to the mobile menu trigger when the viewport crosses below md', () => {
+    mockUseMediaQuery.mockReturnValue(false);
+    const { rerender } = renderHeader('/cv');
+
+    expect(screen.getByRole('link', { name: 'Go to CV' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Open navigation menu' })).not.toBeInTheDocument();
+
+    mockUseMediaQuery.mockReturnValue(true);
+    rerender(
+      <MuiThemeProvider theme={createAppTheme('light', 'evergreen')}>
+        <MemoryRouter initialEntries={['/cv']} future={routerFuture}>
+          <Header />
+        </MemoryRouter>
+      </MuiThemeProvider>
+    );
+
+    expect(screen.getByRole('button', { name: 'Open navigation menu' })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Go to CV' })).not.toBeInTheDocument();
+  });
+
   it('shows navigation links on the home route without the avatar', () => {
     renderHeader('/');
 

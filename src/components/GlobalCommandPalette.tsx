@@ -9,7 +9,7 @@ import {
   Stack,
   TextField,
 } from '@mui/material';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useMotionScale } from '../motion';
 import {
@@ -78,6 +78,7 @@ export const GlobalCommandPalette = () => {
   const location = useLocation();
   const { duration: durationFactor } = useMotionScale();
   const { isOpen, query, openPalette, closePalette, setQuery } = useCommandPalette();
+  const [activeIndex, setActiveIndex] = useState(-1);
   const previousPathnameRef = useRef(location.pathname);
   const disableScrollAnimation = durationFactor === 0;
   const dialogTransitionDuration =
@@ -87,16 +88,26 @@ export const GlobalCommandPalette = () => {
     () => commandPaletteActions.filter((action) => matchesCommandPaletteAction(action, query)),
     [query]
   );
+  const activeAction =
+    activeIndex >= 0 && activeIndex < filteredActions.length ? filteredActions[activeIndex] : undefined;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (isEditableTarget(event.target)) {
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        if (!isOpen && isEditableTarget(event.target)) {
+          return;
+        }
+
+        event.preventDefault();
+        if (isOpen) {
+          closePalette();
+        } else {
+          openPalette();
+        }
         return;
       }
 
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-        event.preventDefault();
-        openPalette();
+      if (isEditableTarget(event.target)) {
         return;
       }
 
@@ -108,7 +119,16 @@ export const GlobalCommandPalette = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [openPalette]);
+  }, [closePalette, isOpen, openPalette]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setActiveIndex(-1);
+      return;
+    }
+
+    setActiveIndex(filteredActions.length > 0 ? 0 : -1);
+  }, [filteredActions, isOpen]);
 
   useEffect(() => {
     if (previousPathnameRef.current === location.pathname) {
@@ -175,6 +195,31 @@ export const GlobalCommandPalette = () => {
     handleClose();
   };
 
+  const handleQueryKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (filteredActions.length === 0) {
+      return;
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActiveIndex((previousIndex) => (previousIndex + 1) % filteredActions.length);
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActiveIndex((previousIndex) =>
+        previousIndex <= 0 ? filteredActions.length - 1 : previousIndex - 1
+      );
+      return;
+    }
+
+    if (event.key === 'Enter' && activeIndex >= 0) {
+      event.preventDefault();
+      handleSelect(filteredActions[activeIndex]);
+    }
+  };
+
   return (
     <Dialog
       open={isOpen}
@@ -205,8 +250,19 @@ export const GlobalCommandPalette = () => {
             autoFocus
             value={query}
             onChange={(event) => setQuery(event.target.value)}
+            onKeyDown={handleQueryKeyDown}
             placeholder="Search routes, albums, and CV sections"
-            inputProps={{ 'aria-label': 'Search routes, albums, and CV sections' }}
+            inputProps={{
+              role: 'combobox',
+              'aria-label': 'Search routes, albums, and CV sections',
+              'aria-activedescendant': activeAction
+                ? `command-palette-action-${activeAction.id}`
+                : undefined,
+              'aria-controls': 'command-palette-results',
+              'aria-autocomplete': 'list',
+              'aria-expanded': filteredActions.length > 0,
+              'aria-haspopup': 'listbox',
+            }}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -215,12 +271,24 @@ export const GlobalCommandPalette = () => {
               ),
             }}
           />
-          <List sx={{ p: 0, display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+          <List
+            component="ul"
+            id="command-palette-results"
+            role="listbox"
+            aria-label="Command palette results"
+            sx={{ p: 0, display: 'flex', flexDirection: 'column', gap: 0.75 }}
+          >
             {filteredActions.length > 0 ? (
-              filteredActions.map((action) => (
+              filteredActions.map((action, index) => (
                 <ListItemButton
+                  component="li"
                   key={action.id}
+                  id={`command-palette-action-${action.id}`}
+                  role="option"
+                  aria-selected={index === activeIndex}
                   onClick={() => handleSelect(action)}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  selected={index === activeIndex}
                   sx={{ borderRadius: 2, alignItems: 'flex-start' }}
                 >
                   <Stack spacing={0.375} sx={{ minWidth: 0 }}>
@@ -234,7 +302,7 @@ export const GlobalCommandPalette = () => {
                 </ListItemButton>
               ))
             ) : (
-              <Box sx={{ px: 1, py: 2 }}>
+              <Box role="status" sx={{ px: 1, py: 2 }}>
                 <Text role="bodyMuted">No matching routes or sections.</Text>
               </Box>
             )}

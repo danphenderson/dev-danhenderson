@@ -55,7 +55,10 @@ test.describe('Photography page', () => {
   test('does not introduce horizontal overflow when resized below md', async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 1200 });
     await page.goto('/photography');
-    await waitForPhotographySection(page);
+    await expect(
+      page.getByText('A selection of field work, climbing days, and stargazing nights.')
+    ).toBeVisible({ timeout: 15000 });
+    await expect(page.getByText('4 albums')).toBeVisible({ timeout: 15000 });
 
     await page.setViewportSize({ width: 700, height: 1200 });
     await page.waitForFunction(() => document.documentElement.scrollWidth <= window.innerWidth);
@@ -91,9 +94,9 @@ test.describe('Photography page', () => {
     const dialog = page.getByRole('dialog', { name: 'Command palette' });
     await expect(dialog).toBeVisible();
     await expect(
-      dialog.getByRole('textbox', { name: 'Search routes, albums, and CV sections' })
+      dialog.getByRole('combobox', { name: 'Search routes, albums, and CV sections' })
     ).toHaveValue(INVALID_PHOTOGRAPHY_SLUG_QUERY);
-    const landscapeAction = dialog.getByRole('button', { name: /Album: Landscape/ });
+    const landscapeAction = dialog.getByRole('option', { name: /Album: Landscape/ });
     await expect(landscapeAction).toBeVisible();
 
     await landscapeAction.click();

@@ -84,21 +84,34 @@ describe('GlobalCommandPalette', () => {
   describe('keyboard shortcut — open', () => {
     it('opens via Cmd+K', () => {
       renderPalette();
-      expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
       openViaCmdK();
-      expect(screen.getByRole('textbox')).toBeInTheDocument();
+      expect(screen.getByRole('combobox')).toBeInTheDocument();
     });
 
     it('opens via Ctrl+K', () => {
       renderPalette();
       openViaCtrlK();
-      expect(screen.getByRole('textbox')).toBeInTheDocument();
+      expect(screen.getByRole('combobox')).toBeInTheDocument();
+    });
+
+    it('toggles closed when Cmd+K is pressed while the palette is already open', async () => {
+      renderPalette();
+      openViaCmdK();
+      const searchBox = screen.getByRole('combobox', {
+        name: 'Search routes, albums, and CV sections',
+      });
+      expect(searchBox).toBeInTheDocument();
+
+      fireEvent.keyDown(searchBox, { key: 'k', metaKey: true });
+
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
     });
 
     it('opens via "/" key', () => {
       renderPalette();
       fireEvent.keyDown(window, { key: '/' });
-      expect(screen.getByRole('textbox')).toBeInTheDocument();
+      expect(screen.getByRole('combobox')).toBeInTheDocument();
     });
 
     it('does not open when Cmd+K is pressed inside an input element', () => {
@@ -134,7 +147,7 @@ describe('GlobalCommandPalette', () => {
     it('shows only matching actions when the user types a query', () => {
       renderPalette();
       openViaCmdK();
-      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'climbing' } });
+      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'climbing' } });
       // Climbing action still visible
       expect(screen.getByText('Climbing')).toBeInTheDocument();
       // Home should no longer be visible (does not match "climbing")
@@ -144,10 +157,18 @@ describe('GlobalCommandPalette', () => {
     it('shows "No matching routes" when no actions match', () => {
       renderPalette();
       openViaCmdK();
-      fireEvent.change(screen.getByRole('textbox'), {
+      fireEvent.change(screen.getByRole('combobox'), {
         target: { value: 'xyzzy-no-match-ever' },
       });
       expect(screen.getByText(/no matching routes/i)).toBeInTheDocument();
+    });
+
+    it('matches queries case-insensitively in the rendered action list', () => {
+      renderPalette();
+      openViaCmdK();
+      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'PHOTOGRAPHY' } });
+
+      expect(screen.getByText('Photography')).toBeInTheDocument();
     });
   });
 
@@ -163,16 +184,75 @@ describe('GlobalCommandPalette', () => {
   });
 
   describe('action selection', () => {
+    it('exposes combobox, listbox, and option semantics for the result set', () => {
+      renderPalette('/');
+      openViaCmdK();
+
+      const searchBox = screen.getByRole('combobox', {
+        name: 'Search routes, albums, and CV sections',
+      });
+      const results = screen.getByRole('listbox', { name: 'Command palette results' });
+      const activeOption = screen.getByRole('option', { name: /home/i });
+
+      expect(searchBox).toHaveAttribute('aria-controls', 'command-palette-results');
+      expect(searchBox).toHaveAttribute('aria-haspopup', 'listbox');
+      expect(searchBox).toHaveAttribute('aria-expanded', 'true');
+      expect(results).toContainElement(activeOption);
+      expect(activeOption).toHaveAttribute('aria-selected', 'true');
+    });
+
     it('navigates and closes the palette when an action is selected', async () => {
       renderPalette('/');
       openViaCmdK();
       // Filter to "CV" for a stable single target
-      fireEvent.change(screen.getByRole('textbox'), { target: { value: 'cv' } });
+      fireEvent.change(screen.getByRole('combobox'), { target: { value: 'cv' } });
       // Click the "CV" action (stable label from commandPaletteActions)
       fireEvent.click(screen.getByText('CV'));
       expect(mockNavigate).toHaveBeenCalled();
       // Dialog closes after the Fade exit transition completes
       await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('moves the active result with arrow keys and selects it with Enter', async () => {
+      renderPalette('/');
+      openViaCmdK();
+
+      const searchBox = screen.getByRole('combobox', {
+        name: 'Search routes, albums, and CV sections',
+      });
+
+      expect(searchBox).toHaveAttribute('aria-activedescendant', 'command-palette-action-route-home');
+      expect(screen.getByRole('option', { name: /home/i })).toHaveAttribute('aria-selected', 'true');
+
+      fireEvent.keyDown(searchBox, { key: 'ArrowDown' });
+      expect(searchBox).toHaveAttribute('aria-activedescendant', 'command-palette-action-route-cv');
+      expect(screen.getByRole('option', { name: /home/i })).toHaveAttribute('aria-selected', 'false');
+      expect(
+        screen.getByRole('option', { name: /^CV Open the interactive CV/i })
+      ).toHaveAttribute('aria-selected', 'true');
+
+      fireEvent.keyDown(searchBox, { key: 'Enter' });
+
+      expect(mockNavigate).toHaveBeenCalledWith('/cv');
+      await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    });
+
+    it('wraps active result navigation when using ArrowUp from the first result', () => {
+      renderPalette('/');
+      openViaCmdK();
+
+      const searchBox = screen.getByRole('combobox', {
+        name: 'Search routes, albums, and CV sections',
+      });
+
+      fireEvent.change(searchBox, { target: { value: 'album:' } });
+
+      fireEvent.keyDown(searchBox, { key: 'ArrowUp' });
+
+      expect(searchBox).toHaveAttribute(
+        'aria-activedescendant',
+        'command-palette-action-photo-album-new-mexico'
+      );
     });
 
     it('uses smooth scrolling for same-route hash actions when motion is enabled', () => {
