@@ -1,0 +1,51 @@
+import { readNodeEnvironment, readRuntimeEnvironmentOverride } from '../utils/appEnvironment';
+
+export type AppRuntimeEnvironment = 'development' | 'test' | 'production';
+
+export type FeatureFlagId = 'blog';
+
+export type FeatureFlagDefinition = {
+  id: FeatureFlagId;
+  description: string;
+  enabledIn: readonly AppRuntimeEnvironment[];
+};
+
+const runtimeEnvironmentValues: readonly AppRuntimeEnvironment[] = [
+  'development',
+  'test',
+  'production',
+];
+
+const isRuntimeEnvironment = (value: string | undefined): value is AppRuntimeEnvironment =>
+  Boolean(value && runtimeEnvironmentValues.includes(value as AppRuntimeEnvironment));
+
+export const resolveAppRuntimeEnvironment = (): AppRuntimeEnvironment => {
+  const runtimeOverride = readRuntimeEnvironmentOverride();
+  if (isRuntimeEnvironment(runtimeOverride)) {
+    return runtimeOverride;
+  }
+
+  const nodeEnvironment = readNodeEnvironment();
+  if (nodeEnvironment === 'production') {
+    return 'production';
+  }
+
+  if (nodeEnvironment === 'test') {
+    return 'test';
+  }
+
+  return 'development';
+};
+
+export const appRuntimeEnvironment = resolveAppRuntimeEnvironment();
+
+export const featureFlagMap: Record<FeatureFlagId, FeatureFlagDefinition> = {
+  blog: {
+    id: 'blog',
+    description: 'Blog routes, navigation, and command-palette entries.',
+    enabledIn: ['development', 'test'],
+  },
+};
+
+export const isFeatureEnabled = (flagId: FeatureFlagId): boolean =>
+  featureFlagMap[flagId].enabledIn.includes(appRuntimeEnvironment);

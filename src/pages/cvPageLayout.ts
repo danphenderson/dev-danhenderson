@@ -43,12 +43,8 @@ export const cvPageSectionLayout: Record<CVSectionKey, CVSectionLayoutDefinition
     mobile: { region: 'stack', order: 5, delayMs: 0, triggerOnView: true },
     desktop: { region: 'sidebar', order: 1, delayMs: 240, triggerOnView: true },
   },
-  tools: {
-    mobile: { region: 'stack', order: 6, delayMs: 0, triggerOnView: true },
-    desktop: { region: 'sidebar', order: 2, delayMs: 360, triggerOnView: true },
-  },
   coding: {
-    mobile: { region: 'stack', order: 7, delayMs: 0, triggerOnView: true },
+    mobile: { region: 'stack', order: 6, delayMs: 0, triggerOnView: true },
     desktop: { region: 'main', order: 3, delayMs: 480, triggerOnView: true },
   },
 };

@@ -1,0 +1,61 @@
+name: General issue
+description: Raise a non-bug issue such as an enhancement, docs update, or repository concern.
+title: "[Issue]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for issues that are not bug reports, including enhancements, documentation updates, or repository maintenance requests.
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: Issue type
+      options:
+        - Enhancement
+        - Documentation
+        - Build/CI
+        - Content update
+        - Repository maintenance
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Home (/)
+        - CV (/cv)
+        - Climbing (/climbing)
+        - Photography (/photography)
+        - Build/CI
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What issue should be addressed?
+      placeholder: Describe the problem or request.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Why does this matter? Include any relevant links, screenshots, or references.
+      placeholder: Add background and any supporting detail.
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: What would a good resolution look like?
+      placeholder: Describe the expected result.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched for existing issues before opening this issue.
+          required: true

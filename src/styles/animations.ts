@@ -51,12 +51,50 @@ export const breathe = keyframes`
   }
 `;
 
-/** Disable all ambient animations when the user prefers reduced motion. */
-export const reducedMotionSx = {
-  '@media (prefers-reduced-motion: reduce)': {
-    animation: 'none !important',
-    '&::before, &::after': {
-      animation: 'none !important',
-    },
-  },
-} as const;
+/**
+ * Loading pulse – smooth opacity ramp for loading-bar progress indicators.
+ * Used on: LoadingBars component.
+ */
+export const loadingPulse = keyframes`
+  0%   { opacity: 0.35; }
+  50%  { opacity: 1; }
+  100% { opacity: 0.35; }
+`;
+
+/**
+ * Pulse ring – expanding ring that fades out for attention-drawing highlights.
+ * Used on: Header hint highlights (audio control, theme dial).
+ */
+export const pulseRing = keyframes`
+  0% {
+    transform: scale(0.85);
+    opacity: 0.9;
+  }
+  70% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+`;
+
+/**
+ * Cursor blink – step-based blink for typewriter cursors.
+ * Used on: TypewriterLoopText cursor display.
+ */
+export const cursorBlink = keyframes`
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+`;
+
+/**
+ * Traffic-dot pulse – scale-up with a fading glow ring to indicate
+ * an auto-triggered window-control action.
+ * Used on: VscodeTitleBar green traffic-light dot during auto-expand.
+ */
+export const trafficDotPulse = keyframes`
+  0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(40, 200, 64, 0.7); }
+  50%  { transform: scale(1.45);  box-shadow: 0 0 8px 4px rgba(40, 200, 64, 0.35); }
+  100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(40, 200, 64, 0); }
+`;

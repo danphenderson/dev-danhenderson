@@ -1,24 +1,27 @@
-import { Avatar, Box, Link, Stack } from '@mui/material';
+import { Avatar, Box, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { AboutMe } from '../../types/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { HeaderTitle, StatusInlineText, StrongMetaText, MetaText, BodyText } from '../text';
+import { Text } from '../text';
+import { CVAboutBioTypewriter } from './CVAboutBioTypewriter';
 
 type ProfileCardProps = {
   about: AboutMe;
   avatarSrc?: string;
   actions?: ReactNode;
+  bioRevealed?: boolean;
+  bioAnimationStartDelayMs?: number;
+  onBioAnimationComplete?: () => void;
 };
 
-const STATUS_MARKER = 'Open to opportunities';
-
-/** Return the index of the line start containing `markerIndex`. */
-const getLineStart = (text: string, markerIndex: number): number => {
-  const lastNewline = text.lastIndexOf('\n', markerIndex);
-  return lastNewline >= 0 ? lastNewline + 1 : markerIndex;
-};
-
-export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => {
+export const ProfileCard = ({
+  about,
+  avatarSrc,
+  actions,
+  bioRevealed = false,
+  bioAnimationStartDelayMs = 0,
+  onBioAnimationComplete,
+}: ProfileCardProps) => {
   const {
     profileHeaderContentSx,
     profileHeaderRowSx,
@@ -29,86 +32,33 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
     profileAvatarSx,
     profileBioSx,
     profileNameRowSx,
+    cvSectionItemSpacing,
   } = useComponentStyles();
-  const bioLink = about.bioLink;
-  const bioText = about.bio;
-  const bioLinkIndex = bioLink ? bioText.indexOf(bioLink.text) : -1;
-  let bioContent: ReactNode = bioText;
-
-  if (bioLink && bioLinkIndex >= 0) {
-    const beforeLink = bioText.slice(0, bioLinkIndex);
-    const afterLink = bioText.slice(bioLinkIndex + bioLink.text.length);
-    const statusIdx = afterLink.indexOf(STATUS_MARKER);
-
-    if (statusIdx >= 0) {
-      const lineStart = getLineStart(afterLink, statusIdx);
-      const beforeStatus = afterLink.slice(0, lineStart);
-      const statusLine = afterLink.slice(lineStart);
-
-      bioContent = (
-        <>
-          {beforeLink}
-          <Link href={bioLink.url} target="_blank" rel="noopener noreferrer" underline="hover">
-            {bioLink.text}
-          </Link>
-          {beforeStatus}
-          <StatusInlineText>{statusLine}</StatusInlineText>
-        </>
-      );
-    } else {
-      bioContent = (
-        <>
-          {beforeLink}
-          <Link href={bioLink.url} target="_blank" rel="noopener noreferrer" underline="hover">
-            {bioLink.text}
-          </Link>
-          {afterLink}
-        </>
-      );
-    }
-  } else {
-    const statusIdx = bioText.indexOf(STATUS_MARKER);
-    if (statusIdx >= 0) {
-      const lineStart = getLineStart(bioText, statusIdx);
-      bioContent = (
-        <>
-          {bioText.slice(0, lineStart)}
-          <StatusInlineText>{bioText.slice(lineStart)}</StatusInlineText>
-        </>
-      );
-    }
-  }
 
   return (
-    <Stack spacing={1.5} alignItems="flex-start">
-      {avatarSrc && (
-        <Avatar
-          src={avatarSrc}
-          alt={about.name}
-          sx={profileAvatarSx}
-        />
-      )}
+    <Stack spacing={cvSectionItemSpacing} alignItems="flex-start">
+      {avatarSrc && <Avatar src={avatarSrc} alt={about.name} sx={profileAvatarSx} />}
       <Box sx={profileHeaderRowSx}>
         <Stack spacing={0.75} sx={profileHeaderContentSx}>
           <Stack direction="row" sx={profileNameRowSx}>
-            <HeaderTitle sx={[primaryTextSx, { mb: 0 }]}>
+            <Text role="sectionTitle" sx={[primaryTextSx, { mb: 0 }]}>
               {about.name}
-            </HeaderTitle>
+            </Text>
           </Stack>
 
           <Stack direction="row" sx={profileMetaRowSx}>
-            <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" sx={profileMetaContentSx}>
-              <StrongMetaText>
-                {about.title}
-              </StrongMetaText>
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              flexWrap="wrap"
+              sx={profileMetaContentSx}
+            >
+              <Text role="metaStrong">{about.title}</Text>
               {about.location && (
                 <>
-                  <MetaText>
-                    •
-                  </MetaText>
-                  <MetaText>
-                    {about.location}
-                  </MetaText>
+                  <Text role="meta">•</Text>
+                  <Text role="meta">{about.location}</Text>
                 </>
               )}
             </Stack>
@@ -117,9 +67,14 @@ export const ProfileCard = ({ about, avatarSrc, actions }: ProfileCardProps) => 
         {actions && <Box sx={profileInlineActionsSx}>{actions}</Box>}
       </Box>
       {about.bio && (
-        <BodyText sx={[primaryTextSx, profileBioSx]}>
-          {bioContent}
-        </BodyText>
+        <Text role="body" sx={[primaryTextSx, profileBioSx]}>
+          <CVAboutBioTypewriter
+            about={about}
+            revealed={bioRevealed}
+            startDelayMs={bioAnimationStartDelayMs}
+            onComplete={onBioAnimationComplete}
+          />
+        </Text>
       )}
     </Stack>
   );

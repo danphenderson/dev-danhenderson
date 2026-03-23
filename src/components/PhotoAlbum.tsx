@@ -2,10 +2,12 @@ import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 import { IconButton, ImageList, ImageListItem } from '@mui/material';
 import { useAppStyles } from '../styles/appStyles';
 import type { PhotoItem } from '../types/data';
+import { TiltCard } from './photography/TiltCard';
 
 type QuiltedImageListProps = {
   imageData: PhotoItem[];
   albumLabel?: string;
+  onPhotoClick?: (index: number) => void;
 };
 
 function srcset(image: string, size: number, rows = 1, cols = 1) {
@@ -22,11 +24,16 @@ function getDownloadFilename(image: string) {
   return decodeURIComponent(segments[segments.length - 1] || 'photo');
 }
 
-export function QuiltedImageList({ imageData, albumLabel }: QuiltedImageListProps) {
+export function QuiltedImageList({ imageData, albumLabel, onPhotoClick }: QuiltedImageListProps) {
   const appStyles = useAppStyles();
 
   return (
-    <ImageList aria-label={albumLabel ? `${albumLabel} photo gallery` : undefined}>
+    <ImageList
+      variant="quilted"
+      cols={4}
+      rowHeight={200}
+      aria-label={albumLabel ? `${albumLabel} photo gallery` : undefined}
+    >
       {imageData.map((item, index) => {
         const normalizedTitle = item.title.trim();
         const hasMeaningfulTitle =
@@ -42,23 +49,39 @@ export function QuiltedImageList({ imageData, albumLabel }: QuiltedImageListProp
             rows={item.rows || 1}
             sx={appStyles.quiltedImageItemSx}
           >
-            <img
-              {...srcset(item.img, 121, item.rows, item.cols)}
-              alt={altText}
-              loading="lazy"
-              decoding="async"
-            />
-            <IconButton
-              className="photo-download-action"
-              component="a"
-              href={item.img}
-              download={getDownloadFilename(item.img)}
-              aria-label={`Download ${altText}`}
-              size="small"
-              sx={appStyles.photoDownloadButtonSx}
-            >
-              <DownloadRoundedIcon fontSize="small" />
-            </IconButton>
+            <TiltCard intensity={0.5} style={{ height: '100%', width: '100%' }}>
+              <img
+                {...srcset(item.img, 121, item.rows, item.cols)}
+                alt={altText}
+                loading="lazy"
+                decoding="async"
+                onClick={onPhotoClick ? () => onPhotoClick(index) : undefined}
+                role={onPhotoClick ? 'button' : undefined}
+                tabIndex={onPhotoClick ? 0 : undefined}
+                onKeyDown={
+                  onPhotoClick
+                    ? (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          onPhotoClick(index);
+                        }
+                      }
+                    : undefined
+                }
+                style={onPhotoClick ? { cursor: 'pointer' } : undefined}
+              />
+              <IconButton
+                className="photo-download-action"
+                component="a"
+                href={item.img}
+                download={getDownloadFilename(item.img)}
+                aria-label={`Download ${altText}`}
+                size="small"
+                sx={appStyles.photoDownloadButtonSx}
+              >
+                <DownloadRoundedIcon fontSize="small" />
+              </IconButton>
+            </TiltCard>
           </ImageListItem>
         );
       })}

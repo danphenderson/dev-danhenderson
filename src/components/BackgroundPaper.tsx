@@ -1,3 +1,4 @@
+import type { Ref } from 'react';
 import { Box, Grid, Paper } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { useAppStyles } from '../styles/appStyles';
@@ -10,7 +11,9 @@ interface BackgroundPaperProps {
   showShell?: boolean;
   contentAlign?: 'flex-start' | 'center' | 'flex-end';
   contentSx?: SxProps<Theme>;
+  contentRef?: Ref<HTMLDivElement>;
   shellSx?: SxProps<Theme>;
+  shellWrapper?: (shell: React.ReactNode) => React.ReactNode;
 }
 
 const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
@@ -19,35 +22,29 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
   showShell = true,
   contentAlign = 'flex-start',
   contentSx,
+  contentRef,
   shellSx,
+  shellWrapper,
 }) => {
   const resolvedImage = resolvePublicAssetPath(image);
   const appStyles = useAppStyles();
+  const shell = (
+    <Paper sx={[appStyles.backgroundShellSx, ...normalizeSxProp(shellSx)]}>{children}</Paper>
+  );
 
   return (
     <Grid container component="main" sx={appStyles.backgroundRootSx}>
-      <Grid
-        item
-        xs={12}
-        sm={12}
-        md={12}
-        sx={appStyles.getBackgroundImageSx(resolvedImage)}
-      >
+      <Grid item xs={12} sm={12} md={12} sx={appStyles.getBackgroundImageSx(resolvedImage)}>
         <Box
-          sx={[
-            appStyles.getBackgroundContentSx(contentAlign),
-            ...normalizeSxProp(contentSx),
-          ]}
+          ref={contentRef}
+          sx={[appStyles.getBackgroundContentSx(contentAlign), ...normalizeSxProp(contentSx)]}
         >
           {showShell ? (
-            <Paper
-              sx={[
-                appStyles.backgroundShellSx,
-                ...normalizeSxProp(shellSx),
-              ]}
-            >
-              {children}
-            </Paper>
+            shellWrapper ? (
+              shellWrapper(shell)
+            ) : (
+              shell
+            )
           ) : (
             <Box sx={appStyles.backgroundChildrenSx}>{children}</Box>
           )}

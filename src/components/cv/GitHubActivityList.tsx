@@ -1,9 +1,8 @@
 import { Box } from '@mui/material';
 import type { GitHubActivityItem } from '../../types/cv';
 import { LoadingBars } from '../LoadingBars';
-import { useComponentStyles } from '../../styles/componentStyles';
 import { GitHubLinkChipList } from './GitHubLinkChipList';
-import { CaptionText } from '../text';
+import { Text } from '../text';
 
 type GitHubActivityListProps = {
   activity: GitHubActivityItem[];
@@ -20,8 +19,6 @@ export const GitHubActivityList = ({
   startDelayMs = 0,
   itemStaggerMs,
 }: GitHubActivityListProps) => {
-  const { secondaryTextSx } = useComponentStyles();
-
   return (
     <Box>
       {loading ? (
@@ -32,6 +29,7 @@ export const GitHubActivityList = ({
             key: `${item.label}-${idx}`,
             label: item.label,
             href: item.href,
+            tooltip: item.href ? `Open ${item.label} on GitHub.` : undefined,
           }))}
           layout="stack"
           animateItems
@@ -40,9 +38,9 @@ export const GitHubActivityList = ({
         />
       )}
       {error && (
-        <CaptionText sx={secondaryTextSx}>
+        <Text role="caption" tone="muted">
           {error}
-        </CaptionText>
+        </Text>
       )}
     </Box>
   );

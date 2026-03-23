@@ -1,23 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
-import { Box, Button, Grid, Stack, Typography } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Box, Stack } from '@mui/material';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
+import { siteRouteMap } from '../constants/siteRoutes';
 import { LoadingBars } from '../components/LoadingBars';
+import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
-import { BodyText } from '../components/text';
+import { Text } from '../components/text';
+import { AlbumCard } from '../components/photography/AlbumCard';
+import { MotionSection, MotionItem, StaggerChildren, scaleIn, MotionTiltCard } from '../motion';
 
 export default function Photography() {
   const appStyles = useAppStyles();
-  const { categories } = usePhotographyData();
+  useDocumentMetadata({
+    ...siteRouteMap.photography,
+    canonicalPath: siteRouteMap.photography.path,
+  });
+  const { categories, featuredCategory, totalPhotos } = usePhotographyData();
+  const supportingCategories = categories.filter((c) => c !== featuredCategory);
   const loadedImagesRef = useRef<Set<string>>(new Set());
   const [loadedImages, setLoadedImages] = useState(0);
   const totalImages = categories.length;
-  const baseDelay = 120;
-  const staggerDelay = 90;
 
   useEffect(() => {
     loadedImagesRef.current.clear();
@@ -35,67 +41,56 @@ export default function Photography() {
   return (
     <PageFrame image={fallbackBackgroundImage}>
       <Stack spacing={2.5}>
-        <SectionCard delayMs={0}>
-          <Stack spacing={1}>
-            <SectionHeading
-              overline="Photography"
-              title="Collections"
-              subtitle="A selection of field work, climbing days, and stargazing nights."
-              sx={appStyles.compactSectionHeadingSx}
-            />
-            <BodyText sx={appStyles.secondaryTextSx}>
-              {categories.length} albums
-            </BodyText>
-            {isLoading && (
-              <Box sx={appStyles.sectionLoadingSx}>
-                <LoadingBars label="Loading photography albums" compact />
-              </Box>
-            )}
-          </Stack>
-        </SectionCard>
-
-        <Grid container spacing={2.5}>
-          {categories.map((card, index) => (
-            <Grid item key={card.name} xs={12} sm={6} md={4}>
-              <SectionCard
-                delayMs={baseDelay + index * staggerDelay}
-                sx={appStyles.photographyCardSx}
-              >
-                <Box sx={appStyles.photographyMediaSx}>
-                  <Box
-                    component="img"
-                    src={card.src}
-                    alt={card.name}
-                    loading="lazy"
-                    decoding="async"
-                    onLoad={() => handleImageReady(card.src)}
-                    onError={() => handleImageReady(card.src)}
-                    sx={appStyles.photographyImageSx}
-                  />
+        <MotionSection>
+          <SectionCard delayMs={0} triggerOnView={false}>
+            <Stack spacing={1}>
+              <SectionHeading
+                overline="Photography"
+                subtitle="A selection of field work, climbing days, and stargazing nights."
+                sx={appStyles.compactSectionHeadingSx}
+              />
+              <Text role="bodyMuted">
+                {totalPhotos} photos · {categories.length} albums
+              </Text>
+              {isLoading && (
+                <Box sx={appStyles.sectionLoadingSx}>
+                  <LoadingBars label="Loading photography albums" compact />
                 </Box>
+              )}
+            </Stack>
+          </SectionCard>
+        </MotionSection>
 
-                <Stack spacing={0.5} sx={appStyles.photographyCardContentSx}>
-                  <Typography variant="h6" sx={appStyles.primaryTextSx}>
-                    {card.name}
-                  </Typography>
-                  <BodyText sx={appStyles.secondaryTextSx}>
-                    {card.description}
-                  </BodyText>
-                </Stack>
+        {featuredCategory && (
+          <MotionSection>
+            <MotionItem variants={scaleIn} style={{ minWidth: 0 }}>
+              <MotionTiltCard>
+                <AlbumCard
+                  category={featuredCategory}
+                  variant="hero"
+                  onImageReady={handleImageReady}
+                />
+              </MotionTiltCard>
+            </MotionItem>
+          </MotionSection>
+        )}
 
-                <Button
-                  component={RouterLink}
-                  to={`/photography/${card.slug}`}
-                  variant="outlined"
-                  size="small"
-                  sx={appStyles.inlineStartSx}
-                >
-                  View album
-                </Button>
-              </SectionCard>
-            </Grid>
+        <StaggerChildren
+          style={{
+            display: 'grid',
+            gap: '20px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            alignItems: 'stretch',
+          }}
+        >
+          {supportingCategories.map((card) => (
+            <MotionItem key={card.slug} variants={scaleIn} style={{ minWidth: 0 }}>
+              <MotionTiltCard style={{ height: '100%' }}>
+                <AlbumCard category={card} variant="grid" onImageReady={handleImageReady} />
+              </MotionTiltCard>
+            </MotionItem>
           ))}
-        </Grid>
+        </StaggerChildren>
       </Stack>
     </PageFrame>
   );

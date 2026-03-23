@@ -1,0 +1,56 @@
+/**
+ * Motion system — unified animation foundation for danhenderson.dev.
+ *
+ * Re-exports tokens (durations, easing, stagger timings), reusable
+ * motion variants, and ready-to-use animated primitives.
+ *
+ * Usage:
+ *
+ *   import { MotionSection, fadeInUp, duration } from '../motion';
+ */
+
+export {
+  duration,
+  cssDuration,
+  easing,
+  stagger,
+  transition,
+  springOptions,
+  scaleDuration,
+  scaleStagger,
+  DEFAULT_INTERSECTION_THRESHOLD,
+  DEFAULT_INTERSECTION_ROOT_MARGIN,
+} from './tokens';
+
+export { useMotionScale } from './hooks';
+
+export {
+  fadeInUp,
+  fadeIn,
+  scaleIn,
+  staggerContainer,
+  hoverLift,
+  tapShrink,
+  hoverZoom,
+  storyContentContainer,
+  storyLabelReveal,
+  storyTitleReveal,
+  storyMetaReveal,
+  storyBodyReveal,
+  storyChipsReveal,
+  storyLinkReveal,
+  storyBulletContainer,
+  storyBulletItem,
+  storyDividerReveal,
+} from './variants';
+
+export {
+  MotionSection,
+  StaggerChildren,
+  MotionCard,
+  MotionImage,
+  MotionItem,
+  MotionFadeIn,
+  MotionScaleIn,
+  MotionTiltCard,
+} from './components';

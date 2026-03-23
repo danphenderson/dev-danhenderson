@@ -2,15 +2,21 @@ import { Button } from '@mui/material';
 import type { Certificate } from '../../types/cv';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { EntryTitle, MetaText } from '../text';
+import { Text } from '../text';
 
 type CertificatesListProps = {
   certificates: Certificate[];
   startDelayMs?: number;
+  skipEntranceAnimation?: boolean;
 };
 
-export const CertificatesList = ({ certificates, startDelayMs = 0 }: CertificatesListProps) => {
-  const { certificateActionSx, contentListStackSpacing, interactiveSurfaceSx } = useComponentStyles();
+export const CertificatesList = ({
+  certificates,
+  startDelayMs = 0,
+  skipEntranceAnimation = false,
+}: CertificatesListProps) => {
+  const { certificateActionSx, contentListStackSpacing, supportAccentInteractiveSurfaceSx } =
+    useComponentStyles();
 
   return (
     <AnimatedContentList
@@ -18,14 +24,16 @@ export const CertificatesList = ({ certificates, startDelayMs = 0 }: Certificate
       getItemKey={(certificate, index) => `${certificate.title}-${index}`}
       mountItemsOnView
       startDelayMs={startDelayMs}
+      skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
+      tiltItems
       renderItem={(certificate) => (
         <>
-          <EntryTitle>{certificate.title}</EntryTitle>
-          <MetaText>
+          <Text role="cardTitle">{certificate.title}</Text>
+          <Text role="meta">
             {certificate.issuer} issued on {certificate.date}
-          </MetaText>
+          </Text>
           {certificate.link && (
             <Button
               href={certificate.link}
@@ -33,7 +41,7 @@ export const CertificatesList = ({ certificates, startDelayMs = 0 }: Certificate
               rel="noopener noreferrer"
               variant="outlined"
               size="small"
-              sx={[interactiveSurfaceSx, certificateActionSx]}
+              sx={[supportAccentInteractiveSurfaceSx, certificateActionSx]}
             >
               View Certificate
             </Button>

@@ -7,13 +7,7 @@ export const SectionPanel = ({ children, sx, ...props }: BoxProps) => {
   const { sectionPanelSx } = useComponentStyles();
 
   return (
-    <Box
-      sx={[
-        sectionPanelSx,
-        ...normalizeSxProp(sx),
-      ]}
-      {...props}
-    >
+    <Box sx={[sectionPanelSx, ...normalizeSxProp(sx)]} {...props}>
       {children}
     </Box>
   );

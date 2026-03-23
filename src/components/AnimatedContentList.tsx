@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Stack } from '@mui/material';
-import type { ReactNode } from 'react';
+import type { ElementType, ReactNode } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
+import {
+  DEFAULT_INTERSECTION_ROOT_MARGIN,
+  DEFAULT_INTERSECTION_THRESHOLD,
+  MotionTiltCard,
+} from '../motion';
 import { useComponentStyles } from '../styles/componentStyles';
 import { normalizeSxProp } from '../utils/sx';
 import { AnimatedContentCard } from './AnimatedContentCard';
 
 type AnimatedContentListLayout = 'stack' | 'wrap';
 type AnimatedContentItemSurface = 'card' | 'panel' | 'plain';
-const DEFAULT_THRESHOLD = 0;
-const DEFAULT_ROOT_MARGIN = '0px 0px -10% 0px';
 
 type AnimatedContentListProps<Item> = {
   items: Item[];
@@ -26,8 +28,10 @@ type AnimatedContentListProps<Item> = {
   itemContainerSx?: SxProps<Theme>;
   itemSurface?: AnimatedContentItemSurface;
   mountItemsOnView?: boolean;
+  skipEntranceAnimation?: boolean;
   mountThreshold?: number;
   mountRootMargin?: string;
+  tiltItems?: boolean;
 };
 
 export const AnimatedContentList = <Item,>({
@@ -44,10 +48,11 @@ export const AnimatedContentList = <Item,>({
   itemContainerSx,
   itemSurface = 'card',
   mountItemsOnView = false,
-  mountThreshold = DEFAULT_THRESHOLD,
-  mountRootMargin = DEFAULT_ROOT_MARGIN,
+  skipEntranceAnimation = false,
+  mountThreshold = DEFAULT_INTERSECTION_THRESHOLD,
+  mountRootMargin = DEFAULT_INTERSECTION_ROOT_MARGIN,
+  tiltItems = false,
 }: AnimatedContentListProps<Item>) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
   const {
     cardResetSx,
     getItemDelayMs,
@@ -57,12 +62,13 @@ export const AnimatedContentList = <Item,>({
     wrapItemContainerSx,
   } = useComponentStyles();
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [hasEnteredView, setHasEnteredView] = useState(!mountItemsOnView || prefersReducedMotion);
+  const [hasEnteredView, setHasEnteredView] = useState(!mountItemsOnView || skipEntranceAnimation);
   const containerSxArray = normalizeSxProp(containerSx);
   const itemSxArray = normalizeSxProp(itemSx);
   const itemContainerSxArray = normalizeSxProp(itemContainerSx);
   const resolvedItemContainerSx =
     layout === 'wrap' ? [wrapItemContainerSx, ...itemContainerSxArray] : itemContainerSxArray;
+  const wrapListSx = getWrapListSx(wrapGap);
   const resolvedItemStaggerMs = itemStaggerMs ?? motionTokens.itemStaggerMs;
   const itemSurfaceSx =
     itemSurface === 'panel'
@@ -71,9 +77,18 @@ export const AnimatedContentList = <Item,>({
         ? [cardResetSx]
         : [];
   const shouldRenderItems = !mountItemsOnView || hasEnteredView;
+  const itemComponent: ElementType | undefined = tiltItems ? MotionTiltCard : undefined;
 
   useEffect(() => {
-    if (!mountItemsOnView || prefersReducedMotion) {
+    if (skipEntranceAnimation) {
+      if (!hasEnteredView) {
+        setHasEnteredView(true);
+      }
+
+      return undefined;
+    }
+
+    if (!mountItemsOnView) {
       if (!hasEnteredView) {
         setHasEnteredView(true);
       }
@@ -85,7 +100,7 @@ export const AnimatedContentList = <Item,>({
       return undefined;
     }
 
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+    if (typeof window === 'undefined' || typeof window.IntersectionObserver !== 'function') {
       setHasEnteredView(true);
       return undefined;
     }
@@ -109,15 +124,17 @@ export const AnimatedContentList = <Item,>({
     observer.observe(node);
 
     return () => observer.disconnect();
-  }, [hasEnteredView, mountItemsOnView, mountRootMargin, mountThreshold, prefersReducedMotion]);
+  }, [hasEnteredView, mountItemsOnView, mountRootMargin, mountThreshold, skipEntranceAnimation]);
 
   const animatedItems = shouldRenderItems
     ? items.map((item, index) => (
         <AnimatedContentCard
           key={getItemKey(item, index)}
           delayMs={getItemDelayMs(index, startDelayMs, resolvedItemStaggerMs)}
+          skipEntranceAnimation={skipEntranceAnimation}
           sx={[...itemSurfaceSx, ...itemSxArray]}
           containerSx={resolvedItemContainerSx}
+          {...(itemComponent ? { component: itemComponent } : {})}
         >
           {renderItem(item, index)}
         </AnimatedContentCard>
@@ -126,7 +143,7 @@ export const AnimatedContentList = <Item,>({
 
   if (layout === 'wrap') {
     return (
-      <Box ref={containerRef} sx={[getWrapListSx(wrapGap), ...containerSxArray]}>
+      <Box ref={containerRef} sx={[wrapListSx, ...containerSxArray]}>
         {animatedItems}
       </Box>
     );

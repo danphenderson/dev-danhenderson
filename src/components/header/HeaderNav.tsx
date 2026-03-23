@@ -1,47 +1,90 @@
+import ArticleIcon from '@mui/icons-material/Article';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import DescriptionIcon from '@mui/icons-material/Description';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Box, Button, IconButton, Menu, MenuItem, Stack } from '@mui/material';
+import TerrainIcon from '@mui/icons-material/Terrain';
+import { Avatar, Box, Button, IconButton, Menu, MenuItem, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { MouseEvent, ReactNode } from 'react';
+import { MouseEvent, ReactElement } from 'react';
 import { Link } from 'react-router-dom';
+import { siteRouteMap, type SiteRouteDefinition } from '../../constants/siteRoutes';
+import { useMotionScale } from '../../motion';
 import { useAppStyles } from '../../styles/appStyles';
-import { NavigationLabel } from '../text';
-
-export type HeaderPage = {
-  name: string;
-  path: string;
-};
+import { Text } from '../text';
 
 type HeaderNavProps = {
-  pages: HeaderPage[];
-  showNavigationLinks: boolean;
+  pages: SiteRouteDefinition[];
+  currentPath: string;
   isMobile: boolean;
   iconButtonSize: 'small' | 'medium' | 'large';
   headerIconSx: SxProps<Theme>;
+  avatarSrc: string;
   mobileMenuOpen: boolean;
   mobileMenuAnchor: HTMLElement | null;
   onMobileMenuOpen: (event: MouseEvent<HTMLButtonElement>) => void;
   onMobileMenuClose: () => void;
-  leftContent?: ReactNode;
 };
+
+const isActivePage = (currentPath: string, pagePath: string): boolean =>
+  pagePath === '/' ? currentPath === '/' : currentPath.startsWith(pagePath);
 
 export const HeaderNav = ({
   pages,
-  showNavigationLinks,
+  currentPath,
   isMobile,
   iconButtonSize,
   headerIconSx,
+  avatarSrc,
   mobileMenuOpen,
   mobileMenuAnchor,
   onMobileMenuOpen,
   onMobileMenuClose,
-  leftContent,
 }: HeaderNavProps) => {
   const appStyles = useAppStyles();
+  const { duration: dFactor } = useMotionScale();
+  const MENU_BASE_DURATION_MS = 200;
+  const menuTransitionDuration = dFactor === 0 ? 0 : Math.round(MENU_BASE_DURATION_MS * dFactor);
+  const showHomeAvatar = !isMobile && !isActivePage(currentPath, '/');
+  const mobilePages = [...pages, siteRouteMap.home].filter(
+    ({ path }) => !isActivePage(currentPath, path)
+  );
+
+  const getPageChipIcon = (path: string): ReactElement | undefined => {
+    switch (path) {
+      case '/cv':
+        return <DescriptionIcon fontSize="small" />;
+      case '/climbing':
+        return <TerrainIcon fontSize="small" />;
+      case '/photography':
+        return <CameraAltIcon fontSize="small" />;
+      case '/blog':
+        return <ArticleIcon fontSize="small" />;
+      case '/':
+        return (
+          <Avatar
+            src={avatarSrc}
+            alt="Daniel Henderson"
+            sx={{
+              width: 24,
+              height: 24,
+              border: (theme) => `1px solid ${theme.palette.common.white}`,
+            }}
+          />
+        );
+      default:
+        return undefined;
+    }
+  };
 
   return (
     <>
       <Box sx={appStyles.headerNavLeadSx}>
-        {showNavigationLinks && isMobile && (
+        {showHomeAvatar ? (
+          <Box component={Link} to="/" sx={appStyles.headerAvatarLinkSx} aria-label="Go to Home">
+            <Avatar src={avatarSrc} alt="Daniel Henderson" sx={appStyles.headerAvatarSx} />
+          </Box>
+        ) : null}
+        {isMobile && (
           <IconButton
             id="mobile-nav-button"
             color="inherit"
@@ -51,47 +94,66 @@ export const HeaderNav = ({
             aria-controls={mobileMenuOpen ? 'mobile-nav-menu' : undefined}
             aria-haspopup="true"
             aria-expanded={mobileMenuOpen ? 'true' : undefined}
+            sx={appStyles.headerIconButtonSx}
           >
             <MenuIcon sx={headerIconSx} />
           </IconButton>
         )}
-        {leftContent}
       </Box>
-      {showNavigationLinks && (
+      {!isMobile && (
         <Box sx={appStyles.headerNavDesktopSx}>
-          <Stack direction="row" spacing={{ md: 5 }}>
-            {pages.map(({ name, path }) => (
+          <Stack direction="row" spacing={1}>
+            {pages.map(({ id, label, path }) => (
               <Button
-                key={name}
-                size="large"
-                sx={appStyles.headerNavButtonSx}
+                key={id}
+                size="small"
+                sx={
+                  isActivePage(currentPath, path)
+                    ? appStyles.headerNavButtonActiveSx
+                    : appStyles.headerNavButtonSx
+                }
                 component={Link}
                 to={path}
-                aria-label={`Go to ${name}`}
+                aria-label={`Go to ${label}`}
+                aria-current={isActivePage(currentPath, path) ? 'page' : undefined}
               >
-                <NavigationLabel>{name}</NavigationLabel>
+                <Text role="inlineLabel" component="span">
+                  {label}
+                </Text>
               </Button>
             ))}
           </Stack>
         </Box>
       )}
-      {showNavigationLinks && (
-        <Menu
-          id="mobile-nav-menu"
-          anchorEl={mobileMenuAnchor}
-          open={mobileMenuOpen}
-          onClose={onMobileMenuClose}
-          MenuListProps={{ 'aria-labelledby': 'mobile-nav-button' }}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-          transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-        >
-          {pages.map(({ name, path }) => (
-            <MenuItem key={name} component={Link} to={path} onClick={onMobileMenuClose}>
-              <NavigationLabel>{name}</NavigationLabel>
-            </MenuItem>
-          ))}
-        </Menu>
-      )}
+      <Menu
+        id="mobile-nav-menu"
+        anchorEl={mobileMenuAnchor}
+        open={mobileMenuOpen}
+        onClose={onMobileMenuClose}
+        transitionDuration={menuTransitionDuration}
+        MenuListProps={{ 'aria-labelledby': 'mobile-nav-button' }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+      >
+        {mobilePages.map(({ id, label, path }) => (
+          <MenuItem key={id} component={Link} to={path} onClick={onMobileMenuClose}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                gap: 1.5,
+                width: '100%',
+              }}
+            >
+              {getPageChipIcon(path)}
+              <Text role="inlineLabel" component="span" sx={{ flex: 1, textAlign: 'left' }}>
+                {label}
+              </Text>
+            </Box>
+          </MenuItem>
+        ))}
+      </Menu>
     </>
   );
 };

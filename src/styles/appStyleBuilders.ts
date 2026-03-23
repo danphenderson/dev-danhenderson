@@ -1,4 +1,6 @@
 import { alpha, SxProps, Theme } from '@mui/material/styles';
+import { cssDuration } from '../motion/tokens';
+import { SPRING_EASING_CSS } from './springEasing';
 
 type BackgroundContentAlign = 'flex-start' | 'center' | 'flex-end';
 type HeaderHighlightTone = 'primary' | 'secondary';
@@ -6,11 +8,34 @@ type LoadingBarTone = 'primary' | 'secondary' | 'success';
 
 export const createAppStyleMap = (theme: Theme) => {
   const isLight = theme.palette.mode === 'light';
-  const backgroundOverlayColor = alpha(theme.palette.common.black, isLight ? 0.4 : 0.6);
-  const shellBackgroundColor = alpha(theme.palette.background.paper, isLight ? 0.72 : 0.6);
-  const shellBorder = `1px solid ${alpha(theme.palette.divider, 0.5)}`;
+  const surface = theme.appearanceTreatment.surface;
+  const backgroundOverlayColor = alpha(
+    theme.palette.common.black,
+    surface.backgroundOverlayOpacity
+  );
+  const shellBackgroundColor = alpha(theme.palette.background.paper, surface.panelSurfaceAlpha);
+  const shellBorder = `1px solid ${alpha(theme.palette.divider, surface.panelBorderAlpha * 0.5)}`;
+
   const photoPlaceholderColor = alpha(theme.palette.text.primary, isLight ? 0.08 : 0.18);
   const photoDownloadShadow = alpha(theme.palette.common.black, isLight ? 0.18 : 0.42);
+  const floatingActionBackgroundColor = alpha(
+    theme.palette.background.paper,
+    Math.min(surface.panelSurfaceAlpha + (isLight ? 0.18 : 0.24), 0.96)
+  );
+  const floatingActionHoverBackgroundColor = alpha(
+    theme.palette.background.paper,
+    Math.min(surface.panelSurfaceAlpha + (isLight ? 0.22 : 0.3), 1)
+  );
+  const floatingActionBorder = 'none';
+  const floatingActionShadow = isLight
+    ? `0 0 0 1px ${alpha(
+        theme.palette.primary.main,
+        Math.min(surface.panelBorderAlpha + 0.04, 0.36)
+      )}, 0 12px 28px ${alpha(theme.palette.common.black, surface.cardShadowAlpha + 0.02)}`
+    : `0 0 0 1px ${alpha(
+        theme.palette.primary.main,
+        Math.min(surface.panelBorderAlpha + 0.04, 0.36)
+      )}, 0 14px 30px ${alpha(theme.palette.common.black, surface.cardShadowAlpha)}`;
 
   const getBackgroundImageSx = (resolvedImage: string): SxProps<Theme> => ({
     backgroundImage: `url('${resolvedImage}')`,
@@ -37,10 +62,7 @@ export const createAppStyleMap = (theme: Theme) => {
     py: 6.25,
   });
 
-  const getHeaderHighlightSx = (
-    tone: HeaderHighlightTone,
-    animation: string
-  ): SxProps<Theme> => {
+  const getHeaderHighlightSx = (tone: HeaderHighlightTone, animation: string): SxProps<Theme> => {
     const palette = tone === 'primary' ? theme.palette.primary : theme.palette.secondary;
     const ringColor = alpha(palette.light, tone === 'secondary' ? 0.95 : 0.9);
     const glowColor = alpha(palette.main, 0.35);
@@ -112,9 +134,26 @@ export const createAppStyleMap = (theme: Theme) => {
     py: { xs: 2, md: 4 },
   };
 
+  const headerNavButtonBaseSx = {
+    fontSize: { md: '0.875rem' },
+    fontWeight: 500,
+    letterSpacing: '0.04em',
+    textTransform: 'none',
+    position: 'relative',
+    px: 1.5,
+    py: 0.75,
+    minWidth: 'auto',
+  } as const;
+
   const headerIconSx: SxProps<Theme> = {
-    fontSize: { xs: 26, md: 30 },
+    fontSize: { xs: 22, md: 24 },
   };
+
+  const headerSpeedDialSx = {
+    position: 'relative',
+    overflow: 'visible',
+    flexShrink: 0,
+  } satisfies SxProps<Theme>;
 
   const photographyCardSx: SxProps<Theme> = {
     height: '100%',
@@ -123,16 +162,65 @@ export const createAppStyleMap = (theme: Theme) => {
     gap: 1.5,
   };
 
+  const photographyGridSx: SxProps<Theme> = {
+    display: 'grid',
+    gap: 2.5,
+    gridTemplateColumns: {
+      xs: 'minmax(0, 1fr)',
+      sm: 'repeat(2, minmax(0, 1fr))',
+      md: 'repeat(3, minmax(0, 1fr))',
+    },
+    alignItems: 'stretch',
+  };
+
+  const photographyGridItemSx: SxProps<Theme> = {
+    minWidth: 0,
+  };
+
   const photographyCardContentSx: SxProps<Theme> = {
     flexGrow: 1,
   };
 
-  const primaryTextSx: SxProps<Theme> = {
-    color: 'text.primary',
+  /* ---- Immersive photography redesign tokens ---- */
+
+  const photographyHeroSx: SxProps<Theme> = {
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: 3,
+    cursor: 'pointer',
+    aspectRatio: { xs: '3 / 2', sm: '16 / 9', lg: '21 / 9' },
   };
 
-  const secondaryTextSx: SxProps<Theme> = {
-    color: 'text.secondary',
+  const photographyImmersiveCardSx: SxProps<Theme> = {
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: 3,
+    cursor: 'pointer',
+    aspectRatio: '4 / 3',
+  };
+
+  const photographyCardOverlaySx: SxProps<Theme> = {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    px: { xs: 2.5, md: 3 },
+    py: { xs: 2, md: 2.5 },
+    background: `linear-gradient(to top, ${alpha(theme.palette.common.black, 0.88)} 0%, ${alpha(
+      theme.palette.common.black,
+      0.52
+    )} 55%, transparent 100%)`,
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 0.75,
+  };
+
+  const photographyDetailCoverSx: SxProps<Theme> = {
+    position: 'relative',
+    overflow: 'hidden',
+    borderRadius: 3,
+    aspectRatio: { xs: '16 / 9', md: '21 / 9' },
+    mb: 2.5,
   };
 
   const quiltedImageItemSx: SxProps<Theme> = {
@@ -144,25 +232,28 @@ export const createAppStyleMap = (theme: Theme) => {
       width: '100%',
       height: '100%',
       objectFit: 'cover',
-      transition: 'transform 180ms ease',
+      transition: `transform ${cssDuration.quick} ${SPRING_EASING_CSS}`,
     },
     '&::after': {
       content: '""',
       position: 'absolute',
       inset: 0,
-      background: `linear-gradient(180deg, ${alpha(theme.palette.common.black, 0.58)} 0%, ${alpha(theme.palette.common.black, 0.18)} 34%, ${alpha(theme.palette.common.black, 0)} 64%)`,
+      background: `linear-gradient(180deg, ${alpha(theme.palette.common.black, 0.58)} 0%, ${alpha(
+        theme.palette.common.black,
+        0.18
+      )} 34%, ${alpha(theme.palette.common.black, 0)} 64%)`,
       opacity: 0,
       pointerEvents: 'none',
-      transition: 'opacity 180ms ease',
+      transition: `opacity ${cssDuration.quick} ${SPRING_EASING_CSS}`,
     },
     '& .photo-download-action': {
       position: 'absolute',
-      top: 1.5,
-      right: 1.5,
+      top: 12,
+      right: 12,
       zIndex: 1,
       opacity: 0,
       transform: 'translateY(-8px)',
-      transition: 'opacity 180ms ease, transform 180ms ease',
+      transition: `opacity ${cssDuration.quick} ${SPRING_EASING_CSS}, transform ${cssDuration.quick} ${SPRING_EASING_CSS}`,
     },
     '&:hover img, &:focus-within img': {
       transform: 'scale(1.02)',
@@ -218,20 +309,32 @@ export const createAppStyleMap = (theme: Theme) => {
       order: { xs: 1, md: 2 },
     } satisfies SxProps<Theme>,
     homeHeroContentSx: { pb: 24.25 } satisfies SxProps<Theme>,
-    homeHeroShellSx: { p: 1.5, pb: 0.5 } satisfies SxProps<Theme>,
+    homeHeroShellSx: {
+      p: 0,
+      backgroundColor: 'transparent',
+      backgroundImage: 'none',
+      border: 'none',
+      boxShadow: 'none',
+      backdropFilter: 'none',
+      WebkitBackdropFilter: 'none',
+      borderRadius: 1,
+      overflow: 'hidden',
+    } satisfies SxProps<Theme>,
     homeHeroTitleSx: {
       color: theme.palette.common.white,
       fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
       lineHeight: 1.5,
     } satisfies SxProps<Theme>,
     headerIconSx,
+    photographyGridSx,
+    photographyGridItemSx,
     headerToolbarSx: {
-      px: { xs: 1.5, md: 2.5 },
-      gap: { xs: 1.5, md: 2.5 },
-      minHeight: { xs: 64, md: 80 },
+      px: { xs: 1.5, md: 3 },
+      gap: { xs: 1.5, md: 2 },
+      minHeight: { xs: 56, md: 56 },
     } satisfies SxProps<Theme>,
     headerOffsetToolbarSx: {
-      minHeight: { xs: 64, md: 80 },
+      minHeight: { xs: 56, md: 56 },
     } satisfies SxProps<Theme>,
     headerActionsContainerSx: {
       display: 'flex',
@@ -239,6 +342,24 @@ export const createAppStyleMap = (theme: Theme) => {
       justifyContent: 'flex-end',
       flexShrink: 0,
       ml: 'auto',
+    } satisfies SxProps<Theme>,
+    headerAppearanceDialSx: {
+      ...headerSpeedDialSx,
+      '& .MuiSpeedDial-actions': {
+        position: 'absolute',
+        top: '100%',
+        right: 0,
+        marginTop: 0,
+        flexDirection: 'column',
+        [theme.breakpoints.down('md')]: {
+          // direction="down" on mobile: drop actions below the FAB
+          paddingTop: theme.spacing(1),
+        },
+        [theme.breakpoints.up('md')]: {
+          // direction="down" on desktop: keep actions stacked below the FAB
+          paddingTop: theme.spacing(1.5),
+        },
+      },
     } satisfies SxProps<Theme>,
     headerNavLeadSx: {
       display: 'flex',
@@ -253,28 +374,52 @@ export const createAppStyleMap = (theme: Theme) => {
       minWidth: 0,
     } satisfies SxProps<Theme>,
     headerNavButtonSx: {
-      color: theme.palette.common.white,
-      fontSize: { md: '1.5rem' },
+      ...headerNavButtonBaseSx,
+      color: alpha(theme.palette.common.white, 0.72),
+      transition: `color ${cssDuration.quick} ${SPRING_EASING_CSS}`,
+      '&:hover': {
+        color: theme.palette.common.white,
+        backgroundColor: alpha(theme.palette.common.white, 0.06),
+      },
     } satisfies SxProps<Theme>,
-    headerAvatarButtonSx: {
-      p: { xs: 0.5, md: 0.625 },
+    headerNavButtonActiveSx: {
+      ...headerNavButtonBaseSx,
+      color: theme.palette.common.white,
+      '&::after': {
+        content: '""',
+        position: 'absolute',
+        bottom: 2,
+        left: '25%',
+        right: '25%',
+        height: 1.5,
+        borderRadius: 1,
+        backgroundColor: alpha(theme.palette.primary.light, 0.85),
+      },
+    } satisfies SxProps<Theme>,
+    headerAvatarLinkSx: {
+      display: 'flex',
+      alignItems: 'center',
+      borderRadius: '50%',
+      transition: `box-shadow ${cssDuration.quick} ${SPRING_EASING_CSS}`,
+      '&:hover': {
+        boxShadow: `0 0 0 2px ${alpha(theme.palette.common.white, 0.3)}`,
+      },
+      '&:focus-visible': {
+        outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
+        outlineOffset: 2,
+      },
     } satisfies SxProps<Theme>,
     headerAvatarSx: {
-      width: { xs: 40, md: 50 },
-      height: { xs: 40, md: 50 },
-      border: `2.5px solid ${alpha(theme.palette.common.white, 0.8)}`,
+      width: { xs: 32, md: 36 },
+      height: { xs: 32, md: 36 },
+      border: `1.5px solid ${alpha(theme.palette.common.white, 0.6)}`,
     } satisfies SxProps<Theme>,
-    headerPageDialSx: {
-      position: 'relative',
-      overflow: 'visible',
-      flexShrink: 0,
-      '& .MuiSpeedDial-actions': {
-        position: 'absolute',
-        left: '100%',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        marginLeft: 0,
-        paddingLeft: 1.5,
+    headerIconButtonSx: {
+      color: alpha(theme.palette.common.white, 0.82),
+      transition: `color ${cssDuration.quick} ${SPRING_EASING_CSS}, background-color ${cssDuration.quick} ${SPRING_EASING_CSS}`,
+      '&:hover': {
+        color: theme.palette.common.white,
+        backgroundColor: alpha(theme.palette.common.white, 0.1),
       },
     } satisfies SxProps<Theme>,
     headerAudioControlSx: {
@@ -285,10 +430,72 @@ export const createAppStyleMap = (theme: Theme) => {
     compactSectionHeadingSx: { mb: 0 } satisfies SxProps<Theme>,
     sectionHeadingOffsetSx: { mt: 2 } satisfies SxProps<Theme>,
     sectionLoadingSx: { mt: 1 } satisfies SxProps<Theme>,
-    primaryTextSx,
-    secondaryTextSx,
-    footerTextSx: {
-      color: 'text.secondary',
+    backToTopFabSx: {
+      position: 'fixed',
+      right: {
+        xs: 'calc(env(safe-area-inset-right, 0px) + 16px)',
+        md: 'calc(env(safe-area-inset-right, 0px) + 24px)',
+      },
+      bottom: {
+        xs: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+        md: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
+      },
+      zIndex: theme.zIndex.appBar - 1,
+      color: theme.palette.text.primary,
+      backgroundColor: floatingActionBackgroundColor,
+      border: floatingActionBorder,
+      boxShadow: floatingActionShadow,
+      backdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+      WebkitBackdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+      '&:hover': {
+        backgroundColor: floatingActionHoverBackgroundColor,
+      },
+      '&:focus-visible': {
+        outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
+        outlineOffset: 3,
+      },
+    } satisfies SxProps<Theme>,
+    cvFloatingDialSx: {
+      position: 'fixed',
+      right: {
+        xs: 'calc(env(safe-area-inset-right, 0px) + 16px)',
+        md: 'calc(env(safe-area-inset-right, 0px) + 24px)',
+      },
+      bottom: {
+        xs: 'calc(env(safe-area-inset-bottom, 0px) + 16px)',
+        md: 'calc(env(safe-area-inset-bottom, 0px) + 24px)',
+      },
+      '& .MuiSpeedDial-fab': {
+        color: theme.palette.text.primary,
+        backgroundColor: floatingActionBackgroundColor,
+        border: floatingActionBorder,
+        boxShadow: floatingActionShadow,
+        backdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+        WebkitBackdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+        '&:hover': {
+          backgroundColor: floatingActionHoverBackgroundColor,
+        },
+      },
+      '& .MuiSpeedDialAction-fab': {
+        color: theme.palette.text.primary,
+        backgroundColor: floatingActionBackgroundColor,
+        border: floatingActionBorder,
+        boxShadow: floatingActionShadow,
+        backdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+        WebkitBackdropFilter: `blur(${surface.cardBlurPx + 2}px)`,
+        '&:hover': {
+          backgroundColor: floatingActionHoverBackgroundColor,
+        },
+      },
+    } satisfies SxProps<Theme>,
+    cvFloatingDialActiveFabSx: {
+      '& .MuiSpeedDial-fab': {
+        borderColor: alpha(theme.palette.primary.light, isLight ? 0.42 : 0.56),
+        boxShadow: `${floatingActionShadow}, 0 0 16px ${alpha(
+          theme.palette.primary.main,
+          isLight ? 0.18 : 0.28
+        )}`,
+      },
     } satisfies SxProps<Theme>,
     hintPopoverPaperSx: {
       p: 2,
@@ -305,6 +512,10 @@ export const createAppStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     photographyCardSx,
     photographyCardContentSx,
+    photographyHeroSx,
+    photographyImmersiveCardSx,
+    photographyCardOverlaySx,
+    photographyDetailCoverSx,
     photographyMediaSx: {
       position: 'relative',
       borderRadius: 1.5,
@@ -321,10 +532,6 @@ export const createAppStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     albumSectionSx: { p: { xs: 1.5, md: 2 } } satisfies SxProps<Theme>,
     climbingCardSx: { p: { xs: 2.5, md: 3.5 } } satisfies SxProps<Theme>,
-    sectionLeadSx: {
-      color: 'text.secondary',
-      fontWeight: 700,
-    } satisfies SxProps<Theme>,
     errorAlertSx: { mb: 1 } satisfies SxProps<Theme>,
     dataGridContainerSx: { width: '100%' } satisfies SxProps<Theme>,
     loadingOverlaySx: { width: '100%', p: 2 } satisfies SxProps<Theme>,

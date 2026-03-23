@@ -1,9 +1,4 @@
 import * as React from 'react';
-import { keyframes } from '@emotion/react';
-import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import PhotoCameraOutlinedIcon from '@mui/icons-material/PhotoCameraOutlined';
-import TerrainIcon from '@mui/icons-material/Terrain';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import { Box, Slide } from '@mui/material';
@@ -11,170 +6,72 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import { useTheme as useMuiTheme } from '@mui/material/styles';
 import { useLocation } from 'react-router-dom';
+import { primaryNavigationRoutes } from '../constants/siteRoutes';
 import { useAppTheme } from '../ThemeProvider';
+import { useMotionScale } from '../motion';
 import { avatar as avatarSrc } from '../data/cv';
 import { useAppStyles } from '../styles/appStyles';
+import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
-import type { AppSpeedDialAction } from './AppSpeedDial';
-import { HeaderActions } from './header/HeaderActions';
+import { HEADER_HIDE_SCROLL_TRIGGER_OPTIONS } from './header/headerScroll';
 import { HeaderNav } from './header/HeaderNav';
-import { HeaderPageDial } from './header/HeaderPageDial';
-import { HintPopover } from './header/HintPopover';
+import { HeaderSettingsPopover } from './header/HeaderSettingsPopover';
 
-const pages = [
-  { name: 'CV', path: '/cv' },
-  { name: 'Climbing', path: '/climbing' },
-  { name: 'Photography', path: '/photography' },
-];
-
-type HeaderPageDialMode = 'cv' | 'climbing' | 'photography';
-
-const pageDialActionsByMode: Record<HeaderPageDialMode, AppSpeedDialAction[]> = {
-  cv: [
-    {
-      id: 'climbing',
-      label: 'Climbing',
-      icon: <TerrainIcon fontSize="small" />,
-      to: '/climbing',
-    },
-    {
-      id: 'photography',
-      label: 'Photography',
-      icon: <PhotoCameraOutlinedIcon fontSize="small" />,
-      to: '/photography',
-    },
-    {
-      id: 'home',
-      label: 'Home',
-      icon: <HomeOutlinedIcon fontSize="small" />,
-      to: '/',
-    },
-  ],
-  climbing: [
-    {
-      id: 'cv',
-      label: 'CV',
-      icon: <DescriptionOutlinedIcon fontSize="small" />,
-      to: '/cv',
-    },
-    {
-      id: 'photography',
-      label: 'Photography',
-      icon: <PhotoCameraOutlinedIcon fontSize="small" />,
-      to: '/photography',
-    },
-    {
-      id: 'home',
-      label: 'Home',
-      icon: <HomeOutlinedIcon fontSize="small" />,
-      to: '/',
-    },
-  ],
-  photography: [
-    {
-      id: 'cv',
-      label: 'CV',
-      icon: <DescriptionOutlinedIcon fontSize="small" />,
-      to: '/cv',
-    },
-    {
-      id: 'climbing',
-      label: 'Climbing',
-      icon: <TerrainIcon fontSize="small" />,
-      to: '/climbing',
-    },
-    {
-      id: 'home',
-      label: 'Home',
-      icon: <HomeOutlinedIcon fontSize="small" />,
-      to: '/',
-    },
-  ],
-};
-
-const getHeaderPageDialMode = (path: string): HeaderPageDialMode | null => {
-  if (path.startsWith('/cv')) {
-    return 'cv';
-  }
-  if (path.startsWith('/climbing')) {
-    return 'climbing';
-  }
-  if (path.startsWith('/photography')) {
-    return 'photography';
-  }
-
-  return null;
-};
-
-const pulseRing = keyframes`
-  0% {
-    transform: scale(0.85);
-    opacity: 0.9;
-  }
-  70% {
-    transform: scale(1.4);
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
-`;
+const SLIDE_BASE_ENTER_MS = 225;
+const SLIDE_BASE_EXIT_MS = 195;
 
 const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
-  const trigger = useScrollTrigger({ disableHysteresis: true, threshold: 80 });
+  const trigger = useScrollTrigger(HEADER_HIDE_SCROLL_TRIGGER_OPTIONS);
+  const { duration: dFactor } = useMotionScale();
+  const timeout =
+    dFactor === 0
+      ? 0
+      : {
+          enter: Math.round(SLIDE_BASE_ENTER_MS * dFactor),
+          exit: Math.round(SLIDE_BASE_EXIT_MS * dFactor),
+        };
 
   return (
-    <Slide appear={false} direction="down" in={!trigger}>
+    <Slide
+      appear={false}
+      direction="down"
+      in={!trigger}
+      timeout={timeout}
+      easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
+    >
       {children}
     </Slide>
   );
 };
 
 export default function Header() {
-  const { mode, toggleTheme } = useAppTheme();
+  const {
+    mode,
+    appearance,
+    motionIntensity,
+    effectiveMotionIntensity,
+    isSystemMotionOverrideActive,
+    setAppearance,
+    setMotionIntensity,
+    toggleTheme,
+  } = useAppTheme();
   const appStyles = useAppStyles();
   const muiTheme = useMuiTheme();
   const location = useLocation();
-  const {
-    isPlaying,
-    pause,
-    play,
-  } = useWelcomeAudio();
-  const {
-    showPauseHint,
-    dismissPauseHint,
-    showDarkModeHint,
-    dismissDarkModeHint,
-  } = useWelcomeOnboarding();
+  const { isPlaying, pause, play, audioConsent } = useWelcomeAudio();
+  const { onboardingCompleted } = useWelcomeOnboarding();
   const path = location.pathname.toLowerCase();
-  const pageDialMode = getHeaderPageDialMode(path);
-  const showPageDial = Boolean(pageDialMode);
-  const pageDialActions = pageDialMode ? pageDialActionsByMode[pageDialMode] : [];
-  const showNavigationLinks = !showPageDial;
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const iconButtonSize = isMobile ? 'medium' : ('large' as const);
   const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState<null | HTMLElement>(null);
   const mobileMenuOpen = Boolean(mobileMenuAnchor);
-  const pauseButtonRef = React.useRef<HTMLButtonElement | null>(null);
-  const themeButtonRef = React.useRef<HTMLButtonElement | null>(null);
-  const themeHintTitle = mode === 'dark' ? 'Try light mode' : 'Try dark mode';
-  const themeHintBody =
-    mode === 'dark'
-      ? 'Tap this button to switch back to light mode.'
-      : 'Tap this button to switch to dark mode.';
-  const pauseHighlightSx = showPauseHint
-    ? appStyles.getHeaderHighlightSx('secondary', `${pulseRing} 1.6s ease-out infinite`)
-    : {};
-  const themeHighlightSx = showDarkModeHint
-    ? appStyles.getHeaderHighlightSx('primary', `${pulseRing} 1.6s ease-out infinite`)
-    : {};
 
   React.useEffect(() => {
-    if ((!isMobile || !showNavigationLinks) && mobileMenuOpen) {
+    if (!isMobile && mobileMenuOpen) {
       setMobileMenuAnchor(null);
     }
-  }, [isMobile, mobileMenuOpen, showNavigationLinks]);
+  }, [isMobile, mobileMenuOpen]);
 
   const handleMobileMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setMobileMenuAnchor(event.currentTarget);
@@ -196,76 +93,42 @@ export default function Header() {
     }
   };
 
-  const handleThemeToggle = () => {
-    if (showDarkModeHint) {
-      dismissDarkModeHint();
-    }
-    toggleTheme();
-  };
-
   return (
     <>
       <HideOnScroll>
-        <AppBar position="fixed" elevation={6}>
+        <AppBar id="site-navigation" position="fixed" elevation={0}>
           <Toolbar sx={appStyles.headerToolbarSx}>
             <HeaderNav
-              pages={pages}
-              showNavigationLinks={showNavigationLinks}
+              pages={primaryNavigationRoutes}
+              currentPath={path}
               isMobile={isMobile}
               iconButtonSize={iconButtonSize}
               headerIconSx={appStyles.headerIconSx}
+              avatarSrc={avatarSrc}
               mobileMenuOpen={mobileMenuOpen}
               mobileMenuAnchor={mobileMenuAnchor}
               onMobileMenuOpen={handleMobileMenuOpen}
               onMobileMenuClose={handleMobileMenuClose}
-              leftContent={
-                showPageDial ? (
-                  <HeaderPageDial
-                    iconButtonSize={iconButtonSize}
-                    avatarSrc={avatarSrc}
-                    actions={pageDialActions}
-                  />
-                ) : null
-              }
             />
             <Box sx={appStyles.headerActionsContainerSx}>
-              <HeaderActions
-                iconButtonSize={iconButtonSize}
-                headerIconSx={appStyles.headerIconSx}
-                showAudioControl
+              <HeaderSettingsPopover
+                mode={mode}
+                onToggleTheme={toggleTheme}
+                appearance={appearance}
+                onChangeAppearance={setAppearance}
+                motionIntensity={motionIntensity}
+                effectiveMotionIntensity={effectiveMotionIntensity}
+                isSystemMotionOverrideActive={isSystemMotionOverrideActive}
+                onChangeMotionIntensity={setMotionIntensity}
+                showAudioControl={audioConsent === 'granted' || onboardingCompleted}
                 isPlaying={isPlaying}
                 onToggleAudio={handleAudioToggle}
-                pauseButtonRef={pauseButtonRef}
-                showPauseHint={showPauseHint}
-                pauseHighlightSx={pauseHighlightSx}
-                showThemeControl
-                mode={mode}
-                onToggleTheme={handleThemeToggle}
-                themeButtonRef={themeButtonRef}
-                showDarkModeHint={showDarkModeHint}
-                themeHighlightSx={themeHighlightSx}
               />
             </Box>
-            <HintPopover
-              id="pause-audio-popover"
-              open={showPauseHint && Boolean(pauseButtonRef.current)}
-              anchorEl={pauseButtonRef.current}
-              onClose={dismissPauseHint}
-              title="Pause anytime"
-              body="Use this pause button in the header to stop the welcome audio whenever you want."
-            />
-            <HintPopover
-              id="dark-mode-popover"
-              open={showDarkModeHint && Boolean(themeButtonRef.current)}
-              anchorEl={themeButtonRef.current}
-              onClose={dismissDarkModeHint}
-              title={themeHintTitle}
-              body={themeHintBody}
-            />
           </Toolbar>
         </AppBar>
       </HideOnScroll>
-      <Toolbar sx={appStyles.headerOffsetToolbarSx} />
+      <Toolbar data-testid="header-offset" sx={appStyles.headerOffsetToolbarSx} />
     </>
   );
 }

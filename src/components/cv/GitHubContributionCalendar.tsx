@@ -1,49 +1,54 @@
 import { useEffect, useRef, useState } from 'react';
 import { Box, Stack } from '@mui/material';
 import { GitHubCalendar } from 'react-github-calendar';
+import { DEFAULT_INTERSECTION_ROOT_MARGIN, MotionTiltCard } from '../../motion';
 import { ContentCard } from '../ContentCard';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { usePrefersReducedMotion } from '../../hooks/usePrefersReducedMotion';
-import { BodyText, SubsectionTitle } from '../text';
+import { Text } from '../text';
+import { getMaxScrollLeft, isElementInViewport } from '../../utils/dom';
+import { easeOutCubic } from '../../utils/easing';
 
 type GitHubContributionCalendarProps = {
   username: string;
   contained?: boolean;
+  skipEntranceAnimation?: boolean;
+  onEntranceComplete?: () => void;
 };
 
 const CALENDAR_SCROLL_CONTAINER_SELECTOR = '.react-activity-calendar__scroll-container';
 const CALENDAR_SCROLL_DURATION_MS = 900;
-const CALENDAR_SCROLL_ROOT_MARGIN = '0px 0px -10% 0px';
-
-const getMaxScrollLeft = (node: HTMLElement) => Math.max(node.scrollWidth - node.clientWidth, 0);
-const easeOutCubic = (progress: number) => 1 - (1 - progress) ** 3;
-const isElementInViewport = (node: HTMLElement) => {
-  const rect = node.getBoundingClientRect();
-
-  return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight;
-};
 
 export const GitHubContributionCalendar = ({
   username,
   contained = true,
+  skipEntranceAnimation = false,
+  onEntranceComplete,
 }: GitHubContributionCalendarProps) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
   const calendarWrapperRef = useRef<HTMLDivElement | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const containerLookupFrameRef = useRef<number | null>(null);
+  const hasNotifiedEntranceCompleteRef = useRef(false);
   const {
     contentCardInsetSx,
     githubCalendarColorScheme,
     githubCalendarContainerSx,
     githubCalendarSizeSx,
     githubCalendarTheme,
-    sectionTitleSx,
-    secondaryTextSx,
   } = useComponentStyles();
   const [scrollContainer, setScrollContainer] = useState<HTMLDivElement | null>(null);
-  const [hasIntersectionTrigger, setHasIntersectionTrigger] = useState(false);
-  const [hasEnteredView, setHasEnteredView] = useState(false);
-  const [hasCompletedEntrance, setHasCompletedEntrance] = useState(false);
+  const [hasIntersectionTrigger, setHasIntersectionTrigger] = useState(skipEntranceAnimation);
+  const [hasEnteredView, setHasEnteredView] = useState(skipEntranceAnimation);
+  const [hasCompletedEntrance, setHasCompletedEntrance] = useState(skipEntranceAnimation);
+
+  useEffect(() => {
+    if (!skipEntranceAnimation) {
+      return;
+    }
+
+    setHasIntersectionTrigger(true);
+    setHasEnteredView(true);
+    setHasCompletedEntrance(true);
+  }, [skipEntranceAnimation]);
 
   useEffect(() => {
     const wrapper = calendarWrapperRef.current;
@@ -72,9 +77,13 @@ export const GitHubContributionCalendar = ({
       );
 
       if (nextScrollContainer) {
-        nextScrollContainer.scrollLeft = hasCompletedEntrance ? getMaxScrollLeft(nextScrollContainer) : 0;
+        nextScrollContainer.scrollLeft = hasCompletedEntrance
+          ? getMaxScrollLeft(nextScrollContainer)
+          : 0;
         setScrollContainer((currentScrollContainer) =>
-          currentScrollContainer === nextScrollContainer ? currentScrollContainer : nextScrollContainer
+          currentScrollContainer === nextScrollContainer
+            ? currentScrollContainer
+            : nextScrollContainer
         );
         return;
       }
@@ -101,11 +110,11 @@ export const GitHubContributionCalendar = ({
   useEffect(() => {
     const wrapper = calendarWrapperRef.current;
 
-    if (!wrapper || hasEnteredView || hasCompletedEntrance) {
+    if (!wrapper || hasEnteredView || hasCompletedEntrance || skipEntranceAnimation) {
       return undefined;
     }
 
-    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) {
+    if (typeof window === 'undefined' || typeof window.IntersectionObserver !== 'function') {
       setHasEnteredView(true);
       return undefined;
     }
@@ -117,18 +126,24 @@ export const GitHubContributionCalendar = ({
           observer.disconnect();
         }
       },
-      { threshold: 0, rootMargin: CALENDAR_SCROLL_ROOT_MARGIN }
+      { threshold: 0, rootMargin: DEFAULT_INTERSECTION_ROOT_MARGIN }
     );
 
     observer.observe(wrapper);
 
     return () => observer.disconnect();
-  }, [hasCompletedEntrance, hasEnteredView]);
+  }, [hasCompletedEntrance, hasEnteredView, skipEntranceAnimation]);
 
   useEffect(() => {
     const wrapper = calendarWrapperRef.current;
 
-    if (!wrapper || !hasIntersectionTrigger || hasEnteredView || hasCompletedEntrance) {
+    if (
+      !wrapper ||
+      !hasIntersectionTrigger ||
+      hasEnteredView ||
+      hasCompletedEntrance ||
+      skipEntranceAnimation
+    ) {
       return undefined;
     }
 
@@ -173,10 +188,10 @@ export const GitHubContributionCalendar = ({
         window.cancelAnimationFrame(visibilityFrameId);
       }
     };
-  }, [hasCompletedEntrance, hasEnteredView, hasIntersectionTrigger]);
+  }, [hasCompletedEntrance, hasEnteredView, hasIntersectionTrigger, skipEntranceAnimation]);
 
   useEffect(() => {
-    if (!scrollContainer || !hasEnteredView || hasCompletedEntrance) {
+    if (!scrollContainer || !hasEnteredView || hasCompletedEntrance || skipEntranceAnimation) {
       return undefined;
     }
 
@@ -193,11 +208,7 @@ export const GitHubContributionCalendar = ({
       setHasCompletedEntrance(true);
     };
 
-    if (
-      prefersReducedMotion ||
-      typeof window === 'undefined' ||
-      typeof window.requestAnimationFrame !== 'function'
-    ) {
+    if (typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') {
       completeEntrance();
       return undefined;
     }
@@ -230,7 +241,16 @@ export const GitHubContributionCalendar = ({
         animationFrameRef.current = null;
       }
     };
-  }, [hasCompletedEntrance, hasEnteredView, prefersReducedMotion, scrollContainer]);
+  }, [hasCompletedEntrance, hasEnteredView, scrollContainer, skipEntranceAnimation]);
+
+  useEffect(() => {
+    if (!hasCompletedEntrance || !onEntranceComplete || hasNotifiedEntranceCompleteRef.current) {
+      return;
+    }
+
+    hasNotifiedEntranceCompleteRef.current = true;
+    onEntranceComplete();
+  }, [hasCompletedEntrance, onEntranceComplete]);
 
   useEffect(() => {
     if (!scrollContainer || !hasCompletedEntrance || typeof window === 'undefined') {
@@ -326,12 +346,10 @@ export const GitHubContributionCalendar = ({
 
   const calendarContent = (
     <Stack spacing={1}>
-      <SubsectionTitle sx={sectionTitleSx}>
+      <Text role="subsectionTitle" tone="support">
         Contribution calendar
-      </SubsectionTitle>
-      <BodyText sx={secondaryTextSx}>
-        Yearly GitHub activity at a glance.
-      </BodyText>
+      </Text>
+      <Text role="bodyMuted">Yearly GitHub activity at a glance.</Text>
       <Box sx={githubCalendarContainerSx}>
         <Box ref={calendarWrapperRef} sx={githubCalendarSizeSx}>
           <GitHubCalendar
@@ -350,5 +368,11 @@ export const GitHubContributionCalendar = ({
     </Stack>
   );
 
-  return contained ? <ContentCard sx={contentCardInsetSx}>{calendarContent}</ContentCard> : calendarContent;
+  const calendarSurface = contained ? (
+    <ContentCard sx={contentCardInsetSx}>{calendarContent}</ContentCard>
+  ) : (
+    calendarContent
+  );
+
+  return <MotionTiltCard intensity={0.5}>{calendarSurface}</MotionTiltCard>;
 };

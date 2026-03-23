@@ -1,26 +1,8 @@
+export { Text } from './Text';
+export type { TextProps } from './Text';
+export { UnsafeTypography } from './UNSAFE_Typography';
+
 export { mergeSx } from './textFactory';
 
-export {
-  HeaderLabel,
-  HeaderTitle,
-  HeaderSubtitle,
-  DisplayTitle,
-  EntryTitle,
-  EntrySubtitle,
-  SectionLabel,
-  MetaText,
-  StrongMetaText,
-  CaptionText,
-  BodyText,
-  ListItemText,
-  SectionLeadText,
-  SubsectionTitle,
-} from './TypographyPrimitives';
-
-export {
-  InteractiveLabel,
-  NavigationLabel,
-  ChipLabel,
-  ChipMetaLabel,
-  StatusInlineText,
-} from './InlineLabelPrimitives';
+export { TypewriterText } from './TypewriterText';
+export { TypewriterLoopText } from './TypewriterLoopText';

@@ -25,6 +25,7 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.eslintcache
 MANIFEST
 resume/*
 !resume/daniel-henderson-resume.tex
@@ -193,3 +194,5 @@ build.tar.gz
 e2e-results/
 playwright-report/
 blob-report/
+test-results/
+.playwright-mcp/

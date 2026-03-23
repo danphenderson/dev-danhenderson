@@ -1,0 +1,46 @@
+import { useEffect, useRef, useState } from 'react';
+import type { WebVitalEntry, WebVitalsState } from '../types/ui';
+
+export type { WebVitalEntry };
+
+const supportsWebVitals = (): boolean =>
+  typeof window !== 'undefined' &&
+  typeof PerformanceObserver !== 'undefined' &&
+  typeof performance !== 'undefined' &&
+  typeof performance.getEntriesByType === 'function';
+
+/**
+ * Collects Core Web Vitals (CLS, INP, LCP, TTFB) and exposes them
+ * as React state. Metrics arrive asynchronously — `collected` becomes true
+ * once at least one metric has been received.
+ *
+ * Gracefully no-ops in environments without the Performance API (e.g. JSDOM).
+ */
+export function useWebVitals(): WebVitalsState {
+  const [metrics, setMetrics] = useState<Map<string, WebVitalEntry>>(new Map());
+  const [collected, setCollected] = useState(false);
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    if (initialized.current || !supportsWebVitals()) return;
+    initialized.current = true;
+
+    const handler = (metric: { name: string; value: number; rating: WebVitalEntry['rating'] }) => {
+      setMetrics((prev) => {
+        const next = new Map(prev);
+        next.set(metric.name, { name: metric.name, value: metric.value, rating: metric.rating });
+        return next;
+      });
+      setCollected(true);
+    };
+
+    import('web-vitals').then(({ onCLS, onINP, onLCP, onTTFB }) => {
+      onCLS(handler);
+      onINP(handler);
+      onLCP(handler);
+      onTTFB(handler);
+    });
+  }, []);
+
+  return { metrics, collected };
+}

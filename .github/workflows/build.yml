@@ -2,9 +2,27 @@ name: Build
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, v1]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.editorconfig'
+      - '.prettierrc'
+      - '.prettierignore'
+      - 'resume/**'
+      - 'plans/**'
   push:
-    branches: [main]
+    branches: [main, v1]
+    paths-ignore:
+      - '*.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.editorconfig'
+      - '.prettierrc'
+      - '.prettierignore'
+      - 'resume/**'
+      - 'plans/**'
 
 permissions:
   contents: read
@@ -16,16 +34,9 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: npm
-
-      - run: npm ci
+      - uses: ./.github/actions/setup
 
       - run: npm run build
 
@@ -36,3 +47,72 @@ jobs:
           path: build
           if-no-files-found: error
           retention-days: 7
+
+  e2e:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - run: npm run build:e2e
+
+      - uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('**/package-lock.json') }}
+
+      - run: npx playwright install --with-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - run: npx playwright install-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+
+      - run: npm run test:e2e:chromium
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-${{ github.sha }}
+          path: |
+            e2e-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  smoke:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-output-${{ github.sha }}
+          path: build
+
+      - uses: actions/cache@v4
+        id: playwright-cache-smoke
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('**/package-lock.json') }}
+
+      - run: npx playwright install --with-deps chromium
+        if: steps.playwright-cache-smoke.outputs.cache-hit != 'true'
+
+      - run: npx playwright install-deps chromium
+        if: steps.playwright-cache-smoke.outputs.cache-hit == 'true'
+
+      - run: npm run test:e2e:smoke
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: smoke-report-${{ github.sha }}
+          path: |
+            e2e-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14

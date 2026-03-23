@@ -5,12 +5,13 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import { useComponentStyles } from '../styles/componentStyles';
 import { normalizeSxProp } from '../utils/sx';
 
-export type ContentCardProps<RootComponent extends ElementType = 'div'> = BoxProps<RootComponent> & {
-  sx?: SxProps<Theme>;
-  href?: string;
-  target?: string;
-  rel?: string;
-};
+export type ContentCardProps<RootComponent extends ElementType = 'div'> =
+  BoxProps<RootComponent> & {
+    sx?: SxProps<Theme>;
+    href?: string;
+    target?: string;
+    rel?: string;
+  };
 
 export const ContentCard = <RootComponent extends ElementType = 'div'>({
   children,

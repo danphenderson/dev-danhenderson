@@ -3,10 +3,18 @@ import {
   MAX_VISIBLE_CONTRIBUTIONS,
   fallbackGitHubActivity,
   fallbackGitHubContributions,
-  fallbackGitHubProjects,
   githubUsername,
 } from '../data/cv';
-import type { GitHubActivityItem, GitHubContribution, GitHubProject } from '../types/cv';
+import { isGitHubApiEnabledInDevelopment, readNodeEnvironment } from '../utils/appEnvironment';
+import type {
+  GitHubActivityItem,
+  GitHubProfileData,
+  SharedDataSourceDetail,
+  SharedDataStatus,
+  SharedDataStatusReason,
+} from '../types/cv';
+
+export type { GitHubProfileData };
 
 type GitHubEvent = {
   id: string;
@@ -38,13 +46,6 @@ type GitHubSearchIssues = {
   items: { repository_url: string }[];
 };
 
-export type GitHubProfileData = {
-  activity: GitHubActivityItem[];
-  projects: GitHubProject[];
-  contributions: GitHubContribution[];
-  encounteredError: boolean;
-};
-
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
 const CONTRIBUTION_EVENT_TYPES = new Set([
@@ -63,6 +64,80 @@ type GitHubProfileCacheEntry = {
 let cacheEntry: GitHubProfileCacheEntry | null = null;
 let inFlightPromise: Promise<GitHubProfileData> | null = null;
 
+const createGitHubStatus = ({
+  source,
+  loading,
+  error,
+  isFallback,
+  reason,
+  label,
+  lastUpdated,
+  sourceDetail,
+}: {
+  source: SharedDataStatus['source'];
+  loading: boolean;
+  error: string | null;
+  isFallback: boolean;
+  reason: SharedDataStatusReason;
+  label: string;
+  lastUpdated?: string;
+  sourceDetail?: SharedDataSourceDetail[];
+}): SharedDataStatus => ({
+  source,
+  loading,
+  error,
+  isFallback,
+  reason,
+  freshness: {
+    label,
+    lastUpdated,
+    staleAfterMs: CACHE_TTL_MS,
+    isStale: lastUpdated ? Date.now() - new Date(lastUpdated).getTime() > CACHE_TTL_MS : false,
+  },
+  ...(sourceDetail ? { sourceDetail } : {}),
+});
+
+export const createInitialGitHubProfileStatus = (): SharedDataStatus =>
+  createGitHubStatus({
+    source: 'static',
+    loading: false,
+    error: null,
+    isFallback: true,
+    reason: 'initial-fallback',
+    label: 'Bundled fallback GitHub highlights are ready while live data loads.',
+  });
+
+export const createBundledGitHubProfileStatus = (): SharedDataStatus =>
+  createGitHubStatus({
+    source: 'static',
+    loading: false,
+    error: null,
+    isFallback: false,
+    reason: 'bundled-content',
+    label: 'Bundled GitHub highlights are used by default in development and test environments.',
+  });
+
+export const shouldUseBundledGitHubProfileDataByDefault = () =>
+  readNodeEnvironment() !== 'production' && !isGitHubApiEnabledInDevelopment();
+
+export const createLoadingGitHubProfileStatus = (
+  previousStatus: SharedDataStatus
+): SharedDataStatus => ({
+  ...previousStatus,
+  loading: true,
+  error: null,
+});
+
+export const createGithubHookErrorStatus = (message: string): SharedDataStatus =>
+  createGitHubStatus({
+    source: 'static',
+    loading: false,
+    error: message,
+    isFallback: true,
+    reason: 'network-error',
+    label: 'Bundled fallback GitHub highlights are shown because the live request failed.',
+  });
+
 const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
   const repoName = event.repo?.name;
   if (!repoName) {
@@ -75,11 +150,15 @@ const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
     case 'PushEvent': {
       const commits = event.payload?.commits ?? [];
       const commitCount = commits.length;
-      const commitShas = commits.map((commit) => commit.sha).filter((sha): sha is string => Boolean(sha));
+      const commitShas = commits
+        .map((commit) => commit.sha)
+        .filter((sha): sha is string => Boolean(sha));
       const headSha = event.payload?.head || commitShas[commitShas.length - 1];
 
       return {
-        label: `Pushed ${commitCount || 'new'} commit${commitCount === 1 ? '' : 's'} to ${repoName}`,
+        label: `Pushed ${commitCount || 'new'} commit${
+          commitCount === 1 ? '' : 's'
+        } to ${repoName}`,
         href: headSha ? `${repoUrl}/commit/${headSha}` : repoUrl,
       };
     }
@@ -89,7 +168,9 @@ const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
       const prUrl = event.payload?.pull_request?.html_url;
 
       return {
-        label: `${action.charAt(0).toUpperCase()}${action.slice(1)} PR${prNumber ? ` #${prNumber}` : ''} on ${repoName}`,
+        label: `${action.charAt(0).toUpperCase()}${action.slice(1)} PR${
+          prNumber ? ` #${prNumber}` : ''
+        } on ${repoName}`,
         href: prUrl || (prNumber ? `${repoUrl}/pull/${prNumber}` : repoUrl),
       };
     }
@@ -99,7 +180,9 @@ const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
       const issueUrl = event.payload?.issue?.html_url;
 
       return {
-        label: `${action.charAt(0).toUpperCase()}${action.slice(1)} issue${issueNumber ? ` #${issueNumber}` : ''} on ${repoName}`,
+        label: `${action.charAt(0).toUpperCase()}${action.slice(1)} issue${
+          issueNumber ? ` #${issueNumber}` : ''
+        } on ${repoName}`,
         href: issueUrl || (issueNumber ? `${repoUrl}/issues/${issueNumber}` : repoUrl),
       };
     }
@@ -114,7 +197,9 @@ const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
     }
     case 'CreateEvent':
       return {
-        label: `Created ${event.payload?.ref_type ?? 'a resource'}${event.payload?.ref ? ` ${event.payload.ref}` : ''} in ${repoName}`,
+        label: `Created ${event.payload?.ref_type ?? 'a resource'}${
+          event.payload?.ref ? ` ${event.payload.ref}` : ''
+        } in ${repoName}`,
         href:
           event.payload?.ref_type === 'branch' && event.payload?.ref
             ? `${repoUrl}/tree/${event.payload.ref}`
@@ -136,7 +221,7 @@ const formatGitHubEvent = (event: GitHubEvent): GitHubActivityItem | null => {
   }
 };
 
-const fetchJson = async <T,>(url: string) => {
+const fetchJson = async <T>(url: string) => {
   const response = await fetch(url, { headers: { Accept: 'application/vnd.github+json' } });
 
   if (!response.ok) {
@@ -164,23 +249,20 @@ const getExternalContributionRepos = (events: GitHubEvent[]) => {
 const buildActivity = (events: GitHubEvent[]) => {
   const activity = events
     .filter((event) =>
-      ['PushEvent', 'PullRequestEvent', 'IssuesEvent', 'PullRequestReviewEvent', 'CreateEvent', 'ReleaseEvent'].includes(event.type)
+      [
+        'PushEvent',
+        'PullRequestEvent',
+        'IssuesEvent',
+        'PullRequestReviewEvent',
+        'CreateEvent',
+        'ReleaseEvent',
+      ].includes(event.type)
     )
     .map(formatGitHubEvent)
     .filter((item): item is GitHubActivityItem => Boolean(item))
     .slice(0, 6);
 
   return activity.length ? activity : fallbackGitHubActivity;
-};
-
-const buildProjects = (repos: GitHubRepo[]) => {
-  const projects = repos
-    .filter((repo) => !repo.fork && !repo.archived)
-    .sort((a, b) => b.stargazers_count - a.stargazers_count)
-    .slice(0, 8)
-    .map((repo) => ({ name: repo.name, url: repo.html_url }));
-
-  return projects.length ? projects : fallbackGitHubProjects;
 };
 
 const buildContributionCandidates = (repoNames: Set<string>) =>
@@ -234,32 +316,37 @@ const enrichContributions = async (
 
 const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
   let encounteredError = false;
+  let usedFallbackActivity = false;
+  let usedFallbackContributions = false;
 
-  const [eventsResult, reposResult, contributionsResult] = await Promise.allSettled([
-    fetchJson<GitHubEvent[]>(`https://api.github.com/users/${githubUsername}/events/public?per_page=20`),
-    fetchJson<GitHubRepo[]>(`https://api.github.com/users/${githubUsername}/repos?per_page=100&sort=updated`),
+  const [eventsResult, contributionsResult] = await Promise.allSettled([
+    fetchJson<GitHubEvent[]>(
+      `https://api.github.com/users/${githubUsername}/events/public?per_page=20`
+    ),
     fetchJson<GitHubSearchIssues>(
       `https://api.github.com/search/issues?q=author:${githubUsername}+is:public+is:pr+-user:${githubUsername}&sort=updated&order=desc&per_page=30`
     ),
   ]);
 
+  const eventsOk = eventsResult.status === 'fulfilled';
+  const contributionsOk = contributionsResult.status === 'fulfilled';
   const externalRepos = new Set<string>();
 
-  const activity =
-    eventsResult.status === 'fulfilled'
-      ? buildActivity(eventsResult.value)
-      : (encounteredError = true, fallbackGitHubActivity);
+  const activity = eventsOk
+    ? buildActivity(eventsResult.value)
+    : ((encounteredError = true), (usedFallbackActivity = true), fallbackGitHubActivity);
 
-  if (eventsResult.status === 'fulfilled') {
-    getExternalContributionRepos(eventsResult.value).forEach((repoName) => externalRepos.add(repoName));
+  if (eventsOk && activity === fallbackGitHubActivity) {
+    usedFallbackActivity = true;
   }
 
-  const projects =
-    reposResult.status === 'fulfilled'
-      ? buildProjects(reposResult.value)
-      : (encounteredError = true, fallbackGitHubProjects);
+  if (eventsOk) {
+    getExternalContributionRepos(eventsResult.value).forEach((repoName) =>
+      externalRepos.add(repoName)
+    );
+  }
 
-  if (contributionsResult.status === 'fulfilled') {
+  if (contributionsOk) {
     contributionsResult.value.items
       .map((item) => item.repository_url?.split('repos/')[1])
       .filter(
@@ -271,22 +358,88 @@ const fetchGitHubProfileData = async (): Promise<GitHubProfileData> => {
     encounteredError = true;
   }
 
-  const enrichedContributions = await enrichContributions(buildContributionCandidates(externalRepos));
+  const enrichedContributions = await enrichContributions(
+    buildContributionCandidates(externalRepos)
+  );
   encounteredError = encounteredError || enrichedContributions.encounteredError;
+  usedFallbackContributions = enrichedContributions.contributions === fallbackGitHubContributions;
+
+  const lastUpdated = new Date().toISOString();
+  const isFallback = usedFallbackActivity || usedFallbackContributions;
+  const reason: SharedDataStatusReason = isFallback
+    ? encounteredError
+      ? usedFallbackActivity && usedFallbackContributions
+        ? 'fallback-content'
+        : 'partial-fallback'
+      : 'fallback-content'
+    : 'live-fetch';
+  const label = isFallback
+    ? 'GitHub activity is partially or fully backed by bundled fallback highlights.'
+    : 'GitHub activity was fetched live and cached for subsequent visits.';
+
+  const sourceDetail: SharedDataSourceDetail[] = [
+    {
+      id: 'events',
+      label: 'Public events',
+      ok: eventsOk,
+    },
+    {
+      id: 'contributions',
+      label: 'Contribution search',
+      ok: contributionsOk,
+    },
+    {
+      id: 'enrichment',
+      label: 'Repo enrichment',
+      ok: !enrichedContributions.encounteredError,
+    },
+  ];
 
   return {
     activity,
-    projects,
     contributions: enrichedContributions.contributions,
     encounteredError,
+    status: createGitHubStatus({
+      source: 'remote',
+      loading: false,
+      error: null,
+      isFallback,
+      reason,
+      label,
+      lastUpdated,
+      sourceDetail,
+    }),
   };
 };
 
+const createBundledGitHubProfileData = (): GitHubProfileData => ({
+  activity: fallbackGitHubActivity,
+  contributions: fallbackGitHubContributions,
+  encounteredError: false,
+  status: createBundledGitHubProfileStatus(),
+});
+
 export const loadGitHubProfileData = async () => {
+  if (shouldUseBundledGitHubProfileDataByDefault()) {
+    return createBundledGitHubProfileData();
+  }
+
   const now = Date.now();
 
   if (cacheEntry && cacheEntry.expiresAt > now) {
-    return cacheEntry.data;
+    return {
+      ...cacheEntry.data,
+      status: createGitHubStatus({
+        source: 'cache',
+        loading: false,
+        error: null,
+        isFallback: cacheEntry.data.status.isFallback,
+        reason: 'cache-hit',
+        label: 'GitHub activity is served from the recent in-memory cache.',
+        lastUpdated: cacheEntry.data.status.freshness.lastUpdated,
+        sourceDetail: cacheEntry.data.status.sourceDetail,
+      }),
+    };
   }
 
   if (!inFlightPromise) {

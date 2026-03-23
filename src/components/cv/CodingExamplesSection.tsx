@@ -1,19 +1,59 @@
-import { Box, Link, Stack } from '@mui/material';
-import type { CodingExample } from '../../types/cv';
+import { Box, Stack } from '@mui/material';
+import type { CodingExample, ExperienceProjectSegment } from '../../types/cv';
+import { AnimatedSlideList, getAnimatedSlideListCloseDelayMs } from '../AnimatedSlideList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
-import type { TabPanelItem } from '../TabPanel';
+import type { TabPanelItem, TabPanelRenderContext } from '../TabPanel';
 import { AnimatedContentList } from '../AnimatedContentList';
+import { CommonLink } from '../CommonLink';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { EntryTitle, BodyText, ListItemText } from '../text';
+import { Text } from '../text';
+import { renderExperienceSegments } from './experienceContent';
 
 type CodingExamplesSectionProps = {
   examples: CodingExample[];
   startDelayMs?: number;
+  skipEntranceAnimation?: boolean;
 };
 
-export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExamplesSectionProps) => {
-  const { codingExampleLinkSx, contentListStackSpacing, detailBlockSx, getDetailListSx } = useComponentStyles();
+const CodingExampleDetailList = ({
+  items,
+  selected,
+  renderContext,
+}: {
+  items: Array<string | ExperienceProjectSegment[]>;
+  selected: boolean;
+  renderContext: TabPanelRenderContext;
+}) => {
+  const { getDetailListSx } = useComponentStyles();
+
+  return (
+    <AnimatedSlideList
+      items={items}
+      getItemKey={(_item, index) => `coding-example-item-${index}`}
+      in={selected}
+      container={renderContext.getDrawerContainer}
+      keepMountedWhenExited
+      reverseExitStagger
+      containerComponent="ul"
+      containerSx={getDetailListSx(0, 0)}
+      itemComponent="li"
+      renderItem={(item) => (
+        <Text role="body" component="span">
+          {Array.isArray(item) ? renderExperienceSegments(item) : item}
+        </Text>
+      )}
+    />
+  );
+};
+
+export const CodingExamplesSection = ({
+  examples,
+  startDelayMs = 0,
+  skipEntranceAnimation = false,
+}: CodingExamplesSectionProps) => {
+  const { codingExampleLinkSx, contentListStackSpacing, detailBlockSx, motionTokens } =
+    useComponentStyles();
 
   return (
     <AnimatedContentList
@@ -21,13 +61,17 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
       getItemKey={(example, index) => `${example.title}-${index}`}
       mountItemsOnView
       startDelayMs={startDelayMs}
+      skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
+      tiltItems
       renderItem={(example, index) => {
         const primaryLink = example.links[0];
         const exampleTabs = (example.tabs ?? []).reduce<TabPanelItem[]>((tabs, tab) => {
           if (tab.kind === 'list') {
-            const items = tab.items.filter((item) => item.trim().length > 0);
+            const items = tab.items.filter((item) =>
+              Array.isArray(item) ? item.length > 0 : item.trim().length > 0
+            );
 
             if (items.length === 0) {
               return tabs;
@@ -36,14 +80,16 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
             tabs.push({
               value: tab.value,
               label: tab.label,
-              content: (
-                <Box component="ul" sx={getDetailListSx(0, 0)}>
-                  {items.map((item) => (
-                    <ListItemText key={item}>
-                      {item}
-                    </ListItemText>
-                  ))}
-                </Box>
+              closeDelayMs: getAnimatedSlideListCloseDelayMs(
+                items.length,
+                motionTokens.accordionChipStaggerMs
+              ),
+              renderContent: (selected, renderContext) => (
+                <CodingExampleDetailList
+                  items={items}
+                  selected={selected}
+                  renderContext={renderContext}
+                />
               ),
             });
 
@@ -59,7 +105,21 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
           tabs.push({
             value: tab.value,
             label: tab.label,
-            renderContent: (selected) => <SkillsChipList skills={skills} dense in={selected} />,
+            closeDelayMs: getAnimatedSlideListCloseDelayMs(
+              skills.length,
+              motionTokens.accordionChipStaggerMs
+            ),
+            renderContent: (selected, renderContext) => (
+              <SkillsChipList
+                skills={skills}
+                dense
+                in={selected}
+                animation="slide"
+                keepMountedWhenExited
+                reverseExitStagger
+                drawerContainer={renderContext.getDrawerContainer}
+              />
+            ),
           });
 
           return tabs;
@@ -69,7 +129,7 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
           <>
             <Stack spacing={1.25}>
               {primaryLink ? (
-                <Link
+                <CommonLink
                   href={primaryLink}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -77,14 +137,14 @@ export const CodingExamplesSection = ({ examples, startDelayMs = 0 }: CodingExam
                   underline="hover"
                   sx={{ textDecorationColor: 'currentColor' }}
                 >
-                  <EntryTitle component="span" sx={codingExampleLinkSx}>
+                  <Text role="cardTitle" component="span" sx={codingExampleLinkSx}>
                     {example.title}
-                  </EntryTitle>
-                </Link>
+                  </Text>
+                </CommonLink>
               ) : (
-                <EntryTitle>{example.title}</EntryTitle>
+                <Text role="cardTitle">{example.title}</Text>
               )}
-              <BodyText>{example.description}</BodyText>
+              <Text role="body">{example.description}</Text>
             </Stack>
             {exampleTabs.length ? (
               <Box sx={detailBlockSx}>

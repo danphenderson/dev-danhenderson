@@ -1,0 +1,92 @@
+/* --- Colour palette ---------------------------------------------------- */
+
+:root {
+  --ifm-color-primary: #0d9488;
+  --ifm-color-primary-dark: #0b8578;
+  --ifm-color-primary-darker: #0a7d71;
+  --ifm-color-primary-darkest: #08675d;
+  --ifm-color-primary-light: #0fa398;
+  --ifm-color-primary-lighter: #10ab9f;
+  --ifm-color-primary-lightest: #14c4b5;
+
+  --ifm-code-font-size: 92%;
+  --ifm-global-radius: 6px;
+  --doc-sidebar-width: 280px;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #2dd4bf;
+  --ifm-color-primary-dark: #1cc0ab;
+  --ifm-color-primary-darker: #1ab5a1;
+  --ifm-color-primary-darkest: #159484;
+  --ifm-color-primary-light: #4edcc9;
+  --ifm-color-primary-lighter: #59dfcd;
+  --ifm-color-primary-lightest: #85e8db;
+
+  --ifm-background-color: #0f172a;
+  --ifm-background-surface-color: #1e293b;
+  --docusaurus-highlighted-code-line-bg: rgba(45, 212, 191, 0.12);
+}
+
+/* --- Typography -------------------------------------------------------- */
+
+:root {
+  --ifm-font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --ifm-heading-font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+  --ifm-heading-font-weight: 600;
+  --ifm-line-height-base: 1.7;
+}
+
+/* --- Article width ----------------------------------------------------- */
+
+.markdown {
+  max-width: 48rem;
+}
+
+article header h1 {
+  font-size: 2rem !important;
+}
+
+/* --- Mermaid ----------------------------------------------------------- */
+
+.docusaurus-mermaid-container {
+  margin: 1.5rem 0;
+}
+
+/* Keep diagrams readable on wide screens */
+.docusaurus-mermaid-container svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- Table readability ------------------------------------------------- */
+
+table {
+  display: table;
+  width: 100%;
+  font-size: 0.92rem;
+}
+
+table th {
+  white-space: nowrap;
+}
+
+/* --- Code blocks ------------------------------------------------------- */
+
+.prism-code {
+  font-size: 0.88rem;
+}
+
+/* --- Navbar polish ----------------------------------------------------- */
+
+.navbar__title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* --- Footer ------------------------------------------------------------ */
+
+.footer--dark {
+  background-color: #0c1222;
+}

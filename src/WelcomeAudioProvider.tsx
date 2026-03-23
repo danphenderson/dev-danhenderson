@@ -1,4 +1,20 @@
-import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useRef, useState } from 'react';
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import {
+  LEGACY_AUDIO_PROMPT_STORAGE_KEY,
+  PREFERENCE_STORAGE_KEYS,
+  isAudioConsent,
+} from './theme/preferences';
+import type { AudioConsent } from './types/ui';
+
+export type { AudioConsent } from './types/ui';
 
 type SoundCloudWidget = {
   play: () => void;
@@ -8,8 +24,6 @@ type SoundCloudWidget = {
   isPaused: (callback: (paused: boolean) => void) => void;
   setLoop: (loop: boolean) => void;
 };
-
-export type AudioConsent = 'unknown' | 'granted' | 'declined';
 
 type WelcomeAudioContextValue = {
   play: () => Promise<void>;
@@ -36,8 +50,6 @@ const WelcomeAudioContext = createContext<WelcomeAudioContextValue>({
 const WIDGET_SCRIPT_SRC = 'https://w.soundcloud.com/player/api.js';
 const TRACK_EMBED_URL =
   'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A298021432&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true';
-const AUDIO_CONSENT_STORAGE_KEY = 'danhenderson-welcome-audio-consent';
-const LEGACY_AUDIO_PROMPT_STORAGE_KEY = 'danhenderson-welcome-audio-prompt';
 const WIDGET_BOOT_TIMEOUT_MS = 8000;
 const hiddenAudioIframeStyle = {
   position: 'absolute',
@@ -67,7 +79,12 @@ const createAbortError = () => {
   return error;
 };
 
-const withTimeout = <T,>(promise: Promise<T>, message: string, timeoutMs: number, signal?: AbortSignal): Promise<T> =>
+const withTimeout = <T,>(
+  promise: Promise<T>,
+  message: string,
+  timeoutMs: number,
+  signal?: AbortSignal
+): Promise<T> =>
   new Promise<T>((resolve, reject) => {
     const timerId = window.setTimeout(() => {
       cleanup();
@@ -101,13 +118,17 @@ const withTimeout = <T,>(promise: Promise<T>, message: string, timeoutMs: number
 const getStoredAudioConsent = (): AudioConsent => {
   if (typeof window === 'undefined') return 'unknown';
 
-  const storedConsent = window.localStorage.getItem(AUDIO_CONSENT_STORAGE_KEY);
-  if (storedConsent === 'granted' || storedConsent === 'declined') {
-    return storedConsent;
-  }
+  try {
+    const storedConsent = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.audioConsent);
+    if (isAudioConsent(storedConsent) && storedConsent !== 'unknown') {
+      return storedConsent;
+    }
 
-  if (window.localStorage.getItem(LEGACY_AUDIO_PROMPT_STORAGE_KEY) === 'dismissed') {
-    return 'declined';
+    if (window.localStorage.getItem(LEGACY_AUDIO_PROMPT_STORAGE_KEY) === 'dismissed') {
+      return 'declined';
+    }
+  } catch {
+    // localStorage may be unavailable in restricted browsing contexts
   }
 
   return 'unknown';
@@ -116,8 +137,12 @@ const getStoredAudioConsent = (): AudioConsent => {
 const persistAudioConsent = (consent: Exclude<AudioConsent, 'unknown'>) => {
   if (typeof window === 'undefined') return;
 
-  window.localStorage.setItem(AUDIO_CONSENT_STORAGE_KEY, consent);
-  window.localStorage.removeItem(LEGACY_AUDIO_PROMPT_STORAGE_KEY);
+  try {
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.audioConsent, consent);
+    window.localStorage.removeItem(LEGACY_AUDIO_PROMPT_STORAGE_KEY);
+  } catch {
+    // localStorage may be unavailable in restricted browsing contexts
+  }
 };
 
 const loadWidgetScript = (signal: AbortSignal): Promise<void> => {
@@ -153,7 +178,9 @@ const loadWidgetScript = (signal: AbortSignal): Promise<void> => {
       reject(createAbortError());
     };
 
-    const existingScript = document.querySelector<HTMLScriptElement>(`script[src="${WIDGET_SCRIPT_SRC}"]`);
+    const existingScript = document.querySelector<HTMLScriptElement>(
+      `script[src="${WIDGET_SCRIPT_SRC}"]`
+    );
     if (existingScript) {
       if (window.SC?.Widget) {
         resolve();
@@ -221,7 +248,12 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
       signal.addEventListener('abort', handleAbort, { once: true });
     });
 
-    return withTimeout(iframeMountPromise, 'Audio iframe did not mount in time.', WIDGET_BOOT_TIMEOUT_MS, signal);
+    return withTimeout(
+      iframeMountPromise,
+      'Audio iframe did not mount in time.',
+      WIDGET_BOOT_TIMEOUT_MS,
+      signal
+    );
   }, []);
 
   useEffect(() => {
@@ -304,10 +336,15 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
       widgetRef.current = widget;
 
       await new Promise<void>((resolve, reject) => {
+        let widgetReady = false;
+
         const markReady = () => {
           if (unmountedRef.current) return;
 
-          cleanup();
+          widgetReady = true;
+          window.clearTimeout(timeoutId);
+          controller.signal.removeEventListener('abort', handleAbort);
+          widget.unbind('ready', markReady);
           setReady(true);
           widget.isPaused((paused: boolean) => {
             if (!unmountedRef.current) {
@@ -350,9 +387,11 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
           window.clearTimeout(timeoutId);
           controller.signal.removeEventListener('abort', handleAbort);
           widget.unbind('ready', markReady);
-          widget.unbind('play', handlePlay);
-          widget.unbind('pause', handlePause);
-          widget.unbind('finish', handleFinish);
+          if (!widgetReady) {
+            widget.unbind('play', handlePlay);
+            widget.unbind('pause', handlePause);
+            widget.unbind('finish', handleFinish);
+          }
         };
 
         widget.bind('ready', markReady);
@@ -363,19 +402,21 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
       });
 
       return widget;
-    })().catch((err) => {
-      setupPromiseRef.current = null;
-      widgetRef.current = null;
-      setupAbortControllerRef.current = null;
+    })()
+      .catch((err) => {
+        setupPromiseRef.current = null;
+        widgetRef.current = null;
+        setupAbortControllerRef.current = null;
 
-      if (!unmountedRef.current) {
-        setReady(false);
-      }
+        if (!unmountedRef.current) {
+          setReady(false);
+        }
 
-      throw err;
-    }).finally(() => {
-      setupAbortControllerRef.current = null;
-    });
+        throw err;
+      })
+      .finally(() => {
+        setupAbortControllerRef.current = null;
+      });
 
     return setupPromiseRef.current;
   }, [ready, waitForIframe]);
@@ -390,7 +431,7 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
       if (!unmountedRef.current) {
         setError('Unable to load welcome audio.');
       }
-      console.error(err);
+      console.error('Welcome audio initialization failed:', err);
     });
   }, [audioConsent, initializeWidget]);
 

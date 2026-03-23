@@ -1,20 +1,56 @@
 import { Box } from '@mui/material';
 import type { VolunteeringEntry } from '../../types/cv';
+import { AnimatedSlideList, getAnimatedSlideListCloseDelayMs } from '../AnimatedSlideList';
 import { AnimatedContentList } from '../AnimatedContentList';
+import { TabPanel } from '../TabPanel';
+import type { TabPanelItem, TabPanelRenderContext } from '../TabPanel';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { BodyText, ListItemText } from '../text';
+import { Text } from '../text';
 import { CVEntryHeader } from './CVEntryHeader';
 
 type VolunteeringListProps = {
   volunteering: VolunteeringEntry[];
   startDelayMs?: number;
+  skipEntranceAnimation?: boolean;
 };
 
-export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: VolunteeringListProps) => {
-  const {
-    contentListStackSpacing,
-    getDetailListSx,
-  } = useComponentStyles();
+const VolunteeringDetailList = ({
+  items,
+  selected,
+  renderContext,
+}: {
+  items: string[];
+  selected: boolean;
+  renderContext: TabPanelRenderContext;
+}) => {
+  const { getDetailListSx } = useComponentStyles();
+
+  return (
+    <AnimatedSlideList
+      items={items}
+      getItemKey={(item, index) => `${item}-${index}`}
+      in={selected}
+      container={renderContext.getDrawerContainer}
+      keepMountedWhenExited
+      reverseExitStagger
+      containerComponent="ul"
+      containerSx={getDetailListSx(0, 0)}
+      itemComponent="li"
+      renderItem={(item) => (
+        <Text role="body" component="span">
+          {item}
+        </Text>
+      )}
+    />
+  );
+};
+
+export const VolunteeringList = ({
+  volunteering,
+  startDelayMs = 0,
+  skipEntranceAnimation = false,
+}: VolunteeringListProps) => {
+  const { contentListStackSpacing, detailBlockSx, motionTokens } = useComponentStyles();
 
   if (volunteering.length === 0) {
     return null;
@@ -26,29 +62,58 @@ export const VolunteeringList = ({ volunteering, startDelayMs = 0 }: Volunteerin
       getItemKey={(entry, index) => `${entry.organization}-${entry.role}-${index}`}
       mountItemsOnView
       startDelayMs={startDelayMs}
+      skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
-      renderItem={(entry) => (
-        <>
-          <CVEntryHeader
-            title={entry.role}
-            organization={entry.organization}
-            organizationUrl={entry.organizationUrl}
-            dateRange={entry.dateRange}
-            supportingMeta={entry.location ? [entry.location] : undefined}
-          />
+      tiltItems
+      renderItem={(entry, index) => {
+        const volunteeringTabs: TabPanelItem[] = entry.highlights.length
+          ? [
+              {
+                value: 'details',
+                label: 'Details',
+                closeDelayMs: getAnimatedSlideListCloseDelayMs(
+                  entry.highlights.length,
+                  motionTokens.accordionChipStaggerMs
+                ),
+                renderContent: (selected, renderContext) => (
+                  <VolunteeringDetailList
+                    items={entry.highlights}
+                    selected={selected}
+                    renderContext={renderContext}
+                  />
+                ),
+              },
+            ]
+          : [];
 
-          <BodyText>{entry.summary}</BodyText>
+        return (
+          <>
+            <CVEntryHeader
+              title={entry.role}
+              organization={entry.organization}
+              organizationUrl={entry.organizationUrl}
+              organizationTooltip={entry.organizationTooltip}
+              dateRange={entry.dateRange}
+              supportingMeta={entry.location ? [entry.location] : undefined}
+            />
 
-          <Box component="ul" sx={getDetailListSx(0, 0)}>
-            {entry.highlights.map((highlight, highlightIndex) => (
-              <ListItemText key={`${highlight}-${highlightIndex}`}>
-                {highlight}
-              </ListItemText>
-            ))}
-          </Box>
-        </>
-      )}
+            <Text role="body">{entry.summary}</Text>
+
+            {volunteeringTabs.length ? (
+              <Box sx={detailBlockSx}>
+                <TabPanel
+                  id={`volunteering-details-${index}`}
+                  ariaLabel={`${entry.role} details`}
+                  items={volunteeringTabs}
+                  dense
+                  tabsVariant="fullWidth"
+                />
+              </Box>
+            ) : null}
+          </>
+        );
+      }}
     />
   );
 };

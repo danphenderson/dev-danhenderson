@@ -1,10 +1,7 @@
-import { Stack } from '@mui/material';
+import type { ReactNode } from 'react';
+import { Box, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
-import type {
-  GitHubActivityItem,
-  GitHubContribution,
-  GitHubProject,
-} from '../../types/cv';
+import type { GitHubActivityItem, GitHubContribution } from '../../types/cv';
 import { githubUsername } from '../../data/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { CVSectionCard } from './CVSectionCard';
@@ -13,22 +10,24 @@ import { SectionPanel } from '../layout/SectionPanel';
 import { GitHubActivityList } from './GitHubActivityList';
 import { GitHubContributionCalendar } from './GitHubContributionCalendar';
 import { GitHubContributions } from './GitHubContributions';
-import { GitHubProjects } from './GitHubProjects';
 import { SectionHeading } from '../layout/SectionHeading';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
-import { SectionLeadText, SubsectionTitle } from '../text';
+import { Text } from '../text';
 
 type CVGitHubSectionProps = {
   activity: GitHubActivityItem[];
   contributions: GitHubContribution[];
-  projects: GitHubProject[];
   loading: boolean;
   error?: string | null;
+  revealed?: boolean;
+  onReveal?: () => void;
+  calendarSettled?: boolean;
+  onCalendarSettled?: () => void;
   sectionDelayMs?: number;
   nestedDelayOffsetMs?: number;
   itemOffsetMs?: number;
-  projectTitle?: string;
   lead?: string;
+  statusIndicator?: ReactNode;
   overlineSx?: SxProps<Theme>;
   sectionId?: string;
 };
@@ -36,14 +35,17 @@ type CVGitHubSectionProps = {
 export const CVGitHubSection = ({
   activity,
   contributions,
-  projects,
   loading,
   error,
+  revealed = false,
+  onReveal,
+  calendarSettled = false,
+  onCalendarSettled,
   sectionDelayMs = 0,
   nestedDelayOffsetMs = 0,
   itemOffsetMs,
-  projectTitle = 'Public Projects',
   lead,
+  statusIndicator,
   overlineSx,
   sectionId,
 }: CVGitHubSectionProps) => {
@@ -53,13 +55,23 @@ export const CVGitHubSection = ({
     getSectionDelayMs,
     motionTokens,
     sectionHeadingCompactSx,
-    sectionTitleSx,
   } = useComponentStyles();
   const resolvedItemOffsetMs = itemOffsetMs ?? motionTokens.itemOffsetMs;
-  const githubActivityDelayMs = getSectionDelayMs(0, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
-  const githubContributionsDelayMs = getSectionDelayMs(1, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
-  const githubCalendarDelayMs = getSectionDelayMs(2, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
-  const githubProjectsDelayMs = getSectionDelayMs(3, nestedDelayOffsetMs, motionTokens.githubSubsectionStaggerMs);
+  const githubActivityDelayMs = getSectionDelayMs(
+    0,
+    nestedDelayOffsetMs,
+    motionTokens.githubSubsectionStaggerMs
+  );
+  const githubContributionsDelayMs = getSectionDelayMs(
+    1,
+    nestedDelayOffsetMs,
+    motionTokens.githubSubsectionStaggerMs
+  );
+  const githubCalendarDelayMs = getSectionDelayMs(
+    2,
+    nestedDelayOffsetMs,
+    motionTokens.githubSubsectionStaggerMs
+  );
   const resolvedOverlineSx = overlineSx ?? sectionHeadingCompactSx;
   const githubSubsectionCardSx: SxProps<Theme> = [
     cardResetSx,
@@ -73,16 +85,36 @@ export const CVGitHubSection = ({
   ];
 
   return (
-    <CVSectionCard delayMs={sectionDelayMs} id={sectionId} sx={cvSectionAnchorSx}>
+    <CVSectionCard
+      delayMs={sectionDelayMs}
+      skipEntranceAnimation={revealed}
+      onVisible={onReveal}
+      id={sectionId}
+      sx={cvSectionAnchorSx}
+    >
       <Stack spacing={compactSidebarSectionSpacing}>
-        <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
-        {lead && <SectionLeadText>{lead}</SectionLeadText>}
-
-        <SectionCard delayMs={githubActivityDelayMs} sx={githubSubsectionCardSx}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 1,
+            flexWrap: 'wrap',
+          }}
+        >
+          <SectionHeading overline="GitHub" sx={resolvedOverlineSx} />
+          {statusIndicator}
+        </Box>
+        {lead && <Text role="metaStrong">{lead}</Text>}
+        <SectionCard
+          delayMs={githubActivityDelayMs}
+          skipEntranceAnimation={revealed}
+          sx={githubSubsectionCardSx}
+        >
           <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={sectionTitleSx}>
+            <Text role="subsectionTitle" tone="support">
               Recent Activity
-            </SubsectionTitle>
+            </Text>
             <SectionPanel>
               <GitHubActivityList
                 activity={activity}
@@ -94,11 +126,15 @@ export const CVGitHubSection = ({
           </Stack>
         </SectionCard>
 
-        <SectionCard delayMs={githubContributionsDelayMs} sx={githubSubsectionCardSx}>
+        <SectionCard
+          delayMs={githubContributionsDelayMs}
+          skipEntranceAnimation={revealed}
+          sx={githubSubsectionCardSx}
+        >
           <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={sectionTitleSx}>
+            <Text role="subsectionTitle" tone="support">
               Contributions
-            </SubsectionTitle>
+            </Text>
             <SectionPanel>
               <GitHubContributions
                 contributions={contributions}
@@ -110,24 +146,18 @@ export const CVGitHubSection = ({
           </Stack>
         </SectionCard>
 
-        <SectionCard delayMs={githubCalendarDelayMs} sx={githubSubsectionCardSx}>
+        <SectionCard
+          delayMs={githubCalendarDelayMs}
+          skipEntranceAnimation={revealed}
+          sx={githubSubsectionCardSx}
+        >
           <Stack spacing={compactSidebarSectionSpacing}>
-            <GitHubContributionCalendar username={githubUsername} contained={false} />
-          </Stack>
-        </SectionCard>
-
-        <SectionCard delayMs={githubProjectsDelayMs} sx={githubSubsectionCardSx}>
-          <Stack spacing={compactSidebarSectionSpacing}>
-            <SubsectionTitle sx={sectionTitleSx}>
-              {projectTitle}
-            </SubsectionTitle>
-            <SectionPanel>
-              <GitHubProjects
-                projects={projects}
-                animateItems
-                startDelayMs={resolvedItemOffsetMs}
-              />
-            </SectionPanel>
+            <GitHubContributionCalendar
+              username={githubUsername}
+              contained={false}
+              skipEntranceAnimation={calendarSettled}
+              onEntranceComplete={onCalendarSettled}
+            />
           </Stack>
         </SectionCard>
       </Stack>

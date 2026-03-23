@@ -1,67 +1,90 @@
-import { createContext, PropsWithChildren, useCallback, useContext, useMemo, useState } from 'react';
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
+
+export const ONBOARDING_COMPLETED_STORAGE_KEY = 'danhenderson-onboarding-completed';
+
+const getStoredOnboardingCompleted = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(ONBOARDING_COMPLETED_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+};
 
 type WelcomeOnboardingContextValue = {
-  showPauseHint: boolean;
-  showDarkModeHint: boolean;
-  openPauseHint: () => void;
-  dismissPauseHint: () => void;
-  openDarkModeHint: () => void;
-  dismissDarkModeHint: () => void;
-  resetHints: () => void;
+  onboardingCompleted: boolean;
+  showCustomizeModal: boolean;
+  showSettingsHint: boolean;
+  openCustomizeModal: () => void;
+  advanceToSettingsHint: () => void;
+  completeOnboarding: () => void;
 };
 
 const WelcomeOnboardingContext = createContext<WelcomeOnboardingContextValue>({
-  showPauseHint: false,
-  showDarkModeHint: false,
-  openPauseHint: () => {},
-  dismissPauseHint: () => {},
-  openDarkModeHint: () => {},
-  dismissDarkModeHint: () => {},
-  resetHints: () => {},
+  onboardingCompleted: false,
+  showCustomizeModal: false,
+  showSettingsHint: false,
+  openCustomizeModal: () => {},
+  advanceToSettingsHint: () => {},
+  completeOnboarding: () => {},
 });
 
 export const WelcomeOnboardingProvider = ({ children }: PropsWithChildren) => {
-  const [showPauseHint, setShowPauseHint] = useState(false);
-  const [showDarkModeHint, setShowDarkModeHint] = useState(false);
+  const [onboardingCompleted, setOnboardingCompleted] = useState(getStoredOnboardingCompleted);
+  const [showCustomizeModal, setShowCustomizeModal] = useState(false);
+  const [showSettingsHint, setShowSettingsHint] = useState(false);
 
-  const openPauseHint = useCallback(() => {
-    setShowPauseHint(true);
+  const openCustomizeModal = useCallback(() => {
+    setShowCustomizeModal(true);
+    setShowSettingsHint(false);
   }, []);
 
-  const dismissPauseHint = useCallback(() => {
-    setShowPauseHint(false);
+  const advanceToSettingsHint = useCallback(() => {
+    setShowCustomizeModal(false);
+    setShowSettingsHint(true);
   }, []);
 
-  const openDarkModeHint = useCallback(() => {
-    setShowDarkModeHint(true);
-  }, []);
-
-  const dismissDarkModeHint = useCallback(() => {
-    setShowDarkModeHint(false);
-  }, []);
-
-  const resetHints = useCallback(() => {
-    setShowPauseHint(false);
-    setShowDarkModeHint(false);
+  const completeOnboarding = useCallback(() => {
+    setShowCustomizeModal(false);
+    setShowSettingsHint(false);
+    setOnboardingCompleted(true);
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem(ONBOARDING_COMPLETED_STORAGE_KEY, 'true');
+      } catch {
+        /* localStorage unavailable */
+      }
+    }
   }, []);
 
   const value = useMemo(
     () => ({
-      showPauseHint,
-      showDarkModeHint,
-      openPauseHint,
-      dismissPauseHint,
-      openDarkModeHint,
-      dismissDarkModeHint,
-      resetHints,
+      onboardingCompleted,
+      showCustomizeModal,
+      showSettingsHint,
+      openCustomizeModal,
+      advanceToSettingsHint,
+      completeOnboarding,
     }),
-    [dismissDarkModeHint, dismissPauseHint, openDarkModeHint, openPauseHint, resetHints, showDarkModeHint, showPauseHint]
+    [
+      advanceToSettingsHint,
+      completeOnboarding,
+      onboardingCompleted,
+      openCustomizeModal,
+      showCustomizeModal,
+      showSettingsHint,
+    ]
   );
 
   return (
-    <WelcomeOnboardingContext.Provider value={value}>
-      {children}
-    </WelcomeOnboardingContext.Provider>
+    <WelcomeOnboardingContext.Provider value={value}>{children}</WelcomeOnboardingContext.Provider>
   );
 };
 

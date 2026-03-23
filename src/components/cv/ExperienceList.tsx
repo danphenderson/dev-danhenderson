@@ -1,46 +1,33 @@
-import { Fragment } from 'react';
-import { Box, Link } from '@mui/material';
-import type {
-  Experience,
-  ExperienceDescription,
-  ExperienceProject,
-  ExperienceProjectSegment,
-} from '../../types/cv';
+import { Box } from '@mui/material';
+import type { Experience, ExperienceProject } from '../../types/cv';
+import { AnimatedSlideList, getAnimatedSlideListCloseDelayMs } from '../AnimatedSlideList';
 import { AnimatedContentList } from '../AnimatedContentList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
-import type { TabPanelItem } from '../TabPanel';
+import type { TabPanelItem, TabPanelRenderContext } from '../TabPanel';
+import {
+  renderExperienceDescriptionContent,
+  renderExperienceProjectContent,
+} from './experienceContent';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { BodyText, ListItemText } from '../text';
+import { Text } from '../text';
 import { CVEntryHeader } from './CVEntryHeader';
 
 type ExperienceListProps = {
   experiences: Experience[];
   startDelayMs?: number;
+  skipEntranceAnimation?: boolean;
 };
 
-const renderInlineSegments = (segments: ExperienceProjectSegment[]) =>
-  segments.map((segment, segmentIndex) => {
-    const content = segment.link ? (
-      <Link href={segment.link} target="_blank" rel="noopener noreferrer" underline="hover">
-        {segment.text}
-      </Link>
-    ) : (
-      <Box component="span">{segment.text}</Box>
-    );
-
-    return (
-      <Fragment key={segmentIndex}>
-        {segment.lineBreakBefore ? <br /> : null}
-        {content}
-      </Fragment>
-    );
-  });
-
-const renderExperienceDescription = (description: ExperienceDescription) =>
-  typeof description === 'string' ? description : renderInlineSegments(description);
-
-const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) => {
+const ExperienceProjects = ({
+  projects,
+  selected,
+  renderContext,
+}: {
+  projects?: ExperienceProject[];
+  selected: boolean;
+  renderContext: TabPanelRenderContext;
+}) => {
   const { getDetailListSx } = useComponentStyles();
 
   if (!projects || projects.length === 0) {
@@ -48,56 +35,44 @@ const ExperienceProjects = ({ projects }: { projects?: ExperienceProject[] }) =>
   }
 
   return (
-    <Box component="ul" sx={getDetailListSx(0, 0)}>
-      {projects.map((project, projectIndex) => {
-        if (typeof project === 'string') {
-          return (
-            <ListItemText key={projectIndex}>
-              {project}
-            </ListItemText>
-          );
-        }
-
-        if (Array.isArray(project)) {
-          return (
-            <ListItemText key={projectIndex}>
-              {renderInlineSegments(project)}
-            </ListItemText>
-          );
-        }
-
-        const linkLabel = project.text.replace(/:\s*$/, '');
-
+    <AnimatedSlideList
+      items={projects}
+      getItemKey={(_project, projectIndex) => `experience-project-${projectIndex}`}
+      in={selected}
+      container={renderContext.getDrawerContainer}
+      keepMountedWhenExited
+      reverseExitStagger
+      containerComponent="ul"
+      containerSx={getDetailListSx(0, 0)}
+      itemComponent="li"
+      renderItem={(project) => {
         return (
-          <ListItemText key={projectIndex}>
-            {project.link ? (
-              <Link href={project.link} target="_blank" rel="noopener noreferrer" underline="hover">
-                {linkLabel}
-              </Link>
-            ) : (
-              project.text
-            )}
-          </ListItemText>
+          <Text role="body" component="span">
+            {renderExperienceProjectContent(project)}
+          </Text>
         );
-      })}
-    </Box>
+      }}
+    />
   );
 };
 
-export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceListProps) => {
-  const {
-    contentListStackSpacing,
-    detailBlockSx,
-    experienceDescriptionSx,
-  } = useComponentStyles();
+export const ExperienceList = ({
+  experiences,
+  startDelayMs = 0,
+  skipEntranceAnimation = false,
+}: ExperienceListProps) => {
+  const { contentListStackSpacing, detailBlockSx, experienceDescriptionSx, motionTokens } =
+    useComponentStyles();
 
   return (
     <AnimatedContentList
       items={experiences}
       getItemKey={(experience, index) => `${experience.company}-${index}`}
       startDelayMs={startDelayMs}
+      skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
       itemSurface="panel"
+      tiltItems
       renderItem={(experience, index) => {
         const filteredSkills = experience.skills?.filter((tool) => tool.trim().length > 0) ?? [];
         const experienceTabs: TabPanelItem[] = [];
@@ -106,7 +81,17 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
           experienceTabs.push({
             value: 'details',
             label: 'Highlights',
-            content: <ExperienceProjects projects={experience.projects} />,
+            closeDelayMs: getAnimatedSlideListCloseDelayMs(
+              experience.projects.length,
+              motionTokens.accordionChipStaggerMs
+            ),
+            renderContent: (selected, renderContext) => (
+              <ExperienceProjects
+                projects={experience.projects}
+                selected={selected}
+                renderContext={renderContext}
+              />
+            ),
           });
         }
 
@@ -114,11 +99,26 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
           experienceTabs.push({
             value: 'skills',
             label: 'Skills',
-            renderContent: (selected) => (
-              <SkillsChipList skills={filteredSkills} dense in={selected} />
+            closeDelayMs: getAnimatedSlideListCloseDelayMs(
+              filteredSkills.length,
+              motionTokens.accordionChipStaggerMs
+            ),
+            renderContent: (selected, renderContext) => (
+              <SkillsChipList
+                skills={filteredSkills}
+                dense
+                in={selected}
+                animation="slide"
+                keepMountedWhenExited
+                reverseExitStagger
+                drawerContainer={renderContext.getDrawerContainer}
+              />
             ),
           });
         }
+
+        const hideSingleSupplementalTab =
+          experienceTabs.length === 1 && experienceTabs[0]?.value !== 'skills';
 
         return (
           <>
@@ -126,13 +126,14 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
               title={experience.title}
               organization={experience.company}
               organizationUrl={experience.companyUrl}
+              organizationTooltip={experience.companyTooltip}
               dateRange={`${experience.startDate} – ${experience.endDate}`}
               chip={experience.industry ? { label: experience.industry } : undefined}
             />
             {experience.description && (
-              <BodyText sx={experienceDescriptionSx}>
-                {renderExperienceDescription(experience.description)}
-              </BodyText>
+              <Text role="body" sx={experienceDescriptionSx}>
+                {renderExperienceDescriptionContent(experience.description)}
+              </Text>
             )}
             {experienceTabs.length ? (
               <Box sx={detailBlockSx}>
@@ -141,7 +142,7 @@ export const ExperienceList = ({ experiences, startDelayMs = 0 }: ExperienceList
                   ariaLabel={`${experience.title} supplemental information`}
                   items={experienceTabs}
                   dense
-                  hideTabsWhenSingle
+                  hideTabsWhenSingle={hideSingleSupplementalTab}
                   tabsVariant="fullWidth"
                 />
               </Box>

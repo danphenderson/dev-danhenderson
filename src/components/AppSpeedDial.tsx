@@ -8,18 +8,11 @@ import type { SxProps, Theme } from '@mui/material/styles';
 import type { SpeedDialActionProps } from '@mui/material/SpeedDialAction';
 import type { SpeedDialProps } from '@mui/material/SpeedDial';
 import { Link } from 'react-router-dom';
-import { InteractiveLabel } from './text';
+import { useMotionScale } from '../motion';
+import { Text } from './text';
+import type { AppSpeedDialAction, AppSpeedDialLayer } from '../types/ui';
 
-export type AppSpeedDialAction = {
-  id: string;
-  label: string;
-  icon: ReactNode;
-  to?: string;
-  href?: string;
-  download?: string | boolean;
-  external?: boolean;
-  onClick?: (event: ReactMouseEvent<HTMLElement>) => void;
-};
+export type { AppSpeedDialAction, AppSpeedDialLayer };
 
 type AppSpeedDialProps = {
   ariaLabel: string;
@@ -30,7 +23,27 @@ type AppSpeedDialProps = {
   actionTooltipPlacement?: SpeedDialActionProps['tooltipPlacement'];
   FabProps?: SpeedDialProps['FabProps'];
   direction?: SpeedDialProps['direction'];
+  layer?: AppSpeedDialLayer;
   sx?: SxProps<Theme>;
+};
+
+const getLayerSx =
+  (layer: AppSpeedDialLayer): SxProps<Theme> =>
+  (theme) => ({
+    zIndex: layer === 'header' ? theme.zIndex.appBar + 1 : theme.zIndex.appBar - 1,
+    '& .MuiSpeedDial-fab, & .MuiSpeedDial-actions': {
+      zIndex: 'inherit',
+    },
+  });
+
+const mergeLayerSx = (layer: AppSpeedDialLayer, sx?: SxProps<Theme>): SxProps<Theme> => {
+  const layerSx = getLayerSx(layer);
+
+  if (!sx) {
+    return layerSx;
+  }
+
+  return [layerSx, ...(Array.isArray(sx) ? sx : [sx])] as SxProps<Theme>;
 };
 
 export const AppSpeedDial = ({
@@ -42,9 +55,14 @@ export const AppSpeedDial = ({
   actionTooltipPlacement,
   FabProps,
   direction = 'up',
+  layer = 'content',
   sx,
 }: AppSpeedDialProps) => {
   const [open, setOpen] = useState(false);
+  const { duration: dFactor } = useMotionScale();
+  const SPEED_DIAL_BASE_DURATION_MS = 200;
+  const speedDialTransitionDuration =
+    dFactor === 0 ? 0 : Math.round(SPEED_DIAL_BASE_DURATION_MS * dFactor);
 
   const handleOpen: NonNullable<SpeedDialProps['onOpen']> = () => {
     setOpen(true);
@@ -61,6 +79,8 @@ export const AppSpeedDial = ({
         action.onClick?.(event);
         setOpen(false);
       },
+      ...(action.onMouseEnter && { onMouseEnter: action.onMouseEnter }),
+      ...(action.onMouseLeave && { onMouseLeave: action.onMouseLeave }),
     };
 
     if (action.to) {
@@ -90,15 +110,20 @@ export const AppSpeedDial = ({
       open={open}
       onOpen={handleOpen}
       onClose={handleClose}
+      transitionDuration={speedDialTransitionDuration}
       icon={openIcon ? <SpeedDialIcon icon={icon} openIcon={openIcon} /> : icon}
       FabProps={FabProps}
-      sx={sx}
+      sx={mergeLayerSx(layer, sx)}
     >
       {actions.map((action) => (
         <SpeedDialAction
           key={action.id}
           icon={action.icon}
-          tooltipTitle={<InteractiveLabel>{action.label}</InteractiveLabel>}
+          tooltipTitle={
+            <Text role="inlineLabel" component="span">
+              {action.label}
+            </Text>
+          }
           tooltipPlacement={actionTooltipPlacement}
           tooltipOpen={actionLabelsAlwaysOpen && open}
           FabProps={getActionFabProps(action)}

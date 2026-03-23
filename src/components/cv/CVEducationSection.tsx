@@ -8,6 +8,8 @@ type CVEducationSectionProps = {
   education: EducationInfo;
   delayMs?: number;
   triggerOnView?: boolean;
+  revealed?: boolean;
+  onReveal?: () => void;
   itemOffsetMs?: number;
   sectionId?: string;
 };
@@ -16,12 +18,16 @@ export const CVEducationSection = ({
   education,
   delayMs = 0,
   triggerOnView = true,
+  revealed = false,
+  onReveal,
   itemOffsetMs,
   sectionId,
 }: CVEducationSectionProps) => (
   <CVSectionCard
     delayMs={delayMs}
     triggerOnView={triggerOnView}
+    skipEntranceAnimation={revealed}
+    onVisible={onReveal}
     id={sectionId}
     sx={cvSectionAnchorSx}
   >
