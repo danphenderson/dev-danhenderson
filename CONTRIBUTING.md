@@ -65,7 +65,7 @@ GitHub Actions currently runs three workflows:
 
 These workflows validate pushes to `main` and `v1`, plus pull requests targeting either branch.
 
-Docs-only, `plans/`, `resume/`, `LICENSE`, and formatting-config-only changes do not trigger the `Codecov` or `Build` workflows.
+Docs-only, `plans/`, `public/resume/`, `LICENSE`, and formatting-config-only changes do not trigger the `Codecov` or `Build` workflows.
 
 ## Project structure
 
@@ -76,8 +76,8 @@ Docs-only, `plans/`, `resume/`, `LICENSE`, and formatting-config-only changes do
 - `src/theme/`, `src/styles/`, `src/motion/`: theming, styling, and motion systems
 - `test/unit/`: Jest unit and component tests
 - `test/e2e/`: Playwright end-to-end tests
-- `public/assets/`: shipped media, photography, climbing, and resume assets
-- `resume/`: LaTeX source for the downloadable resume PDF
+- `public/assets/`: shipped media, photography, climbing, and published resume assets
+- `public/resume/`: LaTeX source for the downloadable resume PDF
 
 ## Primary content entry points
 
@@ -86,7 +86,7 @@ Docs-only, `plans/`, `resume/`, `LICENSE`, and formatting-config-only changes do
 - `src/data/climbs.ts`: climbing ticks and to-dos
 - `src/data/photography.ts`: photography collections and image metadata
 - `public/assets/daniel-henderson-resume.pdf`: downloadable resume artifact
-- `resume/`: resume source files when you intentionally need to update the PDF source
+- `public/resume/`: resume source files when you intentionally need to update the PDF source
 
 ## GitHub-backed CV sections
 

@@ -20,11 +20,11 @@ Prefer changes that preserve the current single-page-app architecture and static
 - `docs/engineering/agent-guide.md` is the canonical source for repository-wide architecture invariants, intentional exceptions, and safe extension patterns.
 - `docs/engineering/testing-strategy.md` is the canonical source for validation matrices, build variants, and repo-standard Playwright/Jest command shapes.
 - `PLANS.md` is the canonical source for ExecPlan requirements, triggers, and templates.
-- Scoped `AGENTS.md` files under `src/` (and `resume/` when relevant) are the canonical local rules for the files they cover.
+- Scoped `AGENTS.md` files under `src/` (and `public/resume/` when relevant) are the canonical local rules for the files they cover.
 
 ## Instruction map
 
-- `resume/AGENTS.md` — resume-source work and PDF update constraints
+- `public/resume/AGENTS.md` — resume-source work and PDF update constraints
 - `src/pages/AGENTS.md` — route-level composition, page-local behavior, and route validation expectations
 - `src/components/AGENTS.md` — shared component design, multi-consumer risk, and component validation expectations
 - `src/components/blog/AGENTS.md` — editorial blog subsystem rules and blog-specific validation
@@ -138,14 +138,14 @@ Notes:
 - `test/e2e/`: Playwright end-to-end specs and helpers when the branch includes browser integration tests
 - `test/unit/`: Jest unit and component tests
 - `public/assets/`: shipped images, certificates, media, and resume PDF
-- `resume/`: LaTeX source for the downloadable resume PDF
+- `public/resume/`: LaTeX source for the downloadable resume PDF
 - `docs/`: source-of-truth architecture, frontend, engineering, and reference documentation
 
 ## Area guidance
 
 ### CV / portfolio and GitHub-backed sections
 
-- `src/data/cv.ts` is the source of truth for interactive `/cv`; use `src/data/AGENTS.md` for content/schema rules and `resume/AGENTS.md` for resume-source work.
+- `src/data/cv.ts` is the source of truth for interactive `/cv`; use `src/data/AGENTS.md` for content/schema rules and `public/resume/AGENTS.md` for resume-source work.
 - Preserve graceful GitHub fallback behavior through the existing hooks and prefer mocked validation when applicable; see `src/hooks/AGENTS.md`.
 
 ### Climbing, photography, and blog content

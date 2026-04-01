@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
+import Tooltip from '@mui/material/Tooltip';
 import SearchOutlined from '@mui/icons-material/SearchOutlined';
 import KeyboardArrowDownOutlined from '@mui/icons-material/KeyboardArrowDownOutlined';
 import AccountCircleOutlined from '@mui/icons-material/AccountCircleOutlined';
@@ -32,72 +33,84 @@ const TrafficDot: React.FC<TrafficDotProps> = ({
   onClick,
   label,
   highlighted,
-}) => (
-  <Box
-    role={onClick ? 'button' : undefined}
-    aria-label={label}
-    tabIndex={onClick ? 0 : -1}
-    onClick={(event: React.MouseEvent) => {
-      if (onClick) {
-        event.stopPropagation();
-        onClick();
-      }
-    }}
-    onKeyDown={
-      onClick
-        ? (event: React.KeyboardEvent<HTMLDivElement>) => {
-            if (event.key === 'Enter' || event.key === ' ') {
-              event.preventDefault();
-              event.stopPropagation();
-              onClick();
+}) => {
+  const dot = (
+    <Box
+      role={onClick ? 'button' : undefined}
+      aria-label={label}
+      tabIndex={onClick ? 0 : -1}
+      onClick={(event: React.MouseEvent) => {
+        if (onClick) {
+          event.stopPropagation();
+          onClick();
+        }
+      }}
+      onKeyDown={
+        onClick
+          ? (event: React.KeyboardEvent<HTMLDivElement>) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                event.stopPropagation();
+                onClick();
+              }
             }
-          }
-        : undefined
-    }
-    onPointerDown={onClick ? stopDragStartPropagation : undefined}
-    sx={{
-      position: 'relative',
-      width: 12,
-      height: 12,
-      borderRadius: '50%',
-      backgroundColor: color,
-      flexShrink: 0,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      transition: 'filter 0.12s',
-      cursor: onClick ? 'pointer' : undefined,
-      outline: 'none',
-      ...(highlighted && {
-        animation: `${trafficDotPulse} ${cssDuration.slow} ease-out`,
-        '@media (prefers-reduced-motion: reduce)': {
-          animation: 'none',
+          : undefined
+      }
+      onPointerDown={onClick ? stopDragStartPropagation : undefined}
+      sx={{
+        position: 'relative',
+        width: 12,
+        height: 12,
+        borderRadius: '50%',
+        backgroundColor: color,
+        flexShrink: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        transition: 'filter 0.12s',
+        cursor: onClick ? 'pointer' : undefined,
+        outline: 'none',
+        ...(highlighted && {
+          animation: `${trafficDotPulse} ${cssDuration.slow} ease-out`,
+          '@media (prefers-reduced-motion: reduce)': {
+            animation: 'none',
+          },
+        }),
+        '&:focus-visible': {
+          outline: `2px solid ${VSCODE_COLORS.activeTabAccent}`,
+          outlineOffset: 2,
         },
-      }),
-      '&:focus-visible': {
-        outline: `2px solid ${VSCODE_COLORS.activeTabAccent}`,
-        outlineOffset: 2,
-      },
-      '& .dot-icon': {
-        opacity: 0,
-        fontSize: '0.5rem',
-        fontWeight: 800,
-        color: 'rgba(0,0,0,0.55)',
-        lineHeight: 1,
-        userSelect: 'none',
-        pointerEvents: 'none',
-        transition: 'opacity 0.1s',
-      },
-      '&:hover .dot-icon': {
-        opacity: 1,
-      },
-    }}
-  >
-    <Box component="span" className="dot-icon">
-      {hoverIcon}
+        '& .dot-icon': {
+          opacity: 0,
+          fontSize: '0.5rem',
+          fontWeight: 800,
+          color: 'rgba(0,0,0,0.55)',
+          lineHeight: 1,
+          userSelect: 'none',
+          pointerEvents: 'none',
+          transition: 'opacity 0.1s',
+        },
+        '&:hover .dot-icon': {
+          opacity: 1,
+        },
+      }}
+    >
+      <Box component="span" className="dot-icon">
+        {hoverIcon}
+      </Box>
     </Box>
-  </Box>
-);
+  );
+
+  if (!label) {
+    return dot;
+  }
+
+  return (
+    <Tooltip arrow disableFocusListener placement="top" title={label}>
+      {dot}
+    </Tooltip>
+  );
+};
 
 /** Clickable icon-button wrapper for title bar controls */
 const TitleBarIcon: React.FC<{ children: React.ReactNode }> = ({ children }) => (

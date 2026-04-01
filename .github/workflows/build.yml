@@ -10,7 +10,7 @@ on:
       - '.editorconfig'
       - '.prettierrc'
       - '.prettierignore'
-      - 'resume/**'
+      - 'public/resume/**'
       - 'plans/**'
   push:
     branches: [main, v1]
@@ -21,7 +21,7 @@ on:
       - '.editorconfig'
       - '.prettierrc'
       - '.prettierignore'
-      - 'resume/**'
+      - 'public/resume/**'
       - 'plans/**'
 
 permissions:

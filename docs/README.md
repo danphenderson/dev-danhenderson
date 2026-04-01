@@ -26,7 +26,7 @@ Repository instructions are layered. Use them in this order:
 | [Agent guide](engineering/agent-guide.md)           | Architecture invariants, intentional exceptions, and safe extension patterns | When making structural UI, motion, theme, styling, or route changes              |
 | [Testing strategy](engineering/testing-strategy.md) | Validation matrix, build variants, and repo-standard command shapes          | Whenever validating a change                                                     |
 | [PLANS.md](../PLANS.md)                             | ExecPlan triggers, requirements, and template                                | When a task is non-trivial, cross-cutting, or otherwise meets a planning trigger |
-| `src/**/AGENTS.md` and `resume/AGENTS.md`           | Canonical local rules for the directory being edited                         | Before editing files in that scope                                               |
+| `src/**/AGENTS.md` and `public/resume/AGENTS.md`    | Canonical local rules for the directory being edited                         | Before editing files in that scope                                               |
 | `.github/instructions/*.instructions.md`            | Auto-applied shims that summarize the relevant scoped rules                  | When Copilot preloads file-matched instructions                                  |
 
 If multiple documents overlap, prefer the canonical owner above and then the nearest scoped `AGENTS.md` for the files you are editing.

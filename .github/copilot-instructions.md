@@ -11,7 +11,7 @@ Use the instruction stack in this order:
 3. `docs/engineering/agent-guide.md` — canonical architecture invariants, intentional exceptions, and safe extension patterns
 4. `docs/engineering/testing-strategy.md` — canonical validation matrix, build variants, and repo-standard Playwright/Jest command shapes
 5. `PLANS.md` — canonical ExecPlan requirements
-6. nearest scoped `AGENTS.md` under `src/` (and `resume/` when relevant) — canonical local rules for the files being changed
+6. nearest scoped `AGENTS.md` under `src/` (and `public/resume/` when relevant) — canonical local rules for the files being changed
 7. `.github/instructions/*.instructions.md` — auto-applied shims that summarize the relevant scoped rules
 
 ## Working rules
