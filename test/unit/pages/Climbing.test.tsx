@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { COMMON_LINK_TOOLTIP_ID } from '../../../src/components/CommonLink';
 import { useClimbingData } from '../../../src/hooks/useClimbingData';
-import { MOTION_INTENSITY_STORAGE_KEY } from '../../../src/theme/appAppearance';
+import { PREFERENCE_STORAGE_KEYS } from '../../../src/theme/preferences';
 import Climbing from '../../../src/pages/Climbing';
 
 const createMockClimbingData = (overrides = {}) => ({
@@ -104,11 +104,11 @@ jest.mock('../../../src/components/AnimatedContentCard', () => ({
 describe('Climbing', () => {
   beforeEach(() => {
     jest.mocked(useClimbingData).mockReturnValue(createMockClimbingData());
-    window.localStorage.removeItem(MOTION_INTENSITY_STORAGE_KEY);
+    window.localStorage.removeItem(PREFERENCE_STORAGE_KEYS.motionIntensity);
   });
 
   afterEach(() => {
-    window.localStorage.removeItem(MOTION_INTENSITY_STORAGE_KEY);
+    window.localStorage.removeItem(PREFERENCE_STORAGE_KEYS.motionIntensity);
   });
 
   it('renders the climbing page with section headings, data grids, and inline route links', () => {
@@ -159,7 +159,7 @@ describe('Climbing', () => {
   });
 
   it('keeps tilt interaction disabled when motion intensity is off', () => {
-    window.localStorage.setItem(MOTION_INTENSITY_STORAGE_KEY, 'off');
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.motionIntensity, 'off');
 
     render(
       <ThemeProvider>

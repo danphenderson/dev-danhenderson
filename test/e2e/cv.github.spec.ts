@@ -91,7 +91,7 @@ test.describe('CV page – GitHub integration', () => {
     await expect(sectionNavFab).toHaveCount(0);
   });
 
-  test('displays mocked GitHub activity when API succeeds', async ({ page }) => {
+  test('displays mocked GitHub activity and contributions when API succeeds', async ({ page }) => {
     await mockGitHubAPISuccess(page);
     await page.goto('/cv');
     await ensureCvSectionVisible(page, 'cv-github');
@@ -102,6 +102,8 @@ test.describe('CV page – GitHub integration', () => {
     await expect(
       main.getByText(/Pushed 1 commit to danphenderson\/dev-danhenderson/)
     ).toBeVisible();
+    await expect(main.getByText('microsoft/playwright')).toBeVisible();
+    await expect(main.getByText('danphenderson/BlockOpt.jl')).toBeVisible();
     await expectGitHubDataStatusTooltip(
       page,
       'Showing live GitHub activity from the latest successful fetch.'
@@ -144,6 +146,7 @@ test.describe('CV page – GitHub integration', () => {
     await expect(
       main.getByText(/Pushed 1 commit to danphenderson\/dev-danhenderson/)
     ).toBeVisible();
+    await expect(main.getByText(/dbt-labs\/dbt-core/)).toBeVisible();
 
     // Partial-fallback status should be visible
     await expectGitHubDataStatusTooltip(

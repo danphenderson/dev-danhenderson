@@ -1,7 +1,7 @@
 import { Link as RouterLink, Navigate, useLocation, useParams } from 'react-router-dom';
 import { Box, Button, Stack } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useCallback, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { BackToTopButton } from '../components/BackToTopButton';
 import { RouteRecoveryPanel } from '../components/RouteRecoveryPanel';
 import { PageFrame } from '../components/layout/PageFrame';
@@ -26,6 +26,11 @@ const legacySlugMap: Record<string, string> = {
   'new%20mexico': 'new-mexico',
 };
 
+const recoveryActions = recoveryRouteActions.map((action) => ({
+  ...action,
+  routeStatusLabel: siteRouteMap[action.routeId].status?.label,
+}));
+
 export default function PhotographyCategory() {
   const appStyles = useAppStyles();
   const location = useLocation();
@@ -35,27 +40,19 @@ export default function PhotographyCategory() {
   const canonicalSlug = slugKey ? legacySlugMap[slugKey] ?? slugKey : undefined;
   const shouldRedirect = Boolean(slugKey && legacySlugMap[slugKey]);
   const category = categories.find((item) => item.slug === canonicalSlug);
-  const recoveryContext = useMemo(() => getRecoveryContext(location.pathname), [location.pathname]);
-  const recoveryActions = useMemo(
-    () =>
-      recoveryRouteActions.map((action) => ({
-        ...action,
-        routeStatusLabel: siteRouteMap[action.routeId].status?.label,
-      })),
-    []
-  );
+  const recoveryContext = getRecoveryContext(location.pathname);
 
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
 
-  const handlePhotoClick = useCallback((index: number) => {
+  const handlePhotoClick = (index: number) => {
     setLightboxIndex(index);
     setLightboxOpen(true);
-  }, []);
+  };
 
-  const handleLightboxClose = useCallback(() => {
+  const handleLightboxClose = () => {
     setLightboxOpen(false);
-  }, []);
+  };
 
   useDocumentMetadata(
     shouldRedirect

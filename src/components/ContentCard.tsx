@@ -3,7 +3,7 @@ import type { BoxProps } from '@mui/material';
 import type { ElementType } from 'react';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { useComponentStyles } from '../styles/componentStyles';
-import { normalizeSxProp } from '../utils/sx';
+import { mergeSx } from '../utils/sx';
 
 export type ContentCardProps<RootComponent extends ElementType = 'div'> =
   BoxProps<RootComponent> & {
@@ -21,7 +21,7 @@ export const ContentCard = <RootComponent extends ElementType = 'div'>({
   const { contentCardSx } = useComponentStyles();
 
   return (
-    <Box sx={[contentCardSx, ...normalizeSxProp(sx)]} {...props}>
+    <Box sx={mergeSx(contentCardSx, sx)} {...props}>
       {children}
     </Box>
   );

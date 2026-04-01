@@ -42,7 +42,7 @@ test.describe('Production smoke', () => {
     const main = page.locator('#main-content');
     await waitForAnimatedSectionReadiness({
       anchor: main.getByRole('heading', { name: 'Overview' }),
-      readyLocators: [main.getByRole('grid').first()],
+      readyLocators: [main.getByRole('table').first()],
     });
 
     const scorecardTrigger = page.getByRole('button', { name: 'Open performance scorecard' });
@@ -77,7 +77,7 @@ test.describe('Production smoke', () => {
     const main = page.locator('#main-content');
     await waitForAnimatedSectionReadiness({
       anchor: main.getByRole('heading', { name: 'Overview' }),
-      readyLocators: [main.getByRole('grid').first()],
+      readyLocators: [main.getByRole('table').first()],
     });
 
     await expect(main.getByRole('heading', { name: 'Overview' })).toBeVisible();
@@ -87,7 +87,7 @@ test.describe('Production smoke', () => {
     await page.goto('/photography');
 
     await waitForAnimatedSectionReadiness({
-      anchor: page.getByText('A selection of field work, climbing days, and stargazing nights.'),
+      anchor: page.getByText('A selection of photo albums.'),
       readyLocators: [page.getByText('4 albums')],
     });
 

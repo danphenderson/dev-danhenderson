@@ -9,14 +9,10 @@ import {
   cvSectionMetadata,
   cvSectionNavigationOrder,
 } from '../../../src/components/cv/cvSectionMetadata';
-import {
-  APP_APPEARANCE_STORAGE_KEY,
-  defaultAppAppearanceKey,
-} from '../../../src/theme/appAppearance';
+import { PREFERENCE_STORAGE_KEYS } from '../../../src/theme/preferences';
 import { cvPageSectionLayout } from '../../../src/pages/cvPageLayout';
 import CV from '../../../src/pages/CV';
 
-const legacyCvAppearanceStorageKey = 'danhenderson-cv-appearance';
 const mockAppSpeedDial = jest.fn();
 
 jest.mock('@mui/material/useMediaQuery', () => jest.fn());
@@ -145,8 +141,7 @@ describe('CV page section navigation', () => {
 
   beforeEach(() => {
     mockUseMediaQuery.mockReturnValue(false);
-    window.localStorage.removeItem(APP_APPEARANCE_STORAGE_KEY);
-    window.localStorage.removeItem(legacyCvAppearanceStorageKey);
+    window.localStorage.removeItem(PREFERENCE_STORAGE_KEYS.appearance);
   });
 
   afterEach(() => {
@@ -274,26 +269,15 @@ describe('CV page section navigation', () => {
     expect(within(githubSection).queryByText('Public Projects')).not.toBeInTheDocument();
   });
 
-  it('ignores the legacy CV appearance key and uses the global default appearance key', () => {
-    window.localStorage.setItem(legacyCvAppearanceStorageKey, 'atlas');
-
-    renderCV();
-
-    const aboutSection = getAnimatedSectionCard('about');
-
-    expect(within(aboutSection).queryByText('Style Preview')).not.toBeInTheDocument();
-    expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe(defaultAppAppearanceKey);
-  });
-
   it('respects the stored global appearance option on load', () => {
-    window.localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, 'atlas');
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.appearance, 'atlas');
 
     renderCV();
 
     const aboutSection = getAnimatedSectionCard('about');
 
     expect(within(aboutSection).queryByText('Style Preview')).not.toBeInTheDocument();
-    expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe('atlas');
+    expect(window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.appearance)).toBe('atlas');
   });
 
   it('renders the mobile stacked order and keeps ABOUT ahead of EXPERIENCE with the current mobile motion contract', () => {

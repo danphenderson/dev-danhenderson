@@ -4,6 +4,7 @@ import {
   useWelcomeOnboarding,
   ONBOARDING_COMPLETED_STORAGE_KEY,
 } from '../../src/WelcomeOnboardingProvider';
+import * as welcomeSequenceEnvironment from '../../src/welcomeSequenceEnvironment';
 
 const TestConsumer = () => {
   const {
@@ -32,6 +33,10 @@ describe('WelcomeOnboardingProvider', () => {
     window.localStorage.clear();
   });
 
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('defaults onboardingCompleted to false when localStorage is empty', () => {
     render(
       <WelcomeOnboardingProvider>
@@ -54,6 +59,21 @@ describe('WelcomeOnboardingProvider', () => {
     );
 
     expect(screen.getByTestId('onboarding-completed')).toHaveTextContent('true');
+  });
+
+  it('starts incomplete when the developer home replay override is active', () => {
+    jest
+      .spyOn(welcomeSequenceEnvironment, 'shouldResetWelcomeSequenceOnHomeLoad')
+      .mockReturnValue(true);
+    window.localStorage.setItem(ONBOARDING_COMPLETED_STORAGE_KEY, 'true');
+
+    render(
+      <WelcomeOnboardingProvider>
+        <TestConsumer />
+      </WelcomeOnboardingProvider>
+    );
+
+    expect(screen.getByTestId('onboarding-completed')).toHaveTextContent('false');
   });
 
   it('opens and closes the customize modal', () => {

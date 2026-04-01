@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Stack } from '@mui/material';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
@@ -23,15 +23,11 @@ export default function Blog() {
   const { posts, postMeta, featuredPost, tags } = useBlogData();
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
-  const nonFeaturedMeta = useMemo(
-    () => postMeta.filter((p) => p.slug !== featuredPost?.slug),
-    [postMeta, featuredPost]
-  );
+  const nonFeaturedPosts = postMeta.filter((post) => post.slug !== featuredPost?.slug);
 
-  const filteredPosts = useMemo(
-    () => (activeTag ? nonFeaturedMeta.filter((p) => p.tags.includes(activeTag)) : nonFeaturedMeta),
-    [nonFeaturedMeta, activeTag]
-  );
+  const filteredPosts = activeTag
+    ? nonFeaturedPosts.filter((post) => post.tags.includes(activeTag))
+    : nonFeaturedPosts;
 
   const filteredFeaturedPost =
     activeTag && featuredPost && !featuredPost.tags.includes(activeTag) ? null : featuredPost;

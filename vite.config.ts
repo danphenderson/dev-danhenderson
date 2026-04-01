@@ -13,6 +13,22 @@ const normalizePublicUrl = (value: string | undefined): string => {
 
 const resolveViteBase = (publicUrl: string): string => (publicUrl ? `${publicUrl}/` : '/');
 
+const resolveManualChunk = (id: string) => {
+  if (id.includes('/src/data/climbs.ts')) {
+    return 'climbing-data';
+  }
+
+  if (id.includes('/node_modules/@mui/x-data-grid/')) {
+    return 'vendor-data-grid';
+  }
+
+  if (id.includes('/node_modules/fuse.js/')) {
+    return 'vendor-fuse';
+  }
+
+  return undefined;
+};
+
 const createPublicUrlHtmlTransformPlugin = (publicUrl: string): Plugin => ({
   name: 'public-url-html-transform',
   transformIndexHtml(html) {
@@ -43,6 +59,11 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'build',
       emptyOutDir: true,
+      rollupOptions: {
+        output: {
+          manualChunks: resolveManualChunk,
+        },
+      },
     },
     define: {
       __APP_ENV__: JSON.stringify(createInjectedAppEnvironment(mode, publicUrl)),

@@ -13,6 +13,7 @@ import {
   isAudioConsent,
 } from './theme/preferences';
 import type { AudioConsent } from './types/ui';
+import { shouldResetWelcomeSequenceOnHomeLoad } from './welcomeSequenceEnvironment';
 
 export type { AudioConsent } from './types/ui';
 
@@ -134,6 +135,9 @@ const getStoredAudioConsent = (): AudioConsent => {
   return 'unknown';
 };
 
+const getInitialAudioConsent = (): AudioConsent =>
+  shouldResetWelcomeSequenceOnHomeLoad() ? 'unknown' : getStoredAudioConsent();
+
 const persistAudioConsent = (consent: Exclude<AudioConsent, 'unknown'>) => {
   if (typeof window === 'undefined') return;
 
@@ -215,7 +219,7 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | undefined>();
-  const [audioConsent, setAudioConsent] = useState<AudioConsent>(getStoredAudioConsent);
+  const [audioConsent, setAudioConsent] = useState<AudioConsent>(getInitialAudioConsent);
 
   const bindIframeRef = useCallback((node: HTMLIFrameElement | null) => {
     iframeRef.current = node;

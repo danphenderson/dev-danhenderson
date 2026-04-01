@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
 import { Button, Stack } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -19,6 +18,11 @@ import { useAppStyles } from '../styles/appStyles';
 import { Text } from '../components/text';
 import { MotionSection } from '../motion';
 
+const recoveryActions = recoveryRouteActions.map((action) => ({
+  ...action,
+  routeStatusLabel: siteRouteMap[action.routeId].status?.label,
+}));
+
 export default function BlogPost() {
   const appStyles = useAppStyles();
   const location = useLocation();
@@ -26,17 +30,9 @@ export default function BlogPost() {
   const { getPostBySlug, getRelatedPosts, getAdjacentPosts } = useBlogData();
 
   const post = slug ? getPostBySlug(slug) : undefined;
-  const related = useMemo(() => (slug ? getRelatedPosts(slug, 3) : []), [slug, getRelatedPosts]);
-  const adjacent = useMemo(() => (slug ? getAdjacentPosts(slug) : {}), [slug, getAdjacentPosts]);
-  const recoveryContext = useMemo(() => getRecoveryContext(location.pathname), [location.pathname]);
-  const recoveryActions = useMemo(
-    () =>
-      recoveryRouteActions.map((action) => ({
-        ...action,
-        routeStatusLabel: siteRouteMap[action.routeId].status?.label,
-      })),
-    []
-  );
+  const related = slug ? getRelatedPosts(slug, 3) : [];
+  const adjacent = slug ? getAdjacentPosts(slug) : {};
+  const recoveryContext = getRecoveryContext(location.pathname);
 
   useDocumentMetadata(
     post

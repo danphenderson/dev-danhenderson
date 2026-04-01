@@ -6,6 +6,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { shouldResetWelcomeSequenceOnHomeLoad } from './welcomeSequenceEnvironment';
 
 export const ONBOARDING_COMPLETED_STORAGE_KEY = 'danhenderson-onboarding-completed';
 
@@ -17,6 +18,9 @@ const getStoredOnboardingCompleted = (): boolean => {
     return false;
   }
 };
+
+const getInitialOnboardingCompleted = (): boolean =>
+  shouldResetWelcomeSequenceOnHomeLoad() ? false : getStoredOnboardingCompleted();
 
 type WelcomeOnboardingContextValue = {
   onboardingCompleted: boolean;
@@ -37,7 +41,7 @@ const WelcomeOnboardingContext = createContext<WelcomeOnboardingContextValue>({
 });
 
 export const WelcomeOnboardingProvider = ({ children }: PropsWithChildren) => {
-  const [onboardingCompleted, setOnboardingCompleted] = useState(getStoredOnboardingCompleted);
+  const [onboardingCompleted, setOnboardingCompleted] = useState(getInitialOnboardingCompleted);
   const [showCustomizeModal, setShowCustomizeModal] = useState(false);
   const [showSettingsHint, setShowSettingsHint] = useState(false);
 

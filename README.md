@@ -1,8 +1,13 @@
 # danhenderson.dev
 
+[![Build](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml)
 [![Codecov](https://codecov.io/github/danphenderson/dev-danhenderson/branch/main/graph/badge.svg)](https://app.codecov.io/github/danphenderson/dev-danhenderson?branch=main)
+[![CodeQL](https://github.com/danphenderson/dev-danhenderson/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/codeql.yml)
+[![Docs](https://github.com/danphenderson/dev-danhenderson/actions/workflows/deploy-docs.yml/badge.svg)](https://danphenderson.github.io/dev-danhenderson/)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D20.19.0-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/danphenderson/dev-danhenderson/blob/main/LICENSE)
 
-Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript portfolio site with an interactive CV, climbing log, photography galleries, and a feature-flagged blog available in development and test builds.
+Source code for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript portfolio site with an interactive CV (& CV story mode), climbing log, photography galleries, and a feature-flagged blog available in development and test builds.
 
 ## Sections
 

@@ -44,7 +44,7 @@ export const aboutMe: AboutMe = {
   email: 'me@danhenderson.dev',
   phone: '',
   location: 'Seattle, WA',
-  opportunities: ['Scientific computing', 'Data platforms', 'ML/AI engineering'],
+  opportunities: ['Scientific computing', 'Data platforms', 'ML/AI engineering', 'Web development'],
   bioLink: {
     text: 'M.S. in applied/computational mathematics',
     url: mtuMathGraduateBioUrl,
