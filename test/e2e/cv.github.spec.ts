@@ -13,7 +13,7 @@ const ensureCvSectionVisible = async (page: Page, sectionId: string) => {
 };
 
 const expectCommonLinkTooltip = async (page: Page, link: Locator, content: string) => {
-  const tooltip = page.locator(`#${COMMON_LINK_TOOLTIP_ID}`);
+  const tooltip = page.getByRole('tooltip').filter({ hasText: content }).first();
 
   await link.scrollIntoViewIfNeeded();
   await expect(link).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);

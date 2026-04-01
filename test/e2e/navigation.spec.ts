@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Locator, type Page } from '@playwright/test';
 import { declineWelcomeAudio } from './helpers/header';
 import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
@@ -8,6 +8,20 @@ import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
  * Validates that header links navigate between primary routes and that
  * browser back-button behavior works correctly.
  */
+
+const waitForClimbingSection = async (main: Locator) => {
+  await waitForAnimatedSectionReadiness({
+    anchor: main.getByRole('heading', { name: 'Overview' }),
+    readyLocators: [main.getByRole('table').first()],
+  });
+};
+
+const waitForPhotographySection = async (page: Page) => {
+  await waitForAnimatedSectionReadiness({
+    anchor: page.getByText('A selection of photo albums.'),
+    readyLocators: [page.getByText('4 albums')],
+  });
+};
 
 test.describe('Cross-route navigation', () => {
   test.beforeEach(async ({ page }) => {
@@ -38,20 +52,14 @@ test.describe('Cross-route navigation', () => {
     await page.getByRole('link', { name: 'Climbing' }).first().click();
 
     await expect(page).toHaveURL(/\/climbing$/);
-    await waitForAnimatedSectionReadiness({
-      anchor: main.getByRole('heading', { name: 'Overview' }),
-      readyLocators: [main.getByRole('grid').first()],
-    });
+    await waitForClimbingSection(main);
     await expect(main.getByRole('heading', { name: 'Overview' })).toBeVisible();
   });
 
   test('Climbing → Photography via header link', async ({ page }) => {
     await page.goto('/climbing');
     const main = page.locator('#main-content');
-    await waitForAnimatedSectionReadiness({
-      anchor: main.getByRole('heading', { name: 'Overview' }),
-      readyLocators: [main.getByRole('grid').first()],
-    });
+    await waitForClimbingSection(main);
 
     // Scroll to top to ensure HideOnScroll header is visible
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -60,18 +68,13 @@ test.describe('Cross-route navigation', () => {
     await photographyLink.click();
 
     await expect(page).toHaveURL(/\/photography$/);
-    await waitForAnimatedSectionReadiness({
-      anchor: page.getByText('A selection of field work, climbing days, and stargazing nights.'),
-      readyLocators: [page.getByText('4 albums')],
-    });
+    await waitForPhotographySection(page);
     await expect(page.getByRole('heading', { name: 'Landscape' })).toBeVisible();
   });
 
   test('Photography → Home via logo link', async ({ page }) => {
     await page.goto('/photography');
-    await waitForAnimatedSectionReadiness({
-      anchor: page.getByText('A selection of field work, climbing days, and stargazing nights.'),
-    });
+    await waitForPhotographySection(page);
 
     await page.getByRole('link', { name: 'Home' }).first().click();
 
@@ -88,10 +91,7 @@ test.describe('Cross-route navigation', () => {
 
     await page.getByRole('link', { name: 'Climbing' }).first().click();
     await expect(page).toHaveURL(/\/climbing$/);
-    await waitForAnimatedSectionReadiness({
-      anchor: main.getByRole('heading', { name: 'Overview' }),
-      readyLocators: [main.getByRole('grid').first()],
-    });
+    await waitForClimbingSection(main);
 
     await page.goBack();
 

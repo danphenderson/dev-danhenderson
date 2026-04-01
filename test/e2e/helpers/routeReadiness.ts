@@ -55,10 +55,10 @@ export async function waitForAnimatedSectionReadiness({
   readyLocators = [],
   hiddenLocators = [],
 }: AnimatedSectionReadinessOptions) {
+  await expect(anchor).toBeVisible();
   await anchor.evaluate((node) => {
     node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
   });
-  await expect(anchor).toBeVisible();
   await expect
     .poll(() => isAnchorAnimationReady(anchor), {
       message: 'Timed out waiting for animated section content to finish revealing.',
