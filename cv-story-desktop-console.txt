@@ -1,6 +1,0 @@
-Total messages: 6 (Errors: 3, Warnings: 0)
-Returning 3 messages for level "error"
-
-[ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ http://manifest.json/:0
-[ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:3002/favicon.ico:0
-[ERROR] Failed to load resource: net::ERR_NAME_NOT_RESOLVED @ http://manifest.json/:0

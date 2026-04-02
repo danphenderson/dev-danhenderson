@@ -231,7 +231,7 @@ test.describe('Home page', () => {
     const settingsHint = page.getByTestId('first-visit-settings-hint-popover');
     await expect(settingsHint).toBeVisible();
     await expect(settingsHint).toContainText(
-      'You can always update motion and welcome audio from the settings button in the header.'
+      'You can always update motion, welcome audio, and more from the settings button in the header.'
     );
     await expect(settingsTrigger).toHaveAttribute('data-highlighted', 'true');
     await settingsHint.getByRole('button', { name: 'Get started' }).click();
