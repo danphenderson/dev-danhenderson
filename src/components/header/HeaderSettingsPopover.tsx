@@ -272,9 +272,11 @@ export const HeaderSettingsPopover = ({
                 checked={mode === 'dark'}
                 onChange={onToggleTheme}
                 size="small"
-                inputProps={{
-                  'aria-labelledby': 'theme-switch-label',
-                  'aria-label': 'Toggle dark mode',
+                slotProps={{
+                  input: {
+                    'aria-labelledby': 'theme-switch-label',
+                    role: 'switch',
+                  },
                 }}
               />
             </Stack>

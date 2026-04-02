@@ -55,7 +55,7 @@ describe('HeaderSettingsPopover', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
 
-    const toggle = screen.getByRole('checkbox', { name: /dark mode/i });
+    const toggle = screen.getByRole('switch', { name: /dark mode/i });
     expect(toggle).toBeInTheDocument();
     expect(toggle).not.toBeChecked();
   });
@@ -65,7 +65,7 @@ describe('HeaderSettingsPopover', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
 
-    expect(screen.getByRole('checkbox', { name: /dark mode/i })).toBeChecked();
+    expect(screen.getByRole('switch', { name: /dark mode/i })).toBeChecked();
   });
 
   it('calls onToggleTheme when the dark mode switch is toggled', () => {
@@ -73,7 +73,7 @@ describe('HeaderSettingsPopover', () => {
     renderSettingsPopover({ onToggleTheme });
 
     fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
-    fireEvent.click(screen.getByRole('checkbox', { name: /dark mode/i }));
+    fireEvent.click(screen.getByRole('switch', { name: /dark mode/i }));
 
     expect(onToggleTheme).toHaveBeenCalledTimes(1);
   });
