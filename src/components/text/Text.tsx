@@ -9,7 +9,7 @@ import type {
   TextPassthroughProps,
 } from '../../types/text';
 import { useTextStyles } from '../../styles/textStyles';
-import { mergeSx } from './textFactory';
+import { mergeSx } from '../../utils/sx';
 
 /* ── Default semantic elements per role ─────────────────── */
 
@@ -95,7 +95,7 @@ export const Text = ({
     <Typography
       variant={typeset.variant}
       component={element}
-      sx={mergeSx([typeset.sx], sx)}
+      sx={mergeSx(typeset.sx, sx)}
       {...rest}
     >
       {children}

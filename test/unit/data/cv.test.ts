@@ -42,7 +42,7 @@ describe('cv.ts schema', () => {
 
 Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software.
 
-I previously built ingestion, analytics, and ML solutions for a healthcare data platform.`
+Previously built ingestion, analytics, and ML solutions for a healthcare data platform.`
       );
     });
   });

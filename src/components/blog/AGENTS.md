@@ -18,7 +18,7 @@ Blog is not a design-system exception — it uses the shared `Text` component wi
 - Use `MotionSection`, `StaggerChildren`, and `MotionCard` for scroll-triggered and interactive motion.
 - Use `contentCardSx` for glassmorphism surface treatments.
 - All navigation uses React Router `Link` or `useNavigate`.
-- Blog route behavior is feature-gated via `isFeatureEnabled('blog')`; keep component behavior compatible with `/blog` and `/blog/:slug` appearing only in enabled runtime environments.
+- Keep component behavior compatible with the public `/blog` and `/blog/:slug` routes.
 
 ## Data model
 
@@ -32,7 +32,7 @@ Blog is not a design-system exception — it uses the shared `Text` component wi
 - All new components must have unit tests in `test/unit/components/blog/` or relevant page/hook test.
 - Blog index and post pages must be covered by unit and E2E tests.
 - Run `npm run build` for compile checks and the narrowest relevant unit tests for changed behavior.
-- Use `npm run build:e2e` before the repo-standard Playwright command for `test/e2e/blog.spec.ts` so the feature-gated blog routes are enabled in the E2E build.
+- Use the repo-standard Playwright command from `docs/engineering/testing-strategy.md` for `test/e2e/blog.spec.ts`.
 - Validate `/blog` and `/blog/:slug` in browser at multiple viewports and theme presets.
 
 ## Recovery and fallback

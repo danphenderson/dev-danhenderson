@@ -44,7 +44,7 @@ Source-of-truth docs:
 - Do not rename route exports, route elements, or route wiring unless explicitly required.
 - Keep page composition aligned with the current architecture: pages assemble content, components render reusable UI, hooks provide data adaptation.
 - For multi-section choreography, prefer layout metadata for section ordering, `delayMs`, and `triggerOnView` instead of scattering delay literals inline.
-- Feature-gated routes must respect `isFeatureEnabled()` and the route metadata in `src/constants/siteRoutes.ts`.
+- Keep route visibility and navigation driven by `src/constants/siteRoutes.ts` rather than ad hoc page checks.
 - If a page change suggests a shared abstraction, prefer extracting only the repeated part rather than refactoring the whole page.
 
 ## Data and hook usage
@@ -76,7 +76,7 @@ When page UI changes are made:
 - validate the changed route directly
 - validate any adjacent route affected by shared navigation or layout
 - check at least one narrow/mobile viewport and one desktop viewport for layout-affecting edits
-- when the working branch includes Playwright E2E coverage for the touched route, run `npm run build` (or `npm run build:e2e` for feature-gated blog coverage) and then the narrowest relevant spec using the repo-standard Playwright command shape from `docs/engineering/testing-strategy.md`
+- when the working branch includes Playwright E2E coverage for the touched route, run `npm run build` and then the narrowest relevant spec using the repo-standard Playwright command shape from `docs/engineering/testing-strategy.md`; use `npm run build:e2e` only when the touched behavior depends on the test runtime
 - when that workflow is present, use the full `npm run test:e2e` suite if a page change spans multiple covered routes or shared route behavior
 - for `/cv` GitHub-backed behavior, prefer mocked Playwright success/failure coverage over live API-dependent validation when that workflow is available
 - verify that major headings, primary content blocks, and critical assets render as intended
@@ -107,7 +107,7 @@ Common checks:
   - `/cv` and mocked GitHub states -> `test/e2e/cv.github.spec.ts`
   - `/climbing` -> `test/e2e/climbing.spec.ts`
   - `/photography` and `/photography/:slug` -> `test/e2e/photography.spec.ts`
-  - `/blog` and `/blog/:slug` -> `npm run build:e2e` then `test/e2e/blog.spec.ts`
+  - `/blog` and `/blog/:slug` -> `test/e2e/blog.spec.ts`
   - unknown-route handling -> `test/e2e/not-found.spec.ts`
 - screenshot capture when the task is visual or review-oriented
 

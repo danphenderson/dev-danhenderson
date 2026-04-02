@@ -1,5 +1,6 @@
 import { render, screen, act, waitFor } from '@testing-library/react';
 import { WelcomeAudioProvider, useWelcomeAudio } from '../../src/WelcomeAudioProvider';
+import * as welcomeSequenceEnvironment from '../../src/welcomeSequenceEnvironment';
 
 const AudioConsumer = () => {
   const { audioConsent, isPlaying, play, pause, grantAudioConsent, declineAudioConsent } =
@@ -82,6 +83,21 @@ describe('WelcomeAudioProvider', () => {
   afterEach(() => {
     jest.restoreAllMocks();
     delete window.SC;
+  });
+
+  it('starts with unknown consent when the developer home replay override is active', () => {
+    jest
+      .spyOn(welcomeSequenceEnvironment, 'shouldResetWelcomeSequenceOnHomeLoad')
+      .mockReturnValue(true);
+    window.localStorage.setItem('danhenderson-welcome-audio-consent', 'declined');
+
+    render(
+      <WelcomeAudioProvider>
+        <AudioConsumer />
+      </WelcomeAudioProvider>
+    );
+
+    expect(screen.getByTestId('consent')).toHaveTextContent('unknown');
   });
 
   it('provides default context values', () => {

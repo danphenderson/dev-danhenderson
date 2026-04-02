@@ -4,6 +4,7 @@ import { Text } from '../text';
 import { BlogCodeBlock } from './BlogCodeBlock';
 import { BlogBlockquote } from './BlogBlockquote';
 import { BlogCallout } from './BlogCallout';
+import { renderHighlightedPython, shouldHighlightInlinePython } from './blogSyntaxHighlight';
 import { MotionSection } from '../../motion';
 import type { BlogContentBlock } from '../../types/blog';
 
@@ -56,9 +57,11 @@ function renderParagraphText(text: string): ReactNode {
     .filter((segment) => segment.length > 0)
     .map((segment, index) => {
       if (segment.startsWith('`') && segment.endsWith('`')) {
+        const codeText = segment.slice(1, -1);
+
         return (
           <Text key={index} role="proseInlineCode">
-            {segment.slice(1, -1)}
+            {shouldHighlightInlinePython(codeText) ? renderHighlightedPython(codeText) : codeText}
           </Text>
         );
       }

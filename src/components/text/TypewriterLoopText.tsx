@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { cursorBlink } from '../../styles/animations';
-import { mergeSx } from './textFactory';
+import { mergeSx } from '../../utils/sx';
 import { useTypewriterLoop } from './useTypewriterLoop';
 import type { TypewriterTimingPreset } from './useTypewriterProgress';
 

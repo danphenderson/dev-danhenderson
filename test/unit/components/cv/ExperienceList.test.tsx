@@ -139,6 +139,36 @@ describe('ExperienceList', () => {
     expect(screen.getByText(summaryText)).toBeVisible();
   });
 
+  it('keeps the active experience card above the section backdrop', () => {
+    const graduateResearchAssistant = experiences.find(
+      (experience) => experience.title === 'Graduate Research Assistant'
+    );
+    const dataPipelineEngineer = experiences.find(
+      (experience) => experience.title === 'Data Pipeline Engineer'
+    );
+
+    expect(graduateResearchAssistant).toBeDefined();
+    expect(dataPipelineEngineer).toBeDefined();
+
+    render(
+      <ThemeProvider>
+        <ExperienceList
+          experiences={[graduateResearchAssistant!, dataPipelineEngineer!]}
+          activeDetail={{ index: 1, value: 'skills' }}
+        />
+      </ThemeProvider>
+    );
+
+    const animatedListProps = mockAnimatedContentList.mock.calls[0][0];
+
+    expect(animatedListProps.getItemContainerSx(graduateResearchAssistant!, 0)).toEqual(
+      expect.objectContaining({ zIndex: 1 })
+    );
+    expect(animatedListProps.getItemContainerSx(dataPipelineEngineer!, 1)).toEqual(
+      expect.objectContaining({ zIndex: 3 })
+    );
+  });
+
   it('switches between highlights and skills within the shared tab panel while keeping the summary visible', async () => {
     const hemodynamicsExperience = experiences.find(
       (experience) => experience.title === 'Graduate Research Assistant'
@@ -264,7 +294,10 @@ describe('ExperienceList', () => {
       'https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad'
     );
     expect(mtuLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
-    expect(mtuLink).toHaveAttribute('data-tooltip-content', 'View online graduate degrees page');
+    expect(mtuLink).toHaveAttribute(
+      'data-tooltip-content',
+      'View Mathematical Sciences student directory page'
+    );
 
     expect(lucernaLink).toHaveAttribute('href', 'https://getlucerna.com');
     expect(lucernaLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
@@ -299,13 +332,37 @@ describe('ExperienceList', () => {
     expect(
       screen.getByRole('link', { name: 'Quasi-Newton Optimization with Hessian Samples' })
     ).toHaveAttribute('href', 'https://lnkd.in/gfP39wZX');
+    expect(
+      screen.getByRole('link', { name: 'Quasi-Newton Optimization with Hessian Samples' })
+    ).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
+    expect(
+      screen.getByRole('link', { name: 'Quasi-Newton Optimization with Hessian Samples' })
+    ).toHaveAttribute('data-tooltip-content', 'View article on arxiv.org');
+
     expect(screen.getByRole('link', { name: 'BlockOpt.jl' })).toHaveAttribute(
       'href',
       'https://github.com/danphenderson/BlockOpt.jl'
     );
+    expect(screen.getByRole('link', { name: 'BlockOpt.jl' })).toHaveAttribute(
+      'data-tooltip-id',
+      COMMON_LINK_TOOLTIP_ID
+    );
+    expect(screen.getByRole('link', { name: 'BlockOpt.jl' })).toHaveAttribute(
+      'data-tooltip-content',
+      'View Github repository'
+    );
+
     expect(screen.getByRole('link', { name: 'UncNLPrograms.jl' })).toHaveAttribute(
       'href',
       'https://github.com/danphenderson/UncNLPrograms.jl'
+    );
+    expect(screen.getByRole('link', { name: 'UncNLPrograms.jl' })).toHaveAttribute(
+      'data-tooltip-id',
+      COMMON_LINK_TOOLTIP_ID
+    );
+    expect(screen.getByRole('link', { name: 'UncNLPrograms.jl' })).toHaveAttribute(
+      'data-tooltip-content',
+      'View Github repository'
     );
     expect(screen.queryByText('Article')).not.toBeInTheDocument();
     expect(screen.queryByText('Zenodo DOI')).not.toBeInTheDocument();

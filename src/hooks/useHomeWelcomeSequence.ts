@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
 
+const CUSTOMIZE_AUTO_ADVANCE_DELAY_MS = 2250;
+
 type HomeWelcomeSequence = {
   error?: string;
   isHeroAnimationReady: boolean;
@@ -64,6 +66,21 @@ export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
     showSettingsHint,
     openCustomizeModal,
   ]);
+
+  /* Automatically advance the customize modal after the onboarding dwell time. */
+  useEffect(() => {
+    if (!showCustomizeModal) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      advanceToSettingsHint();
+    }, CUSTOMIZE_AUTO_ADVANCE_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [showCustomizeModal, advanceToSettingsHint]);
 
   const handleOptOut = () => {
     declineAudioConsent();

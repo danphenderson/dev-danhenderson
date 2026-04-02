@@ -31,6 +31,8 @@ export const CVEntryHeader = ({
 }: CVEntryHeaderProps) => {
   const {
     cvEntryTitleRowSx,
+    cvEntryTitleTextSx,
+    cvEntryDateRangeSx,
     cvEntryOrganizationRowSx,
     cvEntryChipGroupSx,
     cvEntryChipSx,
@@ -42,10 +44,14 @@ export const CVEntryHeader = ({
   return (
     <Stack spacing={0.75} width="100%">
       <Box sx={cvEntryTitleRowSx}>
-        <Text role="cardTitle" sx={minWidthResetSx}>
+        <Text role="cardTitle" sx={[cvEntryTitleTextSx, minWidthResetSx]}>
           {title}
         </Text>
-        {dateRange && <Text role="meta">{dateRange}</Text>}
+        {dateRange && (
+          <Text role="meta" sx={cvEntryDateRangeSx}>
+            {dateRange}
+          </Text>
+        )}
       </Box>
 
       <Box sx={cvEntryOrganizationRowSx}>

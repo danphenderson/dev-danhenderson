@@ -101,10 +101,16 @@ describe('useBlogData', () => {
     expect(result.current).not.toHaveProperty('status');
   });
 
-  it('returns stable references across re-renders', () => {
+  it('returns a stable static result across re-renders', () => {
     const { result, rerender } = renderHook(() => useBlogData());
-    const first = result.current.posts;
+
+    const first = result.current;
+
     rerender();
-    expect(result.current.posts).toBe(first);
+
+    expect(result.current).toBe(first);
+    expect(result.current.posts).toBe(first.posts);
+    expect(result.current.postMeta).toBe(first.postMeta);
+    expect(result.current.getRelatedPosts).toBe(first.getRelatedPosts);
   });
 });

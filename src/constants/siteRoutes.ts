@@ -2,7 +2,6 @@ import { cvBackgroundImage } from '../data/cv';
 import { fallbackBackgroundImage } from '../data/photography';
 import type { SharedDataSourceKind } from '../types/data';
 import { resolvePublicAssetPath } from '../utils/assets';
-import { isFeatureEnabled, type FeatureFlagId } from './featureFlags';
 
 export type SiteRouteId = 'home' | 'cv' | 'climbing' | 'photography' | 'blog' | 'not-found';
 
@@ -16,7 +15,6 @@ export type SiteRouteDefinition = {
   description: string;
   image: string;
   keywords: string[];
-  featureFlag?: FeatureFlagId;
   showInPrimaryNav?: boolean;
   action?: {
     description: string;
@@ -117,7 +115,6 @@ export const siteRouteMap: Record<SiteRouteId, SiteRouteDefinition> = {
     id: 'blog',
     label: 'Blog',
     path: '/blog',
-    featureFlag: 'blog',
     title: 'Blog | Daniel Henderson',
     description:
       'Technical writing on frontend architecture, React patterns, TypeScript, design systems, and software engineering.',
@@ -150,10 +147,7 @@ export const siteRouteMap: Record<SiteRouteId, SiteRouteDefinition> = {
   },
 };
 
-const isRouteEnabled = (route: SiteRouteDefinition) =>
-  !route.featureFlag || isFeatureEnabled(route.featureFlag);
-
-export const siteRoutes = Object.values(siteRouteMap).filter(isRouteEnabled);
+export const siteRoutes = Object.values(siteRouteMap);
 
 export const primaryNavigationRoutes = siteRoutes.filter((route) => route.showInPrimaryNav);
 

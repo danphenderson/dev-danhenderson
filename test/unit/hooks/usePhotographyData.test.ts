@@ -42,13 +42,41 @@ describe('usePhotographyData', () => {
     });
   });
 
-  it('returns stable reference across re-renders', () => {
+  it('derives album metadata and summary totals from the static category list', () => {
+    const { result } = renderHook(() => usePhotographyData());
+
+    expect(result.current.albumMeta).toEqual([
+      {
+        slug: 'landscape',
+        name: 'Landscape',
+        photoCount: 1,
+        uniqueLocations: [],
+        location: undefined,
+        dateRange: undefined,
+      },
+      {
+        slug: 'action',
+        name: 'Action',
+        photoCount: 1,
+        uniqueLocations: [],
+        location: undefined,
+        dateRange: undefined,
+      },
+    ]);
+    expect(result.current.totalPhotos).toBe(2);
+    expect(result.current.featuredCategory?.slug).toBe('landscape');
+  });
+
+  it('returns a stable static result across re-renders', () => {
     const { result, rerender } = renderHook(() => usePhotographyData());
-    const firstCategories = result.current.categories;
+
+    const first = result.current;
 
     rerender();
 
-    expect(result.current.categories).toBe(firstCategories);
+    expect(result.current).toBe(first);
+    expect(result.current.categories).toBe(first.categories);
+    expect(result.current.albumMeta).toBe(first.albumMeta);
   });
 
   it('does not expose async status metadata for bundled photography content', () => {

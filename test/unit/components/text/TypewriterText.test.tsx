@@ -1,6 +1,7 @@
 import { act, render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { TypewriterText } from '../../../../src/components/text/TypewriterText';
+import { PREFERENCE_STORAGE_KEYS } from '../../../../src/theme/preferences';
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <ThemeProvider>{children}</ThemeProvider>
@@ -20,6 +21,7 @@ describe('TypewriterText', () => {
     jest.clearAllTimers();
     jest.useRealTimers();
     jest.restoreAllMocks();
+    window.localStorage.removeItem(PREFERENCE_STORAGE_KEYS.motionIntensity);
   });
 
   it('types from empty to full text over time while exposing the full heading text accessibly', () => {
@@ -130,6 +132,16 @@ describe('TypewriterText', () => {
     const animatedText = getAnimatedTextNode(container);
 
     expect(animatedText).toHaveTextContent('');
+    expect(animatedText).not.toHaveTextContent('|');
+  });
+
+  it('renders complete text immediately when motion intensity is off', () => {
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.motionIntensity, 'off');
+
+    const { container } = render(<TypewriterText text="Instant" typingBaseMs={54} />, { wrapper });
+    const animatedText = getAnimatedTextNode(container);
+
+    expect(animatedText).toHaveTextContent('Instant');
     expect(animatedText).not.toHaveTextContent('|');
   });
 });

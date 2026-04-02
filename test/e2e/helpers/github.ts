@@ -2,7 +2,28 @@ import type { Page } from '@playwright/test';
 
 const GITHUB_API = 'https://api.github.com/**';
 
-/** Mock all GitHub API routes to return successful, deterministic responses. */
+const mockedRepoResponses = {
+  'danphenderson/BlockOpt.jl': {
+    id: 2,
+    name: 'BlockOpt.jl',
+    full_name: 'danphenderson/BlockOpt.jl',
+    html_url: 'https://github.com/danphenderson/BlockOpt.jl',
+    stargazers_count: 3,
+    fork: false,
+    archived: false,
+  },
+  'microsoft/playwright': {
+    id: 100,
+    name: 'playwright',
+    full_name: 'microsoft/playwright',
+    html_url: 'https://github.com/microsoft/playwright',
+    stargazers_count: 50000,
+    fork: false,
+    archived: false,
+  },
+} as const;
+
+/** Mock the GitHub request graph used by githubProfileData.ts. */
 export async function mockGitHubAPISuccess(page: Page) {
   await page.route('**/api.github.com/users/*/events/**', (route) =>
     route.fulfill({
@@ -36,33 +57,6 @@ export async function mockGitHubAPISuccess(page: Page) {
     })
   );
 
-  await page.route('**/api.github.com/users/*/repos**', (route) =>
-    route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify([
-        {
-          id: 1,
-          name: 'dev-danhenderson',
-          full_name: 'danphenderson/dev-danhenderson',
-          html_url: 'https://github.com/danphenderson/dev-danhenderson',
-          stargazers_count: 5,
-          fork: false,
-          archived: false,
-        },
-        {
-          id: 2,
-          name: 'BlockOpt.jl',
-          full_name: 'danphenderson/BlockOpt.jl',
-          html_url: 'https://github.com/danphenderson/BlockOpt.jl',
-          stargazers_count: 3,
-          fork: false,
-          archived: false,
-        },
-      ]),
-    })
-  );
-
   await page.route('**/api.github.com/search/issues**', (route) =>
     route.fulfill({
       status: 200,
@@ -78,21 +72,20 @@ export async function mockGitHubAPISuccess(page: Page) {
     })
   );
 
-  await page.route('**/api.github.com/repos/**', (route) =>
-    route.fulfill({
+  await page.route('**/api.github.com/repos/**', (route) => {
+    const repoName = new URL(route.request().url()).pathname.split('/repos/')[1];
+    const mockedRepo = mockedRepoResponses[repoName as keyof typeof mockedRepoResponses];
+
+    if (!mockedRepo) {
+      return route.fulfill({ status: 404, contentType: 'application/json', body: '{}' });
+    }
+
+    return route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({
-        id: 100,
-        name: 'playwright',
-        full_name: 'microsoft/playwright',
-        html_url: 'https://github.com/microsoft/playwright',
-        stargazers_count: 50000,
-        fork: false,
-        archived: false,
-      }),
-    })
-  );
+      body: JSON.stringify(mockedRepo),
+    });
+  });
 }
 
 /** Mock all GitHub API routes to return server errors so fallback content appears. */

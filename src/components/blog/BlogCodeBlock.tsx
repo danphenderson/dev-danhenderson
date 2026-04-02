@@ -4,6 +4,7 @@ import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
 import { Text } from '../text';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { renderHighlightedCode } from './blogSyntaxHighlight';
 
 type BlogCodeBlockProps = {
   language: string;
@@ -110,7 +111,9 @@ export function BlogCodeBlock({ language, code, filename, caption }: BlogCodeBlo
             },
           }}
         >
-          <Box component="code">{code}</Box>
+          <Box component="code" sx={{ display: 'block', whiteSpace: 'pre' }}>
+            {renderHighlightedCode(language, code)}
+          </Box>
         </Box>
       </Box>
 

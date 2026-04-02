@@ -4,9 +4,6 @@ import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
 const FEATURED_POST_TITLE = 'Fixing and Enforcing None-Type Drift with a Codemod';
 const FEATURED_POST_SLUG = 'fixing-and-enforcing-none-type-drift-with-a-codemod';
-const SECOND_POST_TITLE = 'React Performance Patterns Beyond React.memo';
-const SECOND_POST_SLUG = 'react-performance-patterns-beyond-memo';
-const THIRD_POST_TITLE = 'TypeScript Discriminated Unions for UI State Machines';
 const BLOG_NOT_FOUND_COPY =
   /This article does not exist or has been moved\. Use the command palette or recovery links below to navigate to another page\./;
 const INVALID_BLOG_SLUG_QUERY = 'nonexistent post';
@@ -14,15 +11,15 @@ const INVALID_BLOG_SLUG_QUERY = 'nonexistent post';
 const waitForBlogIndex = async (page: Page) => {
   const main = page.locator('main');
 
-  await expect(main.getByText('Blog').first()).toBeVisible();
-  await expect(
-    main.getByText(
-      'Technical writing on frontend architecture, React patterns, and software engineering.'
-    )
-  ).toBeVisible();
-  await expect(main.getByText(/\d+ articles?/)).toBeVisible();
-  await expect(main.getByRole('button', { name: 'All' })).toBeVisible();
-  await expect(main.getByText(FEATURED_POST_TITLE).first()).toBeVisible();
+  await waitForAnimatedSectionReadiness({
+    anchor: main.getByText(/\d+ articles?/),
+    readyLocators: [
+      main.getByText(/^Blog$/).first(),
+      main.getByRole('button', { name: 'All' }),
+      main.getByText('Featured Article'),
+      main.getByRole('link', { name: new RegExp(FEATURED_POST_TITLE) }).first(),
+    ],
+  });
 };
 
 const waitForBlogFallback = async (page: Page) => {
@@ -50,7 +47,7 @@ test.describe('Blog index page', () => {
 
     // Header content
     await expect(main.getByText('Blog').first()).toBeVisible();
-    await expect(main.getByText('3 articles')).toBeVisible();
+    await expect(main.getByText('1 article')).toBeVisible();
 
     // Featured article
     await expect(main.getByText(FEATURED_POST_TITLE).first()).toBeVisible();
@@ -58,12 +55,8 @@ test.describe('Blog index page', () => {
     // Tag filter
     await expect(main.getByRole('button', { name: 'All' })).toBeVisible();
 
-    // Recent articles heading
-    await expect(main.getByText('Recent Articles')).toBeVisible();
-
-    // Non-featured posts should be listed
-    await expect(main.getByText(SECOND_POST_TITLE)).toBeVisible();
-    await expect(main.getByText(THIRD_POST_TITLE)).toBeVisible();
+    // No non-featured posts — Recent Articles section should not render
+    await expect(main.getByText('Recent Articles')).toHaveCount(0);
   });
 
   test('filters posts by tag when a tag chip is clicked', async ({ page }) => {
@@ -72,36 +65,17 @@ test.describe('Blog index page', () => {
 
     const main = page.locator('main');
 
-    // Both non-featured posts visible initially
-    await expect(main.getByText(SECOND_POST_TITLE)).toBeVisible();
-    await expect(main.getByText(THIRD_POST_TITLE)).toBeVisible();
+    // Tag chips for the featured post's tags should be present
+    await expect(main.getByRole('button', { name: 'python (1)' })).toBeVisible();
 
-    // Click the "performance" tag — only the React Performance post includes it
-    await main.getByRole('button', { name: 'performance (1)' }).click();
-    await expect(main.getByText(FEATURED_POST_TITLE)).toHaveCount(0);
-    await expect(main.getByText(SECOND_POST_TITLE)).toBeVisible();
-    await expect(main.getByText(THIRD_POST_TITLE)).toHaveCount(0);
+    // Clicking a tag that matches the featured post keeps it visible
+    await main.getByRole('button', { name: 'python (1)' }).click();
+    await expect(page).toHaveURL(/\/blog$/);
+    await expect(main.getByText(FEATURED_POST_TITLE).first()).toBeVisible();
 
     // Click "All" to reset the filter
     await main.getByRole('button', { name: 'All' }).click();
-    await expect(main.getByText(SECOND_POST_TITLE)).toBeVisible();
-    await expect(main.getByText(THIRD_POST_TITLE)).toBeVisible();
-  });
-
-  test('filters from a post card tag chip without navigating to the article', async ({ page }) => {
-    await page.goto('/blog');
-    await waitForBlogIndex(page);
-
-    const main = page.locator('main');
-    const performancePostCard = main
-      .getByRole('link', { name: new RegExp(SECOND_POST_TITLE) })
-      .first();
-
-    await performancePostCard.getByRole('button', { name: 'performance' }).click();
-
-    await expect(page).toHaveURL(/\/blog$/);
-    await expect(main.getByText(SECOND_POST_TITLE)).toBeVisible();
-    await expect(main.getByText(THIRD_POST_TITLE)).toHaveCount(0);
+    await expect(main.getByText(FEATURED_POST_TITLE).first()).toBeVisible();
   });
 
   test('navigates from the featured article to the post detail', async ({ page }) => {
@@ -135,33 +109,28 @@ test.describe('Blog post detail page', () => {
       main.getByRole('heading', { name: 'The problem with None annotations in Python' })
     ).toBeVisible({ timeout: 15000 });
 
-    // Article navigation — scroll to the bottom to reach nav and related sections
+    // With only one post, article navigation and related articles must not render
     await page.evaluate(() =>
       window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' })
     );
-    await expect(main.getByText('Next')).toBeVisible({ timeout: 15000 });
-    await expect(main.getByRole('link', { name: /^Next/ })).toBeVisible();
-
-    // Related articles section
-    await expect(main.getByText('Related articles')).toBeVisible();
+    await expect(main.getByText('Next')).toHaveCount(0);
+    await expect(main.getByText('Previous')).toHaveCount(0);
+    await expect(main.getByText('Related articles')).toHaveCount(0);
   });
 
-  test('navigates between adjacent posts via article navigation', async ({ page }) => {
+  test('article navigation is absent when the blog contains a single post', async ({ page }) => {
     await page.goto(`/blog/${FEATURED_POST_SLUG}`);
 
     const main = page.locator('main');
 
-    // Navigate to next post
-    await main
-      .getByRole('link', { name: new RegExp(SECOND_POST_TITLE) })
-      .first()
-      .click();
-    await expect(page).toHaveURL(new RegExp(`/blog/${SECOND_POST_SLUG}$`));
-    await expect(page.getByRole('heading', { name: SECOND_POST_TITLE, level: 1 })).toBeVisible();
+    // Scroll to ensure any lazy-rendered navigation would have mounted
+    await page.evaluate(() =>
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'auto' })
+    );
 
-    // The second post should have both Previous and Next links
-    await expect(main.getByText('Previous')).toBeVisible();
-    await expect(main.getByText('Next')).toBeVisible();
+    // BlogArticleNav returns null when there is no prev/next post
+    await expect(main.getByText('Previous')).toHaveCount(0);
+    await expect(main.getByText('Next')).toHaveCount(0);
   });
 
   test('back to blog button returns to the blog index', async ({ page }) => {
@@ -169,15 +138,21 @@ test.describe('Blog post detail page', () => {
 
     await page.getByRole('link', { name: 'Back to blog' }).click();
     await expect(page).toHaveURL(/\/blog$/);
-    await expect(page.getByText('3 articles')).toBeVisible();
+    await waitForBlogIndex(page);
   });
 
-  test('renders a code block from the featured article', async ({ page }) => {
+  test('renders a syntax-highlighted code block from the featured article', async ({ page }) => {
     await page.goto(`/blog/${FEATURED_POST_SLUG}`);
 
-    const codeExample = page.getByText('def f(x: Optional[int] = None) -> Optional[str]:').first();
-    await codeExample.scrollIntoViewIfNeeded();
-    await expect(codeExample).toBeVisible();
+    const highlightedKeyword = page.locator('main [data-token-kind="keyword"]').filter({
+      hasText: 'def',
+    });
+    await expect(highlightedKeyword.first()).toBeVisible();
+
+    const highlightedType = page.locator('main [data-token-kind="type"]').filter({
+      hasText: 'Optional',
+    });
+    await expect(highlightedType.first()).toBeVisible();
   });
 
   test('renders inline code spans inside prose paragraphs', async ({ page }) => {
@@ -186,10 +161,19 @@ test.describe('Blog post detail page', () => {
     const unionCode = page.locator('main p code').filter({ hasText: 'Union[..., None]' }).first();
     await unionCode.scrollIntoViewIfNeeded();
     await expect(unionCode).toBeVisible();
+    await expect(
+      page.locator('main p code [data-token-kind="type"]').filter({ hasText: 'Union' }).first()
+    ).toBeVisible();
+    await expect(
+      page.locator('main p code [data-token-kind="constant"]').filter({ hasText: 'None' }).first()
+    ).toBeVisible();
 
     const pep604Code = page.locator('main p code').filter({ hasText: 'T | None' }).first();
     await pep604Code.scrollIntoViewIfNeeded();
     await expect(pep604Code).toBeVisible();
+    await expect(
+      pep604Code.locator('[data-token-kind="constant"]').filter({ hasText: 'None' })
+    ).toHaveCount(1);
   });
 
   test('shows recovery panel for an invalid blog slug', async ({ page }) => {
@@ -219,6 +203,6 @@ test.describe('Blog cross-route navigation', () => {
     await expect(blogLink).toBeVisible();
     await blogLink.click();
     await expect(page).toHaveURL(/\/blog$/);
-    await expect(page.getByText('3 articles')).toBeVisible();
+    await waitForBlogIndex(page);
   });
 });

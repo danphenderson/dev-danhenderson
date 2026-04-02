@@ -1,4 +1,3 @@
-import { useMemo, useCallback } from 'react';
 import { blogPosts } from '../data/blog';
 import type { BlogPost, BlogPostMeta } from '../types/blog';
 
@@ -18,71 +17,74 @@ function toMeta(post: BlogPost): BlogPostMeta {
   };
 }
 
-export function useBlogData() {
-  const posts = useMemo(
-    () => [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt)),
-    []
-  );
+const posts = [...blogPosts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 
-  const postMeta = useMemo(() => posts.map(toMeta), [posts]);
+const postMeta = posts.map(toMeta);
 
-  const featuredPost = useMemo(() => posts.find((p) => p.featured) ?? posts[0], [posts]);
+const featuredPost = posts.find((post) => post.featured) ?? posts[0];
 
-  const tags = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const post of posts) {
-      for (const tag of post.tags) {
-        counts.set(tag, (counts.get(tag) ?? 0) + 1);
-      }
+const tags = (() => {
+  const counts = new Map<string, number>();
+
+  for (const post of posts) {
+    for (const tag of post.tags) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
     }
-    return Array.from(counts.entries())
-      .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-      .map(([tag, count]) => ({ tag, count }));
-  }, [posts]);
+  }
 
-  const getPostBySlug = useCallback(
-    (slug: string): BlogPost | undefined => posts.find((p) => p.slug === slug),
-    [posts]
-  );
+  return Array.from(counts.entries())
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .map(([tag, count]) => ({ tag, count }));
+})();
 
-  const getRelatedPosts = useCallback(
-    (slug: string, limit = 3): BlogPostMeta[] => {
-      const current = posts.find((p) => p.slug === slug);
-      if (!current) return [];
+function getPostBySlug(slug: string): BlogPost | undefined {
+  return posts.find((post) => post.slug === slug);
+}
 
-      const scored = posts
-        .filter((p) => p.slug !== slug)
-        .map((p) => {
-          const shared = p.tags.filter((t) => current.tags.includes(t)).length;
-          return { post: p, score: shared };
-        })
-        .filter((entry) => entry.score > 0)
-        .sort((a, b) => b.score - a.score);
+function getRelatedPosts(slug: string, limit = 3): BlogPostMeta[] {
+  const current = getPostBySlug(slug);
 
-      return scored.slice(0, limit).map((entry) => toMeta(entry.post));
-    },
-    [posts]
-  );
+  if (!current) {
+    return [];
+  }
 
-  const getAdjacentPosts = useCallback(
-    (slug: string): { prev?: BlogPostMeta; next?: BlogPostMeta } => {
-      const index = posts.findIndex((p) => p.slug === slug);
-      if (index === -1) return {};
-      return {
-        prev: index > 0 ? toMeta(posts[index - 1]) : undefined,
-        next: index < posts.length - 1 ? toMeta(posts[index + 1]) : undefined,
-      };
-    },
-    [posts]
-  );
+  const currentTags = new Set(current.tags);
+
+  const scored = posts
+    .filter((post) => post.slug !== slug)
+    .map((post) => ({
+      post,
+      score: post.tags.filter((tag) => currentTags.has(tag)).length,
+    }))
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  return scored.slice(0, limit).map((entry) => toMeta(entry.post));
+}
+
+function getAdjacentPosts(slug: string): { prev?: BlogPostMeta; next?: BlogPostMeta } {
+  const index = posts.findIndex((post) => post.slug === slug);
+
+  if (index === -1) {
+    return {};
+  }
 
   return {
-    posts,
-    postMeta,
-    featuredPost,
-    tags,
-    getPostBySlug,
-    getRelatedPosts,
-    getAdjacentPosts,
+    prev: index > 0 ? toMeta(posts[index - 1]) : undefined,
+    next: index < posts.length - 1 ? toMeta(posts[index + 1]) : undefined,
   };
+}
+
+const blogData = {
+  posts,
+  postMeta,
+  featuredPost,
+  tags,
+  getPostBySlug,
+  getRelatedPosts,
+  getAdjacentPosts,
+};
+
+export function useBlogData() {
+  return blogData;
 }

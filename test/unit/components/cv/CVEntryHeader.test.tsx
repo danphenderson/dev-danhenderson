@@ -11,7 +11,7 @@ describe('CVEntryHeader', () => {
           title="Graduate Research Assistant"
           organization="Michigan Technological University"
           organizationUrl="https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad"
-          organizationTooltip="View online graduate degrees page"
+          organizationTooltip="View Mathematical Sciences student directory"
           dateRange="May 2025 – Current"
         />
       </ThemeProvider>
@@ -28,7 +28,7 @@ describe('CVEntryHeader', () => {
     expect(organizationLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
     expect(organizationLink).toHaveAttribute(
       'data-tooltip-content',
-      'View online graduate degrees page'
+      'View Mathematical Sciences student directory'
     );
     expect(organizationLink).toHaveAttribute('data-tooltip-place', 'top');
   });

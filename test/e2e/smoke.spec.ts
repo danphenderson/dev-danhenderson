@@ -1,12 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { test, expect, type Locator, type Page } from '@playwright/test';
+import { waitForClimbingContent } from './helpers/climbing';
 import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
 /**
  * Production smoke suite.
  *
- * Validates that all non-gated routes render, blog routes are blocked,
+ * Validates that core public routes render,
  * and SPA direct-link routing works against the production build output.
  */
 
@@ -39,11 +40,7 @@ test.describe('Production smoke', () => {
   test('production footer scorecard shows stamped build metadata', async ({ page }) => {
     await page.goto('/climbing');
 
-    const main = page.locator('#main-content');
-    await waitForAnimatedSectionReadiness({
-      anchor: main.getByRole('heading', { name: 'Overview' }),
-      readyLocators: [main.getByRole('grid').first()],
-    });
+    await waitForClimbingContent(page);
 
     const scorecardTrigger = page.getByRole('button', { name: 'Open performance scorecard' });
     await scorecardTrigger.scrollIntoViewIfNeeded();
@@ -75,19 +72,16 @@ test.describe('Production smoke', () => {
     await page.goto('/climbing');
 
     const main = page.locator('#main-content');
-    await waitForAnimatedSectionReadiness({
-      anchor: main.getByRole('heading', { name: 'Overview' }),
-      readyLocators: [main.getByRole('grid').first()],
-    });
+    await waitForClimbingContent(page);
 
-    await expect(main.getByRole('heading', { name: 'Overview' })).toBeVisible();
+    await expect(main.getByText('Routes Climbed', { exact: true })).toBeVisible();
   });
 
   test('/photography loads album cards', async ({ page }) => {
     await page.goto('/photography');
 
     await waitForAnimatedSectionReadiness({
-      anchor: page.getByText('A selection of field work, climbing days, and stargazing nights.'),
+      anchor: page.getByText('A collection of photo albums.'),
       readyLocators: [page.getByText('4 albums')],
     });
 
@@ -96,27 +90,30 @@ test.describe('Production smoke', () => {
     await expect(page.getByRole('heading', { name: 'Astronomy' })).toBeVisible();
   });
 
-  test('/blog is not routable in production', async ({ page }) => {
+  test('/blog loads in production', async ({ page }) => {
     await page.goto('/blog');
 
     const main = page.locator('#main-content');
-    await expect(main.getByRole('heading', { name: '404 Not Found' })).toBeVisible();
+    await expect(main.getByText('Blog').first()).toBeVisible();
+    await expect(main.getByText('1 article')).toBeVisible();
   });
 
-  test('/blog/:slug is not routable in production', async ({ page }) => {
-    await page.goto('/blog/any-slug');
+  test('/blog/:slug loads in production', async ({ page }) => {
+    await page.goto('/blog/fixing-and-enforcing-none-type-drift-with-a-codemod');
 
     const main = page.locator('#main-content');
-    await expect(main.getByRole('heading', { name: '404 Not Found' })).toBeVisible();
+    await expect(
+      main.getByRole('heading', { name: 'Fixing and Enforcing None-Type Drift with a Codemod' })
+    ).toBeVisible();
   });
 
-  test('header does not show Blog link in production', async ({ page }) => {
+  test('header shows Blog link in production', async ({ page }) => {
     await page.goto('/climbing');
 
     await expect(page.locator('#main-content')).toBeVisible();
 
     await expect(page.getByRole('link', { name: 'CV' }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Blog' })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Blog' }).first()).toBeVisible();
   });
 
   test('unknown routes render recovery panel', async ({ page }) => {

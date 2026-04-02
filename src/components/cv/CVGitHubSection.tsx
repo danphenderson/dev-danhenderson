@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Box, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { GitHubActivityItem, GitHubContribution } from '../../types/cv';
+import type { AnimatedContentCardEntranceDirection } from '../../types/ui';
 import { githubUsername } from '../../data/cv';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { CVSectionCard } from './CVSectionCard';
@@ -19,6 +20,7 @@ type CVGitHubSectionProps = {
   contributions: GitHubContribution[];
   loading: boolean;
   error?: string | null;
+  entranceDirection?: AnimatedContentCardEntranceDirection;
   revealed?: boolean;
   onReveal?: () => void;
   calendarSettled?: boolean;
@@ -37,6 +39,7 @@ export const CVGitHubSection = ({
   contributions,
   loading,
   error,
+  entranceDirection,
   revealed = false,
   onReveal,
   calendarSettled = false,
@@ -87,6 +90,7 @@ export const CVGitHubSection = ({
   return (
     <CVSectionCard
       delayMs={sectionDelayMs}
+      entranceDirection={entranceDirection}
       skipEntranceAnimation={revealed}
       onVisible={onReveal}
       id={sectionId}

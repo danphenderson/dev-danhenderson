@@ -1,12 +1,20 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import useScrollTrigger from '@mui/material/useScrollTrigger';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
 import CV from '../../../src/pages/CV';
 
-jest.mock('@mui/material/useMediaQuery', () => jest.fn());
+jest.mock('@mui/material/useMediaQuery', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+jest.mock('@mui/material/useScrollTrigger', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
 
 jest.mock('../../../src/hooks/useGithubProfile', () => ({
   useGithubProfile: () => ({
@@ -130,11 +138,19 @@ jest.mock('../../../src/components/layout/PageFrame', () => ({
   PageFrame: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
-jest.mock('../../../src/motion', () => ({
-  MotionSection: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}));
+jest.mock('../../../src/motion', () => {
+  const actualMotion = jest.requireActual(
+    '../../../src/motion'
+  ) as typeof import('../../../src/motion');
+
+  return {
+    ...actualMotion,
+    MotionSection: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  };
+});
 
 const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQuery>;
+const mockUseScrollTrigger = useScrollTrigger as jest.MockedFunction<typeof useScrollTrigger>;
 
 describe('CV reveal persistence across responsive remounts', () => {
   const renderCV = () =>
@@ -148,6 +164,7 @@ describe('CV reveal persistence across responsive remounts', () => {
 
   beforeEach(() => {
     mockUseMediaQuery.mockReturnValue(false);
+    mockUseScrollTrigger.mockReturnValue(true);
   });
 
   afterEach(() => {

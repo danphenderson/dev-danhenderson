@@ -48,7 +48,7 @@ const asMargin = (m: string) =>
   m as Parameters<typeof useInView>[1] extends { margin?: infer M } ? M : never;
 
 const useMotionInView = <Element extends HTMLElement>(
-  ref: RefObject<Element>,
+  ref: RefObject<Element | null>,
   rootMargin: string,
   once: boolean,
   threshold?: number
@@ -58,6 +58,25 @@ const useMotionInView = <Element extends HTMLElement>(
     margin: asMargin(rootMargin),
     amount: threshold || undefined,
   });
+
+type ViewportAnimationState = 'hidden' | 'visible' | 'exit';
+
+const useViewportAnimateTarget = (
+  isInView: boolean,
+  exitOnLeave: boolean
+): ViewportAnimationState => {
+  const hasBeenInViewRef = useRef(false);
+
+  if (isInView) {
+    hasBeenInViewRef.current = true;
+  }
+
+  return exitOnLeave && hasBeenInViewRef.current && !isInView
+    ? 'exit'
+    : isInView
+      ? 'visible'
+      : 'hidden';
+};
 
 /* ------------------------------------------------------------------ */
 /*  MotionSection                                                     */
@@ -73,6 +92,8 @@ interface MotionSectionProps extends Omit<HTMLMotionProps<'div'>, 'variants'> {
   threshold?: number;
   /** Play animation only once (default true). */
   once?: boolean;
+  /** Animate to the shared `exit` variant after leaving the viewport. */
+  exitOnLeave?: boolean;
 }
 
 /**
@@ -87,10 +108,12 @@ export const MotionSection = ({
   rootMargin = '0px 0px -12% 0px',
   threshold = 0,
   once = true,
+  exitOnLeave = false,
   ...rest
 }: MotionSectionProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useMotionInView(ref, rootMargin, once, threshold);
+  const animateTarget = useViewportAnimateTarget(isInView, exitOnLeave);
   const { duration: dFactor } = useMotionScale();
   const scaledVariants = useMemo(
     () => scaleVariantDurations(variants, dFactor),
@@ -105,7 +128,7 @@ export const MotionSection = ({
     <motion.div
       ref={ref}
       initial="hidden"
-      animate={isInView ? 'visible' : 'hidden'}
+      animate={animateTarget}
       variants={scaledVariants}
       {...rest}
     >
@@ -126,6 +149,8 @@ interface StaggerChildrenProps extends Omit<HTMLMotionProps<'div'>, 'variants'> 
   rootMargin?: string;
   /** Play animation only once (default true). */
   once?: boolean;
+  /** Animate children to their shared `exit` variant after leaving the viewport. */
+  exitOnLeave?: boolean;
 }
 
 /**
@@ -140,12 +165,14 @@ export const StaggerChildren = ({
   containerVariants = staggerContainer,
   rootMargin = '0px 0px -8% 0px',
   once = true,
+  exitOnLeave = false,
   initial,
   animate,
   ...rest
 }: StaggerChildrenProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useMotionInView(ref, rootMargin, once);
+  const animateTarget = useViewportAnimateTarget(isInView, exitOnLeave);
   const { duration: dFactor, stagger: sFactor } = useMotionScale();
 
   const scaledVariants = useMemo(() => {
@@ -180,7 +207,7 @@ export const StaggerChildren = ({
     <motion.div
       ref={ref}
       initial={initial ?? 'hidden'}
-      animate={animate ?? (isInView ? 'visible' : 'hidden')}
+      animate={animate ?? animateTarget}
       variants={scaledVariants}
       {...rest}
     >
@@ -283,6 +310,8 @@ interface MotionFadeInProps extends Omit<HTMLMotionProps<'div'>, 'variants'> {
   children: ReactNode;
   rootMargin?: string;
   once?: boolean;
+  /** Animate to the shared `exit` variant after leaving the viewport. */
+  exitOnLeave?: boolean;
 }
 
 /** Minimal scroll-triggered fade-in (no spatial transform). */
@@ -290,10 +319,12 @@ export const MotionFadeIn = ({
   children,
   rootMargin = '0px 0px -8% 0px',
   once = true,
+  exitOnLeave = false,
   ...rest
 }: MotionFadeInProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useMotionInView(ref, rootMargin, once);
+  const animateTarget = useViewportAnimateTarget(isInView, exitOnLeave);
   const { duration: dFactor } = useMotionScale();
   const scaledVariants = useMemo(() => scaleVariantDurations(fadeIn, dFactor), [dFactor]);
 
@@ -305,7 +336,7 @@ export const MotionFadeIn = ({
     <motion.div
       ref={ref}
       initial="hidden"
-      animate={isInView ? 'visible' : 'hidden'}
+      animate={animateTarget}
       variants={scaledVariants}
       {...rest}
     >
@@ -322,6 +353,8 @@ interface MotionScaleInProps extends Omit<HTMLMotionProps<'div'>, 'variants'> {
   children: ReactNode;
   rootMargin?: string;
   once?: boolean;
+  /** Animate to the shared `exit` variant after leaving the viewport. */
+  exitOnLeave?: boolean;
 }
 
 /** Scroll-triggered scale + fade entrance. */
@@ -329,10 +362,12 @@ export const MotionScaleIn = ({
   children,
   rootMargin = '0px 0px -8% 0px',
   once = true,
+  exitOnLeave = false,
   ...rest
 }: MotionScaleInProps) => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useMotionInView(ref, rootMargin, once);
+  const animateTarget = useViewportAnimateTarget(isInView, exitOnLeave);
   const { duration: dFactor } = useMotionScale();
   const scaledVariants = useMemo(() => scaleVariantDurations(scaleIn, dFactor), [dFactor]);
 
@@ -344,7 +379,7 @@ export const MotionScaleIn = ({
     <motion.div
       ref={ref}
       initial="hidden"
-      animate={isInView ? 'visible' : 'hidden'}
+      animate={animateTarget}
       variants={scaledVariants}
       {...rest}
     >

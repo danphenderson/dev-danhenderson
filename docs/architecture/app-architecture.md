@@ -76,12 +76,10 @@ flowchart LR
   Router --> Climbing["/climbing → Climbing"]
   Router --> Photography["/photography → Photography"]
   Router --> PhotographyCat["/photography/:slug → PhotographyCategory"]
-  Router --> Blog["/blog → Blog 🏴"]
-  Router --> BlogPost["/blog/:slug → BlogPost 🏴"]
+  Router --> Blog["/blog → Blog"]
+  Router --> BlogPost["/blog/:slug → BlogPost"]
   Router --> NotFound["/* → NotFound"]
 ```
-
-🏴 = feature-gated via `isFeatureEnabled('blog')` — enabled in development/test, disabled in production.
 
 ### Route metadata
 
@@ -90,14 +88,13 @@ Route definitions live in `src/constants/siteRoutes.ts` as `siteRouteMap`. Each 
 - `path`, `label`, `title`, `description` — used by navigation, SEO head tags, and command palette
 - `image` — OG image reference
 - `keywords` — SEO and command palette search targets
-- `featureFlag` — optional gating (only `blog` currently)
 - `showInPrimaryNav` — whether to show in header navigation
 - `action` — command palette entry with `recoveryPriority` for not-found suggestions
 - `status` — data source kind (static, remote with fallback)
 
-Filtered exports:
+Derived exports:
 
-- `siteRoutes` — all routes with active feature flags
+- `siteRoutes` — all route definitions
 - `primaryNavigationRoutes` — routes with `showInPrimaryNav: true`
 
 ## Page composition model
@@ -157,31 +154,13 @@ Pages own orchestration state. Shared components are intentionally stateless or 
 | Audio prompt flow             | `useHomeWelcomeSequence()` hook            | Page (consumes)                        |
 | Search/filter state           | Page-local state                           | Data hooks (return full datasets)      |
 
-## Feature gating
+## Runtime environment helpers
 
-`src/constants/featureFlags.ts` provides the feature flag system:
+`src/constants/runtimeEnvironment.ts` resolves the app runtime environment from `REACT_APP_RUNTIME_ENV` and `NODE_ENV`.
 
-```mermaid
-stateDiagram-v2
-  [*] --> ResolveFlagEnv: isFeatureEnabled(flagId)
-  ResolveFlagEnv --> CheckEnv: Read REACT_APP_RUNTIME_ENV<br/>fallback to NODE_ENV
-  CheckEnv --> Enabled: Flag's enabledIn includes runtime env
-  CheckEnv --> Disabled: Flag's enabledIn excludes runtime env
-
-  state Enabled {
-    [*] --> RouteRendered: Route JSX present
-    RouteRendered --> NavVisible: Navigation entry shown
-    NavVisible --> CommandPalette: Command palette entries active
-  }
-
-  state Disabled {
-    [*] --> RouteOmitted: Route JSX absent
-    RouteOmitted --> NavHidden: Navigation entry removed
-    NavHidden --> FallsToNotFound: Path falls through to /* catch-all
-  }
-```
-
-Currently only `blog` is feature-gated. Blog routes, navigation entries, and command palette actions are fully removed when the flag is off.
+- `resolveAppRuntimeEnvironment()` returns `development`, `test`, or `production`
+- `appRuntimeEnvironment` exposes the resolved value for modules that need it
+- Current route exposure is public; the runtime helper is used for environment-sensitive client behavior such as development-only welcome-sequence reset logic
 
 ## Cross-cutting concerns
 

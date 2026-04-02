@@ -25,7 +25,7 @@ export type AnimatedControlledListEntry<Item> = {
   index: number;
   key: string;
   isEntered: boolean;
-  nodeRef: RefObject<HTMLElement>;
+  nodeRef: RefObject<HTMLElement | null>;
 };
 
 export const useControlledAnimatedList = <Item>({
@@ -45,7 +45,7 @@ export const useControlledAnimatedList = <Item>({
   const [enteredKeys, setEnteredKeys] = useState<Set<string>>(() => new Set());
   const enterTimerIdsRef = useRef<number[]>([]);
   const latestItemKeysRef = useRef<string[]>([]);
-  const nodeRefs = useRef(new Map<string, RefObject<HTMLElement>>());
+  const nodeRefs = useRef(new Map<string, RefObject<HTMLElement | null>>());
   const resolvedStartDelayMs = Math.round(scaleStagger(startDelayMs, staggerFactor));
   const resolvedItemStaggerMs = Math.round(
     scaleStagger(itemStaggerMs ?? motionTokens.itemStaggerMs, staggerFactor)

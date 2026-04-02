@@ -1,4 +1,3 @@
-import { useMemo } from 'react';
 import { Link as RouterLink, useLocation, useParams } from 'react-router-dom';
 import { Button, Stack } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -17,7 +16,12 @@ import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useBlogData } from '../hooks/useBlogData';
 import { useAppStyles } from '../styles/appStyles';
 import { Text } from '../components/text';
-import { MotionSection } from '../motion';
+import { MotionSection, MotionTiltCard } from '../motion';
+
+const recoveryActions = recoveryRouteActions.map((action) => ({
+  ...action,
+  routeStatusLabel: siteRouteMap[action.routeId].status?.label,
+}));
 
 export default function BlogPost() {
   const appStyles = useAppStyles();
@@ -26,17 +30,9 @@ export default function BlogPost() {
   const { getPostBySlug, getRelatedPosts, getAdjacentPosts } = useBlogData();
 
   const post = slug ? getPostBySlug(slug) : undefined;
-  const related = useMemo(() => (slug ? getRelatedPosts(slug, 3) : []), [slug, getRelatedPosts]);
-  const adjacent = useMemo(() => (slug ? getAdjacentPosts(slug) : {}), [slug, getAdjacentPosts]);
-  const recoveryContext = useMemo(() => getRecoveryContext(location.pathname), [location.pathname]);
-  const recoveryActions = useMemo(
-    () =>
-      recoveryRouteActions.map((action) => ({
-        ...action,
-        routeStatusLabel: siteRouteMap[action.routeId].status?.label,
-      })),
-    []
-  );
+  const related = slug ? getRelatedPosts(slug, 3) : [];
+  const adjacent = slug ? getAdjacentPosts(slug) : {};
+  const recoveryContext = getRecoveryContext(location.pathname);
 
   useDocumentMetadata(
     post
@@ -62,17 +58,19 @@ export default function BlogPost() {
     <PageFrame image={backgroundImage}>
       <Stack spacing={3}>
         <MotionSection>
-          <SectionCard delayMs={0} triggerOnView={false}>
-            <Button
-              component={RouterLink}
-              to="/blog"
-              startIcon={<ArrowBackIcon />}
-              size="small"
-              sx={appStyles.inlineStartSx}
-            >
-              Back to blog
-            </Button>
-          </SectionCard>
+          <MotionTiltCard intensity={0.5}>
+            <SectionCard delayMs={0} triggerOnView={false}>
+              <Button
+                component={RouterLink}
+                to="/blog"
+                startIcon={<ArrowBackIcon />}
+                size="small"
+                sx={appStyles.inlineStartSx}
+              >
+                Back to blog
+              </Button>
+            </SectionCard>
+          </MotionTiltCard>
         </MotionSection>
 
         {post ? (
@@ -89,28 +87,26 @@ export default function BlogPost() {
             <BlogRelatedPosts posts={related} />
           </>
         ) : (
-          <MotionSection>
-            <SectionCard>
-              <Stack spacing={2.5}>
-                <SectionHeading
-                  overline="Blog"
-                  title="Post not found"
-                  sx={{ maxWidth: { md: 760 } }}
-                />
-                <Text role="bodyMuted">
-                  This article does not exist or has been moved. Use the command palette or recovery
-                  links below to navigate to another page.
-                </Text>
-                <RouteRecoveryPanel
-                  attemptedPathLabel={recoveryContext.attemptedPathLabel}
-                  routeHintLabel={recoveryContext.routeHintLabel}
-                  contextualSuggestions={recoveryContext.contextualSuggestions}
-                  recoveryActions={recoveryActions}
-                  suggestedPaletteQuery={recoveryContext.suggestedPaletteQuery}
-                />
-              </Stack>
-            </SectionCard>
-          </MotionSection>
+          <SectionCard delayMs={0} triggerOnView={false} skipEntranceAnimation>
+            <Stack spacing={2.5}>
+              <SectionHeading
+                overline="Blog"
+                title="Post not found"
+                sx={{ maxWidth: { md: 760 } }}
+              />
+              <Text role="bodyMuted">
+                This article does not exist or has been moved. Use the command palette or recovery
+                links below to navigate to another page.
+              </Text>
+              <RouteRecoveryPanel
+                attemptedPathLabel={recoveryContext.attemptedPathLabel}
+                routeHintLabel={recoveryContext.routeHintLabel}
+                contextualSuggestions={recoveryContext.contextualSuggestions}
+                recoveryActions={recoveryActions}
+                suggestedPaletteQuery={recoveryContext.suggestedPaletteQuery}
+              />
+            </Stack>
+          </SectionCard>
         )}
       </Stack>
     </PageFrame>

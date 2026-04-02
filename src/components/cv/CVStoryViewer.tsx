@@ -28,6 +28,8 @@ const kindLabel: Record<CVStoryItem['kind'], string> = {
 const getInitialActiveKind = (items: CVStoryItem[]): CVStoryItem['kind'] =>
   items[0]?.kind ?? 'about';
 
+const getInitialRevealIndex = (items: CVStoryItem[]): number => (items.length > 0 ? 0 : -1);
+
 const getActiveStoryIndex = (items: CVStoryItem[], visibleIndices: Set<number>): number | null => {
   let nextActiveIndex: number | null = null;
 
@@ -73,8 +75,17 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
   const [activeKind, setActiveKind] = useState<CVStoryItem['kind']>(() =>
     getInitialActiveKind(items)
   );
+  const [requestedRevealIndex, setRequestedRevealIndex] = useState<number>(() =>
+    getInitialRevealIndex(items)
+  );
+  const [revealedThroughIndex, setRevealedThroughIndex] = useState<number>(() =>
+    getInitialRevealIndex(items)
+  );
+  const [settledThroughIndex, setSettledThroughIndex] = useState(-1);
+  const [isRevealQueueBypassed, setIsRevealQueueBypassed] = useState(false);
   const sectionRefs = useRef<Map<number, HTMLDivElement>>(new Map());
-  const visibleSectionIndicesRef = useRef<Set<number>>(new Set());
+  const revealedThroughIndexRef = useRef(getInitialRevealIndex(items));
+  const rawVisibleSectionIndicesRef = useRef<Set<number>>(new Set());
 
   // Track scroll progress
   const handleScroll = useCallback(() => {
@@ -86,7 +97,15 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
   }, []);
 
   const updateActiveKindFromVisibleSections = useCallback(() => {
-    const nextActiveIndex = getActiveStoryIndex(items, visibleSectionIndicesRef.current);
+    const revealedVisibleIndices = new Set<number>();
+
+    rawVisibleSectionIndicesRef.current.forEach((index) => {
+      if (index <= revealedThroughIndexRef.current && items[index]) {
+        revealedVisibleIndices.add(index);
+      }
+    });
+
+    const nextActiveIndex = getActiveStoryIndex(items, revealedVisibleIndices);
 
     if (nextActiveIndex === null) {
       return;
@@ -96,22 +115,77 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
     setActiveKind((currentKind) => (currentKind === nextKind ? currentKind : nextKind));
   }, [items]);
 
+  const handleSectionSettled = useCallback((index: number) => {
+    setSettledThroughIndex((currentIndex) => (index > currentIndex ? index : currentIndex));
+  }, []);
+
   useEffect(() => {
-    visibleSectionIndicesRef.current.clear();
+    rawVisibleSectionIndicesRef.current.clear();
+    revealedThroughIndexRef.current = getInitialRevealIndex(items);
     setActiveKind(getInitialActiveKind(items));
+    setRequestedRevealIndex(getInitialRevealIndex(items));
+    setRevealedThroughIndex(getInitialRevealIndex(items));
+    setSettledThroughIndex(-1);
+    setIsRevealQueueBypassed(false);
   }, [items]);
+
+  useEffect(() => {
+    revealedThroughIndexRef.current = revealedThroughIndex;
+    updateActiveKindFromVisibleSections();
+  }, [revealedThroughIndex, updateActiveKindFromVisibleSections]);
+
+  useEffect(() => {
+    if (revealedThroughIndex < 0) {
+      return;
+    }
+
+    if (requestedRevealIndex <= revealedThroughIndex) {
+      return;
+    }
+
+    const nextRequestedRevealIndex = Math.min(requestedRevealIndex, items.length - 1);
+    const hasOutpacedRevealQueue = nextRequestedRevealIndex > settledThroughIndex + 1;
+
+    if (isRevealQueueBypassed || hasOutpacedRevealQueue) {
+      if (!isRevealQueueBypassed) {
+        setIsRevealQueueBypassed(true);
+      }
+
+      setRevealedThroughIndex((currentIndex) =>
+        nextRequestedRevealIndex > currentIndex ? nextRequestedRevealIndex : currentIndex
+      );
+      return;
+    }
+
+    if (revealedThroughIndex >= items.length - 1) {
+      return;
+    }
+
+    if (settledThroughIndex < revealedThroughIndex) {
+      return;
+    }
+
+    setRevealedThroughIndex(revealedThroughIndex + 1);
+  }, [
+    items.length,
+    isRevealQueueBypassed,
+    requestedRevealIndex,
+    revealedThroughIndex,
+    settledThroughIndex,
+  ]);
 
   // Track which section is active based on scroll position
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
 
-    const visibleSectionIndices = visibleSectionIndicesRef.current;
-    visibleSectionIndices.clear();
+    const rawVisibleSectionIndices = rawVisibleSectionIndicesRef.current;
+    rawVisibleSectionIndices.clear();
 
     const observer = new IntersectionObserver(
       (entries) => {
         let shouldResolveActiveKind = false;
+        let highestRequestedIndex = -1;
 
         for (const entry of entries) {
           const index = Number(entry.target.getAttribute('data-story-index'));
@@ -123,10 +197,19 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
           shouldResolveActiveKind = true;
 
           if (entry.isIntersecting) {
-            visibleSectionIndices.add(index);
+            rawVisibleSectionIndices.add(index);
+            if (index > highestRequestedIndex) {
+              highestRequestedIndex = index;
+            }
           } else {
-            visibleSectionIndices.delete(index);
+            rawVisibleSectionIndices.delete(index);
           }
+        }
+
+        if (highestRequestedIndex >= 0) {
+          setRequestedRevealIndex((currentIndex) =>
+            highestRequestedIndex > currentIndex ? highestRequestedIndex : currentIndex
+          );
         }
 
         if (shouldResolveActiveKind) {
@@ -142,7 +225,7 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
 
     return () => {
       observer.disconnect();
-      visibleSectionIndices.clear();
+      rawVisibleSectionIndices.clear();
     };
   }, [items, updateActiveKindFromVisibleSections]);
 
@@ -259,7 +342,12 @@ export const CVStoryViewer = ({ items, onExit }: CVStoryViewerProps) => {
               data-story-index={index}
               sx={{ mb: { xs: 6, sm: 8 } }}
             >
-              <CVStorySectionRenderer item={item} index={index} scrollContainerRef={scrollRef} />
+              <CVStorySectionRenderer
+                item={item}
+                index={index}
+                isRevealed={index <= revealedThroughIndex}
+                onSectionSettled={() => handleSectionSettled(index)}
+              />
             </Box>
           ))}
 

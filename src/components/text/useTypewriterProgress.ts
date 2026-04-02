@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useMotionScale } from '../../motion';
 
 const COMMON_PAIRS = new Set([
   'th',
@@ -159,37 +160,52 @@ export const useTypewriterProgress = ({
   timingPreset = 'default',
   typingBaseMs,
 }: UseTypewriterProgressOptions): UseTypewriterProgressResult => {
+  const { duration: durationScale } = useMotionScale();
   const resolvedTimingProfile = React.useMemo(
     () => resolveTypewriterTimingProfile(timingPreset, typingBaseMs),
     [timingPreset, typingBaseMs]
   );
   const [charIndex, setCharIndex] = React.useState(0);
+  const isInstantReveal = playing && durationScale === 0;
+  const renderedCharIndex = isInstantReveal ? text.length : charIndex;
 
   React.useEffect(() => {
     setCharIndex(0);
   }, [text]);
 
   React.useEffect(() => {
+    if (!isInstantReveal || charIndex === text.length) {
+      return;
+    }
+
+    setCharIndex(text.length);
+  }, [charIndex, isInstantReveal, text.length]);
+
+  React.useEffect(() => {
     if (!playing) return undefined;
+    if (durationScale === 0) return undefined;
     if (charIndex >= text.length) return undefined;
 
     const timeoutId = window.setTimeout(
       () => {
         setCharIndex((currentIndex) => Math.min(currentIndex + 1, text.length));
       },
-      getTypewriterDelay(text, charIndex, resolvedTimingProfile)
+      Math.max(
+        1,
+        Math.round(getTypewriterDelay(text, charIndex, resolvedTimingProfile) * durationScale)
+      )
     );
 
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [charIndex, playing, resolvedTimingProfile, text]);
+  }, [charIndex, durationScale, playing, resolvedTimingProfile, text]);
 
   return {
-    charIndex,
-    visibleText: text.slice(0, charIndex),
-    isComplete: charIndex >= text.length,
-    showCursor: playing && charIndex < text.length,
+    charIndex: renderedCharIndex,
+    visibleText: text.slice(0, renderedCharIndex),
+    isComplete: renderedCharIndex >= text.length,
+    showCursor: playing && renderedCharIndex < text.length,
     resolvedTimingProfile,
   };
 };

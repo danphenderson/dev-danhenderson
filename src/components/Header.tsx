@@ -60,8 +60,9 @@ export default function Header() {
   const muiTheme = useMuiTheme();
   const location = useLocation();
   const { isPlaying, pause, play, audioConsent } = useWelcomeAudio();
-  const { onboardingCompleted } = useWelcomeOnboarding();
+  const { onboardingCompleted, showSettingsHint } = useWelcomeOnboarding();
   const path = location.pathname.toLowerCase();
+  const highlightSettingsTrigger = path === '/' && showSettingsHint;
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const iconButtonSize = isMobile ? 'medium' : ('large' as const);
   const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState<null | HTMLElement>(null);
@@ -123,6 +124,7 @@ export default function Header() {
                 showAudioControl={audioConsent === 'granted' || onboardingCompleted}
                 isPlaying={isPlaying}
                 onToggleAudio={handleAudioToggle}
+                highlightSettingsTrigger={highlightSettingsTrigger}
               />
             </Box>
           </Toolbar>

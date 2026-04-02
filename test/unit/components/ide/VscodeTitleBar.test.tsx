@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { VscodeTitleBar } from '../../../../src/components/ide/VscodeTitleBar';
 
@@ -24,6 +24,21 @@ describe('VscodeTitleBar', () => {
     expect(screen.getByLabelText('Close window')).toBeInTheDocument();
     expect(screen.getByLabelText('Minimize window')).toBeInTheDocument();
     expect(screen.getByLabelText('Expand window')).toBeInTheDocument();
+  });
+
+  it('shows hover tooltips for each traffic dot action', async () => {
+    renderTitleBar();
+
+    const actions = ['Close window', 'Minimize window', 'Expand window'] as const;
+
+    for (const action of actions) {
+      const dot = screen.getByLabelText(action);
+
+      fireEvent.mouseOver(dot);
+      expect(await screen.findByRole('tooltip')).toHaveTextContent(action);
+      fireEvent.mouseLeave(dot);
+      await waitFor(() => expect(screen.queryByRole('tooltip')).not.toBeInTheDocument());
+    }
   });
 
   it('renders the auxiliary controls by default', () => {

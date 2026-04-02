@@ -3,7 +3,7 @@ import { Box, Grid, Paper } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { useAppStyles } from '../styles/appStyles';
 import { resolvePublicAssetPath } from '../utils/assets';
-import { normalizeSxProp } from '../utils/sx';
+import { mergeSx } from '../utils/sx';
 
 interface BackgroundPaperProps {
   image: string;
@@ -28,16 +28,14 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
 }) => {
   const resolvedImage = resolvePublicAssetPath(image);
   const appStyles = useAppStyles();
-  const shell = (
-    <Paper sx={[appStyles.backgroundShellSx, ...normalizeSxProp(shellSx)]}>{children}</Paper>
-  );
+  const shell = <Paper sx={mergeSx(appStyles.backgroundShellSx, shellSx)}>{children}</Paper>;
 
   return (
     <Grid container component="main" sx={appStyles.backgroundRootSx}>
-      <Grid item xs={12} sm={12} md={12} sx={appStyles.getBackgroundImageSx(resolvedImage)}>
+      <Grid size={12} sx={appStyles.getBackgroundImageSx(resolvedImage)}>
         <Box
           ref={contentRef}
-          sx={[appStyles.getBackgroundContentSx(contentAlign), ...normalizeSxProp(contentSx)]}
+          sx={mergeSx(appStyles.getBackgroundContentSx(contentAlign), contentSx)}
         >
           {showShell ? (
             shellWrapper ? (

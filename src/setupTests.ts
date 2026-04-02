@@ -1,4 +1,21 @@
+import { TextDecoder, TextEncoder } from 'util';
 import '@testing-library/jest-dom';
+
+if (typeof global.TextEncoder === 'undefined') {
+  Object.defineProperty(global, 'TextEncoder', {
+    writable: true,
+    configurable: true,
+    value: TextEncoder,
+  });
+}
+
+if (typeof global.TextDecoder === 'undefined') {
+  Object.defineProperty(global, 'TextDecoder', {
+    writable: true,
+    configurable: true,
+    value: TextDecoder,
+  });
+}
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

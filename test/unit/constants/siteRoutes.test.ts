@@ -96,8 +96,8 @@ describe('siteRouteMap', () => {
     expect(siteRouteMap['not-found'].action).toBeUndefined();
   });
 
-  it('marks the blog route with the blog feature flag', () => {
-    expect(siteRouteMap.blog.featureFlag).toBe('blog');
+  it('keeps the blog route in the primary route registry', () => {
+    expect(siteRouteMap.blog.path).toBe('/blog');
   });
 });
 
@@ -138,15 +138,15 @@ describe('primaryNavigationRoutes', () => {
     expect(ids).not.toContain('not-found');
   });
 
-  it('omits the blog from enabled routes in a production import', () => {
+  it('keeps the blog route available in a production import', () => {
     const productionRoutes = loadSiteRoutesForEnv({
       REACT_APP_RUNTIME_ENV: 'production',
       NODE_ENV: 'production',
     });
 
     expect(Object.keys(productionRoutes.siteRouteMap)).toContain('blog');
-    expect(productionRoutes.siteRoutes.map((route) => route.id)).not.toContain('blog');
-    expect(productionRoutes.primaryNavigationRoutes.map((route) => route.id)).not.toContain('blog');
+    expect(productionRoutes.siteRoutes.map((route) => route.id)).toContain('blog');
+    expect(productionRoutes.primaryNavigationRoutes.map((route) => route.id)).toContain('blog');
   });
 });
 

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
@@ -23,6 +23,19 @@ const mockCategories = [
   },
 ];
 
+jest.mock('../../../src/motion', () => {
+  const actual = jest.requireActual('../../../src/motion');
+
+  return {
+    ...actual,
+    MotionTiltCard: ({ children, intensity }: { children: ReactNode; intensity?: number }) => (
+      <div data-testid="photography-tilt-card" data-intensity={String(intensity ?? '')}>
+        {children}
+      </div>
+    ),
+  };
+});
+
 jest.mock('../../../src/hooks/usePhotographyData', () => ({
   usePhotographyData: () => ({
     categories: mockCategories,
@@ -38,12 +51,37 @@ jest.mock('../../../src/components/BackgroundPaper', () => ({
 
 jest.mock('../../../src/components/AnimatedContentCard', () => ({
   ANIMATED_CARD_DURATION_MS: 480,
-  AnimatedContentCard: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  AnimatedContentCard: ({
+    children,
+    onVisible,
+  }: {
+    children: ReactNode;
+    onVisible?: () => void;
+  }) => {
+    useEffect(() => {
+      onVisible?.();
+    }, [onVisible]);
+
+    return <div>{children}</div>;
+  },
 }));
 
 jest.mock('../../../src/components/BackToTopButton', () => ({
   BackToTopButton: () => <div data-testid="back-to-top-button" />,
 }));
+
+jest.mock('../../../src/components/text', () => {
+  const actual = jest.requireActual('../../../src/components/text');
+
+  return {
+    ...actual,
+    TypewriterText: ({ text, playing }: { text: string; playing?: boolean }) => (
+      <span data-testid="typewriter-text" data-playing={String(Boolean(playing))}>
+        {text}
+      </span>
+    ),
+  };
+});
 
 describe('Photography', () => {
   it('renders the photography page with album count and category cards', () => {
@@ -90,8 +128,44 @@ describe('Photography', () => {
     );
 
     expect(screen.getByText('Photography')).toBeInTheDocument();
-    expect(
-      screen.getByText('A selection of field work, climbing days, and stargazing nights.')
-    ).toBeInTheDocument();
+    expect(screen.getByText('A collection of photo albums.')).toBeInTheDocument();
+  });
+
+  it('starts the subtitle typewriter when the intro card becomes visible', () => {
+    render(
+      <ThemeProvider>
+        <MemoryRouter future={routerFuture}>
+          <Photography />
+        </MemoryRouter>
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('typewriter-text')).toHaveAttribute('data-playing', 'true');
+  });
+
+  it('renders the intro and album cards inside MotionTiltCard surfaces', () => {
+    render(
+      <ThemeProvider>
+        <MemoryRouter future={routerFuture}>
+          <Photography />
+        </MemoryRouter>
+      </ThemeProvider>
+    );
+
+    const tiltCards = screen.getAllByTestId('photography-tilt-card');
+    const introCard = screen
+      .getByText('Photography')
+      .closest('[data-testid="photography-tilt-card"]');
+    const featuredAlbumCard = screen
+      .getByText('Landscape')
+      .closest('[data-testid="photography-tilt-card"]');
+    const supportingAlbumCard = screen
+      .getByText('Astrophotography')
+      .closest('[data-testid="photography-tilt-card"]');
+
+    expect(tiltCards).toHaveLength(3);
+    expect(introCard).toHaveAttribute('data-intensity', '0.5');
+    expect(featuredAlbumCard).not.toBeNull();
+    expect(supportingAlbumCard).not.toBeNull();
   });
 });

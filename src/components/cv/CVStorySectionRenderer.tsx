@@ -1,6 +1,6 @@
-import type { ReactNode, RefObject } from 'react';
-import { useRef, useState } from 'react';
-import { motion, useInView } from 'motion/react';
+import type { ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { motion } from 'motion/react';
 import { Box, Divider, Stack, Tabs, Tab } from '@mui/material';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -10,12 +10,12 @@ import { Text } from '../text';
 import { SkillsChipList } from '../SkillsChipList';
 import { CommonLink } from '../CommonLink';
 import {
-  MotionSection,
+  StaggerChildren,
   MotionItem,
   useMotionScale,
   duration,
-  DEFAULT_INTERSECTION_ROOT_MARGIN,
-  DEFAULT_INTERSECTION_THRESHOLD,
+  scaleDuration,
+  scaleStagger,
 } from '../../motion';
 import {
   renderExperienceDescriptionContent,
@@ -35,40 +35,250 @@ import {
   storyDividerReveal,
 } from '../../motion/variants';
 import type { CVStoryItem, CVStoryContactChannel } from '../../types/cv';
+import { useComponentStyles } from '../../styles/componentStyles';
 
 type CVStorySectionRendererProps = {
   item: CVStoryItem;
   index: number;
-  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+  isRevealed: boolean;
+  onSectionSettled?: () => void;
 };
 
-const asMotionMargin = (margin: string) =>
-  margin as Parameters<typeof useInView>[1] extends { margin?: infer Margin } ? Margin : never;
+const STORY_DELAY_CHILDREN_MS = 250;
+const STORY_STAGGER_MS = 140;
+const STORY_SLIDE_TIMEOUT_MS = 220;
+const STORY_LABEL_DURATION_MS = Math.round(duration.fast * 1000);
+const STORY_TITLE_DURATION_MS = Math.round(duration.slow * 1000);
+const STORY_META_DURATION_MS = Math.round(duration.normal * 1000);
+const STORY_BODY_DURATION_MS = Math.round(duration.normal * 1000);
+const STORY_CHIPS_DURATION_MS = Math.round(duration.normal * 1000);
+const STORY_LINK_DURATION_MS = Math.round(duration.normal * 1000);
+
+const getStorySequenceStartDelayMs = (sequenceIndex: number, staggerFactor: number) =>
+  Math.round(
+    scaleStagger(STORY_DELAY_CHILDREN_MS + STORY_STAGGER_MS * sequenceIndex, staggerFactor)
+  );
+
+const getStoryMotionItemFinishMs = (
+  sequenceIndex: number,
+  variantDurationMs: number,
+  durationFactor: number,
+  staggerFactor: number
+) =>
+  getStorySequenceStartDelayMs(sequenceIndex, staggerFactor) +
+  Math.round(scaleDuration(variantDurationMs, durationFactor));
+
+const getStorySkillsFinishMs = (
+  sequenceIndex: number,
+  skillCount: number,
+  durationFactor: number,
+  staggerFactor: number,
+  resolvedItemStaggerMs: number
+) =>
+  getStorySequenceStartDelayMs(sequenceIndex, staggerFactor) +
+  Math.round(scaleDuration(STORY_CHIPS_DURATION_MS, durationFactor)) +
+  Math.round(scaleDuration(STORY_SLIDE_TIMEOUT_MS, durationFactor)) +
+  Math.max(skillCount - 1, 0) * resolvedItemStaggerMs;
+
+const getStorySectionSettleDelayMs = (
+  item: CVStoryItem,
+  durationFactor: number,
+  staggerFactor: number,
+  resolvedItemStaggerMs: number
+) => {
+  if (durationFactor === 0) {
+    return 0;
+  }
+
+  const finishTimes: number[] = [];
+  let sequenceIndex = 0;
+
+  const pushMotionItem = (variantDurationMs: number) => {
+    finishTimes.push(
+      getStoryMotionItemFinishMs(sequenceIndex, variantDurationMs, durationFactor, staggerFactor)
+    );
+    sequenceIndex += 1;
+  };
+
+  const pushSkills = (skillCount: number) => {
+    finishTimes.push(
+      getStorySkillsFinishMs(
+        sequenceIndex,
+        skillCount,
+        durationFactor,
+        staggerFactor,
+        resolvedItemStaggerMs
+      )
+    );
+    sequenceIndex += 1;
+  };
+
+  switch (item.kind) {
+    case 'about': {
+      pushMotionItem(STORY_LABEL_DURATION_MS);
+      pushMotionItem(STORY_TITLE_DURATION_MS);
+      pushMotionItem(STORY_META_DURATION_MS);
+      pushMotionItem(STORY_BODY_DURATION_MS);
+
+      if (item.data.opportunities && item.data.opportunities.length > 0) {
+        pushSkills(item.data.opportunities.length);
+      }
+
+      if (item.data.bioLink) {
+        pushMotionItem(STORY_LINK_DURATION_MS);
+      }
+
+      break;
+    }
+
+    case 'experience': {
+      pushMotionItem(STORY_LABEL_DURATION_MS);
+      pushMotionItem(STORY_TITLE_DURATION_MS);
+      pushMotionItem(STORY_META_DURATION_MS);
+
+      if (item.data.description) {
+        pushMotionItem(STORY_BODY_DURATION_MS);
+      }
+
+      if (item.data.projects && item.data.projects.length > 0) {
+        pushMotionItem(STORY_BODY_DURATION_MS);
+      }
+
+      if (item.data.skills && item.data.skills.length > 0) {
+        pushSkills(item.data.skills.length);
+      }
+
+      break;
+    }
+
+    case 'education': {
+      pushMotionItem(STORY_LABEL_DURATION_MS);
+      pushMotionItem(STORY_TITLE_DURATION_MS);
+      pushMotionItem(STORY_META_DURATION_MS);
+
+      if (item.data.gpa && item.data.gpa.length > 0) {
+        pushMotionItem(STORY_META_DURATION_MS);
+      }
+
+      pushMotionItem(STORY_BODY_DURATION_MS);
+
+      if (item.data.highlights && item.data.highlights.length > 0) {
+        pushMotionItem(STORY_BODY_DURATION_MS);
+      }
+
+      if (item.data.skills && item.data.skills.length > 0) {
+        pushSkills(item.data.skills.length);
+      }
+
+      break;
+    }
+
+    case 'certificate': {
+      pushMotionItem(STORY_LABEL_DURATION_MS);
+      pushMotionItem(STORY_TITLE_DURATION_MS);
+      pushMotionItem(STORY_META_DURATION_MS);
+
+      if (item.data.link) {
+        pushMotionItem(STORY_LINK_DURATION_MS);
+      }
+
+      break;
+    }
+
+    case 'volunteering': {
+      pushMotionItem(STORY_LABEL_DURATION_MS);
+      pushMotionItem(STORY_TITLE_DURATION_MS);
+      pushMotionItem(STORY_META_DURATION_MS);
+      pushMotionItem(STORY_BODY_DURATION_MS);
+
+      if (item.data.highlights && item.data.highlights.length > 0) {
+        pushMotionItem(STORY_BODY_DURATION_MS);
+      }
+
+      break;
+    }
+
+    case 'coding': {
+      const primaryLink = item.data.links?.[0];
+      const skillsTabs = (item.data.tabs ?? []).filter(
+        (tab): tab is Extract<typeof tab, { kind: 'skills' }> => tab.kind === 'skills'
+      );
+      const allTabs = item.data.tabs ?? [];
+
+      pushMotionItem(STORY_LABEL_DURATION_MS);
+      pushMotionItem(STORY_TITLE_DURATION_MS);
+      pushMotionItem(STORY_BODY_DURATION_MS);
+
+      if (primaryLink) {
+        pushMotionItem(STORY_LINK_DURATION_MS);
+      }
+
+      if (allTabs.length === 1 && skillsTabs.length === 1) {
+        pushSkills(skillsTabs[0].skills.length);
+      }
+
+      if (allTabs.length > 1) {
+        pushMotionItem(STORY_BODY_DURATION_MS);
+      }
+
+      break;
+    }
+
+    case 'end': {
+      pushMotionItem(STORY_TITLE_DURATION_MS);
+      pushMotionItem(STORY_BODY_DURATION_MS);
+      pushMotionItem(STORY_CHIPS_DURATION_MS);
+      break;
+    }
+  }
+
+  return finishTimes.length > 0 ? Math.max(...finishTimes) : 0;
+};
 
 const StorySkillsChipList = ({
   skills,
-  scrollContainerRef,
+  isSectionRevealed,
+  sequenceIndex,
 }: {
   skills: string[];
-  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+  isSectionRevealed: boolean;
+  sequenceIndex: number;
 }) => {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const { duration: durationFactor } = useMotionScale();
-  const isRowInView = useInView(rowRef, {
-    once: true,
-    root: scrollContainerRef,
-    margin: asMotionMargin(DEFAULT_INTERSECTION_ROOT_MARGIN),
-    amount: DEFAULT_INTERSECTION_THRESHOLD || undefined,
-  });
+  const { motionTokens } = useComponentStyles();
+  const { duration: durationFactor, stagger: staggerFactor } = useMotionScale();
+  const [showChips, setShowChips] = useState(durationFactor === 0 ? isSectionRevealed : false);
+
+  useEffect(() => {
+    if (!isSectionRevealed) {
+      setShowChips(false);
+      return;
+    }
+
+    if (durationFactor === 0) {
+      setShowChips(true);
+      return;
+    }
+
+    const timerId = window.setTimeout(
+      () => setShowChips(true),
+      getStorySequenceStartDelayMs(sequenceIndex, staggerFactor) +
+        Math.round(scaleDuration(STORY_CHIPS_DURATION_MS, durationFactor))
+    );
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [durationFactor, isSectionRevealed, sequenceIndex, staggerFactor]);
 
   return (
     <MotionItem variants={storyChipsReveal}>
-      <Box ref={rowRef}>
+      <Box>
         <SkillsChipList
           skills={skills}
-          in={durationFactor === 0 || isRowInView}
+          in={showChips}
           animation="slide"
-          startDelayMs={Math.round(duration.normal * 1000)}
+          startDelayMs={0}
+          itemStaggerMs={motionTokens.itemStaggerMs}
         />
       </Box>
     </MotionItem>
@@ -103,27 +313,52 @@ const channelIcon: Record<CVStoryContactChannel['icon'], ReactNode> = {
 
 /* ── Section divider between kind transitions ── */
 
-const StorySectionDivider = () => (
-  <MotionSection variants={storyDividerReveal} rootMargin="0px 0px -5% 0px">
-    <Divider
-      sx={{
-        maxWidth: 120,
-        mx: 'auto',
-        my: { xs: 2, sm: 3 },
-        borderColor: 'divider',
-      }}
-    />
-  </MotionSection>
-);
+const StorySectionDivider = ({ isRevealed }: { isRevealed: boolean }) => {
+  const { duration: durationFactor } = useMotionScale();
+
+  if (durationFactor === 0) {
+    return (
+      <Box aria-hidden={!isRevealed} sx={{ opacity: isRevealed ? 1 : 0 }}>
+        <Divider
+          sx={{
+            maxWidth: 120,
+            mx: 'auto',
+            my: { xs: 2, sm: 3 },
+            borderColor: 'divider',
+          }}
+        />
+      </Box>
+    );
+  }
+
+  return (
+    <motion.div
+      initial="hidden"
+      animate={isRevealed ? 'visible' : 'hidden'}
+      variants={storyDividerReveal}
+      style={{ opacity: isRevealed ? 1 : 0 }}
+      aria-hidden={!isRevealed}
+    >
+      <Divider
+        sx={{
+          maxWidth: 120,
+          mx: 'auto',
+          my: { xs: 2, sm: 3 },
+          borderColor: 'divider',
+        }}
+      />
+    </motion.div>
+  );
+};
 
 /* ── Per-kind section layouts ── */
 
 const AboutSection = ({
   item,
-  scrollContainerRef,
+  isRevealed,
 }: {
   item: Extract<CVStoryItem, { kind: 'about' }>;
-  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+  isRevealed: boolean;
 }) => {
   const { data: about } = item;
 
@@ -157,7 +392,11 @@ const AboutSection = ({
         </Text>
       </MotionItem>
       {about.opportunities && about.opportunities.length > 0 && (
-        <StorySkillsChipList skills={about.opportunities} scrollContainerRef={scrollContainerRef} />
+        <StorySkillsChipList
+          skills={about.opportunities}
+          isSectionRevealed={isRevealed}
+          sequenceIndex={4}
+        />
       )}
       {about.bioLink && (
         <MotionItem variants={storyLinkReveal}>
@@ -172,12 +411,17 @@ const AboutSection = ({
 
 const ExperienceSection = ({
   item,
-  scrollContainerRef,
+  isRevealed,
 }: {
   item: Extract<CVStoryItem, { kind: 'experience' }>;
-  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+  isRevealed: boolean;
 }) => {
   const { data: exp } = item;
+  let nextSequenceIndex = 3;
+  const descriptionSequenceIndex = exp.description ? nextSequenceIndex++ : null;
+  const projectsSequenceIndex =
+    exp.projects && exp.projects.length > 0 ? nextSequenceIndex++ : null;
+  const skillsSequenceIndex = exp.skills && exp.skills.length > 0 ? nextSequenceIndex++ : null;
 
   return (
     <Stack spacing={2.5}>
@@ -208,18 +452,22 @@ const ExperienceSection = ({
           {exp.industry ? ` · ${exp.industry}` : ''}
         </Text>
       </MotionItem>
-      {exp.description && (
+      {exp.description && descriptionSequenceIndex !== null && (
         <MotionItem variants={storyBodyReveal}>
           <Text role="body">{renderExperienceDescriptionContent(exp.description)}</Text>
         </MotionItem>
       )}
-      {exp.projects && exp.projects.length > 0 && (
+      {exp.projects && exp.projects.length > 0 && projectsSequenceIndex !== null && (
         <MotionItem variants={storyBodyReveal}>
           {renderBulletList(exp.projects.map(renderExperienceProjectContent))}
         </MotionItem>
       )}
-      {exp.skills && exp.skills.length > 0 && (
-        <StorySkillsChipList skills={exp.skills} scrollContainerRef={scrollContainerRef} />
+      {exp.skills && exp.skills.length > 0 && skillsSequenceIndex !== null && (
+        <StorySkillsChipList
+          skills={exp.skills}
+          isSectionRevealed={isRevealed}
+          sequenceIndex={skillsSequenceIndex}
+        />
       )}
     </Stack>
   );
@@ -227,12 +475,18 @@ const ExperienceSection = ({
 
 const EducationSection = ({
   item,
-  scrollContainerRef,
+  isRevealed,
 }: {
   item: Extract<CVStoryItem, { kind: 'education' }>;
-  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+  isRevealed: boolean;
 }) => {
   const { data: entry } = item;
+  let nextSequenceIndex = 3;
+  const gpaSequenceIndex = entry.gpa && entry.gpa.length > 0 ? nextSequenceIndex++ : null;
+  const summarySequenceIndex = nextSequenceIndex++;
+  const highlightsSequenceIndex =
+    entry.highlights && entry.highlights.length > 0 ? nextSequenceIndex++ : null;
+  const skillsSequenceIndex = entry.skills && entry.skills.length > 0 ? nextSequenceIndex++ : null;
 
   return (
     <Stack spacing={2.5}>
@@ -250,20 +504,26 @@ const EducationSection = ({
         <MotionItem variants={storyMetaReveal}>
           <Text role="meta">{entry.dateRange ?? entry.expectedCompletion ?? ''}</Text>
         </MotionItem>
-        {entry.gpa && entry.gpa.length > 0 && (
+        {entry.gpa && entry.gpa.length > 0 && gpaSequenceIndex !== null && (
           <MotionItem variants={storyMetaReveal}>
             <Text role="meta">{entry.gpa.map((g) => `${g.label}: ${g.value}`).join('  ·  ')}</Text>
           </MotionItem>
         )}
       </Stack>
-      <MotionItem variants={storyBodyReveal}>
-        <Text role="body">{entry.summary}</Text>
-      </MotionItem>
-      {entry.highlights && entry.highlights.length > 0 && (
+      {summarySequenceIndex >= 0 && (
+        <MotionItem variants={storyBodyReveal}>
+          <Text role="body">{entry.summary}</Text>
+        </MotionItem>
+      )}
+      {entry.highlights && entry.highlights.length > 0 && highlightsSequenceIndex !== null && (
         <MotionItem variants={storyBodyReveal}>{renderBulletList(entry.highlights)}</MotionItem>
       )}
-      {entry.skills && entry.skills.length > 0 && (
-        <StorySkillsChipList skills={entry.skills} scrollContainerRef={scrollContainerRef} />
+      {entry.skills && entry.skills.length > 0 && skillsSequenceIndex !== null && (
+        <StorySkillsChipList
+          skills={entry.skills}
+          isSectionRevealed={isRevealed}
+          sequenceIndex={skillsSequenceIndex}
+        />
       )}
     </Stack>
   );
@@ -337,10 +597,10 @@ const VolunteeringSection = ({
 
 const CodingSection = ({
   item,
-  scrollContainerRef,
+  isRevealed,
 }: {
   item: Extract<CVStoryItem, { kind: 'coding' }>;
-  scrollContainerRef?: RefObject<HTMLDivElement | null>;
+  isRevealed: boolean;
 }) => {
   const { data: example } = item;
   const [activeTab, setActiveTab] = useState(0);
@@ -360,6 +620,11 @@ const CodingSection = ({
     (t): t is Extract<typeof t, { kind: 'skills' }> => t.kind === 'skills'
   );
   const allTabs = example.tabs ?? [];
+  let nextSequenceIndex = 3;
+  const primaryLinkSequenceIndex = primaryLink ? nextSequenceIndex++ : null;
+  const singleSkillsSequenceIndex =
+    allTabs.length === 1 && skillsTabs.length === 1 ? nextSequenceIndex++ : null;
+  const tabsSequenceIndex = allTabs.length > 1 ? nextSequenceIndex++ : null;
 
   return (
     <Stack spacing={2.5}>
@@ -376,20 +641,21 @@ const CodingSection = ({
       <MotionItem variants={storyBodyReveal}>
         <Text role="body">{example.description}</Text>
       </MotionItem>
-      {primaryLink && (
+      {primaryLink && primaryLinkSequenceIndex !== null && (
         <MotionItem variants={storyLinkReveal}>
           <CommonLink href={primaryLink} target="_blank" rel="noopener noreferrer">
             {isGitHub ? 'View on GitHub' : 'View project'}
           </CommonLink>
         </MotionItem>
       )}
-      {allTabs.length === 1 && skillsTabs.length === 1 && (
+      {allTabs.length === 1 && skillsTabs.length === 1 && singleSkillsSequenceIndex !== null && (
         <StorySkillsChipList
           skills={skillsTabs[0].skills}
-          scrollContainerRef={scrollContainerRef}
+          isSectionRevealed={isRevealed}
+          sequenceIndex={singleSkillsSequenceIndex}
         />
       )}
-      {allTabs.length > 1 && (
+      {allTabs.length > 1 && tabsSequenceIndex !== null && (
         <MotionItem variants={storyBodyReveal}>
           <Tabs
             value={activeTab}
@@ -463,40 +729,79 @@ const EndSection = ({ item }: { item: Extract<CVStoryItem, { kind: 'end' }> }) =
 export const CVStorySectionRenderer = ({
   item,
   index,
-  scrollContainerRef,
+  isRevealed,
+  onSectionSettled,
 }: CVStorySectionRendererProps) => {
+  const { motionTokens } = useComponentStyles();
+  const { duration: durationFactor, stagger: staggerFactor } = useMotionScale();
+  const hasReportedSettledRef = useRef(false);
+  const onSectionSettledRef = useRef(onSectionSettled);
   const isFirstItem = index === 0;
+  const resolvedStoryChipItemStaggerMs = Math.round(
+    scaleStagger(motionTokens.itemStaggerMs, staggerFactor)
+  );
+  const sectionSettleDelayMs = getStorySectionSettleDelayMs(
+    item,
+    durationFactor,
+    staggerFactor,
+    resolvedStoryChipItemStaggerMs
+  );
+
+  useEffect(() => {
+    onSectionSettledRef.current = onSectionSettled;
+  }, [onSectionSettled]);
+
+  useEffect(() => {
+    if (!isRevealed) {
+      hasReportedSettledRef.current = false;
+      return;
+    }
+
+    if (!onSectionSettledRef.current || hasReportedSettledRef.current) {
+      return;
+    }
+
+    if (sectionSettleDelayMs <= 0) {
+      hasReportedSettledRef.current = true;
+      onSectionSettledRef.current?.();
+      return;
+    }
+
+    const timerId = window.setTimeout(() => {
+      hasReportedSettledRef.current = true;
+      onSectionSettledRef.current?.();
+    }, sectionSettleDelayMs);
+
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [isRevealed, sectionSettleDelayMs]);
 
   return (
     <>
-      {!isFirstItem && <StorySectionDivider />}
-      <MotionSection
-        variants={storyContentContainer}
-        rootMargin="0px 0px -8% 0px"
-        once
+      {!isFirstItem && <StorySectionDivider isRevealed={isRevealed} />}
+      <StaggerChildren
+        containerVariants={storyContentContainer}
+        initial="hidden"
+        animate={isRevealed ? 'visible' : 'hidden'}
         style={{
           maxWidth: 720,
           margin: '0 auto',
+          opacity: isRevealed ? 1 : 0,
+          pointerEvents: isRevealed ? 'auto' : 'none',
         }}
+        aria-hidden={!isRevealed}
       >
         <Box sx={{ px: { xs: 3, sm: 4 }, py: { xs: 3, sm: 4 }, width: '100%' }}>
-          {item.kind === 'about' && (
-            <AboutSection item={item} scrollContainerRef={scrollContainerRef} />
-          )}
-          {item.kind === 'experience' && (
-            <ExperienceSection item={item} scrollContainerRef={scrollContainerRef} />
-          )}
-          {item.kind === 'education' && (
-            <EducationSection item={item} scrollContainerRef={scrollContainerRef} />
-          )}
+          {item.kind === 'about' && <AboutSection item={item} isRevealed={isRevealed} />}
+          {item.kind === 'experience' && <ExperienceSection item={item} isRevealed={isRevealed} />}
+          {item.kind === 'education' && <EducationSection item={item} isRevealed={isRevealed} />}
           {item.kind === 'certificate' && <CertificateSection item={item} />}
           {item.kind === 'volunteering' && <VolunteeringSection item={item} />}
-          {item.kind === 'coding' && (
-            <CodingSection item={item} scrollContainerRef={scrollContainerRef} />
-          )}
+          {item.kind === 'coding' && <CodingSection item={item} isRevealed={isRevealed} />}
           {item.kind === 'end' && <EndSection item={item} />}
         </Box>
-      </MotionSection>
+      </StaggerChildren>
     </>
   );
 };

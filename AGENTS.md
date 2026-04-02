@@ -10,7 +10,7 @@ Primary user-facing routes:
 - `/cv` interactive CV and GitHub-driven profile sections
 - `/climbing` climbing logs and to-do routes
 - `/photography` and `/photography/:slug` gallery browsing
-- `/blog` and `/blog/:slug` editorial blog and post detail, feature-gated to dev/test builds
+- `/blog` and `/blog/:slug` editorial blog and post detail
 
 Prefer changes that preserve the current single-page-app architecture and static hosting model.
 
@@ -20,17 +20,17 @@ Prefer changes that preserve the current single-page-app architecture and static
 - `docs/engineering/agent-guide.md` is the canonical source for repository-wide architecture invariants, intentional exceptions, and safe extension patterns.
 - `docs/engineering/testing-strategy.md` is the canonical source for validation matrices, build variants, and repo-standard Playwright/Jest command shapes.
 - `PLANS.md` is the canonical source for ExecPlan requirements, triggers, and templates.
-- Scoped `AGENTS.md` files under `src/` (and `resume/` when relevant) are the canonical local rules for the files they cover.
+- Scoped `AGENTS.md` files under `src/` (and `public/resume/` when relevant) are the canonical local rules for the files they cover.
 
 ## Instruction map
 
-- `resume/AGENTS.md` — resume-source work and PDF update constraints
+- `public/resume/AGENTS.md` — resume-source work and PDF update constraints
 - `src/pages/AGENTS.md` — route-level composition, page-local behavior, and route validation expectations
 - `src/components/AGENTS.md` — shared component design, multi-consumer risk, and component validation expectations
 - `src/components/blog/AGENTS.md` — editorial blog subsystem rules and blog-specific validation
 - `src/data/AGENTS.md` — content source-of-truth modules, schema discipline, and protected datasets
 - `src/hooks/AGENTS.md` — adapter-layer boundaries, fallback behavior, and shared hook rules
-- `src/constants/AGENTS.md` — route metadata, feature flags, command palette data, and recovery logic
+- `src/constants/AGENTS.md` — route metadata, runtime-environment helpers, command palette data, and recovery logic
 - `src/motion/AGENTS.md` — motion foundation, timing rules, and Motion-library boundaries
 - `src/styles/AGENTS.md` — style builders, keyframes, and CSS animation ownership
 - `src/theme/AGENTS.md` — appearance presets, theme assembly, and token ownership
@@ -96,7 +96,7 @@ Canonical definitions live in `docs/engineering/agent-guide.md`.
 - Preserve provider nesting order.
 - Preserve the motion intensity contract through `useMotionScale()`.
 - Keep theme-conditional reusable surfaces in the style-builder pipeline.
-- Keep feature-gated routes and navigation driven by `isFeatureEnabled()` and route metadata.
+- Keep route definitions, navigation, command-palette entries, and recovery suggestions aligned through route metadata.
 - Respect the documented intentional design-system exceptions for the Home IDE hero, blog editorial surfaces, photography overlays/lightbox, and CV story mode.
 
 ## Commands
@@ -110,7 +110,7 @@ Quick reference:
 - install: `npm install`
 - dev server: `npm start`
 - build: `npm run build`
-- gated E2E build: `npm run build:e2e`
+- test-runtime E2E build: `npm run build:e2e`
 - unit/component tests: `CI=true npm test -- --watchAll=false`
 - lint: `npm run lint`
 - typecheck: `npm run typecheck`
@@ -133,19 +133,19 @@ Notes:
 - `src/motion/`: unified animation foundation — duration tokens, easing, variants, and animated primitives
 - `src/styles/`: theme-conditioned style maps, Emotion keyframes, and spring-easing constants
 - `src/theme/`: MUI theme assembly and appearance-preset system
-- `src/constants/`: build-time stable config — route definitions, feature flags, command palette registry, recovery scoring
+- `src/constants/`: build-time stable config — route definitions, runtime-environment helpers, command palette registry, recovery scoring
 - `src/utils/`: pure, framework-agnostic helper functions
 - `test/e2e/`: Playwright end-to-end specs and helpers when the branch includes browser integration tests
 - `test/unit/`: Jest unit and component tests
 - `public/assets/`: shipped images, certificates, media, and resume PDF
-- `resume/`: LaTeX source for the downloadable resume PDF
+- `public/resume/`: LaTeX source for the downloadable resume PDF
 - `docs/`: source-of-truth architecture, frontend, engineering, and reference documentation
 
 ## Area guidance
 
 ### CV / portfolio and GitHub-backed sections
 
-- `src/data/cv.ts` is the source of truth for interactive `/cv`; use `src/data/AGENTS.md` for content/schema rules and `resume/AGENTS.md` for resume-source work.
+- `src/data/cv.ts` is the source of truth for interactive `/cv`; use `src/data/AGENTS.md` for content/schema rules and `public/resume/AGENTS.md` for resume-source work.
 - Preserve graceful GitHub fallback behavior through the existing hooks and prefer mocked validation when applicable; see `src/hooks/AGENTS.md`.
 
 ### Climbing, photography, and blog content

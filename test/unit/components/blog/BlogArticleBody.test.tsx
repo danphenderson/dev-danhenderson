@@ -23,19 +23,40 @@ describe('BlogArticleBody', () => {
   });
 
   it('renders inline code spans inside a paragraph block', () => {
-    renderBody([{ type: 'paragraph', text: 'Use `Optional[T]` instead of `Union[T, None]`.' }]);
+    const { container } = renderBody([
+      { type: 'paragraph', text: 'Use `Optional[T]` instead of `Union[T, None]`.' },
+    ]);
 
     const paragraph = screen.getByText(
       (_, element) =>
         element?.tagName === 'P' &&
         element.textContent === 'Use Optional[T] instead of Union[T, None].'
     );
-    const optionalCode = screen.getByText('Optional[T]');
-    const unionCode = screen.getByText('Union[T, None]');
+    const inlineCodeElements = Array.from(container.querySelectorAll('p code'));
+    const optionalCode = inlineCodeElements.find(
+      (element) => element.textContent === 'Optional[T]'
+    );
+    const unionCode = inlineCodeElements.find(
+      (element) => element.textContent === 'Union[T, None]'
+    );
 
     expect(paragraph.tagName).toBe('P');
-    expect(optionalCode.tagName).toBe('CODE');
-    expect(unionCode.tagName).toBe('CODE');
+    expect(optionalCode?.tagName).toBe('CODE');
+    expect(unionCode?.tagName).toBe('CODE');
+    expect(optionalCode?.querySelector('[data-token-kind="type"]')?.textContent).toBe('Optional');
+    expect(unionCode?.querySelector('[data-token-kind="type"]')?.textContent).toBe('Union');
+    expect(unionCode?.querySelector('[data-token-kind="constant"]')?.textContent).toBe('None');
+  });
+
+  it('keeps non-Python inline code as plain inline code text', () => {
+    const { container } = renderBody([
+      { type: 'paragraph', text: 'Run `--target-version 3.10` after the rewrite.' },
+    ]);
+
+    const inlineCode = container.querySelector('p code');
+
+    expect(inlineCode?.textContent).toBe('--target-version 3.10');
+    expect(inlineCode?.querySelector('[data-token-kind]')).toBeNull();
   });
 
   it('renders a heading block with the correct level', () => {
@@ -93,8 +114,25 @@ describe('BlogArticleBody', () => {
   it('renders a code block with language and code content', () => {
     renderBody([{ type: 'code', language: 'typescript', code: 'const x = 1;' }]);
 
-    expect(screen.getByText('const x = 1;')).toBeInTheDocument();
+    expect(screen.getByText('const x = 1;')).toHaveTextContent('const x = 1;');
     expect(screen.getByText('typescript')).toBeInTheDocument();
+  });
+
+  it('renders highlighted Python code blocks with token spans', () => {
+    const { container } = renderBody([
+      {
+        type: 'code',
+        language: 'python',
+        code: 'from typing import Optional\n\nx: Optional[T] = None',
+      },
+    ]);
+
+    expect(container.querySelector('code')?.textContent).toBe(
+      'from typing import Optional\n\nx: Optional[T] = None'
+    );
+    expect(container.querySelector('[data-token-kind="keyword"]')?.textContent).toBe('from');
+    expect(container.querySelector('[data-token-kind="type"]')?.textContent).toBe('Optional');
+    expect(container.querySelector('[data-token-kind="constant"]')?.textContent).toBe('None');
   });
 
   it('renders a blockquote block', () => {

@@ -28,6 +28,8 @@ jest.mock('../../../src/WelcomeAudioProvider', () => {
   };
 });
 
+const CUSTOMIZE_AUTO_ADVANCE_DELAY_MS = 2250;
+
 const {
   WelcomeOnboardingProvider,
   ONBOARDING_COMPLETED_STORAGE_KEY,
@@ -104,6 +106,10 @@ describe('useHomeWelcomeSequence', () => {
     window.localStorage.clear();
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('opens the audio prompt for first-time visitors and keeps the hero blocked', async () => {
     const { result } = renderSequence();
 
@@ -161,6 +167,28 @@ describe('useHomeWelcomeSequence', () => {
     await waitFor(() => expect(result.current.isSettingsHintOpen).toBe(false));
     await waitFor(() => expect(result.current.isHeroAnimationReady).toBe(true));
     expect(window.localStorage.getItem(ONBOARDING_COMPLETED_STORAGE_KEY)).toBe('true');
+  });
+
+  it('auto-advances from customize to settings hint after 2250 ms', async () => {
+    jest.useFakeTimers();
+
+    const { result } = renderSequence({ initialAudioConsent: 'declined' });
+
+    await waitFor(() => expect(result.current.isCustomizeOpen).toBe(true));
+
+    act(() => {
+      jest.advanceTimersByTime(CUSTOMIZE_AUTO_ADVANCE_DELAY_MS - 1);
+    });
+
+    expect(result.current.isCustomizeOpen).toBe(true);
+    expect(result.current.isSettingsHintOpen).toBe(false);
+
+    act(() => {
+      jest.advanceTimersByTime(1);
+    });
+
+    await waitFor(() => expect(result.current.isCustomizeOpen).toBe(false));
+    await waitFor(() => expect(result.current.isSettingsHintOpen).toBe(true));
   });
 
   it('starts ready for returning visitors with completed onboarding', async () => {

@@ -27,7 +27,7 @@ This document covers the actual test organization, harness patterns, and coverag
 - Serves production build on port 3100 via `serve -s build -l 3100`
 - Shared worker count is owned by `playwright.config.ts` (currently 4); docs, workflows, and nested instructions should rely on that default unless a job intentionally overrides it
 - Retries: 2 in CI, 0 locally
-- Build variant: `npm run build:e2e` sets `REACT_APP_RUNTIME_ENV=test` so feature-gated routes (blog) are available
+- Build variant: `npm run build:e2e` sets `REACT_APP_RUNTIME_ENV=test` for the Chromium Playwright bundle and any test-runtime-specific behavior
 - Standard command shapes:
   - full local suite: `npm run test:e2e`
   - chromium project: `npm run build:e2e && npm run test:e2e:chromium`
@@ -50,17 +50,17 @@ When another instruction file says to validate a change, it should point here ra
 
 ## Validation matrix
 
-| Change type                     | Required validation                                                                                                                     |
-| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| Data module only                | `npm run build` + targeted route or consumer validation                                                                                 |
-| Page-level UI                   | `npm run build` + browser validation on the changed route                                                                               |
-| Shared component                | `npm run build` + browser validation on a primary consumer and at least one additional consumer when reuse is clear                     |
-| Motion/animation                | `npm run build` + validation with motion intensity `off` + browser validation                                                           |
-| Theme/styling                   | `npm run build` + browser validation in both light and dark modes; when shared appearance treatment changes, check at least two presets |
-| Route/navigation/not-found      | `npm run build` + direct-navigation check + relevant Playwright route coverage when present                                             |
-| Feature-gated content           | `npm run build:e2e` + gating check + relevant Playwright coverage                                                                       |
-| GitHub-backed CV/fallback data  | `npm run build` + mocked `/cv` success/failure coverage when present + browser validation                                               |
-| Asset-path or media-path change | `npm run build` + direct-navigation check + `PUBLIC_URL` compatibility check                                                            |
+| Change type                            | Required validation                                                                                                                     |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Data module only                       | `npm run build` + targeted route or consumer validation                                                                                 |
+| Page-level UI                          | `npm run build` + browser validation on the changed route                                                                               |
+| Shared component                       | `npm run build` + browser validation on a primary consumer and at least one additional consumer when reuse is clear                     |
+| Motion/animation                       | `npm run build` + validation with motion intensity `off` + browser validation                                                           |
+| Theme/styling                          | `npm run build` + browser validation in both light and dark modes; when shared appearance treatment changes, check at least two presets |
+| Route/navigation/not-found             | `npm run build` + direct-navigation check + relevant Playwright route coverage when present                                             |
+| Runtime-environment-sensitive behavior | `npm run build:e2e` + relevant Playwright or targeted validation                                                                        |
+| GitHub-backed CV/fallback data         | `npm run build` + mocked `/cv` success/failure coverage when present + browser validation                                               |
+| Asset-path or media-path change        | `npm run build` + direct-navigation check + `PUBLIC_URL` compatibility check                                                            |
 
 ### Browser validation expectations
 
@@ -68,7 +68,7 @@ When another instruction file says to validate a change, it should point here ra
 - Validate the smallest set of affected routes first, then expand to another consumer when a shared component or layout primitive changed.
 - Check at least one narrow/mobile viewport and one desktop viewport for layout-affecting edits.
 - When Playwright E2E coverage exists for the touched behavior, run the narrowest relevant spec after the appropriate build variant.
-- Use `npm run build:e2e` before blog or other feature-gated Playwright coverage so `REACT_APP_RUNTIME_ENV=test` enables the gated routes.
+- Use `npm run build:e2e` before Playwright Chromium coverage when the touched behavior depends on the test runtime.
 - Prefer mocked `/cv` coverage over live GitHub API-dependent validation when that workflow is available.
 - If browser tooling is unavailable, run the narrowest fallback validation and report browser validation as deferred.
 - Close browser sessions when validation is finished.
@@ -83,7 +83,7 @@ flowchart TB
     Components["Components<br/>AnimatedContentList · Header<br/>GlobalCommandPalette · PhotoAlbum<br/>+ cv/ blog/ ide/ header/ layout/ text/"]
     Hooks["Hooks<br/>data adapters · custom hooks"]
     Utils["Utilities<br/>date · sx · easing · assets · dom"]
-    Constants["Constants<br/>feature flags · routes · recovery"]
+    Constants["Constants<br/>runtime env · routes · recovery"]
     Styles["Styles<br/>style builder outputs"]
     Data["Data modules<br/>schema validation"]
   end
@@ -161,25 +161,25 @@ Each route spec covers:
 
 ### Currently tested
 
-| Category                      | What's covered                                                                 | Test layer       |
-| ----------------------------- | ------------------------------------------------------------------------------ | ---------------- |
-| Provider state                | Theme toggle, appearance, motion intensity, audio consent, palette state       | Unit             |
-| Route rendering               | All 6 routes render expected content                                           | Unit + E2E       |
-| Component APIs                | Props, conditional rendering, data-driven content                              | Unit             |
-| Data hooks                    | Sorting, lookup, transformation, edge cases                                    | Unit             |
-| GitHub fallback               | Success and error API states, fallback rendering                               | E2E              |
-| Feature gating                | Blog routes present/absent based on runtime env                                | Unit (constants) |
-| CV story mode                 | Story mode activation, scroll progress, active-section tracking, exit controls | Unit             |
-| Not-found recovery            | Recovery panel renders with contextual suggestions                             | Unit + E2E       |
-| Animation component contracts | Delay props, tilt flag, visibility callbacks                                   | Unit             |
-| Style builder outputs         | Builder functions execute without error against theme                          | Unit             |
+| Category                       | What's covered                                                                 | Test layer       |
+| ------------------------------ | ------------------------------------------------------------------------------ | ---------------- |
+| Provider state                 | Theme toggle, appearance, motion intensity, audio consent, palette state       | Unit             |
+| Route rendering                | All 6 routes render expected content                                           | Unit + E2E       |
+| Component APIs                 | Props, conditional rendering, data-driven content                              | Unit             |
+| Data hooks                     | Sorting, lookup, transformation, edge cases                                    | Unit             |
+| GitHub fallback                | Success and error API states, fallback rendering                               | E2E              |
+| Runtime environment resolution | `REACT_APP_RUNTIME_ENV` override and `NODE_ENV` fallback behavior              | Unit (constants) |
+| CV story mode                  | Story mode activation, scroll progress, active-section tracking, exit controls | Unit             |
+| Not-found recovery             | Recovery panel renders with contextual suggestions                             | Unit + E2E       |
+| Animation component contracts  | Delay props, tilt flag, visibility callbacks                                   | Unit             |
+| Style builder outputs          | Builder functions execute without error against theme                          | Unit             |
 
 ### Not currently tested (gaps)
 
-| Category                                   | Why it matters                                                                 | Recommended approach                              |
-| ------------------------------------------ | ------------------------------------------------------------------------------ | ------------------------------------------------- |
-| Motion intensity visual regression by level | Verifies off/subtle/default/expressive remain visually correct across routes   | E2E screenshot comparison per intensity level     |
-| Theme appearance preset visual regression   | Verifies all 6 presets keep rendering quality across routes and color modes    | E2E screenshot comparison across presets and mode |
+| Category                                    | Why it matters                                                                  | Recommended approach                              |
+| ------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------- |
+| Motion intensity visual regression by level | Verifies off/subtle/default/expressive remain visually correct across routes    | E2E screenshot comparison per intensity level     |
+| Theme appearance preset visual regression   | Verifies all 6 presets keep rendering quality across routes and color modes     | E2E screenshot comparison across presets and mode |
 | Full cross-route accessibility audit        | Catches keyboard/focus/semantics issues outside the currently targeted helpers  | Periodic manual or automated a11y sweeps          |
 | Performance budget enforcement              | Prevents route and shared-bundle growth from regressing initial-load experience | CI size budget or Lighthouse/WebPageTest gate     |
 
@@ -243,15 +243,15 @@ flowchart TB
 
 ## Regression risks specific to this codebase
 
-| Risk                    | What breaks                                                         | How to catch it                                              |
-| ----------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Broken motion handoffs  | Typewriter doesn't start, sections never reveal                     | E2E route specs + unit delay prop tests                      |
-| Tab/drawer lifecycle    | Content stays mounted when it should unmount, re-render flicker     | Unit tests with state toggling                               |
-| Route transition issues | Blank pages during navigation, stale content                        | E2E navigation tests                                         |
-| Theme drift             | Hardcoded colors/spacing bypass theme, look broken on preset switch | Unit style builder tests + E2E visual regression             |
-| Component API breaks    | Changed prop names or defaults affect multiple consumers            | Unit tests per component + consumer integration tests        |
-| Composition breakage    | Shared primitives render incorrectly when composed together         | Unit render tests with full ThemeProvider wrapper            |
-| Feature flag leaks      | Feature-gated content appears in production or disappears in test   | Unit tests for `isFeatureEnabled` + E2E build variant checks |
+| Risk                    | What breaks                                                               | How to catch it                                       |
+| ----------------------- | ------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Broken motion handoffs  | Typewriter doesn't start, sections never reveal                           | E2E route specs + unit delay prop tests               |
+| Tab/drawer lifecycle    | Content stays mounted when it should unmount, re-render flicker           | Unit tests with state toggling                        |
+| Route transition issues | Blank pages during navigation, stale content                              | E2E navigation tests                                  |
+| Theme drift             | Hardcoded colors/spacing bypass theme, look broken on preset switch       | Unit style builder tests + E2E visual regression      |
+| Component API breaks    | Changed prop names or defaults affect multiple consumers                  | Unit tests per component + consumer integration tests |
+| Composition breakage    | Shared primitives render incorrectly when composed together               | Unit render tests with full ThemeProvider wrapper     |
+| Route exposure drift    | Header, command palette, and smoke expectations disagree on public routes | Unit route-registry tests + production smoke coverage |
 
 ## Running tests
 

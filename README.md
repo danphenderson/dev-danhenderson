@@ -1,8 +1,13 @@
 # danhenderson.dev
 
+[![Build](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/build.yml)
 [![Codecov](https://codecov.io/github/danphenderson/dev-danhenderson/branch/main/graph/badge.svg)](https://app.codecov.io/github/danphenderson/dev-danhenderson?branch=main)
+[![CodeQL](https://github.com/danphenderson/dev-danhenderson/actions/workflows/codeql.yml/badge.svg?branch=main)](https://github.com/danphenderson/dev-danhenderson/actions/workflows/codeql.yml)
+[![Docs](https://github.com/danphenderson/dev-danhenderson/actions/workflows/deploy-docs.yml/badge.svg)](https://danphenderson.github.io/dev-danhenderson/)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D20.19.0-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/danphenderson/dev-danhenderson/blob/main/LICENSE)
 
-Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript portfolio site with an interactive CV, climbing log, photography galleries, and a feature-flagged blog available in development and test builds.
+Source code for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript portfolio site with an interactive CV (& CV story mode), climbing log, photography galleries, and a public editorial blog.
 
 ## Sections
 
@@ -10,7 +15,7 @@ Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript po
 | --------------------------------------- | ---------------------------------------------------------------------------------------- |
 | `/`                                     | Home page with the welcome audio prompt                                                  |
 | `/cv`                                   | Interactive CV, downloadable resume, and GitHub-backed highlights with bundled fallbacks |
-| `/blog` and `/blog/:slug`               | Editorial blog index and post detail pages in development and test builds                |
+| `/blog` and `/blog/:slug`               | Editorial blog index and post detail pages                                               |
 | `/climbing`                             | Climbing ticks and wish-list views                                                       |
 | `/photography` and `/photography/:slug` | Photography collection index and album pages                                             |
 
@@ -21,22 +26,22 @@ Source for [danhenderson.dev](https://danhenderson.dev), a React + TypeScript po
 - GitHub-powered CV sections degrade gracefully to bundled content when live API data is unavailable.
 - Shared motion, theming, and reusable UI primitives power the different sections of the site.
 
-## Feature Flags
+## Runtime Environment
 
-- `src/constants/featureFlags.ts` is the central runtime-aware feature-flag registry.
-- The `blog` flag is enabled in `development` and `test`, and disabled in `production`.
+- `src/constants/runtimeEnvironment.ts` resolves the app runtime environment from `REACT_APP_RUNTIME_ENV` or `NODE_ENV`.
 - Override the resolved runtime at build time with `REACT_APP_RUNTIME_ENV=development|test|production` when a workflow needs a non-default bundle.
+- The resolved runtime is used for environment-sensitive client behavior and Playwright test-build parity.
 
 ## Build Variants
 
-- `npm run build` creates the production bundle and disables production-hidden feature flags such as `blog`.
-- `npm run build:e2e` creates the test-runtime bundle used for Playwright so gated routes remain available during browser coverage.
+- `npm run build` creates the production bundle.
+- `npm run build:e2e` creates the test-runtime bundle used for Playwright Chromium coverage and test-runtime validation.
 - Both build variants route through `scripts/buildWithMetadata.js`, use Vite for bundling, and stamp git SHA, build time, and package version into the bundle so the footer scorecard reflects the built artifact instead of runtime placeholders.
 
 ## E2E Workflows
 
 - `npm run test:e2e` runs the full local Playwright suite by building the test-runtime bundle for `chromium` first and then rebuilding the production bundle for `smoke`.
-- `npm run build:e2e && npm run test:e2e:chromium` is the targeted path for gated route and blog-enabled browser coverage.
+- `npm run build:e2e && npm run test:e2e:chromium` is the targeted path for Chromium browser coverage.
 - `npm run build && npm run test:e2e:smoke` is the targeted path for production smoke coverage.
 
 ## Coverage

@@ -25,11 +25,19 @@ describe('getRecoveryContext', () => {
     });
   });
 
-  describe('routeHint', () => {
+  describe('routeHint and suggestedPaletteQuery', () => {
     it('returns the cv route hint for a path under /cv', () => {
       const ctx = getRecoveryContext('/cv/unknown-section');
       expect(ctx.routeHint?.id).toBe('cv');
       expect(ctx.routeHintLabel).toContain(siteRouteMap.cv.label);
+    });
+
+    it('keeps short route-token prefix hints for near-miss route paths', () => {
+      const ctx = getRecoveryContext('/cvv');
+
+      expect(ctx.routeHint?.id).toBe('cv');
+      expect(ctx.routeHintLabel).toContain(siteRouteMap.cv.label);
+      expect(ctx.contextualSuggestions.length).toBeGreaterThan(0);
     });
 
     it('returns the climbing route hint for a path starting with /climbing', () => {
@@ -40,68 +48,71 @@ describe('getRecoveryContext', () => {
     it('returns the photography route hint for a path under /photography', () => {
       const ctx = getRecoveryContext('/photography/landscape/zion');
       expect(ctx.routeHint?.id).toBe('photography');
+      expect(ctx.suggestedPaletteQuery).toBe('landscape zion');
     });
 
-    it('uses keyword scoring to hint at the closest route match', () => {
-      // A non-prefix path that contains a recognizable route keyword
+    it('uses keyword matching to hint at the closest route match', () => {
       const ctx = getRecoveryContext('/resume-download');
-      //'resume' overlaps strongly with the cv route keywords
       expect(ctx.routeHint?.id).toBe('cv');
+      expect(ctx.suggestedPaletteQuery).toBe('resume download');
     });
 
-    it('returns null routeHint for a completely unrelated path', () => {
-      const ctx = getRecoveryContext('/xyzzy-totally-unknown-page-12345');
-      // May or may not match — the important thing is it does not throw
-      expect(ctx).toBeDefined();
-    });
-
-    it('returns null routeHintLabel when routeHint is null', () => {
-      // Root path '/' matches no non-root, non-wildcard route, so no hint
-      const ctx = getRecoveryContext('/unknown-xyz-abc');
-      if (ctx.routeHint === null) {
-        expect(ctx.routeHintLabel).toBeNull();
-      }
-    });
-  });
-
-  describe('suggestedPaletteQuery', () => {
     it('produces a non-empty query for a multi-segment path under a known route', () => {
       const ctx = getRecoveryContext('/cv/about-me');
-      expect(ctx.suggestedPaletteQuery).toBeTruthy();
+      expect(ctx.suggestedPaletteQuery).toBe('about me');
     });
 
     it('returns empty string for the root path', () => {
       const ctx = getRecoveryContext('/');
       expect(ctx.suggestedPaletteQuery).toBe('');
     });
+
+    it('returns no route hint for a completely unrelated path', () => {
+      const ctx = getRecoveryContext('/unknown-xyz-abc');
+      expect(ctx.routeHint).toBeNull();
+      expect(ctx.routeHintLabel).toBeNull();
+    });
   });
 
   describe('contextualSuggestions', () => {
-    it('returns at most 3 suggestions', () => {
+    it('prioritizes the matching cv section for typo-like section paths', () => {
+      const ctx = getRecoveryContext('/cv/abou');
+
+      expect(ctx.suggestedPaletteQuery).toBe('abou');
+      expect(ctx.contextualSuggestions[0]?.path).toBe(`${siteRouteMap.cv.path}#cv-about`);
+      expect(ctx.contextualSuggestions[0]?.matchReason).toBe('Closest matching CV section.');
+    });
+
+    it('prefers the cv route action when the path only matches route keywords', () => {
+      const ctx = getRecoveryContext('/resume-download');
+
+      expect(ctx.contextualSuggestions[0]?.path).toBe(siteRouteMap.cv.path);
+    });
+
+    it('prioritizes matching photography albums over the base photography route', () => {
+      const ctx = getRecoveryContext('/photography/landscape/zion');
+      const paths = ctx.contextualSuggestions.map((suggestion) => suggestion.path);
+
+      expect(paths[0]).toBe(`${siteRouteMap.photography.path}/landscape`);
+
+      const photographyRouteIndex = paths.indexOf(siteRouteMap.photography.path);
+      if (photographyRouteIndex !== -1) {
+        expect(photographyRouteIndex).toBeGreaterThan(0);
+      }
+    });
+
+    it('returns unique suggestions and limits the result set to three items', () => {
       const ctx = getRecoveryContext('/cv/experience-senior-engineer');
+      const paths = ctx.contextualSuggestions.map((suggestion) => suggestion.path);
+
       expect(ctx.contextualSuggestions.length).toBeLessThanOrEqual(3);
-    });
-
-    it('scores CV-related actions higher for a path under /cv', () => {
-      const ctx = getRecoveryContext('/cv/experience');
-      const firstSuggestion = ctx.contextualSuggestions[0];
-      expect(firstSuggestion).toBeDefined();
-      // The cv route path should appear in the top suggestion
-      expect(firstSuggestion.path).toContain('/cv');
-    });
-
-    it('does not produce duplicate paths in suggestions', () => {
-      const ctx = getRecoveryContext('/photography/landscape');
-      const paths = ctx.contextualSuggestions.map((s) => s.path);
       expect(new Set(paths).size).toBe(paths.length);
     });
 
-    it('includes matchReason on each suggestion', () => {
-      const ctx = getRecoveryContext('/climbing/trad-routes');
-      ctx.contextualSuggestions.forEach((suggestion) => {
-        expect(typeof suggestion.matchReason).toBe('string');
-        expect(suggestion.matchReason.length).toBeGreaterThan(0);
-      });
+    it('returns no contextual suggestions for unrelated paths', () => {
+      const ctx = getRecoveryContext('/unknown-xyz-abc');
+
+      expect(ctx.contextualSuggestions).toEqual([]);
     });
   });
 });

@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import useScrollTrigger from '@mui/material/useScrollTrigger';
 import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
 import {
@@ -9,17 +10,20 @@ import {
   cvSectionMetadata,
   cvSectionNavigationOrder,
 } from '../../../src/components/cv/cvSectionMetadata';
-import {
-  APP_APPEARANCE_STORAGE_KEY,
-  defaultAppAppearanceKey,
-} from '../../../src/theme/appAppearance';
+import { PREFERENCE_STORAGE_KEYS } from '../../../src/theme/preferences';
 import { cvPageSectionLayout } from '../../../src/pages/cvPageLayout';
 import CV from '../../../src/pages/CV';
 
-const legacyCvAppearanceStorageKey = 'danhenderson-cv-appearance';
 const mockAppSpeedDial = jest.fn();
 
-jest.mock('@mui/material/useMediaQuery', () => jest.fn());
+jest.mock('@mui/material/useMediaQuery', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+jest.mock('@mui/material/useScrollTrigger', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
 
 jest.mock('../../../src/hooks/useGithubProfile', () => ({
   useGithubProfile: () => ({
@@ -54,17 +58,20 @@ jest.mock('../../../src/components/AnimatedContentCard', () => ({
     children,
     id,
     delayMs,
+    entranceDirection,
     triggerOnView,
   }: {
     children: ReactNode;
     id?: string;
     delayMs?: number;
+    entranceDirection?: string;
     triggerOnView?: boolean;
   }) => (
     <div
       id={id}
       data-testid={id ? `animated-card-${id}` : 'animated-card'}
       data-delay-ms={delayMs ?? 0}
+      data-entrance-direction={entranceDirection ?? 'zoom'}
       data-trigger-on-view={String(triggerOnView ?? true)}
     >
       {children}
@@ -129,6 +136,7 @@ jest.mock('../../../src/components/cv/CVSectionNavigator', () => ({
 }));
 
 const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQuery>;
+const mockUseScrollTrigger = useScrollTrigger as jest.MockedFunction<typeof useScrollTrigger>;
 
 describe('CV page section navigation', () => {
   const getAnimatedSectionCard = (sectionKey: CVSectionKey) =>
@@ -145,15 +153,36 @@ describe('CV page section navigation', () => {
 
   beforeEach(() => {
     mockUseMediaQuery.mockReturnValue(false);
-    window.localStorage.removeItem(APP_APPEARANCE_STORAGE_KEY);
-    window.localStorage.removeItem(legacyCvAppearanceStorageKey);
+    mockUseScrollTrigger.mockReturnValue(false);
+    window.localStorage.removeItem(PREFERENCE_STORAGE_KEYS.appearance);
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders the desktop top row and both desktop columns while preserving the desktop motion contract', () => {
+  it('renders only the About section before the header collapse trigger unlocks deferred sections', () => {
+    renderCV();
+
+    const desktopTopRegion = screen.getByTestId('cv-desktop-top-region');
+
+    expect(
+      within(desktopTopRegion).getByTestId(`animated-card-${cvSectionMetadata.about.id}`)
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByTestId(`animated-card-${cvSectionMetadata.github.id}`)
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId(`animated-card-${cvSectionMetadata.experience.id}`)
+    ).not.toBeInTheDocument();
+    expect(screen.queryByTestId('cv-desktop-sidebar-region')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('cv-desktop-main-region')).not.toBeInTheDocument();
+    expect(screen.getByTestId('cv-scroll-unlock-runway')).toBeInTheDocument();
+    expect(screen.queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
+  });
+
+  it('renders the desktop top row and both desktop columns after the header collapse trigger unlocks them', () => {
+    mockUseScrollTrigger.mockReturnValue(true);
     renderCV();
 
     const desktopTopRegion = screen.getByTestId('cv-desktop-top-region');
@@ -181,11 +210,16 @@ describe('CV page section navigation', () => {
     expect(
       within(desktopMainRegion).getByTestId(`animated-card-${cvSectionMetadata.coding.id}`)
     ).toBeInTheDocument();
+    expect(screen.queryByTestId('cv-scroll-unlock-runway')).not.toBeInTheDocument();
 
     (Object.keys(cvPageSectionLayout) as CVSectionKey[]).forEach((sectionKey) => {
-      const { delayMs, triggerOnView } = cvPageSectionLayout[sectionKey].desktop;
+      const { delayMs, entranceDirection, triggerOnView } = cvPageSectionLayout[sectionKey].desktop;
 
       expect(getAnimatedSectionCard(sectionKey)).toHaveAttribute('data-delay-ms', `${delayMs}`);
+      expect(getAnimatedSectionCard(sectionKey)).toHaveAttribute(
+        'data-entrance-direction',
+        entranceDirection
+      );
       expect(getAnimatedSectionCard(sectionKey)).toHaveAttribute(
         'data-trigger-on-view',
         String(triggerOnView)
@@ -193,7 +227,7 @@ describe('CV page section navigation', () => {
     });
   });
 
-  it('renders ABOUT actions and places a floating section navigator at the route root', () => {
+  it('renders ABOUT actions while deferred sections remain locked', () => {
     renderCV();
 
     const aboutDial = screen.getByTestId('speed-dial-open-about-actions');
@@ -229,19 +263,14 @@ describe('CV page section navigation', () => {
         }),
       })
     );
-    const navigator = screen.getByTestId('cv-section-navigator');
-    const desktopSidebarRegion = screen.getByTestId('cv-desktop-sidebar-region');
 
     expect(screen.queryByTestId('cv-sticky-section-navigator')).not.toBeInTheDocument();
     expect(within(aboutSection).queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
-    expect(
-      within(desktopSidebarRegion).queryByTestId('cv-section-navigator')
-    ).not.toBeInTheDocument();
-    expect(navigator.getAttribute('data-sections')).toBe(cvSectionNavigationOrder.join(','));
-    expect(screen.getByTestId('cv-floating-section-dial')).toBeInTheDocument();
+    expect(screen.queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
   });
 
-  it('renders the floating section navigator as the CV route navigation control', () => {
+  it('renders the floating section navigator as the CV route navigation control after unlock', () => {
+    mockUseScrollTrigger.mockReturnValue(true);
     renderCV();
 
     const navigator = screen.getByTestId('cv-section-navigator');
@@ -252,6 +281,7 @@ describe('CV page section navigation', () => {
   });
 
   it('renders the GitHub section without the removed projects subsection', () => {
+    mockUseScrollTrigger.mockReturnValue(true);
     renderCV();
 
     const githubSection = getAnimatedSectionCard('github');
@@ -274,30 +304,20 @@ describe('CV page section navigation', () => {
     expect(within(githubSection).queryByText('Public Projects')).not.toBeInTheDocument();
   });
 
-  it('ignores the legacy CV appearance key and uses the global default appearance key', () => {
-    window.localStorage.setItem(legacyCvAppearanceStorageKey, 'atlas');
-
-    renderCV();
-
-    const aboutSection = getAnimatedSectionCard('about');
-
-    expect(within(aboutSection).queryByText('Style Preview')).not.toBeInTheDocument();
-    expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe(defaultAppAppearanceKey);
-  });
-
   it('respects the stored global appearance option on load', () => {
-    window.localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, 'atlas');
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.appearance, 'atlas');
 
     renderCV();
 
     const aboutSection = getAnimatedSectionCard('about');
 
     expect(within(aboutSection).queryByText('Style Preview')).not.toBeInTheDocument();
-    expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe('atlas');
+    expect(window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.appearance)).toBe('atlas');
   });
 
   it('renders the mobile stacked order and keeps ABOUT ahead of EXPERIENCE with the current mobile motion contract', () => {
     mockUseMediaQuery.mockReturnValue(true);
+    mockUseScrollTrigger.mockReturnValue(true);
 
     renderCV();
 
@@ -306,9 +326,13 @@ describe('CV page section navigation', () => {
       .map(([key]) => key as CVSectionKey);
 
     orderedMobileSections.forEach((sectionKey) => {
-      const { delayMs, triggerOnView } = cvPageSectionLayout[sectionKey].mobile;
+      const { delayMs, entranceDirection, triggerOnView } = cvPageSectionLayout[sectionKey].mobile;
 
       expect(getAnimatedSectionCard(sectionKey)).toHaveAttribute('data-delay-ms', `${delayMs}`);
+      expect(getAnimatedSectionCard(sectionKey)).toHaveAttribute(
+        'data-entrance-direction',
+        entranceDirection
+      );
       expect(getAnimatedSectionCard(sectionKey)).toHaveAttribute(
         'data-trigger-on-view',
         String(triggerOnView)
@@ -329,6 +353,13 @@ describe('CV page section navigation', () => {
       aboutDial.compareDocumentPosition(navigator) & Node.DOCUMENT_POSITION_FOLLOWING
     ).toBeTruthy();
     expect(navigator.getAttribute('data-sections')).toBe(cvSectionNavigationOrder.join(','));
+  });
+
+  it('unlocks deferred sections immediately for deep links to non-About anchors', () => {
+    renderCV(['/cv#cv-github']);
+
+    expect(screen.getByTestId('cv-desktop-sidebar-region')).toBeInTheDocument();
+    expect(screen.getByTestId(`animated-card-${cvSectionMetadata.github.id}`)).toBeInTheDocument();
   });
 
   it('renders story mode viewer when ?mode=story is set', () => {
@@ -354,14 +385,10 @@ describe('CV page section navigation', () => {
 
     expect(screen.getByTestId('cv-story-header')).toBeInTheDocument();
     expect(screen.getByText('Full CV')).toBeInTheDocument();
-
-    const githubSectionForMode = getAnimatedSectionCard('github');
-    expect(
-      within(githubSectionForMode).getByTestId('cv-github-status-tooltip-trigger')
-    ).toBeInTheDocument();
     expect(screen.getByTestId('cv-mode-toggle')).toHaveTextContent('Read my story');
     expect(screen.queryByTestId('cv-story-layout')).not.toBeInTheDocument();
     expect(screen.getByTestId('cv-desktop-top-region')).toBeInTheDocument();
+    expect(screen.queryByTestId('cv-section-navigator')).not.toBeInTheDocument();
   });
 
   it('enters story mode when the mode toggle is clicked', () => {

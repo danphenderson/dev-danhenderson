@@ -32,6 +32,7 @@ type AnimatedContentListProps<Item> = {
   mountThreshold?: number;
   mountRootMargin?: string;
   tiltItems?: boolean;
+  getItemContainerSx?: (item: Item, index: number) => SxProps<Theme>;
 };
 
 export const AnimatedContentList = <Item,>({
@@ -52,6 +53,7 @@ export const AnimatedContentList = <Item,>({
   mountThreshold = DEFAULT_INTERSECTION_THRESHOLD,
   mountRootMargin = DEFAULT_INTERSECTION_ROOT_MARGIN,
   tiltItems = false,
+  getItemContainerSx,
 }: AnimatedContentListProps<Item>) => {
   const {
     cardResetSx,
@@ -133,7 +135,10 @@ export const AnimatedContentList = <Item,>({
           delayMs={getItemDelayMs(index, startDelayMs, resolvedItemStaggerMs)}
           skipEntranceAnimation={skipEntranceAnimation}
           sx={[...itemSurfaceSx, ...itemSxArray]}
-          containerSx={resolvedItemContainerSx}
+          containerSx={[
+            ...resolvedItemContainerSx,
+            ...(getItemContainerSx ? normalizeSxProp(getItemContainerSx(item, index)) : []),
+          ]}
           {...(itemComponent ? { component: itemComponent } : {})}
         >
           {renderItem(item, index)}

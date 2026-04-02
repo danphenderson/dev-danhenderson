@@ -129,7 +129,16 @@ describe('PageTransition', () => {
 
     expect(capturedMotionDivProps.initial).toEqual({ opacity: 0, y: 8 });
     expect(capturedMotionDivProps.animate).toEqual({ opacity: 1, y: 0 });
-    expect(capturedMotionDivProps.exit).toEqual({ opacity: 0 });
+    expect(capturedMotionDivProps.exit).toEqual(
+      expect.objectContaining({
+        opacity: 0,
+        y: -8,
+        transition: expect.objectContaining({
+          duration: expect.any(Number),
+          ease: expect.any(Array),
+        }),
+      })
+    );
     expect(capturedMotionDivProps.transition).toEqual(
       expect.objectContaining({
         duration: expect.any(Number),

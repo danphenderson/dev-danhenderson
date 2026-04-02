@@ -1,5 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Stack } from '@mui/material';
+import { ANIMATED_CARD_DURATION_MS } from '../components/AnimatedContentCard';
 import { SectionHeading } from '../components/layout/SectionHeading';
 import { PageFrame } from '../components/layout/PageFrame';
 import { SectionCard } from '../components/layout/SectionCard';
@@ -10,8 +11,8 @@ import { siteRouteMap } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useBlogData } from '../hooks/useBlogData';
 import { useAppStyles } from '../styles/appStyles';
-import { MotionSection } from '../motion';
-import { Text } from '../components/text';
+import { MotionSection, MotionTiltCard, useMotionScale } from '../motion';
+import { Text, TypewriterText } from '../components/text';
 
 export default function Blog() {
   const appStyles = useAppStyles();
@@ -22,16 +23,37 @@ export default function Blog() {
 
   const { posts, postMeta, featuredPost, tags } = useBlogData();
   const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [hasIntroEntered, setHasIntroEntered] = useState(false);
+  const [isIntroPlaying, setIsIntroPlaying] = useState(false);
+  const { duration: durationScale } = useMotionScale();
 
-  const nonFeaturedMeta = useMemo(
-    () => postMeta.filter((p) => p.slug !== featuredPost?.slug),
-    [postMeta, featuredPost]
-  );
+  useEffect(() => {
+    if (!hasIntroEntered) {
+      return undefined;
+    }
 
-  const filteredPosts = useMemo(
-    () => (activeTag ? nonFeaturedMeta.filter((p) => p.tags.includes(activeTag)) : nonFeaturedMeta),
-    [nonFeaturedMeta, activeTag]
-  );
+    if (durationScale === 0) {
+      setIsIntroPlaying(true);
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(
+      () => {
+        setIsIntroPlaying(true);
+      },
+      Math.round(ANIMATED_CARD_DURATION_MS * durationScale)
+    );
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [durationScale, hasIntroEntered]);
+
+  const nonFeaturedPosts = postMeta.filter((post) => post.slug !== featuredPost?.slug);
+
+  const filteredPosts = activeTag
+    ? nonFeaturedPosts.filter((post) => post.tags.includes(activeTag))
+    : nonFeaturedPosts;
 
   const filteredFeaturedPost =
     activeTag && featuredPost && !featuredPost.tags.includes(activeTag) ? null : featuredPost;
@@ -40,18 +62,27 @@ export default function Blog() {
     <PageFrame image="assets/photography/landscape/landscape-lime-kiln.jpg">
       <Stack spacing={3}>
         <MotionSection>
-          <SectionCard delayMs={0} triggerOnView={false}>
-            <Stack spacing={1}>
-              <SectionHeading
-                overline="Blog"
-                subtitle="Technical writing on frontend architecture, React patterns, and software engineering."
-                sx={appStyles.compactSectionHeadingSx}
-              />
-              <Text role="bodyMuted">
-                {posts.length} article{posts.length !== 1 ? 's' : ''}
-              </Text>
-            </Stack>
-          </SectionCard>
+          <MotionTiltCard intensity={0.5}>
+            <SectionCard
+              delayMs={0}
+              triggerOnView={false}
+              onVisible={() => setHasIntroEntered(true)}
+            >
+              <Stack spacing={1}>
+                <SectionHeading overline="Blog" sx={appStyles.compactSectionHeadingSx} />
+                <Text role="sectionSubtitle">
+                  <TypewriterText
+                    text="Future home of technical notes on software engineering and applied mathematics."
+                    playing={isIntroPlaying}
+                    timingPreset="body"
+                  />
+                </Text>
+                <Text role="bodyMuted">
+                  {posts.length} article{posts.length !== 1 ? 's' : ''}
+                </Text>
+              </Stack>
+            </SectionCard>
+          </MotionTiltCard>
         </MotionSection>
 
         {filteredFeaturedPost && <BlogHero post={filteredFeaturedPost} />}

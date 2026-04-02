@@ -5,6 +5,19 @@ import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
 import BlogPost from '../../../src/pages/BlogPost';
 
+jest.mock('../../../src/motion', () => {
+  const actual = jest.requireActual('../../../src/motion');
+
+  return {
+    ...actual,
+    MotionTiltCard: ({ children, intensity }: { children: ReactNode; intensity?: number }) => (
+      <div data-testid="blog-post-back-link-tilt-card" data-intensity={String(intensity ?? '')}>
+        {children}
+      </div>
+    ),
+  };
+});
+
 jest.mock('../../../src/components/layout/SectionHeading', () => ({
   SectionHeading: ({ overline, title }: { overline: string; title?: string }) => (
     <div data-testid="section-heading" data-overline={overline} data-title={title ?? ''}>
@@ -79,6 +92,16 @@ describe('BlogPost', () => {
     renderBlogPost('test-article');
 
     expect(screen.getByText('Back to blog')).toBeInTheDocument();
+  });
+
+  it('renders the back to blog button inside a MotionTiltCard surface', () => {
+    renderBlogPost('test-article');
+
+    const tiltCard = screen
+      .getByText('Back to blog')
+      .closest('[data-testid="blog-post-back-link-tilt-card"]');
+
+    expect(tiltCard).toHaveAttribute('data-intensity', '0.5');
   });
 
   it('renders not-found recovery when slug does not match', () => {

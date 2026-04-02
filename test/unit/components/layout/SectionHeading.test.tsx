@@ -25,6 +25,19 @@ describe('SectionHeading', () => {
     expect(screen.getByText('A selection of work')).toBeInTheDocument();
   });
 
+  it('renders a subtitle node when provided', () => {
+    render(
+      <ThemeProvider>
+        <SectionHeading
+          overline="Photography"
+          subtitle={<span data-testid="section-subtitle-node">A selection of work</span>}
+        />
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('section-subtitle-node')).toBeInTheDocument();
+  });
+
   it('omits title and subtitle when not provided', () => {
     render(
       <ThemeProvider>

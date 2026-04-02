@@ -52,7 +52,8 @@ export const FirstVisitSettingsHintPopover = ({
         </Stack>
 
         <Text role="body">
-          You can always update motion and welcome audio from the settings button in the header.
+          You can always update motion, welcome audio, and more from the settings button in the
+          header.
         </Text>
 
         <Button onClick={onGetStarted} variant="contained" fullWidth aria-label="Get started">

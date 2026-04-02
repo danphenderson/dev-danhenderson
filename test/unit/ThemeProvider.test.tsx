@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material/styles';
 import { render, screen, act } from '@testing-library/react';
 import ThemeProvider, { useAppTheme } from '../../src/ThemeProvider';
-import { APP_APPEARANCE_STORAGE_KEY, defaultAppAppearanceKey } from '../../src/theme/appAppearance';
+import { defaultAppAppearanceKey } from '../../src/theme/appAppearance';
 import { PREFERENCE_STORAGE_KEYS } from '../../src/theme/preferences';
 
 const mockUseReducedMotion = jest.fn().mockReturnValue(false);
@@ -9,8 +9,6 @@ const mockUseReducedMotion = jest.fn().mockReturnValue(false);
 jest.mock('motion/react', () => ({
   useReducedMotion: () => mockUseReducedMotion(),
 }));
-
-const legacyCvAppearanceStorageKey = 'danhenderson-cv-appearance';
 
 const ThemeConsumer = () => {
   const {
@@ -88,7 +86,7 @@ describe('ThemeProvider', () => {
     });
 
     expect(screen.getByTestId('mode')).toHaveTextContent('light');
-    expect(window.localStorage.getItem('danhenderson-theme')).toBe('light');
+    expect(window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.theme)).toBe('light');
   });
 
   it('setAppearance updates the global appearance and persists it', () => {
@@ -103,12 +101,12 @@ describe('ThemeProvider', () => {
     });
 
     expect(screen.getByTestId('appearance')).toHaveTextContent('atlas');
-    expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe('atlas');
+    expect(window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.appearance)).toBe('atlas');
   });
 
   it('reads stored theme from localStorage', () => {
-    window.localStorage.setItem('danhenderson-theme', 'dark');
-    window.localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, 'ember');
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.theme, 'dark');
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.appearance, 'ember');
 
     render(
       <ThemeProvider>
@@ -120,21 +118,8 @@ describe('ThemeProvider', () => {
     expect(screen.getByTestId('appearance')).toHaveTextContent('ember');
   });
 
-  it('defaults to evergreen when only the legacy CV appearance storage key exists', () => {
-    window.localStorage.setItem(legacyCvAppearanceStorageKey, 'atlas');
-
-    render(
-      <ThemeProvider>
-        <ThemeConsumer />
-      </ThemeProvider>
-    );
-
-    expect(screen.getByTestId('appearance')).toHaveTextContent(defaultAppAppearanceKey);
-    expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe(defaultAppAppearanceKey);
-  });
-
   it('defaults to evergreen when the stored appearance matches an inherited object property', () => {
-    window.localStorage.setItem(APP_APPEARANCE_STORAGE_KEY, 'toString');
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.appearance, 'toString');
 
     render(
       <ThemeProvider>
@@ -143,7 +128,9 @@ describe('ThemeProvider', () => {
     );
 
     expect(screen.getByTestId('appearance')).toHaveTextContent(defaultAppAppearanceKey);
-    expect(window.localStorage.getItem(APP_APPEARANCE_STORAGE_KEY)).toBe(defaultAppAppearanceKey);
+    expect(window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.appearance)).toBe(
+      defaultAppAppearanceKey
+    );
   });
 
   it('disables theme CSS motion when reduced motion is enabled without overwriting the stored preference', () => {

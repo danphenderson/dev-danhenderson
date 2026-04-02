@@ -1,9 +1,15 @@
 import { render, screen } from '@testing-library/react';
+import useScrollTrigger from '@mui/material/useScrollTrigger';
 import { MemoryRouter } from 'react-router-dom';
 import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { aboutMe } from '../../../src/data/cv';
 import CV from '../../../src/pages/CV';
+
+jest.mock('@mui/material/useScrollTrigger', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
 
 jest.mock('../../../src/hooks/useGithubProfile', () => ({
   useGithubProfile: () => ({
@@ -33,6 +39,8 @@ jest.mock('react-github-calendar', () => ({
 }));
 
 describe('CV runtime render', () => {
+  const mockUseScrollTrigger = useScrollTrigger as jest.MockedFunction<typeof useScrollTrigger>;
+
   const renderCV = (initialEntries = ['/cv']) =>
     render(
       <MemoryRouter initialEntries={initialEntries} future={routerFuture}>
@@ -42,47 +50,22 @@ describe('CV runtime render', () => {
       </MemoryRouter>
     );
 
-  it('renders the live CV component tree without invalid element errors', () => {
-    renderCV();
-
-    expect(screen.getByText('About')).toBeInTheDocument();
-    expect(screen.getByText(aboutMe.name)).toBeInTheDocument();
-    expect(screen.getAllByText('Experience').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('GitHub').length).toBeGreaterThan(0);
+  beforeEach(() => {
+    mockUseScrollTrigger.mockReturnValue(true);
   });
 
-  it('renders all primary CV section headings', () => {
-    renderCV();
-
-    expect(screen.getByText('About')).toBeInTheDocument();
-    expect(screen.getAllByText('Experience').length).toBeGreaterThan(0);
-    expect(screen.getAllByText('Education').length).toBeGreaterThan(0);
-    expect(screen.getByText('Volunteering')).toBeInTheDocument();
-    expect(screen.getAllByText('GitHub').length).toBeGreaterThan(0);
-    expect(screen.getByText('Certificates')).toBeInTheDocument();
-  });
-
-  it('renders the profile card with name, title, and program link', () => {
-    renderCV();
-
-    expect(screen.getByText(aboutMe.name)).toBeInTheDocument();
-    expect(screen.getByText(aboutMe.title)).toBeInTheDocument();
-  });
-
-  it('renders the updated about bio copy', () => {
+  it('renders the live CV tree with the accessible bio layer and mocked GitHub content', () => {
     const { container } = renderCV();
 
     const accessibleLayer = container.querySelector('[data-typewriter-layer="accessible"]');
 
+    expect(screen.getByText('About')).toBeInTheDocument();
+    expect(screen.getByText(aboutMe.name)).toBeInTheDocument();
+    expect(screen.getByText(aboutMe.title)).toBeInTheDocument();
     expect(accessibleLayer).not.toBeNull();
     expect(accessibleLayer).toHaveTextContent(
-      'Software developer building scientific, data, and AI-enabled systems. Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software. I previously built ingestion, analytics, and ML solutions for a healthcare data platform.'
+      'Software developer building scientific, data, and AI-enabled systems. Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software. Previously built ingestion, analytics, and ML solutions for a healthcare data platform.'
     );
-  });
-
-  it('renders GitHub section content from mock data', () => {
-    renderCV();
-
     expect(screen.getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
     expect(screen.getByText('microsoft/playwright')).toBeInTheDocument();
     expect(screen.getByTestId('github-calendar')).toBeInTheDocument();

@@ -44,7 +44,7 @@ export const aboutMe: AboutMe = {
   email: 'me@danhenderson.dev',
   phone: '',
   location: 'Seattle, WA',
-  opportunities: ['Scientific computing', 'Data platforms', 'ML/AI engineering'],
+  opportunities: ['Scientific computing', 'Data platforms', 'ML/AI engineering', 'Web development'],
   bioLink: {
     text: 'M.S. in applied/computational mathematics',
     url: mtuMathGraduateBioUrl,
@@ -54,7 +54,7 @@ export const aboutMe: AboutMe = {
 
 Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software.
 
-I previously built ingestion, analytics, and ML solutions for a healthcare data platform.`,
+Previously built ingestion, analytics, and ML solutions for a healthcare data platform.`,
 };
 
 export const codingExamples: CodingExample[] = [
@@ -303,7 +303,7 @@ export const experiences: Experience[] = [
   {
     company: 'Michigan Technological University',
     companyUrl: mtuGlobalCampusOrganizationUrl,
-    companyTooltip: 'View online graduate degrees page',
+    companyTooltip: 'View Mathematical Sciences student directory page',
     industry: 'Higher Education',
     title: 'Graduate Research Assistant',
     startDate: 'May 2025',
@@ -345,7 +345,7 @@ export const experiences: Experience[] = [
   {
     company: 'Michigan Technological University',
     companyUrl: mtuGlobalCampusOrganizationUrl,
-    companyTooltip: 'View online graduate degrees page',
+    companyTooltip: 'View Mathematical Sciences student directory',
     industry: 'Higher Education',
     title: 'Instructor',
     startDate: 'Jan 2025',
@@ -372,7 +372,7 @@ export const experiences: Experience[] = [
   {
     company: 'Michigan Technological University',
     companyUrl: mtuGlobalCampusOrganizationUrl,
-    companyTooltip: 'View online graduate degrees page',
+    companyTooltip: 'View Mathematical Sciences student directory',
     industry: 'Higher Education',
     title: 'Graduate Teaching Assistant',
     startDate: 'Aug 2024',
@@ -465,7 +465,7 @@ export const experiences: Experience[] = [
   {
     company: 'Michigan Technological University',
     companyUrl: mtuGlobalCampusOrganizationUrl,
-    companyTooltip: 'View online graduate degrees page',
+    companyTooltip: 'View Mathematical Sciences student directory',
     industry: 'Higher Education',
     title: 'Research Assistant | Full Time',
     startDate: 'May 2021',
@@ -478,18 +478,27 @@ export const experiences: Experience[] = [
         {
           text: 'Quasi-Newton Optimization with Hessian Samples',
           link: 'https://lnkd.in/gfP39wZX',
+          tooltip: 'View article on arxiv.org',
         },
       ],
       [
         { text: 'Built ' },
-        { text: 'BlockOpt.jl', link: 'https://github.com/danphenderson/BlockOpt.jl' },
+        {
+          text: 'BlockOpt.jl',
+          link: 'https://github.com/danphenderson/BlockOpt.jl',
+          tooltip: 'View Github repository',
+        },
         {
           text: ', an open-source Julia implementation of the paper’s trust-region quasi-Newton methods.',
         },
       ],
       [
         { text: 'Built ' },
-        { text: 'UncNLPrograms.jl', link: 'https://github.com/danphenderson/UncNLPrograms.jl' },
+        {
+          text: 'UncNLPrograms.jl',
+          link: 'https://github.com/danphenderson/UncNLPrograms.jl',
+          tooltip: 'View Github repository',
+        },
         {
           text: ' to create an automatic-differentiation optimization benchmark suite to test paper’s methods.',
         },
@@ -509,10 +518,10 @@ export const experiences: Experience[] = [
   {
     company: 'Michigan Technological University',
     companyUrl: mtuGlobalCampusOrganizationUrl,
-    companyTooltip: 'View online graduate degrees page',
+    companyTooltip: 'View Mathematical Sciences student directory',
     industry: 'Higher Education',
     title: 'Mathematics Tutor | Part Time',
-    startDate: 'September 2015',
+    startDate: 'Sep 2015',
     endDate: 'May 2018 (2 yrs 9 mos)',
     description:
       'Tutor to NCAA student-athletes in calculus (I, II, & III), ordinary differential equations, and linear algebra.',

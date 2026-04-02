@@ -16,13 +16,12 @@ import { CommonLinkTooltip } from './components/CommonLinkTooltip';
 import { LoadingBars } from './components/LoadingBars';
 import { PageTransition } from './components/PageTransition';
 import { ScrollProgressBar } from './components/ScrollProgressBar';
-import { isFeatureEnabled } from './constants/featureFlags';
 import { siteRouteMap } from './constants/siteRoutes';
 
 import { Box } from '@mui/material';
 import { CommandPaletteProvider } from './CommandPaletteProvider';
 import { cssDuration } from './motion/tokens';
-import { routerFuture } from './routerFuture';
+
 import { readPublicUrl } from './utils/appEnvironment';
 
 type LazyRouteModule = {
@@ -64,7 +63,7 @@ const blogRoute = createLazyRouteModule(() => import('./pages/Blog'));
 const blogPostRoute = createLazyRouteModule(() => import('./pages/BlogPost'));
 const notFoundRoute = createLazyRouteModule(() => import('./pages/NotFound'));
 
-const resolveRouteModule = (pathname: string, isBlogEnabled: boolean) => {
+const resolveRouteModule = (pathname: string) => {
   if (matchPath({ path: siteRouteMap.home.path, end: true }, pathname)) {
     return homeRoute;
   }
@@ -85,11 +84,11 @@ const resolveRouteModule = (pathname: string, isBlogEnabled: boolean) => {
     return photographyCategoryRoute;
   }
 
-  if (isBlogEnabled && matchPath({ path: siteRouteMap.blog.path, end: true }, pathname)) {
+  if (matchPath({ path: siteRouteMap.blog.path, end: true }, pathname)) {
     return blogRoute;
   }
 
-  if (isBlogEnabled && matchPath({ path: `${siteRouteMap.blog.path}/:slug`, end: true }, pathname)) {
+  if (matchPath({ path: `${siteRouteMap.blog.path}/:slug`, end: true }, pathname)) {
     return blogPostRoute;
   }
 
@@ -121,11 +120,10 @@ const skipLinkSx = {
 } as const;
 
 function AppContent() {
-  const isBlogEnabled = isFeatureEnabled('blog');
   const location = useLocation();
   const activeRouteModule = useMemo(
-    () => resolveRouteModule(location.pathname, isBlogEnabled),
-    [isBlogEnabled, location.pathname]
+    () => resolveRouteModule(location.pathname),
+    [location.pathname]
   );
   const [displayLocation, setDisplayLocation] = useState<Location | null>(() =>
     activeRouteModule.isLoaded() ? location : null
@@ -189,16 +187,15 @@ function AppContent() {
                   path={`${siteRouteMap.photography.path}/:slug`}
                   element={<photographyCategoryRoute.Component />}
                 />
-                {isBlogEnabled ? (
-                  <Route path={siteRouteMap.blog.path} element={<blogRoute.Component />} />
-                ) : null}
-                {isBlogEnabled ? (
-                  <Route
-                    path={`${siteRouteMap.blog.path}/:slug`}
-                    element={<blogPostRoute.Component />}
-                  />
-                ) : null}
-                <Route path={siteRouteMap['not-found'].path} element={<notFoundRoute.Component />} />
+                <Route path={siteRouteMap.blog.path} element={<blogRoute.Component />} />
+                <Route
+                  path={`${siteRouteMap.blog.path}/:slug`}
+                  element={<blogPostRoute.Component />}
+                />
+                <Route
+                  path={siteRouteMap['not-found'].path}
+                  element={<notFoundRoute.Component />}
+                />
               </Routes>
             </PageTransition>
           ) : (
@@ -215,7 +212,7 @@ function AppContent() {
 
 export default function App() {
   return (
-    <BrowserRouter basename={readPublicUrl()} future={routerFuture}>
+    <BrowserRouter basename={readPublicUrl()}>
       <AppErrorBoundary>
         <AppContent />
       </AppErrorBoundary>

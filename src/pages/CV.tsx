@@ -1,7 +1,8 @@
 import { Box, Grid } from '@mui/material';
-import { useCallback } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import useScrollTrigger from '@mui/material/useScrollTrigger';
 import { useTheme as useMuiTheme } from '@mui/material/styles';
 import DownloadIcon from '@mui/icons-material/Download';
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
@@ -14,7 +15,7 @@ import { CVSectionStack } from '../components/cv/CVSectionStack';
 import { CVStoryHeader } from '../components/cv/CVStoryHeader';
 import { CVStoryViewer } from '../components/cv/CVStoryViewer';
 import { CVGitHubStatusTooltip } from '../components/cv/CVGitHubStatusTooltip';
-import { cvSectionNavigationOrder } from '../components/cv/cvSectionMetadata';
+import { cvSectionMetadata, cvSectionNavigationOrder } from '../components/cv/cvSectionMetadata';
 import { PageFrame } from '../components/layout/PageFrame';
 import {
   aboutMe,
@@ -45,8 +46,15 @@ import {
 } from './cvRouteOrchestration';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
+import { HEADER_HIDE_SCROLL_TRIGGER_OPTIONS } from '../components/header/headerScroll';
 
 const parseCVMode = (value: string | null): CVMode => (value === 'story' ? 'story' : 'default');
+const CV_DEFERRED_SECTION_SCROLL_RUNWAY_PX = HEADER_HIDE_SCROLL_TRIGGER_OPTIONS.threshold + 96;
+const nonAboutSectionIds = new Set<string>(
+  cvSectionNavigationOrder.map((sectionKey) => cvSectionMetadata[sectionKey].id)
+);
+const shouldUnlockDeferredCVSections = (hash: string) =>
+  nonAboutSectionIds.has(hash.replace(/^#/, '').trim());
 
 export default function CV() {
   return <CVRouteContent />;
@@ -55,6 +63,7 @@ export default function CV() {
 const CVRouteContent = () => {
   const appStyles = useAppStyles();
   const { motionTokens } = useComponentStyles();
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const cvMode = parseCVMode(searchParams.get('mode'));
   const isStoryMode = cvMode === 'story';
@@ -72,12 +81,26 @@ const CVRouteContent = () => {
   const { activity, contributions, loading, error, status } = useGithubProfile();
   const muiTheme = useMuiTheme();
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
+  const scrolledPastHeaderCollapse = useScrollTrigger(HEADER_HIDE_SCROLL_TRIGGER_OPTIONS);
   const layoutMode: CVLayoutMode = isMobile ? 'mobile' : 'desktop';
+  const [hasUnlockedDeferredSections, setHasUnlockedDeferredSections] = useState(
+    scrolledPastHeaderCollapse || shouldUnlockDeferredCVSections(location.hash)
+  );
   const revealState = useCVRevealState({
     bio: aboutMe.bio,
     opportunities: aboutMe.opportunities ?? [],
     workflowTools: currentWorkflowTools,
   });
+
+  useEffect(() => {
+    if (hasUnlockedDeferredSections) {
+      return;
+    }
+
+    if (scrolledPastHeaderCollapse || shouldUnlockDeferredCVSections(location.hash)) {
+      setHasUnlockedDeferredSections(true);
+    }
+  }, [hasUnlockedDeferredSections, location.hash, scrolledPastHeaderCollapse]);
 
   const handleToggleMode = useCallback(() => {
     setSearchParams(
@@ -168,6 +191,7 @@ const CVRouteContent = () => {
       key={descriptor.key}
       data-testid={`cv-section-region-item-${descriptor.placement.region}-${descriptor.key}`}
       data-section-delay-ms={descriptor.delayMs}
+      data-section-entrance-direction={descriptor.entranceDirection}
       data-section-trigger-on-view={String(descriptor.triggerOnView)}
     >
       {descriptor.node}
@@ -201,7 +225,9 @@ const CVRouteContent = () => {
   if (isMobile) {
     const mobileSections = getSectionDescriptorsForRegion(sectionDescriptors, 'stack');
     const mobileAboutSection = mobileSections.find((descriptor) => descriptor.key === 'about');
-    const mobileBodySections = mobileSections.filter((descriptor) => descriptor.key !== 'about');
+    const mobileBodySections = hasUnlockedDeferredSections
+      ? mobileSections.filter((descriptor) => descriptor.key !== 'about')
+      : [];
 
     return (
       <PageFrame
@@ -214,35 +240,62 @@ const CVRouteContent = () => {
             {mobileAboutSection && renderSectionDescriptor(mobileAboutSection)}
             {mobileBodySections.map(renderSectionDescriptor)}
           </CVSectionStack>
-          <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator" />
+          {!hasUnlockedDeferredSections ? (
+            <Box
+              aria-hidden
+              data-testid="cv-scroll-unlock-runway"
+              sx={{ height: CV_DEFERRED_SECTION_SCROLL_RUNWAY_PX }}
+            />
+          ) : null}
+          {hasUnlockedDeferredSections ? (
+            <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator" />
+          ) : null}
         </>
       </PageFrame>
     );
   }
 
+  const desktopSidebarSections = hasUnlockedDeferredSections
+    ? getSectionNodesForRegion('sidebar')
+    : [];
+  const desktopMainSections = hasUnlockedDeferredSections ? getSectionNodesForRegion('main') : [];
+
   return (
     <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
       <>
         <Grid container spacing={3} alignItems="stretch">
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-top-region">
               <CVSectionStack spacing={2.5}>{getSectionNodesForRegion('top')}</CVSectionStack>
             </Box>
           </Grid>
 
-          <Grid item xs={12} md={5} lg={4} sx={appStyles.cvDesktopAsideGridItemSx}>
-            <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-sidebar-region">
-              <CVSectionStack spacing={2.5}>{getSectionNodesForRegion('sidebar')}</CVSectionStack>
-            </Box>
-          </Grid>
+          {hasUnlockedDeferredSections ? (
+            <Grid size={{ xs: 12, md: 5, lg: 4 }} sx={appStyles.cvDesktopAsideGridItemSx}>
+              <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-sidebar-region">
+                <CVSectionStack spacing={2.5}>{desktopSidebarSections}</CVSectionStack>
+              </Box>
+            </Grid>
+          ) : null}
 
-          <Grid item xs={12} md={7} lg={8} sx={appStyles.cvDesktopMainGridItemSx}>
-            <Box sx={appStyles.cvPagePrimaryPaneSx} data-testid="cv-desktop-main-region">
-              <CVSectionStack spacing={3.5}>{getSectionNodesForRegion('main')}</CVSectionStack>
-            </Box>
-          </Grid>
+          {hasUnlockedDeferredSections ? (
+            <Grid size={{ xs: 12, md: 7, lg: 8 }} sx={appStyles.cvDesktopMainGridItemSx}>
+              <Box sx={appStyles.cvPagePrimaryPaneSx} data-testid="cv-desktop-main-region">
+                <CVSectionStack spacing={3.5}>{desktopMainSections}</CVSectionStack>
+              </Box>
+            </Grid>
+          ) : null}
         </Grid>
-        <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator" />
+        {!hasUnlockedDeferredSections ? (
+          <Box
+            aria-hidden
+            data-testid="cv-scroll-unlock-runway"
+            sx={{ height: CV_DEFERRED_SECTION_SCROLL_RUNWAY_PX }}
+          />
+        ) : null}
+        {hasUnlockedDeferredSections ? (
+          <CVSectionNavigator sections={cvSectionNavigationOrder} testId="cv-section-navigator" />
+        ) : null}
       </>
     </PageFrame>
   );

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import type { SxProps, Theme } from '@mui/material/styles';
-import { mergeSx } from './textFactory';
+import { mergeSx } from '../../utils/sx';
 import { useTypewriterProgress } from './useTypewriterProgress';
 import type { TypewriterTimingPreset } from './useTypewriterProgress';
 
