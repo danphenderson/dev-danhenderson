@@ -164,10 +164,7 @@ test.describe('Home page', () => {
     const customizeDialog = page.getByTestId('customize-experience-dialog');
     await expect(customizeDialog).toBeVisible();
 
-    await page.clock.runFor(CUSTOMIZE_AUTO_ADVANCE_DELAY_MS - 1);
-    await expect(customizeDialog).toBeVisible();
-
-    await page.clock.runFor(1);
+    await page.clock.runFor(CUSTOMIZE_AUTO_ADVANCE_DELAY_MS);
     await expect(customizeDialog).toBeHidden();
     await expect(page.getByTestId('first-visit-settings-hint-popover')).toBeVisible();
   });

@@ -32,6 +32,14 @@ describe('getRecoveryContext', () => {
       expect(ctx.routeHintLabel).toContain(siteRouteMap.cv.label);
     });
 
+    it('keeps short route-token prefix hints for near-miss route paths', () => {
+      const ctx = getRecoveryContext('/cvv');
+
+      expect(ctx.routeHint?.id).toBe('cv');
+      expect(ctx.routeHintLabel).toContain(siteRouteMap.cv.label);
+      expect(ctx.contextualSuggestions.length).toBeGreaterThan(0);
+    });
+
     it('returns the climbing route hint for a path starting with /climbing', () => {
       const ctx = getRecoveryContext('/climbing/routes/yosemite');
       expect(ctx.routeHint?.id).toBe('climbing');

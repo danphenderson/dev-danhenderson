@@ -101,7 +101,7 @@ const getLooseTokenMatchStrength = (token: string, candidate: string): 0 | 1 | 2
   }
 
   if (
-    Math.min(token.length, candidate.length) >= 3 &&
+    Math.min(token.length, candidate.length) >= 2 &&
     (candidate.startsWith(token) || token.startsWith(candidate))
   ) {
     return 2;

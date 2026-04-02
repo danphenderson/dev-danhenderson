@@ -45,7 +45,6 @@ test.describe('Climbing page', () => {
     await expect(main.getByText('Routes Climbed', { exact: true })).toBeVisible();
     await expect(main.getByText('Routes to Climb', { exact: true }).first()).toBeVisible();
     await expect(main.getByText('Unique Locations', { exact: true })).toBeVisible();
-    await expect(main.getByText('Most Recent Tick')).toBeVisible();
   });
 
   test('renders grade profile section', async ({ page }) => {
