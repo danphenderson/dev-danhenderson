@@ -139,6 +139,36 @@ describe('ExperienceList', () => {
     expect(screen.getByText(summaryText)).toBeVisible();
   });
 
+  it('keeps the active experience card above the section backdrop', () => {
+    const graduateResearchAssistant = experiences.find(
+      (experience) => experience.title === 'Graduate Research Assistant'
+    );
+    const dataPipelineEngineer = experiences.find(
+      (experience) => experience.title === 'Data Pipeline Engineer'
+    );
+
+    expect(graduateResearchAssistant).toBeDefined();
+    expect(dataPipelineEngineer).toBeDefined();
+
+    render(
+      <ThemeProvider>
+        <ExperienceList
+          experiences={[graduateResearchAssistant!, dataPipelineEngineer!]}
+          activeDetail={{ index: 1, value: 'skills' }}
+        />
+      </ThemeProvider>
+    );
+
+    const animatedListProps = mockAnimatedContentList.mock.calls[0][0];
+
+    expect(animatedListProps.getItemContainerSx(graduateResearchAssistant!, 0)).toEqual(
+      expect.objectContaining({ zIndex: 1 })
+    );
+    expect(animatedListProps.getItemContainerSx(dataPipelineEngineer!, 1)).toEqual(
+      expect.objectContaining({ zIndex: 3 })
+    );
+  });
+
   it('switches between highlights and skills within the shared tab panel while keeping the summary visible', async () => {
     const hemodynamicsExperience = experiences.find(
       (experience) => experience.title === 'Graduate Research Assistant'
@@ -266,7 +296,7 @@ describe('ExperienceList', () => {
     expect(mtuLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
     expect(mtuLink).toHaveAttribute(
       'data-tooltip-content',
-      'View Mathematical Sciences student directory'
+      'View Mathematical Sciences student directory page'
     );
 
     expect(lucernaLink).toHaveAttribute('href', 'https://getlucerna.com');

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Box } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { Experience, ExperienceProject } from '../../types/cv';
@@ -12,8 +12,6 @@ import {
   renderExperienceProjectContent,
 } from './experienceContent';
 import { useComponentStyles } from '../../styles/componentStyles';
-import { cssDuration } from '../../motion/tokens';
-import { SPRING_EASING_CSS } from '../../styles/springEasing';
 import { Text } from '../text';
 import { CVEntryHeader } from './CVEntryHeader';
 
@@ -21,6 +19,8 @@ type ExperienceListProps = {
   experiences: Experience[];
   startDelayMs?: number;
   skipEntranceAnimation?: boolean;
+  activeDetail?: { index: number; value: string } | null;
+  onActiveDetailChange?: (detail: { index: number; value: string } | null) => void;
 };
 
 const ExperienceProjects = ({
@@ -64,30 +64,44 @@ export const ExperienceList = ({
   experiences,
   startDelayMs = 0,
   skipEntranceAnimation = false,
+  activeDetail,
+  onActiveDetailChange,
 }: ExperienceListProps) => {
   const { contentListStackSpacing, detailBlockSx, experienceDescriptionSx, motionTokens } =
     useComponentStyles();
-  const [activeTab, setActiveTab] = useState<{ index: number; value: string } | null>(null);
+  const [internalActiveDetail, setInternalActiveDetail] = useState<{
+    index: number;
+    value: string;
+  } | null>(null);
+  const isActiveDetailControlled = activeDetail !== undefined;
+  const resolvedActiveDetail = isActiveDetailControlled ? activeDetail : internalActiveDetail;
 
-  const handleTabChange = useCallback((index: number, value: string | false) => {
-    setActiveTab(value !== false ? { index, value } : null);
-  }, []);
+  const setResolvedActiveDetail = useCallback(
+    (nextDetail: { index: number; value: string } | null) => {
+      if (!isActiveDetailControlled) {
+        setInternalActiveDetail(nextDetail);
+      }
+
+      onActiveDetailChange?.(nextDetail);
+    },
+    [isActiveDetailControlled, onActiveDetailChange]
+  );
+
+  const handleTabChange = useCallback(
+    (index: number, value: string | false) => {
+      setResolvedActiveDetail(value !== false ? { index, value } : null);
+    },
+    [setResolvedActiveDetail]
+  );
 
   const getItemContainerSx = useCallback(
     (_item: Experience, index: number): SxProps<Theme> => {
-      const base = {
-        transition: `opacity ${cssDuration.normal} ${SPRING_EASING_CSS}`,
+      return {
+        position: 'relative',
+        zIndex: resolvedActiveDetail?.index === index ? 3 : 1,
       };
-
-      if (activeTab === null) return base;
-
-      if (activeTab.index === index) {
-        return { ...base, position: 'relative', zIndex: 2 };
-      }
-
-      return { ...base, opacity: 0.3 };
     },
-    [activeTab]
+    [resolvedActiveDetail]
   );
 
   return (
@@ -172,7 +186,9 @@ export const ExperienceList = ({
                     dense
                     hideTabsWhenSingle={hideSingleSupplementalTab}
                     tabsVariant="fullWidth"
-                    value={activeTab?.index === index ? activeTab.value : false}
+                    value={
+                      resolvedActiveDetail?.index === index ? resolvedActiveDetail.value : false
+                    }
                     onChange={(value) => handleTabChange(index, value)}
                   />
                 </Box>

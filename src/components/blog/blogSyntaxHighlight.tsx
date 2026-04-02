@@ -202,7 +202,9 @@ export function shouldHighlightInlinePython(code: string) {
 
 export function renderHighlightedPython(code: string): ReactNode {
   return tokenizePython(code).map((token, index) => {
-    if (token.kind === 'plain') {
+    const tokenKind = token.kind;
+
+    if (tokenKind === 'plain') {
       return <Fragment key={index}>{token.value}</Fragment>;
     }
 
@@ -210,10 +212,10 @@ export function renderHighlightedPython(code: string): ReactNode {
       <Box
         key={index}
         component="span"
-        data-token-kind={token.kind}
+        data-token-kind={tokenKind}
         sx={(theme) => ({
-          color: getPythonTokenColor(theme, token.kind),
-          fontStyle: token.kind === 'comment' ? 'italic' : 'normal',
+          color: getPythonTokenColor(theme, tokenKind),
+          fontStyle: tokenKind === 'comment' ? 'italic' : 'normal',
         })}
       >
         {token.value}

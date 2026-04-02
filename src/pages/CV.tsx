@@ -50,7 +50,7 @@ import { HEADER_HIDE_SCROLL_TRIGGER_OPTIONS } from '../components/header/headerS
 
 const parseCVMode = (value: string | null): CVMode => (value === 'story' ? 'story' : 'default');
 const CV_DEFERRED_SECTION_SCROLL_RUNWAY_PX = HEADER_HIDE_SCROLL_TRIGGER_OPTIONS.threshold + 96;
-const nonAboutSectionIds = new Set(
+const nonAboutSectionIds = new Set<string>(
   cvSectionNavigationOrder.map((sectionKey) => cvSectionMetadata[sectionKey].id)
 );
 const shouldUnlockDeferredCVSections = (hash: string) =>

@@ -1,12 +1,28 @@
 import { render, screen } from '@testing-library/react';
+import { fireEvent } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { CVExperienceSection } from '../../../../src/components/cv/CVExperienceSection';
 import { cvSectionMetadata } from '../../../../src/components/cv/cvSectionMetadata';
 
 const mockExperienceList = jest.fn(
-  (_: { startDelayMs?: number; skipEntranceAnimation?: boolean }) => (
-    <div data-testid="experience-list" />
+  ({
+    activeDetail,
+    onActiveDetailChange,
+  }: {
+    activeDetail?: { index: number; value: string } | null;
+    onActiveDetailChange?: (detail: { index: number; value: string } | null) => void;
+    startDelayMs?: number;
+    skipEntranceAnimation?: boolean;
+  }) => (
+    <div
+      data-testid="experience-list"
+      data-active-detail={activeDetail ? `${activeDetail.index}:${activeDetail.value}` : 'none'}
+    >
+      <button type="button" onClick={() => onActiveDetailChange?.({ index: 0, value: 'details' })}>
+        Activate experience detail
+      </button>
+    </div>
   )
 );
 
@@ -78,6 +94,50 @@ describe('CVExperienceSection', () => {
 
     expect(mockExperienceList.mock.calls[0][0]).not.toEqual(
       expect.objectContaining({ skipEntranceAnimation: true })
+    );
+  });
+
+  it('clears the section backdrop when interaction happens outside the illuminated card', () => {
+    render(
+      <ThemeProvider>
+        <CVExperienceSection experiences={[]} />
+      </ThemeProvider>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Activate experience detail' }));
+
+    expect(screen.getByTestId('experience-list')).toHaveAttribute(
+      'data-active-detail',
+      '0:details'
+    );
+    expect(screen.getByTestId('experience-section-backdrop')).toHaveAttribute(
+      'data-active',
+      'true'
+    );
+
+    fireEvent.pointerDown(document.body);
+
+    expect(screen.getByTestId('experience-list')).toHaveAttribute('data-active-detail', 'none');
+    expect(screen.getByTestId('experience-section-backdrop')).toHaveAttribute(
+      'data-active',
+      'false'
+    );
+  });
+
+  it('lets the backdrop itself dismiss the active experience state', () => {
+    render(
+      <ThemeProvider>
+        <CVExperienceSection experiences={[]} />
+      </ThemeProvider>
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Activate experience detail' }));
+    fireEvent.pointerDown(screen.getByTestId('experience-section-backdrop'));
+
+    expect(screen.getByTestId('experience-list')).toHaveAttribute('data-active-detail', 'none');
+    expect(screen.getByTestId('experience-section-backdrop')).toHaveAttribute(
+      'data-active',
+      'false'
     );
   });
 });

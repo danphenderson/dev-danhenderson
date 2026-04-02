@@ -551,9 +551,9 @@ export const createComponentStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     sectionHeadingOverlineTextSx: sectionHeadingOverlineTextSx satisfies SxProps<Theme>,
     primaryTextSx: { color: 'text.primary' } satisfies SxProps<Theme>,
-    sectionHeadingTitleSx: (subtitle?: string) =>
+    sectionHeadingTitleSx: (hasSubtitle = false) =>
       ({
-        mb: subtitle ? 1 : 2,
+        mb: hasSubtitle ? 1 : 2,
         color: 'text.primary',
       }) satisfies SxProps<Theme>,
     sectionHeadingTitleTextSx: sectionHeadingTitleTextSx satisfies SxProps<Theme>,

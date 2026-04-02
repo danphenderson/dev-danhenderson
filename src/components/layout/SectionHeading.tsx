@@ -17,6 +17,7 @@ export const SectionHeading = ({
   sx,
   ...props
 }: SectionHeadingProps) => {
+  const hasSubtitle = subtitle !== undefined && subtitle !== null && subtitle !== false;
   const {
     sectionHeadingOverlineTextSx,
     sectionHeadingTitleSx,
@@ -31,11 +32,14 @@ export const SectionHeading = ({
         {overline}
       </Text>
       {title && (
-        <Text role="sectionTitle" sx={[sectionHeadingTitleSx(subtitle), sectionHeadingTitleTextSx]}>
+        <Text
+          role="sectionTitle"
+          sx={[sectionHeadingTitleSx(hasSubtitle), sectionHeadingTitleTextSx]}
+        >
           {title}
         </Text>
       )}
-      {subtitle && (
+      {hasSubtitle && (
         <Text role="sectionSubtitle" sx={[sectionHeadingSubtitleSx, sectionHeadingSubtitleTextSx]}>
           {subtitle}
         </Text>
