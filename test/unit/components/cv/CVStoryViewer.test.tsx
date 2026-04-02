@@ -39,8 +39,29 @@ jest.mock('../../../../src/components/cv/CVStoryProgress', () => ({
 
 // Stub the section renderer so we can identify items by kind
 jest.mock('../../../../src/components/cv/CVStorySectionRenderer', () => ({
-  CVStorySectionRenderer: ({ item, index }: { item: CVStoryItem; index: number }) => (
-    <div data-testid="cv-story-section" data-kind={item.kind} data-index={index} />
+  CVStorySectionRenderer: ({
+    item,
+    index,
+    isRevealed,
+    onSectionSettled,
+  }: {
+    item: CVStoryItem;
+    index: number;
+    isRevealed: boolean;
+    onSectionSettled?: () => void;
+  }) => (
+    <div
+      data-testid="cv-story-section"
+      data-kind={item.kind}
+      data-index={index}
+      data-revealed={String(isRevealed)}
+    >
+      {isRevealed ? (
+        <button type="button" data-testid={`settle-section-${index}`} onClick={onSectionSettled}>
+          settle {index}
+        </button>
+      ) : null}
+    </div>
   ),
 }));
 
@@ -134,6 +155,12 @@ const getObservedTarget = (
 ): Element | undefined =>
   observer.observedTargets.find((target) => target.getAttribute('data-story-index') === `${index}`);
 
+const getSection = (index: number) => screen.getAllByTestId('cv-story-section')[index];
+
+const settleSection = (index: number) => {
+  fireEvent.click(screen.getByTestId(`settle-section-${index}`));
+};
+
 describe('CVStoryViewer', () => {
   let originalIntersectionObserver: typeof IntersectionObserver | undefined;
 
@@ -179,25 +206,29 @@ describe('CVStoryViewer', () => {
     expect(sections[0]).toHaveAttribute('data-kind', 'about');
     expect(sections[1]).toHaveAttribute('data-kind', 'experience');
     expect(sections[4]).toHaveAttribute('data-kind', 'end');
+    expect(sections[0]).toHaveAttribute('data-revealed', 'true');
+    expect(sections[1]).toHaveAttribute('data-revealed', 'false');
   });
 
-  it('shows the active kind label', () => {
+  it('reveals the next section immediately when the user scrolls into it before the queue settles', () => {
     renderViewer();
     expect(screen.getByText('About')).toBeInTheDocument();
 
     const observer = mockIntersectionObserverInstances[0];
-    const endTarget = getObservedTarget(observer, 4);
+    const experienceTarget = getObservedTarget(observer, 1);
 
-    expect(endTarget).toBeDefined();
+    expect(experienceTarget).toBeDefined();
 
     act(() => {
-      observer.trigger([{ target: endTarget!, isIntersecting: true }]);
+      observer.trigger([{ target: experienceTarget!, isIntersecting: true }]);
     });
 
-    expect(screen.getByText('Connect')).toBeInTheDocument();
+    expect(getSection(1)).toHaveAttribute('data-revealed', 'true');
+    expect(screen.getByTestId('settle-section-1')).toBeInTheDocument();
+    expect(screen.getByText('Experience')).toBeInTheDocument();
   });
 
-  it('resolves the active kind from the full visible section set instead of entry order', () => {
+  it('reveals through the requested section immediately after a rapid scroll request', () => {
     renderViewer();
 
     const observer = mockIntersectionObserverInstances[0];
@@ -214,6 +245,29 @@ describe('CVStoryViewer', () => {
       ]);
     });
 
+    expect(getSection(1)).toHaveAttribute('data-revealed', 'true');
+    expect(getSection(2)).toHaveAttribute('data-revealed', 'true');
+    expect(getSection(3)).toHaveAttribute('data-revealed', 'true');
+  });
+
+  it('uses the lowest currently visible revealed section for the active label', () => {
+    renderViewer();
+
+    const observer = mockIntersectionObserverInstances[0];
+    const experienceTarget = getObservedTarget(observer, 1);
+    const codingTarget = getObservedTarget(observer, 3);
+
+    expect(experienceTarget).toBeDefined();
+    expect(codingTarget).toBeDefined();
+
+    act(() => {
+      observer.trigger([
+        { target: experienceTarget!, isIntersecting: true },
+        { target: codingTarget!, isIntersecting: true },
+      ]);
+    });
+
+    expect(getSection(3)).toHaveAttribute('data-revealed', 'true');
     expect(screen.getByText('Experience')).toBeInTheDocument();
 
     act(() => {
@@ -221,6 +275,22 @@ describe('CVStoryViewer', () => {
     });
 
     expect(screen.getByText('Project')).toBeInTheDocument();
+  });
+
+  it('advances the active label once a fast-scrolled section is revealed', () => {
+    renderViewer();
+
+    const observer = mockIntersectionObserverInstances[0];
+    const endTarget = getObservedTarget(observer, 4);
+
+    expect(endTarget).toBeDefined();
+
+    act(() => {
+      observer.trigger([{ target: endTarget!, isIntersecting: true }]);
+    });
+
+    expect(screen.getByText('Connect')).toBeInTheDocument();
+    expect(getSection(4)).toHaveAttribute('data-revealed', 'true');
   });
 
   it('calls onExit when Escape is pressed', () => {

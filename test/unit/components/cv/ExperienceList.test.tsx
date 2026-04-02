@@ -264,7 +264,10 @@ describe('ExperienceList', () => {
       'https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad'
     );
     expect(mtuLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
-    expect(mtuLink).toHaveAttribute('data-tooltip-content', 'View online graduate degrees page');
+    expect(mtuLink).toHaveAttribute(
+      'data-tooltip-content',
+      'View Mathematical Sciences student directory'
+    );
 
     expect(lucernaLink).toHaveAttribute('href', 'https://getlucerna.com');
     expect(lucernaLink).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);

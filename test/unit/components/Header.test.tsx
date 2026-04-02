@@ -32,6 +32,7 @@ jest.mock('../../../src/components/header/HeaderSettingsPopover', () => ({
     mode,
     showAudioControl,
     isPlaying,
+    highlightSettingsTrigger,
   }: {
     onChangeAppearance?: (appearance: AppAppearanceKey) => void;
     onToggleTheme?: () => void;
@@ -39,8 +40,12 @@ jest.mock('../../../src/components/header/HeaderSettingsPopover', () => ({
     mode?: 'light' | 'dark';
     showAudioControl?: boolean;
     isPlaying?: boolean;
+    highlightSettingsTrigger?: boolean;
   }) => (
-    <div data-testid="header-settings-popover">
+    <div
+      data-testid="header-settings-popover"
+      data-highlighted={highlightSettingsTrigger ? 'true' : 'false'}
+    >
       <button type="button" aria-label="Open settings">
         Open settings
       </button>
@@ -214,11 +219,37 @@ describe('Header controls', () => {
     renderHeader('/');
 
     expect(screen.getByTestId('header-settings-popover')).toBeInTheDocument();
+    expect(screen.getByTestId('header-settings-popover')).toHaveAttribute(
+      'data-highlighted',
+      'false'
+    );
 
     fireEvent.click(screen.getByRole('button', { name: 'Use Ember appearance' }));
 
     expect(setAppearance).toHaveBeenCalledTimes(1);
     expect(setAppearance).toHaveBeenCalledWith('ember');
+  });
+
+  it('highlights the settings trigger on the home route while the settings hint is open', () => {
+    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ showSettingsHint: true }));
+
+    renderHeader('/');
+
+    expect(screen.getByTestId('header-settings-popover')).toHaveAttribute(
+      'data-highlighted',
+      'true'
+    );
+  });
+
+  it('does not highlight the settings trigger on non-home routes even while the settings hint is open', () => {
+    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ showSettingsHint: true }));
+
+    renderHeader('/cv');
+
+    expect(screen.getByTestId('header-settings-popover')).toHaveAttribute(
+      'data-highlighted',
+      'false'
+    );
   });
 
   it('always shows navigation links on desktop with avatar home link', () => {

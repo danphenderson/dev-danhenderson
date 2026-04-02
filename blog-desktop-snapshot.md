@@ -1,0 +1,42 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - link [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+      - text: Skip to main content
+    - link [ref=e5] [cursor=pointer]:
+      - /url: "#site-navigation"
+      - text: Skip to site navigation
+    - banner [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e9]:
+          - link [ref=e10] [cursor=pointer]:
+            - /url: /cv
+            - generic [ref=e11]: CV
+          - link [ref=e12] [cursor=pointer]:
+            - /url: /climbing
+            - generic [ref=e13]: Climbing
+          - link [ref=e14] [cursor=pointer]:
+            - /url: /photography
+            - generic [ref=e15]: Photography
+          - link [ref=e16] [cursor=pointer]:
+            - /url: /blog
+            - generic [ref=e17]: Blog
+        - button [ref=e20] [cursor=pointer]:
+          - img [ref=e21]
+    - main [ref=e24]:
+      - main [ref=e27]
+    - generic [ref=e35]:
+      - paragraph [ref=e36]:
+        - text: Copyright ©
+        - link [ref=e37] [cursor=pointer]:
+          - /url: https://danhenderson.dev/
+          - text: danhenderson.dev
+        - text: "2026."
+      - button [ref=e38] [cursor=pointer]:
+        - img [ref=e39]
+  - dialog "Play welcome audio?" [ref=e43]:
+    - heading "Play welcome audio?" [level=2] [ref=e44]
+    - paragraph [ref=e46]: Would you like to hear a short verse while browsing the site? Use the pause button in the header to stop it anytime.
+    - generic [ref=e47]:
+      - button "No thanks" [active] [ref=e48] [cursor=pointer]: No thanks
+      - button "Play welcome audio" [ref=e49] [cursor=pointer]: Play audio

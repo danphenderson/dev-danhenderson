@@ -67,9 +67,9 @@ Never generate content procedurally or fetch it from APIs (except GitHub profile
 
 All routes are client-side. Direct links to any route must work when the host rewrites unknown paths to `index.html`. Asset URLs must use `PUBLIC_URL` for static hosting compatibility.
 
-### 6. Feature gating
+### 6. Route registry consistency
 
-Feature-gated routes (currently: blog) must check `isFeatureEnabled()` from `src/constants/featureFlags.ts`. Never expose gated content unconditionally.
+Public route exposure must stay consistent across `src/constants/siteRoutes.ts`, `src/App.tsx`, `src/constants/routeActions.ts`, and `src/constants/commandPaletteActions.ts`. Do not hide or expose a route in one surface without updating the others.
 
 ## Decision trees
 
@@ -148,13 +148,13 @@ flowchart TB
 
 **Prevention:** Add new theme-conditional styles to `componentStyleBuilders.ts` or `appStyleBuilders.ts`. The hooks automatically memoize and update when the theme changes.
 
-### 5. Feature flag leaks
+### 5. Route exposure drift
 
-**Symptom:** Blog content appears in production build.
+**Symptom:** Header navigation, command palette entries, and registered routes disagree about which public routes exist.
 
-**Cause:** Rendering blog routes without checking `isFeatureEnabled('blog')`.
+**Cause:** Updating route JSX without updating `siteRouteMap`, derived route actions, or smoke expectations.
 
-**Prevention:** Any route or navigation link to gated content must check the feature flag.
+**Prevention:** Keep route exposure metadata central in `siteRoutes.ts`, derive navigation and recovery from it, and revalidate smoke coverage after public-route changes.
 
 ### 6. GitHub API in dev/test
 
@@ -168,9 +168,9 @@ flowchart TB
 
 Two subsystems intentionally deviate from the shared design system. Do not "fix" these:
 
-| Subsystem       | Where                            | Why it's different                                                                             |
-| --------------- | -------------------------------- | ---------------------------------------------------------------------------------------------- |
-| IDE hero chrome | `src/components/ide/`            | Must look like VS Code, not like the portfolio                                                 |
+| Subsystem       | Where                            | Why it's different                                                                              |
+| --------------- | -------------------------------- | ----------------------------------------------------------------------------------------------- |
+| IDE hero chrome | `src/components/ide/`            | Must look like VS Code, not like the portfolio                                                  |
 | CV story mode   | `src/components/cv/CVStory*.tsx` | Full-screen immersive experience with its own motion system; bounded through `UnsafeTypography` |
 
 Blog uses prose context via `Text` roles and is **not** a design-system exception. Photography uses inverse-tone overlay context via `Text` and is **not** a design-system exception.
@@ -181,12 +181,12 @@ Blog uses prose context via `Text` roles and is **not** a design-system exceptio
 
 Architecture-specific reminders:
 
-| Change area           | Additional check                                                                                 |
-| --------------------- | ------------------------------------------------------------------------------------------------ |
-| Motion/animation      | Verify motion intensity `off` and reduced-motion handling collapse entrance and stagger behavior |
-| Theme/styling         | Validate both light/dark modes and at least two appearance presets when shared styling changes   |
-| Shared component      | Validate a primary consumer and at least one additional clear consumer                           |
-| Feature-gated content | Use `npm run build:e2e` and verify the gate still hides content outside enabled environments     |
+| Change area                  | Additional check                                                                                                                              |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| Motion/animation             | Verify motion intensity `off` and reduced-motion handling collapse entrance and stagger behavior                                              |
+| Theme/styling                | Validate both light/dark modes and at least two appearance presets when shared styling changes                                                |
+| Shared component             | Validate a primary consumer and at least one additional clear consumer                                                                        |
+| Route exposure / runtime env | Verify the production build matches the intended public route surface; use `npm run build:e2e` only when behavior depends on the test runtime |
 
 ## Safe extension patterns
 
@@ -204,7 +204,7 @@ Architecture-specific reminders:
 2. Add route definition in `src/App.tsx`
 3. Create page component in `src/pages/`
 4. Add navigation entry to header/command palette as needed
-5. If feature-gated, wrap in `isFeatureEnabled()` check
+5. Update smoke or route-level coverage when the public route surface changes
 
 ### Adding a new appearance preset
 

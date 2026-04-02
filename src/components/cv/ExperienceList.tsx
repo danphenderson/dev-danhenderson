@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Backdrop, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { Experience, ExperienceProject } from '../../types/cv';
 import { AnimatedSlideList, getAnimatedSlideListCloseDelayMs } from '../AnimatedSlideList';
@@ -12,6 +12,8 @@ import {
   renderExperienceProjectContent,
 } from './experienceContent';
 import { useComponentStyles } from '../../styles/componentStyles';
+import { cssDuration } from '../../motion/tokens';
+import { SPRING_EASING_CSS } from '../../styles/springEasing';
 import { Text } from '../text';
 import { CVEntryHeader } from './CVEntryHeader';
 
@@ -72,18 +74,24 @@ export const ExperienceList = ({
   }, []);
 
   const getItemContainerSx = useCallback(
-    (_item: Experience, index: number): SxProps<Theme> =>
-      activeTab?.index === index ? { position: 'relative', zIndex: 2 } : {},
+    (_item: Experience, index: number): SxProps<Theme> => {
+      const base = {
+        transition: `opacity ${cssDuration.normal} ${SPRING_EASING_CSS}`,
+      };
+
+      if (activeTab === null) return base;
+
+      if (activeTab.index === index) {
+        return { ...base, position: 'relative', zIndex: 2 };
+      }
+
+      return { ...base, opacity: 0.3 };
+    },
     [activeTab]
   );
 
   return (
-    <Box sx={{ position: 'relative', isolation: 'isolate' }}>
-      <Backdrop
-        open={activeTab !== null}
-        onClick={() => setActiveTab(null)}
-        sx={{ position: 'absolute', zIndex: 1 }}
-      />
+    <Box sx={{ position: 'relative' }}>
       <AnimatedContentList
         items={experiences}
         getItemKey={(experience, index) => `${experience.company}-${index}`}

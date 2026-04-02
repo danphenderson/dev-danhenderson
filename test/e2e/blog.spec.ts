@@ -11,15 +11,15 @@ const INVALID_BLOG_SLUG_QUERY = 'nonexistent post';
 const waitForBlogIndex = async (page: Page) => {
   const main = page.locator('main');
 
-  await expect(main.getByText('Blog').first()).toBeVisible();
-  await expect(
-    main.getByText(
-      'Technical writing on frontend architecture, React patterns, and software engineering.'
-    )
-  ).toBeVisible();
-  await expect(main.getByText(/\d+ articles?/)).toBeVisible();
-  await expect(main.getByRole('button', { name: 'All' })).toBeVisible();
-  await expect(main.getByText(FEATURED_POST_TITLE).first()).toBeVisible();
+  await waitForAnimatedSectionReadiness({
+    anchor: main.getByText(/\d+ articles?/),
+    readyLocators: [
+      main.getByText(/^Blog$/).first(),
+      main.getByRole('button', { name: 'All' }),
+      main.getByText('Featured Article'),
+      main.getByRole('link', { name: new RegExp(FEATURED_POST_TITLE) }).first(),
+    ],
+  });
 };
 
 const waitForBlogFallback = async (page: Page) => {
@@ -138,7 +138,7 @@ test.describe('Blog post detail page', () => {
 
     await page.getByRole('link', { name: 'Back to blog' }).click();
     await expect(page).toHaveURL(/\/blog$/);
-    await expect(page.getByText('1 article')).toBeVisible();
+    await waitForBlogIndex(page);
   });
 
   test('renders a syntax-highlighted code block from the featured article', async ({ page }) => {
@@ -161,10 +161,19 @@ test.describe('Blog post detail page', () => {
     const unionCode = page.locator('main p code').filter({ hasText: 'Union[..., None]' }).first();
     await unionCode.scrollIntoViewIfNeeded();
     await expect(unionCode).toBeVisible();
+    await expect(
+      page.locator('main p code [data-token-kind="type"]').filter({ hasText: 'Union' }).first()
+    ).toBeVisible();
+    await expect(
+      page.locator('main p code [data-token-kind="constant"]').filter({ hasText: 'None' }).first()
+    ).toBeVisible();
 
     const pep604Code = page.locator('main p code').filter({ hasText: 'T | None' }).first();
     await pep604Code.scrollIntoViewIfNeeded();
     await expect(pep604Code).toBeVisible();
+    await expect(
+      pep604Code.locator('[data-token-kind="constant"]').filter({ hasText: 'None' })
+    ).toHaveCount(1);
   });
 
   test('shows recovery panel for an invalid blog slug', async ({ page }) => {
@@ -194,6 +203,6 @@ test.describe('Blog cross-route navigation', () => {
     await expect(blogLink).toBeVisible();
     await blogLink.click();
     await expect(page).toHaveURL(/\/blog$/);
-    await expect(page.getByText('1 article')).toBeVisible();
+    await waitForBlogIndex(page);
   });
 });

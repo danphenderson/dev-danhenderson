@@ -134,7 +134,11 @@ test.describe('CV page – GitHub integration', () => {
       'href',
       'https://www.mtu.edu/globalcampus/programs/degrees/?deliveryOption=online&tags=grad'
     );
-    await expectCommonLinkTooltip(page, mtuOrganizationLink, 'View online graduate degrees page');
+    await expectCommonLinkTooltip(
+      page,
+      mtuOrganizationLink,
+      'View Mathematical Sciences student directory'
+    );
 
     // Route-level coverage only needs to verify the volunteering section can unlock and mount;
     // tooltip/link wiring is covered directly in the volunteering unit tests.
@@ -227,17 +231,16 @@ test.describe('CV page – GitHub integration', () => {
     await expect(page.locator('#site-navigation')).toHaveCount(0);
     await expect(page.getByText('Daniel Henderson')).toBeVisible();
 
+    const lastStorySection = page.locator('[data-story-index]').last();
     const blockOptLink = page.getByRole('link', { name: 'BlockOpt.jl' }).first();
-    await blockOptLink.scrollIntoViewIfNeeded();
+    const endHeading = page.getByRole('heading', { name: "Let's Connect" });
+    await lastStorySection.scrollIntoViewIfNeeded();
+    await expect(endHeading).toBeVisible();
     await expect(blockOptLink).toBeVisible();
     await expect(blockOptLink).toHaveAttribute(
       'href',
       'https://github.com/danphenderson/BlockOpt.jl'
     );
-
-    const endHeading = page.getByRole('heading', { name: "Let's Connect" });
-    await endHeading.scrollIntoViewIfNeeded();
-    await expect(endHeading).toBeVisible();
   });
 
   test('default CV renders a story mode toggle', async ({ page }) => {

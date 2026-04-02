@@ -109,7 +109,7 @@ describe('commandPaletteActions', () => {
     });
   });
 
-  it('omits blog actions from production-isolated imports', () => {
+  it('keeps blog actions in production-isolated imports', () => {
     const productionModules = loadCommandPaletteForEnv({
       REACT_APP_RUNTIME_ENV: 'production',
       NODE_ENV: 'production',
@@ -117,12 +117,12 @@ describe('commandPaletteActions', () => {
 
     expect(
       productionModules.commandPaletteActions.some((action) => action.routeId === 'blog')
-    ).toBe(false);
+    ).toBe(true);
     expect(
       productionModules.commandPaletteActions.some((action) => action.path.startsWith('/blog'))
-    ).toBe(false);
+    ).toBe(true);
     expect(productionModules.recoveryRouteActions.some((action) => action.routeId === 'blog')).toBe(
-      false
+      true
     );
   });
 });

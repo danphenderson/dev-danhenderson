@@ -3,11 +3,6 @@ import type { ReactElement, ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
 import ThemeProvider from '../../src/ThemeProvider';
 import App from '../../src/App';
-import { isFeatureEnabled } from '../../src/constants/featureFlags';
-
-jest.mock('../../src/constants/featureFlags', () => ({
-  isFeatureEnabled: jest.fn(),
-}));
 
 jest.mock('../../src/pages/Home', () => ({
   __esModule: true,
@@ -67,13 +62,7 @@ let mockPageTransitionChildren: ReactNode = null;
 let mockPageTransitionPathname: string | undefined;
 
 jest.mock('../../src/components/PageTransition', () => ({
-  PageTransition: ({
-    children,
-    pathname,
-  }: {
-    children: ReactNode;
-    pathname?: string;
-  }) => {
+  PageTransition: ({ children, pathname }: { children: ReactNode; pathname?: string }) => {
     mockPageTransitionChildren = children;
     mockPageTransitionPathname = pathname;
 
@@ -81,11 +70,8 @@ jest.mock('../../src/components/PageTransition', () => ({
   },
 }));
 
-const mockedIsFeatureEnabled = isFeatureEnabled as jest.MockedFunction<typeof isFeatureEnabled>;
-
 describe('App', () => {
   beforeEach(() => {
-    mockedIsFeatureEnabled.mockReturnValue(true);
     mockPageTransitionChildren = null;
     mockPageTransitionPathname = undefined;
     window.history.pushState({}, '', '/');
@@ -148,8 +134,7 @@ describe('App', () => {
     expect(routesElement.props.location).toEqual(expect.objectContaining({ pathname: '/' }));
   });
 
-  it('falls through to NotFound for /blog when the blog feature is disabled', async () => {
-    mockedIsFeatureEnabled.mockReturnValue(false);
+  it('renders the Blog page for /blog', async () => {
     window.history.pushState({}, '', '/blog');
 
     render(
@@ -158,8 +143,8 @@ describe('App', () => {
       </ThemeProvider>
     );
 
-    expect(await screen.findByTestId('not-found-page')).toBeInTheDocument();
-    expect(screen.queryByTestId('blog-page')).not.toBeInTheDocument();
+    expect(await screen.findByTestId('blog-page')).toBeInTheDocument();
+    expect(screen.queryByTestId('not-found-page')).not.toBeInTheDocument();
   });
 
   it('suppresses app chrome for /cv?mode=story while keeping shared overlays mounted', async () => {

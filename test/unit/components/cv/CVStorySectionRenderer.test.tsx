@@ -1,11 +1,10 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { COMMON_LINK_TOOLTIP_ID } from '../../../../src/components/CommonLink';
 import { CVStorySectionRenderer } from '../../../../src/components/cv/CVStorySectionRenderer';
 import type { CVStoryItem } from '../../../../src/data/cvStoryItems';
 
 const mockSkillsChipList = jest.fn();
-const mockUseInView = jest.fn();
 
 jest.mock('motion/react', () => ({
   motion: {
@@ -13,17 +12,24 @@ jest.mock('motion/react', () => ({
     ul: ({ children, ...rest }: any) => <ul {...rest}>{children}</ul>,
     li: ({ children, ...rest }: any) => <li {...rest}>{children}</li>,
   },
-  useInView: (...args: any[]) => mockUseInView(...args),
   useReducedMotion: () => false,
 }));
 
 jest.mock('../../../../src/motion', () => ({
+  StaggerChildren: ({ children, animate, initial, containerVariants, ...rest }: any) => (
+    <div data-testid="story-stagger" data-animate={animate} data-initial={initial} {...rest}>
+      {children}
+    </div>
+  ),
   MotionItem: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-  MotionSection: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   useMotionScale: () => ({ duration: 1, stagger: 1, tilt: 1 }),
-  duration: { normal: 0.35 },
-  DEFAULT_INTERSECTION_ROOT_MARGIN: '0px 0px -10% 0px',
-  DEFAULT_INTERSECTION_THRESHOLD: 0,
+  duration: { fast: 0.2, normal: 0.35, slow: 0.5 },
+  scaleDuration: (base: number, factor: number) => (factor === 0 ? 0 : base * factor),
+  scaleStagger: (base: number, factor: number) => (factor === 0 ? 0 : base * factor),
+}));
+
+jest.mock('../../../../src/styles/componentStyles', () => ({
+  useComponentStyles: () => ({ motionTokens: { itemStaggerMs: 120 } }),
 }));
 
 jest.mock('../../../../src/components/SkillsChipList', () => ({
@@ -32,8 +38,8 @@ jest.mock('../../../../src/components/SkillsChipList', () => ({
 
     return (
       <div data-testid="skills-chip-list">
-        {(skills ?? []).map((s: string) => (
-          <span key={s}>{s}</span>
+        {(skills ?? []).map((skill: string) => (
+          <span key={skill}>{skill}</span>
         ))}
       </div>
     );
@@ -140,19 +146,62 @@ const endItem: CVStoryItem = {
   },
 };
 
+const renderSection = (
+  item: CVStoryItem,
+  {
+    index = 0,
+    isRevealed = true,
+    onSectionSettled,
+  }: {
+    index?: number;
+    isRevealed?: boolean;
+    onSectionSettled?: () => void;
+  } = {}
+) =>
+  render(
+    <ThemeProvider>
+      <CVStorySectionRenderer
+        item={item}
+        index={index}
+        isRevealed={isRevealed}
+        onSectionSettled={onSectionSettled}
+      />
+    </ThemeProvider>
+  );
+
 describe('CVStorySectionRenderer', () => {
   beforeEach(() => {
+    jest.useFakeTimers();
     mockSkillsChipList.mockClear();
-    mockUseInView.mockReset();
-    mockUseInView.mockReturnValue(true);
   });
 
-  it('renders about section with name, title, location, bio, and opportunities', () => {
-    render(
-      <ThemeProvider>
-        <CVStorySectionRenderer item={aboutItem} index={0} />
-      </ThemeProvider>
+  afterEach(() => {
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
+    jest.useRealTimers();
+  });
+
+  it('keeps unrevealed sections hidden and non-interactive', () => {
+    renderSection(aboutItem, { isRevealed: false });
+
+    const container = screen.getByTestId('story-stagger');
+
+    expect(container).toHaveAttribute('data-animate', 'hidden');
+    expect(container).toHaveAttribute('aria-hidden', 'true');
+    expect(container).toHaveStyle({ opacity: '0', pointerEvents: 'none' });
+    expect(mockSkillsChipList.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({
+        animation: 'slide',
+        in: false,
+        startDelayMs: 0,
+        itemStaggerMs: 120,
+      })
     );
+  });
+
+  it('renders about section content and delays chip motion until the section timeline reaches it', () => {
+    renderSection(aboutItem);
 
     expect(screen.getByText('About')).toBeInTheDocument();
     expect(screen.getByText('Test Person')).toBeInTheDocument();
@@ -163,42 +212,52 @@ describe('CVStorySectionRenderer', () => {
     expect(screen.getByText('TypeScript')).toBeInTheDocument();
     expect(screen.getByText('Portfolio')).toHaveAttribute('href', 'https://example.com');
 
-    expect(mockSkillsChipList.mock.calls[0][0]).toEqual(
-      expect.objectContaining({ animation: 'slide', in: true, startDelayMs: 350 })
+    expect(mockSkillsChipList.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({
+        animation: 'slide',
+        in: false,
+        startDelayMs: 0,
+        itemStaggerMs: 120,
+      })
+    );
+
+    act(() => {
+      jest.advanceTimersByTime(1150);
+    });
+
+    expect(mockSkillsChipList.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ in: false })
+    );
+
+    act(() => {
+      jest.advanceTimersByTime(20);
+    });
+
+    expect(mockSkillsChipList.mock.calls.at(-1)?.[0]).toEqual(
+      expect.objectContaining({ in: true })
     );
   });
 
-  it('keeps story skills chips closed until the row enters view', () => {
-    mockUseInView.mockReturnValue(false);
+  it('reports section settled after the full about-section reveal timeline', () => {
+    const handleSectionSettled = jest.fn();
 
-    const { rerender } = render(
-      <ThemeProvider>
-        <CVStorySectionRenderer item={aboutItem} index={0} />
-      </ThemeProvider>
-    );
+    renderSection(aboutItem, { onSectionSettled: handleSectionSettled });
 
-    expect(mockSkillsChipList.mock.calls.at(-1)?.[0]).toEqual(
-      expect.objectContaining({ animation: 'slide', in: false, startDelayMs: 350 })
-    );
+    act(() => {
+      jest.advanceTimersByTime(1490);
+    });
 
-    mockUseInView.mockReturnValue(true);
-    rerender(
-      <ThemeProvider>
-        <CVStorySectionRenderer item={aboutItem} index={0} />
-      </ThemeProvider>
-    );
+    expect(handleSectionSettled).not.toHaveBeenCalled();
 
-    expect(mockSkillsChipList.mock.calls.at(-1)?.[0]).toEqual(
-      expect.objectContaining({ animation: 'slide', in: true, startDelayMs: 350 })
-    );
+    act(() => {
+      jest.advanceTimersByTime(20);
+    });
+
+    expect(handleSectionSettled).toHaveBeenCalledTimes(1);
   });
 
   it('renders experience section with company link, title, date range, description, structured project links, and skills', () => {
-    render(
-      <ThemeProvider>
-        <CVStorySectionRenderer item={experienceItem} index={1} />
-      </ThemeProvider>
-    );
+    renderSection(experienceItem, { index: 1 });
 
     expect(screen.getByText('Acme Corp')).toBeInTheDocument();
     expect(screen.getByText('Senior Engineer')).toBeInTheDocument();
@@ -221,11 +280,7 @@ describe('CVStorySectionRenderer', () => {
   });
 
   it('renders education section with university, program, GPA, highlights, and skills', () => {
-    render(
-      <ThemeProvider>
-        <CVStorySectionRenderer item={educationItem} index={2} />
-      </ThemeProvider>
-    );
+    renderSection(educationItem, { index: 2 });
 
     expect(screen.getByText('State University')).toBeInTheDocument();
     expect(screen.getByText('B.S. Computer Science')).toBeInTheDocument();
@@ -237,11 +292,7 @@ describe('CVStorySectionRenderer', () => {
   });
 
   it('renders certificate section with issuer, title, date, and link', () => {
-    render(
-      <ThemeProvider>
-        <CVStorySectionRenderer item={certificateItem} index={3} />
-      </ThemeProvider>
-    );
+    renderSection(certificateItem, { index: 3 });
 
     expect(screen.getByText('Amazon')).toBeInTheDocument();
     expect(screen.getByText('AWS Solutions Architect')).toBeInTheDocument();
@@ -253,11 +304,7 @@ describe('CVStorySectionRenderer', () => {
   });
 
   it('renders volunteering section with organization link, role, summary, and highlights', () => {
-    render(
-      <ThemeProvider>
-        <CVStorySectionRenderer item={volunteeringItem} index={4} />
-      </ThemeProvider>
-    );
+    renderSection(volunteeringItem, { index: 4 });
 
     expect(screen.getByText('Code for Good')).toBeInTheDocument();
     expect(screen.getByText('Mentor')).toBeInTheDocument();
@@ -266,11 +313,7 @@ describe('CVStorySectionRenderer', () => {
   });
 
   it('renders coding section with project title, description, GitHub link, and skills tab', () => {
-    render(
-      <ThemeProvider>
-        <CVStorySectionRenderer item={codingItem} index={5} />
-      </ThemeProvider>
-    );
+    renderSection(codingItem, { index: 5 });
 
     expect(screen.getByText('Project')).toBeInTheDocument();
     expect(screen.getByText('Portfolio Site')).toBeInTheDocument();
@@ -284,11 +327,7 @@ describe('CVStorySectionRenderer', () => {
   });
 
   it('renders end section with headline, body, and contact channels', () => {
-    render(
-      <ThemeProvider>
-        <CVStorySectionRenderer item={endItem} index={6} />
-      </ThemeProvider>
-    );
+    renderSection(endItem, { index: 6 });
 
     expect(screen.getByText("Let's Connect")).toBeInTheDocument();
     expect(screen.getByText('Thanks for reading.')).toBeInTheDocument();

@@ -303,7 +303,7 @@ export const experiences: Experience[] = [
   {
     company: 'Michigan Technological University',
     companyUrl: mtuGlobalCampusOrganizationUrl,
-    companyTooltip: 'View online graduate degrees page',
+    companyTooltip: 'View Mathematical Sciences student directory page',
     industry: 'Higher Education',
     title: 'Graduate Research Assistant',
     startDate: 'May 2025',
@@ -345,7 +345,7 @@ export const experiences: Experience[] = [
   {
     company: 'Michigan Technological University',
     companyUrl: mtuGlobalCampusOrganizationUrl,
-    companyTooltip: 'View online graduate degrees page',
+    companyTooltip: 'View Mathematical Sciences student directory',
     industry: 'Higher Education',
     title: 'Instructor',
     startDate: 'Jan 2025',
@@ -372,7 +372,7 @@ export const experiences: Experience[] = [
   {
     company: 'Michigan Technological University',
     companyUrl: mtuGlobalCampusOrganizationUrl,
-    companyTooltip: 'View online graduate degrees page',
+    companyTooltip: 'View Mathematical Sciences student directory',
     industry: 'Higher Education',
     title: 'Graduate Teaching Assistant',
     startDate: 'Aug 2024',
@@ -465,7 +465,7 @@ export const experiences: Experience[] = [
   {
     company: 'Michigan Technological University',
     companyUrl: mtuGlobalCampusOrganizationUrl,
-    companyTooltip: 'View online graduate degrees page',
+    companyTooltip: 'View Mathematical Sciences student directory',
     industry: 'Higher Education',
     title: 'Research Assistant | Full Time',
     startDate: 'May 2021',
@@ -518,7 +518,7 @@ export const experiences: Experience[] = [
   {
     company: 'Michigan Technological University',
     companyUrl: mtuGlobalCampusOrganizationUrl,
-    companyTooltip: 'View online graduate degrees page',
+    companyTooltip: 'View Mathematical Sciences student directory',
     industry: 'Higher Education',
     title: 'Mathematics Tutor | Part Time',
     startDate: 'Sep 2015',

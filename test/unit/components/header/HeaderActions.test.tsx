@@ -25,6 +25,7 @@ const renderSettingsPopover = (
         showAudioControl={false}
         isPlaying={false}
         onToggleAudio={jest.fn()}
+        highlightSettingsTrigger={false}
         {...props}
       />
     </ThemeProvider>
@@ -40,6 +41,44 @@ describe('HeaderSettingsPopover', () => {
     renderSettingsPopover();
 
     expect(screen.getByRole('button', { name: 'Open settings' })).toBeInTheDocument();
+  });
+
+  it('marks the settings trigger as highlighted when the onboarding cue is active', () => {
+    renderSettingsPopover({ highlightSettingsTrigger: true });
+
+    expect(screen.getByTestId('header-settings-trigger-halo')).toHaveAttribute(
+      'data-highlighted',
+      'true'
+    );
+    expect(screen.getByRole('button', { name: 'Open settings' })).toHaveAttribute(
+      'data-highlighted',
+      'true'
+    );
+  });
+
+  it('keeps a static highlight ring visible when reduced motion is active', () => {
+    mockUseReducedMotion.mockReturnValue(true);
+
+    renderSettingsPopover({ highlightSettingsTrigger: true });
+
+    expect(screen.getByTestId('header-settings-trigger-highlight')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Open settings' })).toHaveAttribute(
+      'data-highlighted',
+      'true'
+    );
+  });
+
+  it('does not mark the settings trigger as highlighted by default', () => {
+    renderSettingsPopover();
+
+    expect(screen.getByTestId('header-settings-trigger-halo')).toHaveAttribute(
+      'data-highlighted',
+      'false'
+    );
+    expect(screen.getByRole('button', { name: 'Open settings' })).toHaveAttribute(
+      'data-highlighted',
+      'false'
+    );
   });
 
   it('opens the settings popover when the trigger is clicked', () => {

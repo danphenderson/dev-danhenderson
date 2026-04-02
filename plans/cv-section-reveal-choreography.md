@@ -61,9 +61,13 @@ For desktop entrances, extend the shared animated card wrapper with an optional 
 
 - 2026-04-01: Confirmed the header and `CVSectionNavigator` both already use `HEADER_HIDE_SCROLL_TRIGGER_OPTIONS`, making that the correct shared gate for the new `/cv` reveal sequence.
 - 2026-04-01: Confirmed the existing CV route already centralizes section metadata in `cvPageLayout.ts` and `cvRouteOrchestration.tsx`, so the sequencing change can stay page-owned.
+- 2026-04-02: Confirmed the active branch already includes the route-level unlock gate in `src/pages/CV.tsx`, desktop/mobile entrance-direction metadata in `src/pages/cvPageLayout.ts`, and opt-in directional card support in `src/components/AnimatedContentCard.tsx`.
+- 2026-04-02: `CI=true npm test -- --watchAll=false --runInBand test/unit/pages/CV.test.tsx test/unit/pages/CVRevealPersistence.test.tsx test/unit/components/cv/CVAboutSection.test.tsx test/unit/components/cv/CVExperienceSection.test.tsx test/unit/components/cv/CVSectionCard.test.tsx test/unit/components/layout/SectionCard.test.tsx` passed.
+- 2026-04-02: `npm run build:e2e && npm run test:e2e:chromium -- test/e2e/cv.github.spec.ts` passed.
+- 2026-04-02: Browser validation passed on `/cv` at `1440x1200` and `390x844`, confirming About-only initial render, unlock after scroll, section navigator appearance after unlock, and correct behavior with `danhenderson-motion=off`.
 
 ## Completion Status
 
 - [ ] Not started
-- [x] In progress
-- [ ] Complete
+- [ ] In progress
+- [x] Complete

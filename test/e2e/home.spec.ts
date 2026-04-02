@@ -10,6 +10,7 @@ const SERVER_EDITOR_TEXT = 'Ping Pong Server';
 const CLIENT_EDITOR_TEXT = 'SERVER_URL';
 const WELCOME_AUDIO_PROMPT_BODY =
   'Would you like to hear a short verse while browsing the site? Use the pause button in the header to stop it anytime.';
+const CUSTOMIZE_AUTO_ADVANCE_DELAY_MS = 2250;
 const HOME_ACTIVE_TERMINAL_HERO_SELECTOR =
   '[data-testid="home-ide-expanded"] [data-testid="terminal-hero"], [data-testid="home-hero-window"] [data-testid="terminal-hero"]';
 
@@ -148,7 +149,9 @@ const resetHomeScrollForScreenshot = async (page: Page, terminalHero: Locator) =
 };
 
 test.describe('Home page', () => {
-  test('keeps the customize modal open until the user clicks Okay', async ({ page }) => {
+  test('auto-dismisses the customize modal after 2250 ms and shows the settings hint', async ({
+    page,
+  }) => {
     await resetWelcomeState(page);
     await page.clock.install({ time: HOME_SCREENSHOT_CLOCK_START });
     await page.goto('/');
@@ -161,10 +164,10 @@ test.describe('Home page', () => {
     const customizeDialog = page.getByTestId('customize-experience-dialog');
     await expect(customizeDialog).toBeVisible();
 
-    await page.clock.runFor(2500);
+    await page.clock.runFor(CUSTOMIZE_AUTO_ADVANCE_DELAY_MS - 1);
     await expect(customizeDialog).toBeVisible();
 
-    await customizeDialog.getByRole('button', { name: 'Okay' }).click();
+    await page.clock.runFor(1);
     await expect(customizeDialog).toBeHidden();
     await expect(page.getByTestId('first-visit-settings-hint-popover')).toBeVisible();
   });
@@ -230,8 +233,10 @@ test.describe('Home page', () => {
     await expect(settingsHint).toContainText(
       'You can always update motion and welcome audio from the settings button in the header.'
     );
+    await expect(settingsTrigger).toHaveAttribute('data-highlighted', 'true');
     await settingsHint.getByRole('button', { name: 'Get started' }).click();
     await expect(settingsHint).toBeHidden();
+    await expect(settingsTrigger).toHaveAttribute('data-highlighted', 'false');
 
     await expect(siteNavigation).toBeVisible();
     await expect(siteNavigation.getByText('CV', { exact: true })).toBeVisible();

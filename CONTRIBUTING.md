@@ -51,7 +51,7 @@ Common starting points:
 
 - `npm run build`
 - `CI=true npm test -- --watchAll=false`
-- `npm run build:e2e` then `npm run test:e2e` for feature-gated blog coverage or Playwright route validation
+- `npm run build:e2e` then `npm run test:e2e` for Playwright Chromium coverage or test-runtime route validation
 
 For layout, navigation, interaction, animation, or responsive changes, validate in a browser on at least one desktop viewport and one mobile viewport.
 

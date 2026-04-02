@@ -239,7 +239,7 @@ flowchart TB
 
 ## Blog (`/blog`)
 
-Feature-gated: only rendered when `isFeatureEnabled('blog')` is true (dev/test builds).
+Public route rendered as part of the standard route set.
 
 ### Assembly
 

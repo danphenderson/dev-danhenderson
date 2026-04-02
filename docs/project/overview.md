@@ -1,6 +1,6 @@
 # Project Overview
 
-[danhenderson.dev](https://danhenderson.dev) is a client-side React + TypeScript portfolio site. It is a single-page application built for static hosting, with route-level pages for a CV, climbing log, photography galleries, and a feature-gated blog.
+[danhenderson.dev](https://danhenderson.dev) is a client-side React + TypeScript portfolio site. It is a single-page application built for static hosting, with route-level pages for a CV, climbing log, photography galleries, and a public blog.
 
 The site is not a template or a starter kit. It is a purpose-built frontend application with deliberate choices around motion choreography, theme-driven visual consistency, and compositional UI architecture.
 
@@ -12,7 +12,7 @@ The site is not a template or a starter kit. It is a purpose-built frontend appl
 | `/cv`          | Interactive CV with responsive desktop/mobile layout, GitHub-backed highlights with fallback data, tab/accordion detail panels, and an immersive story mode (`?mode=story`) |
 | `/climbing`    | Searchable climbing log with MUI X DataGrid, fuzzy filtering, and analytics dashboard                                                                                       |
 | `/photography` | Gallery grid with tilt-effect album cards, quilted image layouts, and an immersive full-screen lightbox                                                                     |
-| `/blog`        | Editorial blog with hero cards, tag filtering, code blocks, callouts, and post navigation (feature-gated to dev/test builds)                                                |
+| `/blog`        | Editorial blog with hero cards, tag filtering, code blocks, callouts, and post navigation                                                                                   |
 
 ## What makes the implementation notable
 

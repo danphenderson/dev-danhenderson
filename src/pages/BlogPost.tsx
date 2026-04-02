@@ -87,28 +87,26 @@ export default function BlogPost() {
             <BlogRelatedPosts posts={related} />
           </>
         ) : (
-          <MotionSection>
-            <SectionCard>
-              <Stack spacing={2.5}>
-                <SectionHeading
-                  overline="Blog"
-                  title="Post not found"
-                  sx={{ maxWidth: { md: 760 } }}
-                />
-                <Text role="bodyMuted">
-                  This article does not exist or has been moved. Use the command palette or recovery
-                  links below to navigate to another page.
-                </Text>
-                <RouteRecoveryPanel
-                  attemptedPathLabel={recoveryContext.attemptedPathLabel}
-                  routeHintLabel={recoveryContext.routeHintLabel}
-                  contextualSuggestions={recoveryContext.contextualSuggestions}
-                  recoveryActions={recoveryActions}
-                  suggestedPaletteQuery={recoveryContext.suggestedPaletteQuery}
-                />
-              </Stack>
-            </SectionCard>
-          </MotionSection>
+          <SectionCard delayMs={0} triggerOnView={false} skipEntranceAnimation>
+            <Stack spacing={2.5}>
+              <SectionHeading
+                overline="Blog"
+                title="Post not found"
+                sx={{ maxWidth: { md: 760 } }}
+              />
+              <Text role="bodyMuted">
+                This article does not exist or has been moved. Use the command palette or recovery
+                links below to navigate to another page.
+              </Text>
+              <RouteRecoveryPanel
+                attemptedPathLabel={recoveryContext.attemptedPathLabel}
+                routeHintLabel={recoveryContext.routeHintLabel}
+                contextualSuggestions={recoveryContext.contextualSuggestions}
+                recoveryActions={recoveryActions}
+                suggestedPaletteQuery={recoveryContext.suggestedPaletteQuery}
+              />
+            </Stack>
+          </SectionCard>
         )}
       </Stack>
     </PageFrame>

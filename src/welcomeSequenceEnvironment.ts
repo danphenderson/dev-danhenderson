@@ -1,4 +1,7 @@
-import { resolveAppRuntimeEnvironment, type AppRuntimeEnvironment } from './constants/featureFlags';
+import {
+  resolveAppRuntimeEnvironment,
+  type AppRuntimeEnvironment,
+} from './constants/runtimeEnvironment';
 import { readPublicUrl } from './utils/appEnvironment';
 
 type WelcomeSequenceResetOptions = {
