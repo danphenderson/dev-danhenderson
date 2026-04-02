@@ -54,8 +54,6 @@ describe('ClimbingAnalytics', () => {
     expect(screen.getByText('15')).toBeInTheDocument();
     expect(screen.getByText('Routes to Climb')).toBeInTheDocument();
     expect(screen.getByText('Unique Locations')).toBeInTheDocument();
-    expect(screen.getByText('2024-11-01')).toBeInTheDocument();
-    expect(screen.getByText('Most Recent Tick')).toBeInTheDocument();
   });
 
   it('renders grade profile chips for climbed and to-do grades', () => {

@@ -415,26 +415,18 @@ describe('Climbing', () => {
     expect(screen.getByText('Routes Climbed')).toBeInTheDocument();
     expect(screen.getAllByText('Routes to Climb').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Unique Locations')).toBeInTheDocument();
-    expect(screen.getByText('Most Recent Tick')).toBeInTheDocument();
 
     const routesClimbedMetric = screen.getByText('Routes Climbed').parentElement;
     const routesToClimbMetric = screen.getAllByText('Routes to Climb')[0]?.parentElement;
     const uniqueLocationsMetric = screen.getByText('Unique Locations').parentElement;
-    const mostRecentTickMetric = screen.getByText('Most Recent Tick').parentElement;
 
-    if (
-      !routesClimbedMetric ||
-      !routesToClimbMetric ||
-      !uniqueLocationsMetric ||
-      !mostRecentTickMetric
-    ) {
+    if (!routesClimbedMetric || !routesToClimbMetric || !uniqueLocationsMetric) {
       throw new Error('Expected analytics metric containers to render.');
     }
 
     expect(within(routesClimbedMetric).getByText('2')).toBeInTheDocument();
     expect(within(routesToClimbMetric).getByText('1')).toBeInTheDocument();
     expect(within(uniqueLocationsMetric).getByText('3')).toBeInTheDocument();
-    expect(within(mostRecentTickMetric).getByText('6/26/2025')).toBeInTheDocument();
   });
 
   it('renders the grade profile section', () => {

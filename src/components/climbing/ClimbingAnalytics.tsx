@@ -92,12 +92,6 @@ export const ClimbingAnalytics = ({ analytics }: ClimbingAnalyticsProps) => {
             </Text>
             <Text role="metricLabel">Unique Locations</Text>
           </Box>
-          <Box sx={metricSx}>
-            <Text role="metricValue" tone="accent">
-              {overview.mostRecentDate || 'N/A'}
-            </Text>
-            <Text role="metricLabel">Most Recent Tick</Text>
-          </Box>
         </Box>
       </SectionPanel>
 

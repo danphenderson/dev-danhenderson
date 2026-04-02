@@ -138,9 +138,16 @@ jest.mock('../../../src/components/layout/PageFrame', () => ({
   PageFrame: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
-jest.mock('../../../src/motion', () => ({
-  MotionSection: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}));
+jest.mock('../../../src/motion', () => {
+  const actualMotion = jest.requireActual(
+    '../../../src/motion'
+  ) as typeof import('../../../src/motion');
+
+  return {
+    ...actualMotion,
+    MotionSection: ({ children }: { children: ReactNode }) => <div>{children}</div>,
+  };
+});
 
 const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQuery>;
 const mockUseScrollTrigger = useScrollTrigger as jest.MockedFunction<typeof useScrollTrigger>;

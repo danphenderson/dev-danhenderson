@@ -137,7 +137,7 @@ test.describe('CV page – GitHub integration', () => {
     await expectCommonLinkTooltip(
       page,
       mtuOrganizationLink,
-      'View Mathematical Sciences student directory'
+      'View Mathematical Sciences student directory page'
     );
 
     // Route-level coverage only needs to verify the volunteering section can unlock and mount;
