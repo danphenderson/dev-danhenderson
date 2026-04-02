@@ -32,7 +32,7 @@ const BackgroundPaper: React.FC<BackgroundPaperProps> = ({
 
   return (
     <Grid container component="main" sx={appStyles.backgroundRootSx}>
-      <Grid item xs={12} sm={12} md={12} sx={appStyles.getBackgroundImageSx(resolvedImage)}>
+      <Grid size={12} sx={appStyles.getBackgroundImageSx(resolvedImage)}>
         <Box
           ref={contentRef}
           sx={mergeSx(appStyles.getBackgroundContentSx(contentAlign), contentSx)}

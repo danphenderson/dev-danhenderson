@@ -24,7 +24,7 @@ export function AlbumShareButton({
   albumDescription,
 }: AlbumShareButtonProps) {
   const [copied, setCopied] = useState(false);
-  const copiedTimerRef = useRef<number>();
+  const copiedTimerRef = useRef<number | undefined>(undefined);
   const canonicalUrl = getCanonicalAlbumUrl(albumSlug);
 
   useEffect(

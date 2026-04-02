@@ -22,7 +22,7 @@ import { siteRouteMap } from './constants/siteRoutes';
 import { Box } from '@mui/material';
 import { CommandPaletteProvider } from './CommandPaletteProvider';
 import { cssDuration } from './motion/tokens';
-import { routerFuture } from './routerFuture';
+
 import { readPublicUrl } from './utils/appEnvironment';
 
 type LazyRouteModule = {
@@ -89,7 +89,10 @@ const resolveRouteModule = (pathname: string, isBlogEnabled: boolean) => {
     return blogRoute;
   }
 
-  if (isBlogEnabled && matchPath({ path: `${siteRouteMap.blog.path}/:slug`, end: true }, pathname)) {
+  if (
+    isBlogEnabled &&
+    matchPath({ path: `${siteRouteMap.blog.path}/:slug`, end: true }, pathname)
+  ) {
     return blogPostRoute;
   }
 
@@ -198,7 +201,10 @@ function AppContent() {
                     element={<blogPostRoute.Component />}
                   />
                 ) : null}
-                <Route path={siteRouteMap['not-found'].path} element={<notFoundRoute.Component />} />
+                <Route
+                  path={siteRouteMap['not-found'].path}
+                  element={<notFoundRoute.Component />}
+                />
               </Routes>
             </PageTransition>
           ) : (
@@ -215,7 +221,7 @@ function AppContent() {
 
 export default function App() {
   return (
-    <BrowserRouter basename={readPublicUrl()} future={routerFuture}>
+    <BrowserRouter basename={readPublicUrl()}>
       <AppErrorBoundary>
         <AppContent />
       </AppErrorBoundary>

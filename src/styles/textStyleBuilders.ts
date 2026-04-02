@@ -1,12 +1,12 @@
 import { alpha } from '@mui/material/styles';
-import type { Variant } from '@mui/material/styles/createTypography';
+import type { TypographyVariant } from '@mui/material/styles';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { TextRole, TextTone, TextContext, TextUiRole, TextProseRole } from '../types/text';
 
 /* ── Typeset entry ──────────────────────────────────────── */
 
 /** A typeset fully describes the typographic treatment for one role. */
-type TextVariant = Variant | 'inherit';
+type TextVariant = TypographyVariant | 'inherit';
 
 export type Typeset = {
   /** MUI variant used internally (not exposed to consumers). */

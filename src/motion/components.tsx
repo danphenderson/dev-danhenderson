@@ -48,7 +48,7 @@ const asMargin = (m: string) =>
   m as Parameters<typeof useInView>[1] extends { margin?: infer M } ? M : never;
 
 const useMotionInView = <Element extends HTMLElement>(
-  ref: RefObject<Element>,
+  ref: RefObject<Element | null>,
   rootMargin: string,
   once: boolean,
   threshold?: number

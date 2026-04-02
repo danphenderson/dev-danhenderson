@@ -224,19 +224,19 @@ const CVRouteContent = () => {
     <PageFrame image={cvBackgroundImage} maxWidth={1600} containerSx={appStyles.cvPageContainerSx}>
       <>
         <Grid container spacing={3} alignItems="stretch">
-          <Grid item xs={12}>
+          <Grid size={12}>
             <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-top-region">
               <CVSectionStack spacing={2.5}>{getSectionNodesForRegion('top')}</CVSectionStack>
             </Box>
           </Grid>
 
-          <Grid item xs={12} md={5} lg={4} sx={appStyles.cvDesktopAsideGridItemSx}>
+          <Grid size={{ xs: 12, md: 5, lg: 4 }} sx={appStyles.cvDesktopAsideGridItemSx}>
             <Box sx={appStyles.cvPagePaneSx} data-testid="cv-desktop-sidebar-region">
               <CVSectionStack spacing={2.5}>{getSectionNodesForRegion('sidebar')}</CVSectionStack>
             </Box>
           </Grid>
 
-          <Grid item xs={12} md={7} lg={8} sx={appStyles.cvDesktopMainGridItemSx}>
+          <Grid size={{ xs: 12, md: 7, lg: 8 }} sx={appStyles.cvDesktopMainGridItemSx}>
             <Box sx={appStyles.cvPagePrimaryPaneSx} data-testid="cv-desktop-main-region">
               <CVSectionStack spacing={3.5}>{getSectionNodesForRegion('main')}</CVSectionStack>
             </Box>

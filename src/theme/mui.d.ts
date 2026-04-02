@@ -13,7 +13,7 @@ declare module '@mui/material/styles' {
 
 declare module '@mui/material/Slide' {
   interface SlideProps {
-    nodeRef?: RefObject<HTMLElement>;
+    nodeRef?: RefObject<HTMLElement | null>;
   }
 }
 
