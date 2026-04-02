@@ -9,7 +9,7 @@ import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { usePhotographyData } from '../hooks/usePhotographyData';
 import { useAppStyles } from '../styles/appStyles';
 import { fallbackBackgroundImage } from '../data/photography';
-import { Text } from '../components/text';
+import { Text, TypewriterText } from '../components/text';
 import { AlbumCard } from '../components/photography/AlbumCard';
 import { MotionSection, MotionItem, StaggerChildren, scaleIn, MotionTiltCard } from '../motion';
 
@@ -23,6 +23,7 @@ export default function Photography() {
   const supportingCategories = categories.filter((c) => c !== featuredCategory);
   const loadedImagesRef = useRef<Set<string>>(new Set());
   const [loadedImages, setLoadedImages] = useState(0);
+  const [isSubtitlePlaying, setIsSubtitlePlaying] = useState(false);
   const totalImages = categories.length;
 
   useEffect(() => {
@@ -42,23 +43,42 @@ export default function Photography() {
     <PageFrame image={fallbackBackgroundImage}>
       <Stack spacing={2.5}>
         <MotionSection>
-          <SectionCard delayMs={0} triggerOnView={false}>
-            <Stack spacing={1}>
-              <SectionHeading
-                overline="Photography"
-                subtitle="A selection of photo albums."
-                sx={appStyles.compactSectionHeadingSx}
-              />
-              <Text role="bodyMuted">
-                {totalPhotos} photos · {categories.length} albums
-              </Text>
-              {isLoading && (
-                <Box sx={appStyles.sectionLoadingSx}>
-                  <LoadingBars label="Loading photography albums" compact />
-                </Box>
-              )}
-            </Stack>
-          </SectionCard>
+          <MotionTiltCard intensity={0.5}>
+            <SectionCard
+              delayMs={0}
+              triggerOnView={false}
+              onVisible={() => setIsSubtitlePlaying(true)}
+            >
+              <Stack spacing={1}>
+                <SectionHeading
+                  overline="Photography"
+                  subtitle={
+                    <TypewriterText
+                      text="A collection of photo albums."
+                      playing={isSubtitlePlaying}
+                      timingPreset="body"
+                    />
+                  }
+                  sx={[
+                    appStyles.compactSectionHeadingSx,
+                    {
+                      '& > :first-of-type': {
+                        display: 'block',
+                      },
+                    },
+                  ]}
+                />
+                <Text role="bodyMuted">
+                  {totalPhotos} photos · {categories.length} albums
+                </Text>
+                {isLoading && (
+                  <Box sx={appStyles.sectionLoadingSx}>
+                    <LoadingBars label="Loading photography albums" compact />
+                  </Box>
+                )}
+              </Stack>
+            </SectionCard>
+          </MotionTiltCard>
         </MotionSection>
 
         {featuredCategory && (

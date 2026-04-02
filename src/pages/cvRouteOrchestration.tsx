@@ -10,6 +10,7 @@ import { CVVolunteeringSection } from '../components/cv/CVVolunteeringSection';
 import { cvSectionMetadata } from '../components/cv/cvSectionMetadata';
 import { githubSectionLead } from '../data/cv';
 import { CVLayoutMode, CVSectionRegion, cvPageSectionLayout } from './cvPageLayout';
+import type { AnimatedContentCardEntranceDirection } from '../types/ui';
 import type {
   AboutMe,
   Certificate,
@@ -28,6 +29,7 @@ const WORKFLOW_CONTENT_DELIMITER = '|workflow|';
 
 type CVLayoutMotion = {
   delayMs: number;
+  entranceDirection: AnimatedContentCardEntranceDirection;
   triggerOnView: boolean;
 };
 
@@ -56,6 +58,7 @@ export type CVResolvedSectionDescriptor = {
     region: CVSectionRegion;
   };
   delayMs: number;
+  entranceDirection: AnimatedContentCardEntranceDirection;
   triggerOnView: boolean;
 };
 
@@ -195,6 +198,7 @@ export const buildCVSectionDescriptors = ({
         <CVExperienceSection
           experiences={experiences}
           delayMs={layout.delayMs}
+          entranceDirection={layout.entranceDirection}
           triggerOnView={layout.triggerOnView}
           revealed={revealState.isSectionRevealed('experience')}
           onReveal={() => revealState.markSectionRevealed('experience')}
@@ -209,6 +213,7 @@ export const buildCVSectionDescriptors = ({
         <CVEducationSection
           education={education}
           delayMs={layout.delayMs}
+          entranceDirection={layout.entranceDirection}
           triggerOnView={layout.triggerOnView}
           revealed={revealState.isSectionRevealed('education')}
           onReveal={() => revealState.markSectionRevealed('education')}
@@ -223,6 +228,7 @@ export const buildCVSectionDescriptors = ({
         <CVVolunteeringSection
           volunteering={volunteering}
           delayMs={layout.delayMs}
+          entranceDirection={layout.entranceDirection}
           triggerOnView={layout.triggerOnView}
           revealed={revealState.isSectionRevealed('volunteering')}
           onReveal={() => revealState.markSectionRevealed('volunteering')}
@@ -239,6 +245,7 @@ export const buildCVSectionDescriptors = ({
           contributions={githubContributions}
           loading={githubLoading}
           error={githubError}
+          entranceDirection={layout.entranceDirection}
           statusIndicator={githubStatusTooltip}
           revealed={revealState.isGithubRevealed}
           onReveal={() => revealState.markSectionRevealed('github')}
@@ -258,6 +265,7 @@ export const buildCVSectionDescriptors = ({
         <CVCertificatesSection
           certificates={certificates}
           delayMs={layout.delayMs}
+          entranceDirection={layout.entranceDirection}
           triggerOnView={layout.triggerOnView}
           revealed={revealState.isSectionRevealed('certificates')}
           onReveal={() => revealState.markSectionRevealed('certificates')}
@@ -272,6 +280,7 @@ export const buildCVSectionDescriptors = ({
         <CVCodingSection
           examples={codingExamples}
           delayMs={layout.delayMs}
+          entranceDirection={layout.entranceDirection}
           triggerOnView={layout.triggerOnView}
           revealed={revealState.isSectionRevealed('coding')}
           onReveal={() => revealState.markSectionRevealed('coding')}
@@ -294,6 +303,7 @@ export const buildCVSectionDescriptors = ({
         region: layout.region,
       },
       delayMs: layout.delayMs,
+      entranceDirection: layout.entranceDirection,
       triggerOnView: layout.triggerOnView,
     };
   });

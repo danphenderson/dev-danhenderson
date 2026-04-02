@@ -42,6 +42,10 @@ describe('useHomeWelcomeSequence', () => {
     mockOnboardingState = createMockOnboardingState();
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('opens prompt when audioConsent is unknown and onboarding has not been completed', () => {
     const { result } = renderHook(() => useHomeWelcomeSequence());
     expect(result.current.isPromptOpen).toBe(true);
@@ -165,6 +169,24 @@ describe('useHomeWelcomeSequence', () => {
 
     expect(result.current.isPromptOpen).toBe(false);
     expect(mockOnboardingState.openCustomizeModal).not.toHaveBeenCalled();
+  });
+
+  it('does not advance the customize step on elapsed time alone', () => {
+    jest.useFakeTimers();
+    mockAudioState = createMockAudioState({ audioConsent: 'declined' });
+    mockOnboardingState = createMockOnboardingState({ showCustomizeModal: true });
+
+    const { result } = renderHook(() => useHomeWelcomeSequence());
+
+    expect(result.current.isCustomizeOpen).toBe(true);
+
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+
+    expect(mockOnboardingState.advanceToSettingsHint).not.toHaveBeenCalled();
+    expect(result.current.isCustomizeOpen).toBe(true);
+    expect(result.current.isSettingsHintOpen).toBe(false);
   });
 
   it('handleCustomizeDismiss advances to the settings hint', () => {

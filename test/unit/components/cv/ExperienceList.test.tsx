@@ -299,13 +299,37 @@ describe('ExperienceList', () => {
     expect(
       screen.getByRole('link', { name: 'Quasi-Newton Optimization with Hessian Samples' })
     ).toHaveAttribute('href', 'https://lnkd.in/gfP39wZX');
+    expect(
+      screen.getByRole('link', { name: 'Quasi-Newton Optimization with Hessian Samples' })
+    ).toHaveAttribute('data-tooltip-id', COMMON_LINK_TOOLTIP_ID);
+    expect(
+      screen.getByRole('link', { name: 'Quasi-Newton Optimization with Hessian Samples' })
+    ).toHaveAttribute('data-tooltip-content', 'View article on arxiv.org');
+
     expect(screen.getByRole('link', { name: 'BlockOpt.jl' })).toHaveAttribute(
       'href',
       'https://github.com/danphenderson/BlockOpt.jl'
     );
+    expect(screen.getByRole('link', { name: 'BlockOpt.jl' })).toHaveAttribute(
+      'data-tooltip-id',
+      COMMON_LINK_TOOLTIP_ID
+    );
+    expect(screen.getByRole('link', { name: 'BlockOpt.jl' })).toHaveAttribute(
+      'data-tooltip-content',
+      'View Github repository'
+    );
+
     expect(screen.getByRole('link', { name: 'UncNLPrograms.jl' })).toHaveAttribute(
       'href',
       'https://github.com/danphenderson/UncNLPrograms.jl'
+    );
+    expect(screen.getByRole('link', { name: 'UncNLPrograms.jl' })).toHaveAttribute(
+      'data-tooltip-id',
+      COMMON_LINK_TOOLTIP_ID
+    );
+    expect(screen.getByRole('link', { name: 'UncNLPrograms.jl' })).toHaveAttribute(
+      'data-tooltip-content',
+      'View Github repository'
     );
     expect(screen.queryByText('Article')).not.toBeInTheDocument();
     expect(screen.queryByText('Zenodo DOI')).not.toBeInTheDocument();

@@ -1,9 +1,15 @@
 import { render, screen } from '@testing-library/react';
+import useScrollTrigger from '@mui/material/useScrollTrigger';
 import { MemoryRouter } from 'react-router-dom';
 import { routerFuture } from '../../../src/routerFuture';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { aboutMe } from '../../../src/data/cv';
 import CV from '../../../src/pages/CV';
+
+jest.mock('@mui/material/useScrollTrigger', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
 
 jest.mock('../../../src/hooks/useGithubProfile', () => ({
   useGithubProfile: () => ({
@@ -33,6 +39,8 @@ jest.mock('react-github-calendar', () => ({
 }));
 
 describe('CV runtime render', () => {
+  const mockUseScrollTrigger = useScrollTrigger as jest.MockedFunction<typeof useScrollTrigger>;
+
   const renderCV = (initialEntries = ['/cv']) =>
     render(
       <MemoryRouter initialEntries={initialEntries} future={routerFuture}>
@@ -41,6 +49,10 @@ describe('CV runtime render', () => {
         </ThemeProvider>
       </MemoryRouter>
     );
+
+  beforeEach(() => {
+    mockUseScrollTrigger.mockReturnValue(true);
+  });
 
   it('renders the live CV tree with the accessible bio layer and mocked GitHub content', () => {
     const { container } = renderCV();
@@ -52,7 +64,7 @@ describe('CV runtime render', () => {
     expect(screen.getByText(aboutMe.title)).toBeInTheDocument();
     expect(accessibleLayer).not.toBeNull();
     expect(accessibleLayer).toHaveTextContent(
-      'Software developer building scientific, data, and AI-enabled systems. Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software. I previously built ingestion, analytics, and ML solutions for a healthcare data platform.'
+      'Software developer building scientific, data, and AI-enabled systems. Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software. Previously built ingestion, analytics, and ML solutions for a healthcare data platform.'
     );
     expect(screen.getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
     expect(screen.getByText('microsoft/playwright')).toBeInTheDocument();

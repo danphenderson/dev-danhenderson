@@ -13,6 +13,11 @@ export const fadeInUp: Variants = {
     y: 0,
     transition: { duration: duration.normal, ease: easing.decel },
   },
+  exit: {
+    opacity: 0,
+    y: -16,
+    transition: { duration: duration.fast, ease: easing.accel },
+  },
 };
 
 /** Simple opacity crossfade. */
@@ -21,6 +26,10 @@ export const fadeIn: Variants = {
   visible: {
     opacity: 1,
     transition: { duration: duration.normal, ease: easing.smooth },
+  },
+  exit: {
+    opacity: 0,
+    transition: { duration: duration.fast, ease: easing.accel },
   },
 };
 
@@ -31,6 +40,11 @@ export const scaleIn: Variants = {
     opacity: 1,
     scale: 1,
     transition: { duration: duration.normal, ease: easing.spring },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.96,
+    transition: { duration: duration.fast, ease: easing.accel },
   },
 };
 

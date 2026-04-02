@@ -4,7 +4,7 @@ import { dismissWelcomeSequence, resetWelcomeState } from './helpers/header';
 const HOME_SCREENSHOT_CLOCK_START = new Date('2026-03-17T12:00:00.000Z');
 const STABLE_TERMINAL_OUTPUT_TEXT =
   /v22\.14\.0|9ab2238 polish: terminal UI chrome|Compiled successfully in 2\.4s|mathematics|julia version 1\.10\.10|==> Formulae/;
-const STABLE_TERMINAL_COMMAND_TEXT = 'brew';
+const STABLE_TERMINAL_COMMAND_TEXT = 'brew ls';
 const TERMINAL_NOTIFICATION_TEXT = 'server.py — No problems detected ✓';
 const SERVER_EDITOR_TEXT = 'Ping Pong Server';
 const CLIENT_EDITOR_TEXT = 'SERVER_URL';
@@ -124,7 +124,7 @@ const advanceClockUntilTerminalBodyContains = async (
   page: Page,
   terminalHero: Locator,
   expectedText: string,
-  maxElapsedMs = 12_000,
+  maxElapsedMs = 30_000,
   stepMs = 250
 ) => {
   const terminalPanelBody = terminalHero.getByTestId('terminal-panel-body');
@@ -148,6 +148,27 @@ const resetHomeScrollForScreenshot = async (page: Page, terminalHero: Locator) =
 };
 
 test.describe('Home page', () => {
+  test('keeps the customize modal open until the user clicks Okay', async ({ page }) => {
+    await resetWelcomeState(page);
+    await page.clock.install({ time: HOME_SCREENSHOT_CLOCK_START });
+    await page.goto('/');
+
+    const welcomePrompt = page.getByRole('dialog', { name: 'Play welcome audio?' });
+    await expect(welcomePrompt).toBeVisible();
+    await welcomePrompt.getByRole('button', { name: 'No thanks' }).click();
+    await expect(welcomePrompt).toBeHidden();
+
+    const customizeDialog = page.getByTestId('customize-experience-dialog');
+    await expect(customizeDialog).toBeVisible();
+
+    await page.clock.runFor(2500);
+    await expect(customizeDialog).toBeVisible();
+
+    await customizeDialog.getByRole('button', { name: 'Okay' }).click();
+    await expect(customizeDialog).toBeHidden();
+    await expect(page.getByTestId('first-visit-settings-hint-popover')).toBeVisible();
+  });
+
   test('renders the hero content after completing the welcome sequence', async ({ page }) => {
     await resetWelcomeState(page);
     await page.goto('/');
@@ -230,7 +251,7 @@ test.describe('Home page', () => {
     await expect(settingsPopover).toBeVisible();
     await expect(settingsPopover.getByText('Theme', { exact: true })).toBeVisible();
     await expect(settingsPopover.getByText(/Dark mode|Light mode/)).toBeVisible();
-    await expect(settingsPopover.getByRole('checkbox', { name: 'Dark mode' })).toBeVisible();
+    await expect(settingsPopover.locator('[role="switch"]')).toHaveCount(1);
     await expect(
       settingsPopover.getByRole('radiogroup', { name: 'Appearance presets' })
     ).toBeVisible();

@@ -1,7 +1,21 @@
 import { render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { ClimbingAnalytics } from '../../../../src/components/climbing/ClimbingAnalytics';
 import type { ClimbingAnalytics as ClimbingAnalyticsType } from '../../../../src/hooks/useClimbingData';
+
+jest.mock('../../../../src/motion', () => {
+  const actual = jest.requireActual('../../../../src/motion');
+
+  return {
+    ...actual,
+    MotionTiltCard: ({ children, intensity }: { children: ReactNode; intensity?: number }) => (
+      <div data-testid="climbing-analytics-tilt-card" data-intensity={String(intensity ?? '')}>
+        {children}
+      </div>
+    ),
+  };
+});
 
 const mockAnalytics: ClimbingAnalyticsType = {
   overview: {
@@ -61,19 +75,33 @@ describe('ClimbingAnalytics', () => {
     expect(screen.getByText('5.9 (2)')).toBeInTheDocument();
   });
 
-  it('renders top destination locations', () => {
+  it('renders top destination locations inside tilt cards', () => {
     render(
       <ThemeProvider>
         <ClimbingAnalytics analytics={mockAnalytics} />
       </ThemeProvider>
     );
 
-    expect(screen.getByText('Most Climbed')).toBeInTheDocument();
-    expect(screen.getByText('Red River Gorge')).toBeInTheDocument();
-    expect(screen.getByText('New River Gorge')).toBeInTheDocument();
-    expect(screen.getByText('Most Wanted')).toBeInTheDocument();
-    expect(screen.getByText('Indian Creek')).toBeInTheDocument();
-    expect(screen.getByText('Rifle')).toBeInTheDocument();
+    const tiltCards = screen.getAllByTestId('climbing-analytics-tilt-card');
+    const mostClimbedCard = screen
+      .getByText('Most Climbed')
+      .closest('[data-testid="climbing-analytics-tilt-card"]');
+    const mostWantedCard = screen
+      .getByText('Most Wanted')
+      .closest('[data-testid="climbing-analytics-tilt-card"]');
+
+    if (!mostClimbedCard || !mostWantedCard) {
+      throw new Error('Expected destination tilt cards to render.');
+    }
+
+    expect(tiltCards).toHaveLength(2);
+    tiltCards.forEach((tiltCard) => {
+      expect(tiltCard).toHaveAttribute('data-intensity', '0.4');
+    });
+    expect(mostClimbedCard).toContainElement(screen.getByText('Red River Gorge'));
+    expect(mostClimbedCard).toContainElement(screen.getByText('New River Gorge'));
+    expect(mostWantedCard).toContainElement(screen.getByText('Indian Creek'));
+    expect(mostWantedCard).toContainElement(screen.getByText('Rifle'));
   });
 
   it('renders the bundled freshness label from analytics recency', () => {

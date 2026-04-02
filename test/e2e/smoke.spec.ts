@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { test, expect, type Locator, type Page } from '@playwright/test';
+import { waitForClimbingContent } from './helpers/climbing';
 import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
 /**
@@ -39,11 +40,7 @@ test.describe('Production smoke', () => {
   test('production footer scorecard shows stamped build metadata', async ({ page }) => {
     await page.goto('/climbing');
 
-    const main = page.locator('#main-content');
-    await waitForAnimatedSectionReadiness({
-      anchor: main.getByRole('heading', { name: 'Overview' }),
-      readyLocators: [main.getByRole('table').first()],
-    });
+    await waitForClimbingContent(page);
 
     const scorecardTrigger = page.getByRole('button', { name: 'Open performance scorecard' });
     await scorecardTrigger.scrollIntoViewIfNeeded();
@@ -75,19 +72,16 @@ test.describe('Production smoke', () => {
     await page.goto('/climbing');
 
     const main = page.locator('#main-content');
-    await waitForAnimatedSectionReadiness({
-      anchor: main.getByRole('heading', { name: 'Overview' }),
-      readyLocators: [main.getByRole('table').first()],
-    });
+    await waitForClimbingContent(page);
 
-    await expect(main.getByRole('heading', { name: 'Overview' })).toBeVisible();
+    await expect(main.getByText('Routes Climbed', { exact: true })).toBeVisible();
   });
 
   test('/photography loads album cards', async ({ page }) => {
     await page.goto('/photography');
 
     await waitForAnimatedSectionReadiness({
-      anchor: page.getByText('A selection of photo albums.'),
+      anchor: page.getByText('A collection of photo albums.'),
       readyLocators: [page.getByText('4 albums')],
     });
 

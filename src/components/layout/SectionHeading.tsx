@@ -1,12 +1,13 @@
 import { Box } from '@mui/material';
 import type { BoxProps } from '@mui/material';
+import type { ReactNode } from 'react';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { Text } from '../text';
 
 type SectionHeadingProps = BoxProps & {
   overline: string;
   title?: string;
-  subtitle?: string;
+  subtitle?: ReactNode;
 };
 
 export const SectionHeading = ({

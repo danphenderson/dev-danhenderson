@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useLocation } from 'react-router-dom';
-import { duration, useMotionScale, scaleDuration } from '../motion';
+import { duration, easing, useMotionScale, scaleDuration } from '../motion';
 import { SPRING_EASING_MOTION } from '../styles/springEasing';
 
 /** Subtle vertical offset (px) for the enter slide-up effect. */
@@ -30,7 +30,18 @@ export const PageTransition = ({ children, pathname }: PageTransitionProps) => {
         key={routePathname}
         initial={dFactor === 0 ? false : { opacity: 0, y: ENTER_Y_OFFSET }}
         animate={{ opacity: 1, y: 0 }}
-        exit={dFactor === 0 ? undefined : { opacity: 0 }}
+        exit={
+          dFactor === 0
+            ? undefined
+            : {
+                opacity: 0,
+                y: -ENTER_Y_OFFSET,
+                transition: {
+                  duration: scaleDuration(duration.fast, dFactor),
+                  ease: easing.accel,
+                },
+              }
+        }
         transition={{
           duration: scaledDuration,
           ease: SPRING_EASING_MOTION,

@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import ThemeProvider from '../../../../src/ThemeProvider';
+import { COMMON_LINK_TOOLTIP_ID } from '../../../../src/components/CommonLink';
 import { CVStorySectionRenderer } from '../../../../src/components/cv/CVStorySectionRenderer';
 import type { CVStoryItem } from '../../../../src/data/cvStoryItems';
 
@@ -66,7 +67,11 @@ const experienceItem: CVStoryItem = {
     projects: [
       [
         { text: 'Built ' },
-        { text: 'BlockOpt.jl', link: 'https://github.com/example/blockopt' },
+        {
+          text: 'BlockOpt.jl',
+          link: 'https://github.com/example/blockopt',
+          tooltip: 'View Github repository',
+        },
         { text: ' for trust-region experiments.' },
       ],
     ],
@@ -202,6 +207,14 @@ describe('CVStorySectionRenderer', () => {
     expect(screen.getByText('BlockOpt.jl')).toHaveAttribute(
       'href',
       'https://github.com/example/blockopt'
+    );
+    expect(screen.getByText('BlockOpt.jl')).toHaveAttribute(
+      'data-tooltip-id',
+      COMMON_LINK_TOOLTIP_ID
+    );
+    expect(screen.getByText('BlockOpt.jl')).toHaveAttribute(
+      'data-tooltip-content',
+      'View Github repository'
     );
     expect(screen.getByText('Go')).toBeInTheDocument();
     expect(screen.getByText('Kubernetes')).toBeInTheDocument();

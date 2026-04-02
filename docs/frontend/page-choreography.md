@@ -180,22 +180,22 @@ sequenceDiagram
 ```mermaid
 flowchart TB
   PF["PageFrame<br/>background: climbing.jpg"]
-  MS1["MotionSection"]
-  SH1["SectionHeading<br/>Ticked Routes"]
-  SC1["SectionCard<br/>MUI X DataGrid (ticks)"]
-  MS2["MotionSection"]
-  SH2["SectionHeading<br/>Wish List"]
-  SC2["SectionCard<br/>MUI X DataGrid (todos)"]
-  MS3["MotionSection"]
+  Intro["MotionSection<br/>typed CLIMBING eyebrow"]
+  Runway["Scroll runway until header hide threshold"]
+  Main["SectionCard<br/>spring entrance after unlock"]
   Analytics["ClimbingAnalytics<br/>SectionPanel dashboard"]
+  Ticks["MUI X DataGrid (ticks)"]
+  Todos["Wish list DataGrid (todos)"]
 
-  PF --> MS1 --> SH1 --> SC1
-  PF --> MS2 --> SH2 --> SC2
-  PF --> MS3 --> Analytics
+  PF --> Intro --> Runway --> Main
+  Main --> Analytics
+  Main --> Ticks
+  Main --> Todos
 ```
 
 - `useFuzzySearch()` provides route/location filtering across both DataGrid tables
-- `MotionSection` wraps each major block for viewport-triggered fade-in-up
+- initial load shows only the typed `CLIMBING` eyebrow; the analytics and tables stay deferred until the user scrolls far enough to hide the header
+- once unlocked, the main climbing card enters with the same spring-style card motion used by the deferred CV sections
 - Analytics panels use `SectionPanel` for dense data display
 
 ## Photography (`/photography`)

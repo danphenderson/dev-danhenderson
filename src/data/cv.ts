@@ -54,7 +54,7 @@ export const aboutMe: AboutMe = {
 
 Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software.
 
-I previously built ingestion, analytics, and ML solutions for a healthcare data platform.`,
+Previously built ingestion, analytics, and ML solutions for a healthcare data platform.`,
 };
 
 export const codingExamples: CodingExample[] = [
@@ -478,18 +478,27 @@ export const experiences: Experience[] = [
         {
           text: 'Quasi-Newton Optimization with Hessian Samples',
           link: 'https://lnkd.in/gfP39wZX',
+          tooltip: 'View article on arxiv.org',
         },
       ],
       [
         { text: 'Built ' },
-        { text: 'BlockOpt.jl', link: 'https://github.com/danphenderson/BlockOpt.jl' },
+        {
+          text: 'BlockOpt.jl',
+          link: 'https://github.com/danphenderson/BlockOpt.jl',
+          tooltip: 'View Github repository',
+        },
         {
           text: ', an open-source Julia implementation of the paper’s trust-region quasi-Newton methods.',
         },
       ],
       [
         { text: 'Built ' },
-        { text: 'UncNLPrograms.jl', link: 'https://github.com/danphenderson/UncNLPrograms.jl' },
+        {
+          text: 'UncNLPrograms.jl',
+          link: 'https://github.com/danphenderson/UncNLPrograms.jl',
+          tooltip: 'View Github repository',
+        },
         {
           text: ' to create an automatic-differentiation optimization benchmark suite to test paper’s methods.',
         },
@@ -512,7 +521,7 @@ export const experiences: Experience[] = [
     companyTooltip: 'View online graduate degrees page',
     industry: 'Higher Education',
     title: 'Mathematics Tutor | Part Time',
-    startDate: 'September 2015',
+    startDate: 'Sep 2015',
     endDate: 'May 2018 (2 yrs 9 mos)',
     description:
       'Tutor to NCAA student-athletes in calculus (I, II, & III), ordinary differential equations, and linear algebra.',

@@ -624,12 +624,24 @@ export const createComponentStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     profileBioSx: { whiteSpace: 'pre-line' } satisfies SxProps<Theme>,
     cvEntryTitleRowSx: {
-      display: 'grid',
-      gridTemplateColumns: 'minmax(0, 1fr) auto',
-      alignItems: 'start',
+      display: 'flex',
+      flexWrap: 'wrap',
+      alignItems: 'baseline',
       columnGap: 1.5,
       rowGap: 0.5,
       width: '100%',
+    } satisfies SxProps<Theme>,
+    cvEntryTitleTextSx: {
+      flex: '1 1 16rem',
+      minWidth: 0,
+      overflowWrap: 'anywhere',
+    } satisfies SxProps<Theme>,
+    cvEntryDateRangeSx: {
+      flex: '0 1 auto',
+      minWidth: 0,
+      ml: 'auto',
+      maxWidth: '100%',
+      textAlign: 'right',
     } satisfies SxProps<Theme>,
     cvEntryOrganizationRowSx: {
       display: 'grid',

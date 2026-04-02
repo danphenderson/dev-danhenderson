@@ -1,4 +1,6 @@
-import { Box } from '@mui/material';
+import { useState, useCallback } from 'react';
+import { Backdrop, Box } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material/styles';
 import type { Experience, ExperienceProject } from '../../types/cv';
 import { AnimatedSlideList, getAnimatedSlideListCloseDelayMs } from '../AnimatedSlideList';
 import { AnimatedContentList } from '../AnimatedContentList';
@@ -63,93 +65,114 @@ export const ExperienceList = ({
 }: ExperienceListProps) => {
   const { contentListStackSpacing, detailBlockSx, experienceDescriptionSx, motionTokens } =
     useComponentStyles();
+  const [activeTab, setActiveTab] = useState<{ index: number; value: string } | null>(null);
+
+  const handleTabChange = useCallback((index: number, value: string | false) => {
+    setActiveTab(value !== false ? { index, value } : null);
+  }, []);
+
+  const getItemContainerSx = useCallback(
+    (_item: Experience, index: number): SxProps<Theme> =>
+      activeTab?.index === index ? { position: 'relative', zIndex: 2 } : {},
+    [activeTab]
+  );
 
   return (
-    <AnimatedContentList
-      items={experiences}
-      getItemKey={(experience, index) => `${experience.company}-${index}`}
-      startDelayMs={startDelayMs}
-      skipEntranceAnimation={skipEntranceAnimation}
-      stackSpacing={contentListStackSpacing}
-      itemSurface="panel"
-      tiltItems
-      renderItem={(experience, index) => {
-        const filteredSkills = experience.skills?.filter((tool) => tool.trim().length > 0) ?? [];
-        const experienceTabs: TabPanelItem[] = [];
+    <Box sx={{ position: 'relative', isolation: 'isolate' }}>
+      <Backdrop
+        open={activeTab !== null}
+        onClick={() => setActiveTab(null)}
+        sx={{ position: 'absolute', zIndex: 1 }}
+      />
+      <AnimatedContentList
+        items={experiences}
+        getItemKey={(experience, index) => `${experience.company}-${index}`}
+        startDelayMs={startDelayMs}
+        skipEntranceAnimation={skipEntranceAnimation}
+        stackSpacing={contentListStackSpacing}
+        itemSurface="panel"
+        tiltItems
+        getItemContainerSx={getItemContainerSx}
+        renderItem={(experience, index) => {
+          const filteredSkills = experience.skills?.filter((tool) => tool.trim().length > 0) ?? [];
+          const experienceTabs: TabPanelItem[] = [];
 
-        if (experience.projects?.length) {
-          experienceTabs.push({
-            value: 'details',
-            label: 'Highlights',
-            closeDelayMs: getAnimatedSlideListCloseDelayMs(
-              experience.projects.length,
-              motionTokens.accordionChipStaggerMs
-            ),
-            renderContent: (selected, renderContext) => (
-              <ExperienceProjects
-                projects={experience.projects}
-                selected={selected}
-                renderContext={renderContext}
-              />
-            ),
-          });
-        }
-
-        if (filteredSkills.length) {
-          experienceTabs.push({
-            value: 'skills',
-            label: 'Skills',
-            closeDelayMs: getAnimatedSlideListCloseDelayMs(
-              filteredSkills.length,
-              motionTokens.accordionChipStaggerMs
-            ),
-            renderContent: (selected, renderContext) => (
-              <SkillsChipList
-                skills={filteredSkills}
-                dense
-                in={selected}
-                animation="slide"
-                keepMountedWhenExited
-                reverseExitStagger
-                drawerContainer={renderContext.getDrawerContainer}
-              />
-            ),
-          });
-        }
-
-        const hideSingleSupplementalTab =
-          experienceTabs.length === 1 && experienceTabs[0]?.value !== 'skills';
-
-        return (
-          <>
-            <CVEntryHeader
-              title={experience.title}
-              organization={experience.company}
-              organizationUrl={experience.companyUrl}
-              organizationTooltip={experience.companyTooltip}
-              dateRange={`${experience.startDate} – ${experience.endDate}`}
-              chip={experience.industry ? { label: experience.industry } : undefined}
-            />
-            {experience.description && (
-              <Text role="body" sx={experienceDescriptionSx}>
-                {renderExperienceDescriptionContent(experience.description)}
-              </Text>
-            )}
-            {experienceTabs.length ? (
-              <Box sx={detailBlockSx}>
-                <TabPanel
-                  id={`experience-details-${index}`}
-                  ariaLabel={`${experience.title} supplemental information`}
-                  items={experienceTabs}
-                  dense
-                  hideTabsWhenSingle={hideSingleSupplementalTab}
-                  tabsVariant="fullWidth"
+          if (experience.projects?.length) {
+            experienceTabs.push({
+              value: 'details',
+              label: 'Highlights',
+              closeDelayMs: getAnimatedSlideListCloseDelayMs(
+                experience.projects.length,
+                motionTokens.accordionChipStaggerMs
+              ),
+              renderContent: (selected, renderContext) => (
+                <ExperienceProjects
+                  projects={experience.projects}
+                  selected={selected}
+                  renderContext={renderContext}
                 />
-              </Box>
-            ) : null}
-          </>
-        );
-      }}
-    />
+              ),
+            });
+          }
+
+          if (filteredSkills.length) {
+            experienceTabs.push({
+              value: 'skills',
+              label: 'Skills',
+              closeDelayMs: getAnimatedSlideListCloseDelayMs(
+                filteredSkills.length,
+                motionTokens.accordionChipStaggerMs
+              ),
+              renderContent: (selected, renderContext) => (
+                <SkillsChipList
+                  skills={filteredSkills}
+                  dense
+                  in={selected}
+                  animation="slide"
+                  keepMountedWhenExited
+                  reverseExitStagger
+                  drawerContainer={renderContext.getDrawerContainer}
+                />
+              ),
+            });
+          }
+
+          const hideSingleSupplementalTab =
+            experienceTabs.length === 1 && experienceTabs[0]?.value !== 'skills';
+
+          return (
+            <>
+              <CVEntryHeader
+                title={experience.title}
+                organization={experience.company}
+                organizationUrl={experience.companyUrl}
+                organizationTooltip={experience.companyTooltip}
+                dateRange={`${experience.startDate} – ${experience.endDate}`}
+                chip={experience.industry ? { label: experience.industry } : undefined}
+              />
+              {experience.description && (
+                <Text role="body" sx={experienceDescriptionSx}>
+                  {renderExperienceDescriptionContent(experience.description)}
+                </Text>
+              )}
+              {experienceTabs.length ? (
+                <Box sx={detailBlockSx}>
+                  <TabPanel
+                    id={`experience-details-${index}`}
+                    ariaLabel={`${experience.title} supplemental information`}
+                    items={experienceTabs}
+                    dense
+                    hideTabsWhenSingle={hideSingleSupplementalTab}
+                    tabsVariant="fullWidth"
+                    value={activeTab?.index === index ? activeTab.value : false}
+                    onChange={(value) => handleTabChange(index, value)}
+                  />
+                </Box>
+              ) : null}
+            </>
+          );
+        }}
+      />
+    </Box>
   );
 };

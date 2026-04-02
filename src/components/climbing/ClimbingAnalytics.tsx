@@ -2,6 +2,7 @@ import { Box, Chip, Stack } from '@mui/material';
 import type { SxProps, Theme } from '@mui/material/styles';
 import { SectionPanel } from '../layout/SectionPanel';
 import { Text } from '../text';
+import { MotionTiltCard } from '../../motion';
 import type { ClimbingAnalytics as ClimbingAnalyticsType } from '../../types/data';
 
 type ClimbingAnalyticsProps = {
@@ -42,6 +43,18 @@ const locationTextSx: SxProps<Theme> = {
   minWidth: 0,
 };
 
+const destinationPanelSx: SxProps<Theme> = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 1,
+  height: '100%',
+};
+
+const destinationCardStyle = {
+  flex: '1 1 0',
+  minWidth: 0,
+};
+
 export const ClimbingAnalytics = ({ analytics }: ClimbingAnalyticsProps) => {
   const { overview, gradeProfile, destinationProfile } = analytics;
   const freshnessLabel = overview.mostRecentDate
@@ -50,7 +63,6 @@ export const ClimbingAnalytics = ({ analytics }: ClimbingAnalyticsProps) => {
 
   return (
     <Stack spacing={2}>
-      <Text role="subsectionTitle">Overview</Text>
       <SectionPanel>
         <Box
           sx={{
@@ -91,7 +103,7 @@ export const ClimbingAnalytics = ({ analytics }: ClimbingAnalyticsProps) => {
 
       <Text role="subsectionTitle">Grade Profile</Text>
       <SectionPanel>
-        <Stack spacing={1}>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ width: '100%' }}>
           <Text role="caption" tone="muted">
             Climbed
           </Text>
@@ -128,9 +140,13 @@ export const ClimbingAnalytics = ({ analytics }: ClimbingAnalyticsProps) => {
       </SectionPanel>
 
       <Text role="subsectionTitle">Top Destinations</Text>
-      <SectionPanel>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ width: '100%' }}>
-          <Box sx={{ flex: 1, minWidth: 0 }}>
+      <Stack
+        direction={{ xs: 'column', md: 'row' }}
+        spacing={2}
+        sx={{ width: '100%', alignItems: 'stretch' }}
+      >
+        <MotionTiltCard intensity={0.4} style={destinationCardStyle}>
+          <SectionPanel sx={destinationPanelSx}>
             <Text role="caption" tone="muted">
               Most Climbed
             </Text>
@@ -146,9 +162,11 @@ export const ClimbingAnalytics = ({ analytics }: ClimbingAnalyticsProps) => {
                 </Box>
               ))}
             </Box>
-          </Box>
+          </SectionPanel>
+        </MotionTiltCard>
 
-          <Box sx={{ flex: 1, minWidth: 0 }}>
+        <MotionTiltCard intensity={0.4} style={destinationCardStyle}>
+          <SectionPanel sx={destinationPanelSx}>
             <Text role="caption" tone="muted">
               Most Wanted
             </Text>
@@ -164,9 +182,9 @@ export const ClimbingAnalytics = ({ analytics }: ClimbingAnalyticsProps) => {
                 </Box>
               ))}
             </Box>
-          </Box>
-        </Stack>
-      </SectionPanel>
+          </SectionPanel>
+        </MotionTiltCard>
+      </Stack>
 
       <Text role="caption" tone="muted" sx={{ textAlign: 'center', paddingTop: 0.5 }}>
         {freshnessLabel}
