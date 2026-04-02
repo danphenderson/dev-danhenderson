@@ -16,7 +16,7 @@ import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useBlogData } from '../hooks/useBlogData';
 import { useAppStyles } from '../styles/appStyles';
 import { Text } from '../components/text';
-import { MotionSection } from '../motion';
+import { MotionSection, MotionTiltCard } from '../motion';
 
 const recoveryActions = recoveryRouteActions.map((action) => ({
   ...action,
@@ -58,17 +58,19 @@ export default function BlogPost() {
     <PageFrame image={backgroundImage}>
       <Stack spacing={3}>
         <MotionSection>
-          <SectionCard delayMs={0} triggerOnView={false}>
-            <Button
-              component={RouterLink}
-              to="/blog"
-              startIcon={<ArrowBackIcon />}
-              size="small"
-              sx={appStyles.inlineStartSx}
-            >
-              Back to blog
-            </Button>
-          </SectionCard>
+          <MotionTiltCard intensity={0.5}>
+            <SectionCard delayMs={0} triggerOnView={false}>
+              <Button
+                component={RouterLink}
+                to="/blog"
+                startIcon={<ArrowBackIcon />}
+                size="small"
+                sx={appStyles.inlineStartSx}
+              >
+                Back to blog
+              </Button>
+            </SectionCard>
+          </MotionTiltCard>
         </MotionSection>
 
         {post ? (

@@ -14,8 +14,29 @@ describe('BlogCodeBlock', () => {
       </ThemeProvider>
     );
 
-    expect(screen.getByText('const x = 1;')).toBeInTheDocument();
+    expect(screen.getByText('const x = 1;')).toHaveTextContent('const x = 1;');
     expect(screen.getByText('typescript')).toBeInTheDocument();
+  });
+
+  it('renders Python syntax token spans for highlighted code', () => {
+    const { container } = render(
+      <ThemeProvider>
+        <BlogCodeBlock
+          language="python"
+          code={'from typing import Optional\n\ndef f(x: Optional[T] = None):\n    return x'}
+        />
+      </ThemeProvider>
+    );
+
+    const codeElement = container.querySelector('code');
+
+    expect(codeElement?.textContent).toBe(
+      'from typing import Optional\n\ndef f(x: Optional[T] = None):\n    return x'
+    );
+    expect(container.querySelector('[data-token-kind="keyword"]')?.textContent).toBe('from');
+    expect(container.querySelector('[data-token-kind="type"]')?.textContent).toBe('Optional');
+    expect(container.querySelector('[data-token-kind="function"]')?.textContent).toBe('f');
+    expect(container.querySelector('[data-token-kind="constant"]')?.textContent).toBe('None');
   });
 
   it('renders the filename when provided', () => {

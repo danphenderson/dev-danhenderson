@@ -93,8 +93,25 @@ describe('BlogArticleBody', () => {
   it('renders a code block with language and code content', () => {
     renderBody([{ type: 'code', language: 'typescript', code: 'const x = 1;' }]);
 
-    expect(screen.getByText('const x = 1;')).toBeInTheDocument();
+    expect(screen.getByText('const x = 1;')).toHaveTextContent('const x = 1;');
     expect(screen.getByText('typescript')).toBeInTheDocument();
+  });
+
+  it('renders highlighted Python code blocks with token spans', () => {
+    const { container } = renderBody([
+      {
+        type: 'code',
+        language: 'python',
+        code: 'from typing import Optional\n\nx: Optional[T] = None',
+      },
+    ]);
+
+    expect(container.querySelector('code')?.textContent).toBe(
+      'from typing import Optional\n\nx: Optional[T] = None'
+    );
+    expect(container.querySelector('[data-token-kind="keyword"]')?.textContent).toBe('from');
+    expect(container.querySelector('[data-token-kind="type"]')?.textContent).toBe('Optional');
+    expect(container.querySelector('[data-token-kind="constant"]')?.textContent).toBe('None');
   });
 
   it('renders a blockquote block', () => {

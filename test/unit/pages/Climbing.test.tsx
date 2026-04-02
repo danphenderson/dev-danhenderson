@@ -292,6 +292,12 @@ describe('Climbing', () => {
     const introCard = screen
       .getByTestId('climbing-intro-label')
       .closest('[data-testid="climbing-tilt-card"]');
+    const climbedGradesCard = screen
+      .getByText('Climbed')
+      .closest('[data-testid="climbing-tilt-card"]');
+    const toClimbGradesCard = screen
+      .getByText('To Climb')
+      .closest('[data-testid="climbing-tilt-card"]');
     const mostClimbedCard = screen
       .getByText('Most Climbed')
       .closest('[data-testid="climbing-tilt-card"]');
@@ -307,6 +313,8 @@ describe('Climbing', () => {
 
     if (
       !introCard ||
+      !climbedGradesCard ||
+      !toClimbGradesCard ||
       !mostClimbedCard ||
       !mostWantedCard ||
       !climbedRoutesCard ||
@@ -315,17 +323,21 @@ describe('Climbing', () => {
       throw new Error('Expected all climbing tilt card surfaces to render.');
     }
 
-    expect(tiltCards).toHaveLength(5);
+    expect(tiltCards).toHaveLength(7);
     tiltCards.forEach((tiltCard) => {
       expect(tiltCard).toHaveAttribute('data-tilt-enabled', 'true');
     });
 
     expect(introCard).toHaveAttribute('data-intensity', '0.5');
     expect(introCard).toContainElement(screen.getByText(climbingIntroText));
+    expect(climbedGradesCard).toHaveAttribute('data-intensity', '0.4');
+    expect(toClimbGradesCard).toHaveAttribute('data-intensity', '0.4');
     expect(mostClimbedCard).toHaveAttribute('data-intensity', '0.4');
     expect(mostWantedCard).toHaveAttribute('data-intensity', '0.4');
     expect(climbedRoutesCard).toHaveAttribute('data-intensity', '0.4');
     expect(todoRoutesCard).toHaveAttribute('data-intensity', '0.4');
+    expect(climbedGradesCard).toContainElement(screen.getByText('Climbed'));
+    expect(toClimbGradesCard).toContainElement(screen.getByText('To Climb'));
     expect(mostClimbedCard).toContainElement(screen.getByText('Most Climbed'));
     expect(mostWantedCard).toContainElement(screen.getByText('Most Wanted'));
     expect(climbedRoutesCard).toContainElement(screen.getByRole('link', { name: 'Hyperspace' }));
@@ -339,7 +351,7 @@ describe('Climbing', () => {
 
     const tiltCards = screen.getAllByTestId('climbing-tilt-card');
 
-    expect(tiltCards).toHaveLength(5);
+    expect(tiltCards).toHaveLength(7);
     tiltCards.forEach((tiltCard) => {
       expect(tiltCard).toHaveAttribute('data-tilt-enabled', 'false');
     });
@@ -479,6 +491,6 @@ describe('Climbing', () => {
     ).not.toBeInTheDocument();
     expect(screen.queryByPlaceholderText('Search routes to climb...')).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'The Tooth' })).not.toBeInTheDocument();
-    expect(screen.getAllByTestId('climbing-tilt-card')).toHaveLength(4);
+    expect(screen.getAllByTestId('climbing-tilt-card')).toHaveLength(6);
   });
 });

@@ -53,7 +53,9 @@ test.describe('Climbing page', () => {
     const { main } = await waitForClimbingContent(page);
 
     await expect(main.getByText('Grade Profile')).toBeVisible();
-    await expect(main.locator('.MuiChip-root').first()).toBeVisible();
+    await expect(main.getByText('Climbed', { exact: true })).toBeVisible();
+    await expect(main.getByText('To Climb', { exact: true })).toBeVisible();
+    await expect(main.getByText(/\d+\.\d+ \(\d+\)/).first()).toBeVisible();
   });
 
   test('renders destination profile section', async ({ page }) => {

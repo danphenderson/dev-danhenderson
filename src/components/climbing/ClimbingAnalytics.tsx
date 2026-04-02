@@ -102,42 +102,52 @@ export const ClimbingAnalytics = ({ analytics }: ClimbingAnalyticsProps) => {
       </SectionPanel>
 
       <Text role="subsectionTitle">Grade Profile</Text>
-      <SectionPanel>
-        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ width: '100%' }}>
-          <Text role="caption" tone="muted">
-            Climbed
-          </Text>
-          <Box sx={gradeSectionSx}>
-            {gradeProfile
-              .filter((grade) => grade.tickCount > 0)
-              .map((grade) => (
-                <Chip
-                  key={`tick-${grade.bucket}`}
-                  label={`${grade.bucket} (${grade.tickCount})`}
-                  size="small"
-                  variant="outlined"
-                />
-              ))}
-          </Box>
+      <Stack
+        direction={{ xs: 'column', md: 'row' }}
+        spacing={2}
+        sx={{ width: '100%', alignItems: 'stretch' }}
+      >
+        <MotionTiltCard intensity={0.4} style={destinationCardStyle}>
+          <SectionPanel sx={destinationPanelSx}>
+            <Text role="caption" tone="muted">
+              Climbed
+            </Text>
+            <Box sx={gradeSectionSx}>
+              {gradeProfile
+                .filter((grade) => grade.tickCount > 0)
+                .map((grade) => (
+                  <Chip
+                    key={`tick-${grade.bucket}`}
+                    label={`${grade.bucket} (${grade.tickCount})`}
+                    size="small"
+                    variant="outlined"
+                  />
+                ))}
+            </Box>
+          </SectionPanel>
+        </MotionTiltCard>
 
-          <Text role="caption" tone="muted">
-            To Climb
-          </Text>
-          <Box sx={gradeSectionSx}>
-            {gradeProfile
-              .filter((grade) => grade.todoCount > 0)
-              .map((grade) => (
-                <Chip
-                  key={`todo-${grade.bucket}`}
-                  label={`${grade.bucket} (${grade.todoCount})`}
-                  size="small"
-                  variant="outlined"
-                  color="secondary"
-                />
-              ))}
-          </Box>
-        </Stack>
-      </SectionPanel>
+        <MotionTiltCard intensity={0.4} style={destinationCardStyle}>
+          <SectionPanel sx={destinationPanelSx}>
+            <Text role="caption" tone="muted">
+              To Climb
+            </Text>
+            <Box sx={gradeSectionSx}>
+              {gradeProfile
+                .filter((grade) => grade.todoCount > 0)
+                .map((grade) => (
+                  <Chip
+                    key={`todo-${grade.bucket}`}
+                    label={`${grade.bucket} (${grade.todoCount})`}
+                    size="small"
+                    variant="outlined"
+                    color="secondary"
+                  />
+                ))}
+            </Box>
+          </SectionPanel>
+        </MotionTiltCard>
+      </Stack>
 
       <Text role="subsectionTitle">Top Destinations</Text>
       <Stack

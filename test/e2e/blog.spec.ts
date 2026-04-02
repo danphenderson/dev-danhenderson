@@ -141,12 +141,18 @@ test.describe('Blog post detail page', () => {
     await expect(page.getByText('1 article')).toBeVisible();
   });
 
-  test('renders a code block from the featured article', async ({ page }) => {
+  test('renders a syntax-highlighted code block from the featured article', async ({ page }) => {
     await page.goto(`/blog/${FEATURED_POST_SLUG}`);
 
-    const codeExample = page.getByText('def f(x: Optional[int] = None) -> Optional[str]:').first();
-    await codeExample.scrollIntoViewIfNeeded();
-    await expect(codeExample).toBeVisible();
+    const highlightedKeyword = page.locator('main [data-token-kind="keyword"]').filter({
+      hasText: 'def',
+    });
+    await expect(highlightedKeyword.first()).toBeVisible();
+
+    const highlightedType = page.locator('main [data-token-kind="type"]').filter({
+      hasText: 'Optional',
+    });
+    await expect(highlightedType.first()).toBeVisible();
   });
 
   test('renders inline code spans inside prose paragraphs', async ({ page }) => {
