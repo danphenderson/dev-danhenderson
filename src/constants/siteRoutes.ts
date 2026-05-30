@@ -36,7 +36,7 @@ export const siteRouteMap: Record<SiteRouteId, SiteRouteDefinition> = {
     id: 'home',
     label: 'Home',
     path: '/',
-    title: 'Daniel Henderson | Software Engineer, Data Scientist, and Mathematician',
+    title: 'Daniel Henderson | Software Engineer',
     description:
       'Portfolio site for Daniel Henderson featuring software engineering, scientific computing, climbing, and photography.',
     image: homeImage,
