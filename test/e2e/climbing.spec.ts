@@ -1,6 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 import { waitForClimbingContent, waitForClimbingIntro } from './helpers/climbing';
-import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
 test.describe('Climbing page', () => {
   test('shows only the climbing intro until scrolling unlocks the deferred content', async ({

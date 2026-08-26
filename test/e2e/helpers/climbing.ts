@@ -1,9 +1,6 @@
 import { expect, type Page } from '@playwright/test';
 import { waitForAnimatedSectionReadiness } from './routeReadiness';
 
-const climbingSummaryPattern =
-  /A collection of ascents that were recorded on Mountain Project, including everything from the rare onsights to noteworthy top-ropes\./;
-
 export const waitForClimbingIntro = async (page: Page) => {
   const main = page.locator('#main-content');
   const introLabel = main.getByText('Climbing', { exact: true }).first();
