@@ -40,19 +40,19 @@ export const currentWorkflowTools = [
 
 export const aboutMe: AboutMe = {
   name: 'Daniel Henderson',
-  title: 'MS in Applied/Computational Math',
+  title: `Build what's missing, re-use what isn't`,
   email: 'me@danhenderson.dev',
   phone: '',
-  location: 'Seattle, WA',
+  location: 'Redmond, WA',
   opportunities: ['Scientific computing', 'Data platforms', 'ML/AI engineering', 'Web development'],
   bioLink: {
-    text: 'M.S. in applied/computational mathematics',
+    text: 'M.S. Mathematics, B.S. Applied/Computational Mathematics, Computer Science Minor',
     url: mtuMathGraduateBioUrl,
     tooltip: 'View the Michigan Tech graduate mathematics student page.',
   },
   bio: `Software developer building scientific, data, and AI-enabled systems.
 
-Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software.
+Open source contributor and researcher with a background in applied mathematics.
 
 Previously built ingestion, analytics, and ML solutions for a healthcare data platform.`,
 };
@@ -307,7 +307,7 @@ export const experiences: Experience[] = [
     industry: 'Higher Education',
     title: 'Graduate Research Assistant',
     startDate: 'May 2025',
-    endDate: 'Current',
+    endDate: 'Aug 2026 (1yr 4 mos)',
     description: [
       {
         text: 'Researching blood-flow and transport models governed by Navier–Stokes and convection-diffusion PDEs using traditional numerical and machine-learning approaches.',
@@ -551,9 +551,8 @@ export const educationInfo: EducationInfo = {
       university: 'Michigan Technological University',
       program: 'MS Mathematics, Applied/Computational',
       summary:
-        'Graduate studies in applied/computational mathematics, while research bridges classical fluid dynamics with scientific machine learning.',
-      dateRange: 'Fall 2024 – Present',
-      expectedCompletion: 'Expected Summer 2026',
+        'Graduate studies in mathematics, focusing on applied and computational methods for differential equations.',
+      dateRange: 'Fall 2024 – Aug 2026',
       gpa: [{ label: 'Cumulative', value: '3.44' }],
       highlights: [
         'Pedagogical training in curriculum design, assessment, and evidence-based instruction.',
