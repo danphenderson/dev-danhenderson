@@ -1,4 +1,4 @@
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Page } from '@playwright/test';
 import { declineWelcomeAudio } from './helpers/header';
 import { waitForClimbingContent } from './helpers/climbing';
 import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
@@ -52,7 +52,6 @@ test.describe('Cross-route navigation', () => {
 
   test('Climbing → Photography via header link', async ({ page }) => {
     await page.goto('/climbing');
-    const main = page.locator('#main-content');
     await waitForClimbingContent(page);
 
     // Scroll to top to ensure HideOnScroll header is visible

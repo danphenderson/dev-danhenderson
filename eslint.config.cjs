@@ -7,7 +7,15 @@ const playwrightPlugin = require('eslint-plugin-playwright');
 
 const reactRecommended = reactPlugin.configs.flat.recommended;
 const reactJsxRuntime = reactPlugin.configs.flat['jsx-runtime'];
-const reactHooksRecommended = reactHooksPlugin.configs['flat/recommended'][0];
+const reactHooksRecommended = {
+  plugins: {
+    'react-hooks': reactHooksPlugin,
+  },
+  rules: {
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
+  },
+};
 const playwrightRecommended = playwrightPlugin.configs['flat/recommended'];
 
 const restrictedTypographyImports = [

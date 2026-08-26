@@ -95,14 +95,11 @@ const dismissTerminalNotificationToast = async (page: Page) => {
 };
 
 const expectPingPongHeroMetadata = async (terminalHero: Locator) => {
-  const ariaLabel = await terminalHero.getAttribute('aria-label');
-
-  expect(ariaLabel).toBeTruthy();
-  expect(ariaLabel).toContain('node --version');
-  expect(ariaLabel).toContain('git log --oneline -1');
-  expect(ariaLabel).toContain('npm run build');
-  expect(ariaLabel).toContain('whoami --passions');
-  expect(ariaLabel).toContain('brew ls');
+  await expect(terminalHero).toHaveAttribute('aria-label', /node --version/);
+  await expect(terminalHero).toHaveAttribute('aria-label', /git log --oneline -1/);
+  await expect(terminalHero).toHaveAttribute('aria-label', /npm run build/);
+  await expect(terminalHero).toHaveAttribute('aria-label', /whoami --passions/);
+  await expect(terminalHero).toHaveAttribute('aria-label', /brew ls/);
 };
 
 const waitForStableTerminalHero = async (page: Page, terminalHero: Locator) => {
