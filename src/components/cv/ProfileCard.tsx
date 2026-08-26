@@ -45,7 +45,6 @@ export const ProfileCard = ({
               {about.name}
             </Text>
           </Stack>
-
           <Stack direction="row" sx={profileMetaRowSx}>
             <Stack
               direction="row"
@@ -54,13 +53,7 @@ export const ProfileCard = ({
               flexWrap="wrap"
               sx={profileMetaContentSx}
             >
-              <Text role="metaStrong">{about.title}</Text>
-              {about.location && (
-                <>
-                  <Text role="meta">•</Text>
-                  <Text role="meta">{about.location}</Text>
-                </>
-              )}
+              <Text role="metaStrong">{about.location}</Text>
             </Stack>
           </Stack>
         </Stack>
