@@ -57,7 +57,7 @@ jobs:
 
       - run: npm run build:e2e
 
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
@@ -93,7 +93,7 @@ jobs:
           name: build-output-${{ github.sha }}
           path: build
 
-      - uses: actions/cache@v5
+      - uses: actions/cache@v6
         id: playwright-cache-smoke
         with:
           path: ~/.cache/ms-playwright
