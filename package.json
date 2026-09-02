@@ -10,7 +10,7 @@
     "@mui/icons-material": "^7.3.9",
     "@mui/material": "^7.3.9",
     "@mui/x-data-grid": "^8.28.0",
-    "@types/node": "^20",
+    "@types/node": "^26",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "fuse.js": "^7.1.0",
