@@ -40,6 +40,31 @@ describe('Home route integration', () => {
     );
   });
 
+  it('exposes the preferences opener as a disclosure that keyboard users can enter and toggle', async () => {
+    renderHomeRoute();
+    const opener = screen.getByRole('button', { name: 'Customize appearance & audio' });
+    expect(opener).toHaveAttribute('aria-expanded', 'false');
+    expect(opener).not.toHaveAttribute('aria-controls');
+
+    // Keyboard and assistive-technology activation dispatch clicks without a pointer count.
+    fireEvent.click(opener, { detail: 0 });
+    const region = screen.getByRole('region', { name: 'Make yourself at home' });
+    expect(opener).toHaveAttribute('aria-expanded', 'true');
+    expect(opener).toHaveAttribute('aria-controls', region.id);
+    expect(region).toHaveFocus();
+
+    fireEvent.click(opener, { detail: 1 });
+    expect(opener).toHaveAttribute('aria-expanded', 'false');
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('region', { name: 'Make yourself at home' })
+      ).not.toBeInTheDocument()
+    );
+
+    fireEvent.click(opener, { detail: 1 });
+    expect(screen.getByRole('region', { name: 'Make yourself at home' })).not.toHaveFocus();
+  });
+
   it('skips onboarding for returning visitors and renders the ping-pong hero shell immediately', async () => {
     await renderHomeWithHeroVisible();
 

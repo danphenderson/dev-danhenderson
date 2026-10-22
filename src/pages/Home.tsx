@@ -14,7 +14,7 @@ import {
 } from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
-import { FirstVisitWelcome } from '../components/FirstVisitWelcome';
+import { FIRST_VISIT_WELCOME_ID, FirstVisitWelcome } from '../components/FirstVisitWelcome';
 import { HeroMotionPath } from '../components/HeroMotionPath';
 import { TerminalHeroContent } from '../components/TerminalHeroContent';
 import type { TerminalLine } from '../types/ui';
@@ -55,6 +55,7 @@ export default function Home() {
     isAudioPlaying,
     isAudioLoading,
     isWelcomeOpen,
+    focusWelcomeOnOpen,
     setIsInteracting,
     handleDismiss,
     handleOpen,
@@ -129,7 +130,12 @@ export default function Home() {
               </Stack>
               <Button
                 ref={preferencesTriggerRef}
-                onClick={handleOpen}
+                aria-expanded={isWelcomeOpen}
+                aria-controls={isWelcomeOpen ? FIRST_VISIT_WELCOME_ID : undefined}
+                // Keyboard and assistive-technology activation reports no pointer clicks.
+                onClick={(event) =>
+                  isWelcomeOpen ? handleDismiss() : handleOpen({ moveFocus: event.detail === 0 })
+                }
                 size="small"
                 sx={{ alignSelf: 'flex-start' }}
               >
@@ -200,6 +206,7 @@ export default function Home() {
 
           <FirstVisitWelcome
             open={isWelcomeOpen}
+            focusOnOpen={focusWelcomeOnOpen}
             returnFocusRef={preferencesTriggerRef}
             onClose={handleDismiss}
             onInteractionChange={setIsInteracting}

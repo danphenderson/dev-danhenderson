@@ -25,7 +25,7 @@ flowchart TB
 
 ## Home (`/`)
 
-Home presents identity and CV/projects links immediately, alongside a faux-VS Code IDE. The optional, nonmodal preferences panel opens from “Customize appearance & audio”. It dismisses after five idle seconds; hover or keyboard focus pauses the timer. Escape, click-away, or either dismiss button closes it; keyboard dismissal restores focus to its Customize opener, and header settings remain available. Audio starts only after explicit play. The IDE remains windowed until explicitly expanded; close, minimize, restore, drag, and resize remain available. Off/reduced motion settles the hero immediately and shows a stable terminal transcript.
+Home presents identity and CV/projects links immediately, alongside a faux-VS Code IDE. The optional, nonmodal preferences panel opens from “Customize appearance & audio”, which acts as a disclosure toggle (`aria-expanded`/`aria-controls`). It dismisses after five idle seconds; hover or keyboard focus pauses the timer. Keyboard or assistive-technology activation moves focus into the panel; pointer activation leaves focus on the opener. Escape, click-away, or either dismiss button closes it; keyboard dismissal restores focus to its Customize opener, and header settings remain available. Audio starts only after explicit play. The IDE remains windowed until explicitly expanded; close, minimize, restore, drag, and resize remain available. Off/reduced motion settles the hero immediately and shows a stable terminal transcript.
 
 ### Assembly
 

@@ -22,6 +22,8 @@ import { Text } from './text';
 
 type FirstVisitWelcomeProps = {
   open: boolean;
+  /** Moves focus into the panel on open, for keyboard and assistive-technology activation. */
+  focusOnOpen?: boolean;
   returnFocusRef?: React.RefObject<HTMLButtonElement | null>;
   onClose: () => void;
   onInteractionChange: (interacting: boolean) => void;
@@ -35,8 +37,12 @@ type FirstVisitWelcomeProps = {
 
 const motionLevels: MotionIntensityLevel[] = ['off', 'subtle', 'default', 'expressive'];
 
+export const FIRST_VISIT_WELCOME_ID = 'home-welcome-panel';
+const AUDIO_STATUS_ID = 'home-welcome-audio-status';
+
 export const FirstVisitWelcome = ({
   open,
+  focusOnOpen = false,
   returnFocusRef,
   onClose,
   onInteractionChange,
@@ -86,16 +92,26 @@ export const FirstVisitWelcome = ({
       <ClickAwayListener
         mouseEvent="onMouseDown"
         touchEvent="onTouchStart"
-        onClickAway={() => {
-          if (open) dismiss();
+        onClickAway={(event) => {
+          // The opener toggles the panel itself; dismissing here would immediately reopen it.
+          if (open && !returnFocusRef?.current?.contains(event.target as Node)) dismiss();
         }}
       >
-        <Fade in={open} timeout={duration.fast * dFactor * 1000} unmountOnExit>
+        <Fade
+          in={open}
+          timeout={duration.fast * dFactor * 1000}
+          unmountOnExit
+          onEnter={(node) => {
+            if (focusOnOpen) node.focus({ preventScroll: true });
+          }}
+        >
           <Paper
             ref={panelRef}
+            id={FIRST_VISIT_WELCOME_ID}
             component="section"
             role="region"
             aria-labelledby="home-welcome-title"
+            tabIndex={-1}
             data-testid="first-visit-welcome"
             elevation={0}
             sx={welcomePanelSx}
@@ -150,29 +166,35 @@ export const FirstVisitWelcome = ({
                   ))}
                 </ToggleButtonGroup>
               </Stack>
-              <Button
-                variant="outlined"
-                onClick={onToggleAudio}
-                disabled={isAudioLoading}
-                aria-label={isAudioPlaying ? 'Pause welcome audio' : 'Play welcome audio'}
-                startIcon={isAudioPlaying ? <PauseCircleOutlineIcon /> : <PlayCircleOutlineIcon />}
-              >
-                {isAudioLoading
-                  ? 'Loading audio…'
-                  : isAudioPlaying
-                    ? 'Pause welcome audio'
-                    : 'Play welcome audio'}
-              </Button>
-              {audioError && (
+              <Stack>
+                <Button
+                  variant="outlined"
+                  onClick={onToggleAudio}
+                  disabled={isAudioLoading}
+                  aria-label={isAudioPlaying ? 'Pause welcome audio' : 'Play welcome audio'}
+                  aria-describedby={audioError ? AUDIO_STATUS_ID : undefined}
+                  startIcon={
+                    isAudioPlaying ? <PauseCircleOutlineIcon /> : <PlayCircleOutlineIcon />
+                  }
+                >
+                  {isAudioLoading
+                    ? 'Loading audio…'
+                    : isAudioPlaying
+                      ? 'Pause welcome audio'
+                      : 'Play welcome audio'}
+                </Button>
+                {/* Stays mounted so screen readers announce errors that arrive later. */}
                 <Text
                   role="caption"
                   component="span"
+                  id={AUDIO_STATUS_ID}
                   aria-live="polite"
-                  sx={{ color: 'error.main' }}
+                  aria-atomic="true"
+                  sx={{ color: 'error.main', '&:not(:empty)': { mt: 1 } }}
                 >
                   {audioError}
                 </Text>
-              )}
+              </Stack>
               <Stack direction="row" spacing={1} alignItems="center">
                 <SettingsOutlinedIcon fontSize="small" sx={{ color: 'text.secondary' }} />
                 <Text role="caption" tone="muted">

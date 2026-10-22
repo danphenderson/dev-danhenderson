@@ -25,7 +25,7 @@ Source code for [danhenderson.dev](https://danhenderson.dev), a React + TypeScri
 - Portfolio content is authored in local TypeScript data modules.
 - GitHub-powered CV sections degrade gracefully to bundled content when live API data is unavailable. Contribution stars use live values when available, show an em dash for unknown counts, and sort unknowns after known counts.
 - Shared motion, theming, and reusable UI primitives power the different sections of the site.
-- Home identity, CV/project links, and the IDE are available immediately; expansion is manual. “Customize appearance & audio” opens a nonmodal panel that closes after five idle seconds and stays open during hover or focus. Header settings remain available, and audio requires explicit play. Failed audio-script loads can be retried from either control.
+- Home identity, CV/project links, and the IDE are available immediately; expansion is manual. “Customize appearance & audio” toggles a nonmodal panel (exposed with `aria-expanded`) that closes after five idle seconds and stays open during hover or focus; keyboard activation moves focus into the panel, which keeps it open. Header settings remain available, and audio requires explicit play. Failed audio-script loads can be retried from either control.
 - CV and Climbing retain scroll reveals and also provide keyboard-operable reveal buttons. Resume and contact links are visible in the CV header.
 - Photography uses generated responsive WebP display files; original photographs remain available for download.
 
@@ -77,6 +77,7 @@ After `npm run build`, run `npm run check:bundle`. It totals the entry's entire 
 ## Tooling Notes
 
 - Playwright launches Chromium with `chromiumSandbox: true`; keep the browser sandbox enabled.
+- Ubuntu 23.10+ (including GitHub's Ubuntu 24.04 runners) blocks the unprivileged user namespaces that Chromium's sandbox needs, so Playwright fails with "No usable sandbox!". CI runs `.github/actions/playwright-sandbox`, which grants that permission only to Playwright's Chromium through an AppArmor profile. On a local Ubuntu machine, run the same commands from that action.
 - The main app now uses Vite for `npm start`, `npm run build`, and `npm run build:e2e`.
 - The main app toolchain baseline is Node 20.19 or newer and TypeScript 5.6.x.
 - Jest configuration is owned by `jest.config.cjs`, ESLint configuration is owned by `eslint.config.cjs`, and `npm run typecheck` uses `tsconfig.typecheck.json`.

@@ -133,3 +133,8 @@ Deferred, P3 or optional (recorded, not implemented):
   - Local sandboxed runs with the AppArmor profile: Chromium 81 passed, 1 flaky (F2); smoke 12/12.
   - Lint, typecheck, `media:check`, build, and `check:bundle` (896,703 B raw / 279,413 B gzip) pass.
   - Full Jest: 136 suites / 1007 tests pass.
+- 2026-10-22: Implementation (time-boxed).
+  - F1 done: `.github/actions/playwright-sandbox` loads an AppArmor userns profile only when `kernel.apparmor_restrict_unprivileged_userns=1`. Validated locally: launch failed without the profile, the action script loaded it, Chromium launched sandboxed, and a rerun was idempotent. Hosted CI must still confirm.
+  - F2 done: under load (8 workers × 8 repeats), the HEAD build also failed `header navigation is usable during the welcome at 390px` 2/64 for the same reason (the click retry scrolled the page and hid the header). `openPreferences` now waits for a stable opener without scrolling (`scrollIntoView: false`, a new opt-out that defaults to the old behavior).
+  - F3/F4/F5 done: the opener is a disclosure toggle with `aria-expanded`/`aria-controls`. Keyboard/AT activation (`event.detail === 0`) focuses the panel through Fade `onEnter` with `preventScroll`. Clicking the opener no longer counts as a click-away. The audio error region stays mounted and describes the button. Unit regressions: 24/24 focused tests pass.
+  - Deferred (not started due to time): F6 (service-worker cache writes still delay responses; move to `event.waitUntil`) and F7 (`Climbing.test.tsx:484` should use `queryByLabelText`). A real-keyboard Playwright test for F3 is also still to add.

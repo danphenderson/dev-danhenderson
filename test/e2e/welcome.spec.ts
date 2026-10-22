@@ -1,8 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
+import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
 const welcome = (page: Page) => page.getByRole('region', { name: 'Make yourself at home' });
 const openPreferences = async (page: Page) => {
-  await page.getByRole('button', { name: 'Customize appearance & audio' }).click();
+  const opener = page.getByRole('button', { name: 'Customize appearance & audio' });
+  // Clicking during the page transition makes Playwright retry with scrolls that hide the header.
+  await waitForAnimatedSectionReadiness({ anchor: opener, scrollIntoView: false });
+  await opener.click();
   await expect(welcome(page)).toBeVisible();
 };
 

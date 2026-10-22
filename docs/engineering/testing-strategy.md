@@ -72,6 +72,7 @@ When another instruction file says to validate a change, it should point here ra
 ### Browser validation expectations
 
 - Use sandboxed Playwright for route rendering, layout inspection, and screenshots when UI is affected; `playwright.config.ts` explicitly enables `chromiumSandbox`.
+- On Ubuntu 23.10+ hosts, where `kernel.apparmor_restrict_unprivileged_userns=1`, the sandbox needs the Chromium-only AppArmor profile from `.github/actions/playwright-sandbox`. CI's `e2e` and `smoke` jobs apply it automatically. Do not switch to `--no-sandbox` or disable the restriction globally.
 - Validate the smallest set of affected routes first, then expand to another consumer when a shared component or layout primitive changed.
 - Check at least one narrow/mobile viewport and one desktop viewport for layout-affecting edits.
 - When Playwright E2E coverage exists for the touched behavior, run the narrowest relevant spec after the appropriate build variant.

@@ -9,6 +9,7 @@ export const useHomeWelcomeSequence = () => {
   const { play, pause, isPlaying, error } = useWelcomeAudio();
   const { completeOnboarding } = useWelcomeOnboarding();
   const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
+  const [focusWelcomeOnOpen, setFocusWelcomeOnOpen] = useState(false);
   const [isInteracting, setIsInteracting] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const mounted = useRef(false);
@@ -27,8 +28,10 @@ export const useHomeWelcomeSequence = () => {
     completeOnboarding();
   }, [completeOnboarding]);
 
-  const handleOpen = () => {
+  // Keyboard and assistive-technology openers move focus into the panel, which also pauses the timer.
+  const handleOpen = ({ moveFocus = false }: { moveFocus?: boolean } = {}) => {
     setIsInteracting(false);
+    setFocusWelcomeOnOpen(moveFocus);
     setIsWelcomeOpen(true);
   };
 
@@ -63,6 +66,7 @@ export const useHomeWelcomeSequence = () => {
     isAudioPlaying: isPlaying,
     isAudioLoading,
     isWelcomeOpen,
+    focusWelcomeOnOpen,
     isHeroAnimationReady: true,
     setIsInteracting,
     handleDismiss,

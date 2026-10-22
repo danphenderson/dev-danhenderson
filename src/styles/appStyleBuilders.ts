@@ -534,6 +534,10 @@ export const createAppStyleMap = (theme: Theme) => {
       border: shellBorder,
       boxShadow: floatingActionShadow,
       zIndex: theme.zIndex.appBar - 1,
+      '&:focus-visible': {
+        outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
+        outlineOffset: 2,
+      },
     } satisfies SxProps<Theme>,
     hintPopoverPaperSx: {
       p: 2,
