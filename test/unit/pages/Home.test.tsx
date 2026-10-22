@@ -65,6 +65,26 @@ describe('Home route integration', () => {
     expect(screen.getByRole('region', { name: 'Make yourself at home' })).not.toHaveFocus();
   });
 
+  it('keeps the preferences panel available and in place while the IDE window is minimized', async () => {
+    renderHomeRoute();
+    fireEvent.click(screen.getByTestId('ide-minimize-btn'));
+    await waitFor(() => expect(screen.queryByTestId('background-shell')).not.toBeInTheDocument());
+
+    const opener = screen.getByRole('button', { name: 'Customize appearance & audio' });
+    fireEvent.click(opener, { detail: 0 });
+    const region = screen.getByRole('region', { name: 'Make yourself at home' });
+    expect(opener).toHaveAttribute('aria-controls', region.id);
+    expect(region).toHaveFocus();
+
+    const restore = screen.getByRole('button', { name: 'Restore window' });
+    await act(async () => restore.focus());
+    fireEvent.click(restore);
+    await waitFor(() => expect(screen.getByTestId('background-shell')).toBeInTheDocument());
+    // Restoring the IDE must not remount the panel or pull focus back into it.
+    expect(screen.getByRole('region', { name: 'Make yourself at home' })).toBe(region);
+    expect(region).not.toHaveFocus();
+  });
+
   it('skips onboarding for returning visitors and renders the ping-pong hero shell immediately', async () => {
     await renderHomeWithHeroVisible();
 

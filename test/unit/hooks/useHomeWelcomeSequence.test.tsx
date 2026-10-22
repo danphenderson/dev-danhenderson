@@ -85,12 +85,15 @@ describe('useHomeWelcomeSequence', () => {
     expect(next.result.current.isHeroAnimationReady).toBe(true);
   });
 
-  it('records keyboard openings so focus can enter the panel, and resets for pointer openings', () => {
+  it('records keyboard openings so focus can enter the panel, and clears the request on dismissal', () => {
     const { result } = renderHook(useHomeWelcomeSequence, { wrapper });
     expect(result.current.focusWelcomeOnOpen).toBe(false);
     act(() => result.current.handleOpen({ moveFocus: true }));
     expect(result.current.isWelcomeOpen).toBe(true);
     expect(result.current.focusWelcomeOnOpen).toBe(true);
+    act(() => result.current.handleDismiss());
+    expect(result.current.focusWelcomeOnOpen).toBe(false);
+    act(() => result.current.handleOpen({ moveFocus: true }));
     act(() => result.current.handleDismiss());
     act(() => result.current.handleOpen());
     expect(result.current.isWelcomeOpen).toBe(true);

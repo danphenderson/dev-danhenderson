@@ -24,6 +24,7 @@ export const useHomeWelcomeSequence = () => {
 
   const handleDismiss = useCallback(() => {
     setIsWelcomeOpen(false);
+    setFocusWelcomeOnOpen(false);
     setIsInteracting(false);
     completeOnboarding();
   }, [completeOnboarding]);

@@ -112,9 +112,10 @@ test.describe('Unobstructed home entry', () => {
     await opener(page).click();
     await expect(welcome(page)).toBeVisible();
     await expect(opener(page)).toBeFocused();
+    // Well inside the 5 s auto-dismiss, so only the click itself can close the panel here.
     await opener(page).click();
-    await expect(welcome(page)).toBeHidden();
-    await expect(opener(page)).toHaveAttribute('aria-expanded', 'false');
+    await expect(opener(page)).toHaveAttribute('aria-expanded', 'false', { timeout: 2000 });
+    await expect(welcome(page)).toBeHidden({ timeout: 2000 });
   });
 
   test('settings remains accessible while the welcome is open', async ({ page }) => {

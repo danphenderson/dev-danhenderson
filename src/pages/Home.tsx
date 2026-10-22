@@ -203,22 +203,23 @@ export default function Home() {
               ) : null}
             </AnimatedContentCard>
           </MotionTiltCard>
-
-          <FirstVisitWelcome
-            open={isWelcomeOpen}
-            focusOnOpen={focusWelcomeOnOpen}
-            returnFocusRef={preferencesTriggerRef}
-            onClose={handleDismiss}
-            onInteractionChange={setIsInteracting}
-            motionIntensity={motionIntensity}
-            onChangeMotionIntensity={setMotionIntensity}
-            isAudioPlaying={isAudioPlaying}
-            isAudioLoading={isAudioLoading}
-            audioError={error}
-            onToggleAudio={handleToggleAudio}
-          />
         </BackgroundPaper>
       </motion.div>
+
+      {/* Outside the IDE shell so minimizing, closing, or expanding the IDE never unmounts it. */}
+      <FirstVisitWelcome
+        open={isWelcomeOpen}
+        focusOnOpen={focusWelcomeOnOpen}
+        returnFocusRef={preferencesTriggerRef}
+        onClose={handleDismiss}
+        onInteractionChange={setIsInteracting}
+        motionIntensity={motionIntensity}
+        onChangeMotionIntensity={setMotionIntensity}
+        isAudioPlaying={isAudioPlaying}
+        isAudioLoading={isAudioLoading}
+        audioError={error}
+        onToggleAudio={handleToggleAudio}
+      />
 
       {ideWindowPortalContainer && isHeroAnimationReady && ideVisible
         ? createPortal(

@@ -26,6 +26,8 @@ Decide whether `fix/app-speed-dial-slot-props` (PR #290) can merge into `main`. 
 | F5 | P3 accessibility, introduced, medium | The audio-error `aria-live` span mounts already populated, so many screen readers skip it. | Keep a persistent live region while the panel is open. |
 | F6 | P3 performance, introduced, medium-high | `public/service-worker.js` `updateCache` awaits the serialized cache-write chain before returning. Every runtime image, script, style, and font response waits for its own body to download and all earlier writes to finish; one stalled write blocks later route chunks and loses progressive image rendering. | Return the network response immediately and extend the fetch event with `event.waitUntil` for the write. |
 | F7 | P3 test integrity, introduced, high | `test/unit/pages/Climbing.test.tsx:484` queries the label text as a placeholder (`Route or location` is the placeholder), so the negative assertion cannot fail. | Query by label, matching the positive assertion at line 387. |
+| F8 | P2 accessibility, introduced by the F3 fix, high (found by the post-fix code review) | `FirstVisitWelcome` rendered inside `BackgroundPaper`, which `shellWrapper` drops while the IDE is expanded, minimized, or closed. In those states the opener reported `aria-expanded="true"` with an `aria-controls` target that did not exist. If the pointer was over the panel when it unmounted, `isInteracting` stayed true and auto-dismiss never ran. On restore, Fade remounted with `in` already true and `onEnter` pulled focus back into the panel. | Render the panel outside the IDE shell; it portals to `<body>`, so the layout is unchanged. Make the focus request one-shot (cleared on dismiss). |
+| F9 | P3 test integrity, introduced by the F3 test, high (found by the post-fix code review) | The keyboard e2e test's final "toggles closed" assertions used the 10 s expect timeout, longer than the 5 s auto-dismiss, so they could pass even if the toggle did nothing. | Assert `aria-expanded="false"` and the hidden panel within 2 s of the click. |
 
 Verified without findings:
 - The speed-dial fix matches MUI 7.3.9: `SpeedDial` merges `slotProps.fab` with its injected ref, while the legacy `FabProps` path was overridden.
@@ -61,8 +63,8 @@ Deferred, P3 or optional (recorded, not implemented):
 - `.github/workflows/build.yml`: run that action in the `e2e` and `smoke` jobs after browser installation.
 - `README.md` and `docs/engineering/testing-strategy.md`: document the runner requirement and how to apply it locally. Note the opener and focus behavior and the service-worker write strategy.
 - `docs/frontend/page-choreography.md`: describe the opener toggle and keyboard focus behavior.
-- `src/pages/Home.tsx`: opener `aria-expanded`/`aria-controls` and toggle; detects keyboard/AT activation (`event.detail === 0`).
-- `src/hooks/useHomeWelcomeSequence.ts`: `handleOpen({ moveFocus })` records whether focus should enter the panel.
+- `src/pages/Home.tsx`: opener `aria-expanded`/`aria-controls` and toggle; detects keyboard/AT activation (`event.detail === 0`); renders the panel outside the IDE shell (F8).
+- `src/hooks/useHomeWelcomeSequence.ts`: `handleOpen({ moveFocus })` records whether focus should enter the panel; `handleDismiss` clears that request.
 - `src/components/FirstVisitWelcome.tsx`:
   - exported panel id, focusable region, optional `focusOnOpen` focus move
   - opener excluded from click-away
@@ -149,3 +151,19 @@ Deferred, P3 or optional (recorded, not implemented):
     - `npm run build`, then the smoke project: 12/12; `service-worker.smoke.spec.ts` with 5 repeats: 10/10.
     - Keyboard-open state at 390 px dark + reduced motion and 1440 px light + motion Off: focus on the panel, focus-visible outline, no page scroll, header visible.
   - Final verdict: ready for human review, pending hosted CI on the pushed head (the sandbox action has only been proven locally).
+- 2026-10-22: Post-fix code review (F8, F9).
+  - F8 done: `FirstVisitWelcome` renders after the hero container instead of inside `BackgroundPaper`, so IDE window state no longer unmounts an open panel. `handleDismiss` clears `focusWelcomeOnOpen`, so a later remount cannot take focus.
+    - Home regression test: minimize the IDE, then open from the keyboard. Asserts the panel exists, `aria-controls` resolves, and focus enters it. After restore, it asserts the same panel node is still there and does not have focus. The test fails against the previous placement (the panel is missing while minimized).
+    - The hook test asserts that dismissal clears the focus request.
+  - F9 done: the keyboard e2e test asserts the toggle closes the panel within 2 s, well inside the 5 s auto-dismiss.
+  - Validation:
+    - Focused Jest: 25/25.
+    - `npm run lint -- --max-warnings=0` and `npm run typecheck` pass. Prettier drift in `Home.tsx` (top import block) and `welcome.spec.ts` predates this change.
+    - Full Jest: 136 suites / 1014 tests pass.
+    - `npm run build:e2e`, then the Chromium project: 83/83 with retries disabled. `welcome.spec.ts` with 8 repeats on 8 workers: 72/72.
+    - Real-Chromium probe at 1440 px light + reduced motion and at 390 px dark + full motion:
+      - Minimize the IDE, then open the panel with Enter: the panel shows, `aria-expanded="true"`, `aria-controls` resolves, and focus is inside the panel.
+      - Restore the IDE with Enter: the panel stays open and does not take focus.
+      - Press Enter on the opener: the panel closes.
+    - Restoring moves focus to `<body>` because the restore control unmounts. That behavior predates this PR and is recorded as debt.
+  - Verdict unchanged: ready for human review, pending hosted CI on the pushed head.
