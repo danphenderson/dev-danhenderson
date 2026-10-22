@@ -137,4 +137,15 @@ Deferred, P3 or optional (recorded, not implemented):
   - F1 done: `.github/actions/playwright-sandbox` loads an AppArmor userns profile only when `kernel.apparmor_restrict_unprivileged_userns=1`. Validated locally: launch failed without the profile, the action script loaded it, Chromium launched sandboxed, and a rerun was idempotent. Hosted CI must still confirm.
   - F2 done: under load (8 workers × 8 repeats), the HEAD build also failed `header navigation is usable during the welcome at 390px` 2/64 for the same reason (the click retry scrolled the page and hid the header). `openPreferences` now waits for a stable opener without scrolling (`scrollIntoView: false`, a new opt-out that defaults to the old behavior).
   - F3/F4/F5 done: the opener is a disclosure toggle with `aria-expanded`/`aria-controls`. Keyboard/AT activation (`event.detail === 0`) focuses the panel through Fade `onEnter` with `preventScroll`. Clicking the opener no longer counts as a click-away. The audio error region stays mounted and describes the button. Unit regressions: 24/24 focused tests pass.
-  - Deferred (not started due to time): F6 (service-worker cache writes still delay responses; move to `event.waitUntil`) and F7 (`Climbing.test.tsx:484` should use `queryByLabelText`). A real-keyboard Playwright test for F3 is also still to add.
+  - Deferred at that point: F6, F7, and a real-keyboard Playwright test for F3 (all completed below).
+- 2026-10-22: Remaining findings completed.
+  - F6 done: `updateCache` returns the network response immediately and passes the serialized write to `event.waitUntil`. The unit harness records lifetime promises (`settleWrites`) and holds writes (`holdWrites`); the new regression test times out on the previous worker and passes now. The service-worker smoke spec polls the cache until it holds the original, then the redeployed, byte length instead of assuming writes finish before the image loads.
+  - F7 done: the empty to-do assertion uses `queryByLabelText`.
+  - F3 browser coverage done: `welcome.spec.ts` opens the panel with Enter and checks focus, `aria-expanded`/`aria-controls`, Tab order, the paused timer, Escape focus return, and the pointer toggle.
+  - Validation on the final head (fresh environment, AppArmor profile loaded by running the action script verbatim, sandbox on):
+    - `npm run lint -- --max-warnings=0`, `npm run typecheck`, `npm run media:check`, `npm run build`, and `npm run check:bundle` pass (896,793 B raw / 279,419 B gzip; +90 B / +6 B against the baseline).
+    - Full Jest: 136 suites / 1013 tests pass (1007 baseline + 6 new).
+    - `npm run build:e2e`, then the Chromium project: 83/83 with retries disabled. `welcome.spec.ts` with 8 repeats on 8 workers: 72/72.
+    - `npm run build`, then the smoke project: 12/12; `service-worker.smoke.spec.ts` with 5 repeats: 10/10.
+    - Keyboard-open state at 390 px dark + reduced motion and 1440 px light + motion Off: focus on the panel, focus-visible outline, no page scroll, header visible.
+  - Final verdict: ready for human review, pending hosted CI on the pushed head (the sandbox action has only been proven locally).
