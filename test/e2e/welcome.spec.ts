@@ -2,11 +2,13 @@ import { expect, test, type Page } from '@playwright/test';
 import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
 const welcome = (page: Page) => page.getByRole('region', { name: 'Make yourself at home' });
+const opener = (page: Page) => page.getByRole('button', { name: 'Customize appearance & audio' });
+// Clicking during the page transition makes Playwright retry with scrolls that hide the header.
+const waitForOpener = (page: Page) =>
+  waitForAnimatedSectionReadiness({ anchor: opener(page), scrollIntoView: false });
 const openPreferences = async (page: Page) => {
-  const opener = page.getByRole('button', { name: 'Customize appearance & audio' });
-  // Clicking during the page transition makes Playwright retry with scrolls that hide the header.
-  await waitForAnimatedSectionReadiness({ anchor: opener, scrollIntoView: false });
-  await opener.click();
+  await waitForOpener(page);
+  await opener(page).click();
   await expect(welcome(page)).toBeVisible();
 };
 
@@ -83,6 +85,36 @@ test.describe('Unobstructed home entry', () => {
     await page.keyboard.press('Escape');
     await expect(welcome(page)).toBeHidden();
     await expect(page.getByRole('button', { name: 'Customize appearance & audio' })).toBeFocused();
+  });
+
+  test('opens from the keyboard as a disclosure that takes focus and toggles closed', async ({
+    page,
+  }) => {
+    await page.clock.install();
+    await page.goto('/');
+    await waitForOpener(page);
+    await expect(opener(page)).toHaveAttribute('aria-expanded', 'false');
+    await opener(page).focus();
+    await page.keyboard.press('Enter');
+    await expect(welcome(page)).toBeFocused();
+    await expect(opener(page)).toHaveAttribute('aria-expanded', 'true');
+    await expect(opener(page)).toHaveAttribute('aria-controls', 'home-welcome-panel');
+    await expect(welcome(page)).toHaveAttribute('id', 'home-welcome-panel');
+    await page.keyboard.press('Tab');
+    await expect(welcome(page).getByRole('button', { name: 'Dismiss welcome' })).toBeFocused();
+    await page.clock.runFor(10000);
+    await expect(welcome(page)).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(welcome(page)).toBeHidden();
+    await expect(opener(page)).toBeFocused();
+    await expect(opener(page)).toHaveAttribute('aria-expanded', 'false');
+
+    await opener(page).click();
+    await expect(welcome(page)).toBeVisible();
+    await expect(opener(page)).toBeFocused();
+    await opener(page).click();
+    await expect(welcome(page)).toBeHidden();
+    await expect(opener(page)).toHaveAttribute('aria-expanded', 'false');
   });
 
   test('settings remains accessible while the welcome is open', async ({ page }) => {

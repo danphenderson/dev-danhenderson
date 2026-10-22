@@ -35,7 +35,9 @@ const keyOf = (request: RequestKey) => (typeof request === 'string' ? request : 
 const workerHarness = () => {
   const stores = new Map<string, Map<string, Response>>();
   const listeners: Record<string, (event: any) => void> = {};
+  const lifetimes: Promise<unknown>[] = [];
   let failWrites = false;
+  let writeGate: Promise<void> | undefined;
   const caches = {
     keys: async () => [...stores.keys()],
     delete: async (name: string) => stores.delete(name),
@@ -45,6 +47,7 @@ const workerHarness = () => {
       return {
         put: async (key: RequestKey, response: Response) => {
           if (failWrites) throw new Error('Quota exceeded');
+          await writeGate;
           entries.set(keyOf(key), response);
         },
         keys: async () => [...entries.keys()].map((url) => ({ url })),
@@ -80,6 +83,9 @@ const workerHarness = () => {
       respondWith: (promise: Promise<Response>) => {
         result = promise;
       },
+      waitUntil: (promise: Promise<unknown>) => {
+        lifetimes.push(promise);
+      },
     });
     return result!;
   };
@@ -87,6 +93,11 @@ const workerHarness = () => {
     stores,
     fetch,
     requestImage,
+    // Resolves once every write the worker extended its lifetime for has finished.
+    settleWrites: () => Promise.all(lifetimes),
+    holdWrites: (gate: Promise<void>) => {
+      writeGate = gate;
+    },
     failWrites: () => {
       failWrites = true;
     },
@@ -102,6 +113,7 @@ describe('service worker image storage', () => {
       )
     );
     expect(responses.every((response) => response.ok)).toBe(true);
+    await harness.settleWrites();
     const cached = [...harness.stores.values()].flatMap((store) => [...store.keys()]);
     expect(cached).toHaveLength(48);
     expect(cached).not.toContain(`${origin}/portfolio/assets/display/photo-0.webp`);
@@ -114,6 +126,7 @@ describe('service worker image storage', () => {
     await harness.requestImage('/portfolio/assets/display/photo.webp?w=100');
     harness.fetch.mockImplementationOnce(async () => new Response(new Uint8Array(1_000_001)));
     await harness.requestImage('/portfolio/assets/display/large.webp');
+    await harness.settleWrites();
     expect([...harness.stores.values()].every((store) => store.size === 0)).toBe(true);
   });
 
@@ -123,6 +136,24 @@ describe('service worker image storage', () => {
     const response = await harness.requestImage('/portfolio/assets/display/photo.webp');
     expect(response.ok).toBe(true);
     expect(await response.text()).toBe('display-image');
+    await harness.settleWrites();
+  });
+
+  it('responds before cache writes finish and keeps the worker alive until they do', async () => {
+    const harness = workerHarness();
+    const cachedUrls = () => [...harness.stores.values()].flatMap((store) => [...store.keys()]);
+    let releaseWrites!: () => void;
+    harness.holdWrites(
+      new Promise<void>((resolve) => {
+        releaseWrites = resolve;
+      })
+    );
+    const response = await harness.requestImage('/portfolio/assets/display/photo.webp');
+    expect(await response.text()).toBe('display-image');
+    expect(cachedUrls()).toEqual([]);
+    releaseWrites();
+    await harness.settleWrites();
+    expect(cachedUrls()).toEqual([`${origin}/portfolio/assets/display/photo.webp`]);
   });
 
   it('refreshes the same URL online and falls back to its latest cached body offline', async () => {
@@ -131,6 +162,7 @@ describe('service worker image storage', () => {
     await harness.requestImage(path);
     harness.fetch.mockImplementationOnce(async () => new Response('updated-image'));
     expect(await (await harness.requestImage(path)).text()).toBe('updated-image');
+    await harness.settleWrites();
     harness.fetch.mockRejectedValueOnce(new Error('Offline'));
     expect(await (await harness.requestImage(path)).text()).toBe('updated-image');
   });

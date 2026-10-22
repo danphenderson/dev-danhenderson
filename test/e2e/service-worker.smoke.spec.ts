@@ -46,8 +46,6 @@ type TemporaryDeploymentOptions = {
 };
 
 type ProbeMetrics = {
-  cached: boolean;
-  cachedSize: number | null;
   naturalHeight: number;
   naturalWidth: number;
 };
@@ -176,25 +174,24 @@ const readProbeMetrics = async (page: Page, probeUrl: string): Promise<ProbeMetr
       image.onerror = () => reject(new Error(`Failed to load probe asset: ${assetUrl}`));
     });
 
-    let cachedSize: number | null = null;
-
-    for (const cacheKey of await caches.keys()) {
-      const cachedResponse = await (await caches.open(cacheKey)).match(assetUrl);
-
-      if (!cachedResponse) {
-        continue;
-      }
-
-      cachedSize = (await cachedResponse.clone().blob()).size;
-      break;
-    }
-
     return {
-      cached: cachedSize !== null,
-      cachedSize,
       naturalHeight: image.naturalHeight,
       naturalWidth: image.naturalWidth,
     };
+  }, probeUrl);
+
+// The worker stores runtime assets after responding, so callers poll for the cached body.
+const readCachedProbeSize = (page: Page, probeUrl: string) =>
+  page.evaluate(async (assetUrl) => {
+    for (const cacheKey of await caches.keys()) {
+      const cachedResponse = await (await caches.open(cacheKey)).match(assetUrl);
+
+      if (cachedResponse) {
+        return (await cachedResponse.blob()).size;
+      }
+    }
+
+    return null;
   }, probeUrl);
 
 const createReplacementWebp = async (page: Page) => {
@@ -242,8 +239,7 @@ test.describe('Production service worker smoke', () => {
       const initialProbe = await readProbeMetrics(page, probeUrl);
       expect(initialProbe.naturalWidth).toBeGreaterThan(1);
       expect(initialProbe.naturalHeight).toBeGreaterThan(1);
-      expect(initialProbe.cached).toBe(true);
-      expect(initialProbe.cachedSize).not.toBeNull();
+      await expect.poll(() => readCachedProbeSize(page, probeUrl)).toBe(originalAsset.byteLength);
 
       const replacementAsset = await createReplacementWebp(page);
       await writeFile(deployment.assetPath, replacementAsset);
@@ -254,11 +250,9 @@ test.describe('Production service worker smoke', () => {
       const refreshedProbe = await readProbeMetrics(page, probeUrl);
       expect(refreshedProbe.naturalWidth).toBe(1);
       expect(refreshedProbe.naturalHeight).toBe(1);
-      expect(refreshedProbe.cached).toBe(true);
-      expect(refreshedProbe.cachedSize).not.toBeNull();
-      expect(refreshedProbe.cachedSize).toBeLessThan(
-        initialProbe.cachedSize ?? Number.MAX_SAFE_INTEGER
-      );
+      await expect
+        .poll(() => readCachedProbeSize(page, probeUrl))
+        .toBe(replacementAsset.byteLength);
     } finally {
       await writeFile(deployment.assetPath, originalAsset);
       await disposeTemporaryDeployment(deployment);

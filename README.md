@@ -70,7 +70,7 @@ Run `npm run media:generate` after adding or replacing source images under `publ
 
 Commit `public/assets/display/` and `src/generated/displayImages.json` together. `npm run media:check` detects stale sources, missing derivatives, and budget violations. The manifest is generated; gallery content and original downloads remain in their existing modules. `getDisplayImage()` handles responsive display URLs, including `PUBLIC_URL` subpaths.
 
-The service worker keeps at most 48 display images (each at most 1 MB) and 128 other runtime assets, plus the app shell. It does not cache original images or image query variants. Cache-write failures preserve successful network responses.
+The service worker keeps at most 48 display images (each at most 1 MB) and 128 other runtime assets, plus the app shell. It does not cache original images or image query variants. Cache writes finish in the background (the worker stays alive through `event.waitUntil`), so they never delay network responses, and write failures preserve successful responses.
 
 After `npm run build`, run `npm run check:bundle`. It totals the entry's entire static import graph, with limits of 950 KB raw and 300 KB gzip; dynamic route chunks are reported separately by Vite. These are transfer-size checks, not a production performance score. Build CI runs lint, typecheck, media checks, and this bundle budget.
 

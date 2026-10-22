@@ -34,8 +34,9 @@ function getCachedAppShell() {
     .then((cached) => cached || createUnavailableResponse('Offline'));
 }
 
-async function updateCache(request, response) {
+function updateCache(event, response) {
   if (!response.ok) return response;
+  const { request } = event;
   const isImage = request.destination === 'image';
   const clone = response.clone();
   // Serialize writes so concurrent image loads cannot escape the entry bound.
@@ -55,15 +56,17 @@ async function updateCache(request, response) {
       // Quota/storage failures must never discard a successful network response.
     }
   });
-  await cacheWrites;
+  // Keep the worker alive for the write without making the page wait for storage.
+  event.waitUntil(cacheWrites);
   return response;
 }
 
-function networkFirstWithCacheFallback(request) {
+function networkFirstWithCacheFallback(event) {
+  const { request } = event;
   return fetch(request)
     .then((response) => {
       if (response.ok) {
-        return updateCache(request, response);
+        return updateCache(event, response);
       }
 
       return caches.match(request).then((cached) => cached || response);
@@ -144,7 +147,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   if (RUNTIME_ASSET_DESTINATIONS.has(event.request.destination)) {
-    event.respondWith(networkFirstWithCacheFallback(event.request));
+    event.respondWith(networkFirstWithCacheFallback(event));
     return;
   }
 

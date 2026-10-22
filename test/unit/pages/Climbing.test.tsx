@@ -481,7 +481,7 @@ describe('Climbing', () => {
     expect(
       screen.queryByText("A collection of routes I'd still like to climb.")
     ).not.toBeInTheDocument();
-    expect(screen.queryByPlaceholderText('Search routes to climb')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Search routes to climb')).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'The Tooth' })).not.toBeInTheDocument();
     expect(screen.getAllByTestId('climbing-tilt-card')).toHaveLength(6);
   });
