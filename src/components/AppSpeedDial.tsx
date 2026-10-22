@@ -27,6 +27,8 @@ type AppSpeedDialProps = {
   sx?: SxProps<Theme>;
 };
 
+type ActionFabSlotProps = NonNullable<SpeedDialActionProps['slotProps']>['fab'];
+
 const getLayerSx =
   (layer: AppSpeedDialLayer): SxProps<Theme> =>
   (theme) => ({
@@ -72,7 +74,7 @@ export const AppSpeedDial = ({
     setOpen(false);
   };
 
-  const getActionFabProps = (action: AppSpeedDialAction): SpeedDialActionProps['FabProps'] => {
+  const getActionFabProps = (action: AppSpeedDialAction): ActionFabSlotProps => {
     const resolvedFabProps: Partial<FabProps> & Record<string, unknown> = {
       'aria-label': action.label,
       onClick: (event: ReactMouseEvent<HTMLElement>) => {
@@ -100,7 +102,7 @@ export const AppSpeedDial = ({
       resolvedFabProps.rel = 'noopener noreferrer';
     }
 
-    return resolvedFabProps as SpeedDialActionProps['FabProps'];
+    return resolvedFabProps;
   };
 
   return (
@@ -126,7 +128,7 @@ export const AppSpeedDial = ({
           }
           tooltipPlacement={actionTooltipPlacement}
           tooltipOpen={actionLabelsAlwaysOpen && open}
-          FabProps={getActionFabProps(action)}
+          slotProps={{ fab: getActionFabProps(action) }}
         />
       ))}
     </SpeedDial>
