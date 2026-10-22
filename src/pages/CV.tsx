@@ -1,5 +1,5 @@
-import { Box, Grid } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { Box, Button, Grid, Stack } from '@mui/material';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
@@ -86,6 +86,33 @@ const CVRouteContent = () => {
   const [hasUnlockedDeferredSections, setHasUnlockedDeferredSections] = useState(
     scrolledPastHeaderCollapse || shouldUnlockDeferredCVSections(location.hash)
   );
+  const focusSectionsOnReveal = useRef(false);
+  useEffect(() => {
+    if (!hasUnlockedDeferredSections) return;
+    const hash = location.hash.replace(/^#/, '');
+    const targetId = nonAboutSectionIds.has(hash)
+      ? hash
+      : focusSectionsOnReveal.current
+        ? cvSectionMetadata.experience.id
+        : undefined;
+    if (!targetId) return;
+    const target = document.getElementById(targetId);
+    if (!target) return;
+    target.tabIndex = -1;
+    target.scrollIntoView?.({ block: 'start', behavior: 'instant' });
+    let frameId = 0;
+    const focusWhenVisible = () => {
+      if (!target.isConnected) return;
+      if (getComputedStyle(target).visibility === 'hidden') {
+        frameId = window.requestAnimationFrame(focusWhenVisible);
+        return;
+      }
+      target.focus({ preventScroll: true });
+      focusSectionsOnReveal.current = false;
+    };
+    frameId = window.requestAnimationFrame(focusWhenVisible);
+    return () => window.cancelAnimationFrame(frameId);
+  }, [hasUnlockedDeferredSections, location.hash]);
   const revealState = useCVRevealState({
     bio: aboutMe.bio,
     opportunities: aboutMe.opportunities ?? [],
@@ -162,7 +189,34 @@ const CVRouteContent = () => {
     </Box>
   );
   const aboutModeControls = (
-    <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} variant="embedded" />
+    <Stack spacing={2}>
+      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+        {!hasUnlockedDeferredSections && (
+          <Button
+            variant="contained"
+            onClick={() => {
+              focusSectionsOnReveal.current = true;
+              setHasUnlockedDeferredSections(true);
+            }}
+          >
+            Explore full CV
+          </Button>
+        )}
+        <Button
+          component="a"
+          href={resumePdfUrl}
+          download={resumeDownloadFilename}
+          startIcon={<DownloadIcon />}
+          variant="outlined"
+        >
+          Download resume
+        </Button>
+        <Button component="a" href={`mailto:${aboutMe.email}`} startIcon={<EmailOutlinedIcon />}>
+          Contact me
+        </Button>
+      </Stack>
+      <CVStoryHeader mode={cvMode} onToggleMode={handleToggleMode} variant="embedded" />
+    </Stack>
   );
   const githubStatusTooltip = <CVGitHubStatusTooltip status={status} />;
 

@@ -10,14 +10,14 @@ Hooks and data-fetch modules in this directory are the adaptation layer between 
 
 Files:
 
-- `useClimbingData.ts` — derives `TickRow[]`, `TodoRow[]`, `GradeBucket[]`, `LocationCount[]`, and `ClimbingAnalytics` from static `src/data/climbs.ts`. Exports `normalizeGrade` and `formatClimbingLocation` for downstream DataGrid use.
+- `useClimbingData.ts` — derives `TickRow[]`, `TodoRow[]`, `GradeBucket[]`, `LocationCount[]`, and `ClimbingAnalytics` from static `src/data/climbs.ts`. Exports `normalizeGrade` and `formatClimbingLocation` for downstream MUI Table use.
 - `usePhotographyData.ts` — derives `PhotographyAlbumMeta[]` and summary statistics from static `src/data/photography.ts`.
 - `useBlogData.ts` — derives `BlogPostMeta[]` with tag frequency counts from static `src/data/blog.ts`. Tags are sorted by descending frequency with alphabetical tie-breaking for stable UI ordering.
 - `useGithubProfile.ts` — React hook that manages loading state and calls `loadGitHubProfileData`.
 - `githubProfileData.ts` — module-level singleton cache + fetch logic for the GitHub API (events, repos, PR search, repo enrichment). Not a hook. Exports `GitHubProfileData` as a re-export from `src/types/cv.ts`.
 - `useDocumentMetadata.ts` — sets `<title>`, Open Graph, Twitter card, and canonical link tags for the current route.
 - `useFuzzySearch.ts` — generic Fuse.js wrapper; returns `search`, `setSearch`, `filtered`.
-- `useHomeWelcomeSequence.ts` — coordinates the home-page welcome dialog + hint sequence with `WelcomeAudioProvider` and `WelcomeOnboardingProvider`.
+- `useHomeWelcomeSequence.ts` — coordinates optional, user-opened Home customization and the settings hint through `WelcomeOnboardingProvider`; it never gates content or starts audio.
 - `useWebVitals.ts` — collects Core Web Vitals via `web-vitals` and exposes them as React state. Gracefully no-ops in JSDOM.
 
 ## Type handling

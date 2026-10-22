@@ -1,3 +1,5 @@
+import { resolvePublicAssetPath } from '../../utils/assets';
+import { getDisplayImage } from '../../utils/displayImages';
 import CloseIcon from '@mui/icons-material/Close';
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
@@ -106,11 +108,10 @@ export function ImmersiveLightbox({
       onClose={onClose}
       fullScreen
       transitionDuration={dialogTransitionDuration}
-      aria-label={`Immersive photo viewer: ${displayTitle}`}
-      PaperProps={{
-        sx: {
-          bgcolor: 'common.black',
-          backgroundImage: 'none',
+      slotProps={{
+        paper: {
+          'aria-label': `Immersive photo viewer: ${displayTitle}`,
+          sx: { bgcolor: 'common.black', backgroundImage: 'none' },
         },
       }}
     >
@@ -145,7 +146,7 @@ export function ImmersiveLightbox({
           <Stack direction="row" spacing={0.5}>
             <IconButton
               component="a"
-              href={photo.img}
+              href={resolvePublicAssetPath(photo.img)}
               download={getDownloadFilename(photo.img)}
               aria-label={`Download ${displayTitle}`}
               size="small"
@@ -195,7 +196,8 @@ export function ImmersiveLightbox({
 
           <Box
             component="img"
-            src={photo.img}
+            {...getDisplayImage(photo.img, 2400)}
+            sizes="100vw"
             alt={displayTitle}
             sx={{
               maxWidth: '100%',

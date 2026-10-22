@@ -5,6 +5,7 @@ import { BlogArticleHeader } from '../../../../src/components/blog/BlogArticleHe
 import type { BlogPost } from '../../../../src/types/blog';
 
 jest.mock('../../../../src/motion', () => ({
+  ...jest.requireActual('../../../../src/motion'),
   MotionSection: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 

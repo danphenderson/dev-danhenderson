@@ -107,26 +107,14 @@ test.describe('CV page – GitHub integration', () => {
   test('renders the CV page with core sections', async ({ page }) => {
     await page.goto('/cv');
     await expect(page.getByText('Daniel Henderson')).toBeVisible();
-    await expect(page.getByText('MS in Applied/Computational Math')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Download resume' })).toBeVisible();
     await ensureCvSectionVisible(page, 'cv-github');
     await expectGitHubDataStatusTooltip(page);
 
-    const programLink = page.getByRole('link', {
-      name: 'M.S. in applied/computational mathematics',
-    });
     const advisorLink = page.getByRole('link', { name: 'Jiguang Sun' });
     const mtuOrganizationLink = page
       .getByRole('link', { name: 'Michigan Technological University' })
       .first();
-    await expect(programLink).toHaveAttribute(
-      'href',
-      'https://www.mtu.edu/math/graduate/students/'
-    );
-    await expectCommonLinkTooltip(
-      page,
-      programLink,
-      'View the Michigan Tech graduate mathematics student page.'
-    );
     await ensureCvSectionVisible(page, 'cv-experience');
     await expect(advisorLink).toBeVisible();
     await expectCommonLinkTooltip(page, advisorLink, 'View faculty page');
@@ -246,7 +234,7 @@ test.describe('CV page – GitHub integration', () => {
   test('default CV renders a story mode toggle', async ({ page }) => {
     await page.goto('/cv');
 
-    await expect(page.getByText('Full CV')).toBeVisible();
+    await expect(page.getByText('Full CV', { exact: true })).toBeVisible();
     await expect(page.getByTestId('cv-mode-toggle')).toContainText('Read my story');
   });
 });

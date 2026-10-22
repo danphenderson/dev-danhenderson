@@ -16,14 +16,18 @@ afterEach(() => {
 });
 
 describe('Home route integration', () => {
-  it('reveals the hero only after the onboarding flow completes and starts the typewriter after hero motion', async () => {
+  it('shows identity and navigation immediately while keeping customization optional', async () => {
     renderHomeRoute();
 
-    expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
-    expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
-    expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument();
-
-    fireEvent.click(await screen.findByRole('button', { name: 'No thanks' }));
+    expect(screen.getByRole('heading', { level: 1, name: 'Daniel Henderson' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Explore my CV' })).toHaveAttribute('href', '/cv');
+    expect(screen.getByRole('link', { name: 'View projects' })).toHaveAttribute(
+      'href',
+      '/cv#cv-coding'
+    );
+    expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Customize appearance & audio' }));
 
     await waitFor(() =>
       expect(screen.getByTestId('customize-modal-open')).toHaveTextContent('true')

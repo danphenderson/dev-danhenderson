@@ -37,6 +37,13 @@ This document covers the actual test organization, harness patterns, and coverag
   - specific chromium spec: `npm run build:e2e && npm run test:e2e:chromium -- test/e2e/<spec>.ts`
   - specific smoke spec: `npm run build && npm run test:e2e:smoke -- test/e2e/smoke.spec.ts`
 
+## Media and bundle gates
+
+- `npm run media:generate` regenerates display images and their manifest after source-photo changes; see the root README for the recipe and budgets.
+- `npm run media:check` verifies that committed display files match current source hashes and size limits.
+- `npm run build && npm run check:bundle` validates the complete eager JavaScript import graph (950 KB raw / 300 KB gzip), preventing chunk renaming from hiding growth.
+- `test/e2e/quality.spec.ts` covers font validity across all presets/modes, article contrast, narrow album layout and keyboard lightbox return, page landmarks, reveal actions, metadata navigation, and motion off/reduced behavior.
+
 ## Validation ownership
 
 This document is the canonical source for:
@@ -64,7 +71,7 @@ When another instruction file says to validate a change, it should point here ra
 
 ### Browser validation expectations
 
-- Use the webdev browser tooling for route rendering, layout inspection, and screenshots when UI is affected.
+- Use sandboxed Playwright for route rendering, layout inspection, and screenshots when UI is affected; `playwright.config.ts` explicitly enables `chromiumSandbox`.
 - Validate the smallest set of affected routes first, then expand to another consumer when a shared component or layout primitive changed.
 - Check at least one narrow/mobile viewport and one desktop viewport for layout-affecting edits.
 - When Playwright E2E coverage exists for the touched behavior, run the narrowest relevant spec after the appropriate build variant.
@@ -260,7 +267,7 @@ flowchart TB
 CI=true npm test -- --watchAll=false
 
 # Unit tests (specific file)
-CI=true npm test -- --watchAll=false --testPathPattern=AnimatedContentList
+CI=true npm test -- --watchAll=false --testPathPatterns=AnimatedContentList
 
 # Build verification
 npm run build
@@ -288,7 +295,7 @@ npm run build
 npm run test:e2e:smoke
 ```
 
-**Note:** `CI=true npm test -- --watchAll=false` may show baseline failures in existing CV tests unrelated to your changes. Focus on regressions in the files you changed.
+**Note:** The October 2026 stale CV expectations have been repaired. The full unit suite is expected to pass; distinguish any new baseline drift from regressions with current evidence.
 
 ## Further reading
 

@@ -15,7 +15,7 @@ flowchart TB
 
   subgraph Standard["Standard scaffold (PageFrame)"]
     CV["/cv CV<br/>Grid layout: top · main · sidebar<br/>+ story mode"]
-    Climbing["/climbing Climbing<br/>DataGrid + analytics"]
+    Climbing["/climbing Climbing<br/>MUI Table + analytics"]
     Photo["/photography Photography<br/>StaggerChildren album grid"]
     PhotoCat["/photography/:slug<br/>Quilted grid + lightbox"]
     Blog["/blog Blog<br/>Hero + tag filter + post grid"]
@@ -25,7 +25,7 @@ flowchart TB
 
 ## Home (`/`)
 
-The home page is the most orchestration-heavy route. It renders a faux-VS Code IDE as an interactive hero element.
+Home presents identity and CV/projects links immediately, alongside a faux-VS Code IDE. Customization is optional and never auto-dismisses. The IDE remains windowed until explicitly expanded; close, minimize, restore, drag, and resize remain available. Off/reduced motion settles the hero immediately and shows a stable terminal transcript.
 
 ### Assembly
 
@@ -38,12 +38,12 @@ flowchart TB
   ACC["AnimatedContentCard<br/>fade-in reveal"]
   THC["TerminalHeroContent<br/>VS Code shell:<br/>title bar · activity bar · explorer<br/>editor pane · terminal · status bar"]
   ScrollP["Scroll parallax<br/>heroScale (1→1.08)<br/>heroOpacity (1→0.6)"]
-  Dialog["Welcome audio Dialog<br/>play / no thanks"]
+  Intro["Identity + CV/projects links<br/>optional customization button"]
   Portal["Expanded IDE portal<br/>fixed fullscreen"]
 
   BG --> HMP --> DragDiv --> Tilt --> ACC --> THC
   BG --> ScrollP
-  BG -.-> Dialog
+  BG --> Intro
   DragDiv -.->|expanded| Portal
 ```
 
@@ -56,7 +56,7 @@ sequenceDiagram
   participant HMP as HeroMotionPath
   participant Shell as TerminalHeroContent
   participant TW as Terminal typewriter
-  participant Audio as Welcome audio prompt
+  participant Intro as Identity and navigation
 
   Mount->>BG: Render background image + overlay
   BG->>HMP: Mount shell inside motion path
@@ -69,19 +69,19 @@ sequenceDiagram
   TW->>TW: Type: git log → commit hash
   TW->>TW: Type: npm run build → ✓ Compiled
   TW->>TW: Type: whoami --passions → math · computers · adventures
-  Mount->>Audio: Show audio consent dialog (if needed)
+  Mount->>Intro: Available immediately; audio only after explicit play
 ```
 
 ### Page-owned state
 
-| State              | Purpose                                            |
-| ------------------ | -------------------------------------------------- |
-| `ideWindowState`   | normal / minimized / expanded                      |
-| `ideWindowSize`    | width × height for resize                          |
-| Drag constraints   | Bound to hero container via `heroBoundsRef`        |
-| Typewriter playing | Triggered by `HeroMotionPath` completion           |
-| Scroll transforms  | `heroScale` and `heroOpacity` from scroll progress |
-| Welcome sequence   | Managed by `useHomeWelcomeSequence()` hook         |
+| State                  | Purpose                                                     |
+| ---------------------- | ----------------------------------------------------------- |
+| `ideWindowState`       | normal / minimized / expanded                               |
+| `ideWindowSize`        | width × height for resize                                   |
+| Drag constraints       | Bound to hero container via `heroBoundsRef`                 |
+| Typewriter playing     | Triggered by `HeroMotionPath` completion                    |
+| Scroll transforms      | `heroScale` and `heroOpacity` from scroll progress          |
+| Optional customization | `useHomeWelcomeSequence()`; opened by the user, never timed |
 
 ### IDE window interactions
 
@@ -104,7 +104,7 @@ stateDiagram-v2
 
 ## CV (`/cv`)
 
-The CV page has two modes: a default grid layout and an immersive story viewer.
+The CV page has two modes: a default grid layout and an immersive story viewer. Default mode reveals deferred sections on scroll, a known section hash, or the “Explore full CV” button. An explicit reveal focuses Experience; a deep link focuses its target. Resume and contact actions remain visible in About.
 
 ### Default mode — assembly
 
@@ -184,8 +184,8 @@ flowchart TB
   Runway["Scroll runway until header hide threshold"]
   Main["SectionCard<br/>spring entrance after unlock"]
   Analytics["ClimbingAnalytics<br/>SectionPanel dashboard"]
-  Ticks["MUI X DataGrid (ticks)"]
-  Todos["Wish list DataGrid (todos)"]
+  Ticks["MUI Table (ticks)"]
+  Todos["Wish list MUI Table (todos)"]
 
   PF --> Intro --> Runway --> Main
   Main --> Analytics
@@ -193,8 +193,8 @@ flowchart TB
   Main --> Todos
 ```
 
-- `useFuzzySearch()` provides route/location filtering across both DataGrid tables
-- initial load shows only the typed `CLIMBING` eyebrow; the analytics and tables stay deferred until the user scrolls far enough to hide the header
+- `useFuzzySearch()` provides route/location filtering across both route tables
+- initial load shows the Climbing h1, introduction, and “View climbing log” button; analytics and tables reveal on either the existing scroll threshold or the button. The button moves focus to the log, and both searches have persistent labels.
 - once unlocked, the main climbing card enters with the same spring-style card motion used by the deferred CV sections
 - Analytics panels use `SectionPanel` for dense data display
 
@@ -233,7 +233,9 @@ flowchart TB
   PF -.->|invalid slug| Recovery
 ```
 
-- Quilted layout uses MUI `ImageList` with responsive column counts
+- Album metadata is in normal document flow below the cover; location chips use a native details disclosure.
+- Quilted layout uses MUI `ImageList` with one column below 600 px, two below 900 px, and four above; desktop spans are clamped to the available columns.
+- Display media uses generated width-descriptor WebP sources; download links retain originals.
 - `ImmersiveLightbox` is a full-screen overlay with keyboard navigation, download, and close
 - Legacy slug redirects handled in the component for backward compatibility
 

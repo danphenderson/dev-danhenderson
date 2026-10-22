@@ -1,13 +1,6 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
-import { SPRING_EASING_MOTION } from '../styles/springEasing';
-
-/**
- * Total entrance duration in seconds:
- * - initial hold so the nested MUI Zoom can play
- * - spiral travel to resting position
- */
-const ENTRANCE_DURATION_S = 3.6;
+import { duration, easing, useMotionScale } from '../motion';
 
 /** Hold at the starting position while the inner Zoom entrance completes. */
 const HOLD_FRACTION = 0.08;
@@ -141,21 +134,37 @@ function buildSpiralKeyframes(startX: number, startY: number): SpiralKeyframes {
 }
 
 export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathProps) => {
+  const { duration: motionScale } = useMotionScale();
+  const completed = useRef(false);
   const ref = useRef<HTMLDivElement>(null);
   const [startOffset, setStartOffset] = useState<{ x: number; y: number } | null>(null);
   const [settled, setSettled] = useState(false);
 
   /** Reset settled state when the path deactivates so a re-entrance replays. */
   useEffect(() => {
-    if (!active) setSettled(false);
+    if (!active) {
+      completed.current = false;
+      setSettled(false);
+    }
   }, [active]);
+
+  const completeOnce = useCallback(() => {
+    if (!active || completed.current) return;
+    completed.current = true;
+    setSettled(true);
+    onComplete?.();
+  }, [active, onComplete]);
+
+  useEffect(() => {
+    if (active && motionScale === 0) completeOnce();
+  }, [active, motionScale, completeOnce]);
 
   /**
    * Measure the element's final resting position and compute the transform
    * needed to place it in the visual centre of the viewport.
    */
   useLayoutEffect(() => {
-    if (!active) {
+    if (!active || motionScale === 0) {
       setStartOffset(null);
       return;
     }
@@ -175,15 +184,15 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
     };
 
     measure();
-  }, [active]);
+  }, [active, motionScale]);
 
   const keyframes = useMemo(() => {
     if (!startOffset) return null;
     return buildSpiralKeyframes(startOffset.x, startOffset.y);
   }, [startOffset]);
 
-  if (!active) {
-    return <>{children}</>;
+  if (!active || motionScale === 0) {
+    return <div>{children}</div>;
   }
 
   const motionStyle: React.CSSProperties | undefined = !keyframes
@@ -220,16 +229,13 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
       transition={
         keyframes
           ? {
-              duration: ENTRANCE_DURATION_S,
+              duration: duration.heroPath * motionScale,
               times: keyframes.times,
-              ease: SPRING_EASING_MOTION,
+              ease: easing.spring,
             }
           : undefined
       }
-      onAnimationComplete={() => {
-        setSettled(true);
-        onComplete?.();
-      }}
+      onAnimationComplete={completeOnce}
       style={motionStyle}
     >
       {children}

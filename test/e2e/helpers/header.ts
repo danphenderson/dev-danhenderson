@@ -14,20 +14,8 @@ export const declineWelcomeAudio = async (page: Page) => {
   });
 };
 
+/** Home is available immediately; existing route tests share this readiness check. */
 export const dismissWelcomeSequence = async (page: Page) => {
-  const dialog = page.getByRole('dialog', { name: 'Play welcome audio?' });
-
-  await expect(dialog).toBeVisible();
-  await dialog.getByRole('button', { name: 'No thanks' }).click();
-  await expect(dialog).toBeHidden();
-
-  const customizeDialog = page.getByTestId('customize-experience-dialog');
-  await expect(customizeDialog).toBeVisible();
-  await customizeDialog.getByRole('button', { name: 'Okay' }).click();
-  await expect(customizeDialog).toBeHidden();
-
-  const settingsHint = page.getByTestId('first-visit-settings-hint-popover');
-  await expect(settingsHint).toBeVisible();
-  await settingsHint.getByRole('button', { name: 'Get started' }).click();
-  await expect(settingsHint).toBeHidden();
+  await expect(page.getByRole('heading', { level: 1, name: 'Daniel Henderson' })).toBeVisible();
+  await expect(page.getByRole('dialog', { name: 'Play welcome audio?' })).toHaveCount(0);
 };

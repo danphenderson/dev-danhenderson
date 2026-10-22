@@ -1,3 +1,4 @@
+import { getDisplayImage } from '../../utils/displayImages';
 import ArticleIcon from '@mui/icons-material/Article';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -62,7 +63,7 @@ export const HeaderNav = ({
       case '/':
         return (
           <Avatar
-            src={avatarSrc}
+            src={getDisplayImage(avatarSrc, 480).src}
             alt="Daniel Henderson"
             sx={{
               width: 24,
@@ -77,27 +78,41 @@ export const HeaderNav = ({
   };
 
   return (
-    <>
+    <Box
+      component="nav"
+      aria-label="Primary"
+      sx={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}
+    >
       <Box sx={appStyles.headerNavLeadSx}>
         {showHomeAvatar ? (
           <Box component={Link} to="/" sx={appStyles.headerAvatarLinkSx} aria-label="Go to Home">
-            <Avatar src={avatarSrc} alt="Daniel Henderson" sx={appStyles.headerAvatarSx} />
+            <Avatar
+              src={getDisplayImage(avatarSrc, 480).src}
+              alt="Daniel Henderson"
+              sx={appStyles.headerAvatarSx}
+            />
           </Box>
         ) : null}
         {isMobile && (
-          <IconButton
-            id="mobile-nav-button"
-            color="inherit"
-            size={iconButtonSize}
-            onClick={onMobileMenuOpen}
-            aria-label="Open navigation menu"
-            aria-controls={mobileMenuOpen ? 'mobile-nav-menu' : undefined}
-            aria-haspopup="true"
-            aria-expanded={mobileMenuOpen ? 'true' : undefined}
-            sx={appStyles.headerIconButtonSx}
-          >
-            <MenuIcon sx={headerIconSx} />
-          </IconButton>
+          <>
+            <IconButton
+              id="mobile-nav-button"
+              color="inherit"
+              size={iconButtonSize}
+              onClick={onMobileMenuOpen}
+              aria-label="Open navigation menu"
+              aria-controls={mobileMenuOpen ? 'mobile-nav-menu' : undefined}
+              aria-haspopup="true"
+              aria-expanded={mobileMenuOpen ? 'true' : undefined}
+              sx={appStyles.headerIconButtonSx}
+            >
+              <MenuIcon sx={headerIconSx} />
+            </IconButton>
+            <Text role="metaStrong" tone="inverse" sx={{ ml: 0.5 }}>
+              {pages.find((page) => isActivePage(currentPath, page.path))?.label ??
+                'Daniel Henderson'}
+            </Text>
+          </>
         )}
       </Box>
       {!isMobile && (
@@ -117,7 +132,7 @@ export const HeaderNav = ({
                 aria-label={`Go to ${label}`}
                 aria-current={isActivePage(currentPath, path) ? 'page' : undefined}
               >
-                <Text role="inlineLabel" component="span">
+                <Text role="inlineLabel" component="span" sx={{ color: 'inherit' }}>
                   {label}
                 </Text>
               </Button>
@@ -154,6 +169,6 @@ export const HeaderNav = ({
           </MenuItem>
         ))}
       </Menu>
-    </>
+    </Box>
   );
 };

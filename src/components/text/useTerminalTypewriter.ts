@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useMotionScale } from '../../motion';
 import { getTypewriterDelay, resolveTypewriterTimingProfile } from './useTypewriterProgress';
 import type { TypewriterTimingPreset } from './useTypewriterProgress';
 import type { TerminalLine } from '../../types/ui';
@@ -48,6 +49,8 @@ export const useTerminalTypewriter = ({
   pauseBeforeOutputMs = DEFAULT_PAUSE_BEFORE_OUTPUT_MS,
   pauseAfterOutputMs = DEFAULT_PAUSE_AFTER_OUTPUT_MS,
 }: UseTerminalTypewriterOptions): UseTerminalTypewriterResult => {
+  const { duration: motionScale } = useMotionScale();
+  const animatedPlaying = playing && motionScale > 0 && lines.length > 0;
   const resolvedTimingProfile = React.useMemo(
     () => resolveTypewriterTimingProfile(timingPreset, typingBaseMs),
     [timingPreset, typingBaseMs]
@@ -65,14 +68,14 @@ export const useTerminalTypewriter = ({
 
   // Start typing when playing transitions to true
   React.useEffect(() => {
-    if (playing && phase === 'idle') {
+    if (animatedPlaying && phase === 'idle') {
       setPhase('typing-command');
     }
-  }, [playing, phase]);
+  }, [animatedPlaying, phase]);
 
   // Phase: typing-command — type the command character by character
   React.useEffect(() => {
-    if (!playing || phase !== 'typing-command') return undefined;
+    if (!animatedPlaying || phase !== 'typing-command') return undefined;
 
     if (commandCharIndex >= currentLine.command.length) {
       setPhase('pause-before-output');
@@ -83,56 +86,76 @@ export const useTerminalTypewriter = ({
       () => {
         setCommandCharIndex((prev) => Math.min(prev + 1, currentLine.command.length));
       },
-      getTypewriterDelay(currentLine.command, commandCharIndex, resolvedTimingProfile)
+      getTypewriterDelay(currentLine.command, commandCharIndex, resolvedTimingProfile) * motionScale
     );
 
     return () => window.clearTimeout(timeoutId);
-  }, [playing, phase, commandCharIndex, currentLine.command, resolvedTimingProfile]);
+  }, [
+    animatedPlaying,
+    phase,
+    commandCharIndex,
+    currentLine.command,
+    resolvedTimingProfile,
+    motionScale,
+  ]);
 
   // Phase: pause-before-output — brief pause to simulate pressing enter
   React.useEffect(() => {
-    if (!playing || phase !== 'pause-before-output') return undefined;
+    if (!animatedPlaying || phase !== 'pause-before-output') return undefined;
 
     const timeoutId = window.setTimeout(() => {
       setPhase('showing-output');
-    }, pauseBeforeOutputMs);
+    }, pauseBeforeOutputMs * motionScale);
 
     return () => window.clearTimeout(timeoutId);
-  }, [playing, phase, pauseBeforeOutputMs]);
+  }, [animatedPlaying, phase, pauseBeforeOutputMs, motionScale]);
 
   // Phase: showing-output — output appears instantly, then pause
   React.useEffect(() => {
-    if (!playing || phase !== 'showing-output') return undefined;
+    if (!animatedPlaying || phase !== 'showing-output') return undefined;
 
     setPhase('pause-after-output');
     return undefined;
-  }, [playing, phase]);
+  }, [animatedPlaying, phase]);
 
   // Phase: pause-after-output — let the user read the output, then simulate Control+L
   React.useEffect(() => {
-    if (!playing || phase !== 'pause-after-output') return undefined;
+    if (!animatedPlaying || phase !== 'pause-after-output') return undefined;
 
     const timeoutId = window.setTimeout(() => {
       // Control+L: clear the screen immediately, show empty prompt briefly
       setHistory([]);
       setCommandCharIndex(0);
       setPhase('clearing-screen');
-    }, pauseAfterOutputMs);
+    }, pauseAfterOutputMs * motionScale);
 
     return () => window.clearTimeout(timeoutId);
-  }, [playing, phase, pauseAfterOutputMs]);
+  }, [animatedPlaying, phase, pauseAfterOutputMs, motionScale]);
 
   // Phase: clearing-screen — brief pause showing empty prompt after Control+L, then advance
   React.useEffect(() => {
-    if (!playing || phase !== 'clearing-screen') return undefined;
+    if (!animatedPlaying || phase !== 'clearing-screen') return undefined;
 
     const timeoutId = window.setTimeout(() => {
       setLineIndex((prev) => prev + 1);
       setPhase('typing-command');
-    }, CLEAR_SCREEN_PAUSE_MS);
+    }, CLEAR_SCREEN_PAUSE_MS * motionScale);
 
     return () => window.clearTimeout(timeoutId);
-  }, [playing, phase]);
+  }, [animatedPlaying, phase, motionScale]);
+
+  // A stable transcript is immediately available without scheduling a loop.
+  if (motionScale === 0) {
+    const lastLine = lines[lines.length - 1];
+    return {
+      promptText: prompt,
+      commandText: lastLine?.command ?? '',
+      outputText: lastLine?.output ?? '',
+      showCursor: false,
+      phase: 'pause-after-output',
+      history: lines.slice(0, -1),
+    };
+  }
 
   // Compute display text
   const commandText = currentLine.command.slice(0, commandCharIndex);

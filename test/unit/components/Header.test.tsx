@@ -165,12 +165,12 @@ describe('Header controls', () => {
     expect(pause).toHaveBeenCalledTimes(1);
   });
 
-  it('hides the audio control when welcome audio consent was declined before onboarding completed', () => {
+  it('keeps an explicit play control available even without onboarding', () => {
     mockUseWelcomeAudio.mockReturnValue(createAudioState({ audioConsent: 'declined' }));
 
     renderHeader('/cv');
 
-    expect(screen.queryByRole('button', { name: 'Play welcome audio' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Play welcome audio' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Pause welcome audio' })).not.toBeInTheDocument();
   });
 

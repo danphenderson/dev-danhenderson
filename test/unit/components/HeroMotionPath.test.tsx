@@ -2,6 +2,12 @@ import type { CSSProperties, HTMLAttributes, ReactNode, Ref } from 'react';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { HeroMotionPath } from '../../../src/components/HeroMotionPath';
 
+let mockMotionScale = 1;
+jest.mock('../../../src/motion', () => ({
+  ...jest.requireActual('../../../src/motion'),
+  useMotionScale: () => ({ duration: mockMotionScale }),
+}));
+
 const mockMotionDivProps = {
   initial: undefined as Record<string, unknown> | false | undefined,
   animate: undefined as Record<string, unknown> | undefined,
@@ -32,7 +38,7 @@ jest.mock('motion/react', () => {
             transition?: Record<string, unknown>;
             style?: CSSProperties;
           } & HTMLAttributes<HTMLDivElement>,
-          ref: Ref<HTMLDivElement>,
+          ref: Ref<HTMLDivElement>
         ) => {
           mockMotionDivProps.initial = initial;
           mockMotionDivProps.animate = animate;
@@ -53,7 +59,7 @@ jest.mock('motion/react', () => {
               )}
             </div>
           );
-        },
+        }
       ),
     },
   };
@@ -65,6 +71,7 @@ const defaultGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect
 
 describe('HeroMotionPath', () => {
   beforeEach(() => {
+    mockMotionScale = 1;
     mockMotionDivProps.initial = undefined;
     mockMotionDivProps.animate = undefined;
     mockMotionDivProps.transition = undefined;
@@ -97,7 +104,7 @@ describe('HeroMotionPath', () => {
     render(
       <HeroMotionPath active onComplete={jest.fn()}>
         <span data-testid="child">content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
     expect(screen.getByTestId('motion-div')).toBeInTheDocument();
@@ -110,7 +117,7 @@ describe('HeroMotionPath', () => {
     render(
       <HeroMotionPath active={false} onComplete={jest.fn()}>
         <span data-testid="child">content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
     expect(screen.queryByTestId('motion-div')).not.toBeInTheDocument();
@@ -123,7 +130,7 @@ describe('HeroMotionPath', () => {
     render(
       <HeroMotionPath active onComplete={onComplete}>
         <span>content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
     await waitFor(() => expect(mockMotionDivProps.transition).toBeDefined());
@@ -139,17 +146,61 @@ describe('HeroMotionPath', () => {
 
     // After animation completes, overflow:hidden is removed
     await waitFor(() =>
-      expect(mockMotionDivProps.style).not.toEqual(
-        expect.objectContaining({ overflow: 'hidden' }),
-      ),
+      expect(mockMotionDivProps.style).not.toEqual(expect.objectContaining({ overflow: 'hidden' }))
     );
+  });
+
+  it('settles instantly and completes only once when motion is disabled during entrance', () => {
+    const onComplete = jest.fn();
+    const { rerender } = render(
+      <HeroMotionPath active onComplete={onComplete}>
+        content
+      </HeroMotionPath>
+    );
+    mockMotionScale = 0;
+    rerender(
+      <HeroMotionPath active onComplete={onComplete}>
+        content
+      </HeroMotionPath>
+    );
+    expect(screen.queryByTestId('motion-div')).not.toBeInTheDocument();
+    expect(screen.getByText('content')).toBeVisible();
+    expect(onComplete).toHaveBeenCalledTimes(1);
+    rerender(
+      <HeroMotionPath active onComplete={onComplete}>
+        content
+      </HeroMotionPath>
+    );
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders immediately when initially off and completes each new activation once', () => {
+    mockMotionScale = 0;
+    const onComplete = jest.fn();
+    const { rerender } = render(
+      <HeroMotionPath active onComplete={onComplete}>
+        content
+      </HeroMotionPath>
+    );
+    expect(onComplete).toHaveBeenCalledTimes(1);
+    rerender(
+      <HeroMotionPath active={false} onComplete={onComplete}>
+        content
+      </HeroMotionPath>
+    );
+    rerender(
+      <HeroMotionPath active onComplete={onComplete}>
+        content
+      </HeroMotionPath>
+    );
+    expect(onComplete).toHaveBeenCalledTimes(2);
   });
 
   it('measures the shell position and builds measured spiral keyframes', async () => {
     render(
       <HeroMotionPath active onComplete={jest.fn()}>
         <span>content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
     await waitFor(() => expect(mockMotionDivProps.initial).toBeDefined());
@@ -217,7 +268,7 @@ describe('HeroMotionPath', () => {
     const { rerender } = render(
       <HeroMotionPath active onComplete={jest.fn()}>
         <span>content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
     await waitFor(() => expect(mockMotionDivProps.initial).toBeDefined());
@@ -232,7 +283,7 @@ describe('HeroMotionPath', () => {
     rerender(
       <HeroMotionPath active={false} onComplete={jest.fn()}>
         <span>content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
     expect(screen.queryByTestId('motion-div')).not.toBeInTheDocument();
@@ -252,7 +303,7 @@ describe('HeroMotionPath', () => {
     rerender(
       <HeroMotionPath active onComplete={jest.fn()}>
         <span>content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
     await waitFor(() =>
@@ -262,7 +313,7 @@ describe('HeroMotionPath', () => {
         scale: 1,
         rotate: 0,
         borderRadius: 28,
-      }),
+      })
     );
   });
 });

@@ -22,7 +22,7 @@ export const FirstVisitSettingsHintPopover = ({
     <Popover
       open
       anchorEl={anchorEl}
-      onClose={() => {}}
+      onClose={onGetStarted}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       data-testid="first-visit-settings-hint-root"

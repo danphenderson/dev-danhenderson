@@ -1,22 +1,17 @@
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
-import { IconButton, ImageList, ImageListItem } from '@mui/material';
+import { IconButton, ImageList, ImageListItem, useMediaQuery, useTheme } from '@mui/material';
 import { useAppStyles } from '../styles/appStyles';
 import type { PhotoItem } from '../types/data';
+import { getDisplayImage } from '../utils/displayImages';
+import { resolvePublicAssetPath } from '../utils/assets';
 import { TiltCard } from './photography/TiltCard';
+import { useMotionScale } from '../motion';
 
 type QuiltedImageListProps = {
   imageData: PhotoItem[];
   albumLabel?: string;
   onPhotoClick?: (index: number) => void;
 };
-
-function srcset(image: string, size: number, rows = 1, cols = 1) {
-  const correctPath = image.startsWith('./') ? image.substring(1) : image;
-  return {
-    src: `${correctPath}?w=${size * cols}&h=${size * rows}&fit=crop&auto=format`,
-    srcSet: `${correctPath}?w=${size * cols}&h=${size * rows}&fit=crop&auto=format&dpr=2 2x`,
-  };
-}
 
 function getDownloadFilename(image: string) {
   const sanitizedPath = image.split('?')[0].split('#')[0];
@@ -26,12 +21,18 @@ function getDownloadFilename(image: string) {
 
 export function QuiltedImageList({ imageData, albumLabel, onPhotoClick }: QuiltedImageListProps) {
   const appStyles = useAppStyles();
+  const { duration: motionScale } = useMotionScale();
+
+  const theme = useTheme();
+  const medium = useMediaQuery(theme.breakpoints.up('md'));
+  const small = useMediaQuery(theme.breakpoints.up('sm'));
+  const columns = medium ? 4 : small ? 2 : 1;
 
   return (
     <ImageList
       variant="quilted"
-      cols={4}
-      rowHeight={200}
+      cols={columns}
+      rowHeight={medium ? 200 : 260}
       aria-label={albumLabel ? `${albumLabel} photo gallery` : undefined}
     >
       {imageData.map((item, index) => {
@@ -45,13 +46,28 @@ export function QuiltedImageList({ imageData, albumLabel, onPhotoClick }: Quilte
         return (
           <ImageListItem
             key={item.img}
-            cols={item.cols || 1}
-            rows={item.rows || 1}
-            sx={appStyles.quiltedImageItemSx}
+            cols={Math.min(item.cols || 1, columns)}
+            rows={medium ? item.rows || 1 : 1}
+            sx={[
+              appStyles.quiltedImageItemSx,
+              ...(motionScale === 0
+                ? [
+                    {
+                      '& img, &::after, & .photo-download-action': { transition: 'none' },
+                      '&:hover img, &:focus-within img': { transform: 'none' },
+                    },
+                  ]
+                : []),
+            ]}
           >
             <TiltCard intensity={0.5} style={{ height: '100%', width: '100%' }}>
               <img
-                {...srcset(item.img, 121, item.rows, item.cols)}
+                {...getDisplayImage(item.img)}
+                sizes={
+                  medium && (item.cols || 1) > 1
+                    ? '(min-width: 1200px) 600px, (min-width: 900px) 50vw, (min-width: 600px) 50vw, 100vw'
+                    : '(min-width: 1200px) 300px, (min-width: 900px) 25vw, (min-width: 600px) 50vw, 100vw'
+                }
                 alt={altText}
                 loading="lazy"
                 decoding="async"
@@ -73,7 +89,7 @@ export function QuiltedImageList({ imageData, albumLabel, onPhotoClick }: Quilte
               <IconButton
                 className="photo-download-action"
                 component="a"
-                href={item.img}
+                href={resolvePublicAssetPath(item.img)}
                 download={getDownloadFilename(item.img)}
                 aria-label={`Download ${altText}`}
                 size="small"

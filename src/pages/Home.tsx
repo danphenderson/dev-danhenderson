@@ -1,23 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
-import {
-  motion,
-  useDragControls,
-  useScroll,
-  useTransform,
-  AnimatePresence,
-  useReducedMotion,
-} from 'motion/react';
+import { Link as RouterLink } from 'react-router-dom';
+import { cvSectionMetadata } from '../components/cv/cvSectionMetadata';
+import { aboutMe } from '../data/cv';
+import { Box, Button, Stack, IconButton, Tooltip } from '@mui/material';
+import { motion, useDragControls, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
 import { FirstVisitCustomizeModal } from '../components/FirstVisitCustomizeModal';
@@ -35,7 +22,7 @@ import { useComponentStyles } from '../styles/componentStyles';
 import { useAppTheme } from '../ThemeProvider';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { Text } from '../components/text';
-import { MotionTiltCard, useMotionScale } from '../motion';
+import { MotionTiltCard, duration, useMotionScale } from '../motion';
 import { VSCODE_COLORS, VSCODE_WINDOW_RADIUS } from '../components/ide/vscodeTokens';
 
 const heroLines: TerminalLine[] = [
@@ -66,14 +53,10 @@ export default function Home() {
     error: audioError,
   } = useWelcomeAudio();
   const {
-    error,
     isHeroAnimationReady,
-    isLoading,
-    isPromptOpen,
     isCustomizeOpen,
     isSettingsHintOpen,
-    handleOptOut,
-    handlePlay,
+    handleCustomizeOpen,
     handleCustomizeDismiss,
     handleSettingsHintComplete,
   } = useHomeWelcomeSequence();
@@ -102,7 +85,6 @@ export default function Home() {
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.6]);
   const { duration: motionDurationScale } = useMotionScale();
-  const prefersReducedMotion = useReducedMotion();
   const heroMotionStyle =
     motionDurationScale > 0 ? { scale: heroScale, opacity: heroOpacity } : { scale: 1, opacity: 1 };
   const settingsHintAnchorEl =
@@ -134,7 +116,6 @@ export default function Home() {
     handleIdeExpand,
     handleIdeRestore,
   } = useHomeIdeOrchestration({
-    prefersReducedMotion,
     dragControls: heroDragControls,
     heroRef,
     heroBoundsRef,
@@ -142,8 +123,33 @@ export default function Home() {
 
   return (
     <>
-      <motion.div ref={heroRef} style={heroMotionStyle}>
+      <motion.div ref={heroRef} style={{ ...heroMotionStyle, position: 'relative' }}>
         <BackgroundPaper
+          intro={
+            <Stack spacing={2} sx={appStyles.homeIntroSx}>
+              <Text role="pageTitle" component="h1">
+                {aboutMe.name}
+              </Text>
+              <Text role="body" sx={{ maxWidth: 600 }}>
+                Software developer building scientific, data, and AI-enabled systems.
+              </Text>
+              <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1.5}>
+                <Button component={RouterLink} to={siteRouteMap.cv.path} variant="contained">
+                  Explore my CV
+                </Button>
+                <Button
+                  component={RouterLink}
+                  to={`${siteRouteMap.cv.path}#${cvSectionMetadata.coding.id}`}
+                  variant="outlined"
+                >
+                  View projects
+                </Button>
+              </Stack>
+              <Button onClick={handleCustomizeOpen} size="small" sx={{ alignSelf: 'flex-start' }}>
+                Customize appearance &amp; audio
+              </Button>
+            </Stack>
+          }
           contentRef={heroBoundsRef}
           image="assets/home.jpg"
           contentAlign="flex-end"
@@ -176,7 +182,7 @@ export default function Home() {
                         initial={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: duration.fast * motionDurationScale }}
                       >
                         {shell}
                       </motion.div>
@@ -204,34 +210,6 @@ export default function Home() {
               ) : null}
             </AnimatedContentCard>
           </MotionTiltCard>
-
-          <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
-            <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
-            <DialogContent>
-              <Text role="body" sx={{ mt: 1 }}>
-                Would you like to hear a short verse while browsing the site? Use the pause button
-                in the header to stop it anytime.
-              </Text>
-              {error && (
-                <Text role="caption" sx={{ display: 'block', mt: 1, color: 'error.main' }}>
-                  {error}
-                </Text>
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleOptOut} autoFocus>
-                No thanks
-              </Button>
-              <Button
-                onClick={handlePlay}
-                variant="contained"
-                disabled={isLoading}
-                aria-label="Play welcome audio"
-              >
-                {isLoading ? 'Loading…' : 'Play audio'}
-              </Button>
-            </DialogActions>
-          </Dialog>
 
           <FirstVisitCustomizeModal
             open={isCustomizeOpen}
@@ -300,7 +278,7 @@ export default function Home() {
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.22 }}
+              transition={{ duration: duration.fast * motionDurationScale }}
               style={{
                 position: 'fixed',
                 top: expandedIdeViewport.top,
@@ -337,7 +315,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 12 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: duration.normal * motionDurationScale }}
             style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 10 }}
           >
             <Tooltip title="Open Visual Studio Code" placement="left">
@@ -378,7 +356,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 12 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: duration.normal * motionDurationScale }}
             style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 10 }}
           >
             <Tooltip title="Restore window" placement="left">

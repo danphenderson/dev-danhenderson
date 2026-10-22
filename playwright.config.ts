@@ -17,6 +17,7 @@ export default defineConfig({
   expect: { timeout: 10_000 },
   use: {
     baseURL,
+    launchOptions: { chromiumSandbox: true },
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'on-first-retry',

@@ -1,3 +1,4 @@
+import { getDisplayImage } from '../../utils/displayImages';
 import { Avatar, Box, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { AboutMe } from '../../types/cv';
@@ -37,11 +38,13 @@ export const ProfileCard = ({
 
   return (
     <Stack spacing={cvSectionItemSpacing} alignItems="flex-start">
-      {avatarSrc && <Avatar src={avatarSrc} alt={about.name} sx={profileAvatarSx} />}
+      {avatarSrc && (
+        <Avatar src={getDisplayImage(avatarSrc, 480).src} alt={about.name} sx={profileAvatarSx} />
+      )}
       <Box sx={profileHeaderRowSx}>
         <Stack spacing={0.75} sx={profileHeaderContentSx}>
           <Stack direction="row" sx={profileNameRowSx}>
-            <Text role="sectionTitle" sx={[primaryTextSx, { mb: 0 }]}>
+            <Text role="pageTitle" component="h1" sx={[primaryTextSx, { mb: 0 }]}>
               {about.name}
             </Text>
           </Stack>

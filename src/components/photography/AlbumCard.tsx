@@ -1,3 +1,4 @@
+import { getDisplayImage } from '../../utils/displayImages';
 import { Box, Button, Stack } from '@mui/material';
 import PlaceIcon from '@mui/icons-material/Place';
 import { Link as RouterLink } from 'react-router-dom';
@@ -24,7 +25,12 @@ export function AlbumCard({ category, variant, onImageReady, sx }: AlbumCardProp
   return (
     <Box sx={[containerSx, ...(Array.isArray(sx) ? sx : sx ? [sx] : [])]}>
       <MotionImage
-        src={category.src}
+        {...getDisplayImage(category.src, 1600)}
+        sizes={
+          variant === 'hero'
+            ? '(min-width: 1200px) 1200px, 100vw'
+            : '(min-width: 900px) 33vw, (min-width: 600px) 50vw, 100vw'
+        }
         alt={category.name}
         loading="lazy"
         decoding="async"

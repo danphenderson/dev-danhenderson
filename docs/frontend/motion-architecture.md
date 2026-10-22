@@ -313,9 +313,10 @@ sequenceDiagram
 - Measures the shell element's final resting position on screen
 - Computes a transform offset to place it at viewport center
 - Builds a parametric spiral path: 1.35 turns, exponential radius falloff (1.15), 48 samples
-- Animates for 3.6 seconds with a 0.08 hold fraction at the start (while inner "zoom" plays)
+- Uses `duration.heroPath` (3.6 seconds at default intensity) multiplied by `useMotionScale()`, with a 0.08 hold fraction. Off/reduced motion renders the resting position immediately.
 - Six interpolated keyframe stops control scale (0.85–1.1), rotation (-8°–10°), and border-radius
-- Signals completion via `onAnimationComplete` callback
+- Invokes the completion callback once per activation, including instant completion when motion is disabled during entrance.
+- The terminal loop stops all typing/clearing timers when motion is off and renders a stable transcript.
 
 ## CV story mode motion
 

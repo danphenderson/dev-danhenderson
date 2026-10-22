@@ -18,6 +18,8 @@ export const duration = {
   slow: 0.5,
   /** Dramatic reveals: page-level choreography. */
   dramatic: 0.7,
+  /** Home IDE spiral, including its initial hold. */
+  heroPath: 3.6,
 } as const;
 
 /* ------------------------------------------------------------------ */

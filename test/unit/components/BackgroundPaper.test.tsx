@@ -13,7 +13,7 @@ describe('BackgroundPaper', () => {
     );
 
     expect(screen.getByText('Shell content')).toBeInTheDocument();
-    expect(screen.getByRole('main')).toBeInTheDocument();
+    expect(screen.queryByRole('main')).not.toBeInTheDocument();
   });
 
   it('renders children without a Paper shell when showShell is false', () => {

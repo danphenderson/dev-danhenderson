@@ -380,11 +380,11 @@ describe('Climbing', () => {
     expect(screen.queryByRole('columnheader', { name: 'Date' })).not.toBeInTheDocument();
   });
 
-  it('renders search inputs with correct placeholders', () => {
+  it('renders search inputs with persistent labels', () => {
     renderClimbing({ scrolledPastHeaderCollapse: true });
 
-    expect(screen.getByPlaceholderText('Search climbed routes...')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('Search routes to climb...')).toBeInTheDocument();
+    expect(screen.getByLabelText('Search climbed routes')).toBeInTheDocument();
+    expect(screen.getByLabelText('Search routes to climb')).toBeInTheDocument();
   });
 
   it('filters ticks grid when typing into the ticks search box', async () => {
@@ -393,7 +393,7 @@ describe('Climbing', () => {
     expect(screen.getByRole('link', { name: 'Hyperspace' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Angel' })).toBeInTheDocument();
 
-    const tickSearchInput = screen.getByPlaceholderText('Search climbed routes...');
+    const tickSearchInput = screen.getByLabelText('Search climbed routes');
     fireEvent.change(tickSearchInput, { target: { value: 'Angel' } });
 
     expect(screen.getByRole('link', { name: 'Angel' })).toBeInTheDocument();
@@ -403,7 +403,7 @@ describe('Climbing', () => {
   it('maintains independent search state between grids', async () => {
     renderClimbing({ scrolledPastHeaderCollapse: true });
 
-    const tickSearchInput = screen.getByPlaceholderText('Search climbed routes...');
+    const tickSearchInput = screen.getByLabelText('Search climbed routes');
     fireEvent.change(tickSearchInput, { target: { value: 'Angel' } });
 
     expect(screen.getByRole('link', { name: 'The Tooth' })).toBeInTheDocument();
@@ -481,7 +481,7 @@ describe('Climbing', () => {
     expect(
       screen.queryByText("A collection of routes I'd still like to climb.")
     ).not.toBeInTheDocument();
-    expect(screen.queryByPlaceholderText('Search routes to climb...')).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText('Search routes to climb')).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'The Tooth' })).not.toBeInTheDocument();
     expect(screen.getAllByTestId('climbing-tilt-card')).toHaveLength(6);
   });

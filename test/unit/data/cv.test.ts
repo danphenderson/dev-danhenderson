@@ -40,7 +40,7 @@ describe('cv.ts schema', () => {
       expect(aboutMe.bio).toBe(
         `Software developer building scientific, data, and AI-enabled systems.
 
-Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software.
+Open source contributor and researcher with a background in applied mathematics.
 
 Previously built ingestion, analytics, and ML solutions for a healthcare data platform.`
       );

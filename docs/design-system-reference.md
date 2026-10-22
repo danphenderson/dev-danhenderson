@@ -48,12 +48,12 @@ For architecture-level context, see [Component architecture](frontend/component-
 
 ## Foundations
 
-| Area                    | Preferred pattern                                                                | Primary source                                                                  |
-| ----------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Theme                   | Responsive type scale, palette, rounded surfaces, chip and button defaults       | [src/theme/createAppTheme.ts](../src/theme/createAppTheme.ts)                   |
-| Appearance presets      | Body and heading font families, surface treatments, motion scaling               | [src/theme/appAppearance.ts](../src/theme/appAppearance.ts)                     |
-| Shared component styles | Card, panel, chip, tab, list, and CV-specific surface styling                    | [src/styles/componentStyleBuilders.ts](../src/styles/componentStyleBuilders.ts) |
-| Shared page styles      | Route container spacing, backdrop shells, photography, CV, and DataGrid wrappers | [src/styles/appStyleBuilders.ts](../src/styles/appStyleBuilders.ts)             |
+| Area                    | Preferred pattern                                                                 | Primary source                                                                  |
+| ----------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Theme                   | Responsive type scale, palette, rounded surfaces, chip and button defaults        | [src/theme/createAppTheme.ts](../src/theme/createAppTheme.ts)                   |
+| Appearance presets      | Body and heading font families, surface treatments, motion scaling                | [src/theme/appAppearance.ts](../src/theme/appAppearance.ts)                     |
+| Shared component styles | Card, panel, chip, tab, list, and CV-specific surface styling                     | [src/styles/componentStyleBuilders.ts](../src/styles/componentStyleBuilders.ts) |
+| Shared page styles      | Route container spacing, backdrop shells, photography, CV, and MUI Table wrappers | [src/styles/appStyleBuilders.ts](../src/styles/appStyleBuilders.ts)             |
 
 ## Typography
 
@@ -309,7 +309,7 @@ Primary consumers:
 
 ### 2. Structured data and analytics surfaces
 
-- Searchable route tables with `DataGrid`: [src/pages/Climbing.tsx](../src/pages/Climbing.tsx)
+- Searchable route tables with `MUI Table`: [src/pages/Climbing.tsx](../src/pages/Climbing.tsx)
 - Analytics dashboard panels: [src/components/climbing/ClimbingAnalytics.tsx](../src/components/climbing/ClimbingAnalytics.tsx)
 - GitHub activity chips, contributions, and calendar: [src/components/cv/CVGitHubSection.tsx](../src/components/cv/CVGitHubSection.tsx)
 

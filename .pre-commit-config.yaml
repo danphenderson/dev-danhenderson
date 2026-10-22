@@ -12,6 +12,11 @@ repos:
       - id: check-yaml
       - id: check-json
       - id: check-added-large-files
+        exclude: ^public/assets/display/.*\.webp$
+      - id: check-added-large-files
+        name: check generated display image sizes
+        files: ^public/assets/display/.*\.webp$
+        args: [--maxkb=1000]
       - id: check-case-conflict
       - id: check-merge-conflict
       - id: check-executables-have-shebangs
