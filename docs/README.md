@@ -53,7 +53,7 @@ flowchart TB
   subgraph Routes["Route pages"]
     Home["/ — Home<br/>faux-VSCode hero IDE"]
     CV["/cv — CV<br/>interactive + story mode"]
-    Climbing["/climbing — Climbing<br/>DataGrid + analytics"]
+    Climbing["/climbing — Climbing<br/>MUI Table + analytics"]
     Photography["/photography — Photography<br/>gallery grid + lightbox"]
     Blog["/blog — Blog<br/>editorial index + posts"]
     NF["/* — NotFound<br/>recovery panel"]

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
 
@@ -7,7 +7,8 @@ export const WELCOME_AUTO_DISMISS_MS = 5000;
 
 export const useHomeWelcomeSequence = () => {
   const { play, pause, isPlaying, error } = useWelcomeAudio();
-  const { onboardingCompleted, completeOnboarding } = useWelcomeOnboarding();
+  const { completeOnboarding } = useWelcomeOnboarding();
+  const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
   const [isInteracting, setIsInteracting] = useState(false);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const mounted = useRef(false);
@@ -20,11 +21,22 @@ export const useHomeWelcomeSequence = () => {
     };
   }, []);
 
+  const handleDismiss = useCallback(() => {
+    setIsWelcomeOpen(false);
+    setIsInteracting(false);
+    completeOnboarding();
+  }, [completeOnboarding]);
+
+  const handleOpen = () => {
+    setIsInteracting(false);
+    setIsWelcomeOpen(true);
+  };
+
   useEffect(() => {
-    if (onboardingCompleted || isInteracting) return;
-    const timeoutId = window.setTimeout(completeOnboarding, WELCOME_AUTO_DISMISS_MS);
+    if (!isWelcomeOpen || isInteracting) return;
+    const timeoutId = window.setTimeout(handleDismiss, WELCOME_AUTO_DISMISS_MS);
     return () => window.clearTimeout(timeoutId);
-  }, [onboardingCompleted, isInteracting, completeOnboarding]);
+  }, [isWelcomeOpen, isInteracting, handleDismiss]);
 
   const handleToggleAudio = async () => {
     if (isPlaying) {
@@ -50,10 +62,11 @@ export const useHomeWelcomeSequence = () => {
     error,
     isAudioPlaying: isPlaying,
     isAudioLoading,
-    isWelcomeOpen: !onboardingCompleted,
-    isHeroAnimationReady: onboardingCompleted,
+    isWelcomeOpen,
+    isHeroAnimationReady: true,
     setIsInteracting,
-    handleDismiss: completeOnboarding,
+    handleDismiss,
+    handleOpen,
     handleToggleAudio,
   };
 };

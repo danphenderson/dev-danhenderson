@@ -38,14 +38,14 @@ export default function NotFound() {
           <SectionHeading
             overline="Route recovery"
             title="404 Not Found"
+            titleComponent="h1"
             subtitle="The page you're looking for doesn't exist."
             sx={{ mt: 3, maxWidth: 560 }}
           />
         </MotionItem>
         <MotionItem>
           <Text role="bodyMuted" sx={{ maxWidth: 560, opacity: 0.78 }}>
-            Use the command palette or the contextual suggestions below to recover without leaving
-            the shared route and section registry.
+            Try one of the suggested pages below, or search the site to find what you need.
           </Text>
         </MotionItem>
         <MotionItem>

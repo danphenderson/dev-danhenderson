@@ -3,6 +3,7 @@ import { cp, mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { extname, join, resolve, sep } from 'node:path';
+import displayImages from '../../src/generated/displayImages.json';
 import { declineWelcomeAudio } from './helpers/header';
 
 /**
@@ -14,7 +15,7 @@ import { declineWelcomeAudio } from './helpers/header';
  */
 
 const BUILD_DIRECTORY = resolve(process.cwd(), 'build');
-const PROBE_ASSET_PATH = '/assets/home.jpg';
+const PROBE_ASSET_PATH = displayImages['/assets/home.jpg'].images[0].src;
 
 const CONTENT_TYPES: Record<string, string> = {
   '.css': 'text/css; charset=utf-8',
@@ -29,6 +30,7 @@ const CONTENT_TYPES: Record<string, string> = {
   '.svg': 'image/svg+xml; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
   '.xml': 'application/xml; charset=utf-8',
+  '.webp': 'image/webp',
 };
 
 type TemporaryDeployment = {
@@ -129,7 +131,7 @@ const createTemporaryDeployment = async (
   }
 
   return {
-    assetPath: join(rootDir, 'assets', 'home.jpg'),
+    assetPath: join(rootDir, PROBE_ASSET_PATH),
     rootDir,
     tempDir: tempParentDir,
     url: `http://127.0.0.1:${address.port}`,
@@ -195,7 +197,7 @@ const readProbeMetrics = async (page: Page, probeUrl: string): Promise<ProbeMetr
     };
   }, probeUrl);
 
-const createReplacementJpeg = async (page: Page) => {
+const createReplacementWebp = async (page: Page) => {
   const dataUrl = await page.evaluate(() => {
     const canvas = document.createElement('canvas');
     canvas.width = 1;
@@ -210,10 +212,10 @@ const createReplacementJpeg = async (page: Page) => {
     context.fillStyle = '#ff5a36';
     context.fillRect(0, 0, 1, 1);
 
-    return canvas.toDataURL('image/jpeg', 1);
+    return canvas.toDataURL('image/webp', 1);
   });
 
-  return Buffer.from(dataUrl.replace('data:image/jpeg;base64,', ''), 'base64');
+  return Buffer.from(dataUrl.replace('data:image/webp;base64,', ''), 'base64');
 };
 
 const disposeTemporaryDeployment = async (deployment: TemporaryDeployment) => {
@@ -243,7 +245,7 @@ test.describe('Production service worker smoke', () => {
       expect(initialProbe.cached).toBe(true);
       expect(initialProbe.cachedSize).not.toBeNull();
 
-      const replacementAsset = await createReplacementJpeg(page);
+      const replacementAsset = await createReplacementWebp(page);
       await writeFile(deployment.assetPath, replacementAsset);
 
       await page.reload({ waitUntil: 'load' });
@@ -279,7 +281,7 @@ test.describe('Production service worker smoke', () => {
       await expect(page).toHaveURL(cvUrl);
       await expect(page.locator('#main-content')).toBeVisible();
       await expect(page.getByText('Daniel Henderson')).toBeVisible();
-      await expect(page.getByRole('button', { name: 'Open about actions' })).toBeVisible();
+      await expect(page.getByRole('link', { name: 'Download resume' })).toBeVisible();
     } finally {
       await disposeTemporaryDeployment(deployment);
     }

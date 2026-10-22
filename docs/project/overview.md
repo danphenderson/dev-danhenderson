@@ -10,7 +10,7 @@ The site is not a template or a starter kit. It is a purpose-built frontend appl
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `/`            | Home page with a faux-VS Code IDE hero — draggable, resizable, expandable — featuring terminal typewriter animation and optional welcome audio                              |
 | `/cv`          | Interactive CV with responsive desktop/mobile layout, GitHub-backed highlights with fallback data, tab/accordion detail panels, and an immersive story mode (`?mode=story`) |
-| `/climbing`    | Searchable climbing log with MUI X DataGrid, fuzzy filtering, and analytics dashboard                                                                                       |
+| `/climbing`    | Searchable climbing log with MUI Table, fuzzy filtering, and analytics dashboard                                                                                            |
 | `/photography` | Gallery grid with tilt-effect album cards, quilted image layouts, and an immersive full-screen lightbox                                                                     |
 | `/blog`        | Editorial blog with hero cards, tag filtering, code blocks, callouts, and post navigation                                                                                   |
 
@@ -108,11 +108,11 @@ flowchart LR
 
 | Concern           | Technology                                                   |
 | ----------------- | ------------------------------------------------------------ |
-| Framework         | React 18                                                     |
+| Framework         | React 19                                                     |
 | Language          | TypeScript 5.6                                               |
-| Routing           | React Router v6                                              |
+| Routing           | React Router v7                                              |
 | Component library | MUI (Material UI) + Emotion                                  |
-| Data tables       | MUI X DataGrid                                               |
+| Data tables       | MUI Table                                                    |
 | Animation         | Framer Motion (via `motion/react`)                           |
 | Build tooling     | Vite for dev/build; standalone Jest/ESLint/typecheck tooling |
 | Unit testing      | Jest + React Testing Library                                 |

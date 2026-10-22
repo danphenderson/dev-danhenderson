@@ -39,7 +39,7 @@ Changes here should preserve schema stability, predictable rendering, and compat
 ### `climbs.ts`
 
 - Do not edit climbing datasets unless the task explicitly requests it.
-- Preserve sorting, normalization, and assumptions used by `useClimbingData` and DataGrid consumers.
+- Preserve sorting, normalization, and assumptions used by `useClimbingData` and MUI Table consumers.
 - Do not silently rename grades, areas, identifiers, or filterable fields.
 
 ### `photography.ts`

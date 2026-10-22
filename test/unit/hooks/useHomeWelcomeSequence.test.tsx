@@ -42,10 +42,13 @@ describe('useHomeWelcomeSequence', () => {
     jest.restoreAllMocks();
   });
 
-  it('automatically enters the IDE without audio consent or button clicks', () => {
+  it('shows content immediately and only times a user-opened preferences panel', () => {
     const { result } = renderHook(useHomeWelcomeSequence, { wrapper });
-    expect(result.current.isWelcomeOpen).toBe(true);
-    expect(result.current.isHeroAnimationReady).toBe(false);
+    expect(result.current.isWelcomeOpen).toBe(false);
+    expect(result.current.isHeroAnimationReady).toBe(true);
+    act(() => jest.advanceTimersByTime(WELCOME_AUTO_DISMISS_MS));
+    expect(localStorage.getItem(ONBOARDING_COMPLETED_STORAGE_KEY)).toBeNull();
+    act(() => result.current.handleOpen());
     act(() => jest.advanceTimersByTime(WELCOME_AUTO_DISMISS_MS - 1));
     expect(result.current.isWelcomeOpen).toBe(true);
     act(() => jest.advanceTimersByTime(1));
@@ -58,6 +61,7 @@ describe('useHomeWelcomeSequence', () => {
 
   it('pauses for interaction and gives a fresh reading interval on release', () => {
     const { result } = renderHook(useHomeWelcomeSequence, { wrapper });
+    act(() => result.current.handleOpen());
     act(() => jest.advanceTimersByTime(2000));
     act(() => result.current.setIsInteracting(true));
     act(() => jest.advanceTimersByTime(20000));
@@ -69,6 +73,10 @@ describe('useHomeWelcomeSequence', () => {
 
   it('completes immediately on dismissal and stays completed on remount', () => {
     const first = renderHook(useHomeWelcomeSequence, { wrapper });
+    act(() => first.result.current.handleOpen());
+    act(() => first.result.current.handleDismiss());
+    act(() => first.result.current.handleOpen());
+    expect(first.result.current.isWelcomeOpen).toBe(true);
     act(() => first.result.current.handleDismiss());
     expect(first.result.current.isHeroAnimationReady).toBe(true);
     first.unmount();
@@ -78,7 +86,8 @@ describe('useHomeWelcomeSequence', () => {
   });
 
   it('clears the dismissal timer on unmount', () => {
-    const { unmount } = renderHook(useHomeWelcomeSequence, { wrapper });
+    const { result, unmount } = renderHook(useHomeWelcomeSequence, { wrapper });
+    act(() => result.current.handleOpen());
     unmount();
     act(() => jest.advanceTimersByTime(WELCOME_AUTO_DISMISS_MS));
     expect(localStorage.getItem(ONBOARDING_COMPLETED_STORAGE_KEY)).toBeNull();
@@ -93,6 +102,7 @@ describe('useHomeWelcomeSequence', () => {
         })
     );
     const { result } = renderHook(useHomeWelcomeSequence, { wrapper });
+    act(() => result.current.handleOpen());
     let pending!: Promise<void>;
     act(() => {
       pending = result.current.handleToggleAudio();
@@ -114,6 +124,7 @@ describe('useHomeWelcomeSequence', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
     mockPlay.mockRejectedValue(new Error('Audio unavailable'));
     const { result } = renderHook(useHomeWelcomeSequence, { wrapper });
+    act(() => result.current.handleOpen());
     await act(async () => result.current.handleToggleAudio());
     expect(result.current.isAudioLoading).toBe(false);
     act(() => result.current.handleDismiss());
@@ -123,6 +134,7 @@ describe('useHomeWelcomeSequence', () => {
   it('pauses audio that is already playing', async () => {
     mockIsPlaying = true;
     const { result } = renderHook(useHomeWelcomeSequence, { wrapper });
+    act(() => result.current.handleOpen());
     await act(async () => result.current.handleToggleAudio());
     expect(mockPause).toHaveBeenCalledTimes(1);
     expect(mockPlay).not.toHaveBeenCalled();
@@ -133,6 +145,7 @@ describe('useHomeWelcomeSequence', () => {
       throw new Error('Storage blocked');
     });
     const { result } = renderHook(useHomeWelcomeSequence, { wrapper });
+    act(() => result.current.handleOpen());
     act(() => jest.advanceTimersByTime(WELCOME_AUTO_DISMISS_MS));
     expect(result.current.isHeroAnimationReady).toBe(true);
   });

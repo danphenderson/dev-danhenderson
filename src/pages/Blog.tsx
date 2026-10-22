@@ -10,12 +10,10 @@ import { BlogTagFilter } from '../components/blog/BlogTagFilter';
 import { siteRouteMap } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useBlogData } from '../hooks/useBlogData';
-import { useAppStyles } from '../styles/appStyles';
 import { MotionSection, MotionTiltCard, useMotionScale } from '../motion';
 import { Text, TypewriterText } from '../components/text';
 
 export default function Blog() {
-  const appStyles = useAppStyles();
   useDocumentMetadata({
     ...siteRouteMap.blog,
     canonicalPath: siteRouteMap.blog.path,
@@ -69,10 +67,12 @@ export default function Blog() {
               onVisible={() => setHasIntroEntered(true)}
             >
               <Stack spacing={1}>
-                <SectionHeading overline="Blog" sx={appStyles.compactSectionHeadingSx} />
+                <Text role="pageTitle" component="h1">
+                  Blog
+                </Text>
                 <Text role="sectionSubtitle">
                   <TypewriterText
-                    text="Future home of technical notes on software engineering and applied mathematics."
+                    text="Notes on software engineering, applied mathematics, and the work in between."
                     playing={isIntroPlaying}
                     timingPreset="body"
                   />

@@ -1,0 +1,1753 @@
+{
+  "/assets/climbing/climbing-locations.png": {
+    "sourceHash": "662693e63b7d2452c3b4bec95d8b48827a0a136ddbb44bbc370cc2766481bf1d",
+    "images": [
+      {
+        "src": "/assets/display/climbing/climbing-locations-662693e63b-480.webp",
+        "width": 480,
+        "height": 335,
+        "bytes": 35276
+      },
+      {
+        "src": "/assets/display/climbing/climbing-locations-662693e63b-717.webp",
+        "width": 717,
+        "height": 500,
+        "bytes": 68050
+      }
+    ]
+  },
+  "/assets/home.jpg": {
+    "sourceHash": "58f6a00fffad09e397e10cc280b420aeb019889199c17cba5891594b1ba2219b",
+    "images": [
+      {
+        "src": "/assets/display/home-58f6a00fff-480.webp",
+        "width": 480,
+        "height": 480,
+        "bytes": 17734
+      },
+      {
+        "src": "/assets/display/home-58f6a00fff-960.webp",
+        "width": 960,
+        "height": 960,
+        "bytes": 52102
+      },
+      {
+        "src": "/assets/display/home-58f6a00fff-1600.webp",
+        "width": 1600,
+        "height": 1600,
+        "bytes": 166358
+      },
+      {
+        "src": "/assets/display/home-58f6a00fff-2400.webp",
+        "width": 2400,
+        "height": 2400,
+        "bytes": 703948
+      }
+    ]
+  },
+  "/assets/photography/action/action-bighorns.jpg": {
+    "sourceHash": "0035d5bab1c470e5134f23d70d8c8a2fffcd97ae9b069177fdd9e3c0a7bf36e4",
+    "images": [
+      {
+        "src": "/assets/display/photography/action/action-bighorns-0035d5bab1-480.webp",
+        "width": 480,
+        "height": 384,
+        "bytes": 54344
+      },
+      {
+        "src": "/assets/display/photography/action/action-bighorns-0035d5bab1-960.webp",
+        "width": 960,
+        "height": 768,
+        "bytes": 201528
+      },
+      {
+        "src": "/assets/display/photography/action/action-bighorns-0035d5bab1-1600.webp",
+        "width": 1600,
+        "height": 1280,
+        "bytes": 434772
+      },
+      {
+        "src": "/assets/display/photography/action/action-bighorns-0035d5bab1-2400.webp",
+        "width": 2400,
+        "height": 1920,
+        "bytes": 924652
+      }
+    ]
+  },
+  "/assets/photography/action/action-bouldering-pinheads.jpg": {
+    "sourceHash": "b6160c933f92ea24c8222dda5b89ae386fc6496c76206ee182e1792ad7b753cb",
+    "images": [
+      {
+        "src": "/assets/display/photography/action/action-bouldering-pinheads-b6160c933f-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 21918
+      },
+      {
+        "src": "/assets/display/photography/action/action-bouldering-pinheads-b6160c933f-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 84648
+      },
+      {
+        "src": "/assets/display/photography/action/action-bouldering-pinheads-b6160c933f-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 235898
+      },
+      {
+        "src": "/assets/display/photography/action/action-bouldering-pinheads-b6160c933f-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 479714
+      }
+    ]
+  },
+  "/assets/photography/action/action-city-photo-1.jpg": {
+    "sourceHash": "f9e9fa211f8f2c86cda153207b307a52299c02a338b2d8f74bfba530bfb32404",
+    "images": [
+      {
+        "src": "/assets/display/photography/action/action-city-photo-1-f9e9fa211f-319.webp",
+        "width": 319,
+        "height": 480,
+        "bytes": 36960
+      },
+      {
+        "src": "/assets/display/photography/action/action-city-photo-1-f9e9fa211f-639.webp",
+        "width": 639,
+        "height": 960,
+        "bytes": 146240
+      },
+      {
+        "src": "/assets/display/photography/action/action-city-photo-1-f9e9fa211f-1065.webp",
+        "width": 1065,
+        "height": 1600,
+        "bytes": 430362
+      },
+      {
+        "src": "/assets/display/photography/action/action-city-photo-1-f9e9fa211f-1597.webp",
+        "width": 1597,
+        "height": 2400,
+        "bytes": 776814
+      }
+    ]
+  },
+  "/assets/photography/action/action-city-photo-2.jpg": {
+    "sourceHash": "722b245649bb48bf6d681b61595852d58c9c3fcb066e90031cd171728bcdb3bd",
+    "images": [
+      {
+        "src": "/assets/display/photography/action/action-city-photo-2-722b245649-319.webp",
+        "width": 319,
+        "height": 480,
+        "bytes": 36072
+      },
+      {
+        "src": "/assets/display/photography/action/action-city-photo-2-722b245649-639.webp",
+        "width": 639,
+        "height": 960,
+        "bytes": 140082
+      },
+      {
+        "src": "/assets/display/photography/action/action-city-photo-2-722b245649-1065.webp",
+        "width": 1065,
+        "height": 1600,
+        "bytes": 394834
+      },
+      {
+        "src": "/assets/display/photography/action/action-city-photo-2-722b245649-1597.webp",
+        "width": 1597,
+        "height": 2400,
+        "bytes": 871408
+      }
+    ]
+  },
+  "/assets/photography/action/action-dan-clipping-cam.jpg": {
+    "sourceHash": "6bc1cfed639c2716c6d165dc17a0d494188de52c2af082b96e23d14b01a9d1ff",
+    "images": [
+      {
+        "src": "/assets/display/photography/action/action-dan-clipping-cam-6bc1cfed63-384.webp",
+        "width": 384,
+        "height": 480,
+        "bytes": 21290
+      },
+      {
+        "src": "/assets/display/photography/action/action-dan-clipping-cam-6bc1cfed63-768.webp",
+        "width": 768,
+        "height": 960,
+        "bytes": 85490
+      },
+      {
+        "src": "/assets/display/photography/action/action-dan-clipping-cam-6bc1cfed63-1280.webp",
+        "width": 1280,
+        "height": 1600,
+        "bytes": 288468
+      },
+      {
+        "src": "/assets/display/photography/action/action-dan-clipping-cam-6bc1cfed63-1920.webp",
+        "width": 1920,
+        "height": 2400,
+        "bytes": 762096
+      }
+    ]
+  },
+  "/assets/photography/action/action-eric-off.jpg": {
+    "sourceHash": "e1322996cae8a2dda6b8d54a616703571c549ab59daeb3cb834135125fdb7b55",
+    "images": [
+      {
+        "src": "/assets/display/photography/action/action-eric-off-e1322996ca-384.webp",
+        "width": 384,
+        "height": 480,
+        "bytes": 25478
+      },
+      {
+        "src": "/assets/display/photography/action/action-eric-off-e1322996ca-768.webp",
+        "width": 768,
+        "height": 960,
+        "bytes": 89594
+      },
+      {
+        "src": "/assets/display/photography/action/action-eric-off-e1322996ca-1280.webp",
+        "width": 1280,
+        "height": 1600,
+        "bytes": 231434
+      },
+      {
+        "src": "/assets/display/photography/action/action-eric-off-e1322996ca-1920.webp",
+        "width": 1920,
+        "height": 2400,
+        "bytes": 491164
+      }
+    ]
+  },
+  "/assets/photography/action/action-eric-on.jpg": {
+    "sourceHash": "32c3d27c80d9ce4cd6817a063a5b33573275867b89631c3b7deb780c0fc6db37",
+    "images": [
+      {
+        "src": "/assets/display/photography/action/action-eric-on-32c3d27c80-384.webp",
+        "width": 384,
+        "height": 480,
+        "bytes": 24970
+      },
+      {
+        "src": "/assets/display/photography/action/action-eric-on-32c3d27c80-768.webp",
+        "width": 768,
+        "height": 960,
+        "bytes": 93282
+      },
+      {
+        "src": "/assets/display/photography/action/action-eric-on-32c3d27c80-1280.webp",
+        "width": 1280,
+        "height": 1600,
+        "bytes": 243850
+      },
+      {
+        "src": "/assets/display/photography/action/action-eric-on-32c3d27c80-1920.webp",
+        "width": 1920,
+        "height": 2400,
+        "bytes": 524312
+      }
+    ]
+  },
+  "/assets/photography/action/action-flying-crow.jpg": {
+    "sourceHash": "579fb127bee90384c1c1aabc97502d656915ca991d6752104a48104cd3272d5b",
+    "images": [
+      {
+        "src": "/assets/display/photography/action/action-flying-crow-579fb127be-480.webp",
+        "width": 480,
+        "height": 414,
+        "bytes": 25738
+      },
+      {
+        "src": "/assets/display/photography/action/action-flying-crow-579fb127be-960.webp",
+        "width": 960,
+        "height": 829,
+        "bytes": 95234
+      },
+      {
+        "src": "/assets/display/photography/action/action-flying-crow-579fb127be-1600.webp",
+        "width": 1600,
+        "height": 1382,
+        "bytes": 255456
+      },
+      {
+        "src": "/assets/display/photography/action/action-flying-crow-579fb127be-2400.webp",
+        "width": 2400,
+        "height": 2072,
+        "bytes": 526046
+      }
+    ]
+  },
+  "/assets/photography/action/action-lime-kiln.jpg": {
+    "sourceHash": "b21e0a05fb2f420ce00c6de6f8f5fc9b09bbc4b45d43c04aa6d4963de97d5d41",
+    "images": [
+      {
+        "src": "/assets/display/photography/action/action-lime-kiln-b21e0a05fb-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 38978
+      },
+      {
+        "src": "/assets/display/photography/action/action-lime-kiln-b21e0a05fb-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 159172
+      },
+      {
+        "src": "/assets/display/photography/action/action-lime-kiln-b21e0a05fb-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 476398
+      },
+      {
+        "src": "/assets/display/photography/action/action-lime-kiln-b21e0a05fb-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 828986
+      }
+    ]
+  },
+  "/assets/photography/action/action-lucia-scarface.jpg": {
+    "sourceHash": "7e138c9097b4a2e20c018bc4c76b2a1b45231839c8c546343bce55f353259586",
+    "images": [
+      {
+        "src": "/assets/display/photography/action/action-lucia-scarface-7e138c9097-384.webp",
+        "width": 384,
+        "height": 480,
+        "bytes": 10224
+      },
+      {
+        "src": "/assets/display/photography/action/action-lucia-scarface-7e138c9097-768.webp",
+        "width": 768,
+        "height": 960,
+        "bytes": 43738
+      },
+      {
+        "src": "/assets/display/photography/action/action-lucia-scarface-7e138c9097-1280.webp",
+        "width": 1280,
+        "height": 1600,
+        "bytes": 125748
+      },
+      {
+        "src": "/assets/display/photography/action/action-lucia-scarface-7e138c9097-1920.webp",
+        "width": 1920,
+        "height": 2400,
+        "bytes": 246894
+      }
+    ]
+  },
+  "/assets/photography/action/action-relaxing.jpg": {
+    "sourceHash": "5e22e3cf887d68a391ea6333b282c94660c1f2eaf90754a712a35402a18b6930",
+    "images": [
+      {
+        "src": "/assets/display/photography/action/action-relaxing-5e22e3cf88-320.webp",
+        "width": 320,
+        "height": 480,
+        "bytes": 31662
+      },
+      {
+        "src": "/assets/display/photography/action/action-relaxing-5e22e3cf88-640.webp",
+        "width": 640,
+        "height": 960,
+        "bytes": 113124
+      },
+      {
+        "src": "/assets/display/photography/action/action-relaxing-5e22e3cf88-1067.webp",
+        "width": 1067,
+        "height": 1600,
+        "bytes": 309734
+      },
+      {
+        "src": "/assets/display/photography/action/action-relaxing-5e22e3cf88-1600.webp",
+        "width": 1600,
+        "height": 2400,
+        "bytes": 716142
+      }
+    ]
+  },
+  "/assets/photography/astronomy/astronomy-arora-1.jpg": {
+    "sourceHash": "c4d3ded294679c71d1427c90f522d42f2e00bf91632c1a98f197739dce096669",
+    "images": [
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-1-c4d3ded294-320.webp",
+        "width": 320,
+        "height": 480,
+        "bytes": 25546
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-1-c4d3ded294-640.webp",
+        "width": 640,
+        "height": 960,
+        "bytes": 141754
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-1-c4d3ded294-1067.webp",
+        "width": 1067,
+        "height": 1600,
+        "bytes": 455114
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-1-c4d3ded294-1600.webp",
+        "width": 1600,
+        "height": 2400,
+        "bytes": 877432
+      }
+    ]
+  },
+  "/assets/photography/astronomy/astronomy-arora-2.jpg": {
+    "sourceHash": "4340e7e5f17e89cfabdb7cc5c1860c47d93cfe0552ae72c35d6dfdb8dd5164e5",
+    "images": [
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-2-4340e7e5f1-320.webp",
+        "width": 320,
+        "height": 480,
+        "bytes": 19404
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-2-4340e7e5f1-640.webp",
+        "width": 640,
+        "height": 960,
+        "bytes": 110568
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-2-4340e7e5f1-1067.webp",
+        "width": 1067,
+        "height": 1600,
+        "bytes": 342440
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-2-4340e7e5f1-1600.webp",
+        "width": 1600,
+        "height": 2400,
+        "bytes": 772740
+      }
+    ]
+  },
+  "/assets/photography/astronomy/astronomy-arora-3.jpg": {
+    "sourceHash": "dcf4b2b43528189d3c1b9449759b6c67674724453e7871a8c7fa3a674a6aee2c",
+    "images": [
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-3-dcf4b2b435-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 29156
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-3-dcf4b2b435-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 117788
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-3-dcf4b2b435-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 337310
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-3-dcf4b2b435-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 850232
+      }
+    ]
+  },
+  "/assets/photography/astronomy/astronomy-arora-4.jpg": {
+    "sourceHash": "7d3bbeacc4b31b6043d5c9f8582a2ed00d7e4ceb17b6c4cf8c658a72899399b2",
+    "images": [
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-4-7d3bbeacc4-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 20910
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-4-7d3bbeacc4-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 108754
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-4-7d3bbeacc4-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 345024
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-arora-4-7d3bbeacc4-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 889862
+      }
+    ]
+  },
+  "/assets/photography/astronomy/astronomy-galaxy-1.jpg": {
+    "sourceHash": "b9a313088a67485cdeb49b89668dc67e724c2f7bd573670b3c5995dd5611e87f",
+    "images": [
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-galaxy-1-b9a313088a-384.webp",
+        "width": 384,
+        "height": 480,
+        "bytes": 50898
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-galaxy-1-b9a313088a-768.webp",
+        "width": 768,
+        "height": 960,
+        "bytes": 201728
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-galaxy-1-b9a313088a-1280.webp",
+        "width": 1280,
+        "height": 1600,
+        "bytes": 399470
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-galaxy-1-b9a313088a-1920.webp",
+        "width": 1920,
+        "height": 2400,
+        "bytes": 992348
+      }
+    ]
+  },
+  "/assets/photography/astronomy/astronomy-galaxy-2.jpg": {
+    "sourceHash": "594754d388ed68d3cc68b5158edafa27889970b98f346683318119fc3bea9a61",
+    "images": [
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-galaxy-2-594754d388-480.webp",
+        "width": 480,
+        "height": 384,
+        "bytes": 38166
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-galaxy-2-594754d388-960.webp",
+        "width": 960,
+        "height": 768,
+        "bytes": 124080
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-galaxy-2-594754d388-1600.webp",
+        "width": 1600,
+        "height": 1280,
+        "bytes": 331808
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-galaxy-2-594754d388-2400.webp",
+        "width": 2400,
+        "height": 1920,
+        "bytes": 744560
+      }
+    ]
+  },
+  "/assets/photography/astronomy/astronomy-indian-creek-tree.jpg": {
+    "sourceHash": "a8b7590aa65af8e30fbf3cc11a7340e92025b05b0be73f671ddc448b92dd0a93",
+    "images": [
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-indian-creek-tree-a8b7590aa6-480.webp",
+        "width": 480,
+        "height": 384,
+        "bytes": 38004
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-indian-creek-tree-a8b7590aa6-960.webp",
+        "width": 960,
+        "height": 768,
+        "bytes": 123566
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-indian-creek-tree-a8b7590aa6-1600.webp",
+        "width": 1600,
+        "height": 1280,
+        "bytes": 326634
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-indian-creek-tree-a8b7590aa6-2400.webp",
+        "width": 2400,
+        "height": 1920,
+        "bytes": 726738
+      }
+    ]
+  },
+  "/assets/photography/astronomy/astronomy-joshua-tree-1.jpg": {
+    "sourceHash": "82d4224e22adc57cc4ccbaa23fa604f75b7a2e664a0ace6ed67706c5062eeeac",
+    "images": [
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-joshua-tree-1-82d4224e22-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 9084
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-joshua-tree-1-82d4224e22-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 42664
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-joshua-tree-1-82d4224e22-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 106332
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-joshua-tree-1-82d4224e22-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 202696
+      }
+    ]
+  },
+  "/assets/photography/astronomy/astronomy-joshua-tree-2.jpg": {
+    "sourceHash": "d1915cbe2e1ac7d94aa351c05a7509489e1e25c7f74eb867267b1d60a66eabf4",
+    "images": [
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-joshua-tree-2-d1915cbe2e-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 16868
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-joshua-tree-2-d1915cbe2e-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 70198
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-joshua-tree-2-d1915cbe2e-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 170722
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-joshua-tree-2-d1915cbe2e-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 326502
+      }
+    ]
+  },
+  "/assets/photography/astronomy/astronomy-joshua-tree-3.jpg": {
+    "sourceHash": "2093e0042000d05fc979f37ea4c24d3b2d1b114e0a2c59f70ad7c4ffcb05c6a9",
+    "images": [
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-joshua-tree-3-2093e00420-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 12498
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-joshua-tree-3-2093e00420-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 52670
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-joshua-tree-3-2093e00420-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 126470
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-joshua-tree-3-2093e00420-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 229700
+      }
+    ]
+  },
+  "/assets/photography/astronomy/astronomy-kolab-canyon-1.jpg": {
+    "sourceHash": "870f573a847129bc94709cff46ff061fc7c3a60c84a10235ba931a2a8a7dffa0",
+    "images": [
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-kolab-canyon-1-870f573a84-480.webp",
+        "width": 480,
+        "height": 270,
+        "bytes": 11164
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-kolab-canyon-1-870f573a84-960.webp",
+        "width": 960,
+        "height": 540,
+        "bytes": 32886
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-kolab-canyon-1-870f573a84-1600.webp",
+        "width": 1600,
+        "height": 900,
+        "bytes": 80452
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-kolab-canyon-1-870f573a84-2400.webp",
+        "width": 2400,
+        "height": 1350,
+        "bytes": 191136
+      }
+    ]
+  },
+  "/assets/photography/astronomy/astronomy-kolab-canyon-2.jpg": {
+    "sourceHash": "6bddb7532e4dd21b529195bb86ea96dc7d5d0ccb1c4f3d9082072107525fad92",
+    "images": [
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-kolab-canyon-2-6bddb7532e-480.webp",
+        "width": 480,
+        "height": 360,
+        "bytes": 18520
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-kolab-canyon-2-6bddb7532e-960.webp",
+        "width": 960,
+        "height": 720,
+        "bytes": 61556
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-kolab-canyon-2-6bddb7532e-1600.webp",
+        "width": 1600,
+        "height": 1200,
+        "bytes": 217596
+      },
+      {
+        "src": "/assets/display/photography/astronomy/astronomy-kolab-canyon-2-6bddb7532e-2400.webp",
+        "width": 2400,
+        "height": 1800,
+        "bytes": 776312
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-alki-beach.jpg": {
+    "sourceHash": "ba473076a8da43a7f5e77353d6e76077a35cc4e042686015d49b8a7e11f71e5e",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-alki-beach-ba473076a8-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 18424
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-alki-beach-ba473076a8-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 70210
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-alki-beach-ba473076a8-1600.webp",
+        "width": 1600,
+        "height": 1066,
+        "bytes": 196194
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-alki-beach-ba473076a8-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 445964
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-beef-basin-fin.jpg": {
+    "sourceHash": "3615396663322cd16b3daa3b2b1d8254c6ecfcd54df76458709f6249ab4f000f",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-beef-basin-fin-3615396663-480.webp",
+        "width": 480,
+        "height": 270,
+        "bytes": 33338
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-beef-basin-fin-3615396663-960.webp",
+        "width": 960,
+        "height": 540,
+        "bytes": 137306
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-beef-basin-fin-3615396663-1600.webp",
+        "width": 1600,
+        "height": 900,
+        "bytes": 371590
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-beef-basin-fin-3615396663-2400.webp",
+        "width": 2400,
+        "height": 1350,
+        "bytes": 787920
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-beef-basin-sunset.jpg": {
+    "sourceHash": "d11215a4516d6e1a28a63ea5177e0f0c95026c705b398784e3baadeb36621c57",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-beef-basin-sunset-d11215a451-480.webp",
+        "width": 480,
+        "height": 300,
+        "bytes": 27506
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-beef-basin-sunset-d11215a451-960.webp",
+        "width": 960,
+        "height": 600,
+        "bytes": 109114
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-beef-basin-sunset-d11215a451-1600.webp",
+        "width": 1600,
+        "height": 1000,
+        "bytes": 321288
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-beef-basin-sunset-d11215a451-2400.webp",
+        "width": 2400,
+        "height": 1500,
+        "bytes": 789438
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-cotton-candy-rocks.jpg": {
+    "sourceHash": "13edf33702a1fb6e8f98d7af2100ce4d04a95a2861a51da5cc08717c38e15d3d",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-cotton-candy-rocks-13edf33702-480.webp",
+        "width": 480,
+        "height": 270,
+        "bytes": 31482
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-cotton-candy-rocks-13edf33702-960.webp",
+        "width": 960,
+        "height": 540,
+        "bytes": 116132
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-cotton-candy-rocks-13edf33702-1600.webp",
+        "width": 1600,
+        "height": 900,
+        "bytes": 320270
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-cotton-candy-rocks-13edf33702-2400.webp",
+        "width": 2400,
+        "height": 1350,
+        "bytes": 733044
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-dagger-bush.jpg": {
+    "sourceHash": "0ece4aa3b9d2df2b74a1689e35e115825452167d873dbfce21bac15445c10fc2",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-dagger-bush-0ece4aa3b9-320.webp",
+        "width": 320,
+        "height": 480,
+        "bytes": 31808
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-dagger-bush-0ece4aa3b9-640.webp",
+        "width": 640,
+        "height": 960,
+        "bytes": 97404
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-dagger-bush-0ece4aa3b9-1067.webp",
+        "width": 1067,
+        "height": 1600,
+        "bytes": 214938
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-dagger-bush-0ece4aa3b9-1600.webp",
+        "width": 1600,
+        "height": 2400,
+        "bytes": 402010
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-hidden-valley-sunset.jpg": {
+    "sourceHash": "adb2c5a3f9786c20647c49f8cfa92478a6a3cd78f0df9a3823fe514495295497",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-hidden-valley-sunset-adb2c5a3f9-480.webp",
+        "width": 480,
+        "height": 270,
+        "bytes": 12898
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-hidden-valley-sunset-adb2c5a3f9-960.webp",
+        "width": 960,
+        "height": 540,
+        "bytes": 42772
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-hidden-valley-sunset-adb2c5a3f9-1600.webp",
+        "width": 1600,
+        "height": 900,
+        "bytes": 115222
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-hidden-valley-sunset-adb2c5a3f9-2400.webp",
+        "width": 2400,
+        "height": 1350,
+        "bytes": 253646
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-iccle-creek.jpg": {
+    "sourceHash": "1f27ae1b5431bf66da79588d8de7506721c53e6e05985c4392d4c2bec3dea29d",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-iccle-creek-1f27ae1b54-480.webp",
+        "width": 480,
+        "height": 384,
+        "bytes": 54076
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-iccle-creek-1f27ae1b54-960.webp",
+        "width": 960,
+        "height": 768,
+        "bytes": 225930
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-iccle-creek-1f27ae1b54-1600.webp",
+        "width": 1600,
+        "height": 1280,
+        "bytes": 495728
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-iccle-creek-1f27ae1b54-2400.webp",
+        "width": 2400,
+        "height": 1920,
+        "bytes": 953294
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-indian-creek-1.jpg": {
+    "sourceHash": "35b7ad33bbcc2199219dc978c752d118765a54220f8183e5c7e80c087e5c1455",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-indian-creek-1-35b7ad33bb-480.webp",
+        "width": 480,
+        "height": 270,
+        "bytes": 28270
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-indian-creek-1-35b7ad33bb-960.webp",
+        "width": 960,
+        "height": 540,
+        "bytes": 109282
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-indian-creek-1-35b7ad33bb-1600.webp",
+        "width": 1600,
+        "height": 900,
+        "bytes": 316224
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-indian-creek-1-35b7ad33bb-2400.webp",
+        "width": 2400,
+        "height": 1350,
+        "bytes": 717488
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-indian-creek-2.jpg": {
+    "sourceHash": "7d436b92a562ecf9495234dac210d6b61ff85da9784f150501500558def0d4e5",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-indian-creek-2-7d436b92a5-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 17606
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-indian-creek-2-7d436b92a5-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 67444
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-indian-creek-2-7d436b92a5-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 185062
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-indian-creek-2-7d436b92a5-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 404704
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-lime-kiln.jpg": {
+    "sourceHash": "9b5a644c02367957db4acd407ab109bdfb54cdcd659b6c9c758a5e143d28bb48",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-lime-kiln-9b5a644c02-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 32538
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-lime-kiln-9b5a644c02-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 129298
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-lime-kiln-9b5a644c02-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 367534
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-lime-kiln-9b5a644c02-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 853206
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-rim-rock.jpg": {
+    "sourceHash": "904860477e5fc3f0cb03a808b4d39dcbf40464558118fd39156eed99059163db",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-rim-rock-904860477e-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 17874
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-rim-rock-904860477e-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 62550
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-rim-rock-904860477e-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 167634
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-rim-rock-904860477e-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 356320
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-sand-dunes.jpg": {
+    "sourceHash": "f10c3ed3165440531d2b111a607f6f25d18928e3d68c6d4ecee629269cc5f8b3",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-sand-dunes-f10c3ed316-480.webp",
+        "width": 480,
+        "height": 270,
+        "bytes": 17038
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-sand-dunes-f10c3ed316-960.webp",
+        "width": 960,
+        "height": 540,
+        "bytes": 69410
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-sand-dunes-f10c3ed316-1600.webp",
+        "width": 1600,
+        "height": 900,
+        "bytes": 203596
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-sand-dunes-f10c3ed316-2400.webp",
+        "width": 2400,
+        "height": 1350,
+        "bytes": 447664
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-six-shooter-sunset.jpg": {
+    "sourceHash": "0c740d97d5cfa7a7124a5d7bd40c53b4c8a423476311399cb22fb4d2fd230998",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-six-shooter-sunset-0c740d97d5-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 1850
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-six-shooter-sunset-0c740d97d5-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 4566
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-six-shooter-sunset-0c740d97d5-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 9658
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-six-shooter-sunset-0c740d97d5-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 19740
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-south-six-shooter-silhouette.jpg": {
+    "sourceHash": "e31815787b78f75cda413e1c861af20825b4829027d2099120080fd23bccb479",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-south-six-shooter-silhouette-e31815787b-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 1902
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-south-six-shooter-silhouette-e31815787b-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 4950
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-south-six-shooter-silhouette-e31815787b-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 10572
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-south-six-shooter-silhouette-e31815787b-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 21418
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-south-six-shooter.jpg.jpg": {
+    "sourceHash": "6f2c1d7fb27c304f7b2f3957b03ba7bc1b74711d62d476d358b2866a7920a793",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-south-six-shooter.jpg-6f2c1d7fb2-270.webp",
+        "width": 270,
+        "height": 480,
+        "bytes": 1636
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-south-six-shooter.jpg-6f2c1d7fb2-540.webp",
+        "width": 540,
+        "height": 960,
+        "bytes": 4200
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-south-six-shooter.jpg-6f2c1d7fb2-900.webp",
+        "width": 900,
+        "height": 1600,
+        "bytes": 9198
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-south-six-shooter.jpg-6f2c1d7fb2-1350.webp",
+        "width": 1350,
+        "height": 2400,
+        "bytes": 18470
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-space-station.jpg": {
+    "sourceHash": "66756dfde4079ad56c4fcc5345916c5e43e28f673ead66d2af583cfe4a83b423",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-space-station-66756dfde4-480.webp",
+        "width": 480,
+        "height": 300,
+        "bytes": 22192
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-space-station-66756dfde4-960.webp",
+        "width": 960,
+        "height": 600,
+        "bytes": 83728
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-space-station-66756dfde4-1600.webp",
+        "width": 1600,
+        "height": 1000,
+        "bytes": 215376
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-space-station-66756dfde4-2400.webp",
+        "width": 2400,
+        "height": 1500,
+        "bytes": 420308
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-tieton-south-fork-1.jpg": {
+    "sourceHash": "86fcae937809c645fc6826b940e8b15a7fa54f84a4bb2628c7130721d14448ca",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-tieton-south-fork-1-86fcae9378-480.webp",
+        "width": 480,
+        "height": 384,
+        "bytes": 24370
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-tieton-south-fork-1-86fcae9378-960.webp",
+        "width": 960,
+        "height": 768,
+        "bytes": 85696
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-tieton-south-fork-1-86fcae9378-1600.webp",
+        "width": 1600,
+        "height": 1280,
+        "bytes": 218600
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-tieton-south-fork-1-86fcae9378-2400.webp",
+        "width": 2400,
+        "height": 1920,
+        "bytes": 456482
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-tieton-south-fork-2.jpg": {
+    "sourceHash": "5053fb7f792de938d5a33937a1681999afc2896def8e4165d111f60a52e07256",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-tieton-south-fork-2-5053fb7f79-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 27708
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-tieton-south-fork-2-5053fb7f79-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 109554
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-tieton-south-fork-2-5053fb7f79-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 313278
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-tieton-south-fork-2-5053fb7f79-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 737256
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-tieton-south-fork-3.jpg": {
+    "sourceHash": "9b09cf1a48e0b109279f0b44cfd85e07fb5d73b9ee4e66d0b0c8322cc3edcdac",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-tieton-south-fork-3-9b09cf1a48-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 39676
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-tieton-south-fork-3-9b09cf1a48-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 149462
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-tieton-south-fork-3-9b09cf1a48-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 421410
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-tieton-south-fork-3-9b09cf1a48-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 752512
+      }
+    ]
+  },
+  "/assets/photography/landscape/landscape-tumwater-canyon.jpg": {
+    "sourceHash": "939dd7f9ae89573201aa338ec0d30ba9e5b93d83428c6bd4d8788b5ba35bdd2b",
+    "images": [
+      {
+        "src": "/assets/display/photography/landscape/landscape-tumwater-canyon-939dd7f9ae-480.webp",
+        "width": 480,
+        "height": 270,
+        "bytes": 18840
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-tumwater-canyon-939dd7f9ae-960.webp",
+        "width": 960,
+        "height": 540,
+        "bytes": 64978
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-tumwater-canyon-939dd7f9ae-1600.webp",
+        "width": 1600,
+        "height": 900,
+        "bytes": 156372
+      },
+      {
+        "src": "/assets/display/photography/landscape/landscape-tumwater-canyon-939dd7f9ae-2400.webp",
+        "width": 2400,
+        "height": 1350,
+        "bytes": 308594
+      }
+    ]
+  },
+  "/assets/photography/new-mexico/capulin-canyon-sunset-1.jpg": {
+    "sourceHash": "b257aa648f965e981f33eafa61731db2519d9b9aadb006bb83040f64be4e691e",
+    "images": [
+      {
+        "src": "/assets/display/photography/new-mexico/capulin-canyon-sunset-1-b257aa648f-480.webp",
+        "width": 480,
+        "height": 319,
+        "bytes": 28268
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/capulin-canyon-sunset-1-b257aa648f-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 129744
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/capulin-canyon-sunset-1-b257aa648f-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 418970
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/capulin-canyon-sunset-1-b257aa648f-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 720364
+      }
+    ]
+  },
+  "/assets/photography/new-mexico/capulin-canyon.jpg": {
+    "sourceHash": "009fcd84fd19c987c9f53d84e50005ac4783409a4f471cafaf57b25d2a06f355",
+    "images": [
+      {
+        "src": "/assets/display/photography/new-mexico/capulin-canyon-009fcd84fd-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 8056
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/capulin-canyon-009fcd84fd-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 26016
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/capulin-canyon-009fcd84fd-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 76796
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/capulin-canyon-009fcd84fd-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 308598
+      }
+    ]
+  },
+  "/assets/photography/new-mexico/enchanted-tower.jpg": {
+    "sourceHash": "d04b93750419539b0097abe2a775dd0fd4cca50546b95378a4d79371262a8154",
+    "images": [
+      {
+        "src": "/assets/display/photography/new-mexico/enchanted-tower-d04b937504-320.webp",
+        "width": 320,
+        "height": 480,
+        "bytes": 29346
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/enchanted-tower-d04b937504-640.webp",
+        "width": 640,
+        "height": 960,
+        "bytes": 117830
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/enchanted-tower-d04b937504-1066.webp",
+        "width": 1066,
+        "height": 1600,
+        "bytes": 339326
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/enchanted-tower-d04b937504-1600.webp",
+        "width": 1600,
+        "height": 2400,
+        "bytes": 804090
+      }
+    ]
+  },
+  "/assets/photography/new-mexico/hdr-jemez-mountains-bridge.jpg": {
+    "sourceHash": "5dac36c4ae231776aff281ccdd3b3959cb31f19b2e73f4f060ca29d54f152c3e",
+    "images": [
+      {
+        "src": "/assets/display/photography/new-mexico/hdr-jemez-mountains-bridge-5dac36c4ae-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 39318
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/hdr-jemez-mountains-bridge-5dac36c4ae-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 152534
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/hdr-jemez-mountains-bridge-5dac36c4ae-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 388632
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/hdr-jemez-mountains-bridge-5dac36c4ae-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 743524
+      }
+    ]
+  },
+  "/assets/photography/new-mexico/hdr-river-jemez-mountains.jpg": {
+    "sourceHash": "a4ae46facd8c977de6967ce16d968d8977e6f9470b977c32c6913206d9cf9bb4",
+    "images": [
+      {
+        "src": "/assets/display/photography/new-mexico/hdr-river-jemez-mountains-a4ae46facd-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 47884
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/hdr-river-jemez-mountains-a4ae46facd-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 183232
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/hdr-river-jemez-mountains-a4ae46facd-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 466732
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/hdr-river-jemez-mountains-a4ae46facd-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 940544
+      }
+    ]
+  },
+  "/assets/photography/new-mexico/james-2.jpg": {
+    "sourceHash": "6d1b3484aec1c2bb0fbf498bf4263545a3e59f3b97797b3ad9ebced46af91566",
+    "images": [
+      {
+        "src": "/assets/display/photography/new-mexico/james-2-6d1b3484ae-320.webp",
+        "width": 320,
+        "height": 480,
+        "bytes": 46960
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/james-2-6d1b3484ae-640.webp",
+        "width": 640,
+        "height": 960,
+        "bytes": 181080
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/james-2-6d1b3484ae-1067.webp",
+        "width": 1067,
+        "height": 1600,
+        "bytes": 381210
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/james-2-6d1b3484ae-1600.webp",
+        "width": 1600,
+        "height": 2400,
+        "bytes": 898658
+      }
+    ]
+  },
+  "/assets/photography/new-mexico/jemez-mountains-mist-1.jpg": {
+    "sourceHash": "3e9416f5ce99fcbcdbd280e42da286135493eac2195d31814ce1ca0fd5c6810c",
+    "images": [
+      {
+        "src": "/assets/display/photography/new-mexico/jemez-mountains-mist-1-3e9416f5ce-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 40396
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/jemez-mountains-mist-1-3e9416f5ce-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 134264
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/jemez-mountains-mist-1-3e9416f5ce-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 308498
+      },
+      {
+        "src": "/assets/display/photography/new-mexico/jemez-mountains-mist-1-3e9416f5ce-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 606426
+      }
+    ]
+  },
+  "/assets/photography/portrait/portrait-ancestrial-pueblo-view.jpg": {
+    "sourceHash": "b56851039e43ae8f80477df1e19bb568e80319a729998df3f79079a4c9b8a587",
+    "images": [
+      {
+        "src": "/assets/display/photography/portrait/portrait-ancestrial-pueblo-view-b56851039e-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 19808
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-ancestrial-pueblo-view-b56851039e-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 54018
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-ancestrial-pueblo-view-b56851039e-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 118678
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-ancestrial-pueblo-view-b56851039e-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 229426
+      }
+    ]
+  },
+  "/assets/photography/portrait/portrait-cactus.jpg": {
+    "sourceHash": "dc8bbd0c398e43cba89a2c18e12fa9fdef05fd9776d19e99c09264c8b13c14e5",
+    "images": [
+      {
+        "src": "/assets/display/photography/portrait/portrait-cactus-dc8bbd0c39-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 56664
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-cactus-dc8bbd0c39-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 189026
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-cactus-dc8bbd0c39-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 442860
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-cactus-dc8bbd0c39-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 851630
+      }
+    ]
+  },
+  "/assets/photography/portrait/portrait-dangerous-jug.jpg": {
+    "sourceHash": "67f6d1d1569aeaa686db036cbc512fbd1c8bccd483e8218b706c8482ba6885f3",
+    "images": [
+      {
+        "src": "/assets/display/photography/portrait/portrait-dangerous-jug-67f6d1d156-320.webp",
+        "width": 320,
+        "height": 480,
+        "bytes": 21596
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-dangerous-jug-67f6d1d156-640.webp",
+        "width": 640,
+        "height": 960,
+        "bytes": 81634
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-dangerous-jug-67f6d1d156-940.webp",
+        "width": 940,
+        "height": 1410,
+        "bytes": 145294
+      }
+    ]
+  },
+  "/assets/photography/portrait/portrait-lucia-pbj.jpg": {
+    "sourceHash": "5a19e79caf25e444be678cb6aae290c40ca879e012d98149dc820c166bbdac89",
+    "images": [
+      {
+        "src": "/assets/display/photography/portrait/portrait-lucia-pbj-5a19e79caf-343.webp",
+        "width": 343,
+        "height": 480,
+        "bytes": 19650
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-lucia-pbj-5a19e79caf-686.webp",
+        "width": 686,
+        "height": 960,
+        "bytes": 50766
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-lucia-pbj-5a19e79caf-1143.webp",
+        "width": 1143,
+        "height": 1600,
+        "bytes": 104712
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-lucia-pbj-5a19e79caf-1715.webp",
+        "width": 1715,
+        "height": 2400,
+        "bytes": 181548
+      }
+    ]
+  },
+  "/assets/photography/portrait/portrait-nature.jpg": {
+    "sourceHash": "ef7abf3e36511499f565d8d29e336c902852aea24223e88b1f1f6d72a8823cc7",
+    "images": [
+      {
+        "src": "/assets/display/photography/portrait/portrait-nature-ef7abf3e36-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 27932
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-nature-ef7abf3e36-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 107512
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-nature-ef7abf3e36-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 295210
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-nature-ef7abf3e36-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 640924
+      }
+    ]
+  },
+  "/assets/photography/portrait/portrait-sydney-iccle.jpg": {
+    "sourceHash": "079aba78b4dbb54bad220d3f153816462d0b53c42c2d34c59bfe8808f161e6ae",
+    "images": [
+      {
+        "src": "/assets/display/photography/portrait/portrait-sydney-iccle-079aba78b4-480.webp",
+        "width": 480,
+        "height": 320,
+        "bytes": 30496
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-sydney-iccle-079aba78b4-960.webp",
+        "width": 960,
+        "height": 640,
+        "bytes": 72538
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-sydney-iccle-079aba78b4-1600.webp",
+        "width": 1600,
+        "height": 1067,
+        "bytes": 144064
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-sydney-iccle-079aba78b4-2400.webp",
+        "width": 2400,
+        "height": 1600,
+        "bytes": 253440
+      }
+    ]
+  },
+  "/assets/photography/portrait/portrait-sydney-tumwater.jpg": {
+    "sourceHash": "0aa49ad233443618e8d9dd59c88d1cfc44547b33b51ca404b3f74258339609c4",
+    "images": [
+      {
+        "src": "/assets/display/photography/portrait/portrait-sydney-tumwater-0aa49ad233-480.webp",
+        "width": 480,
+        "height": 360,
+        "bytes": 18208
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-sydney-tumwater-0aa49ad233-960.webp",
+        "width": 960,
+        "height": 720,
+        "bytes": 46092
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-sydney-tumwater-0aa49ad233-1600.webp",
+        "width": 1600,
+        "height": 1200,
+        "bytes": 113444
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-sydney-tumwater-0aa49ad233-2400.webp",
+        "width": 2400,
+        "height": 1800,
+        "bytes": 540888
+      }
+    ]
+  },
+  "/assets/photography/portrait/portrait-walter-1.jpg": {
+    "sourceHash": "379fb82177f309845151f42a4908ad6a057eaaa809ffa27b2d6b0d5c936a7f7e",
+    "images": [
+      {
+        "src": "/assets/display/photography/portrait/portrait-walter-1-379fb82177-480.webp",
+        "width": 480,
+        "height": 384,
+        "bytes": 26310
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-walter-1-379fb82177-960.webp",
+        "width": 960,
+        "height": 768,
+        "bytes": 74742
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-walter-1-379fb82177-1600.webp",
+        "width": 1600,
+        "height": 1280,
+        "bytes": 176682
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-walter-1-379fb82177-2400.webp",
+        "width": 2400,
+        "height": 1920,
+        "bytes": 375766
+      }
+    ]
+  },
+  "/assets/photography/portrait/portrait-walter-watching.jpg": {
+    "sourceHash": "3232105a579534c0a4eb6a04042257affeaee773b6b277837426eadc36b0b9d4",
+    "images": [
+      {
+        "src": "/assets/display/photography/portrait/portrait-walter-watching-3232105a57-480.webp",
+        "width": 480,
+        "height": 384,
+        "bytes": 29288
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-walter-watching-3232105a57-960.webp",
+        "width": 960,
+        "height": 768,
+        "bytes": 86752
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-walter-watching-3232105a57-1600.webp",
+        "width": 1600,
+        "height": 1280,
+        "bytes": 216236
+      },
+      {
+        "src": "/assets/display/photography/portrait/portrait-walter-watching-3232105a57-2400.webp",
+        "width": 2400,
+        "height": 1920,
+        "bytes": 452138
+      }
+    ]
+  }
+}

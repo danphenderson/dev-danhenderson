@@ -1,6 +1,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import { keyframes } from '@emotion/react';
+import { duration, useMotionScale } from '../../motion';
+import { statusColumnFlash } from '../../styles/animations';
 import type { VscodeEditorTab } from '../../types/ui';
 import {
   VSCODE_COLORS,
@@ -12,12 +13,6 @@ import {
 import { getVscodeEditorTabMetadata } from './vscodeEditorTabs';
 
 const PROMPT_PREFIX = '~ $ ';
-
-const colFlash = keyframes`
-  0%   { opacity: 1; }
-  50%  { opacity: 0.4; }
-  100% { opacity: 1; }
-`;
 
 /** Reusable status bar segment with an optional hover dropdown */
 const StatusSegment: React.FC<{
@@ -95,6 +90,7 @@ export const VscodeStatusBar: React.FC<VscodeStatusBarProps> = ({
   commandText,
   historyLineCount = 0,
 }) => {
+  const { duration: motionScale } = useMotionScale();
   const activeTabMetadata = getVscodeEditorTabMetadata(activeTab);
   const col = commandText.length + PROMPT_PREFIX.length + 1;
   const ln = historyLineCount + 1;
@@ -179,7 +175,10 @@ export const VscodeStatusBar: React.FC<VscodeStatusBarProps> = ({
           key={col}
           sx={{
             px: '4px',
-            animation: `${colFlash} 0.3s ease-out`,
+            animation:
+              motionScale === 0
+                ? 'none'
+                : `${statusColumnFlash} ${duration.normal * motionScale}s ease-out`,
           }}
         >
           Ln {ln}, Col {col}

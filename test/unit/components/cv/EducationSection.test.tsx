@@ -9,7 +9,7 @@ jest.mock('@mui/material', () => {
 
   return {
     ...actual,
-    Collapse: ({ children, in: inProp, onEntered, ...rest }: any) => {
+    Collapse: ({ children, in: inProp, onEntered, appear: _appear, ...rest }: any) => {
       const React = require('react');
       const onEnteredRef = React.useRef(onEntered);
 
@@ -173,10 +173,10 @@ describe('EducationSection', () => {
 
     const titleRow = programHeading.parentElement;
 
-    expect(titleRow).toHaveTextContent('Fall 2024 – Present');
+    expect(titleRow).toHaveTextContent('Fall 2024 – Aug 2026');
 
     expect(screen.getByText('Michigan Technological University')).toBeInTheDocument();
-    expect(screen.getByText('Expected Summer 2026')).toBeInTheDocument();
+    expect(screen.queryByText(/Expected Summer/)).not.toBeInTheDocument();
     const gpaChip = screen.getByText('Cumulative: 3.44').closest('.MuiChip-root');
 
     expect(gpaChip).not.toBeNull();

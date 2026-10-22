@@ -57,7 +57,10 @@ const getCurrentAbsoluteUrl = (): string => {
     return '';
   }
 
-  return new URL(`${window.location.pathname}${window.location.search}`, window.location.origin).toString();
+  return new URL(
+    `${window.location.pathname}${window.location.search}`,
+    window.location.origin
+  ).toString();
 };
 
 export const useDocumentMetadata = ({
@@ -86,6 +89,9 @@ export const useDocumentMetadata = ({
       const absoluteImageUrl = toAbsoluteUrl(image);
       ensureMetaTag('property', 'og:image').content = absoluteImageUrl;
       ensureMetaTag('name', 'twitter:image').content = absoluteImageUrl;
+    } else {
+      document.head.querySelector('meta[property="og:image"]')?.remove();
+      document.head.querySelector('meta[name="twitter:image"]')?.remove();
     }
 
     ensureLinkTag('canonical').href = canonicalHref;

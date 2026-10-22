@@ -88,9 +88,7 @@ const dispatchPointerUp = () => {
   });
 };
 
-const createHookHarness = ({
-  prefersReducedMotion = false,
-}: { prefersReducedMotion?: boolean } = {}) => {
+const createHookHarness = () => {
   const heroHost = document.createElement('div');
   const terminalHero = document.createElement('div');
   terminalHero.dataset.testid = 'terminal-hero';
@@ -108,7 +106,6 @@ const createHookHarness = ({
 
   const hook = renderHook(() =>
     useHomeIdeOrchestration({
-      prefersReducedMotion,
       dragControls,
       heroRef,
       heroBoundsRef,
@@ -156,39 +153,17 @@ describe('useHomeIdeOrchestration', () => {
     expect(dragControls.start).toHaveBeenCalledTimes(1);
   });
 
-  it('auto-expands after hero motion completes and highlights the expand affordance while waiting', async () => {
+  it('keeps the IDE windowed after entrance until the user explicitly expands it', () => {
     jest.useFakeTimers();
-
     const { result } = createHookHarness();
-
-    act(() => {
-      result.current.handleHeroMotionComplete();
-    });
-
+    act(() => result.current.handleHeroMotionComplete());
+    act(() => jest.advanceTimersByTime(AUTO_EXPAND_WAIT_MS));
     expect(result.current.isTypewriterPlaying).toBe(true);
-    expect(result.current.expandDotHighlighted).toBe(true);
     expect(result.current.ideWindowState).toBe('normal');
-
-    act(() => {
-      jest.advanceTimersByTime(AUTO_EXPAND_WAIT_MS);
-    });
-
-    await waitFor(() => expect(result.current.ideWindowState).toBe('expanded'));
     expect(result.current.expandDotHighlighted).toBe(false);
-
-    jest.useRealTimers();
-  });
-
-  it('expands immediately after hero motion when reduced motion is preferred', () => {
-    const { result } = createHookHarness({ prefersReducedMotion: true });
-
-    act(() => {
-      result.current.handleHeroMotionComplete();
-    });
-
-    expect(result.current.isTypewriterPlaying).toBe(true);
+    act(() => result.current.handleIdeExpand());
     expect(result.current.ideWindowState).toBe('expanded');
-    expect(result.current.expandDotHighlighted).toBe(false);
+    jest.useRealTimers();
   });
 
   it('resolves the expanded viewport from the visible page area when expanded', async () => {

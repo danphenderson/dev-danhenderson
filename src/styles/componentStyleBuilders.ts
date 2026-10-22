@@ -491,6 +491,7 @@ export const createComponentStyleMap = (theme: Theme) => {
       ...borderGlowOverlaySx,
     } satisfies SxProps<Theme>,
     cvSectionCardSx: {
+      borderRadius: 1.5,
       position: 'relative',
       overflow: 'hidden',
       isolation: 'isolate',

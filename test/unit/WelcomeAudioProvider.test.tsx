@@ -3,13 +3,14 @@ import { WelcomeAudioProvider, useWelcomeAudio } from '../../src/WelcomeAudioPro
 import * as welcomeSequenceEnvironment from '../../src/welcomeSequenceEnvironment';
 
 const AudioConsumer = () => {
-  const { audioConsent, isPlaying, play, pause, grantAudioConsent, declineAudioConsent } =
+  const { audioConsent, isPlaying, error, play, pause, grantAudioConsent, declineAudioConsent } =
     useWelcomeAudio();
   return (
     <div>
       <span data-testid="consent">{audioConsent}</span>
       <span data-testid="playing">{String(isPlaying)}</span>
-      <button onClick={() => void play()}>play</button>
+      <span data-testid="error">{error}</span>
+      <button onClick={() => void play().catch(() => {})}>play</button>
       <button onClick={pause}>pause</button>
       <button onClick={grantAudioConsent}>grant</button>
       <button onClick={declineAudioConsent}>decline</button>
@@ -81,8 +82,12 @@ describe('WelcomeAudioProvider', () => {
   });
 
   afterEach(() => {
+    jest.useRealTimers();
     jest.restoreAllMocks();
     delete window.SC;
+    document
+      .querySelectorAll('script[src="https://w.soundcloud.com/player/api.js"]')
+      .forEach((script) => script.remove());
   });
 
   it('starts with unknown consent when the developer home replay override is active', () => {
@@ -189,4 +194,45 @@ describe('WelcomeAudioProvider', () => {
     await waitFor(() => expect(screen.getByTestId('playing')).toHaveTextContent('false'));
     expect(soundCloudWidget.pause).toHaveBeenCalledTimes(1);
   });
+
+  it.each(['error', 'load', 'timeout', 'abort'])(
+    'retries a failed script (%s) with one fresh setup and reaches playback',
+    async (failureEvent) => {
+      if (failureEvent === 'timeout') jest.useFakeTimers();
+      delete window.SC;
+      jest.spyOn(console, 'error').mockImplementation(() => {});
+      render(
+        <WelcomeAudioProvider>
+          <AudioConsumer />
+        </WelcomeAudioProvider>
+      );
+      await act(async () => screen.getByRole('button', { name: 'play' }).click());
+      const script = document.querySelector('script[src="https://w.soundcloud.com/player/api.js"]')!;
+      expect(script).not.toBeNull();
+      if (failureEvent === 'timeout') {
+        await act(async () => jest.advanceTimersByTimeAsync(8000));
+      } else if (failureEvent === 'abort') {
+        await act(async () => screen.getByRole('button', { name: 'decline' }).click());
+      } else {
+        await act(async () => script.dispatchEvent(new Event(failureEvent)));
+      }
+      expect(screen.getByTestId('error')).toHaveTextContent(/Unable to (play|load) welcome audio\./);
+      expect(script).not.toBeInTheDocument();
+
+      await act(async () => {
+        screen.getByRole('button', { name: 'play' }).click();
+        screen.getByRole('button', { name: 'play' }).click();
+      });
+      const scripts = document.querySelectorAll('script[src="https://w.soundcloud.com/player/api.js"]');
+      expect(scripts).toHaveLength(1);
+      expect(scripts[0]).not.toBe(script);
+      const createWidget = jest.fn(() => soundCloudWidget);
+      window.SC = { Widget: createWidget };
+      await act(async () => scripts[0].dispatchEvent(new Event('load')));
+      if (failureEvent === 'timeout') await act(async () => jest.advanceTimersByTimeAsync(1));
+      await waitFor(() => expect(screen.getByTestId('playing')).toHaveTextContent('true'));
+      expect(createWidget).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId('error')).toBeEmptyDOMElement();
+    }
+  );
 });

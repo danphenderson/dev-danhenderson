@@ -1,5 +1,7 @@
 # Home welcome and speed-dial second pass
 
+> Integration update: [Branch PR readiness review](branch-pr-readiness-review.md) supersedes the automatic welcome and IDE expansion described below. Home content is immediate, IDE expansion is manual, and Customize opens the single optional panel.
+
 ## Goal
 
 Let visitors reach the portfolio without acknowledging a sequence of dialogs. Combine the audio, motion, and settings introduction into one optional panel that automatically hands off to the VS Code entrance. Review the prior speed-dial fix and add meaningful regression protection.

@@ -1,13 +1,16 @@
 import { useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Box, IconButton, Tooltip } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import { cvSectionMetadata } from '../components/cv/cvSectionMetadata';
+import { aboutMe } from '../data/cv';
+import { Text } from '../components/text';
+import { Box, Button, Stack, IconButton, Tooltip } from '@mui/material';
 import {
   motion,
   useDragControls,
   useScroll,
   useTransform,
   AnimatePresence,
-  useReducedMotion,
 } from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
@@ -54,9 +57,11 @@ export default function Home() {
     isWelcomeOpen,
     setIsInteracting,
     handleDismiss,
+    handleOpen,
     handleToggleAudio,
   } = useHomeWelcomeSequence();
 
+  const preferencesTriggerRef = useRef<HTMLButtonElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const heroBoundsRef = useRef<HTMLDivElement>(null);
   const heroDragControls = useDragControls();
@@ -64,7 +69,6 @@ export default function Home() {
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.6]);
   const { duration: motionDurationScale } = useMotionScale();
-  const prefersReducedMotion = useReducedMotion();
   const heroMotionStyle =
     motionDurationScale > 0 ? { scale: heroScale, opacity: heroOpacity } : { scale: 1, opacity: 1 };
 
@@ -94,7 +98,6 @@ export default function Home() {
     handleIdeExpand,
     handleIdeRestore,
   } = useHomeIdeOrchestration({
-    prefersReducedMotion: prefersReducedMotion || motionDurationScale === 0,
     dragControls: heroDragControls,
     heroRef,
     heroBoundsRef,
@@ -104,6 +107,36 @@ export default function Home() {
     <>
       <motion.div ref={heroRef} style={{ position: 'relative', ...heroMotionStyle }}>
         <BackgroundPaper
+          intro={
+            <Stack spacing={2} sx={appStyles.homeIntroSx}>
+              <Text role="pageTitle" component="h1">
+                {aboutMe.name}
+              </Text>
+              <Text role="body" sx={{ maxWidth: 600 }}>
+                Software developer building scientific, data, and AI-enabled systems.
+              </Text>
+              <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1.5}>
+                <Button component={RouterLink} to={siteRouteMap.cv.path} variant="contained">
+                  Explore my CV
+                </Button>
+                <Button
+                  component={RouterLink}
+                  to={`${siteRouteMap.cv.path}#${cvSectionMetadata.coding.id}`}
+                  variant="outlined"
+                >
+                  View projects
+                </Button>
+              </Stack>
+              <Button
+                ref={preferencesTriggerRef}
+                onClick={handleOpen}
+                size="small"
+                sx={{ alignSelf: 'flex-start' }}
+              >
+                Customize appearance &amp; audio
+              </Button>
+            </Stack>
+          }
           contentRef={heroBoundsRef}
           image="assets/home.jpg"
           contentAlign="flex-end"
@@ -167,6 +200,7 @@ export default function Home() {
 
           <FirstVisitWelcome
             open={isWelcomeOpen}
+            returnFocusRef={preferencesTriggerRef}
             onClose={handleDismiss}
             onInteractionChange={setIsInteracting}
             motionIntensity={motionIntensity}

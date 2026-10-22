@@ -7,12 +7,14 @@ import { Text } from '../text';
 type SectionHeadingProps = BoxProps & {
   overline: string;
   title?: string;
+  titleComponent?: 'h1' | 'h2';
   subtitle?: ReactNode;
 };
 
 export const SectionHeading = ({
   overline,
   title,
+  titleComponent = 'h2',
   subtitle,
   sx,
   ...props
@@ -34,6 +36,7 @@ export const SectionHeading = ({
       {title && (
         <Text
           role="sectionTitle"
+          component={titleComponent}
           sx={[sectionHeadingTitleSx(hasSubtitle), sectionHeadingTitleTextSx]}
         >
           {title}

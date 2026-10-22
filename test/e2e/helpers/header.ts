@@ -14,9 +14,7 @@ export const declineWelcomeAudio = async (page: Page) => {
   });
 };
 
-export const dismissWelcomeSequence = async (page: Page) => {
-  const welcome = page.getByRole('region', { name: 'Make yourself at home' });
-  await expect(welcome).toBeVisible();
-  await welcome.getByRole('button', { name: 'Explore now' }).click();
-  await expect(welcome).toBeHidden();
+export const expectImmediateHome = async (page: Page) => {
+  await expect(page.getByRole('link', { name: 'Explore my CV' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Make yourself at home' })).toHaveCount(0);
 };

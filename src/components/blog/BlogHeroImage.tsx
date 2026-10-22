@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { resolvePublicAssetPath } from '../../utils/assets';
+import { getDisplayImage } from '../../utils/displayImages';
 
 type BlogHeroImageProps = {
   src: string;
@@ -21,8 +21,6 @@ export function BlogHeroImage({
   borderRadius,
   loading = 'eager',
 }: BlogHeroImageProps) {
-  const resolvedSrc = resolvePublicAssetPath(src);
-
   return (
     <Box
       sx={{
@@ -35,7 +33,8 @@ export function BlogHeroImage({
     >
       <Box
         component="img"
-        src={resolvedSrc}
+        {...getDisplayImage(src, 1600)}
+        sizes="(min-width: 1200px) 1200px, 100vw"
         alt={alt}
         loading={loading}
         sx={{

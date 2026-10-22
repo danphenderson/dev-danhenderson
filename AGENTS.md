@@ -39,11 +39,11 @@ Prefer changes that preserve the current single-page-app architecture and static
 
 ## Stack and runtime
 
-- React 18
+- React 19
 - TypeScript
-- React Router v6
+- React Router v7
 - MUI + Emotion
-- MUI X DataGrid
+- MUI Table
 - TypeScript 5.6 baseline
 - Framer Motion (via `motion/react`)
 - Vite for dev/build
@@ -120,7 +120,7 @@ Notes:
 
 - The dev server defaults to port `3001` in this repository.
 - Playwright serves the `build/` directory on port `3100`.
-- `CI=true npm test -- --watchAll=false` currently has unrelated baseline failures in existing CV tests, so prefer the narrowest relevant validation for the files you change and separate unrelated failures from regressions you introduce.
+- Run focused tests during development, then the full unit suite for cross-cutting changes. The October 2026 CV expectation drift has been repaired; investigate any new full-suite failure.
 - Do not claim a command or validation step was run unless it was actually run.
 
 ## Repository map

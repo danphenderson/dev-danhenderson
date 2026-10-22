@@ -51,7 +51,9 @@ export default function Photography() {
             >
               <Stack spacing={1}>
                 <SectionHeading
-                  overline="Photography"
+                  overline="Photo albums"
+                  title="Photography"
+                  titleComponent="h1"
                   subtitle={
                     <TypewriterText
                       text="A collection of photo albums."
@@ -99,7 +101,7 @@ export default function Photography() {
           style={{
             display: 'grid',
             gap: '20px',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
             alignItems: 'stretch',
           }}
         >

@@ -39,8 +39,9 @@ export default function BlogPost() {
       ? {
           title: `${post.title} | Daniel Henderson`,
           description: post.excerpt,
-          image: post.heroImage,
-          canonicalPath: `/blog/${post.slug}`,
+          image: post.heroImage ?? siteRouteMap.blog.image,
+          type: 'article',
+          canonicalPath: `${siteRouteMap.blog.path}/${post.slug}`,
         }
       : {
           ...siteRouteMap['not-found'],
@@ -62,7 +63,7 @@ export default function BlogPost() {
             <SectionCard delayMs={0} triggerOnView={false}>
               <Button
                 component={RouterLink}
-                to="/blog"
+                to={siteRouteMap.blog.path}
                 startIcon={<ArrowBackIcon />}
                 size="small"
                 sx={appStyles.inlineStartSx}
@@ -92,6 +93,7 @@ export default function BlogPost() {
               <SectionHeading
                 overline="Blog"
                 title="Post not found"
+                titleComponent="h1"
                 sx={{ maxWidth: { md: 760 } }}
               />
               <Text role="bodyMuted">

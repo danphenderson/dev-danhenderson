@@ -15,7 +15,7 @@ const baseAbout: AboutMe = {
 };
 
 describe('ProfileCard', () => {
-  it('renders name, title, and location', () => {
+  it('renders name and location without the retired profile motto', () => {
     render(
       <ThemeProvider>
         <ProfileCard about={baseAbout} />
@@ -23,7 +23,7 @@ describe('ProfileCard', () => {
     );
 
     expect(screen.getByText('Test User')).toBeInTheDocument();
-    expect(screen.getByText('Software Engineer')).toBeInTheDocument();
+    expect(screen.queryByText('Software Engineer')).not.toBeInTheDocument();
     expect(screen.getByText('Seattle, WA')).toBeInTheDocument();
   });
 
@@ -39,7 +39,7 @@ describe('ProfileCard', () => {
 
     expect(screen.getByRole('button', { name: 'Open about actions' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Test User' })).toBeInTheDocument();
-    expect(screen.getByText('Software Engineer')).toBeInTheDocument();
+    expect(screen.queryByText('Software Engineer')).not.toBeInTheDocument();
     expect(screen.getByText('Seattle, WA')).toBeInTheDocument();
   });
 
@@ -66,7 +66,9 @@ describe('ProfileCard', () => {
 
     const accessibleLayer = container.querySelector('[data-typewriter-layer="accessible"]');
 
-    expect(accessibleLayer).toHaveTextContent('A developer with experience in React and TypeScript.');
+    expect(accessibleLayer).toHaveTextContent(
+      'A developer with experience in React and TypeScript.'
+    );
   });
 
   it('embeds a link within bio text when bioLink is provided', () => {

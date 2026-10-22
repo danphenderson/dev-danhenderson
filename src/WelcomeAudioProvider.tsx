@@ -162,48 +162,50 @@ const loadWidgetScript = (signal: AbortSignal): Promise<void> => {
     return widgetScriptPromise;
   }
 
+  if (signal.aborted) return Promise.reject(createAbortError());
+
   widgetScriptPromise = new Promise<void>((resolve, reject) => {
-    const resolveWhenReady = () => {
-      if (window.SC?.Widget) {
-        resolve();
-        return;
-      }
-
-      widgetScriptPromise = null;
-      reject(new Error('SoundCloud widget API unavailable.'));
-    };
-
-    const rejectLoad = () => {
-      widgetScriptPromise = null;
-      reject(new Error('Failed to load SoundCloud widget.'));
-    };
-    const handleAbort = () => {
-      widgetScriptPromise = null;
-      reject(createAbortError());
-    };
-
     const existingScript = document.querySelector<HTMLScriptElement>(
       `script[src="${WIDGET_SCRIPT_SRC}"]`
     );
-    if (existingScript) {
-      if (window.SC?.Widget) {
-        resolve();
+    const script = existingScript ?? document.createElement('script');
+    let settled = false;
+    const cleanup = () => {
+      script.removeEventListener('load', resolveWhenReady);
+      script.removeEventListener('error', rejectLoad);
+      signal.removeEventListener('abort', handleAbort);
+    };
+    const fail = (error: Error) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      // Remove only the element this loader owns so a retry makes a new request.
+      if (!existingScript) script.remove();
+      widgetScriptPromise = null;
+      reject(error);
+    };
+    const resolveWhenReady = () => {
+      if (!window.SC?.Widget) {
+        fail(new Error('SoundCloud widget API unavailable.'));
         return;
       }
+      if (settled) return;
+      settled = true;
+      cleanup();
+      widgetScriptPromise = null;
+      resolve();
+    };
+    const rejectLoad = () => fail(new Error('Failed to load SoundCloud widget.'));
+    const handleAbort = () => fail(createAbortError());
 
-      existingScript.addEventListener('load', resolveWhenReady, { once: true });
-      existingScript.addEventListener('error', rejectLoad, { once: true });
-      signal.addEventListener('abort', handleAbort, { once: true });
-      return;
-    }
-
-    const script = document.createElement('script');
-    script.src = WIDGET_SCRIPT_SRC;
-    script.async = true;
-    script.onload = resolveWhenReady;
-    script.onerror = rejectLoad;
+    script.addEventListener('load', resolveWhenReady);
+    script.addEventListener('error', rejectLoad);
     signal.addEventListener('abort', handleAbort, { once: true });
-    document.body.appendChild(script);
+    if (!existingScript) {
+      script.src = WIDGET_SCRIPT_SRC;
+      script.async = true;
+      document.body.appendChild(script);
+    }
   });
 
   return widgetScriptPromise;
@@ -319,16 +321,16 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
       return widgetRef.current;
     }
 
+    const controller = new AbortController();
+    setupAbortControllerRef.current = controller;
     setupPromiseRef.current = (async () => {
-      const controller = new AbortController();
-      setupAbortControllerRef.current = controller;
-
       await withTimeout(
         loadWidgetScript(controller.signal),
         'Timed out loading welcome audio widget script.',
         WIDGET_BOOT_TIMEOUT_MS,
         controller.signal
       );
+      if (controller.signal.aborted) throw createAbortError();
       const iframe = await waitForIframe(controller.signal);
       const SC = window.SC;
 
@@ -408,18 +410,20 @@ export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
       return widget;
     })()
       .catch((err) => {
-        setupPromiseRef.current = null;
-        widgetRef.current = null;
-        setupAbortControllerRef.current = null;
-
-        if (!unmountedRef.current) {
-          setReady(false);
+        // A timeout must also cancel the loader and remove its stalled script.
+        controller.abort();
+        if (setupAbortControllerRef.current === controller) {
+          setupPromiseRef.current = null;
+          widgetRef.current = null;
+          if (!unmountedRef.current) setReady(false);
         }
 
         throw err;
       })
       .finally(() => {
-        setupAbortControllerRef.current = null;
+        if (setupAbortControllerRef.current === controller) {
+          setupAbortControllerRef.current = null;
+        }
       });
 
     return setupPromiseRef.current;

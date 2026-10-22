@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import {
   expectHeroParallaxSource,
   expectTerminalLinesStructure,
@@ -16,19 +16,19 @@ afterEach(() => {
 });
 
 describe('Home route integration', () => {
-  it('reveals the hero only after the onboarding flow completes and starts the typewriter after hero motion', async () => {
+  it('renders the intro and hero immediately and opens preferences only on request', async () => {
     renderHomeRoute();
 
-    expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
-    expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
-    expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument();
-
+    expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true');
+    expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
+    expect(screen.getByRole('link', { name: 'Explore my CV' })).toBeVisible();
+    expect(screen.queryByRole('region', { name: 'Make yourself at home' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Customize appearance & audio' }));
     expect(screen.getByRole('region', { name: 'Make yourself at home' })).toBeVisible();
+    await act(async () => screen.getByRole('button', { name: 'Off', exact: true }).focus());
     fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.getByRole('button', { name: 'Customize appearance & audio' })).toHaveFocus();
 
-    await waitFor(() =>
-      expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
-    );
     expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-active', 'true');
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'false');
     expectTerminalLinesStructure(screen.getByTestId('terminal-hero'));

@@ -18,10 +18,6 @@ const resolveManualChunk = (id: string) => {
     return 'climbing-data';
   }
 
-  if (id.includes('/node_modules/@mui/x-data-grid/')) {
-    return 'vendor-data-grid';
-  }
-
   if (id.includes('/node_modules/fuse.js/')) {
     return 'vendor-fuse';
   }
@@ -58,6 +54,7 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       outDir: 'build',
+      manifest: true,
       emptyOutDir: true,
       rollupOptions: {
         output: {

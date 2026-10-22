@@ -7,6 +7,28 @@ import {
   type MotionIntensityLevel,
 } from './appAppearance';
 
+// Generic families are CSS keywords; concrete family names are CSS strings.
+// Quoting is essential for names containing numeric tokens, e.g. Source Sans 3.
+const genericFontFamilies = new Set([
+  'serif',
+  'sans-serif',
+  'monospace',
+  'cursive',
+  'fantasy',
+  'system-ui',
+  'ui-serif',
+  'ui-sans-serif',
+  'ui-monospace',
+  'ui-rounded',
+  'emoji',
+  'math',
+  'fangsong',
+]);
+const serializeFontFamily = (families: string[]) =>
+  families
+    .map((family) => (genericFontFamilies.has(family) ? family : JSON.stringify(family)))
+    .join(', ');
+
 export const createAppTheme = (
   mode: PaletteMode,
   appearanceKey: AppAppearanceKey,
@@ -37,39 +59,39 @@ export const createAppTheme = (
       borderRadius: 14,
     },
     typography: {
-      fontFamily: bodyFontFamily.join(','),
+      fontFamily: serializeFontFamily(bodyFontFamily),
       h1: {
-        fontFamily: headingFontFamily.join(','),
+        fontFamily: serializeFontFamily(headingFontFamily),
         fontWeight: 700,
         fontSize: 'clamp(2rem, 4vw, 3rem)',
         lineHeight: 1.1,
       },
       h2: {
-        fontFamily: headingFontFamily.join(','),
+        fontFamily: serializeFontFamily(headingFontFamily),
         fontWeight: 700,
         fontSize: 'clamp(1.65rem, 3vw, 2.25rem)',
         lineHeight: 1.15,
       },
       h3: {
-        fontFamily: headingFontFamily.join(','),
+        fontFamily: serializeFontFamily(headingFontFamily),
         fontWeight: 700,
         fontSize: 'clamp(1.4rem, 2.5vw, 1.8rem)',
         lineHeight: 1.2,
       },
       h4: {
-        fontFamily: headingFontFamily.join(','),
+        fontFamily: serializeFontFamily(headingFontFamily),
         fontWeight: 600,
         fontSize: 'clamp(1.3rem, 2.1vw, 1.65rem)',
         lineHeight: 1.2,
       },
       h5: {
-        fontFamily: headingFontFamily.join(','),
+        fontFamily: serializeFontFamily(headingFontFamily),
         fontWeight: 600,
         fontSize: '1.22rem',
         lineHeight: 1.25,
       },
       h6: {
-        fontFamily: headingFontFamily.join(','),
+        fontFamily: serializeFontFamily(headingFontFamily),
         fontWeight: 600,
         fontSize: '1.06rem',
         lineHeight: 1.3,
@@ -93,7 +115,7 @@ export const createAppTheme = (
         lineHeight: 1.58,
       },
       overline: {
-        fontFamily: headingFontFamily.join(','),
+        fontFamily: serializeFontFamily(headingFontFamily),
         fontWeight: 700,
         letterSpacing: '0.12em',
       },
@@ -106,6 +128,7 @@ export const createAppTheme = (
       MuiCssBaseline: {
         styleOverrides: (theme) => ({
           html: {
+            position: 'relative',
             height: '100%',
             width: '100%',
             textRendering: 'optimizeLegibility',

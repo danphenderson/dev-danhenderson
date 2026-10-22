@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { duration } from '../../../../src/motion/tokens';
 import { PREFERENCE_STORAGE_KEYS } from '../../../../src/theme/preferences';
@@ -290,11 +291,13 @@ jest.mock('../../../../src/components/BackgroundPaper', () => ({
   __esModule: true,
   default: ({
     children,
+    intro,
     showShell,
     contentRef,
     shellWrapper,
   }: {
     children: React.ReactNode;
+    intro?: React.ReactNode;
     showShell?: boolean;
     contentRef?: React.Ref<HTMLDivElement>;
     shellWrapper?: (shell: React.ReactNode) => React.ReactNode;
@@ -304,6 +307,7 @@ jest.mock('../../../../src/components/BackgroundPaper', () => ({
     return (
       <div data-testid="background-paper" data-show-shell={String(Boolean(showShell))}>
         <div data-testid="background-content" ref={contentRef}>
+          {intro}
           {showShell ? (shellWrapper ? shellWrapper(shell) : shell) : children}
         </div>
       </div>
@@ -370,15 +374,17 @@ const HomeHarness = ({
         declineAudioConsent,
       }}
     >
-      <ThemeProvider>
-        <WelcomeOnboardingProvider>
-          <button id={HEADER_SETTINGS_TRIGGER_ID} type="button">
-            Header settings anchor
-          </button>
-          <Home />
-          <OnboardingStateProbe />
-        </WelcomeOnboardingProvider>
-      </ThemeProvider>
+      <MemoryRouter>
+        <ThemeProvider>
+          <WelcomeOnboardingProvider>
+            <button id={HEADER_SETTINGS_TRIGGER_ID} type="button">
+              Header settings anchor
+            </button>
+            <Home />
+            <OnboardingStateProbe />
+          </WelcomeOnboardingProvider>
+        </ThemeProvider>
+      </MemoryRouter>
     </MockWelcomeAudioProvider>
   );
 };

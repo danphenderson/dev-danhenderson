@@ -19,6 +19,14 @@ const topIcons = [
   ExtensionOutlined, // Extensions
   AccountTreeOutlined, // Source Control
 ];
+const activityLabels = [
+  'Explorer',
+  'Copilot Chat',
+  'GitHub',
+  'GitHub Actions',
+  'Extensions',
+  'Source Control',
+];
 
 interface VscodeActivityBarProps {
   sx?: SxProps<Theme>;
@@ -36,7 +44,6 @@ export const VscodeActivityBar: React.FC<VscodeActivityBarProps> = ({
   onIconClick,
 }) => (
   <Box
-    aria-hidden="true"
     sx={[
       {
         display: { xs: 'none', sm: 'flex' },
@@ -57,10 +64,17 @@ export const VscodeActivityBar: React.FC<VscodeActivityBarProps> = ({
       const isActive = i === activeIndex;
       return (
         <Box
+          component="button"
+          type="button"
+          aria-label={activityLabels[i]}
+          aria-pressed={isActive}
           key={i}
           data-testid={`activity-icon-${i}`}
           onClick={() => onIconClick?.(i)}
           sx={{
+            p: 0,
+            border: 0,
+            backgroundColor: 'transparent',
             position: 'relative',
             display: 'flex',
             alignItems: 'center',
@@ -72,6 +86,10 @@ export const VscodeActivityBar: React.FC<VscodeActivityBarProps> = ({
             transition: 'background-color 0.1s',
             '&:hover': {
               backgroundColor: VSCODE_COLORS.iconHover,
+            },
+            '&:focus-visible': {
+              outline: `2px solid ${ICON_ACTIVE}`,
+              outlineOffset: -2,
             },
             // Active indicator: 2px white left bar
             ...(isActive && {
@@ -104,13 +122,14 @@ export const VscodeActivityBar: React.FC<VscodeActivityBarProps> = ({
 
     {/* Bottom-pinned Settings icon */}
     <Box
+      aria-hidden="true"
       sx={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         width: VSCODE_LAYOUT.activityBarWidth,
         height: VSCODE_LAYOUT.activityBarWidth,
-        cursor: 'pointer',
+        cursor: 'default',
         transition: 'background-color 0.1s',
         '&:hover': { backgroundColor: VSCODE_COLORS.iconHover },
       }}

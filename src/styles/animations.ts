@@ -1,5 +1,11 @@
 import { keyframes } from '@emotion/react';
 
+/** Column-change feedback in the optional IDE status bar. */
+export const statusColumnFlash = keyframes`
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+`;
+
 /**
  * Shimmer sweep – a translucent highlight that slides across an element.
  * Applied via a `::after` pseudo-element with a linear-gradient background.
@@ -97,4 +103,10 @@ export const trafficDotPulse = keyframes`
   0%   { transform: scale(1);    box-shadow: 0 0 0 0 rgba(40, 200, 64, 0.7); }
   50%  { transform: scale(1.45);  box-shadow: 0 0 8px 4px rgba(40, 200, 64, 0.35); }
   100% { transform: scale(1);    box-shadow: 0 0 0 0 rgba(40, 200, 64, 0); }
+`;
+
+/** Decorative IDE terminal cursor; disabled by the consumer when motion is off. */
+export const terminalCursorBlink = keyframes`
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 `;

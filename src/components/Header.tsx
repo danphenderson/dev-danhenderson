@@ -21,7 +21,13 @@ import { HeaderSettingsPopover } from './header/HeaderSettingsPopover';
 const SLIDE_BASE_ENTER_MS = 225;
 const SLIDE_BASE_EXIT_MS = 195;
 
-const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
+const HideOnScroll = ({
+  children,
+  forceVisible,
+}: {
+  children: React.ReactElement;
+  forceVisible?: boolean;
+}) => {
   const trigger = useScrollTrigger(HEADER_HIDE_SCROLL_TRIGGER_OPTIONS);
   const { duration: dFactor } = useMotionScale();
   const timeout =
@@ -36,7 +42,7 @@ const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
     <Slide
       appear={false}
       direction="down"
-      in={!trigger}
+      in={forceVisible || !trigger}
       timeout={timeout}
       easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
     >
@@ -59,10 +65,10 @@ export default function Header() {
   const appStyles = useAppStyles();
   const muiTheme = useMuiTheme();
   const location = useLocation();
-  const { isPlaying, pause, play, audioConsent } = useWelcomeAudio();
-  const { onboardingCompleted } = useWelcomeOnboarding();
+  const { isPlaying, pause, play } = useWelcomeAudio();
+  const { showSettingsHint } = useWelcomeOnboarding();
   const path = location.pathname.toLowerCase();
-  const highlightSettingsTrigger = path === '/' && !onboardingCompleted;
+  const highlightSettingsTrigger = path === '/' && showSettingsHint;
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const iconButtonSize = isMobile ? 'medium' : ('large' as const);
   const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState<null | HTMLElement>(null);
@@ -96,7 +102,7 @@ export default function Header() {
 
   return (
     <>
-      <HideOnScroll>
+      <HideOnScroll forceVisible={showSettingsHint}>
         <AppBar id="site-navigation" position="fixed" elevation={0}>
           <Toolbar sx={appStyles.headerToolbarSx}>
             <HeaderNav
@@ -121,7 +127,7 @@ export default function Header() {
                 effectiveMotionIntensity={effectiveMotionIntensity}
                 isSystemMotionOverrideActive={isSystemMotionOverrideActive}
                 onChangeMotionIntensity={setMotionIntensity}
-                showAudioControl={audioConsent === 'granted' || onboardingCompleted}
+                showAudioControl
                 isPlaying={isPlaying}
                 onToggleAudio={handleAudioToggle}
                 highlightSettingsTrigger={highlightSettingsTrigger}

@@ -37,8 +37,11 @@ export const createAppStyleMap = (theme: Theme) => {
         Math.min(surface.panelBorderAlpha + 0.04, 0.36)
       )}, 0 14px 30px ${alpha(theme.palette.common.black, surface.cardShadowAlpha)}`;
 
-  const getBackgroundImageSx = (resolvedImage: string): SxProps<Theme> => ({
-    backgroundImage: `url('${resolvedImage}')`,
+  const getBackgroundImageSx = (
+    resolvedImage: string,
+    smallImage = resolvedImage
+  ): SxProps<Theme> => ({
+    backgroundImage: { xs: `url('${smallImage}')`, md: `url('${resolvedImage}')` },
     backgroundRepeat: 'no-repeat',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
@@ -188,7 +191,10 @@ export const createAppStyleMap = (theme: Theme) => {
     overflow: 'hidden',
     borderRadius: 3,
     cursor: 'pointer',
-    aspectRatio: { xs: '3 / 2', sm: '16 / 9', lg: '21 / 9' },
+    minHeight: { xs: 360, sm: 440 },
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
   };
 
   const photographyImmersiveCardSx: SxProps<Theme> = {
@@ -196,16 +202,17 @@ export const createAppStyleMap = (theme: Theme) => {
     overflow: 'hidden',
     borderRadius: 3,
     cursor: 'pointer',
-    aspectRatio: '4 / 3',
+    minHeight: 360,
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'flex-end',
   };
 
   const photographyCardOverlaySx: SxProps<Theme> = {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+    position: 'relative',
+    pt: { xs: 8, md: 10 },
     px: { xs: 2.5, md: 3 },
-    py: { xs: 2, md: 2.5 },
+    pb: { xs: 2, md: 2.5 },
     background: `linear-gradient(to top, ${alpha(theme.palette.common.black, 0.88)} 0%, ${alpha(
       theme.palette.common.black,
       0.52
@@ -218,15 +225,19 @@ export const createAppStyleMap = (theme: Theme) => {
   const photographyDetailCoverSx: SxProps<Theme> = {
     position: 'relative',
     overflow: 'hidden',
-    borderRadius: 3,
-    aspectRatio: { xs: '16 / 9', md: '21 / 9' },
-    mb: 2.5,
+    borderRadius: 1.5,
+    aspectRatio: { xs: '4 / 3', sm: '16 / 9', md: '21 / 9' },
+  };
+
+  const readingSurfaceSx: SxProps<Theme> = {
+    backgroundColor: theme.palette.background.paper,
+    borderRadius: 1.5,
   };
 
   const quiltedImageItemSx: SxProps<Theme> = {
     position: 'relative',
     overflow: 'hidden',
-    borderRadius: 3,
+    borderRadius: 1,
     '& img': {
       display: 'block',
       width: '100%',
@@ -297,10 +308,10 @@ export const createAppStyleMap = (theme: Theme) => {
     } satisfies SxProps<Theme>,
     cvPagePaneSx: {
       height: '100%',
-      p: { xs: 2.5, md: 3 },
+      p: { xs: 0, md: 1 },
     } satisfies SxProps<Theme>,
     cvPagePrimaryPaneSx: {
-      p: { xs: 2.5, md: 3.5 },
+      p: { xs: 0, md: 1 },
     } satisfies SxProps<Theme>,
     cvDesktopAsideGridItemSx: {
       order: { xs: 2, md: 1 },
@@ -308,7 +319,20 @@ export const createAppStyleMap = (theme: Theme) => {
     cvDesktopMainGridItemSx: {
       order: { xs: 1, md: 2 },
     } satisfies SxProps<Theme>,
-    homeHeroContentSx: { pb: 24.25 } satisfies SxProps<Theme>,
+    homeIntroSx: {
+      width: 'min(1100px, 100%)',
+      p: { xs: 2.5, md: 4 },
+      borderRadius: 1.5,
+      backgroundColor: theme.palette.background.paper,
+    } satisfies SxProps<Theme>,
+    homeHeroContentSx: {
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 4,
+      px: { xs: 2, md: 4 },
+      py: { xs: 4, md: 6 },
+    } satisfies SxProps<Theme>,
     homeHeroShellSx: {
       p: 0,
       backgroundColor: 'transparent',
@@ -530,6 +554,7 @@ export const createAppStyleMap = (theme: Theme) => {
     photographyImmersiveCardSx,
     photographyCardOverlaySx,
     photographyDetailCoverSx,
+    readingSurfaceSx,
     photographyMediaSx: {
       position: 'relative',
       borderRadius: 1.5,

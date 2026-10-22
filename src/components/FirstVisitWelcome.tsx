@@ -22,6 +22,7 @@ import { Text } from './text';
 
 type FirstVisitWelcomeProps = {
   open: boolean;
+  returnFocusRef?: React.RefObject<HTMLButtonElement | null>;
   onClose: () => void;
   onInteractionChange: (interacting: boolean) => void;
   motionIntensity: MotionIntensityLevel;
@@ -36,6 +37,7 @@ const motionLevels: MotionIntensityLevel[] = ['off', 'subtle', 'default', 'expre
 
 export const FirstVisitWelcome = ({
   open,
+  returnFocusRef,
   onClose,
   onInteractionChange,
   motionIntensity,
@@ -52,15 +54,23 @@ export const FirstVisitWelcome = ({
   const { welcomePanelSx } = useAppStyles();
 
   useEffect(() => {
+    if (!open) {
+      setHovered(false);
+      setFocused(false);
+    }
+  }, [open]);
+
+  useEffect(() => {
     onInteractionChange(open && (hovered || focused));
   }, [open, hovered, focused, onInteractionChange]);
 
   const dismiss = useCallback(() => {
     if (panelRef.current?.contains(document.activeElement)) {
-      document.getElementById(HEADER_SETTINGS_TRIGGER_ID)?.focus({ preventScroll: true });
+      const target = returnFocusRef?.current ?? document.getElementById(HEADER_SETTINGS_TRIGGER_ID);
+      target?.focus();
     }
     onClose();
-  }, [onClose]);
+  }, [onClose, returnFocusRef]);
 
   useEffect(() => {
     if (!open) return;
@@ -74,6 +84,8 @@ export const FirstVisitWelcome = ({
   return (
     <Portal>
       <ClickAwayListener
+        mouseEvent="onMouseDown"
+        touchEvent="onTouchStart"
         onClickAway={() => {
           if (open) dismiss();
         }}
@@ -173,7 +185,7 @@ export const FirstVisitWelcome = ({
               <Text role="caption" tone="muted" sx={{ textAlign: 'center' }}>
                 {hovered || focused
                   ? 'Take your time — this stays open while you choose.'
-                  : 'Continues automatically · Esc to skip'}
+                  : 'Closes automatically · Esc to dismiss'}
               </Text>
             </Stack>
           </Paper>

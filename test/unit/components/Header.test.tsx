@@ -165,12 +165,12 @@ describe('Header controls', () => {
     expect(pause).toHaveBeenCalledTimes(1);
   });
 
-  it('hides the audio control when welcome audio consent was declined before onboarding completed', () => {
+  it('keeps an explicit play control available even without onboarding', () => {
     mockUseWelcomeAudio.mockReturnValue(createAudioState({ audioConsent: 'declined' }));
 
     renderHeader('/cv');
 
-    expect(screen.queryByRole('button', { name: 'Play welcome audio' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Play welcome audio' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Pause welcome audio' })).not.toBeInTheDocument();
   });
 
@@ -204,7 +204,6 @@ describe('Header controls', () => {
   });
 
   it('renders the settings popover on the home route and forwards preset changes', () => {
-    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ onboardingCompleted: true }));
     const setAppearance = jest.fn();
     mockUseAppTheme.mockReturnValue({
       mode: 'light',
@@ -231,8 +230,8 @@ describe('Header controls', () => {
     expect(setAppearance).toHaveBeenCalledWith('ember');
   });
 
-  it('highlights the settings trigger while the home welcome is visible', () => {
-    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ onboardingCompleted: false }));
+  it('highlights the settings trigger on the home route while the settings hint is open', () => {
+    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ showSettingsHint: true }));
 
     renderHeader('/');
 
@@ -242,8 +241,8 @@ describe('Header controls', () => {
     );
   });
 
-  it('does not highlight the settings trigger on non-home routes before onboarding', () => {
-    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ onboardingCompleted: false }));
+  it('does not highlight the settings trigger on non-home routes even while the settings hint is open', () => {
+    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ showSettingsHint: true }));
 
     renderHeader('/cv');
 

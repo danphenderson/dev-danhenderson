@@ -79,3 +79,9 @@ export type PhotographyAlbumMeta = {
   location?: string;
   dateRange?: string;
 };
+
+/** Generated display files; source gallery records continue to reference originals. */
+export type DisplayImageSet = {
+  sourceHash: string;
+  images: { src: string; width: number; height: number; bytes: number }[];
+};

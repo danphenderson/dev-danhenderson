@@ -107,11 +107,7 @@ test.describe('CV page – GitHub integration', () => {
   test('renders the CV page with core sections', async ({ page }) => {
     await page.goto('/cv');
     await expect(page.getByText('Daniel Henderson')).toBeVisible();
-    await expect(page.getByText('Redmond, WA', { exact: true })).toBeVisible();
-    await ensureCvSectionVisible(page, 'cv-education');
-    await expect(
-      page.getByText('MS Mathematics, Applied/Computational', { exact: true })
-    ).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Download resume' })).toBeVisible();
     await ensureCvSectionVisible(page, 'cv-github');
     await expectGitHubDataStatusTooltip(page);
 
@@ -238,7 +234,7 @@ test.describe('CV page – GitHub integration', () => {
   test('default CV renders a story mode toggle', async ({ page }) => {
     await page.goto('/cv');
 
-    await expect(page.getByText('Full CV')).toBeVisible();
+    await expect(page.getByText('Full CV', { exact: true })).toBeVisible();
     await expect(page.getByTestId('cv-mode-toggle')).toContainText('Read my story');
   });
 });
