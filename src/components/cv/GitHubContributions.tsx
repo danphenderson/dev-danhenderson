@@ -40,7 +40,10 @@ export const GitHubContributions = ({
     return <Text role="bodyMuted">No recent community contributions found right now.</Text>;
   }
 
-  const sortedContributions = [...contributions].sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0));
+  const sortedContributions = [...contributions].sort((a, b) => (b.stars ?? -1) - (a.stars ?? -1));
+  const starCount = (project: GitHubContribution) => project.stars?.toLocaleString('en-US') ?? '—';
+  const starLabel = (project: GitHubContribution) =>
+    project.stars === undefined ? 'Star count unavailable' : `${starCount(project)} GitHub stars`;
 
   if (variant === 'list') {
     return (
@@ -54,8 +57,13 @@ export const GitHubContributions = ({
               <Box component="span" sx={contributionInlineNameSx}>
                 {project.name}
               </Box>
-              <Box component="span" sx={contributionInlineMetaSx}>
-                ★ {project.stars ?? 0}
+              <Box
+                component="span"
+                sx={contributionInlineMetaSx}
+                aria-label={starLabel(project)}
+                title={starLabel(project)}
+              >
+                ★ {starCount(project)}
               </Box>
             </Text>
           ),
@@ -85,8 +93,13 @@ export const GitHubContributions = ({
             </Text>
           </Box>
           <Stack direction="row" spacing={0.5} alignItems="center" sx={contributionCardMetaRowSx}>
-            <Text role="meta" sx={contributionCardMetaSx}>
-              ★ {project.stars ?? 0}
+            <Text
+              role="meta"
+              sx={contributionCardMetaSx}
+              aria-label={starLabel(project)}
+              title={starLabel(project)}
+            >
+              ★ {starCount(project)}
             </Text>
           </Stack>
         </ContentCard>

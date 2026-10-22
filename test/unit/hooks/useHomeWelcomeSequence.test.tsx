@@ -1,204 +1,139 @@
-import * as React from 'react';
-import { act, renderHook, waitFor } from '@testing-library/react';
-
-type MockWelcomeAudioState = {
-  play: () => Promise<void>;
-  pause: () => void;
-  isPlaying: boolean;
-  ready: boolean;
-  error?: string;
-  audioConsent: 'unknown' | 'granted' | 'declined';
-  grantAudioConsent: () => void;
-  declineAudioConsent: () => void;
-};
-
-const mockWelcomeAudioContext = React.createContext<MockWelcomeAudioState | null>(null);
-
-jest.mock('../../../src/WelcomeAudioProvider', () => {
-  const React = require('react');
-
-  return {
-    useWelcomeAudio: () => {
-      const value = React.useContext(mockWelcomeAudioContext);
-      if (!value) {
-        throw new Error('Missing mock welcome audio state.');
-      }
-      return value;
-    },
-  };
-});
-
-const CUSTOMIZE_AUTO_ADVANCE_DELAY_MS = 2250;
-
-const {
+import { StrictMode, type PropsWithChildren } from 'react';
+import { act, renderHook } from '@testing-library/react';
+import {
   WelcomeOnboardingProvider,
   ONBOARDING_COMPLETED_STORAGE_KEY,
-} = require('../../../src/WelcomeOnboardingProvider');
-const { useHomeWelcomeSequence } = require('../../../src/hooks/useHomeWelcomeSequence');
+} from '../../../src/WelcomeOnboardingProvider';
+import {
+  useHomeWelcomeSequence,
+  WELCOME_AUTO_DISMISS_MS,
+} from '../../../src/hooks/useHomeWelcomeSequence';
 
-const renderSequence = ({
-  initialAudioConsent = 'unknown',
-  error,
-}: {
-  initialAudioConsent?: MockWelcomeAudioState['audioConsent'];
-  error?: string;
-} = {}) => {
-  type AudioControls = {
-    play: jest.Mock<Promise<void>, []>;
-    pause: jest.Mock<void, []>;
-    grantAudioConsent: jest.Mock<void, []>;
-    declineAudioConsent: jest.Mock<void, []>;
-  };
+const mockPlay = jest.fn<Promise<void>, []>();
+const mockPause = jest.fn();
+const mockDecline = jest.fn();
+let mockIsPlaying = false;
+jest.mock('../../../src/WelcomeAudioProvider', () => ({
+  useWelcomeAudio: () => ({
+    play: mockPlay,
+    pause: mockPause,
+    isPlaying: mockIsPlaying,
+    audioConsent: 'unknown',
+    declineAudioConsent: mockDecline,
+  }),
+}));
 
-  const audioState: {
-    setAudioConsent: React.Dispatch<React.SetStateAction<MockWelcomeAudioState['audioConsent']>>;
-    setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>;
-  } = {
-    setAudioConsent: () => {},
-    setIsPlaying: () => {},
-  };
-
-  const audioControls: AudioControls = {
-    play: jest.fn(async () => {
-      audioState.setAudioConsent('granted');
-      audioState.setIsPlaying(true);
-    }),
-    pause: jest.fn(() => audioState.setIsPlaying(false)),
-    grantAudioConsent: jest.fn(),
-    declineAudioConsent: jest.fn(() => {
-      audioState.setAudioConsent('declined');
-    }),
-  };
-
-  const Wrapper = ({ children }: { children: React.ReactNode }) => {
-    const [audioConsent, setAudioConsent] =
-      React.useState<MockWelcomeAudioState['audioConsent']>(initialAudioConsent);
-    const [isPlaying, setIsPlaying] = React.useState(initialAudioConsent === 'granted');
-
-    audioState.setAudioConsent = setAudioConsent;
-    audioState.setIsPlaying = setIsPlaying;
-
-    return (
-      <mockWelcomeAudioContext.Provider
-        value={{
-          play: audioControls.play,
-          pause: audioControls.pause,
-          isPlaying,
-          ready: true,
-          error,
-          audioConsent,
-          grantAudioConsent: audioControls.grantAudioConsent,
-          declineAudioConsent: audioControls.declineAudioConsent,
-        }}
-      >
-        <WelcomeOnboardingProvider>{children}</WelcomeOnboardingProvider>
-      </mockWelcomeAudioContext.Provider>
-    );
-  };
-
-  const hook = renderHook(() => useHomeWelcomeSequence(), { wrapper: Wrapper });
-
-  return { ...hook, audioControls };
-};
+const wrapper = ({ children }: PropsWithChildren) => (
+  <StrictMode>
+    <WelcomeOnboardingProvider>{children}</WelcomeOnboardingProvider>
+  </StrictMode>
+);
 
 describe('useHomeWelcomeSequence', () => {
   beforeEach(() => {
     window.localStorage.clear();
+    jest.useFakeTimers();
+    jest.clearAllMocks();
+    mockPlay.mockResolvedValue(undefined);
+    mockIsPlaying = false;
   });
-
   afterEach(() => {
     jest.useRealTimers();
+    jest.restoreAllMocks();
   });
 
-  it('opens the audio prompt for first-time visitors and keeps the hero blocked', async () => {
-    const { result } = renderSequence();
-
-    await waitFor(() => expect(result.current.isPromptOpen).toBe(true));
-    expect(result.current.isCustomizeOpen).toBe(false);
-    expect(result.current.isSettingsHintOpen).toBe(false);
+  it('automatically enters the IDE without audio consent or button clicks', () => {
+    const { result } = renderHook(useHomeWelcomeSequence, { wrapper });
+    expect(result.current.isWelcomeOpen).toBe(true);
     expect(result.current.isHeroAnimationReady).toBe(false);
+    act(() => jest.advanceTimersByTime(WELCOME_AUTO_DISMISS_MS - 1));
+    expect(result.current.isWelcomeOpen).toBe(true);
+    act(() => jest.advanceTimersByTime(1));
+    expect(result.current.isWelcomeOpen).toBe(false);
+    expect(result.current.isHeroAnimationReady).toBe(true);
+    expect(localStorage.getItem(ONBOARDING_COMPLETED_STORAGE_KEY)).toBe('true');
+    expect(mockPlay).not.toHaveBeenCalled();
+    expect(mockDecline).not.toHaveBeenCalled();
   });
 
-  it('declining the prompt closes it and advances to the customize step', async () => {
-    const { result, audioControls } = renderSequence();
+  it('pauses for interaction and gives a fresh reading interval on release', () => {
+    const { result } = renderHook(useHomeWelcomeSequence, { wrapper });
+    act(() => jest.advanceTimersByTime(2000));
+    act(() => result.current.setIsInteracting(true));
+    act(() => jest.advanceTimersByTime(20000));
+    expect(result.current.isWelcomeOpen).toBe(true);
+    act(() => result.current.setIsInteracting(false));
+    act(() => jest.advanceTimersByTime(WELCOME_AUTO_DISMISS_MS));
+    expect(result.current.isHeroAnimationReady).toBe(true);
+  });
 
-    await waitFor(() => expect(result.current.isPromptOpen).toBe(true));
+  it('completes immediately on dismissal and stays completed on remount', () => {
+    const first = renderHook(useHomeWelcomeSequence, { wrapper });
+    act(() => first.result.current.handleDismiss());
+    expect(first.result.current.isHeroAnimationReady).toBe(true);
+    first.unmount();
+    const next = renderHook(useHomeWelcomeSequence, { wrapper });
+    expect(next.result.current.isWelcomeOpen).toBe(false);
+    expect(next.result.current.isHeroAnimationReady).toBe(true);
+  });
 
+  it('clears the dismissal timer on unmount', () => {
+    const { unmount } = renderHook(useHomeWelcomeSequence, { wrapper });
+    unmount();
+    act(() => jest.advanceTimersByTime(WELCOME_AUTO_DISMISS_MS));
+    expect(localStorage.getItem(ONBOARDING_COMPLETED_STORAGE_KEY)).toBeNull();
+  });
+
+  it('keeps entry available while audio is pending and ignores duplicate play requests', async () => {
+    let resolve!: () => void;
+    mockPlay.mockImplementation(
+      () =>
+        new Promise<void>((done) => {
+          resolve = done;
+        })
+    );
+    const { result } = renderHook(useHomeWelcomeSequence, { wrapper });
+    let pending!: Promise<void>;
     act(() => {
-      result.current.handleOptOut();
+      pending = result.current.handleToggleAudio();
+      void result.current.handleToggleAudio();
     });
-
-    expect(audioControls.declineAudioConsent).toHaveBeenCalledTimes(1);
-    await waitFor(() => expect(result.current.isPromptOpen).toBe(false));
-    await waitFor(() => expect(result.current.isCustomizeOpen).toBe(true));
-  });
-
-  it('playing audio closes the prompt and advances to the customize step', async () => {
-    const { result, audioControls } = renderSequence();
-
-    await waitFor(() => expect(result.current.isPromptOpen).toBe(true));
-
+    expect(mockPlay).toHaveBeenCalledTimes(1);
+    expect(result.current.isAudioLoading).toBe(true);
+    act(() => jest.advanceTimersByTime(WELCOME_AUTO_DISMISS_MS));
+    expect(result.current.isHeroAnimationReady).toBe(true);
     await act(async () => {
-      await result.current.handlePlay();
+      resolve();
+      await pending;
     });
-
-    expect(audioControls.play).toHaveBeenCalledTimes(1);
-    expect(result.current.isLoading).toBe(false);
-    await waitFor(() => expect(result.current.isPromptOpen).toBe(false));
-    await waitFor(() => expect(result.current.isCustomizeOpen).toBe(true));
+    expect(result.current.isAudioLoading).toBe(false);
+    expect(result.current.isWelcomeOpen).toBe(false);
   });
 
-  it('advances from customize to settings hint and then completes onboarding', async () => {
-    const { result } = renderSequence({ initialAudioConsent: 'declined' });
-
-    await waitFor(() => expect(result.current.isCustomizeOpen).toBe(true));
-
-    act(() => {
-      result.current.handleCustomizeDismiss();
-    });
-
-    await waitFor(() => expect(result.current.isCustomizeOpen).toBe(false));
-    await waitFor(() => expect(result.current.isSettingsHintOpen).toBe(true));
-
-    act(() => {
-      result.current.handleSettingsHintComplete();
-    });
-
-    await waitFor(() => expect(result.current.isSettingsHintOpen).toBe(false));
-    await waitFor(() => expect(result.current.isHeroAnimationReady).toBe(true));
-    expect(window.localStorage.getItem(ONBOARDING_COMPLETED_STORAGE_KEY)).toBe('true');
+  it('does not block dismissal after audio fails', async () => {
+    jest.spyOn(console, 'error').mockImplementation(() => {});
+    mockPlay.mockRejectedValue(new Error('Audio unavailable'));
+    const { result } = renderHook(useHomeWelcomeSequence, { wrapper });
+    await act(async () => result.current.handleToggleAudio());
+    expect(result.current.isAudioLoading).toBe(false);
+    act(() => result.current.handleDismiss());
+    expect(result.current.isHeroAnimationReady).toBe(true);
   });
 
-  it('auto-advances from customize to settings hint after 2250 ms', async () => {
-    jest.useFakeTimers();
-
-    const { result } = renderSequence({ initialAudioConsent: 'declined' });
-
-    await waitFor(() => expect(result.current.isCustomizeOpen).toBe(true));
-
-    act(() => {
-      jest.advanceTimersByTime(CUSTOMIZE_AUTO_ADVANCE_DELAY_MS - 1);
-    });
-
-    expect(result.current.isCustomizeOpen).toBe(true);
-    expect(result.current.isSettingsHintOpen).toBe(false);
-
-    act(() => {
-      jest.advanceTimersByTime(1);
-    });
-
-    await waitFor(() => expect(result.current.isCustomizeOpen).toBe(false));
-    await waitFor(() => expect(result.current.isSettingsHintOpen).toBe(true));
+  it('pauses audio that is already playing', async () => {
+    mockIsPlaying = true;
+    const { result } = renderHook(useHomeWelcomeSequence, { wrapper });
+    await act(async () => result.current.handleToggleAudio());
+    expect(mockPause).toHaveBeenCalledTimes(1);
+    expect(mockPlay).not.toHaveBeenCalled();
   });
 
-  it('starts ready for returning visitors with completed onboarding', async () => {
-    window.localStorage.setItem(ONBOARDING_COMPLETED_STORAGE_KEY, 'true');
-
-    const { result } = renderSequence({ initialAudioConsent: 'declined' });
-
-    await waitFor(() => expect(result.current.isHeroAnimationReady).toBe(true));
-    expect(result.current.isPromptOpen).toBe(false);
-    expect(result.current.isCustomizeOpen).toBe(false);
-    expect(result.current.isSettingsHintOpen).toBe(false);
+  it('still enters when localStorage cannot persist completion', () => {
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('Storage blocked');
+    });
+    const { result } = renderHook(useHomeWelcomeSequence, { wrapper });
+    act(() => jest.advanceTimersByTime(WELCOME_AUTO_DISMISS_MS));
+    expect(result.current.isHeroAnimationReady).toBe(true);
   });
 });

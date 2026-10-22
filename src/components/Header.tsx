@@ -60,9 +60,9 @@ export default function Header() {
   const muiTheme = useMuiTheme();
   const location = useLocation();
   const { isPlaying, pause, play, audioConsent } = useWelcomeAudio();
-  const { onboardingCompleted, showSettingsHint } = useWelcomeOnboarding();
+  const { onboardingCompleted } = useWelcomeOnboarding();
   const path = location.pathname.toLowerCase();
-  const highlightSettingsTrigger = path === '/' && showSettingsHint;
+  const highlightSettingsTrigger = path === '/' && !onboardingCompleted;
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const iconButtonSize = isMobile ? 'medium' : ('large' as const);
   const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState<null | HTMLElement>(null);

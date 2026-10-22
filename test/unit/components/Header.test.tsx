@@ -204,6 +204,7 @@ describe('Header controls', () => {
   });
 
   it('renders the settings popover on the home route and forwards preset changes', () => {
+    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ onboardingCompleted: true }));
     const setAppearance = jest.fn();
     mockUseAppTheme.mockReturnValue({
       mode: 'light',
@@ -230,8 +231,8 @@ describe('Header controls', () => {
     expect(setAppearance).toHaveBeenCalledWith('ember');
   });
 
-  it('highlights the settings trigger on the home route while the settings hint is open', () => {
-    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ showSettingsHint: true }));
+  it('highlights the settings trigger while the home welcome is visible', () => {
+    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ onboardingCompleted: false }));
 
     renderHeader('/');
 
@@ -241,8 +242,8 @@ describe('Header controls', () => {
     );
   });
 
-  it('does not highlight the settings trigger on non-home routes even while the settings hint is open', () => {
-    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ showSettingsHint: true }));
+  it('does not highlight the settings trigger on non-home routes before onboarding', () => {
+    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ onboardingCompleted: false }));
 
     renderHeader('/cv');
 

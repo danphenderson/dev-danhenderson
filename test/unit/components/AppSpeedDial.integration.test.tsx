@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { ThemeProvider } from '@mui/material/styles';
 import { MemoryRouter, useLocation } from 'react-router-dom';
 import { AppSpeedDial } from '../../../src/components/AppSpeedDial';
@@ -9,6 +9,40 @@ const theme = createAppTheme('light', 'evergreen', 'off');
 const CurrentPath = () => <output aria-label="Current path">{useLocation().pathname}</output>;
 
 describe('AppSpeedDial with real MUI components', () => {
+  it('keeps static labels and keyboard navigation working through the FAB slot', () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <AppSpeedDial
+          ariaLabel="Open navigation"
+          icon={<span>Open</span>}
+          actionLabelsAlwaysOpen
+          actions={[
+            { id: 'first', label: 'First section', icon: <span>1</span>, onClick: jest.fn() },
+            {
+              id: 'download',
+              label: 'Save file',
+              icon: <span>2</span>,
+              href: '/file.pdf',
+              download: true,
+            },
+          ]}
+        />
+      </ThemeProvider>
+    );
+    const trigger = screen.getByRole('button', { name: 'Open navigation' });
+    act(() => trigger.focus());
+    fireEvent.click(trigger);
+    fireEvent.keyDown(trigger, { key: 'ArrowUp' });
+    const first = screen.getByRole('menuitem', { name: 'First section' });
+    expect(first).toHaveFocus();
+    fireEvent.keyDown(first, { key: 'ArrowUp' });
+    const download = screen.getByRole('menuitem', { name: 'Save file' });
+    expect(download).toHaveFocus();
+    expect(download).toHaveAttribute('download');
+    fireEvent.keyDown(download, { key: 'Escape' });
+    expect(trigger).toHaveFocus();
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
   it('preserves external, email, and download links and their accessible names', () => {
     render(
       <ThemeProvider theme={theme}>

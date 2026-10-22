@@ -15,9 +15,9 @@ jest.mock('../../../../src/components/cv/GitHubLinkChipList', () => ({
   }) => (
     <div data-testid="chip-list">
       {items.map((item) => (
-        <span key={item.key} data-tooltip={item.tooltip}>
-          {item.key}
-        </span>
+        <a key={item.key} href={item.href} data-tooltip={item.tooltip}>
+          {item.label}
+        </a>
       ))}
     </div>
   ),
@@ -59,7 +59,10 @@ describe('GitHubContributions', () => {
       </ThemeProvider>
     );
 
-    const names = screen.getAllByText(/stars/).map((el) => el.closest('a')?.textContent);
+    expect(screen.getAllByRole('link').map((link) => link.textContent)).toEqual([
+      'high-stars★ 1,000',
+      'low-stars★ 10',
+    ]);
     expect(screen.getByText('high-stars')).toBeInTheDocument();
     expect(screen.getByText('low-stars')).toBeInTheDocument();
   });
@@ -76,9 +79,36 @@ describe('GitHubContributions', () => {
     );
 
     expect(screen.getByTestId('chip-list')).toBeInTheDocument();
-    expect(screen.getByText('contrib-a')).toHaveAttribute(
+    expect(screen.getByText('contrib-a').closest('a')).toHaveAttribute(
       'data-tooltip',
       'Open contrib-a on GitHub.'
     );
   });
+
+  it.each(['cards', 'list'] as const)(
+    'distinguishes unknown and verified zero counts in %s',
+    (variant) => {
+      render(
+        <ThemeProvider>
+          <GitHubContributions
+            loading={false}
+            variant={variant}
+            contributions={[
+              { name: 'unknown', url: 'https://github.com/unknown' },
+              { name: 'zero', url: 'https://github.com/zero', stars: 0 },
+              { name: 'popular', url: 'https://github.com/popular', stars: 50000 },
+            ]}
+          />
+        </ThemeProvider>
+      );
+      expect(screen.getByLabelText('Star count unavailable')).toHaveTextContent('★ —');
+      expect(screen.getByLabelText('0 GitHub stars')).toHaveTextContent('★ 0');
+      expect(screen.getByLabelText('50,000 GitHub stars')).toHaveTextContent('★ 50,000');
+      expect(screen.getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual([
+        'https://github.com/popular',
+        'https://github.com/zero',
+        'https://github.com/unknown',
+      ]);
+    }
+  );
 });

@@ -1,13 +1,14 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { SPRING_EASING_MOTION } from '../styles/springEasing';
+import { duration, useMotionScale } from '../motion';
 
 /**
  * Total entrance duration in seconds:
  * - initial hold so the nested MUI Zoom can play
  * - spiral travel to resting position
  */
-const ENTRANCE_DURATION_S = 3.6;
+const ENTRANCE_DURATION_S = duration.heroEntrance;
 
 /** Hold at the starting position while the inner Zoom entrance completes. */
 const HOLD_FRACTION = 0.08;
@@ -144,18 +145,32 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
   const ref = useRef<HTMLDivElement>(null);
   const [startOffset, setStartOffset] = useState<{ x: number; y: number } | null>(null);
   const [settled, setSettled] = useState(false);
+  const completed = useRef(false);
+  const { duration: dFactor } = useMotionScale();
+
+  const complete = useCallback(() => {
+    if (completed.current) return;
+    completed.current = true;
+    setSettled(true);
+    onComplete?.();
+  }, [onComplete]);
 
   /** Reset settled state when the path deactivates so a re-entrance replays. */
   useEffect(() => {
-    if (!active) setSettled(false);
-  }, [active]);
+    if (!active) {
+      completed.current = false;
+      setSettled(false);
+    } else if (dFactor === 0) {
+      complete();
+    }
+  }, [active, dFactor, complete]);
 
   /**
    * Measure the element's final resting position and compute the transform
    * needed to place it in the visual centre of the viewport.
    */
   useLayoutEffect(() => {
-    if (!active) {
+    if (!active || dFactor === 0) {
       setStartOffset(null);
       return;
     }
@@ -175,14 +190,14 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
     };
 
     measure();
-  }, [active]);
+  }, [active, dFactor]);
 
   const keyframes = useMemo(() => {
     if (!startOffset) return null;
     return buildSpiralKeyframes(startOffset.x, startOffset.y);
   }, [startOffset]);
 
-  if (!active) {
+  if (!active || dFactor === 0) {
     return <>{children}</>;
   }
 
@@ -220,16 +235,13 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
       transition={
         keyframes
           ? {
-              duration: ENTRANCE_DURATION_S,
+              duration: ENTRANCE_DURATION_S * dFactor,
               times: keyframes.times,
               ease: SPRING_EASING_MOTION,
             }
           : undefined
       }
-      onAnimationComplete={() => {
-        setSettled(true);
-        onComplete?.();
-      }}
+      onAnimationComplete={complete}
       style={motionStyle}
     >
       {children}

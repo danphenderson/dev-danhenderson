@@ -23,17 +23,8 @@ describe('Home route integration', () => {
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
     expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument();
 
-    fireEvent.click(await screen.findByRole('button', { name: 'No thanks' }));
-
-    await waitFor(() =>
-      expect(screen.getByTestId('customize-modal-open')).toHaveTextContent('true')
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: 'Okay' }));
-
-    await waitFor(() => expect(screen.getByTestId('settings-hint-open')).toHaveTextContent('true'));
-
-    fireEvent.click(screen.getByRole('button', { name: 'Get started' }));
+    expect(screen.getByRole('region', { name: 'Make yourself at home' })).toBeVisible();
+    fireEvent.keyDown(document, { key: 'Escape' });
 
     await waitFor(() =>
       expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
@@ -52,9 +43,7 @@ describe('Home route integration', () => {
   it('skips onboarding for returning visitors and renders the ping-pong hero shell immediately', async () => {
     await renderHomeWithHeroVisible();
 
-    expect(screen.queryByText('Play welcome audio?')).not.toBeInTheDocument();
-    expect(screen.queryByText('Customize your experience')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('first-visit-settings-hint-popover')).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Make yourself at home' })).not.toBeInTheDocument();
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
     expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-active', 'true');
     expectTerminalLinesStructure(screen.getByTestId('terminal-hero'));

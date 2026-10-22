@@ -8,9 +8,7 @@ const STABLE_TERMINAL_COMMAND_TEXT = 'brew ls';
 const TERMINAL_NOTIFICATION_TEXT = 'server.py — No problems detected ✓';
 const SERVER_EDITOR_TEXT = 'Ping Pong Server';
 const CLIENT_EDITOR_TEXT = 'SERVER_URL';
-const WELCOME_AUDIO_PROMPT_BODY =
-  'Would you like to hear a short verse while browsing the site? Use the pause button in the header to stop it anytime.';
-const CUSTOMIZE_AUTO_ADVANCE_DELAY_MS = 2250;
+const WELCOME_AUTO_DISMISS_MS = 5000;
 const HOME_ACTIVE_TERMINAL_HERO_SELECTOR =
   '[data-testid="home-ide-expanded"] [data-testid="terminal-hero"], [data-testid="home-hero-window"] [data-testid="terminal-hero"]';
 
@@ -122,8 +120,8 @@ const advanceClockUntilTerminalBodyContains = async (
   page: Page,
   terminalHero: Locator,
   expectedText: string,
-  maxElapsedMs = 30_000,
-  stepMs = 250
+  maxElapsedMs = 45_000,
+  stepMs = 50
 ) => {
   const terminalPanelBody = terminalHero.getByTestId('terminal-panel-body');
 
@@ -146,33 +144,26 @@ const resetHomeScrollForScreenshot = async (page: Page, terminalHero: Locator) =
 };
 
 test.describe('Home page', () => {
-  test('auto-dismisses the customize modal after 2250 ms and shows the settings hint', async ({
-    page,
-  }) => {
+  test('automatically hands the welcome panel off to the IDE without a click', async ({ page }) => {
     await resetWelcomeState(page);
     await page.clock.install({ time: HOME_SCREENSHOT_CLOCK_START });
     await page.goto('/');
 
-    const welcomePrompt = page.getByRole('dialog', { name: 'Play welcome audio?' });
-    await expect(welcomePrompt).toBeVisible();
-    await welcomePrompt.getByRole('button', { name: 'No thanks' }).click();
-    await expect(welcomePrompt).toBeHidden();
-
-    const customizeDialog = page.getByTestId('customize-experience-dialog');
-    await expect(customizeDialog).toBeVisible();
-
-    await page.clock.runFor(CUSTOMIZE_AUTO_ADVANCE_DELAY_MS);
-    await expect(customizeDialog).toBeHidden();
-    await expect(page.getByTestId('first-visit-settings-hint-popover')).toBeVisible();
+    const welcome = page.getByRole('region', { name: 'Make yourself at home' });
+    await expect(welcome).toBeVisible();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await page.clock.runFor(WELCOME_AUTO_DISMISS_MS + 500);
+    await expect(welcome).toBeHidden();
+    await expect(page.getByTestId('terminal-hero')).toBeVisible();
   });
 
   test('renders the hero content after completing the welcome sequence', async ({ page }) => {
     await resetWelcomeState(page);
     await page.goto('/');
 
-    const welcomePrompt = page.getByRole('dialog', { name: 'Play welcome audio?' });
+    const welcomePrompt = page.getByRole('region', { name: 'Make yourself at home' });
     await expect(welcomePrompt).toBeVisible();
-    await expect(welcomePrompt).toContainText(WELCOME_AUDIO_PROMPT_BODY);
+    await expect(welcomePrompt.getByRole('button', { name: 'Play welcome audio' })).toBeVisible();
 
     await dismissWelcomeSequence(page);
 
@@ -212,24 +203,8 @@ test.describe('Home page', () => {
     const siteNavigation = page.locator('#site-navigation');
     const settingsTrigger = page.getByTestId('header-settings-trigger');
 
-    const welcomePrompt = page.getByRole('dialog', { name: 'Play welcome audio?' });
-    await expect(welcomePrompt).toBeVisible();
-    await welcomePrompt.getByRole('button', { name: 'No thanks' }).click();
-    await expect(welcomePrompt).toBeHidden();
-
-    const customizeDialog = page.getByTestId('customize-experience-dialog');
-    await expect(customizeDialog).toBeVisible();
-    await customizeDialog.getByRole('button', { name: 'Okay' }).click();
-    await expect(customizeDialog).toBeHidden();
-
-    const settingsHint = page.getByTestId('first-visit-settings-hint-popover');
-    await expect(settingsHint).toBeVisible();
-    await expect(settingsHint).toContainText(
-      'You can always update motion, welcome audio, and more from the settings button in the header.'
-    );
     await expect(settingsTrigger).toHaveAttribute('data-highlighted', 'true');
-    await settingsHint.getByRole('button', { name: 'Get started' }).click();
-    await expect(settingsHint).toBeHidden();
+    await dismissWelcomeSequence(page);
     await expect(settingsTrigger).toHaveAttribute('data-highlighted', 'false');
 
     await expect(siteNavigation).toBeVisible();
@@ -265,6 +240,7 @@ test.describe('Home page', () => {
   test('shows the restored ping pong surfaces for the post-boot home terminal hero', async ({
     page,
   }) => {
+    test.setTimeout(60_000);
     await resetWelcomeState(page);
     await page.clock.install({ time: HOME_SCREENSHOT_CLOCK_START });
     await page.goto('/');
@@ -611,16 +587,13 @@ test.describe('Home page', () => {
     expect(Math.abs(resizedHeight - initialHeight)).toBeLessThanOrEqual(2);
   });
 
-  test('welcome audio prompt can be dismissed', async ({ page }) => {
+  test('welcome can be dismissed with Escape', async ({ page }) => {
     await resetWelcomeState(page);
     await page.goto('/');
-    const audioDialog = page.getByRole('dialog', { name: 'Play welcome audio?' });
-    await expect(audioDialog).toBeVisible();
-    await expect(audioDialog.getByText('Play welcome audio?')).toBeVisible();
-    await audioDialog.getByRole('button', { name: 'No thanks' }).click();
-    await expect(audioDialog).toBeHidden();
-
-    const customizeDialog = page.getByTestId('customize-experience-dialog');
-    await expect(customizeDialog).toBeVisible();
+    const welcome = page.getByRole('region', { name: 'Make yourself at home' });
+    await expect(welcome).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(welcome).toBeHidden();
+    await expect(page.getByTestId('terminal-hero')).toBeVisible();
   });
 });

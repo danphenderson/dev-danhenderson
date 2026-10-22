@@ -279,7 +279,7 @@ test.describe('Production service worker smoke', () => {
       await expect(page).toHaveURL(cvUrl);
       await expect(page.locator('#main-content')).toBeVisible();
       await expect(page.getByText('Daniel Henderson')).toBeVisible();
-      await expect(page.getByText('MS in Applied/Computational Math')).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Open about actions' })).toBeVisible();
     } finally {
       await disposeTemporaryDeployment(deployment);
     }

@@ -27,6 +27,8 @@ flowchart TB
 
 The home page is the most orchestration-heavy route. It renders a faux-VS Code IDE as an interactive hero element.
 
+The first visit opens one nonmodal welcome panel with motion and opt-in audio controls. After five seconds it dismisses into the IDE entrance; hover and keyboard focus pause the reading timer. Explore now, close, Escape, outside interaction, and header navigation allow immediate entry. Audio loading or failure never gates the IDE, and dismissal never grants audio consent. Completion persists through the onboarding provider; development home reloads intentionally replay the welcome. Motion off and system reduced motion skip the spiral and complete the IDE handoff immediately.
+
 ### Assembly
 
 ```mermaid
@@ -38,7 +40,7 @@ flowchart TB
   ACC["AnimatedContentCard<br/>fade-in reveal"]
   THC["TerminalHeroContent<br/>VS Code shell:<br/>title bar · activity bar · explorer<br/>editor pane · terminal · status bar"]
   ScrollP["Scroll parallax<br/>heroScale (1→1.08)<br/>heroOpacity (1→0.6)"]
-  Dialog["Welcome audio Dialog<br/>play / no thanks"]
+  Dialog["Optional welcome panel<br/>motion + audio · automatic dismissal"]
   Portal["Expanded IDE portal<br/>fixed fullscreen"]
 
   BG --> HMP --> DragDiv --> Tilt --> ACC --> THC
@@ -56,9 +58,11 @@ sequenceDiagram
   participant HMP as HeroMotionPath
   participant Shell as TerminalHeroContent
   participant TW as Terminal typewriter
-  participant Audio as Welcome audio prompt
+  participant Audio as Optional welcome panel
 
   Mount->>BG: Render background image + overlay
+  Mount->>Audio: Offer motion and optional audio
+  Audio-->>HMP: Timer or dismissal starts IDE entrance
   BG->>HMP: Mount shell inside motion path
   HMP->>HMP: Measure final position
   HMP->>HMP: Spiral path (1.35 turns, 3.6s)
@@ -69,7 +73,6 @@ sequenceDiagram
   TW->>TW: Type: git log → commit hash
   TW->>TW: Type: npm run build → ✓ Compiled
   TW->>TW: Type: whoami --passions → math · computers · adventures
-  Mount->>Audio: Show audio consent dialog (if needed)
 ```
 
 ### Page-owned state

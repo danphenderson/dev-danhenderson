@@ -13,7 +13,7 @@ Source code for [danhenderson.dev](https://danhenderson.dev), a React + TypeScri
 
 | Route                                   | What it contains                                                                         |
 | --------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `/`                                     | Home page with the welcome audio prompt                                                  |
+| `/`                                     | VS Code-inspired home with an optional motion/audio welcome panel                        |
 | `/cv`                                   | Interactive CV, downloadable resume, and GitHub-backed highlights with bundled fallbacks |
 | `/blog` and `/blog/:slug`               | Editorial blog index and post detail pages                                               |
 | `/climbing`                             | Climbing ticks and wish-list views                                                       |
@@ -24,7 +24,9 @@ Source code for [danhenderson.dev](https://danhenderson.dev), a React + TypeScri
 - Fully client-side single-page app built for static hosting.
 - Portfolio content is authored in local TypeScript data modules.
 - GitHub-powered CV sections degrade gracefully to bundled content when live API data is unavailable.
+- Contribution chips show verified repository star counts; `★ —` means the count is unavailable (including bundled development data), rather than zero.
 - Shared motion, theming, and reusable UI primitives power the different sections of the site.
+- The home welcome combines motion and optional audio in one nonmodal panel. It continues automatically after five seconds (paused while hovered or focused), or immediately via Explore now, close, Escape, or outside interaction. Header navigation stays available throughout; audio plays only on request. Returning visitors skip the panel, while development home reloads replay it.
 
 ## Runtime Environment
 
