@@ -12,7 +12,15 @@ test.describe('Unobstructed home entry', () => {
   }) => {
     const audioRequests: string[] = [];
     page.on('request', (request) => {
-      if (request.url().includes('soundcloud.com')) audioRequests.push(request.url());
+      try {
+        const url = request.url();
+        const { hostname } = new URL(url);
+        if (hostname === 'soundcloud.com' || hostname.endsWith('.soundcloud.com')) {
+          audioRequests.push(url);
+        }
+      } catch {
+        // Ignore malformed or non-standard URLs in request tracking.
+      }
     });
     await page.goto('/');
     await openPreferences(page);
