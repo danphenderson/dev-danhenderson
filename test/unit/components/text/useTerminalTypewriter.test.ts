@@ -1,6 +1,11 @@
 import { renderHook, act } from '@testing-library/react';
 import { useTerminalTypewriter } from '../../../../src/components/text/useTerminalTypewriter';
 
+let mockMotionScale = 1;
+jest.mock('../../../../src/motion', () => ({
+  useMotionScale: () => ({ duration: mockMotionScale }),
+}));
+
 const lines = [
   { command: 'hello', output: 'world' },
   { command: 'foo', output: 'bar' },
@@ -8,11 +13,27 @@ const lines = [
 
 describe('useTerminalTypewriter', () => {
   beforeEach(() => {
+    mockMotionScale = 1;
     jest.useFakeTimers();
   });
 
   afterEach(() => {
     jest.useRealTimers();
+  });
+
+  it('stops active timers and returns a stable transcript when motion turns off', () => {
+    const { result, rerender } = renderHook(() => useTerminalTypewriter({ lines }));
+    act(() => jest.advanceTimersByTime(50));
+    mockMotionScale = 0;
+    rerender();
+    expect(result.current.history).toEqual([lines[0]]);
+    expect(result.current.commandText).toBe('foo');
+    expect(result.current.outputText).toBe('bar');
+    expect(result.current.showCursor).toBe(false);
+    expect(jest.getTimerCount()).toBe(0);
+    const transcript = result.current;
+    act(() => jest.advanceTimersByTime(60_000));
+    expect(result.current).toEqual(transcript);
   });
 
   it('starts in idle phase and does not type when not playing', () => {

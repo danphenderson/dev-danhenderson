@@ -1,5 +1,5 @@
 import PlaceIcon from '@mui/icons-material/Place';
-import { Chip, Stack } from '@mui/material';
+import { Box, Chip, Stack } from '@mui/material';
 import type { PhotoItem } from '../../types/data';
 import { Text } from '../text';
 
@@ -40,31 +40,30 @@ export function AlbumLocationSummary({
         <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
           {albumLocation && (
             <Stack direction="row" spacing={0.5} alignItems="center">
-              <PlaceIcon sx={{ color: 'rgba(255,255,255,0.7)', fontSize: 18 }} />
-              <Text role="body" tone="inverse" context="overlay" sx={{ opacity: 0.7 }}>
-                {albumLocation}
-              </Text>
+              <PlaceIcon sx={{ color: 'text.secondary', fontSize: 18 }} />
+              <Text role="bodyMuted">{albumLocation}</Text>
             </Stack>
           )}
-          {dateRange && (
-            <Text role="body" tone="inverse" context="overlay" sx={{ opacity: 0.7 }}>
-              · {dateRange}
-            </Text>
-          )}
+          {dateRange && <Text role="bodyMuted">· {dateRange}</Text>}
         </Stack>
       )}
       {uniqueLocations.length > 1 && (
-        <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap>
-          {uniqueLocations.map((location) => (
-            <Chip
-              key={location}
-              label={location}
-              size="small"
-              variant="outlined"
-              icon={<PlaceIcon />}
-            />
-          ))}
-        </Stack>
+        <Box component="details">
+          <Box component="summary" sx={{ cursor: 'pointer', color: 'text.secondary', py: 0.5 }}>
+            {uniqueLocations.length} photo locations
+          </Box>
+          <Stack direction="row" spacing={0.75} flexWrap="wrap" useFlexGap sx={{ mt: 1 }}>
+            {uniqueLocations.map((location) => (
+              <Chip
+                key={location}
+                label={location}
+                size="small"
+                variant="outlined"
+                icon={<PlaceIcon />}
+              />
+            ))}
+          </Stack>
+        </Box>
       )}
     </Stack>
   );

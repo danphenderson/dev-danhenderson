@@ -1,0 +1,22 @@
+name: Allow sandboxed Playwright Chromium
+description: >-
+  Ubuntu 23.10+ runners restrict unprivileged user namespaces through AppArmor, which
+  Chromium's sandbox needs. Grant user namespaces only to Playwright's Chromium binaries
+  so playwright.config.ts can keep chromiumSandbox enabled.
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        if [ "$(sysctl -n kernel.apparmor_restrict_unprivileged_userns 2>/dev/null)" != "1" ]; then
+          echo "Unprivileged user namespaces are not restricted; no AppArmor profile needed."
+          exit 0
+        fi
+        printf '%s\n' \
+          'abi <abi/4.0>,' \
+          'include <tunables/global>' \
+          "profile playwright-chromium ${HOME}/.cache/ms-playwright/chromium*/**/chrome{,-headless-shell} flags=(unconfined) {" \
+          '  userns,' \
+          '}' | sudo tee /etc/apparmor.d/playwright-chromium > /dev/null
+        sudo apparmor_parser -r /etc/apparmor.d/playwright-chromium

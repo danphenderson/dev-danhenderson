@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import {
   expectHeroParallaxSource,
   expectTerminalLinesStructure,
@@ -16,28 +16,19 @@ afterEach(() => {
 });
 
 describe('Home route integration', () => {
-  it('reveals the hero only after the onboarding flow completes and starts the typewriter after hero motion', async () => {
+  it('renders the intro and hero immediately and opens preferences only on request', async () => {
     renderHomeRoute();
 
-    expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'false');
-    expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'false');
-    expect(screen.queryByTestId('terminal-hero')).not.toBeInTheDocument();
+    expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true');
+    expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
+    expect(screen.getByRole('link', { name: 'Explore my CV' })).toBeVisible();
+    expect(screen.queryByRole('region', { name: 'Make yourself at home' })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Customize appearance & audio' }));
+    expect(screen.getByRole('region', { name: 'Make yourself at home' })).toBeVisible();
+    await act(async () => screen.getByRole('button', { name: 'Off', exact: true }).focus());
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.getByRole('button', { name: 'Customize appearance & audio' })).toHaveFocus();
 
-    fireEvent.click(await screen.findByRole('button', { name: 'No thanks' }));
-
-    await waitFor(() =>
-      expect(screen.getByTestId('customize-modal-open')).toHaveTextContent('true')
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: 'Okay' }));
-
-    await waitFor(() => expect(screen.getByTestId('settings-hint-open')).toHaveTextContent('true'));
-
-    fireEvent.click(screen.getByRole('button', { name: 'Get started' }));
-
-    await waitFor(() =>
-      expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
-    );
     expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-active', 'true');
     expect(screen.getByTestId('terminal-hero')).toHaveAttribute('data-playing', 'false');
     expectTerminalLinesStructure(screen.getByTestId('terminal-hero'));
@@ -49,12 +40,55 @@ describe('Home route integration', () => {
     );
   });
 
+  it('exposes the preferences opener as a disclosure that keyboard users can enter and toggle', async () => {
+    renderHomeRoute();
+    const opener = screen.getByRole('button', { name: 'Customize appearance & audio' });
+    expect(opener).toHaveAttribute('aria-expanded', 'false');
+    expect(opener).not.toHaveAttribute('aria-controls');
+
+    // Keyboard and assistive-technology activation dispatch clicks without a pointer count.
+    fireEvent.click(opener, { detail: 0 });
+    const region = screen.getByRole('region', { name: 'Make yourself at home' });
+    expect(opener).toHaveAttribute('aria-expanded', 'true');
+    expect(opener).toHaveAttribute('aria-controls', region.id);
+    expect(region).toHaveFocus();
+
+    fireEvent.click(opener, { detail: 1 });
+    expect(opener).toHaveAttribute('aria-expanded', 'false');
+    await waitFor(() =>
+      expect(
+        screen.queryByRole('region', { name: 'Make yourself at home' })
+      ).not.toBeInTheDocument()
+    );
+
+    fireEvent.click(opener, { detail: 1 });
+    expect(screen.getByRole('region', { name: 'Make yourself at home' })).not.toHaveFocus();
+  });
+
+  it('keeps the preferences panel available and in place while the IDE window is minimized', async () => {
+    renderHomeRoute();
+    fireEvent.click(screen.getByTestId('ide-minimize-btn'));
+    await waitFor(() => expect(screen.queryByTestId('background-shell')).not.toBeInTheDocument());
+
+    const opener = screen.getByRole('button', { name: 'Customize appearance & audio' });
+    fireEvent.click(opener, { detail: 0 });
+    const region = screen.getByRole('region', { name: 'Make yourself at home' });
+    expect(opener).toHaveAttribute('aria-controls', region.id);
+    expect(region).toHaveFocus();
+
+    const restore = screen.getByRole('button', { name: 'Restore window' });
+    await act(async () => restore.focus());
+    fireEvent.click(restore);
+    await waitFor(() => expect(screen.getByTestId('background-shell')).toBeInTheDocument());
+    // Restoring the IDE must not remount the panel or pull focus back into it.
+    expect(screen.getByRole('region', { name: 'Make yourself at home' })).toBe(region);
+    expect(region).not.toHaveFocus();
+  });
+
   it('skips onboarding for returning visitors and renders the ping-pong hero shell immediately', async () => {
     await renderHomeWithHeroVisible();
 
-    expect(screen.queryByText('Play welcome audio?')).not.toBeInTheDocument();
-    expect(screen.queryByText('Customize your experience')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('first-visit-settings-hint-popover')).not.toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Make yourself at home' })).not.toBeInTheDocument();
     expect(screen.getByTestId('background-paper')).toHaveAttribute('data-show-shell', 'true');
     expect(screen.getByTestId('hero-motion-path')).toHaveAttribute('data-active', 'true');
     expectTerminalLinesStructure(screen.getByTestId('terminal-hero'));

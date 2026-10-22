@@ -9,6 +9,12 @@ const mockMotionDivProps = {
   style: undefined as CSSProperties | undefined,
 };
 
+let mockDurationFactor = 1;
+jest.mock('../../../src/motion', () => ({
+  duration: { heroEntrance: 3.6 },
+  useMotionScale: () => ({ duration: mockDurationFactor }),
+}));
+
 jest.mock('motion/react', () => {
   const React = require('react');
 
@@ -32,7 +38,7 @@ jest.mock('motion/react', () => {
             transition?: Record<string, unknown>;
             style?: CSSProperties;
           } & HTMLAttributes<HTMLDivElement>,
-          ref: Ref<HTMLDivElement>,
+          ref: Ref<HTMLDivElement>
         ) => {
           mockMotionDivProps.initial = initial;
           mockMotionDivProps.animate = animate;
@@ -53,7 +59,7 @@ jest.mock('motion/react', () => {
               )}
             </div>
           );
-        },
+        }
       ),
     },
   };
@@ -65,6 +71,7 @@ const defaultGetBoundingClientRect = HTMLElement.prototype.getBoundingClientRect
 
 describe('HeroMotionPath', () => {
   beforeEach(() => {
+    mockDurationFactor = 1;
     mockMotionDivProps.initial = undefined;
     mockMotionDivProps.animate = undefined;
     mockMotionDivProps.transition = undefined;
@@ -97,7 +104,7 @@ describe('HeroMotionPath', () => {
     render(
       <HeroMotionPath active onComplete={jest.fn()}>
         <span data-testid="child">content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
     expect(screen.getByTestId('motion-div')).toBeInTheDocument();
@@ -106,15 +113,106 @@ describe('HeroMotionPath', () => {
     await waitFor(() => expect(mockMotionDivProps.initial).toBeDefined());
   });
 
-  it('does not render a motion div when not active', () => {
+  it('keeps children visible without animation when not active', () => {
     render(
       <HeroMotionPath active={false} onComplete={jest.fn()}>
         <span data-testid="child">content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
-    expect(screen.queryByTestId('motion-div')).not.toBeInTheDocument();
+    expect(mockMotionDivProps.animate).toMatchObject({ x: 0, y: 0, scale: 1, rotate: 0 });
+    expect(mockMotionDivProps.transition?.duration).toBe(0);
     expect(screen.getByTestId('child')).toBeInTheDocument();
+  });
+
+  it('completes immediately and exactly once when motion is off', () => {
+    mockDurationFactor = 0;
+    const onComplete = jest.fn();
+    const { rerender } = render(
+      <HeroMotionPath active onComplete={onComplete}>
+        <span>content</span>
+      </HeroMotionPath>
+    );
+    expect(mockMotionDivProps.animate).toMatchObject({ x: 0, y: 0, scale: 1, rotate: 0 });
+    expect(mockMotionDivProps.transition?.duration).toBe(0);
+    expect(screen.getByText('content')).toBeVisible();
+    expect(onComplete).toHaveBeenCalledTimes(1);
+    rerender(
+      <HeroMotionPath active onComplete={onComplete}>
+        <span>content</span>
+      </HeroMotionPath>
+    );
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('scales the entrance and completes when motion is disabled mid-flight', () => {
+    mockDurationFactor = 0.5;
+    const onComplete = jest.fn();
+    const { rerender } = render(
+      <HeroMotionPath active onComplete={onComplete}>
+        <span>content</span>
+      </HeroMotionPath>
+    );
+    expect(mockMotionDivProps.transition?.duration).toBe(1.8);
+    mockDurationFactor = 0;
+    rerender(
+      <HeroMotionPath active onComplete={onComplete}>
+        <span>content</span>
+      </HeroMotionPath>
+    );
+    expect(onComplete).toHaveBeenCalledTimes(1);
+    expect(screen.getByText('content')).toBeVisible();
+  });
+
+  it('keeps a completed entrance settled and preserves focused children across motion changes', () => {
+    const onComplete = jest.fn();
+    const content = (
+      <HeroMotionPath active onComplete={onComplete}>
+        <input aria-label="Editor" defaultValue="unfinished work" />
+      </HeroMotionPath>
+    );
+    const { rerender } = render(content);
+    act(() => screen.getByTestId('trigger-complete').click());
+    const editor = screen.getByRole('textbox', { name: 'Editor' });
+    act(() => editor.focus());
+    const measurementCount = (HTMLElement.prototype.getBoundingClientRect as jest.Mock).mock
+      .calls.length;
+
+    for (const scale of [0.5, 1.35, 0, 1]) {
+      mockDurationFactor = scale;
+      rerender(
+        <HeroMotionPath active onComplete={onComplete}>
+          <input aria-label="Editor" defaultValue="unfinished work" />
+        </HeroMotionPath>
+      );
+      expect(mockMotionDivProps.animate).toMatchObject({ x: 0, y: 0, scale: 1, rotate: 0 });
+      expect(mockMotionDivProps.transition?.duration).toBe(0);
+      expect(screen.getByRole('textbox', { name: 'Editor' })).toBe(editor);
+      expect(editor).toHaveFocus();
+      expect(editor).toHaveValue('unfinished work');
+      expect(HTMLElement.prototype.getBoundingClientRect).toHaveBeenCalledTimes(measurementCount);
+      expect(onComplete).toHaveBeenCalledTimes(1);
+    }
+  });
+
+  it('does not start travel when motion is enabled after an initial Off entrance', () => {
+    mockDurationFactor = 0;
+    const onComplete = jest.fn();
+    const { rerender } = render(
+      <HeroMotionPath active onComplete={onComplete}>
+        <span>content</span>
+      </HeroMotionPath>
+    );
+    mockDurationFactor = 1;
+    rerender(
+      <HeroMotionPath active onComplete={onComplete}>
+        <span>content</span>
+      </HeroMotionPath>
+    );
+    expect(mockMotionDivProps.animate).toMatchObject({ x: 0, y: 0, scale: 1, rotate: 0 });
+    expect(mockMotionDivProps.transition?.duration).toBe(0);
+    expect(HTMLElement.prototype.getBoundingClientRect).not.toHaveBeenCalled();
+    expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
   it('calls onComplete when the motion animation completes', async () => {
@@ -123,7 +221,7 @@ describe('HeroMotionPath', () => {
     render(
       <HeroMotionPath active onComplete={onComplete}>
         <span>content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
     await waitFor(() => expect(mockMotionDivProps.transition).toBeDefined());
@@ -139,9 +237,7 @@ describe('HeroMotionPath', () => {
 
     // After animation completes, overflow:hidden is removed
     await waitFor(() =>
-      expect(mockMotionDivProps.style).not.toEqual(
-        expect.objectContaining({ overflow: 'hidden' }),
-      ),
+      expect(mockMotionDivProps.style).not.toEqual(expect.objectContaining({ overflow: 'hidden' }))
     );
   });
 
@@ -149,7 +245,7 @@ describe('HeroMotionPath', () => {
     render(
       <HeroMotionPath active onComplete={jest.fn()}>
         <span>content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
     await waitFor(() => expect(mockMotionDivProps.initial).toBeDefined());
@@ -217,7 +313,7 @@ describe('HeroMotionPath', () => {
     const { rerender } = render(
       <HeroMotionPath active onComplete={jest.fn()}>
         <span>content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
     await waitFor(() => expect(mockMotionDivProps.initial).toBeDefined());
@@ -232,10 +328,10 @@ describe('HeroMotionPath', () => {
     rerender(
       <HeroMotionPath active={false} onComplete={jest.fn()}>
         <span>content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
-    expect(screen.queryByTestId('motion-div')).not.toBeInTheDocument();
+    expect(screen.getByTestId('motion-div')).toBeVisible();
 
     HTMLElement.prototype.getBoundingClientRect = jest.fn(() => ({
       x: 680,
@@ -252,7 +348,7 @@ describe('HeroMotionPath', () => {
     rerender(
       <HeroMotionPath active onComplete={jest.fn()}>
         <span>content</span>
-      </HeroMotionPath>,
+      </HeroMotionPath>
     );
 
     await waitFor(() =>
@@ -262,7 +358,7 @@ describe('HeroMotionPath', () => {
         scale: 1,
         rotate: 0,
         borderRadius: 28,
-      }),
+      })
     );
   });
 });

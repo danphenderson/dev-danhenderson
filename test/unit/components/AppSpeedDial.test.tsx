@@ -49,17 +49,17 @@ jest.mock('@mui/material/SpeedDial', () => ({
 jest.mock('@mui/material/SpeedDialAction', () => ({
   __esModule: true,
   default: ({
-    FabProps,
+    slotProps,
     icon,
     tooltipOpen,
     tooltipTitle,
   }: {
-    FabProps?: Record<string, unknown>;
+    slotProps?: { fab?: Record<string, unknown> };
     icon?: ReactNode;
     tooltipOpen?: boolean;
     tooltipTitle?: ReactNode;
   }) => {
-    const { component, onClick, to, ...restFabProps } = FabProps ?? {};
+    const { component, onClick, to, ...restFabProps } = slotProps?.fab ?? {};
 
     if (component === 'a') {
       return (

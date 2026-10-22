@@ -269,9 +269,10 @@ interface MotionImageProps extends HTMLMotionProps<'img'> {
  * Uses `overflow: hidden` on the parent to clip the zoom effect.
  */
 export const MotionImage = ({ disableHover = false, style, ...rest }: MotionImageProps) => {
+  const { duration: motionScale } = useMotionScale();
   return (
     <motion.img
-      whileHover={!disableHover ? hoverZoom : undefined}
+      whileHover={!disableHover && motionScale > 0 ? hoverZoom : undefined}
       style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover', ...style }}
       {...rest}
     />

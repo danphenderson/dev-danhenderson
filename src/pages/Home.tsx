@@ -1,41 +1,31 @@
-import { useCallback, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { createPortal } from 'react-dom';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  Tooltip,
-} from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import { cvSectionMetadata } from '../components/cv/cvSectionMetadata';
+import { aboutMe } from '../data/cv';
+import { Text } from '../components/text';
+import { Box, Button, Stack, IconButton, Tooltip } from '@mui/material';
 import {
   motion,
   useDragControls,
   useScroll,
   useTransform,
   AnimatePresence,
-  useReducedMotion,
 } from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
-import { FirstVisitCustomizeModal } from '../components/FirstVisitCustomizeModal';
-import { FirstVisitSettingsHintPopover } from '../components/FirstVisitSettingsHintPopover';
+import { FIRST_VISIT_WELCOME_ID, FirstVisitWelcome } from '../components/FirstVisitWelcome';
 import { HeroMotionPath } from '../components/HeroMotionPath';
 import { TerminalHeroContent } from '../components/TerminalHeroContent';
 import type { TerminalLine } from '../types/ui';
 import { siteRouteMap } from '../constants/siteRoutes';
-import { HEADER_SETTINGS_TRIGGER_ID } from '../components/header/HeaderSettingsPopover';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
 import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useHomeIdeOrchestration } from './homeIdeOrchestration';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
 import { useAppTheme } from '../ThemeProvider';
-import { useWelcomeAudio } from '../WelcomeAudioProvider';
-import { Text } from '../components/text';
-import { MotionTiltCard, useMotionScale } from '../motion';
+import { duration, MotionTiltCard, useMotionScale } from '../motion';
 import { VSCODE_COLORS, VSCODE_WINDOW_RADIUS } from '../components/ide/vscodeTokens';
 
 const heroLines: TerminalLine[] = [
@@ -60,41 +50,19 @@ export default function Home() {
   useDocumentMetadata({ ...siteRouteMap.home, canonicalPath: siteRouteMap.home.path });
   const { motionIntensity, setMotionIntensity } = useAppTheme();
   const {
-    isPlaying: isAudioPlaying,
-    play: playAudio,
-    pause: pauseAudio,
-    error: audioError,
-  } = useWelcomeAudio();
-  const {
     error,
     isHeroAnimationReady,
-    isLoading,
-    isPromptOpen,
-    isCustomizeOpen,
-    isSettingsHintOpen,
-    handleOptOut,
-    handlePlay,
-    handleCustomizeDismiss,
-    handleSettingsHintComplete,
+    isAudioPlaying,
+    isAudioLoading,
+    isWelcomeOpen,
+    focusWelcomeOnOpen,
+    setIsInteracting,
+    handleDismiss,
+    handleOpen,
+    handleToggleAudio,
   } = useHomeWelcomeSequence();
-  const [isCustomizeAudioLoading, setIsCustomizeAudioLoading] = useState(false);
 
-  const handleCustomizeAudioToggle = useCallback(async () => {
-    if (isAudioPlaying) {
-      pauseAudio();
-      return;
-    }
-
-    try {
-      setIsCustomizeAudioLoading(true);
-      await playAudio();
-    } catch (err) {
-      console.error('Unable to play welcome audio', err);
-    } finally {
-      setIsCustomizeAudioLoading(false);
-    }
-  }, [isAudioPlaying, pauseAudio, playAudio]);
-
+  const preferencesTriggerRef = useRef<HTMLButtonElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const heroBoundsRef = useRef<HTMLDivElement>(null);
   const heroDragControls = useDragControls();
@@ -102,11 +70,8 @@ export default function Home() {
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.6]);
   const { duration: motionDurationScale } = useMotionScale();
-  const prefersReducedMotion = useReducedMotion();
   const heroMotionStyle =
     motionDurationScale > 0 ? { scale: heroScale, opacity: heroOpacity } : { scale: 1, opacity: 1 };
-  const settingsHintAnchorEl =
-    typeof document === 'undefined' ? null : document.getElementById(HEADER_SETTINGS_TRIGGER_ID);
 
   const {
     ideWindowState,
@@ -134,7 +99,6 @@ export default function Home() {
     handleIdeExpand,
     handleIdeRestore,
   } = useHomeIdeOrchestration({
-    prefersReducedMotion,
     dragControls: heroDragControls,
     heroRef,
     heroBoundsRef,
@@ -142,8 +106,43 @@ export default function Home() {
 
   return (
     <>
-      <motion.div ref={heroRef} style={heroMotionStyle}>
+      <motion.div ref={heroRef} style={{ position: 'relative', ...heroMotionStyle }}>
         <BackgroundPaper
+          intro={
+            <Stack spacing={2} sx={appStyles.homeIntroSx}>
+              <Text role="pageTitle" component="h1">
+                {aboutMe.name}
+              </Text>
+              <Text role="body" sx={{ maxWidth: 600 }}>
+                Software developer building scientific, data, and AI-enabled systems.
+              </Text>
+              <Stack direction="row" flexWrap="wrap" useFlexGap spacing={1.5}>
+                <Button component={RouterLink} to={siteRouteMap.cv.path} variant="contained">
+                  Explore my CV
+                </Button>
+                <Button
+                  component={RouterLink}
+                  to={`${siteRouteMap.cv.path}#${cvSectionMetadata.coding.id}`}
+                  variant="outlined"
+                >
+                  View projects
+                </Button>
+              </Stack>
+              <Button
+                ref={preferencesTriggerRef}
+                aria-expanded={isWelcomeOpen}
+                aria-controls={isWelcomeOpen ? FIRST_VISIT_WELCOME_ID : undefined}
+                // Keyboard and assistive-technology activation reports no pointer clicks.
+                onClick={(event) =>
+                  isWelcomeOpen ? handleDismiss() : handleOpen({ moveFocus: event.detail === 0 })
+                }
+                size="small"
+                sx={{ alignSelf: 'flex-start' }}
+              >
+                Customize appearance &amp; audio
+              </Button>
+            </Stack>
+          }
           contentRef={heroBoundsRef}
           image="assets/home.jpg"
           contentAlign="flex-end"
@@ -176,7 +175,7 @@ export default function Home() {
                         initial={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: duration.fast * motionDurationScale }}
                       >
                         {shell}
                       </motion.div>
@@ -204,53 +203,23 @@ export default function Home() {
               ) : null}
             </AnimatedContentCard>
           </MotionTiltCard>
-
-          <Dialog open={isPromptOpen} onClose={handleOptOut} aria-labelledby="welcome-audio-title">
-            <DialogTitle id="welcome-audio-title">Play welcome audio?</DialogTitle>
-            <DialogContent>
-              <Text role="body" sx={{ mt: 1 }}>
-                Would you like to hear a short verse while browsing the site? Use the pause button
-                in the header to stop it anytime.
-              </Text>
-              {error && (
-                <Text role="caption" sx={{ display: 'block', mt: 1, color: 'error.main' }}>
-                  {error}
-                </Text>
-              )}
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleOptOut} autoFocus>
-                No thanks
-              </Button>
-              <Button
-                onClick={handlePlay}
-                variant="contained"
-                disabled={isLoading}
-                aria-label="Play welcome audio"
-              >
-                {isLoading ? 'Loading…' : 'Play audio'}
-              </Button>
-            </DialogActions>
-          </Dialog>
-
-          <FirstVisitCustomizeModal
-            open={isCustomizeOpen}
-            onClose={handleCustomizeDismiss}
-            motionIntensity={motionIntensity}
-            onChangeMotionIntensity={setMotionIntensity}
-            isAudioPlaying={isAudioPlaying}
-            isAudioLoading={isCustomizeAudioLoading}
-            audioError={audioError}
-            onToggleAudio={handleCustomizeAudioToggle}
-          />
-
-          <FirstVisitSettingsHintPopover
-            open={isSettingsHintOpen}
-            anchorEl={settingsHintAnchorEl}
-            onGetStarted={handleSettingsHintComplete}
-          />
         </BackgroundPaper>
       </motion.div>
+
+      {/* Outside the IDE shell so minimizing, closing, or expanding the IDE never unmounts it. */}
+      <FirstVisitWelcome
+        open={isWelcomeOpen}
+        focusOnOpen={focusWelcomeOnOpen}
+        returnFocusRef={preferencesTriggerRef}
+        onClose={handleDismiss}
+        onInteractionChange={setIsInteracting}
+        motionIntensity={motionIntensity}
+        onChangeMotionIntensity={setMotionIntensity}
+        isAudioPlaying={isAudioPlaying}
+        isAudioLoading={isAudioLoading}
+        audioError={error}
+        onToggleAudio={handleToggleAudio}
+      />
 
       {ideWindowPortalContainer && isHeroAnimationReady && ideVisible
         ? createPortal(
@@ -300,7 +269,7 @@ export default function Home() {
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
-              transition={{ duration: 0.22 }}
+              transition={{ duration: duration.fast * motionDurationScale }}
               style={{
                 position: 'fixed',
                 top: expandedIdeViewport.top,
@@ -337,7 +306,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 12 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: duration.fast * motionDurationScale }}
             style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 10 }}
           >
             <Tooltip title="Open Visual Studio Code" placement="left">
@@ -378,7 +347,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 12 }}
-            transition={{ duration: 0.25 }}
+            transition={{ duration: duration.fast * motionDurationScale }}
             style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 10 }}
           >
             <Tooltip title="Restore window" placement="left">

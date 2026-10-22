@@ -61,10 +61,10 @@ describe('CV runtime render', () => {
 
     expect(screen.getByText('About')).toBeInTheDocument();
     expect(screen.getByText(aboutMe.name)).toBeInTheDocument();
-    expect(screen.getByText(aboutMe.title)).toBeInTheDocument();
+    expect(screen.queryByText(aboutMe.title)).not.toBeInTheDocument();
     expect(accessibleLayer).not.toBeNull();
     expect(accessibleLayer).toHaveTextContent(
-      'Software developer building scientific, data, and AI-enabled systems. Currently pursuing an M.S. in applied/computational mathematics, researching macrocirculatory hemodynamics, and contributing to open-source software. Previously built ingestion, analytics, and ML solutions for a healthcare data platform.'
+      'Software developer building scientific, data, and AI-enabled systems. Open source contributor and researcher with a background in applied mathematics. Previously built ingestion, analytics, and ML solutions for a healthcare data platform.'
     );
     expect(screen.getByText('Pushed 2 commits to owner/repo')).toBeInTheDocument();
     expect(screen.getByText('microsoft/playwright')).toBeInTheDocument();

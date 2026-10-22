@@ -1,10 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent, PointerEventHandler, RefObject } from 'react';
-import { duration } from '../motion/tokens';
 import type { IdeResizeEdge, IdeWindowSize, IdeWindowState } from '../types/ui';
 import { VSCODE_RESIZE } from '../components/ide/vscodeTokens';
-
-const AUTO_EXPAND_PULSE_DURATION_MS = Math.round(duration.slow * 150);
 
 type IdeWindowMountMode = 'normal' | 'expanded';
 
@@ -16,7 +13,6 @@ export type ExpandedIdeViewport = {
 };
 
 type UseHomeIdeOrchestrationOptions = {
-  prefersReducedMotion: boolean | null;
   dragControls: {
     start: (event: ReactPointerEvent<HTMLDivElement>) => void;
   };
@@ -107,7 +103,6 @@ const resolveExpandedIdeViewport = (): ExpandedIdeViewport | null => {
 };
 
 export const useHomeIdeOrchestration = ({
-  prefersReducedMotion,
   dragControls,
   heroRef,
   heroBoundsRef,
@@ -122,7 +117,6 @@ export const useHomeIdeOrchestration = ({
 
     return document.createElement('div');
   });
-  const [expandDotHighlighted, setExpandDotHighlighted] = useState(false);
   const [isTypewriterPlaying, setIsTypewriterPlaying] = useState(false);
   const [canDragHeroWindow, setCanDragHeroWindow] = useState(false);
   const [isHeroWindowDragging, setIsHeroWindowDragging] = useState(false);
@@ -130,8 +124,6 @@ export const useHomeIdeOrchestration = ({
   const [isResizing, setIsResizing] = useState(false);
   const inlineIdeHostRef = useRef<HTMLDivElement | null>(null);
   const expandedIdeHostRef = useRef<HTMLDivElement | null>(null);
-  const hasAutoExpandedRef = useRef(false);
-  const autoExpandTimerRef = useRef<number | null>(null);
   const resizeEdgeRef = useRef<IdeResizeEdge | null>(null);
   const resizeInitialPointerRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const resizeInitialSizeRef = useRef<{ width: number; height: number }>({ width: 0, height: 0 });
@@ -146,36 +138,6 @@ export const useHomeIdeOrchestration = ({
     setIsHeroWindowDragging(false);
     resizeEdgeRef.current = null;
   }, []);
-
-  const cancelAutoExpand = useCallback(() => {
-    if (autoExpandTimerRef.current !== null) {
-      window.clearTimeout(autoExpandTimerRef.current);
-      autoExpandTimerRef.current = null;
-    }
-
-    setExpandDotHighlighted(false);
-  }, []);
-
-  const scheduleAutoExpand = useCallback(() => {
-    if (hasAutoExpandedRef.current) {
-      return;
-    }
-
-    hasAutoExpandedRef.current = true;
-    cancelAutoExpand();
-
-    if (prefersReducedMotion) {
-      setIdeWindowState((prev) => (prev === 'normal' ? 'expanded' : prev));
-      return;
-    }
-
-    setExpandDotHighlighted(true);
-    autoExpandTimerRef.current = window.setTimeout(() => {
-      autoExpandTimerRef.current = null;
-      setExpandDotHighlighted(false);
-      setIdeWindowState((prev) => (prev === 'normal' ? 'expanded' : prev));
-    }, AUTO_EXPAND_PULSE_DURATION_MS);
-  }, [cancelAutoExpand, prefersReducedMotion]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
@@ -237,8 +199,6 @@ export const useHomeIdeOrchestration = ({
     [ideWindowPortalContainer]
   );
 
-  useEffect(() => cancelAutoExpand, [cancelAutoExpand]);
-
   useEffect(() => {
     if (ideWindowState !== 'expanded') {
       setExpandedIdeViewport(null);
@@ -274,23 +234,20 @@ export const useHomeIdeOrchestration = ({
   }, [ideWindowState]);
 
   const handleIdeClose = useCallback(() => {
-    cancelAutoExpand();
     resetWindowInteractions();
     queueFreshIdeSession();
     setIdeWindowState('closed');
-  }, [cancelAutoExpand, queueFreshIdeSession, resetWindowInteractions]);
+  }, [queueFreshIdeSession, resetWindowInteractions]);
 
   const handleIdeMinimize = useCallback(() => {
-    cancelAutoExpand();
     resetWindowInteractions();
     queueFreshIdeSession();
     setIdeWindowState('minimized');
-  }, [cancelAutoExpand, queueFreshIdeSession, resetWindowInteractions]);
+  }, [queueFreshIdeSession, resetWindowInteractions]);
 
   const handleIdeExpand = useCallback(() => {
-    cancelAutoExpand();
     setIdeWindowState((prev) => (prev === 'expanded' ? 'normal' : 'expanded'));
-  }, [cancelAutoExpand]);
+  }, []);
 
   const handleIdeRestore = useCallback(() => {
     resetWindowInteractions();
@@ -299,8 +256,7 @@ export const useHomeIdeOrchestration = ({
 
   const handleHeroMotionComplete = useCallback(() => {
     setIsTypewriterPlaying(true);
-    scheduleAutoExpand();
-  }, [scheduleAutoExpand]);
+  }, []);
 
   const windowDragEnabled = canDragHeroWindow && isTypewriterPlaying;
   const resizeEnabled = canDragHeroWindow && ideWindowState === 'normal' && !isHeroWindowDragging;
@@ -347,8 +303,14 @@ export const useHomeIdeOrchestration = ({
         VSCODE_RESIZE.minHeight,
         boundsRect ? boundsRect.bottom - rect.top : window.innerHeight - rect.top
       );
-      const lockedWidth = Math.min(Math.max(rect.width, VSCODE_RESIZE.minWidth), maxWidth);
-      const lockedHeight = Math.min(Math.max(rect.height, VSCODE_RESIZE.minHeight), maxHeight);
+      const lockedWidth = Math.min(
+        Math.max(heroEl.offsetWidth || rect.width, VSCODE_RESIZE.minWidth),
+        maxWidth
+      );
+      const lockedHeight = Math.min(
+        Math.max(heroEl.offsetHeight || rect.height, VSCODE_RESIZE.minHeight),
+        maxHeight
+      );
 
       resizeEdgeRef.current = edge;
       resizeInitialPointerRef.current = { x: startClientX, y: startClientY };
@@ -401,7 +363,7 @@ export const useHomeIdeOrchestration = ({
     ideVisible: ideWindowState !== 'closed' && ideWindowState !== 'minimized',
     expandedIdeViewport,
     ideWindowPortalContainer,
-    expandDotHighlighted,
+    expandDotHighlighted: false,
     isTypewriterPlaying,
     windowDragEnabled,
     isHeroWindowDragging,

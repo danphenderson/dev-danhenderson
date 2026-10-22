@@ -8,6 +8,7 @@ import {
 import { isGitHubApiEnabledInDevelopment, readNodeEnvironment } from '../utils/appEnvironment';
 import type {
   GitHubActivityItem,
+  GitHubContribution,
   GitHubProfileData,
   SharedDataSourceDetail,
   SharedDataStatus,
@@ -265,18 +266,15 @@ const buildActivity = (events: GitHubEvent[]) => {
   return activity.length ? activity : fallbackGitHubActivity;
 };
 
-const buildContributionCandidates = (repoNames: Set<string>) =>
+const buildContributionCandidates = (repoNames: Set<string>): GitHubContribution[] =>
   Array.from(repoNames)
     .slice(0, MAX_VISIBLE_CONTRIBUTIONS)
     .map((name) => ({
       name,
       url: `https://github.com/${name}`,
-      stars: 0,
     }));
 
-const enrichContributions = async (
-  contributionCandidates: Array<{ name: string; url: string; stars: number }>
-) => {
+const enrichContributions = async (contributionCandidates: GitHubContribution[]) => {
   let encounteredError = false;
 
   if (!contributionCandidates.length) {
@@ -293,11 +291,16 @@ const enrichContributions = async (
     enrichmentCandidates.map(async (repo) => {
       try {
         const data = await fetchJson<GitHubRepo>(`https://api.github.com/repos/${repo.name}`);
+        const stars =
+          Number.isSafeInteger(data.stargazers_count) && data.stargazers_count >= 0
+            ? data.stargazers_count
+            : undefined;
+        if (stars === undefined) encounteredError = true;
 
         return {
           name: data.full_name || repo.name,
           url: data.html_url || repo.url,
-          stars: data.stargazers_count || 0,
+          stars,
         };
       } catch (_error) {
         encounteredError = true;
@@ -308,7 +311,7 @@ const enrichContributions = async (
 
   return {
     contributions: [...enrichedHead, ...tailCandidates]
-      .sort((a, b) => (b.stars || 0) - (a.stars || 0))
+      .sort((a, b) => (b.stars ?? -1) - (a.stars ?? -1))
       .map(({ name, url, stars }) => ({ name, url, stars })),
     encounteredError,
   };

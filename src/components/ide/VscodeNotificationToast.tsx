@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import Box from '@mui/material/Box';
+import { duration, useMotionScale } from '../../motion';
 import type { VscodeEditorTab } from '../../types/ui';
 import { VSCODE_COLORS, monoFontFamily } from './vscodeTokens';
 import { getVscodeEditorTabMetadata } from './vscodeEditorTabs';
@@ -11,21 +12,13 @@ interface VscodeNotificationToastProps {
   onDismiss: () => void;
 }
 
-const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
-
-const usePrefersReducedMotion = (): boolean => {
-  const [prefersReducedMotion] = React.useState(
-    () => typeof window !== 'undefined' && window.matchMedia(REDUCED_MOTION_QUERY).matches
-  );
-  return prefersReducedMotion;
-};
-
 export const VscodeNotificationToast: React.FC<VscodeNotificationToastProps> = ({
   activeTab = 'server',
   visible,
   onDismiss,
 }) => {
-  const prefersReducedMotion = usePrefersReducedMotion();
+  const { duration: motionScale } = useMotionScale();
+  const prefersReducedMotion = motionScale === 0;
   const activeTabMetadata = getVscodeEditorTabMetadata(activeTab);
 
   return (
@@ -36,7 +29,7 @@ export const VscodeNotificationToast: React.FC<VscodeNotificationToastProps> = (
           initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: 12 }}
-          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.25 }}
+          transition={{ duration: duration.fast * motionScale }}
           sx={{
             position: 'absolute',
             bottom: 28,
@@ -61,10 +54,14 @@ export const VscodeNotificationToast: React.FC<VscodeNotificationToastProps> = (
             {`${activeTabMetadata.fileName} — No problems detected ✓`}
           </Box>
           <Box
-            component="span"
+            component="button"
+            type="button"
+            aria-label="Dismiss editor notification"
             onClick={onDismiss}
             sx={{
               cursor: 'pointer',
+              background: 'transparent',
+              border: 0,
               color: VSCODE_COLORS.inactiveTab,
               fontSize: '0.8rem',
               lineHeight: 1,

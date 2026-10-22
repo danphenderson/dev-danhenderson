@@ -1,123 +1,77 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
 import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
 
-const CUSTOMIZE_AUTO_ADVANCE_DELAY_MS = 2250;
+// Reading time, not animation time: keep preferences available with motion off too.
+export const WELCOME_AUTO_DISMISS_MS = 5000;
 
-type HomeWelcomeSequence = {
-  error?: string;
-  isHeroAnimationReady: boolean;
-  isLoading: boolean;
-  isPromptOpen: boolean;
-  isCustomizeOpen: boolean;
-  isSettingsHintOpen: boolean;
-  handleOptOut: () => void;
-  handlePlay: () => Promise<void>;
-  handleCustomizeDismiss: () => void;
-  handleSettingsHintComplete: () => void;
-};
+export const useHomeWelcomeSequence = () => {
+  const { play, pause, isPlaying, error } = useWelcomeAudio();
+  const { completeOnboarding } = useWelcomeOnboarding();
+  const [isWelcomeOpen, setIsWelcomeOpen] = useState(false);
+  const [focusWelcomeOnOpen, setFocusWelcomeOnOpen] = useState(false);
+  const [isInteracting, setIsInteracting] = useState(false);
+  const [isAudioLoading, setIsAudioLoading] = useState(false);
+  const mounted = useRef(false);
+  const audioPending = useRef(false);
 
-export const useHomeWelcomeSequence = (): HomeWelcomeSequence => {
-  const { play, isPlaying, error, audioConsent, declineAudioConsent } = useWelcomeAudio();
-  const {
-    onboardingCompleted,
-    showCustomizeModal,
-    showSettingsHint,
-    openCustomizeModal,
-    advanceToSettingsHint,
-    completeOnboarding,
-  } = useWelcomeOnboarding();
-  const [isPromptOpen, setIsPromptOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const hasHandledAudioPrompt = audioConsent !== 'unknown';
-
-  /* Open the audio prompt for first-time visitors. */
   useEffect(() => {
-    if (onboardingCompleted) return;
-
-    if (audioConsent === 'unknown' && !isPlaying) {
-      setIsPromptOpen(true);
-      return;
-    }
-
-    if (audioConsent === 'declined') {
-      setIsPromptOpen(false);
-    }
-  }, [onboardingCompleted, audioConsent, isPlaying]);
-
-  /* After the audio prompt is handled, show the customize modal. */
-  useEffect(() => {
-    if (
-      onboardingCompleted ||
-      !hasHandledAudioPrompt ||
-      isPromptOpen ||
-      showCustomizeModal ||
-      showSettingsHint
-    ) {
-      return;
-    }
-
-    openCustomizeModal();
-  }, [
-    onboardingCompleted,
-    hasHandledAudioPrompt,
-    isPromptOpen,
-    showCustomizeModal,
-    showSettingsHint,
-    openCustomizeModal,
-  ]);
-
-  /* Automatically advance the customize modal after the onboarding dwell time. */
-  useEffect(() => {
-    if (!showCustomizeModal) {
-      return;
-    }
-
-    const timeoutId = window.setTimeout(() => {
-      advanceToSettingsHint();
-    }, CUSTOMIZE_AUTO_ADVANCE_DELAY_MS);
-
+    mounted.current = true;
     return () => {
-      window.clearTimeout(timeoutId);
+      mounted.current = false;
     };
-  }, [showCustomizeModal, advanceToSettingsHint]);
+  }, []);
 
-  const handleOptOut = () => {
-    declineAudioConsent();
-    setIsPromptOpen(false);
+  const handleDismiss = useCallback(() => {
+    setIsWelcomeOpen(false);
+    setFocusWelcomeOnOpen(false);
+    setIsInteracting(false);
+    completeOnboarding();
+  }, [completeOnboarding]);
+
+  // Keyboard and assistive-technology openers move focus into the panel, which also pauses the timer.
+  const handleOpen = ({ moveFocus = false }: { moveFocus?: boolean } = {}) => {
+    setIsInteracting(false);
+    setFocusWelcomeOnOpen(moveFocus);
+    setIsWelcomeOpen(true);
   };
 
-  const handlePlay = async () => {
+  useEffect(() => {
+    if (!isWelcomeOpen || isInteracting) return;
+    const timeoutId = window.setTimeout(handleDismiss, WELCOME_AUTO_DISMISS_MS);
+    return () => window.clearTimeout(timeoutId);
+  }, [isWelcomeOpen, isInteracting, handleDismiss]);
+
+  const handleToggleAudio = async () => {
+    if (isPlaying) {
+      pause();
+      return;
+    }
+    if (audioPending.current) return;
+
+    audioPending.current = true;
+    setIsAudioLoading(true);
     try {
-      setIsLoading(true);
       await play();
-      setIsPromptOpen(false);
     } catch (err) {
+      // The provider exposes an error and retains the header's retry control.
       console.error('Unable to play welcome audio', err);
     } finally {
-      setIsLoading(false);
+      audioPending.current = false;
+      if (mounted.current) setIsAudioLoading(false);
     }
-  };
-
-  const handleCustomizeDismiss = () => {
-    advanceToSettingsHint();
-  };
-
-  const handleSettingsHintComplete = () => {
-    completeOnboarding();
   };
 
   return {
     error,
-    isHeroAnimationReady:
-      onboardingCompleted && !isPromptOpen && !showCustomizeModal && !showSettingsHint,
-    isLoading,
-    isPromptOpen,
-    isCustomizeOpen: showCustomizeModal,
-    isSettingsHintOpen: showSettingsHint,
-    handleOptOut,
-    handlePlay,
-    handleCustomizeDismiss,
-    handleSettingsHintComplete,
+    isAudioPlaying: isPlaying,
+    isAudioLoading,
+    isWelcomeOpen,
+    focusWelcomeOnOpen,
+    isHeroAnimationReady: true,
+    setIsInteracting,
+    handleDismiss,
+    handleOpen,
+    handleToggleAudio,
   };
 };

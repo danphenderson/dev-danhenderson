@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Box, Stack, TextField, InputAdornment } from '@mui/material';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Box, Button, Stack, TextField, InputAdornment } from '@mui/material';
 import useScrollTrigger from '@mui/material/useScrollTrigger';
 import SearchIcon from '@mui/icons-material/Search';
 import { SectionHeading } from '../components/layout/SectionHeading';
@@ -35,6 +35,15 @@ export default function Climbing() {
   const [hasUnlockedDeferredContent, setHasUnlockedDeferredContent] = useState(
     scrolledPastHeaderCollapse
   );
+  const focusLogOnReveal = useRef(false);
+  const logRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (hasUnlockedDeferredContent && focusLogOnReveal.current) {
+      focusLogOnReveal.current = false;
+      logRef.current?.focus({ preventScroll: true });
+      logRef.current?.scrollIntoView?.({ block: 'start' });
+    }
+  }, [hasUnlockedDeferredContent]);
   const tickSearch = useFuzzySearch<TickRow>(ticks, tickSearchKeys);
   const todoSearch = useFuzzySearch<TodoRow>(todos, todoSearchKeys);
   const hasRoutesToClimb = todos.length > 0;
@@ -63,7 +72,7 @@ export default function Climbing() {
             <SectionCard delayMs={0} triggerOnView={false} onVisible={handleIntroVisible}>
               <Stack spacing={1}>
                 <Box sx={appStyles.compactSectionHeadingSx} data-testid="climbing-intro-label">
-                  <Text role="sectionEyebrow" tone="support">
+                  <Text role="pageTitle" component="h1">
                     <TypewriterText
                       text="Climbing"
                       playing={isIntroPlaying}
@@ -79,72 +88,92 @@ export default function Climbing() {
                     timingPreset="body"
                   />
                 </Text>
+                {!hasUnlockedDeferredContent && (
+                  <Button
+                    variant="contained"
+                    sx={{ alignSelf: 'flex-start', mt: 1 }}
+                    aria-controls="climbing-log"
+                    onClick={() => {
+                      focusLogOnReveal.current = true;
+                      setHasUnlockedDeferredContent(true);
+                    }}
+                  >
+                    View climbing log
+                  </Button>
+                )}
               </Stack>
             </SectionCard>
           </MotionTiltCard>
         </MotionSection>
 
         {hasUnlockedDeferredContent ? (
-          <SectionCard
-            delayMs={CLIMBING_CONTENT_ENTRANCE_DELAY_MS}
-            entranceDirection="right"
-            sx={appStyles.climbingCardSx}
-          >
-            <Stack spacing={2}>
-              <ClimbingAnalytics analytics={analytics} />
-              <TextField
-                size="small"
-                placeholder="Search climbed routes..."
-                value={tickSearch.search}
-                onChange={(e) => tickSearch.setSearch(e.target.value)}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <SearchIcon fontSize="small" />
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              <MotionTiltCard intensity={0.4}>
-                <ClimbingRouteTable
-                  rows={tickSearch.filtered}
-                  ariaLabel="Climbed routes"
-                  emptyMessage="No climbed routes match this search."
+          <Box id="climbing-log" ref={logRef} tabIndex={-1} sx={{ scrollMarginTop: 100 }}>
+            <SectionCard
+              delayMs={CLIMBING_CONTENT_ENTRANCE_DELAY_MS}
+              entranceDirection="right"
+              sx={appStyles.climbingCardSx}
+            >
+              <Stack spacing={2}>
+                <Text role="sectionTitle" component="h2">
+                  Climbing log
+                </Text>
+                <ClimbingAnalytics analytics={analytics} />
+                <TextField
+                  size="small"
+                  label="Search climbed routes"
+                  placeholder="Route or location"
+                  value={tickSearch.search}
+                  onChange={(e) => tickSearch.setSearch(e.target.value)}
+                  InputProps={{
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchIcon fontSize="small" />
+                      </InputAdornment>
+                    ),
+                  }}
                 />
-              </MotionTiltCard>
-              {hasRoutesToClimb && (
-                <>
-                  <MotionFadeIn>
-                    <SectionHeading
-                      overline="Routes to Climb"
-                      sx={appStyles.sectionHeadingOffsetSx}
-                    />
-                  </MotionFadeIn>
-                  <Text role="metaStrong">A collection of routes I'd still like to climb.</Text>
-                  <TextField
-                    size="small"
-                    placeholder="Search routes to climb..."
-                    value={todoSearch.search}
-                    onChange={(e) => todoSearch.setSearch(e.target.value)}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <SearchIcon fontSize="small" />
-                        </InputAdornment>
-                      ),
-                    }}
+                <MotionTiltCard intensity={0.4}>
+                  <ClimbingRouteTable
+                    rows={tickSearch.filtered}
+                    ariaLabel="Climbed routes"
+                    emptyMessage="No climbed routes match this search."
                   />
-                  <MotionTiltCard intensity={0.4}>
-                    <ClimbingRouteTable
-                      rows={todoSearch.filtered}
-                      ariaLabel="Routes to climb"
-                      emptyMessage="No routes to climb match this search."
+                </MotionTiltCard>
+                {hasRoutesToClimb && (
+                  <>
+                    <MotionFadeIn>
+                      <SectionHeading
+                        overline="Routes to Climb"
+                        sx={appStyles.sectionHeadingOffsetSx}
+                      />
+                    </MotionFadeIn>
+                    <Text role="metaStrong">A collection of routes I'd still like to climb.</Text>
+                    <TextField
+                      size="small"
+                      label="Search routes to climb"
+                      placeholder="Route or location"
+                      value={todoSearch.search}
+                      onChange={(e) => todoSearch.setSearch(e.target.value)}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <SearchIcon fontSize="small" />
+                          </InputAdornment>
+                        ),
+                      }}
                     />
-                  </MotionTiltCard>
-                </>
-              )}
-            </Stack>
-          </SectionCard>
+                    <MotionTiltCard intensity={0.4}>
+                      <ClimbingRouteTable
+                        rows={todoSearch.filtered}
+                        ariaLabel="Routes to climb"
+                        emptyMessage="No routes to climb match this search."
+                      />
+                    </MotionTiltCard>
+                  </>
+                )}
+              </Stack>
+            </SectionCard>
+          </Box>
         ) : (
           <Box
             aria-hidden

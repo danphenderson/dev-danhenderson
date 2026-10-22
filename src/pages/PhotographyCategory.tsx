@@ -1,3 +1,4 @@
+import { getDisplayImage } from '../utils/displayImages';
 import { Link as RouterLink, Navigate, useLocation, useParams } from 'react-router-dom';
 import { Box, Button, Stack } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -93,7 +94,7 @@ export default function PhotographyCategory() {
             <SectionCard delayMs={0} triggerOnView={false}>
               <Button
                 component={RouterLink}
-                to="/photography"
+                to={siteRouteMap.photography.path}
                 startIcon={<ArrowBackIcon />}
                 size="small"
                 sx={appStyles.inlineStartSx}
@@ -108,18 +109,19 @@ export default function PhotographyCategory() {
               <MotionSection>
                 <Box sx={appStyles.photographyDetailCoverSx}>
                   <MotionImage
-                    src={category.src}
+                    {...getDisplayImage(category.src, 1600)}
+                    sizes="(min-width: 1200px) 1200px, 100vw"
                     alt={category.name}
                     loading="eager"
                     decoding="async"
                     style={{ position: 'absolute', inset: 0, zIndex: 0 }}
                   />
-                  <Box sx={appStyles.photographyCardOverlaySx}>
+                </Box>
+                <SectionCard delayMs={0} triggerOnView={false} sx={appStyles.readingSurfaceSx}>
+                  <Stack spacing={1.5}>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <Text
                         role="pageTitle"
-                        tone="inverse"
-                        context="overlay"
                         component="h1"
                         sx={{
                           fontSize: { xs: '2rem', sm: '2.5rem', md: '3.25rem' },
@@ -136,19 +138,15 @@ export default function PhotographyCategory() {
                         albumDescription={category.description}
                       />
                     </Stack>
-                    <Text role="body" tone="inverse" context="overlay" sx={{ opacity: 0.82 }}>
-                      {category.description}
-                    </Text>
+                    <Text role="bodyMuted">{category.description}</Text>
                     <AlbumLocationSummary
                       albumLocation={category.location}
                       dateRange={category.dateRange}
                       photos={category.album}
                     />
-                    <Text role="caption" tone="inverse" context="overlay" sx={{ opacity: 0.65 }}>
-                      {category.album.length} photos
-                    </Text>
-                  </Box>
-                </Box>
+                    <Text role="caption">{category.album.length} photos</Text>
+                  </Stack>
+                </SectionCard>
               </MotionSection>
 
               <MotionScaleIn>
@@ -176,6 +174,7 @@ export default function PhotographyCategory() {
                   <SectionHeading
                     overline="Photography album"
                     title="Album not found"
+                    titleComponent="h1"
                     sx={{ minWidth: 0, maxWidth: { md: 760 } }}
                   />
                   <Text role="bodyMuted">

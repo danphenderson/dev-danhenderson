@@ -14,20 +14,7 @@ export const declineWelcomeAudio = async (page: Page) => {
   });
 };
 
-export const dismissWelcomeSequence = async (page: Page) => {
-  const dialog = page.getByRole('dialog', { name: 'Play welcome audio?' });
-
-  await expect(dialog).toBeVisible();
-  await dialog.getByRole('button', { name: 'No thanks' }).click();
-  await expect(dialog).toBeHidden();
-
-  const customizeDialog = page.getByTestId('customize-experience-dialog');
-  await expect(customizeDialog).toBeVisible();
-  await customizeDialog.getByRole('button', { name: 'Okay' }).click();
-  await expect(customizeDialog).toBeHidden();
-
-  const settingsHint = page.getByTestId('first-visit-settings-hint-popover');
-  await expect(settingsHint).toBeVisible();
-  await settingsHint.getByRole('button', { name: 'Get started' }).click();
-  await expect(settingsHint).toBeHidden();
+export const expectImmediateHome = async (page: Page) => {
+  await expect(page.getByRole('link', { name: 'Explore my CV' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'Make yourself at home' })).toHaveCount(0);
 };

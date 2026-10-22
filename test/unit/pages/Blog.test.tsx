@@ -186,7 +186,7 @@ describe('Blog', () => {
     expect(introCard).toHaveAttribute('data-intensity', '0.5');
     expect(introCard).toContainElement(
       screen.getByText(
-        'Future home of technical notes on software engineering and applied mathematics.'
+        'Notes on software engineering, applied mathematics, and the work in between.'
       )
     );
   });

@@ -46,3 +46,20 @@ describe('useDocumentMetadata', () => {
     );
   });
 });
+
+describe('metadata navigation lifecycle', () => {
+  it('clears obsolete image tags and resets article type on an imageless route', () => {
+    const { rerender } = renderHook(
+      ({ image, type }: { image?: string; type?: 'article' | 'website' }) =>
+        useDocumentMetadata({ title: 'Route', description: 'Description', image, type }),
+      { initialProps: { image: '/assets/old.jpg', type: 'article' } }
+    );
+    expect(getMetaContent('meta[property="og:image"]')).toContain('/assets/old.jpg');
+    expect(getMetaContent('meta[property="og:type"]')).toBe('article');
+    rerender({ image: undefined, type: undefined });
+    expect(document.head.querySelector('meta[property="og:image"]')).toBeNull();
+    expect(document.head.querySelector('meta[name="twitter:image"]')).toBeNull();
+    expect(getMetaContent('meta[property="og:type"]')).toBe('website');
+    expect(getMetaContent('meta[name="twitter:card"]')).toBe('summary');
+  });
+});

@@ -4,6 +4,8 @@ type AnimatedSectionReadinessOptions = {
   anchor: Locator;
   readyLocators?: Locator[];
   hiddenLocators?: Locator[];
+  /** Set to false when scrolling would change the state under test, such as the hide-on-scroll header. */
+  scrollIntoView?: boolean;
 };
 
 const isAnchorAnimationReady = async (anchor: Locator) =>
@@ -54,11 +56,14 @@ export async function waitForAnimatedSectionReadiness({
   anchor,
   readyLocators = [],
   hiddenLocators = [],
+  scrollIntoView = true,
 }: AnimatedSectionReadinessOptions) {
   await expect(anchor).toBeVisible();
-  await anchor.evaluate((node) => {
-    node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
-  });
+  if (scrollIntoView) {
+    await anchor.evaluate((node) => {
+      node.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
+    });
+  }
   await expect
     .poll(() => isAnchorAnimationReady(anchor), {
       message: 'Timed out waiting for animated section content to finish revealing.',

@@ -1,16 +1,12 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import { dismissWelcomeSequence, resetWelcomeState } from './helpers/header';
+import { expectImmediateHome, resetWelcomeState } from './helpers/header';
 
 const HOME_SCREENSHOT_CLOCK_START = new Date('2026-03-17T12:00:00.000Z');
 const STABLE_TERMINAL_OUTPUT_TEXT =
   /v22\.14\.0|9ab2238 polish: terminal UI chrome|Compiled successfully in 2\.4s|mathematics|julia version 1\.10\.10|==> Formulae/;
-const STABLE_TERMINAL_COMMAND_TEXT = 'brew ls';
 const TERMINAL_NOTIFICATION_TEXT = 'server.py — No problems detected ✓';
 const SERVER_EDITOR_TEXT = 'Ping Pong Server';
 const CLIENT_EDITOR_TEXT = 'SERVER_URL';
-const WELCOME_AUDIO_PROMPT_BODY =
-  'Would you like to hear a short verse while browsing the site? Use the pause button in the header to stop it anytime.';
-const CUSTOMIZE_AUTO_ADVANCE_DELAY_MS = 2250;
 const HOME_ACTIVE_TERMINAL_HERO_SELECTOR =
   '[data-testid="home-ide-expanded"] [data-testid="terminal-hero"], [data-testid="home-hero-window"] [data-testid="terminal-hero"]';
 
@@ -57,7 +53,12 @@ const ensureWindowedTerminalHero = async (page: Page) => {
 
 const moveMouseAwayFromHero = async (page: Page) => {
   await page.mouse.move(4, 4);
-  await page.waitForTimeout(500);
+};
+
+const getBounds = async (locator: Locator) => {
+  const bounds = await locator.boundingBox();
+  if (!bounds) throw new Error('Expected visible element bounds');
+  return bounds;
 };
 
 const getElementLayoutWidth = async (element: Locator) =>
@@ -118,63 +119,34 @@ const waitForStableTerminalHero = async (page: Page, terminalHero: Locator) => {
   await moveMouseAwayFromHero(page);
 };
 
-const advanceClockUntilTerminalBodyContains = async (
-  page: Page,
-  terminalHero: Locator,
-  expectedText: string,
-  maxElapsedMs = 30_000,
-  stepMs = 250
-) => {
-  const terminalPanelBody = terminalHero.getByTestId('terminal-panel-body');
-
-  for (let elapsedMs = 0; elapsedMs <= maxElapsedMs; elapsedMs += stepMs) {
-    const panelText = (await terminalPanelBody.textContent()) ?? '';
-
-    if (panelText.includes(expectedText)) {
-      return;
-    }
-
-    await page.clock.runFor(stepMs);
-  }
-
-  await expect(terminalPanelBody).toContainText(expectedText, { timeout: 1000 });
-};
-
 const resetHomeScrollForScreenshot = async (page: Page, terminalHero: Locator) => {
   await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }));
   await expect(terminalHero).toBeVisible();
 };
 
 test.describe('Home page', () => {
-  test('auto-dismisses the customize modal after 2250 ms and shows the settings hint', async ({
-    page,
-  }) => {
+  test('keeps optional preferences open while a control has focus', async ({ page }) => {
     await resetWelcomeState(page);
     await page.clock.install({ time: HOME_SCREENSHOT_CLOCK_START });
     await page.goto('/');
-
-    const welcomePrompt = page.getByRole('dialog', { name: 'Play welcome audio?' });
-    await expect(welcomePrompt).toBeVisible();
-    await welcomePrompt.getByRole('button', { name: 'No thanks' }).click();
-    await expect(welcomePrompt).toBeHidden();
-
-    const customizeDialog = page.getByTestId('customize-experience-dialog');
-    await expect(customizeDialog).toBeVisible();
-
-    await page.clock.runFor(CUSTOMIZE_AUTO_ADVANCE_DELAY_MS);
-    await expect(customizeDialog).toBeHidden();
-    await expect(page.getByTestId('first-visit-settings-hint-popover')).toBeVisible();
+    await expectImmediateHome(page);
+    await expect(page.getByRole('link', { name: 'Explore my CV' })).toBeVisible();
+    await page.getByRole('button', { name: 'Customize appearance & audio' }).click();
+    const preferences = page.getByRole('region', { name: 'Make yourself at home' });
+    await preferences.getByRole('button', { name: 'Off', exact: true }).focus();
+    await expect(page.getByRole('button', { name: 'Off', exact: true })).toBeFocused();
+    await expect(page.getByText('Take your time — this stays open while you choose.')).toBeVisible();
+    await page.clock.runFor(10_000);
+    await expect(preferences).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(preferences).toBeHidden();
   });
 
-  test('renders the hero content after completing the welcome sequence', async ({ page }) => {
+  test('renders hero content without a welcome sequence', async ({ page }) => {
     await resetWelcomeState(page);
     await page.goto('/');
 
-    const welcomePrompt = page.getByRole('dialog', { name: 'Play welcome audio?' });
-    await expect(welcomePrompt).toBeVisible();
-    await expect(welcomePrompt).toContainText(WELCOME_AUDIO_PROMPT_BODY);
-
-    await dismissWelcomeSequence(page);
+    await expectImmediateHome(page);
 
     const terminalHero = await waitForHomeTerminalHero(page);
 
@@ -188,19 +160,16 @@ test.describe('Home page', () => {
     );
   });
 
-  test('auto-expands the hero into the viewport overlay after the welcome sequence', async ({
-    page,
-  }) => {
+  test('keeps the hero windowed until the user chooses to expand it', async ({ page }) => {
     await resetWelcomeState(page);
     await page.goto('/');
-
-    await dismissWelcomeSequence(page);
-
-    const expandedHero = getExpandedTerminalHero(page);
-    await expect(expandedHero).toBeVisible();
-    await expect(expandedHero).toHaveAttribute('data-expanded', 'true');
+    await expectImmediateHome(page);
+    const hero = await waitForStableHomeTerminalHero(page);
+    await expect(hero).toHaveAttribute('data-expanded', 'false');
+    await expect(page.getByTestId('home-ide-expanded')).toHaveCount(0);
+    await hero.getByRole('button', { name: 'Expand window' }).click();
+    await expect(getExpandedTerminalHero(page)).toHaveAttribute('data-expanded', 'true');
     await expect(getWindowedTerminalHero(page)).toHaveCount(0);
-    await waitForStableTerminalHero(page, expandedHero);
   });
 
   test('renders the desktop AppBar navigation and keeps audio recovery available after onboarding', async ({
@@ -212,25 +181,14 @@ test.describe('Home page', () => {
     const siteNavigation = page.locator('#site-navigation');
     const settingsTrigger = page.getByTestId('header-settings-trigger');
 
-    const welcomePrompt = page.getByRole('dialog', { name: 'Play welcome audio?' });
-    await expect(welcomePrompt).toBeVisible();
-    await welcomePrompt.getByRole('button', { name: 'No thanks' }).click();
-    await expect(welcomePrompt).toBeHidden();
+    await page.getByRole('button', { name: 'Customize appearance & audio' }).click();
 
-    const customizeDialog = page.getByTestId('customize-experience-dialog');
-    await expect(customizeDialog).toBeVisible();
-    await customizeDialog.getByRole('button', { name: 'Okay' }).click();
-    await expect(customizeDialog).toBeHidden();
-
-    const settingsHint = page.getByTestId('first-visit-settings-hint-popover');
-    await expect(settingsHint).toBeVisible();
-    await expect(settingsHint).toContainText(
-      'You can always update motion, welcome audio, and more from the settings button in the header.'
-    );
-    await expect(settingsTrigger).toHaveAttribute('data-highlighted', 'true');
-    await settingsHint.getByRole('button', { name: 'Get started' }).click();
-    await expect(settingsHint).toBeHidden();
+    const preferences = page.getByRole('region', { name: 'Make yourself at home' });
+    await expect(preferences).toBeVisible();
+    await preferences.getByRole('button', { name: 'Explore now' }).click();
+    await expect(preferences).toBeHidden();
     await expect(settingsTrigger).toHaveAttribute('data-highlighted', 'false');
+    await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
 
     await expect(siteNavigation).toBeVisible();
     await expect(siteNavigation.getByText('CV', { exact: true })).toBeVisible();
@@ -238,9 +196,7 @@ test.describe('Home page', () => {
     await expect(siteNavigation.getByText('Photography', { exact: true })).toBeVisible();
 
     const blogNavigationLink = siteNavigation.getByText('Blog', { exact: true });
-    if ((await blogNavigationLink.count()) > 0) {
-      await expect(blogNavigationLink).toBeVisible();
-    }
+    await expect(blogNavigationLink).toBeVisible();
 
     await expect(settingsTrigger).toBeVisible();
 
@@ -269,7 +225,7 @@ test.describe('Home page', () => {
     await page.clock.install({ time: HOME_SCREENSHOT_CLOCK_START });
     await page.goto('/');
 
-    await dismissWelcomeSequence(page);
+    await expectImmediateHome(page);
 
     await waitForStableHomeTerminalHero(page);
 
@@ -277,9 +233,12 @@ test.describe('Home page', () => {
 
     await resetHomeScrollForScreenshot(page, terminalHero);
     await expect(terminalHero).toContainText(SERVER_EDITOR_TEXT, { timeout: 20000 });
-    await expect(terminalHero.getByText('Explorer')).toBeVisible();
+    await terminalHero.getByRole('button', { name: 'Explorer', exact: true }).click();
+    await expect(terminalHero.getByText('Explorer', { exact: true })).toBeVisible();
     await expect(terminalHero).toContainText('DANHENDERSON.DEV');
-    await advanceClockUntilTerminalBodyContains(page, terminalHero, STABLE_TERMINAL_COMMAND_TEXT);
+    await expect(terminalHero.getByTestId('terminal-panel-body')).toContainText(
+      STABLE_TERMINAL_OUTPUT_TEXT
+    );
     await expectPingPongHeroMetadata(terminalHero);
   });
 
@@ -290,7 +249,7 @@ test.describe('Home page', () => {
     await page.clock.install({ time: HOME_SCREENSHOT_CLOCK_START });
     await page.goto('/');
 
-    await dismissWelcomeSequence(page);
+    await expectImmediateHome(page);
 
     const terminalHero = await waitForStableHomeTerminalHero(page);
     const clientTab = terminalHero.getByTestId('vscode-tab-client');
@@ -307,7 +266,7 @@ test.describe('Home page', () => {
     await resetWelcomeState(page);
     await page.goto('/');
 
-    await dismissWelcomeSequence(page);
+    await expectImmediateHome(page);
 
     const terminalHero = await waitForStableHomeTerminalHero(page);
     const clientTab = terminalHero.getByTestId('vscode-tab-client');
@@ -332,7 +291,7 @@ test.describe('Home page', () => {
     await resetWelcomeState(page);
     await page.goto('/');
 
-    await dismissWelcomeSequence(page);
+    await expectImmediateHome(page);
 
     const terminalHero = await waitForStableHomeTerminalHero(page);
     const clientTab = terminalHero.getByTestId('vscode-tab-client');
@@ -359,7 +318,7 @@ test.describe('Home page', () => {
     await resetWelcomeState(page);
     await page.goto('/');
 
-    await dismissWelcomeSequence(page);
+    await expectImmediateHome(page);
 
     await waitForStableHomeTerminalHero(page);
 
@@ -393,20 +352,16 @@ test.describe('Home page', () => {
       'true'
     );
 
-    const expandedRect = await expandedHero.boundingBox();
-    const mainRect = await mainContent.boundingBox();
-    const headerRect = await header.boundingBox();
-    const viewport = page.viewportSize();
+    const expandedRect = await getBounds(expandedHero);
+    const mainRect = await getBounds(mainContent);
+    const headerRect = await getBounds(header);
+    const viewport = page.viewportSize()!;
 
     expect(expandedRect).not.toBeNull();
     expect(mainRect).not.toBeNull();
     expect(viewport).not.toBeNull();
 
-    if (!expandedRect || !mainRect || !viewport) {
-      throw new Error('Expected expanded hero, main content, and viewport bounds to be available.');
-    }
-
-    const topBound = headerRect ? Math.max(0, headerRect.y + headerRect.height) : 0;
+    const topBound = Math.max(0, headerRect.y + headerRect.height);
     const rightBound = Math.min(viewport.width, mainRect.x + mainRect.width);
     const bottomBound = Math.min(viewport.height, mainRect.y + mainRect.height);
 
@@ -438,7 +393,7 @@ test.describe('Home page', () => {
     await resetWelcomeState(page);
     await page.goto('/');
 
-    await dismissWelcomeSequence(page);
+    await expectImmediateHome(page);
 
     await waitForStableHomeTerminalHero(page);
 
@@ -454,17 +409,13 @@ test.describe('Home page', () => {
       }
     );
 
-    const heroBefore = await terminalHero.boundingBox();
-    const titleBarBox = await titleBar.boundingBox();
-    const mainBox = await mainRegion.boundingBox();
+    const heroBefore = await getBounds(terminalHero);
+    const titleBarBox = await getBounds(titleBar);
+    const mainBox = await getBounds(mainRegion);
 
     expect(heroBefore).not.toBeNull();
     expect(titleBarBox).not.toBeNull();
     expect(mainBox).not.toBeNull();
-
-    if (!heroBefore || !titleBarBox || !mainBox) {
-      throw new Error('Expected hero, title bar, and main region bounding boxes to be available.');
-    }
 
     // Start from the empty lower-left strip of the title bar so the drag path avoids
     // the interactive traffic dots and centered search affordance.
@@ -476,13 +427,9 @@ test.describe('Home page', () => {
     await page.mouse.move(dragStartX + 120, dragStartY - 56, { steps: 12 });
     await page.mouse.up();
 
-    const heroAfter = await terminalHero.boundingBox();
+    const heroAfter = await getBounds(terminalHero);
 
     expect(heroAfter).not.toBeNull();
-
-    if (!heroAfter) {
-      throw new Error('Expected the terminal hero bounding box after dragging.');
-    }
 
     const xDelta = Math.abs(heroAfter.x - heroBefore.x);
     const yDelta = Math.abs(heroAfter.y - heroBefore.y);
@@ -498,7 +445,7 @@ test.describe('Home page', () => {
     await resetWelcomeState(page);
     await page.goto('/');
 
-    await dismissWelcomeSequence(page);
+    await expectImmediateHome(page);
 
     await waitForStableHomeTerminalHero(page);
 
@@ -537,7 +484,7 @@ test.describe('Home page', () => {
     await resetWelcomeState(page);
     await page.goto('/');
 
-    await dismissWelcomeSequence(page);
+    await expectImmediateHome(page);
 
     await waitForStableHomeTerminalHero(page);
 
@@ -546,6 +493,7 @@ test.describe('Home page', () => {
     const explorerSidebarLabel = terminalHero.getByText('Explorer');
 
     await expect(explorerToggle).toBeVisible();
+    await explorerToggle.click();
     await expect(explorerSidebarLabel).toBeVisible();
 
     const explorerOpenWidth = await getElementLayoutWidth(terminalHero);
@@ -568,7 +516,7 @@ test.describe('Home page', () => {
     await resetWelcomeState(page);
     await page.goto('/');
 
-    await dismissWelcomeSequence(page);
+    await expectImmediateHome(page);
 
     await waitForStableHomeTerminalHero(page);
 
@@ -579,13 +527,9 @@ test.describe('Home page', () => {
 
     const initialWidth = await getElementLayoutWidth(terminalHero);
     const initialHeight = await getElementLayoutHeight(terminalHero);
-    const handleBox = await resizeHandle.boundingBox();
+    const handleBox = await getBounds(resizeHandle);
 
     expect(handleBox).not.toBeNull();
-
-    if (!handleBox) {
-      throw new Error('Expected the right resize handle bounding box to be available.');
-    }
 
     const dragStartX = handleBox.x + handleBox.width / 2;
     const dragStartY = handleBox.y + handleBox.height / 2;
@@ -611,16 +555,43 @@ test.describe('Home page', () => {
     expect(Math.abs(resizedHeight - initialHeight)).toBeLessThanOrEqual(2);
   });
 
-  test('welcome audio prompt can be dismissed', async ({ page }) => {
+  test('keeps the settled IDE mounted and stationary after motion preferences change', async ({ page }) => {
+    await page.goto('/');
+    const hero = getWindowedTerminalHero(page);
+    await expect(hero).toHaveAttribute('data-playing', 'true');
+    const originalNodes = await page.getByTestId('home-hero-window').evaluateHandle((window) => ({
+      wrapper: window.parentElement!,
+      terminal: window.querySelector('[data-testid="terminal-hero"]')!,
+    }));
+    await page.getByRole('button', { name: 'Open settings' }).click();
+    for (const level of ['Subtle', 'Expressive', 'Off', 'Default']) {
+      await page.getByRole('button', { name: level, exact: true }).click();
+      const stable = await originalNodes.evaluate(async ({ wrapper, terminal }) => {
+        const end = performance.now() + 700;
+        do {
+          await new Promise(requestAnimationFrame);
+          if (!wrapper.isConnected || !terminal.isConnected) return false;
+          if (!new DOMMatrixReadOnly(getComputedStyle(wrapper).transform).isIdentity) return false;
+        } while (performance.now() < end);
+        return true;
+      });
+      expect(stable).toBe(true);
+      await expect(hero).toHaveAttribute('data-expanded', 'false');
+    }
+    await originalNodes.dispose();
+    await page.keyboard.press('Escape');
+    await hero.getByRole('button', { name: 'Expand window' }).click();
+    await expect(getExpandedTerminalHero(page)).toBeVisible();
+  });
+
+  test('does not grant audio consent on an ordinary first visit', async ({ page }) => {
     await resetWelcomeState(page);
     await page.goto('/');
-    const audioDialog = page.getByRole('dialog', { name: 'Play welcome audio?' });
-    await expect(audioDialog).toBeVisible();
-    await expect(audioDialog.getByText('Play welcome audio?')).toBeVisible();
-    await audioDialog.getByRole('button', { name: 'No thanks' }).click();
-    await expect(audioDialog).toBeHidden();
-
-    const customizeDialog = page.getByTestId('customize-experience-dialog');
-    await expect(customizeDialog).toBeVisible();
+    await expectImmediateHome(page);
+    expect(
+      await page.evaluate(() => localStorage.getItem('danhenderson-welcome-audio-consent'))
+    ).not.toBe('granted');
+    await page.getByTestId('header-settings-trigger').click();
+    await expect(page.getByRole('button', { name: 'Play welcome audio' })).toBeVisible();
   });
 });

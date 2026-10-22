@@ -110,6 +110,44 @@ describe('useGithubProfile', () => {
     expect(result.current.status.freshness.lastUpdated).toEqual(expect.any(String));
   });
 
+  it('preserves verified stars and leaves failed, invalid, and unenriched counts unknown', async () => {
+    enableLiveGitHubRequestsForTest();
+    global.fetch = jest.fn((input) => {
+      const url = String(input);
+      if (url.includes('/events/')) return createOkResponse([]);
+      if (url.includes('/search/issues'))
+        return createOkResponse({
+          items: Array.from({ length: 10 }, (_, i) => ({
+            repository_url: `https://api.github.com/repos/community/repo-${i}`,
+          })),
+        });
+      const index = Number(url.split('repo-')[1]);
+      if (index === 2) return createErrorResponse();
+      return createOkResponse({
+        stargazers_count: index === 0 ? 50000 : index === 1 ? 0 : index === 3 ? -1 : undefined,
+      });
+    });
+    const { result } = renderHook(() => useGithubProfile());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(
+      result.current.contributions.find((repo) => repo.name === 'community/repo-0')?.stars
+    ).toBe(50000);
+    expect(
+      result.current.contributions.find((repo) => repo.name === 'community/repo-1')?.stars
+    ).toBe(0);
+    for (const index of [2, 3, 4, 8, 9]) {
+      expect(
+        result.current.contributions.find((repo) => repo.name === `community/repo-${index}`)?.stars
+      ).toBeUndefined();
+    }
+    expect(global.fetch).toHaveBeenCalledTimes(10);
+    expect(result.current.status.sourceDetail).toContainEqual({
+      id: 'enrichment',
+      label: 'Repo enrichment',
+      ok: false,
+    });
+  });
+
   it('falls back gracefully on fetch failure', async () => {
     enableLiveGitHubRequestsForTest();
     global.fetch = jest

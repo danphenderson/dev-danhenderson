@@ -13,7 +13,7 @@ Source code for [danhenderson.dev](https://danhenderson.dev), a React + TypeScri
 
 | Route                                   | What it contains                                                                         |
 | --------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `/`                                     | Home page with the welcome audio prompt                                                  |
+| `/`                                     | Identity, portfolio links, interactive IDE, and optional appearance/audio controls       |
 | `/cv`                                   | Interactive CV, downloadable resume, and GitHub-backed highlights with bundled fallbacks |
 | `/blog` and `/blog/:slug`               | Editorial blog index and post detail pages                                               |
 | `/climbing`                             | Climbing ticks and wish-list views                                                       |
@@ -23,8 +23,11 @@ Source code for [danhenderson.dev](https://danhenderson.dev), a React + TypeScri
 
 - Fully client-side single-page app built for static hosting.
 - Portfolio content is authored in local TypeScript data modules.
-- GitHub-powered CV sections degrade gracefully to bundled content when live API data is unavailable.
+- GitHub-powered CV sections degrade gracefully to bundled content when live API data is unavailable. Contribution stars use live values when available, show an em dash for unknown counts, and sort unknowns after known counts.
 - Shared motion, theming, and reusable UI primitives power the different sections of the site.
+- Home identity, CV/project links, and the IDE are available immediately; expansion is manual. “Customize appearance & audio” toggles a nonmodal panel (exposed with `aria-expanded`) that closes after five idle seconds and stays open during hover or focus; keyboard activation moves focus into the panel, which keeps it open. Header settings remain available, and audio requires explicit play. Failed audio-script loads can be retried from either control.
+- CV and Climbing retain scroll reveals and also provide keyboard-operable reveal buttons. Resume and contact links are visible in the CV header.
+- Photography uses generated responsive WebP display files; original photographs remain available for download.
 
 ## Runtime Environment
 
@@ -54,15 +57,27 @@ Source code for [danhenderson.dev](https://danhenderson.dev), a React + TypeScri
 
 ## Stack
 
-- React 18
+- React 19
 - TypeScript
-- React Router v6
+- React Router v7
 - MUI + Emotion
-- MUI X DataGrid
+- MUI Table
 - Vite for local development and production builds
+
+## Display images and performance checks
+
+Run `npm run media:generate` after adding or replacing source images under `public/assets/photography/`, `public/assets/climbing/`, or `public/assets/home.jpg`. The development-only Sharp transformer auto-orients images, strips metadata, avoids upscaling, and writes WebP variants with maximum edges of 480, 960, 1600, and 2400 pixels. Quality starts at 80 and is reduced only to meet the per-file budgets: 250 KB through 960 px, 500 KB through 1600 px, and 1 MB through 2400 px.
+
+Commit `public/assets/display/` and `src/generated/displayImages.json` together. `npm run media:check` detects stale sources, missing derivatives, and budget violations. The manifest is generated; gallery content and original downloads remain in their existing modules. `getDisplayImage()` handles responsive display URLs, including `PUBLIC_URL` subpaths.
+
+The service worker keeps at most 48 display images (each at most 1 MB) and 128 other runtime assets, plus the app shell. It does not cache original images or image query variants. Cache writes finish in the background (the worker stays alive through `event.waitUntil`), so they never delay network responses, and write failures preserve successful responses.
+
+After `npm run build`, run `npm run check:bundle`. It totals the entry's entire static import graph, with limits of 950 KB raw and 300 KB gzip; dynamic route chunks are reported separately by Vite. These are transfer-size checks, not a production performance score. Build CI runs lint, typecheck, media checks, and this bundle budget.
 
 ## Tooling Notes
 
+- Playwright launches Chromium with `chromiumSandbox: true`; keep the browser sandbox enabled.
+- Ubuntu 23.10+ (including GitHub's Ubuntu 24.04 runners) blocks the unprivileged user namespaces that Chromium's sandbox needs, so Playwright fails with "No usable sandbox!". CI runs `.github/actions/playwright-sandbox`, which grants that permission only to Playwright's Chromium through an AppArmor profile. On a local Ubuntu machine, run the same commands from that action.
 - The main app now uses Vite for `npm start`, `npm run build`, and `npm run build:e2e`.
 - The main app toolchain baseline is Node 20.19 or newer and TypeScript 5.6.x.
 - Jest configuration is owned by `jest.config.cjs`, ESLint configuration is owned by `eslint.config.cjs`, and `npm run typecheck` uses `tsconfig.typecheck.json`.

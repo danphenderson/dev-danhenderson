@@ -1,16 +1,11 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import { keyframes } from '@emotion/react';
+import { useMotionScale } from '../../motion';
+import { terminalCursorBlink } from '../../styles/animations';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { TerminalLine, TerminalSessionTab } from '../../types/ui';
 import type { TerminalTypewriterPhase } from '../text/useTerminalTypewriter';
 import { VSCODE_COLORS, VSCODE_LAYOUT, monoFontFamily, systemFontFamily } from './vscodeTokens';
-
-// Module-level keyframe — prevents Emotion from generating duplicate names on re-renders
-const cursorBlink = keyframes`
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0; }
-`;
 
 export const isCommandPhase = (phase: TerminalTypewriterPhase): boolean =>
   phase === 'typing-command' || phase === 'pause-before-output' || phase === 'clearing-screen';
@@ -143,6 +138,7 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
   sessions,
   activeSessionId,
 }) => {
+  const { duration: motionScale } = useMotionScale();
   const flexLayout = expanded || fluidLayout || resized;
   const scrollRef = React.useRef<HTMLDivElement>(null);
 
@@ -163,9 +159,10 @@ export const VscodeTerminalPanel: React.FC<VscodeTerminalPanelProps> = ({
     width: '0.55ch',
     ml: '1px',
     userSelect: 'none',
-    ...(isCursorBlinking && {
-      animation: `${cursorBlink} 530ms step-end infinite`,
-    }),
+    ...(isCursorBlinking &&
+      motionScale > 0 && {
+        animation: `${terminalCursorBlink} 530ms step-end infinite`,
+      }),
   };
 
   return (

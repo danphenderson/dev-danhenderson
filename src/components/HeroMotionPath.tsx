@@ -1,13 +1,14 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'motion/react';
 import { SPRING_EASING_MOTION } from '../styles/springEasing';
+import { duration, useMotionScale } from '../motion';
 
 /**
  * Total entrance duration in seconds:
  * - initial hold so the nested MUI Zoom can play
  * - spiral travel to resting position
  */
-const ENTRANCE_DURATION_S = 3.6;
+const ENTRANCE_DURATION_S = duration.heroEntrance;
 
 /** Hold at the starting position while the inner Zoom entrance completes. */
 const HOLD_FRACTION = 0.08;
@@ -28,6 +29,13 @@ const SAMPLE_COUNT = 48;
  * is seamless.  (theme.shape.borderRadius = 14, sx borderRadius: 2 → 28px)
  */
 const RESTING_BORDER_RADIUS = 28;
+const RESTING_TRANSFORM = {
+  x: 0,
+  y: 0,
+  scale: 1,
+  rotate: 0,
+  borderRadius: RESTING_BORDER_RADIUS,
+};
 
 /**
  * In-flight keyframe milestones (progress 0..1 through the travel portion).
@@ -144,11 +152,25 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
   const ref = useRef<HTMLDivElement>(null);
   const [startOffset, setStartOffset] = useState<{ x: number; y: number } | null>(null);
   const [settled, setSettled] = useState(false);
+  const completed = useRef(false);
+  const { duration: dFactor } = useMotionScale();
+
+  const complete = useCallback(() => {
+    if (!active || completed.current) return;
+    completed.current = true;
+    setSettled(true);
+    onComplete?.();
+  }, [active, onComplete]);
 
   /** Reset settled state when the path deactivates so a re-entrance replays. */
   useEffect(() => {
-    if (!active) setSettled(false);
-  }, [active]);
+    if (!active) {
+      completed.current = false;
+      setSettled(false);
+    } else if (dFactor === 0) {
+      complete();
+    }
+  }, [active, dFactor, complete]);
 
   /**
    * Measure the element's final resting position and compute the transform
@@ -159,6 +181,7 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
       setStartOffset(null);
       return;
     }
+    if (settled || dFactor === 0) return;
 
     const node = ref.current;
     if (!node) return;
@@ -175,28 +198,27 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
     };
 
     measure();
-  }, [active]);
+  }, [active, dFactor, settled]);
 
   const keyframes = useMemo(() => {
     if (!startOffset) return null;
     return buildSpiralKeyframes(startOffset.x, startOffset.y);
   }, [startOffset]);
 
-  if (!active) {
-    return <>{children}</>;
-  }
-
-  const motionStyle: React.CSSProperties | undefined = !keyframes
-    ? { visibility: 'hidden' }
-    : !settled
+  // A completed entrance stays at rest until explicitly deactivated. Keep the
+  // wrapper mounted so preference changes preserve focus and the IDE portal host.
+  const entering = active && dFactor > 0 && !settled;
+  const motionStyle: React.CSSProperties | undefined = entering
+    ? keyframes
       ? { overflow: 'hidden' }
-      : undefined;
+      : { visibility: 'hidden' }
+    : undefined;
 
   return (
     <motion.div
       ref={ref}
       initial={
-        keyframes
+        entering && keyframes
           ? {
               x: keyframes.x[0],
               y: keyframes.y[0],
@@ -207,29 +229,28 @@ export const HeroMotionPath = ({ active, children, onComplete }: HeroMotionPathP
           : false
       }
       animate={
-        keyframes
-          ? {
-              x: keyframes.x,
-              y: keyframes.y,
-              scale: keyframes.scale,
-              rotate: keyframes.rotate,
-              borderRadius: keyframes.borderRadius,
-            }
-          : undefined
+        entering
+          ? keyframes
+            ? {
+                x: keyframes.x,
+                y: keyframes.y,
+                scale: keyframes.scale,
+                rotate: keyframes.rotate,
+                borderRadius: keyframes.borderRadius,
+              }
+            : undefined
+          : RESTING_TRANSFORM
       }
       transition={
-        keyframes
+        entering && keyframes
           ? {
-              duration: ENTRANCE_DURATION_S,
+              duration: ENTRANCE_DURATION_S * dFactor,
               times: keyframes.times,
               ease: SPRING_EASING_MOTION,
             }
-          : undefined
+          : { duration: 0 }
       }
-      onAnimationComplete={() => {
-        setSettled(true);
-        onComplete?.();
-      }}
+      onAnimationComplete={entering && keyframes ? complete : undefined}
       style={motionStyle}
     >
       {children}

@@ -3,6 +3,7 @@ import { cp, mkdtemp, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
 import { extname, join, resolve, sep } from 'node:path';
+import displayImages from '../../src/generated/displayImages.json';
 import { declineWelcomeAudio } from './helpers/header';
 
 /**
@@ -14,7 +15,7 @@ import { declineWelcomeAudio } from './helpers/header';
  */
 
 const BUILD_DIRECTORY = resolve(process.cwd(), 'build');
-const PROBE_ASSET_PATH = '/assets/home.jpg';
+const PROBE_ASSET_PATH = displayImages['/assets/home.jpg'].images[0].src;
 
 const CONTENT_TYPES: Record<string, string> = {
   '.css': 'text/css; charset=utf-8',
@@ -29,6 +30,7 @@ const CONTENT_TYPES: Record<string, string> = {
   '.svg': 'image/svg+xml; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
   '.xml': 'application/xml; charset=utf-8',
+  '.webp': 'image/webp',
 };
 
 type TemporaryDeployment = {
@@ -44,8 +46,6 @@ type TemporaryDeploymentOptions = {
 };
 
 type ProbeMetrics = {
-  cached: boolean;
-  cachedSize: number | null;
   naturalHeight: number;
   naturalWidth: number;
 };
@@ -129,7 +129,7 @@ const createTemporaryDeployment = async (
   }
 
   return {
-    assetPath: join(rootDir, 'assets', 'home.jpg'),
+    assetPath: join(rootDir, PROBE_ASSET_PATH),
     rootDir,
     tempDir: tempParentDir,
     url: `http://127.0.0.1:${address.port}`,
@@ -174,28 +174,27 @@ const readProbeMetrics = async (page: Page, probeUrl: string): Promise<ProbeMetr
       image.onerror = () => reject(new Error(`Failed to load probe asset: ${assetUrl}`));
     });
 
-    let cachedSize: number | null = null;
-
-    for (const cacheKey of await caches.keys()) {
-      const cachedResponse = await (await caches.open(cacheKey)).match(assetUrl);
-
-      if (!cachedResponse) {
-        continue;
-      }
-
-      cachedSize = (await cachedResponse.clone().blob()).size;
-      break;
-    }
-
     return {
-      cached: cachedSize !== null,
-      cachedSize,
       naturalHeight: image.naturalHeight,
       naturalWidth: image.naturalWidth,
     };
   }, probeUrl);
 
-const createReplacementJpeg = async (page: Page) => {
+// The worker stores runtime assets after responding, so callers poll for the cached body.
+const readCachedProbeSize = (page: Page, probeUrl: string) =>
+  page.evaluate(async (assetUrl) => {
+    for (const cacheKey of await caches.keys()) {
+      const cachedResponse = await (await caches.open(cacheKey)).match(assetUrl);
+
+      if (cachedResponse) {
+        return (await cachedResponse.blob()).size;
+      }
+    }
+
+    return null;
+  }, probeUrl);
+
+const createReplacementWebp = async (page: Page) => {
   const dataUrl = await page.evaluate(() => {
     const canvas = document.createElement('canvas');
     canvas.width = 1;
@@ -210,10 +209,10 @@ const createReplacementJpeg = async (page: Page) => {
     context.fillStyle = '#ff5a36';
     context.fillRect(0, 0, 1, 1);
 
-    return canvas.toDataURL('image/jpeg', 1);
+    return canvas.toDataURL('image/webp', 1);
   });
 
-  return Buffer.from(dataUrl.replace('data:image/jpeg;base64,', ''), 'base64');
+  return Buffer.from(dataUrl.replace('data:image/webp;base64,', ''), 'base64');
 };
 
 const disposeTemporaryDeployment = async (deployment: TemporaryDeployment) => {
@@ -240,10 +239,9 @@ test.describe('Production service worker smoke', () => {
       const initialProbe = await readProbeMetrics(page, probeUrl);
       expect(initialProbe.naturalWidth).toBeGreaterThan(1);
       expect(initialProbe.naturalHeight).toBeGreaterThan(1);
-      expect(initialProbe.cached).toBe(true);
-      expect(initialProbe.cachedSize).not.toBeNull();
+      await expect.poll(() => readCachedProbeSize(page, probeUrl)).toBe(originalAsset.byteLength);
 
-      const replacementAsset = await createReplacementJpeg(page);
+      const replacementAsset = await createReplacementWebp(page);
       await writeFile(deployment.assetPath, replacementAsset);
 
       await page.reload({ waitUntil: 'load' });
@@ -252,11 +250,9 @@ test.describe('Production service worker smoke', () => {
       const refreshedProbe = await readProbeMetrics(page, probeUrl);
       expect(refreshedProbe.naturalWidth).toBe(1);
       expect(refreshedProbe.naturalHeight).toBe(1);
-      expect(refreshedProbe.cached).toBe(true);
-      expect(refreshedProbe.cachedSize).not.toBeNull();
-      expect(refreshedProbe.cachedSize).toBeLessThan(
-        initialProbe.cachedSize ?? Number.MAX_SAFE_INTEGER
-      );
+      await expect
+        .poll(() => readCachedProbeSize(page, probeUrl))
+        .toBe(replacementAsset.byteLength);
     } finally {
       await writeFile(deployment.assetPath, originalAsset);
       await disposeTemporaryDeployment(deployment);
@@ -279,7 +275,7 @@ test.describe('Production service worker smoke', () => {
       await expect(page).toHaveURL(cvUrl);
       await expect(page.locator('#main-content')).toBeVisible();
       await expect(page.getByText('Daniel Henderson')).toBeVisible();
-      await expect(page.getByText('MS in Applied/Computational Math')).toBeVisible();
+      await expect(page.getByRole('link', { name: 'Download resume' })).toBeVisible();
     } finally {
       await disposeTemporaryDeployment(deployment);
     }

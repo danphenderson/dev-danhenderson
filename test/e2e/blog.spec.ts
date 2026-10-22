@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { dismissWelcomeSequence } from './helpers/header';
+import { expectImmediateHome } from './helpers/header';
 import { waitForAnimatedSectionReadiness } from './helpers/routeReadiness';
 
 const FEATURED_POST_TITLE = 'Fixing and Enforcing None-Type Drift with a Codemod';
@@ -196,7 +196,7 @@ test.describe('Blog cross-route navigation', () => {
   test('header navigation includes a Blog link that reaches the blog index', async ({ page }) => {
     await page.goto('/');
 
-    await dismissWelcomeSequence(page);
+    await expectImmediateHome(page);
 
     // The header should contain a Blog link
     const blogLink = page.getByRole('link', { name: 'Blog' });

@@ -8,7 +8,12 @@
  * files across future deploys.
  */
 
-const CACHE_NAME = 'danhenderson-v1';
+const CACHE_NAME = 'danhenderson-v2';
+const IMAGE_CACHE_NAME = `${CACHE_NAME}-display-images`;
+const MAX_DISPLAY_IMAGES = 48;
+const MAX_IMAGE_BYTES = 1_000_000;
+const MAX_RUNTIME_ASSETS = 128;
+let cacheWrites = Promise.resolve();
 
 const PRECACHE_URLS = ['./', './index.html'];
 const RUNTIME_ASSET_DESTINATIONS = new Set(['image', 'style', 'script', 'font']);
@@ -24,26 +29,44 @@ function createUnavailableResponse(statusText) {
 }
 
 function getCachedAppShell() {
-  return caches.match('./index.html').then((cached) => cached || createUnavailableResponse('Offline'));
+  return caches
+    .match('./index.html')
+    .then((cached) => cached || createUnavailableResponse('Offline'));
 }
 
-function updateCache(request, response) {
-  if (!response.ok) {
-    return response;
-  }
-
+function updateCache(event, response) {
+  if (!response.ok) return response;
+  const { request } = event;
+  const isImage = request.destination === 'image';
   const clone = response.clone();
-
-  caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-
+  // Serialize writes so concurrent image loads cannot escape the entry bound.
+  cacheWrites = cacheWrites.then(async () => {
+    try {
+      if (isImage && (await clone.clone().blob()).size > MAX_IMAGE_BYTES) return;
+      const cache = await caches.open(isImage ? IMAGE_CACHE_NAME : CACHE_NAME);
+      await cache.put(request, clone);
+      const keys = (await cache.keys()).filter(
+        (key) => !PRECACHE_URLS.some((url) => new URL(url, self.location.href).href === key.url)
+      );
+      const limit = isImage ? MAX_DISPLAY_IMAGES : MAX_RUNTIME_ASSETS;
+      for (const key of keys.slice(0, Math.max(0, keys.length - limit))) {
+        await cache.delete(key);
+      }
+    } catch {
+      // Quota/storage failures must never discard a successful network response.
+    }
+  });
+  // Keep the worker alive for the write without making the page wait for storage.
+  event.waitUntil(cacheWrites);
   return response;
 }
 
-function networkFirstWithCacheFallback(request) {
+function networkFirstWithCacheFallback(event) {
+  const { request } = event;
   return fetch(request)
     .then((response) => {
       if (response.ok) {
-        return updateCache(request, response);
+        return updateCache(event, response);
       }
 
       return caches.match(request).then((cached) => cached || response);
@@ -86,7 +109,12 @@ self.addEventListener('activate', (event) => {
       .keys()
       .then((cacheNames) =>
         Promise.all(
-          cacheNames.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name))
+          cacheNames
+            .filter(
+              (name) =>
+                name.startsWith('danhenderson-') && name !== CACHE_NAME && name !== IMAGE_CACHE_NAME
+            )
+            .map((name) => caches.delete(name))
         )
       )
       .then(() => self.clients.claim())
@@ -109,8 +137,17 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Keep original photography and duplicate query variants out of runtime storage.
+  if (
+    event.request.destination === 'image' &&
+    (requestUrl.search || !requestUrl.pathname.includes('/assets/display/'))
+  ) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   if (RUNTIME_ASSET_DESTINATIONS.has(event.request.destination)) {
-    event.respondWith(networkFirstWithCacheFallback(event.request));
+    event.respondWith(networkFirstWithCacheFallback(event));
     return;
   }
 
