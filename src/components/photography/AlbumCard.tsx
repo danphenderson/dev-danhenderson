@@ -1,4 +1,4 @@
-import { getDisplayImage } from '../../utils/displayImages';
+import { applyOriginalImageFallback, getDisplayImage } from '../../utils/displayImages';
 import { Box, Button, Stack } from '@mui/material';
 import PlaceIcon from '@mui/icons-material/Place';
 import { Link as RouterLink } from 'react-router-dom';
@@ -35,7 +35,12 @@ export function AlbumCard({ category, variant, onImageReady, sx }: AlbumCardProp
         loading="lazy"
         decoding="async"
         onLoad={onImageReady ? () => onImageReady(category.src) : undefined}
-        onError={onImageReady ? () => onImageReady(category.src) : undefined}
+        onError={(event) => {
+          // Keep the album loading indicator pending while the original is retried.
+          if (!applyOriginalImageFallback(event.currentTarget as HTMLImageElement, category.src)) {
+            onImageReady?.(category.src);
+          }
+        }}
         style={{ position: 'absolute', inset: 0, zIndex: 0 }}
       />
       <Box sx={appStyles.photographyCardOverlaySx}>

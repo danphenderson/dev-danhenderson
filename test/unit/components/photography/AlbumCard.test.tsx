@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { routerFuture } from '../../../../src/routerFuture';
 import ThemeProvider from '../../../../src/ThemeProvider';
@@ -7,7 +7,7 @@ import type { PhotoCategory } from '../../../../src/types/data';
 
 jest.mock('../../../../src/motion', () => ({
   MotionImage: ({ src, alt, ...rest }: any) => (
-    <img src={src} alt={alt} data-testid="album-image" />
+    <img src={src} alt={alt} data-testid="album-image" {...rest} />
   ),
 }));
 
@@ -84,5 +84,59 @@ describe('AlbumCard', () => {
 
     expect(screen.queryByText('California, USA')).not.toBeInTheDocument();
     expect(screen.queryByText('· Aug 2024')).not.toBeInTheDocument();
+  });
+
+  describe('when the display derivative fails to load', () => {
+    const displayCategory: PhotoCategory = {
+      ...category,
+      src: '/assets/photography/landscape/landscape-tieton-south-fork-1.jpg',
+    };
+
+    const renderWithReady = (onImageReady?: (src: string) => void) =>
+      render(
+        <MemoryRouter future={routerFuture}>
+          <ThemeProvider>
+            <AlbumCard category={displayCategory} variant="hero" onImageReady={onImageReady} />
+          </ThemeProvider>
+        </MemoryRouter>
+      );
+
+    it('retries the original photograph instead of leaving the cover blank', () => {
+      renderWithReady();
+
+      const img = screen.getByTestId('album-image');
+      expect(img).toHaveAttribute('src', expect.stringContaining('/assets/display/'));
+
+      fireEvent.error(img);
+
+      expect(img).toHaveAttribute('src', displayCategory.src);
+      expect(img).not.toHaveAttribute('srcset');
+    });
+
+    it('keeps the album loading indicator pending until the retry resolves', () => {
+      const onImageReady = jest.fn();
+      renderWithReady(onImageReady);
+
+      const img = screen.getByTestId('album-image');
+
+      fireEvent.error(img);
+      expect(onImageReady).not.toHaveBeenCalled();
+
+      // The original failed too, so the cover must stop being counted as pending.
+      fireEvent.error(img);
+      expect(onImageReady).toHaveBeenCalledWith(displayCategory.src);
+    });
+
+    it('still settles loading when the retry succeeds', () => {
+      const onImageReady = jest.fn();
+      renderWithReady(onImageReady);
+
+      const img = screen.getByTestId('album-image');
+
+      fireEvent.error(img);
+      fireEvent.load(img);
+
+      expect(onImageReady).toHaveBeenCalledWith(displayCategory.src);
+    });
   });
 });

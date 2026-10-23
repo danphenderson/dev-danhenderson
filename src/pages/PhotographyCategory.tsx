@@ -1,4 +1,4 @@
-import { getDisplayImage } from '../utils/displayImages';
+import { applyOriginalImageFallback, getDisplayImage } from '../utils/displayImages';
 import { Link as RouterLink, Navigate, useLocation, useParams } from 'react-router-dom';
 import { Box, Button, Stack } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -114,6 +114,12 @@ export default function PhotographyCategory() {
                     alt={category.name}
                     loading="eager"
                     decoding="async"
+                    onError={(event) =>
+                      applyOriginalImageFallback(
+                        event.currentTarget as HTMLImageElement,
+                        category.src
+                      )
+                    }
                     style={{ position: 'absolute', inset: 0, zIndex: 0 }}
                   />
                 </Box>

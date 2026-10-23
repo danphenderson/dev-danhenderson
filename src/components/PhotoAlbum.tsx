@@ -2,7 +2,7 @@ import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 import { IconButton, ImageList, ImageListItem, useMediaQuery, useTheme } from '@mui/material';
 import { useAppStyles } from '../styles/appStyles';
 import type { PhotoItem } from '../types/data';
-import { getDisplayImage } from '../utils/displayImages';
+import { applyOriginalImageFallback, getDisplayImage } from '../utils/displayImages';
 import { resolvePublicAssetPath } from '../utils/assets';
 import { TiltCard } from './photography/TiltCard';
 import { useMotionScale } from '../motion';
@@ -71,6 +71,7 @@ export function QuiltedImageList({ imageData, albumLabel, onPhotoClick }: Quilte
                 alt={altText}
                 loading="lazy"
                 decoding="async"
+                onError={(event) => applyOriginalImageFallback(event.currentTarget, item.img)}
                 onClick={onPhotoClick ? () => onPhotoClick(index) : undefined}
                 role={onPhotoClick ? 'button' : undefined}
                 tabIndex={onPhotoClick ? 0 : undefined}
