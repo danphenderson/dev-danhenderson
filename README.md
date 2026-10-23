@@ -27,7 +27,7 @@ Source code for [danhenderson.dev](https://danhenderson.dev), a React + TypeScri
 - Shared motion, theming, and reusable UI primitives power the different sections of the site.
 - Home identity, CV/project links, and the IDE are available immediately; expansion is manual. “Customize appearance & audio” toggles a nonmodal panel (exposed with `aria-expanded`) that closes after five idle seconds and stays open during hover or focus; keyboard activation moves focus into the panel, which keeps it open. Header settings remain available, and audio requires explicit play. Failed audio-script loads can be retried from either control.
 - CV and Climbing retain scroll reveals and also provide keyboard-operable reveal buttons. Resume and contact links are visible in the CV header.
-- Photography uses generated responsive WebP display files; original photographs remain available for download.
+- Photography uses generated responsive WebP display files; original photographs remain available for download. If a generated display file cannot be loaded, album covers, gallery tiles, the lightbox, and the page background fall back once to the original photograph instead of rendering blank.
 
 ## Runtime Environment
 

@@ -1,4 +1,4 @@
-import { getDisplayImage } from '../../../src/utils/displayImages';
+import { applyOriginalImageFallback, getDisplayImage } from '../../../src/utils/displayImages';
 import { resolvePublicAssetPath } from '../../../src/utils/assets';
 
 const original = '/assets/photography/landscape/landscape-tieton-south-fork-1.jpg';
@@ -33,5 +33,45 @@ describe('display images', () => {
     expect(getDisplayImage('data:image/png;base64,123')).toEqual({
       src: 'data:image/png;base64,123',
     });
+  });
+});
+
+describe('applyOriginalImageFallback', () => {
+  const createImage = () => {
+    const image = document.createElement('img');
+    const display = getDisplayImage(original, 1600);
+    image.setAttribute('src', display.src);
+    image.setAttribute('srcset', display.srcSet ?? '');
+    image.setAttribute('sizes', '100vw');
+    return image;
+  };
+
+  it('retries the original and clears responsive attributes that would override src', () => {
+    const image = createImage();
+
+    expect(image.getAttribute('src')).toMatch(/^\/assets\/display\//);
+    expect(applyOriginalImageFallback(image, original)).toBe(true);
+
+    expect(image.getAttribute('src')).toBe(original);
+    // srcSet/sizes must be gone, otherwise the failed derivative is reselected.
+    expect(image.getAttribute('srcset')).toBeNull();
+    expect(image.getAttribute('sizes')).toBeNull();
+  });
+
+  it('retries only once so a missing original cannot loop', () => {
+    const image = createImage();
+
+    expect(applyOriginalImageFallback(image, original)).toBe(true);
+    expect(applyOriginalImageFallback(image, original)).toBe(false);
+    expect(image.getAttribute('src')).toBe(original);
+  });
+
+  it('resolves the original against PUBLIC_URL subpaths', () => {
+    const image = document.createElement('img');
+    image.setAttribute('src', getDisplayImage(original, 1600, '/portfolio').src);
+
+    expect(applyOriginalImageFallback(image, original, '/portfolio')).toBe(true);
+    expect(image.getAttribute('src')).toBe(`/portfolio${original}`);
+    expect(applyOriginalImageFallback(image, original, '/portfolio')).toBe(false);
   });
 });

@@ -108,4 +108,64 @@ test.describe('Photography page', () => {
     await expect(page).toHaveURL(/\/photography\/new-mexico$/);
     await waitForPhotographyCategoryPage(page, 'New Mexico', 'New Mexico in November.');
   });
+
+  test.describe('when generated display derivatives are unavailable', () => {
+    test.beforeEach(async ({ page }) => {
+      await page.route('**/assets/display/**', (route) =>
+        route.fulfill({ status: 404, body: '' })
+      );
+    });
+
+    test('recovers album covers by falling back to the original photographs', async ({ page }) => {
+      await page.goto('/photography');
+      await waitForPhotographySection(page);
+
+      const covers = page.locator('main img');
+      await expect.poll(async () => covers.count()).toBeGreaterThan(0);
+
+      await expect
+        .poll(
+          async () =>
+            covers.evaluateAll((images) =>
+              images.every(
+                (image) =>
+                  (image as HTMLImageElement).complete &&
+                  (image as HTMLImageElement).naturalWidth > 0
+              )
+            ),
+          { timeout: 20000 }
+        )
+        .toBe(true);
+
+      const sources = await covers.evaluateAll((images) =>
+        images.map((image) => (image as HTMLImageElement).currentSrc)
+      );
+      expect(sources.every((source) => source.includes('/assets/photography/'))).toBe(true);
+    });
+
+    test('recovers album gallery tiles by falling back to the original photographs', async ({
+      page,
+    }) => {
+      await page.goto('/photography/landscape');
+      await waitForPhotographyCategoryPage(page, 'Landscape', 'Landscape photo collection');
+
+      await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight }));
+
+      const tiles = page.getByRole('list', { name: 'Landscape photo gallery' }).locator('img');
+      await expect
+        .poll(
+          async () =>
+            tiles.evaluateAll((images) =>
+              images.every(
+                (image) =>
+                  (image as HTMLImageElement).complete &&
+                  (image as HTMLImageElement).naturalWidth > 0 &&
+                  (image as HTMLImageElement).currentSrc.includes('/assets/photography/')
+              )
+            ),
+          { timeout: 30000 }
+        )
+        .toBe(true);
+    });
+  });
 });

@@ -1,5 +1,5 @@
 import { resolvePublicAssetPath } from '../../utils/assets';
-import { getDisplayImage } from '../../utils/displayImages';
+import { applyOriginalImageFallback, getDisplayImage } from '../../utils/displayImages';
 import CloseIcon from '@mui/icons-material/Close';
 import DownloadRoundedIcon from '@mui/icons-material/DownloadRounded';
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
@@ -199,6 +199,9 @@ export function ImmersiveLightbox({
             {...getDisplayImage(photo.img, 2400)}
             sizes="100vw"
             alt={displayTitle}
+            onError={(event: React.SyntheticEvent<HTMLImageElement>) =>
+              applyOriginalImageFallback(event.currentTarget, photo.img)
+            }
             sx={{
               maxWidth: '100%',
               maxHeight: '100%',

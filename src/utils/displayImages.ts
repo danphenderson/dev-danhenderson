@@ -5,6 +5,31 @@ import { resolvePublicAssetPath } from './assets';
 
 const imagesBySource: Record<string, DisplayImageSet> = manifest;
 
+/**
+ * Recover a failed display derivative by loading the original photograph once.
+ *
+ * `srcSet` and `sizes` are removed first; otherwise responsive selection would
+ * immediately override the assigned `src` with the derivative that just failed.
+ * Returns `false` once the original itself has failed, which bounds the retry.
+ */
+export const applyOriginalImageFallback = (
+  image: HTMLImageElement,
+  source: string,
+  publicUrl = readPublicUrl()
+): boolean => {
+  const original = resolvePublicAssetPath(source, publicUrl);
+
+  if (image.getAttribute('src') === original) {
+    return false;
+  }
+
+  image.removeAttribute('srcset');
+  image.removeAttribute('sizes');
+  image.setAttribute('src', original);
+
+  return true;
+};
+
 /** Resolve display derivatives without changing the original download URL. */
 export const getDisplayImage = (
   source: string,
