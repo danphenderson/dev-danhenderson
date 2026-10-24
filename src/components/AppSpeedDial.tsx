@@ -33,9 +33,9 @@ const getLayerSx =
   (layer: AppSpeedDialLayer): SxProps<Theme> =>
   (theme) => ({
     zIndex: layer === 'header' ? theme.zIndex.appBar + 1 : theme.zIndex.appBar - 1,
-    '& .MuiSpeedDial-fab, & .MuiSpeedDial-actions': {
-      zIndex: 'inherit',
-    },
+    // The action tray's negative margin overlaps small triggers in WebKit.
+    '& .MuiSpeedDial-fab': { zIndex: 1 },
+    '& .MuiSpeedDial-actions': { zIndex: 0 },
   });
 
 const mergeLayerSx = (layer: AppSpeedDialLayer, sx?: SxProps<Theme>): SxProps<Theme> => {

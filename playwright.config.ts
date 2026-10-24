@@ -33,10 +33,24 @@ export default defineConfig({
       testMatch: /smoke\.spec\.ts/,
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'mobile-chromium',
+      testMatch: /asset-delivery\.smoke\.spec\.ts/,
+      use: { ...devices['Pixel 7'] },
+    },
+    {
+      name: 'mobile-webkit',
+      testMatch: /asset-delivery\.smoke\.spec\.ts/,
+      // Original-photo recovery is memory-heavy; do not run these WebKit cases together.
+      fullyParallel: false,
+      use: { ...devices['iPhone 13'] },
+    },
   ],
   webServer: {
-    command: `serve -s build -l ${PORT}`,
+    command: process.env.PLAYWRIGHT_SERVE_DIR
+      ? `serve -s "$PLAYWRIGHT_SERVE_DIR" -l ${PORT}`
+      : `serve -s build -l ${PORT}`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: !process.env.CI && !process.env.PLAYWRIGHT_SERVE_DIR,
   },
 });

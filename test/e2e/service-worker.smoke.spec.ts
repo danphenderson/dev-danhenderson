@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { extname, join, resolve, sep } from 'node:path';
 import displayImages from '../../src/generated/displayImages.json';
 import { declineWelcomeAudio } from './helpers/header';
+import { certificates, resumePdfUrl } from '../../src/data/cv';
 
 /**
  * Production service worker smoke coverage.
@@ -27,6 +28,7 @@ const CONTENT_TYPES: Record<string, string> = {
   '.json': 'application/json; charset=utf-8',
   '.map': 'application/json; charset=utf-8',
   '.png': 'image/png',
+  '.pdf': 'application/pdf',
   '.svg': 'image/svg+xml; charset=utf-8',
   '.txt': 'text/plain; charset=utf-8',
   '.xml': 'application/xml; charset=utf-8',
@@ -276,6 +278,24 @@ test.describe('Production service worker smoke', () => {
       await expect(page.locator('#main-content')).toBeVisible();
       await expect(page.getByText('Daniel Henderson')).toBeVisible();
       await expect(page.getByRole('link', { name: 'Download resume' })).toBeVisible();
+    } finally {
+      await disposeTemporaryDeployment(deployment);
+    }
+  });
+
+  test('does not turn missing CV documents into successful SPA navigations', async ({ page }) => {
+    const deployment = await createTemporaryDeployment();
+    try {
+      await page.goto(deployment.url);
+      await ensureServiceWorkerControlsPage(page);
+      for (const asset of [resumePdfUrl, ...certificates.map((certificate) => certificate.link!)]) {
+        await rm(join(deployment.rootDir, asset));
+        const response = await page.goto(`${deployment.url}${asset}`);
+        expect(response?.status()).toBe(404);
+        expect(response?.headers()['content-type']).toContain('text/plain');
+        await expect(page.locator('body')).toHaveText('Not found');
+        await expect(page.locator('#main-content')).toHaveCount(0);
+      }
     } finally {
       await disposeTemporaryDeployment(deployment);
     }

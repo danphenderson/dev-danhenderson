@@ -32,11 +32,15 @@
     "test:e2e": "node scripts/runPlaywrightSuite.js",
     "test:e2e:chromium": "playwright test --project=chromium",
     "test:e2e:smoke": "playwright test --project=smoke",
+    "test:e2e:assets": "playwright test --project=smoke --project=mobile-chromium --project=mobile-webkit test/e2e/asset-delivery.smoke.spec.ts",
+    "test:e2e:assets:subpath": "node scripts/testAssetSubpath.js",
+    "test:e2e:mobile": "playwright test --project=mobile-chromium --project=mobile-webkit",
     "test:e2e:headed": "npm run build:e2e && npm run test:e2e:chromium -- --headed",
     "test:e2e:ui": "npm run build:e2e && npm run test:e2e:chromium -- --ui",
     "typecheck": "tsc --noEmit --project tsconfig.typecheck.json",
     "media:generate": "node scripts/generateDisplayImages.js",
     "media:check": "node scripts/generateDisplayImages.js --check",
+    "assets:check": "node scripts/checkAssets.js",
     "check:bundle": "node scripts/checkBundleBudget.js"
   },
   "devDependencies": {

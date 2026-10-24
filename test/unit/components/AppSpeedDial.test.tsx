@@ -255,9 +255,8 @@ describe('AppSpeedDial', () => {
     const layerSx = resolvedSx(theme);
 
     expect(layerSx.zIndex).toBe(theme.zIndex.appBar - 1);
-    expect(layerSx['& .MuiSpeedDial-fab, & .MuiSpeedDial-actions']).toEqual({
-      zIndex: 'inherit',
-    });
+    expect(layerSx['& .MuiSpeedDial-fab']).toEqual({ zIndex: 1 });
+    expect(layerSx['& .MuiSpeedDial-actions']).toEqual({ zIndex: 0 });
   });
 
   it('lets header speed dials opt into the header layer and preserves caller sx', () => {

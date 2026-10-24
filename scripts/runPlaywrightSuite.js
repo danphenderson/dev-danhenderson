@@ -13,6 +13,11 @@ const projects = [
     buildScript: 'build',
     testScript: 'test:e2e:smoke',
   },
+  {
+    label: 'mobile',
+    buildScript: 'build',
+    testScript: 'test:e2e:mobile',
+  },
 ];
 
 const runNpmScript = (scriptName, description) => {
@@ -39,6 +44,10 @@ for (const project of projects) {
   if (testExitCode !== 0) {
     hasFailure = true;
   }
+}
+
+if (runNpmScript('test:e2e:assets:subpath', 'Checking PUBLIC_URL asset delivery') !== 0) {
+  hasFailure = true;
 }
 
 process.exit(hasFailure ? 1 : 0);

@@ -110,6 +110,8 @@ test.describe('Photography page', () => {
   });
 
   test.describe('when generated display derivatives are unavailable', () => {
+    test.use({ serviceWorkers: 'block' });
+
     test.beforeEach(async ({ page }) => {
       await page.route('**/assets/display/**', (route) =>
         route.fulfill({ status: 404, body: '' })
@@ -146,26 +148,22 @@ test.describe('Photography page', () => {
     test('recovers album gallery tiles by falling back to the original photographs', async ({
       page,
     }) => {
+      test.setTimeout(90_000);
       await page.goto('/photography/landscape');
       await waitForPhotographyCategoryPage(page, 'Landscape', 'Landscape photo collection');
 
-      await page.evaluate(() => window.scrollTo({ top: document.body.scrollHeight }));
-
       const tiles = page.getByRole('list', { name: 'Landscape photo gallery' }).locator('img');
-      await expect
-        .poll(
-          async () =>
-            tiles.evaluateAll((images) =>
-              images.every(
-                (image) =>
-                  (image as HTMLImageElement).complete &&
-                  (image as HTMLImageElement).naturalWidth > 0 &&
-                  (image as HTMLImageElement).currentSrc.includes('/assets/photography/')
-              )
-            ),
-          { timeout: 30000 }
-        )
-        .toBe(true);
+      await expect.poll(() => tiles.count()).toBeGreaterThan(0);
+      for (const tile of await tiles.all()) {
+        await tile.scrollIntoViewIfNeeded();
+        await expect.poll(() =>
+          tile.evaluate((image: HTMLImageElement) =>
+            image.complete &&
+            image.naturalWidth > 0 &&
+            image.currentSrc.includes('/assets/photography/')
+          )
+        ).toBe(true);
+      }
     });
   });
 });

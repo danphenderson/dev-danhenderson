@@ -43,4 +43,13 @@ const result = spawnSync(npmCommand, ['exec', 'vite', 'build'], {
   stdio: 'inherit',
 });
 
-process.exit(result.status ?? 1);
+if (result.status !== 0) {
+  process.exit(result.status ?? 1);
+}
+
+const assetCheck = spawnSync(process.execPath, [path.join(__dirname, 'checkAssets.js')], {
+  cwd: rootDir,
+  env,
+  stdio: 'inherit',
+});
+process.exit(assetCheck.status ?? 1);

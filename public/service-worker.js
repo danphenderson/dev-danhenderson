@@ -8,7 +8,7 @@
  * files across future deploys.
  */
 
-const CACHE_NAME = 'danhenderson-v2';
+const CACHE_NAME = 'danhenderson-v3';
 const IMAGE_CACHE_NAME = `${CACHE_NAME}-display-images`;
 const MAX_DISPLAY_IMAGES = 48;
 const MAX_IMAGE_BYTES = 1_000_000;
@@ -18,9 +18,9 @@ let cacheWrites = Promise.resolve();
 const PRECACHE_URLS = ['./', './index.html'];
 const RUNTIME_ASSET_DESTINATIONS = new Set(['image', 'style', 'script', 'font']);
 
-function createUnavailableResponse(statusText) {
+function createUnavailableResponse(statusText, status = 503) {
   return new Response(statusText, {
-    status: 503,
+    status,
     statusText,
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
@@ -35,7 +35,7 @@ function getCachedAppShell() {
 }
 
 function updateCache(event, response) {
-  if (!response.ok) return response;
+  if (response.status !== 200) return response;
   const { request } = event;
   const isImage = request.destination === 'image';
   const clone = response.clone();
@@ -61,18 +61,37 @@ function updateCache(event, response) {
   return response;
 }
 
+function isUsableAssetResponse(request, response) {
+  return (
+    response &&
+    response.ok &&
+    (request.destination !== 'image' ||
+      /^image\//i.test(response.headers.get('Content-Type') || ''))
+  );
+}
+
+function getCachedAsset(request) {
+  return caches
+    .match(request)
+    .then((cached) => (isUsableAssetResponse(request, cached) ? cached : undefined));
+}
+
 function networkFirstWithCacheFallback(event) {
   const { request } = event;
   return fetch(request)
     .then((response) => {
-      if (response.ok) {
+      if (isUsableAssetResponse(request, response)) {
         return updateCache(event, response);
       }
 
-      return caches.match(request).then((cached) => cached || response);
+      return getCachedAsset(request).then(
+        (cached) =>
+          cached ||
+          (response.ok ? createUnavailableResponse('Invalid image response', 502) : response)
+      );
     })
     .catch(() =>
-      caches.match(request).then((cached) => {
+      getCachedAsset(request).then((cached) => {
         if (cached) {
           return cached;
         }
@@ -85,7 +104,7 @@ function networkFirstWithCacheFallback(event) {
 function networkFirstNavigationWithShellFallback(request) {
   return fetch(request)
     .then((response) => {
-      if (response.ok && response.status !== 404) {
+      if (response.ok) {
         return response;
       }
 
@@ -122,18 +141,27 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') {
-    return;
-  }
-
-  if (event.request.mode === 'navigate') {
-    event.respondWith(networkFirstNavigationWithShellFallback(event.request));
+  if (event.request.method !== 'GET' || event.request.headers.has('Range')) {
     return;
   }
 
   const requestUrl = new URL(event.request.url);
+  const scopePath = new URL('./', self.location.href).pathname;
 
-  if (requestUrl.origin !== self.location.origin) {
+  if (
+    requestUrl.origin !== self.location.origin ||
+    !requestUrl.pathname.startsWith(scopePath)
+  ) {
+    return;
+  }
+
+  if (event.request.mode === 'navigate') {
+    const relativePath = requestUrl.pathname.slice(scopePath.length);
+    // Native PDF viewers and file links must never receive the SPA shell.
+    const isFile = relativePath.startsWith('assets/') || /\/?[^/]+\.[^/]+\/?$/.test(relativePath);
+    if (!isFile || relativePath === 'index.html') {
+      event.respondWith(networkFirstNavigationWithShellFallback(event.request));
+    }
     return;
   }
 
