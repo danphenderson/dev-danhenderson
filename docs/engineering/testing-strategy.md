@@ -7,7 +7,7 @@ This document covers the actual test organization, harness patterns, and coverag
 | Layer              | Framework                         | Location     | Run command                            |
 | ------------------ | --------------------------------- | ------------ | -------------------------------------- |
 | Unit / component   | Jest + React Testing Library      | `test/unit/` | `CI=true npm test -- --watchAll=false` |
-| End-to-end         | Playwright (`chromium` + `smoke`) | `test/e2e/`  | `npm run test:e2e`                     |
+| End-to-end         | Playwright (Chromium + mobile WebKit) | `test/e2e/`  | `npm run test:e2e`                     |
 | Build verification | Vite production build             | —            | `npm run build`                        |
 
 ### Jest configuration
@@ -23,9 +23,14 @@ This document covers the actual test organization, harness patterns, and coverag
 ### Playwright configuration
 
 - Test directory: `test/e2e/`
-- Projects: `chromium` for route/browser coverage and `smoke` for production smoke coverage
+- Projects: `chromium` for route/browser coverage, `smoke` for desktop production
+  coverage, and `mobile-chromium` / `mobile-webkit` for focused production asset
+  coverage using Pixel 7 and iPhone 13 device settings
 - Serves production build on port 3100 via `serve -s build -l 3100`
 - Shared worker count is owned by `playwright.config.ts` (currently 4); docs, workflows, and nested instructions should rely on that default unless a job intentionally overrides it
+- Mobile WebKit runs the asset spec sequentially within its project because
+  concurrent original-photo recovery cases create unnecessary memory pressure.
+  Other projects still use the shared worker pool.
 - Retries: 2 in CI, 0 locally
 - Build variant: `npm run build:e2e` sets `REACT_APP_RUNTIME_ENV=test` for the Chromium Playwright bundle and any test-runtime-specific behavior
 - Standard command shapes:
@@ -36,11 +41,28 @@ This document covers the actual test organization, harness patterns, and coverag
   - UI runner for chromium coverage: `npm run test:e2e:ui`
   - specific chromium spec: `npm run build:e2e && npm run test:e2e:chromium -- test/e2e/<spec>.ts`
   - specific smoke spec: `npm run build && npm run test:e2e:smoke -- test/e2e/smoke.spec.ts`
+  - asset delivery across all three production browser configurations: `npm run build && npm run test:e2e:assets`
+  - mobile asset projects only: `npm run build && npm run test:e2e:mobile`
+  - actual `PUBLIC_URL=/portfolio` deployment: `npm run test:e2e:assets:subpath`
+- Install both Chromium and WebKit with `npx playwright install --with-deps chromium webkit`.
+  The subpath runner stages a temporary deployment, needs port 3100 free, cleans up,
+  and restores the normal build even on test failure.
+- CI currently runs the build asset gate and desktop coverage. Enabling the mobile
+  projects and subpath run in CI requires a workflow-authorized maintainer to apply
+  `plans/cv-photography-workflow.patch` and publish the workflow update. The patch
+  also installs WebKit and separates the browser-cache keys.
 
 ## Media and bundle gates
 
 - `npm run media:generate` regenerates display images and their manifest after source-photo changes; see the root README for the recipe and budgets.
 - `npm run media:check` verifies that committed display files match current source hashes and size limits.
+- Both build variants automatically run `npm run assets:check` to verify CV PDF and
+  media signatures and exact build/source equality. The inventory is derived from
+  CV/photography data and the generated display manifest.
+- `npm run assets:check -- --url https://host/base` audits a completed deployment's
+  real response bodies, MIME types, source equality, and PDF ranges. It downloads
+  originals as well as derivatives; use the matching checkout and expect substantial
+  network transfer. A 200 HTML rewrite is a failure, not an asset success.
 - `npm run build && npm run check:bundle` validates the complete eager JavaScript import graph (950 KB raw / 300 KB gzip), preventing chunk renaming from hiding growth.
 - `test/e2e/quality.spec.ts` covers font validity across all presets/modes, article contrast, narrow album layout and keyboard lightbox return, page landmarks, reveal actions, metadata navigation, and motion off/reduced behavior.
 
@@ -67,7 +89,7 @@ When another instruction file says to validate a change, it should point here ra
 | Route/navigation/not-found             | `npm run build` + direct-navigation check + relevant Playwright route coverage when present                                             |
 | Runtime-environment-sensitive behavior | `npm run build:e2e` + relevant Playwright or targeted validation                                                                        |
 | GitHub-backed CV/fallback data         | `npm run build` + mocked `/cv` success/failure coverage when present + browser validation                                               |
-| Asset-path or media-path change        | `npm run build` + direct-navigation check + `PUBLIC_URL` compatibility check                                                            |
+| Asset-path or media-path change        | `npm run build` + `npm run test:e2e:assets` + `npm run test:e2e:assets:subpath`                                                            |
 
 ### Browser validation expectations
 
@@ -80,6 +102,18 @@ When another instruction file says to validate a change, it should point here ra
 - Prefer mocked `/cv` coverage over live GitHub API-dependent validation when that workflow is available.
 - If browser tooling is unavailable, run the narrowest fallback validation and report browser validation as deferred.
 - Close browser sessions when validation is finished.
+- Asset browser coverage checks actual `%PDF-` downloads from both resume controls,
+  certificate click requests plus PDF response bodies, byte-range responses, and
+  decoded album covers/tiles/lightbox images. It scrolls lazy images into view rather
+  than confusing offscreen images with load failures, and uses reduced motion to
+  isolate asset delivery from animation timing. Original-image recovery is exercised
+  with both 404 and 200 HTML derivative responses; these UI-only fault tests block
+  service workers so interception is deterministic.
+- Production worker smoke tests separately verify real worker control, offline-cache
+  behavior, and that missing PDFs stay errors instead of becoming HTML shells.
+- Mobile WebKit emulation does not reproduce the native iOS PDF viewer. Before a
+  release, also validate both PDF controls and photography on physical Safari,
+  including an existing worker-controlled session and a fresh session.
 
 ## Test organization
 

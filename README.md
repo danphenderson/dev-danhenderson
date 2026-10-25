@@ -39,13 +39,23 @@ Source code for [danhenderson.dev](https://danhenderson.dev), a React + TypeScri
 
 - `npm run build` creates the production bundle.
 - `npm run build:e2e` creates the test-runtime bundle used for Playwright Chromium coverage and test-runtime validation.
-- Both build variants route through `scripts/buildWithMetadata.js`, use Vite for bundling, and stamp git SHA, build time, and package version into the bundle so the footer scorecard reflects the built artifact instead of runtime placeholders.
+- Both build variants route through `scripts/buildWithMetadata.js`, use Vite for bundling, and stamp git SHA, build time, and package version into the bundle so the footer scorecard reflects the built artifact instead of runtime placeholders. Each build also checks that CV documents and photography source/display assets contain the expected file signatures and exactly match the public source files.
 
 ## E2E Workflows
 
-- `npm run test:e2e` runs the full local Playwright suite by building the test-runtime bundle for `chromium` first and then rebuilding the production bundle for `smoke`.
+- `npm run test:e2e` runs the test-runtime Chromium suite, production smoke and mobile asset suites, and a temporary `/portfolio` deployment to verify `PUBLIC_URL`.
 - `npm run build:e2e && npm run test:e2e:chromium` is the targeted path for Chromium browser coverage.
 - `npm run build && npm run test:e2e:smoke` is the targeted path for production smoke coverage.
+- `npm run build && npm run test:e2e:assets` checks native CV downloads/certificate links, PDF byte ranges, decoded photography images, and original-image recovery in desktop Chromium, mobile Chromium, and iPhone-configured WebKit.
+- `npm run test:e2e:assets:subpath` builds and checks the same asset flows under `/portfolio`, removes its temporary deployment, and restores the normal build. Port 3100 must be free. Install both engines with `npx playwright install --with-deps chromium webkit`.
+
+**Pending CI activation:** The mobile/subpath commands are available locally, but
+the workflow update requires credentials authorized to modify GitHub Actions.
+The exact update is preserved in `plans/cv-photography-workflow.patch`; a maintainer
+can run `git apply --check plans/cv-photography-workflow.patch` followed by
+`git apply plans/cv-photography-workflow.patch`, then commit and push the workflow
+with authorized credentials. Existing CI still runs the build asset gate and
+desktop smoke coverage.
 
 ## Coverage
 
@@ -72,7 +82,37 @@ Commit `public/assets/display/` and `src/generated/displayImages.json` together.
 
 The service worker keeps at most 48 display images (each at most 1 MB) and 128 other runtime assets, plus the app shell. It does not cache original images or image query variants. Cache writes finish in the background (the worker stays alive through `event.waitUntil`), so they never delay network responses, and write failures preserve successful responses.
 
+The worker only applies HTML fallback to same-origin, in-scope application navigations. PDF/file navigations and byte-range requests go directly to the host; failed documents must not become successful HTML downloads. Non-image responses cannot enter or replace the display-image cache. The cache version changes when these rules change so older poisoned entries are discarded.
+
 After `npm run build`, run `npm run check:bundle`. It totals the entry's entire static import graph, with limits of 950 KB raw and 300 KB gzip; dynamic route chunks are reported separately by Vite. These are transfer-size checks, not a production performance score. Build CI runs lint, typecheck, media checks, and this bundle budget.
+
+## Asset hosting and release acceptance
+
+Serve real static files before applying the SPA rewrite. In particular, do not rewrite
+`/assets/**` (including `.pdf` and `.webp`) or `service-worker.js` to `index.html`.
+Use `application/pdf` for PDFs, `image/webp` for display images, and the correct image
+MIME for originals. Support PDF range requests with `206` and `Content-Range`.
+Missing assets must retain a real error status. App routes such as `/cv` and
+`/photography/landscape` must still resolve to the SPA shell.
+
+Deploy the complete `build/` atomically, including both original photographs and
+the generated display files. Do not deploy only the JavaScript/CSS bundles. A
+blanket SPA rewrite can make certificate links render an application 404 and can
+make desktop downloads appear successful while actually saving HTML. WebP rewrites
+can also break mobile responsive-image candidates.
+
+Run `npm run assets:check` to recheck an existing build. After deployment, run
+`npm run assets:check -- --url https://danhenderson.dev` (include the base path for
+a subpath deployment). This opt-in network audit downloads all referenced CV/media
+files, checks status, MIME, signatures, byte-for-byte equality with this checkout,
+and PDF range responses; original photographs can make this a large download.
+Run it against a completed deployment from the matching revision, not during a build.
+
+Automated WebKit coverage is not a physical iOS PDF-viewer test. Release acceptance
+also includes opening both certificates, downloading the resume from both controls,
+and scrolling the photography index/album on an iPhone in a fresh Safari session
+and an existing service-worker-controlled session. Verify the PDF viewer/share-save
+flow, normal image decoding, and returning to the site.
 
 ## Tooling Notes
 
