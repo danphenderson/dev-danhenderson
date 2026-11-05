@@ -14,6 +14,8 @@ import {
 import { useComponentStyles } from '../../styles/componentStyles';
 import { Text } from '../text';
 import { CVEntryHeader } from './CVEntryHeader';
+import { getCVEntryAnchor } from '../../utils/cvEvidence';
+import { cvSectionAnchorSx } from './cvSectionMetadata';
 
 type ExperienceListProps = {
   experiences: Experience[];
@@ -73,6 +75,7 @@ export const ExperienceList = ({
     index: number;
     value: string;
   } | null>(null);
+  const [visibleEntries, setVisibleEntries] = useState<Set<string>>(() => new Set());
   const isActiveDetailControlled = activeDetail !== undefined;
   const resolvedActiveDetail = isActiveDetailControlled ? activeDetail : internalActiveDetail;
 
@@ -108,7 +111,13 @@ export const ExperienceList = ({
     <Box sx={{ position: 'relative' }}>
       <AnimatedContentList
         items={experiences}
-        getItemKey={(experience, index) => `${experience.company}-${index}`}
+        getItemKey={(experience, index) => experience.id ?? `${experience.company}-${index}`}
+        onItemVisible={(experience) => {
+          if (!experience.id) return;
+          setVisibleEntries((previous) =>
+            previous.has(experience.id!) ? previous : new Set(previous).add(experience.id!)
+          );
+        }}
         startDelayMs={startDelayMs}
         skipEntranceAnimation={skipEntranceAnimation}
         stackSpacing={contentListStackSpacing}
@@ -116,6 +125,7 @@ export const ExperienceList = ({
         tiltItems
         getItemContainerSx={getItemContainerSx}
         renderItem={(experience, index) => {
+          const anchor = experience.id ? getCVEntryAnchor('experience', experience.id) : undefined;
           const filteredSkills = experience.skills?.filter((tool) => tool.trim().length > 0) ?? [];
           const experienceTabs: TabPanelItem[] = [];
 
@@ -163,8 +173,18 @@ export const ExperienceList = ({
             experienceTabs.length === 1 && experienceTabs[0]?.value !== 'skills';
 
           return (
-            <>
+            <Box
+              id={anchor}
+              data-cv-entry-visible={visibleEntries.has(experience.id ?? '')}
+              sx={cvSectionAnchorSx}
+              onFocusCapture={() => {
+                if (resolvedActiveDetail && resolvedActiveDetail.index !== index) {
+                  setResolvedActiveDetail(null);
+                }
+              }}
+            >
               <CVEntryHeader
+                headingId={anchor ? `${anchor}-heading` : undefined}
                 title={experience.title}
                 organization={experience.company}
                 organizationUrl={experience.companyUrl}
@@ -193,7 +213,7 @@ export const ExperienceList = ({
                   />
                 </Box>
               ) : null}
-            </>
+            </Box>
           );
         }}
       />

@@ -123,40 +123,26 @@ describe('CodingExamplesSection', () => {
       'href',
       'https://github.com/danphenderson/python-typewriter'
     );
-    expect(screen.getByRole('tab', { name: 'Purpose' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: 'Rewrites' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Problem' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Approach' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Stack' })).toBeInTheDocument();
+    expect(screen.getByText(codingExamples[0].description)).toBeVisible();
     expect(
-      screen.getByText(
-        'Typewriter is a pip-installable CLI built on Typer and LibCST to normalize None-related type annotations while preserving formatting and comments.'
-      )
-    ).toBeVisible();
-    expect(
-      screen.queryByText(
-        'Normalize `Union[..., None]` and default-`None` annotations across Python source files.'
-      )
+      screen.queryByText(/A codebase can express the same optional value/)
     ).not.toBeInTheDocument();
     expect(screen.queryByText('Python')).not.toBeInTheDocument();
 
     await act(async () => {
-      fireEvent.click(screen.getByRole('tab', { name: 'Purpose' }));
+      fireEvent.click(screen.getByRole('tab', { name: 'Problem' }));
     });
 
-    expect(
-      screen.getByText(
-        'Normalize `Union[..., None]` and default-`None` annotations across Python source files.'
-      )
-    ).toBeVisible();
+    expect(screen.getByText(/A codebase can express the same optional value/)).toBeVisible();
     expect(
       mockAnimatedSlideList.mock.calls.some(
         ([props]) => props.containerComponent === 'ul' && props.itemComponent === 'li'
       )
     ).toBe(true);
-    expect(
-      screen.getByText(
-        'Support dry-run auditing with unified diffs through `typewriter run ... --check`.'
-      )
-    ).toBeVisible();
+    expect(screen.getByText(/The tool needs to distinguish Python syntax/)).toBeVisible();
     expect(screen.queryByText('Python')).not.toBeInTheDocument();
 
     await act(async () => {
@@ -167,9 +153,7 @@ describe('CodingExamplesSection', () => {
     expect(screen.getByText('Typer')).toBeVisible();
     expect(mockAnimatedSlideList.mock.calls.some(([props]) => props.layout === 'wrap')).toBe(true);
     expect(
-      screen.queryByText(
-        'Normalize `Union[..., None]` and default-`None` annotations across Python source files.'
-      )
+      screen.queryByText(/A codebase can express the same optional value/)
     ).not.toBeInTheDocument();
 
     await act(async () => {

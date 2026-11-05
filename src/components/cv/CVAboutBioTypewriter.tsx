@@ -2,7 +2,7 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import type { SxProps, Theme } from '@mui/material/styles';
 import type { AboutMe } from '../../types/cv';
-import { DEFAULT_INTERSECTION_ROOT_MARGIN } from '../../motion';
+import { DEFAULT_INTERSECTION_ROOT_MARGIN, useMotionScale } from '../../motion';
 import { useComponentStyles } from '../../styles/componentStyles';
 import { CommonLink, COMMON_LINK_TOOLTIP_ID } from '../CommonLink';
 import { mergeSx, Text } from '../text';
@@ -203,6 +203,9 @@ export const CVAboutBioTypewriter = ({
   cursorSx,
   onComplete,
 }: CVAboutBioTypewriterProps) => {
+  const { duration: durationScale } = useMotionScale();
+  const isInstantReveal = durationScale === 0;
+  const scaledStartDelayMs = startDelayMs * durationScale;
   const rootRef = React.useRef<HTMLSpanElement | null>(null);
   const startTimeoutRef = React.useRef<number | undefined>(undefined);
   const hasNotifiedCompletionRef = React.useRef(false);
@@ -216,6 +219,11 @@ export const CVAboutBioTypewriter = ({
 
   React.useEffect(() => {
     if (revealed || shouldPlay) {
+      return undefined;
+    }
+
+    if (isInstantReveal) {
+      setShouldPlay(true);
       return undefined;
     }
 
@@ -233,7 +241,7 @@ export const CVAboutBioTypewriter = ({
 
         observer.disconnect();
 
-        if (startDelayMs <= 0) {
+        if (scaledStartDelayMs <= 0) {
           setShouldPlay(true);
           return;
         }
@@ -241,7 +249,7 @@ export const CVAboutBioTypewriter = ({
         startTimeoutRef.current = window.setTimeout(() => {
           setShouldPlay(true);
           startTimeoutRef.current = undefined;
-        }, startDelayMs);
+        }, scaledStartDelayMs);
       },
       { threshold: 0, rootMargin: DEFAULT_INTERSECTION_ROOT_MARGIN }
     );
@@ -256,11 +264,11 @@ export const CVAboutBioTypewriter = ({
         startTimeoutRef.current = undefined;
       }
     };
-  }, [revealed, shouldPlay, startDelayMs]);
+  }, [isInstantReveal, revealed, scaledStartDelayMs, shouldPlay]);
 
   const { charIndex, isComplete, showCursor } = useTypewriterProgress({
     text: fullText,
-    playing: shouldPlay,
+    playing: shouldPlay || isInstantReveal,
     timingPreset,
     typingBaseMs,
   });

@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import type { MouseEventHandler, ReactNode, SyntheticEvent } from 'react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import type { MouseEventHandler, ReactNode, Ref, SyntheticEvent } from 'react';
 import type { Theme } from '@mui/material/styles';
 import { AppSpeedDial } from '../../../src/components/AppSpeedDial';
 import { createAppTheme } from '../../../src/theme/createAppTheme';
@@ -18,6 +18,7 @@ jest.mock('@mui/material/SpeedDial', () => ({
     open,
     sx,
     transitionDuration,
+    ref,
   }: {
     ariaLabel: string;
     children: ReactNode;
@@ -27,11 +28,12 @@ jest.mock('@mui/material/SpeedDial', () => ({
     open?: boolean;
     sx?: unknown;
     transitionDuration?: number;
+    ref?: Ref<HTMLDivElement>;
   }) => {
     mockSpeedDial({ ariaLabel, children, icon, onClose, onOpen, open, sx, transitionDuration });
 
     return (
-      <div data-testid="speed-dial-root" data-open={String(Boolean(open))}>
+      <div ref={ref} data-testid="speed-dial-root" data-open={String(Boolean(open))}>
         <button
           type="button"
           aria-label={ariaLabel}
@@ -214,6 +216,38 @@ describe('AppSpeedDial', () => {
     expect(onJump).toHaveBeenCalledTimes(1);
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
     expect(screen.queryByTestId('speed-dial-actions')).not.toBeInTheDocument();
+  });
+
+  it('keeps a focused menu open on mouse leave but closes when focus moves outside', () => {
+    render(
+      <>
+        <AppSpeedDial ariaLabel="Open shared actions" icon={<span>Open</span>} actions={[]} />
+        <button>Outside</button>
+      </>
+    );
+    const trigger = screen.getByRole('button', { name: 'Open shared actions' });
+    fireEvent.click(trigger);
+    trigger.focus();
+    const close = (reason: string) =>
+      act(() => {
+        mockSpeedDial.mock.calls.at(-1)?.[0].onClose({} as SyntheticEvent, reason);
+      });
+
+    close('mouseLeave');
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    screen.getByRole('button', { name: 'Outside' }).focus();
+    close('blur');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('still closes a hover-only menu when the mouse leaves', () => {
+    render(<AppSpeedDial ariaLabel="Open shared actions" icon={<span>Open</span>} actions={[]} />);
+    act(() => mockSpeedDial.mock.calls.at(-1)?.[0].onOpen({} as SyntheticEvent, 'mouseEnter'));
+    act(() => mockSpeedDial.mock.calls.at(-1)?.[0].onClose({} as SyntheticEvent, 'mouseLeave'));
+    expect(screen.getByRole('button', { name: 'Open shared actions' })).toHaveAttribute(
+      'aria-expanded',
+      'false'
+    );
   });
 
   it('maps internal route actions onto action links and closes the menu after selection', () => {

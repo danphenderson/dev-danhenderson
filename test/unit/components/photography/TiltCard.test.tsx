@@ -11,29 +11,25 @@ jest.mock('../../../../src/motion/hooks', () => ({
 
 jest.mock('motion/react', () => ({
   motion: {
-    div: require('react').forwardRef(
-      ({ children, style, onMouseMove, onMouseLeave, className, ...rest }: any, ref: any) => {
-        capturedMotionDivStyle = style;
-        return (
-          <div
-            ref={ref}
-            data-testid="tilt-card"
-            className={className}
-            style={style}
-            onMouseMove={onMouseMove}
-            onMouseLeave={onMouseLeave}
-            {...rest}
-          >
-            {children}
-          </div>
-        );
-      }
-    ),
+    div: require('react').forwardRef(({ children, style, className, ...rest }: any, ref: any) => {
+      capturedMotionDivStyle = style;
+      return (
+        <div ref={ref} data-testid="tilt-card" className={className} style={style} {...rest}>
+          {children}
+        </div>
+      );
+    }),
   },
-  useMotionValue: (initial: number) => ({ get: () => initial, set: jest.fn() }),
+  useMotionValue: (initial: number) => ({ get: () => initial, set: jest.fn(), jump: jest.fn() }),
   useSpring: (source: unknown, config: unknown) => mockUseSpring(source, config),
   useReducedMotion: () => mockUseReducedMotion(),
 }));
+
+const mousePointer = (element: HTMLElement, type: string, init: MouseEventInit = {}) => {
+  const event = new MouseEvent(type, { bubbles: true, ...init });
+  Object.defineProperty(event, 'pointerType', { value: 'mouse' });
+  fireEvent(element, event);
+};
 
 describe('TiltCard', () => {
   afterEach(() => {
@@ -95,8 +91,8 @@ describe('TiltCard', () => {
     const card = getByTestId('tilt-card');
 
     expect(() => {
-      fireEvent.mouseMove(card, { clientX: 100, clientY: 100 });
-      fireEvent.mouseLeave(card);
+      mousePointer(card, 'pointermove', { clientX: 100, clientY: 100 });
+      mousePointer(card, 'pointerout');
     }).not.toThrow();
   });
 
@@ -107,10 +103,10 @@ describe('TiltCard', () => {
 
     expect(card.style.willChange).toBe('');
 
-    fireEvent.mouseEnter(card);
+    mousePointer(card, 'pointerover');
     expect(card.style.willChange).toBe('transform');
 
-    fireEvent.mouseLeave(card);
+    mousePointer(card, 'pointerout');
     expect(card.style.willChange).toBe('');
   });
 
@@ -120,8 +116,8 @@ describe('TiltCard', () => {
     const { getByTestId } = render(<TiltCard>Content</TiltCard>);
     const card = getByTestId('tilt-card');
 
-    fireEvent.mouseEnter(card);
-    fireEvent.mouseMove(card, { clientX: 60, clientY: 60 });
+    mousePointer(card, 'pointerover');
+    mousePointer(card, 'pointermove', { clientX: 60, clientY: 60 });
     expect(card.style.willChange).toBe('');
   });
 
@@ -129,7 +125,7 @@ describe('TiltCard', () => {
     expect(() => {
       const { getByTestId } = render(<TiltCard intensity={2}>Content</TiltCard>);
 
-      fireEvent.mouseMove(getByTestId('tilt-card'), { clientX: 50, clientY: 50 });
+      mousePointer(getByTestId('tilt-card'), 'pointermove', { clientX: 50, clientY: 50 });
     }).not.toThrow();
   });
 
@@ -137,8 +133,8 @@ describe('TiltCard', () => {
     expect(() => {
       const { getByTestId } = render(<TiltCard disabled>Content</TiltCard>);
 
-      fireEvent.mouseMove(getByTestId('tilt-card'), { clientX: 50, clientY: 50 });
-      fireEvent.mouseLeave(getByTestId('tilt-card'));
+      mousePointer(getByTestId('tilt-card'), 'pointermove', { clientX: 50, clientY: 50 });
+      mousePointer(getByTestId('tilt-card'), 'pointerout');
     }).not.toThrow();
   });
 });

@@ -134,7 +134,10 @@ test('keyboard users can reveal CV and climbing content and reach labeled search
   await reveal.focus();
   await page.keyboard.press('Enter');
   await expect(page.locator('#cv-experience')).toBeFocused();
-  await expect(page.getByRole('link', { name: 'Download resume' })).toHaveAttribute('download');
+  await expect(page.getByRole('link', { name: 'Contact me' })).toHaveAttribute(
+    'href',
+    'mailto:me@danhenderson.dev'
+  );
   await page.goto('/climbing');
   await page.getByRole('button', { name: 'View climbing log' }).focus();
   await page.keyboard.press('Enter');
@@ -143,14 +146,13 @@ test('keyboard users can reveal CV and climbing content and reach labeled search
   await expect(page.getByText('No climbed routes match this search.')).toBeVisible();
 });
 
-test('a first visit can go straight to projects and retains article metadata on client navigation', async ({
+test('a first visit can go straight to the CV and retains article metadata on client navigation', async ({
   page,
 }) => {
   await seedAppearance(page);
   await page.goto('/');
-  await page.getByRole('link', { name: 'View projects' }).click();
-  await expect(page).toHaveURL(/\/cv#cv-coding$/);
-  await expect(page.locator('#cv-coding')).toBeFocused();
+  await page.getByRole('link', { name: 'Explore my CV' }).click();
+  await expect(page).toHaveURL(/\/cv$/);
   await page.goto('/photography/landscape');
   await page.getByRole('link', { name: 'Go to Blog', exact: true }).click();
   await page

@@ -10,7 +10,6 @@ export const resetWelcomeState = async (page: Page) => {
 export const declineWelcomeAudio = async (page: Page) => {
   await page.addInitScript(() => {
     window.localStorage.setItem('danhenderson-welcome-audio-consent', 'declined');
-    window.localStorage.setItem('danhenderson-onboarding-completed', 'true');
   });
 };
 

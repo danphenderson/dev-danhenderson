@@ -2,6 +2,13 @@ import type { ReactNode, MouseEvent as ReactMouseEvent } from 'react';
 
 export type AudioConsent = 'unknown' | 'granted' | 'declined';
 
+export type SkillChipLink = {
+  to: string;
+  accessibleLabel: string;
+  id?: string;
+  onClick?: (event: ReactMouseEvent<HTMLAnchorElement>) => void;
+};
+
 export type AppSpeedDialLayer = 'content' | 'header';
 
 export type AppSpeedDialAction = {
@@ -43,7 +50,6 @@ export type WebVitalEntry = {
 
 export type WebVitalsState = {
   metrics: Map<string, WebVitalEntry>;
-  collected: boolean;
 };
 
 export interface TerminalLine {

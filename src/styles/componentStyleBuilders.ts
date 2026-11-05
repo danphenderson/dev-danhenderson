@@ -767,6 +767,19 @@ export const createComponentStyleMap = (theme: Theme) => {
       ...sharedPillChipSx,
       ...pillPulseOverlaySx,
     } satisfies SxProps<Theme>,
+    skillsLinkChipSx: {
+      cursor: 'pointer',
+      textDecoration: 'none',
+      '&:hover': {
+        borderColor: supportAccentColor,
+        backgroundColor: alpha(supportAccentColor, 0.12),
+        textDecoration: 'none',
+      },
+      '&:focus-visible': {
+        outline: `2px solid ${theme.palette.text.primary}`,
+        outlineOffset: '3px',
+      },
+    } satisfies SxProps<Theme>,
     skillsWrapSx: {
       display: 'flex',
       flexWrap: 'wrap',

@@ -12,7 +12,7 @@ Source-of-truth doc: `docs/frontend/motion-architecture.md`.
 
 Files:
 
-- `tokens.ts` — `duration` (seconds), `cssDuration` (CSS strings), `easing`, `stagger`, `transition` presets, `DEFAULT_INTERSECTION_THRESHOLD`, and `DEFAULT_INTERSECTION_ROOT_MARGIN`. Import from here instead of hard-coding timing values in components.
+- `tokens.ts` — `duration` (seconds), `cssDuration` (CSS strings), `easing`, `stagger`, `DEFAULT_INTERSECTION_THRESHOLD`, and `DEFAULT_INTERSECTION_ROOT_MARGIN`. Import from here instead of hard-coding timing values in components.
 - `variants.ts` — Motion `Variants` objects: `fadeInUp`, `fadeIn`, `scaleIn`, `staggerContainer`, `hoverLift`, `tapShrink`, `hoverZoom`, plus CV story-specific variants (`storySlideVariants`, `slideContentContainer`, `slideContentItem`).
 - `components.tsx` — animated React primitives built on the above: `MotionSection`, `StaggerChildren`, `MotionItem`, `MotionCard`, `MotionImage`, `MotionFadeIn`, `MotionScaleIn`, and `MotionTiltCard`. These wrap `motion/react` with IntersectionObserver-triggered entry and sensible defaults.
 - `index.ts` — re-exports everything above. Always import from `'../motion'` (or `'../../motion'`) rather than deep sub-paths.

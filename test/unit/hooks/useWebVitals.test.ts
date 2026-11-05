@@ -36,11 +36,10 @@ describe('useWebVitals', () => {
     jest.clearAllMocks();
   });
 
-  it('returns empty metrics and collected false initially', () => {
+  it('returns empty metrics initially', () => {
     const { result } = renderHook(() => useWebVitals());
 
     expect(result.current.metrics.size).toBe(0);
-    expect(result.current.collected).toBe(false);
   });
 
   it('registers all four web-vitals reporters on mount', async () => {
@@ -55,7 +54,7 @@ describe('useWebVitals', () => {
     expect(webVitals.onTTFB).toHaveBeenCalledTimes(1);
   });
 
-  it('accumulates a metric and sets collected to true', async () => {
+  it('accumulates a metric', async () => {
     const webVitals = require('web-vitals');
 
     const { result } = renderHook(() => useWebVitals());
@@ -69,7 +68,6 @@ describe('useWebVitals', () => {
       clsHandler({ name: 'CLS', value: 0.05, rating: 'good' });
     });
 
-    expect(result.current.collected).toBe(true);
     expect(result.current.metrics.size).toBe(1);
     expect(result.current.metrics.get('CLS')).toEqual({
       name: 'CLS',

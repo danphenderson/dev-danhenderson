@@ -1,10 +1,37 @@
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import { codingExamples } from '../../../../src/data/cv';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { COMMON_LINK_TOOLTIP_ID } from '../../../../src/components/CommonLink';
 import { CVStorySectionRenderer } from '../../../../src/components/cv/CVStorySectionRenderer';
 import type { CVStoryItem } from '../../../../src/data/cvStoryItems';
 
 const mockSkillsChipList = jest.fn();
+
+it.each(['typewriter', 'portfolio'])(
+  'keeps source evidence visible in the %s story case study',
+  (id) => {
+    const example = codingExamples.find((entry) => entry.id === id)!;
+    render(
+      <ThemeProvider>
+        <CVStorySectionRenderer item={{ kind: 'coding', data: example }} index={0} isRevealed />
+      </ThemeProvider>
+    );
+    fireEvent.click(screen.getByRole('tab', { name: 'Results', exact: true }));
+    const sourceItems = example.tabs!.find((tab) => tab.value === 'results');
+    if (sourceItems?.kind !== 'list') throw new Error('Expected case-study Results');
+    for (const item of sourceItems.items) {
+      if (!Array.isArray(item)) continue;
+      for (const segment of item) {
+        if (segment.link) {
+          expect(screen.getByRole('link', { name: segment.text })).toHaveAttribute(
+            'href',
+            segment.link
+          );
+        }
+      }
+    }
+  }
+);
 
 jest.mock('motion/react', () => ({
   motion: {

@@ -169,6 +169,70 @@ describe('ExperienceList', () => {
     );
   });
 
+  it('requests dismissal only when keyboard focus enters another experience card', async () => {
+    const graduateResearchAssistant = experiences.find(
+      (experience) => experience.title === 'Graduate Research Assistant'
+    )!;
+    const dataPipelineEngineer = experiences.find(
+      (experience) => experience.title === 'Data Pipeline Engineer'
+    )!;
+    const onActiveDetailChange = jest.fn();
+
+    render(
+      <ThemeProvider>
+        <ExperienceList
+          experiences={[graduateResearchAssistant, dataPipelineEngineer]}
+          activeDetail={{ index: 0, value: 'skills' }}
+          onActiveDetailChange={onActiveDetailChange}
+        />
+      </ThemeProvider>
+    );
+
+    await act(async () => {
+      screen.getByRole('link', { name: 'Jiguang Sun' }).focus();
+    });
+
+    expect(screen.getByRole('link', { name: 'Jiguang Sun' })).toHaveFocus();
+    expect(onActiveDetailChange).not.toHaveBeenCalled();
+
+    await act(async () => {
+      screen.getByRole('link', { name: 'Lucerna Health' }).focus();
+    });
+
+    expect(screen.getByRole('link', { name: 'Lucerna Health' })).toHaveFocus();
+    expect(onActiveDetailChange).toHaveBeenCalledTimes(1);
+    expect(onActiveDetailChange).toHaveBeenCalledWith(null);
+  });
+
+  it('closes internally managed details when focus enters another experience card', async () => {
+    const graduateResearchAssistant = experiences.find(
+      (experience) => experience.title === 'Graduate Research Assistant'
+    )!;
+    const dataPipelineEngineer = experiences.find(
+      (experience) => experience.title === 'Data Pipeline Engineer'
+    )!;
+
+    render(
+      <ThemeProvider>
+        <ExperienceList experiences={[graduateResearchAssistant, dataPipelineEngineer]} />
+      </ThemeProvider>
+    );
+
+    const skillsTab = screen.getAllByRole('tab', { name: 'Skills' })[0];
+    await act(async () => {
+      fireEvent.click(skillsTab);
+    });
+
+    expect(skillsTab).toHaveAttribute('aria-selected', 'true');
+
+    await act(async () => {
+      screen.getByRole('link', { name: 'Lucerna Health' }).focus();
+    });
+
+    expect(screen.getByRole('link', { name: 'Lucerna Health' })).toHaveFocus();
+    expect(skillsTab).toHaveAttribute('aria-selected', 'false');
+  });
+
   it('switches between highlights and skills within the shared tab panel while keeping the summary visible', async () => {
     const hemodynamicsExperience = experiences.find(
       (experience) => experience.title === 'Graduate Research Assistant'

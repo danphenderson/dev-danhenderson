@@ -17,7 +17,6 @@ Files:
 - `githubProfileData.ts` — module-level singleton cache + fetch logic for the GitHub API (events, repos, PR search, repo enrichment). Not a hook. Exports `GitHubProfileData` as a re-export from `src/types/cv.ts`.
 - `useDocumentMetadata.ts` — sets `<title>`, Open Graph, Twitter card, and canonical link tags for the current route.
 - `useFuzzySearch.ts` — generic Fuse.js wrapper; returns `search`, `setSearch`, `filtered`.
-- `useHomeWelcomeSequence.ts` — coordinates the user-opened Home preferences panel, pauses its idle-dismiss timer during interaction, and delegates explicit audio actions to `WelcomeAudioProvider`; it never gates content or starts audio automatically.
 - `useWebVitals.ts` — collects Core Web Vitals via `web-vitals` and exposes them as React state. Gracefully no-ops in JSDOM.
 
 ## Type handling

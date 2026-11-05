@@ -11,14 +11,12 @@ const supportsWebVitals = (): boolean =>
 
 /**
  * Collects Core Web Vitals (CLS, INP, LCP, TTFB) and exposes them
- * as React state. Metrics arrive asynchronously — `collected` becomes true
- * once at least one metric has been received.
+ * as React state. The map starts empty and fills as metrics arrive.
  *
  * Gracefully no-ops in environments without the Performance API (e.g. JSDOM).
  */
 export function useWebVitals(): WebVitalsState {
   const [metrics, setMetrics] = useState<Map<string, WebVitalEntry>>(new Map());
-  const [collected, setCollected] = useState(false);
   const initialized = useRef(false);
 
   useEffect(() => {
@@ -31,7 +29,6 @@ export function useWebVitals(): WebVitalsState {
         next.set(metric.name, { name: metric.name, value: metric.value, rating: metric.rating });
         return next;
       });
-      setCollected(true);
     };
 
     import('web-vitals').then(({ onCLS, onINP, onLCP, onTTFB }) => {
@@ -42,5 +39,5 @@ export function useWebVitals(): WebVitalsState {
     });
   }, []);
 
-  return { metrics, collected };
+  return { metrics };
 }

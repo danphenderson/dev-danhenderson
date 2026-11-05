@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { MemoryRouter } from 'react-router-dom';
@@ -6,7 +6,6 @@ import { useAppTheme } from '../../../src/ThemeProvider';
 import { createAppTheme } from '../../../src/theme/createAppTheme';
 import type { AppAppearanceKey } from '../../../src/theme/appAppearance';
 import { useWelcomeAudio } from '../../../src/WelcomeAudioProvider';
-import { useWelcomeOnboarding } from '../../../src/WelcomeOnboardingProvider';
 import Header from '../../../src/components/Header';
 import { routerFuture } from '../../../src/routerFuture';
 
@@ -20,10 +19,6 @@ jest.mock('../../../src/WelcomeAudioProvider', () => ({
   useWelcomeAudio: jest.fn(),
 }));
 
-jest.mock('../../../src/WelcomeOnboardingProvider', () => ({
-  useWelcomeOnboarding: jest.fn(),
-}));
-
 jest.mock('../../../src/components/header/HeaderSettingsPopover', () => ({
   HeaderSettingsPopover: ({
     onChangeAppearance,
@@ -32,7 +27,8 @@ jest.mock('../../../src/components/header/HeaderSettingsPopover', () => ({
     mode,
     showAudioControl,
     isPlaying,
-    highlightSettingsTrigger,
+    isAudioLoading,
+    audioError,
   }: {
     onChangeAppearance?: (appearance: AppAppearanceKey) => void;
     onToggleTheme?: () => void;
@@ -40,12 +36,10 @@ jest.mock('../../../src/components/header/HeaderSettingsPopover', () => ({
     mode?: 'light' | 'dark';
     showAudioControl?: boolean;
     isPlaying?: boolean;
-    highlightSettingsTrigger?: boolean;
+    isAudioLoading?: boolean;
+    audioError?: string;
   }) => (
-    <div
-      data-testid="header-settings-popover"
-      data-highlighted={highlightSettingsTrigger ? 'true' : 'false'}
-    >
+    <div data-testid="header-settings-popover">
       <button type="button" aria-label="Open settings">
         Open settings
       </button>
@@ -73,11 +67,13 @@ jest.mock('../../../src/components/header/HeaderSettingsPopover', () => ({
         <button
           type="button"
           aria-label={isPlaying ? 'Pause welcome audio' : 'Play welcome audio'}
+          disabled={isAudioLoading}
           onClick={() => onToggleAudio()}
         >
           {isPlaying ? 'Pause' : 'Play'}
         </button>
       ) : null}
+      {audioError ? <div role="alert">{audioError}</div> : null}
     </div>
   ),
 }));
@@ -85,9 +81,6 @@ jest.mock('../../../src/components/header/HeaderSettingsPopover', () => ({
 const mockUseMediaQuery = useMediaQuery as jest.MockedFunction<typeof useMediaQuery>;
 const mockUseAppTheme = useAppTheme as jest.MockedFunction<typeof useAppTheme>;
 const mockUseWelcomeAudio = useWelcomeAudio as jest.MockedFunction<typeof useWelcomeAudio>;
-const mockUseWelcomeOnboarding = useWelcomeOnboarding as jest.MockedFunction<
-  typeof useWelcomeOnboarding
->;
 
 const createAudioState = (
   overrides: Partial<ReturnType<typeof useWelcomeAudio>> = {}
@@ -95,23 +88,6 @@ const createAudioState = (
   play: jest.fn().mockResolvedValue(undefined),
   pause: jest.fn(),
   isPlaying: false,
-  ready: true,
-  error: undefined,
-  audioConsent: 'granted',
-  grantAudioConsent: jest.fn(),
-  declineAudioConsent: jest.fn(),
-  ...overrides,
-});
-
-const createOnboardingState = (
-  overrides: Partial<ReturnType<typeof useWelcomeOnboarding>> = {}
-): ReturnType<typeof useWelcomeOnboarding> => ({
-  onboardingCompleted: false,
-  showCustomizeModal: false,
-  showSettingsHint: false,
-  openCustomizeModal: jest.fn(),
-  advanceToSettingsHint: jest.fn(),
-  completeOnboarding: jest.fn(),
   ...overrides,
 });
 
@@ -138,14 +114,13 @@ describe('Header controls', () => {
       setMotionIntensity: jest.fn(),
     });
     mockUseWelcomeAudio.mockReturnValue(createAudioState());
-    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState());
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('plays audio when the play button is clicked', () => {
+  it('plays audio when the play button is clicked', async () => {
     const play = jest.fn().mockResolvedValue(undefined);
     mockUseWelcomeAudio.mockReturnValue(createAudioState({ isPlaying: false, play }));
 
@@ -153,6 +128,38 @@ describe('Header controls', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Play welcome audio' }));
     expect(play).toHaveBeenCalledTimes(1);
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Play welcome audio' })).toBeEnabled()
+    );
+  });
+
+  it('waits for playback, shows a failure, and allows a successful retry', async () => {
+    let rejectPlayback!: (error: Error) => void;
+    const play = jest
+      .fn()
+      .mockImplementationOnce(
+        () =>
+          new Promise<void>((_resolve, reject) => {
+            rejectPlayback = reject;
+          })
+      )
+      .mockResolvedValue(undefined);
+    const logError = jest.spyOn(console, 'error').mockImplementation(() => {});
+    mockUseWelcomeAudio.mockReturnValue(createAudioState({ play }));
+    renderHeader('/');
+    const button = screen.getByRole('button', { name: 'Play welcome audio' });
+
+    fireEvent.click(button);
+    expect(button).toBeDisabled();
+    await act(async () => rejectPlayback(new Error('Playback blocked')));
+    expect(screen.getByRole('alert')).toHaveTextContent('Audio could not start. Please try again.');
+    expect(button).toBeEnabled();
+
+    fireEvent.click(button);
+    await waitFor(() => expect(button).toBeEnabled());
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    expect(play).toHaveBeenCalledTimes(2);
+    logError.mockRestore();
   });
 
   it('pauses audio when the pause button is clicked', () => {
@@ -165,22 +172,11 @@ describe('Header controls', () => {
     expect(pause).toHaveBeenCalledTimes(1);
   });
 
-  it('keeps an explicit play control available even without onboarding', () => {
-    mockUseWelcomeAudio.mockReturnValue(createAudioState({ audioConsent: 'declined' }));
-
+  it('keeps an explicit play control available while paused', () => {
     renderHeader('/cv');
 
     expect(screen.getByRole('button', { name: 'Play welcome audio' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Pause welcome audio' })).not.toBeInTheDocument();
-  });
-
-  it('shows the audio control after onboarding is completed even when audio was declined', () => {
-    mockUseWelcomeAudio.mockReturnValue(createAudioState({ audioConsent: 'declined' }));
-    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ onboardingCompleted: true }));
-
-    renderHeader('/cv');
-
-    expect(screen.getByRole('button', { name: 'Play welcome audio' })).toBeInTheDocument();
   });
 
   it('toggles theme when the theme action is clicked', () => {
@@ -219,37 +215,11 @@ describe('Header controls', () => {
     renderHeader('/');
 
     expect(screen.getByTestId('header-settings-popover')).toBeInTheDocument();
-    expect(screen.getByTestId('header-settings-popover')).toHaveAttribute(
-      'data-highlighted',
-      'false'
-    );
 
     fireEvent.click(screen.getByRole('button', { name: 'Use Ember appearance' }));
 
     expect(setAppearance).toHaveBeenCalledTimes(1);
     expect(setAppearance).toHaveBeenCalledWith('ember');
-  });
-
-  it('highlights the settings trigger on the home route while the settings hint is open', () => {
-    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ showSettingsHint: true }));
-
-    renderHeader('/');
-
-    expect(screen.getByTestId('header-settings-popover')).toHaveAttribute(
-      'data-highlighted',
-      'true'
-    );
-  });
-
-  it('does not highlight the settings trigger on non-home routes even while the settings hint is open', () => {
-    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState({ showSettingsHint: true }));
-
-    renderHeader('/cv');
-
-    expect(screen.getByTestId('header-settings-popover')).toHaveAttribute(
-      'data-highlighted',
-      'false'
-    );
   });
 
   it('always shows navigation links on desktop with avatar home link', () => {
@@ -357,7 +327,6 @@ describe('Header mobile layout', () => {
       setMotionIntensity: jest.fn(),
     });
     mockUseWelcomeAudio.mockReturnValue(createAudioState());
-    mockUseWelcomeOnboarding.mockReturnValue(createOnboardingState());
   });
 
   afterEach(() => {

@@ -13,7 +13,6 @@ import { avatar as avatarSrc } from '../data/cv';
 import { useAppStyles } from '../styles/appStyles';
 import { SPRING_EASING_CSS } from '../styles/springEasing';
 import { useWelcomeAudio } from '../WelcomeAudioProvider';
-import { useWelcomeOnboarding } from '../WelcomeOnboardingProvider';
 import { HEADER_HIDE_SCROLL_TRIGGER_OPTIONS } from './header/headerScroll';
 import { HeaderNav } from './header/HeaderNav';
 import { HeaderSettingsPopover } from './header/HeaderSettingsPopover';
@@ -21,13 +20,7 @@ import { HeaderSettingsPopover } from './header/HeaderSettingsPopover';
 const SLIDE_BASE_ENTER_MS = 225;
 const SLIDE_BASE_EXIT_MS = 195;
 
-const HideOnScroll = ({
-  children,
-  forceVisible,
-}: {
-  children: React.ReactElement;
-  forceVisible?: boolean;
-}) => {
+const HideOnScroll = ({ children }: { children: React.ReactElement }) => {
   const trigger = useScrollTrigger(HEADER_HIDE_SCROLL_TRIGGER_OPTIONS);
   const { duration: dFactor } = useMotionScale();
   const timeout =
@@ -42,7 +35,7 @@ const HideOnScroll = ({
     <Slide
       appear={false}
       direction="down"
-      in={forceVisible || !trigger}
+      in={!trigger}
       timeout={timeout}
       easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
     >
@@ -65,10 +58,10 @@ export default function Header() {
   const appStyles = useAppStyles();
   const muiTheme = useMuiTheme();
   const location = useLocation();
-  const { isPlaying, pause, play } = useWelcomeAudio();
-  const { showSettingsHint } = useWelcomeOnboarding();
+  const { isPlaying, pause, play, error: playbackError } = useWelcomeAudio();
+  const [isAudioLoading, setIsAudioLoading] = React.useState(false);
+  const [audioError, setAudioError] = React.useState<string>();
   const path = location.pathname.toLowerCase();
-  const highlightSettingsTrigger = path === '/' && showSettingsHint;
   const isMobile = useMediaQuery(muiTheme.breakpoints.down('md'));
   const iconButtonSize = isMobile ? 'medium' : ('large' as const);
   const [mobileMenuAnchor, setMobileMenuAnchor] = React.useState<null | HTMLElement>(null);
@@ -89,20 +82,26 @@ export default function Header() {
   };
 
   const handleAudioToggle = async () => {
+    setAudioError(undefined);
     if (isPlaying) {
       pause();
       return;
     }
+    setIsAudioLoading(true);
     try {
       await play();
     } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return;
+      setAudioError('Audio could not start. Please try again.');
       console.error('Unable to play welcome audio', err);
+    } finally {
+      setIsAudioLoading(false);
     }
   };
 
   return (
     <>
-      <HideOnScroll forceVisible={showSettingsHint}>
+      <HideOnScroll>
         <AppBar id="site-navigation" position="fixed" elevation={0}>
           <Toolbar sx={appStyles.headerToolbarSx}>
             <HeaderNav
@@ -129,8 +128,9 @@ export default function Header() {
                 onChangeMotionIntensity={setMotionIntensity}
                 showAudioControl
                 isPlaying={isPlaying}
+                isAudioLoading={isAudioLoading}
+                audioError={audioError ?? playbackError}
                 onToggleAudio={handleAudioToggle}
-                highlightSettingsTrigger={highlightSettingsTrigger}
               />
             </Box>
           </Toolbar>

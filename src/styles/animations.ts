@@ -68,26 +68,8 @@ export const loadingPulse = keyframes`
 `;
 
 /**
- * Pulse ring – expanding ring that fades out for attention-drawing highlights.
- * Used on: Header hint highlights (audio control, theme dial).
- */
-export const pulseRing = keyframes`
-  0% {
-    transform: scale(0.85);
-    opacity: 0.9;
-  }
-  70% {
-    transform: scale(1.4);
-    opacity: 0;
-  }
-  100% {
-    opacity: 0;
-  }
-`;
-
-/**
  * Cursor blink – step-based blink for typewriter cursors.
- * Used on: TypewriterLoopText cursor display.
+ * Used on: VscodeEditorPane cursor display.
  */
 export const cursorBlink = keyframes`
   0%, 100% { opacity: 1; }

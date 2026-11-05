@@ -39,7 +39,6 @@ jest.mock('@mui/material', () => {
 jest.mock('../../../src/hooks/useWebVitals', () => ({
   useWebVitals: () => ({
     metrics: mockMetrics,
-    collected: mockMetrics.size > 0,
   }),
 }));
 

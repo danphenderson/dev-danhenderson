@@ -95,12 +95,4 @@ describe('createAppStyleMap', () => {
       borderRadius: 1,
     });
   });
-
-  it('keeps header speed dials overflow-visible for header layouts', () => {
-    const theme = createAppTheme('dark', 'ember');
-    const styleMap = createAppStyleMap(theme);
-    const headerAppearanceDialSx = styleMap.headerAppearanceDialSx as Record<string, unknown>;
-
-    expect(headerAppearanceDialSx.overflow).toBe('visible');
-  });
 });

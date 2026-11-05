@@ -1,3 +1,5 @@
+import { Link as RouterLink } from 'react-router-dom';
+import type { SkillChipLink } from '../types/ui';
 import { Box, Chip, Zoom } from '@mui/material';
 import { AnimatedSlideList } from './AnimatedSlideList';
 import { useControlledAnimatedList } from './animatedListShared';
@@ -7,8 +9,49 @@ import { Text } from './text';
 
 const ZOOM_BASE_TIMEOUT_MS = 220;
 
+const SkillChip = ({
+  skill,
+  index,
+  dense,
+  link,
+  visible,
+}: {
+  skill: string;
+  index: number;
+  dense: boolean;
+  link?: SkillChipLink;
+  visible: boolean;
+}) => {
+  const { chipWaveSx, getChipWaveDelaySx, skillsChipSx, skillsLinkChipSx } = useComponentStyles();
+  const sharedProps = {
+    label: (
+      <Text role="inlineLabel" component="span">
+        {skill}
+      </Text>
+    ),
+    size: dense ? ('small' as const) : ('medium' as const),
+    variant: 'outlined' as const,
+    sx: [skillsChipSx, chipWaveSx, getChipWaveDelaySx(index)],
+  };
+  return link ? (
+    <Chip
+      {...sharedProps}
+      component={RouterLink}
+      to={link.to}
+      id={link.id}
+      aria-label={link.accessibleLabel}
+      onClick={link.onClick}
+      tabIndex={visible ? 0 : -1}
+      sx={[...sharedProps.sx, skillsLinkChipSx]}
+    />
+  ) : (
+    <Chip {...sharedProps} />
+  );
+};
+
 type SkillsChipListProps = {
   skills?: string[];
+  links?: Partial<Record<string, SkillChipLink>>;
   dense?: boolean;
   in?: boolean;
   animation?: 'zoom' | 'slide';
@@ -21,15 +64,17 @@ type SkillsChipListProps = {
 
 const ZoomSkillsChipList = ({
   skills,
+  links,
   dense,
   in: inProp,
   startDelayMs,
   itemStaggerMs,
 }: Required<Pick<SkillsChipListProps, 'dense' | 'in' | 'startDelayMs'>> & {
   skills: string[];
+  links?: Partial<Record<string, SkillChipLink>>;
   itemStaggerMs?: number;
 }) => {
-  const { chipWaveSx, getChipWaveDelaySx, skillsChipSx, skillsWrapSx } = useComponentStyles();
+  const { skillsWrapSx } = useComponentStyles();
   const { durationFactor, isMotionDisabled, itemEntries, resolvedContainerSx } =
     useControlledAnimatedList({
       items: skills,
@@ -50,15 +95,12 @@ const ZoomSkillsChipList = ({
       >
         {itemEntries.map(({ item: skill, index, key, nodeRef }) => (
           <Box key={key} ref={nodeRef}>
-            <Chip
-              label={
-                <Text role="inlineLabel" component="span">
-                  {skill}
-                </Text>
-              }
-              size={dense ? 'small' : 'medium'}
-              variant="outlined"
-              sx={[skillsChipSx, chipWaveSx, getChipWaveDelaySx(index)]}
+            <SkillChip
+              skill={skill}
+              index={index}
+              dense={dense}
+              link={links?.[skill]}
+              visible={inProp}
             />
           </Box>
         ))}
@@ -77,15 +119,12 @@ const ZoomSkillsChipList = ({
           easing={{ enter: SPRING_EASING_CSS, exit: undefined }}
         >
           <Box>
-            <Chip
-              label={
-                <Text role="inlineLabel" component="span">
-                  {skill}
-                </Text>
-              }
-              size={dense ? 'small' : 'medium'}
-              variant="outlined"
-              sx={[skillsChipSx, chipWaveSx, getChipWaveDelaySx(index)]}
+            <SkillChip
+              skill={skill}
+              index={index}
+              dense={dense}
+              link={links?.[skill]}
+              visible={inProp && isEntered}
             />
           </Box>
         </Zoom>
@@ -96,6 +135,7 @@ const ZoomSkillsChipList = ({
 
 export const SkillsChipList = ({
   skills = [],
+  links,
   dense = false,
   in: inProp = true,
   animation = 'zoom',
@@ -105,7 +145,7 @@ export const SkillsChipList = ({
   keepMountedWhenExited = false,
   reverseExitStagger = false,
 }: SkillsChipListProps) => {
-  const { chipWaveSx, getChipWaveDelaySx, skillsChipSx, skillsWrapSx } = useComponentStyles();
+  const { skillsWrapSx } = useComponentStyles();
   const filteredSkills = skills.filter(
     (skill): skill is string => typeof skill === 'string' && skill.trim().length > 0
   );
@@ -128,16 +168,12 @@ export const SkillsChipList = ({
         reverseExitStagger={reverseExitStagger}
         containerSx={skillsWrapSx}
         renderItem={(skill, index) => (
-          <Chip
-            key={`${skill}-${index}`}
-            label={
-              <Text role="inlineLabel" component="span">
-                {skill}
-              </Text>
-            }
-            size={dense ? 'small' : 'medium'}
-            variant="outlined"
-            sx={[skillsChipSx, chipWaveSx, getChipWaveDelaySx(index)]}
+          <SkillChip
+            skill={skill}
+            index={index}
+            dense={dense}
+            link={links?.[skill]}
+            visible={inProp}
           />
         )}
       />
@@ -147,6 +183,7 @@ export const SkillsChipList = ({
   return (
     <ZoomSkillsChipList
       skills={filteredSkills}
+      links={links}
       dense={dense}
       in={inProp}
       startDelayMs={startDelayMs}

@@ -25,15 +25,18 @@ Source code for [danhenderson.dev](https://danhenderson.dev), a React + TypeScri
 - Portfolio content is authored in local TypeScript data modules.
 - GitHub-powered CV sections degrade gracefully to bundled content when live API data is unavailable. Contribution stars use live values when available, show an em dash for unknown counts, and sort unknowns after known counts.
 - Shared motion, theming, and reusable UI primitives power the different sections of the site.
-- Home identity, CV/project links, and the IDE are available immediately; expansion is manual. “Customize appearance & audio” toggles a nonmodal panel (exposed with `aria-expanded`) that closes after five idle seconds and stays open during hover or focus; keyboard activation moves focus into the panel, which keeps it open. Header settings remain available, and audio requires explicit play. Failed audio-script loads can be retried from either control.
-- CV and Climbing retain scroll reveals and also provide keyboard-operable reveal buttons. Resume and contact links are visible in the CV header.
+- Home identity, the CV link, and the IDE are available immediately; expansion is manual. Appearance, motion, and audio controls remain available in header settings. Welcome audio uses the local `public/assets/verse.mp3`, starts paused on every page load, and loads only after Play. Settings shows loading and playback errors, supports retry, and pauses/resumes the track across client-side navigation.
+- CV and Climbing retain scroll reveals and also provide keyboard-operable reveal buttons. The CV About card provides a contact link and resume download through its actions menu.
+- Card tilt follows mouse input only, keeping touch-operated CV links stationary. Action menus retain keyboard focus when the mouse leaves and dismiss on selection, Escape, or focus leaving the menu.
+- CV bio and workflow reveals, experience-detail backdrops, and story progress respect the motion setting and settle immediately when motion is off or reduced. Moving keyboard focus to another experience closes the active detail backdrop.
+- Eight CV Stack chips link to supporting project or experience entries. Stable URLs such as `/cv#cv-coding-typewriter`, `/cv#cv-coding-portfolio`, and `/cv#cv-experience-lucerna-data-pipeline` reveal the destination, open its Approach or Highlights detail, and focus its heading. Back restores the originating chip. The normal CV motion and explicit story mode are preserved.
+- Typewriter CLI and this portfolio have Problem, Approach, Results, and Stack case-study tabs with source links and bounded claims. Evidence mappings live beside the content in `src/data/cv.ts`; tools without a substantive supporting example remain plain chips.
 - Photography uses generated responsive WebP display files; original photographs remain available for download. If a generated display file cannot be loaded, album covers, gallery tiles, the lightbox, and the page background fall back once to the original photograph instead of rendering blank.
 
 ## Runtime Environment
 
-- `src/constants/runtimeEnvironment.ts` resolves the app runtime environment from `REACT_APP_RUNTIME_ENV` or `NODE_ENV`.
 - Override the resolved runtime at build time with `REACT_APP_RUNTIME_ENV=development|test|production` when a workflow needs a non-default bundle.
-- The resolved runtime is used for environment-sensitive client behavior and Playwright test-build parity.
+- Build variants retain runtime metadata for Playwright test-build parity. Audio behavior is the same in every environment; no welcome-sequence reset runs on page load.
 
 ## Build Variants
 

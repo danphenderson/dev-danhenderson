@@ -1,7 +1,7 @@
 import { Box } from '@mui/material';
 import { motion } from 'motion/react';
 import { useTheme, alpha } from '@mui/material/styles';
-import { duration, easing } from '../../motion/tokens';
+import { duration, easing, useMotionScale } from '../../motion';
 
 type CVStoryProgressProps = {
   progress: number;
@@ -9,6 +9,7 @@ type CVStoryProgressProps = {
 
 export const CVStoryProgress = ({ progress }: CVStoryProgressProps) => {
   const theme = useTheme();
+  const { duration: durationFactor } = useMotionScale();
 
   return (
     <Box
@@ -29,7 +30,7 @@ export const CVStoryProgress = ({ progress }: CVStoryProgressProps) => {
           originX: 0,
         }}
         animate={{ scaleX: progress }}
-        transition={{ duration: duration.normal, ease: easing.decel }}
+        transition={{ duration: duration.normal * durationFactor, ease: easing.decel }}
       />
     </Box>
   );

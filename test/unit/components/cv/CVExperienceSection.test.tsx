@@ -1,9 +1,16 @@
 import { render, screen } from '@testing-library/react';
 import { fireEvent } from '@testing-library/react';
 import type { ReactNode } from 'react';
+import { useReducedMotion } from 'motion/react';
 import ThemeProvider from '../../../../src/ThemeProvider';
 import { CVExperienceSection } from '../../../../src/components/cv/CVExperienceSection';
 import { cvSectionMetadata } from '../../../../src/components/cv/cvSectionMetadata';
+import { PREFERENCE_STORAGE_KEYS } from '../../../../src/theme/preferences';
+
+jest.mock('motion/react', () => ({
+  ...jest.requireActual('motion/react'),
+  useReducedMotion: jest.fn(() => false),
+}));
 
 const mockExperienceList = jest.fn(
   ({
@@ -58,8 +65,58 @@ jest.mock('../../../../src/components/cv/ExperienceList', () => ({
 }));
 
 describe('CVExperienceSection', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+    jest.mocked(useReducedMotion).mockReturnValue(false);
+  });
+
   afterEach(() => {
     mockExperienceList.mockClear();
+    window.localStorage.clear();
+  });
+
+  it.each([
+    ['off', false],
+    ['default', true],
+  ])(
+    'changes the backdrop instantly with %s motion and reduced motion %s',
+    (intensity, reduced) => {
+      window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.motionIntensity, intensity);
+      jest.mocked(useReducedMotion).mockReturnValue(reduced);
+      render(
+        <ThemeProvider>
+          <CVExperienceSection experiences={[]} />
+        </ThemeProvider>
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: 'Activate experience detail' }));
+
+      expect(screen.getByTestId('experience-section-backdrop')).toHaveStyle({ transition: 'none' });
+      expect(screen.getByTestId('experience-section-backdrop')).toHaveAttribute(
+        'data-active',
+        'true'
+      );
+
+      fireEvent.pointerDown(screen.getByTestId('experience-section-backdrop'));
+
+      expect(screen.getByTestId('experience-section-backdrop')).toHaveStyle({ transition: 'none' });
+      expect(screen.getByTestId('experience-section-backdrop')).toHaveAttribute(
+        'data-active',
+        'false'
+      );
+    }
+  );
+
+  it('retains the backdrop transition when motion is enabled', () => {
+    render(
+      <ThemeProvider>
+        <CVExperienceSection experiences={[]} />
+      </ThemeProvider>
+    );
+
+    expect(
+      getComputedStyle(screen.getByTestId('experience-section-backdrop')).transition
+    ).toContain('opacity 0.35s');
   });
 
   it('forwards motion props, section id, and item offset to the experience list', () => {

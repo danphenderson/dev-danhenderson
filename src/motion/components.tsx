@@ -410,7 +410,8 @@ const TILT_DEG = 6;
  *
  * Tracks the pointer within the element and applies spring-animated
  * `rotateX` / `rotateY` transforms for a subtle depth effect.
- * Fully suppressed when `prefers-reduced-motion` is set or `disabled` is true.
+ * Touch/pen input never tilts the card. Fully suppressed when
+ * `prefers-reduced-motion` is set or `disabled` is true.
  */
 export const MotionTiltCard = ({
   children,
@@ -439,21 +440,28 @@ export const MotionTiltCard = ({
 
   useEffect(() => {
     if (!tiltEnabled) {
+      rawX.set(0);
+      rawY.set(0);
+      rotateX.jump(0);
+      rotateY.jump(0);
       setWillChange(false);
     }
-  }, [setWillChange, tiltEnabled]);
+  }, [rawX, rawY, rotateX, rotateY, setWillChange, tiltEnabled]);
 
-  const handleMouseEnter = useCallback(() => {
-    if (!tiltEnabled) {
-      return;
-    }
+  const handlePointerEnter = useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      if (!tiltEnabled || event.pointerType !== 'mouse') {
+        return;
+      }
 
-    setWillChange(true);
-  }, [setWillChange, tiltEnabled]);
+      setWillChange(true);
+    },
+    [setWillChange, tiltEnabled]
+  );
 
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (!tiltEnabled) return;
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!tiltEnabled || e.pointerType !== 'mouse' || e.buttons !== 0) return;
       setWillChange(true);
       const el = ref.current;
       if (!el) return;
@@ -466,7 +474,7 @@ export const MotionTiltCard = ({
     [rawX, rawY, effectiveIntensity, setWillChange, tiltEnabled]
   );
 
-  const handleMouseLeave = useCallback(() => {
+  const resetTilt = useCallback(() => {
     rawX.set(0);
     rawY.set(0);
     setWillChange(false);
@@ -483,9 +491,10 @@ export const MotionTiltCard = ({
         transformStyle: 'preserve-3d',
         ...style,
       }}
-      onMouseEnter={handleMouseEnter}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
+      onPointerEnter={handlePointerEnter}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={resetTilt}
+      onPointerCancel={resetTilt}
     >
       {children}
     </motion.div>

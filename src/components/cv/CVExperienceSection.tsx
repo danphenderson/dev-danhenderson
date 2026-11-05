@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Box } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import type { Experience } from '../../types/cv';
+import type { Experience, CVEntryRequest } from '../../types/cv';
 import type { AnimatedContentCardEntranceDirection } from '../../types/ui';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { ExperienceList } from './ExperienceList';
 import { SectionHeading } from '../layout/SectionHeading';
 import { CVSectionCard } from './CVSectionCard';
-import { cssDuration } from '../../motion/tokens';
+import { duration, useMotionScale } from '../../motion';
 import { SPRING_EASING_CSS } from '../../styles/springEasing';
 
 type CVExperienceSectionProps = {
   experiences: Experience[];
+  entryRequest?: CVEntryRequest;
   delayMs?: number;
   entranceDirection?: AnimatedContentCardEntranceDirection;
   triggerOnView?: boolean;
@@ -23,6 +24,7 @@ type CVExperienceSectionProps = {
 
 export const CVExperienceSection = ({
   experiences,
+  entryRequest,
   delayMs = 0,
   entranceDirection,
   triggerOnView = true,
@@ -31,9 +33,18 @@ export const CVExperienceSection = ({
   itemOffsetMs,
   sectionId,
 }: CVExperienceSectionProps) => {
+  const { duration: durationFactor } = useMotionScale();
   const [activeDetail, setActiveDetail] = useState<{ index: number; value: string } | null>(null);
   const sectionContentRef = useRef<HTMLDivElement | null>(null);
   const hasBackdrop = activeDetail !== null;
+
+  useEffect(() => {
+    if (entryRequest?.kind !== 'experience') return;
+    const index = experiences.findIndex((entry) => entry.id === entryRequest.entryId);
+    if (index >= 0 && experiences[index].projects?.length) {
+      setActiveDetail({ index, value: 'details' });
+    }
+  }, [entryRequest, experiences]);
 
   const clearActiveDetail = useCallback(() => {
     setActiveDetail(null);
@@ -118,7 +129,14 @@ export const CVExperienceSection = ({
           opacity: hasBackdrop ? 1 : 0,
           pointerEvents: hasBackdrop ? 'auto' : 'none',
           cursor: hasBackdrop ? 'pointer' : 'default',
-          transition: `opacity ${cssDuration.normal} ${SPRING_EASING_CSS}, backdrop-filter ${cssDuration.normal} ${SPRING_EASING_CSS}`,
+          transition:
+            durationFactor === 0
+              ? 'none'
+              : `opacity ${
+                  duration.normal * durationFactor
+                }s ${SPRING_EASING_CSS}, backdrop-filter ${
+                  duration.normal * durationFactor
+                }s ${SPRING_EASING_CSS}`,
         })}
       />
     </CVSectionCard>

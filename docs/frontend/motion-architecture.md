@@ -12,7 +12,6 @@ flowchart TB
     D["duration<br/>instant · quick · fast · normal · slow · dramatic"]
     E["easing<br/>smooth · spring · decel · accel"]
     S["stagger<br/>fast · normal · slow"]
-    T["transition presets<br/>spring · smooth · snappy · reveal · dramatic"]
     IO["IntersectionObserver defaults<br/>threshold · rootMargin"]
     Scale["scaleDuration() · scaleStagger()<br/>multiply base values by intensity factor"]
   end
@@ -81,10 +80,6 @@ Also exported as `cssDuration` (string format: `'0.35s'`) for use in MUI `sx` pr
 | `normal` | 0.08  | Default card grids              |
 | `slow`   | 0.12  | Large sections                  |
 
-### Transition presets
-
-Pre-composed `{ duration, ease }` objects: `spring`, `smooth`, `snappy`, `reveal`, `dramatic`.
-
 ### Scaling helpers
 
 ```
@@ -152,16 +147,16 @@ Continuous-scroll section reveals for the immersive story viewer:
 
 ### Component catalog
 
-| Component         | Trigger               | Animation                           | Key behavior                                                         |
-| ----------------- | --------------------- | ----------------------------------- | -------------------------------------------------------------------- |
-| `MotionSection`   | Viewport intersection | `fadeInUp` (customizable)           | Renders plain `<div>` when motion is off; `once=true` by default     |
-| `StaggerChildren` | Viewport intersection | `staggerContainer` + children       | Scales both duration and stagger factors independently               |
-| `MotionItem`      | Parent stagger timing | `fadeInUp` (customizable)           | Used inside `StaggerChildren`; inherits hidden/visible from parent   |
-| `MotionCard`      | Hover/tap             | `hoverLift` + `tapShrink`           | Suppressed when duration factor is 0                                 |
-| `MotionImage`     | Hover                 | `hoverZoom`                         | Expects parent `overflow: hidden`                                    |
-| `MotionFadeIn`    | Viewport intersection | `fadeIn`                            | Fade-only variant of `MotionSection`                                 |
-| `MotionScaleIn`   | Viewport intersection | `scaleIn`                           | Scale + fade variant of `MotionSection`                              |
-| `MotionTiltCard`  | Pointer position      | 3D rotateX/rotateY (spring physics) | Intensity scaled by `tiltFactor`; fully suppressed by reduced-motion |
+| Component         | Trigger                | Animation                           | Key behavior                                                                                                   |
+| ----------------- | ---------------------- | ----------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `MotionSection`   | Viewport intersection  | `fadeInUp` (customizable)           | Renders plain `<div>` when motion is off; `once=true` by default                                               |
+| `StaggerChildren` | Viewport intersection  | `staggerContainer` + children       | Scales both duration and stagger factors independently                                                         |
+| `MotionItem`      | Parent stagger timing  | `fadeInUp` (customizable)           | Used inside `StaggerChildren`; inherits hidden/visible from parent                                             |
+| `MotionCard`      | Hover/tap              | `hoverLift` + `tapShrink`           | Suppressed when duration factor is 0                                                                           |
+| `MotionImage`     | Hover                  | `hoverZoom`                         | Expects parent `overflow: hidden`                                                                              |
+| `MotionFadeIn`    | Viewport intersection  | `fadeIn`                            | Fade-only variant of `MotionSection`                                                                           |
+| `MotionScaleIn`   | Viewport intersection  | `scaleIn`                           | Scale + fade variant of `MotionSection`                                                                        |
+| `MotionTiltCard`  | Mouse pointer position | 3D rotateX/rotateY (spring physics) | Touch/pen and compatibility mouse events do not tilt; disabled/reduced motion resets existing tilt immediately |
 
 ### IntersectionObserver integration
 
@@ -207,7 +202,7 @@ sequenceDiagram
   participant OS as prefers-reduced-motion
   participant Comp as Animated component
 
-  User->>LS: Select intensity (HeaderMotionDial)
+  User->>LS: Select intensity (HeaderSettingsPopover)
   LS->>Theme: Read on mount
   Theme->>Scale: motionIntensity → MotionScaleFactors
   Scale->>Theme: Attach to theme.appearanceTreatment.motionScale
@@ -373,7 +368,7 @@ Right: the parent list component (`AnimatedContentList`) owns stagger timing; th
 
 Wrong: a new component that uses `framer-motion` directly with hardcoded duration/easing values instead of tokens.
 
-Right: use `duration`, `easing`, and `transition` from `src/motion/tokens.ts`.
+Right: use `duration`, `easing`, and scaling helpers from `src/motion/tokens.ts`.
 
 ### Do not ignore intensity scaling
 

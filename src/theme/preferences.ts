@@ -32,6 +32,3 @@ export const DEFAULT_PREFERENCES: Readonly<UserPreferences> = {
 
 export const isPaletteMode = (value: string | null): value is PaletteMode =>
   value === 'light' || value === 'dark';
-
-export const isAudioConsent = (value: string | null): value is AudioConsent =>
-  value === 'unknown' || value === 'granted' || value === 'declined';

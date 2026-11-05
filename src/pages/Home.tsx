@@ -1,30 +1,20 @@
 import { useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link as RouterLink } from 'react-router-dom';
-import { cvSectionMetadata } from '../components/cv/cvSectionMetadata';
 import { aboutMe } from '../data/cv';
 import { Text } from '../components/text';
 import { Box, Button, Stack, IconButton, Tooltip } from '@mui/material';
-import {
-  motion,
-  useDragControls,
-  useScroll,
-  useTransform,
-  AnimatePresence,
-} from 'motion/react';
+import { motion, useDragControls, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { AnimatedContentCard } from '../components/AnimatedContentCard';
 import BackgroundPaper from '../components/BackgroundPaper';
-import { FIRST_VISIT_WELCOME_ID, FirstVisitWelcome } from '../components/FirstVisitWelcome';
 import { HeroMotionPath } from '../components/HeroMotionPath';
 import { TerminalHeroContent } from '../components/TerminalHeroContent';
 import type { TerminalLine } from '../types/ui';
 import { siteRouteMap } from '../constants/siteRoutes';
 import { useDocumentMetadata } from '../hooks/useDocumentMetadata';
-import { useHomeWelcomeSequence } from '../hooks/useHomeWelcomeSequence';
 import { useHomeIdeOrchestration } from './homeIdeOrchestration';
 import { useAppStyles } from '../styles/appStyles';
 import { useComponentStyles } from '../styles/componentStyles';
-import { useAppTheme } from '../ThemeProvider';
 import { duration, MotionTiltCard, useMotionScale } from '../motion';
 import { VSCODE_COLORS, VSCODE_WINDOW_RADIUS } from '../components/ide/vscodeTokens';
 
@@ -48,21 +38,6 @@ export default function Home() {
   const appStyles = useAppStyles();
   const { cardResetSx } = useComponentStyles();
   useDocumentMetadata({ ...siteRouteMap.home, canonicalPath: siteRouteMap.home.path });
-  const { motionIntensity, setMotionIntensity } = useAppTheme();
-  const {
-    error,
-    isHeroAnimationReady,
-    isAudioPlaying,
-    isAudioLoading,
-    isWelcomeOpen,
-    focusWelcomeOnOpen,
-    setIsInteracting,
-    handleDismiss,
-    handleOpen,
-    handleToggleAudio,
-  } = useHomeWelcomeSequence();
-
-  const preferencesTriggerRef = useRef<HTMLButtonElement>(null);
   const heroRef = useRef<HTMLDivElement>(null);
   const heroBoundsRef = useRef<HTMLDivElement>(null);
   const heroDragControls = useDragControls();
@@ -106,7 +81,11 @@ export default function Home() {
 
   return (
     <>
-      <motion.div ref={heroRef} style={{ position: 'relative', ...heroMotionStyle }}>
+      <motion.div
+        ref={heroRef}
+        // Entrance transforms must not widen the mobile viewport and displace header settings.
+        style={{ position: 'relative', overflowX: 'clip', ...heroMotionStyle }}
+      >
         <BackgroundPaper
           intro={
             <Stack spacing={2} sx={appStyles.homeIntroSx}>
@@ -120,37 +99,17 @@ export default function Home() {
                 <Button component={RouterLink} to={siteRouteMap.cv.path} variant="contained">
                   Explore my CV
                 </Button>
-                <Button
-                  component={RouterLink}
-                  to={`${siteRouteMap.cv.path}#${cvSectionMetadata.coding.id}`}
-                  variant="outlined"
-                >
-                  View projects
-                </Button>
               </Stack>
-              <Button
-                ref={preferencesTriggerRef}
-                aria-expanded={isWelcomeOpen}
-                aria-controls={isWelcomeOpen ? FIRST_VISIT_WELCOME_ID : undefined}
-                // Keyboard and assistive-technology activation reports no pointer clicks.
-                onClick={(event) =>
-                  isWelcomeOpen ? handleDismiss() : handleOpen({ moveFocus: event.detail === 0 })
-                }
-                size="small"
-                sx={{ alignSelf: 'flex-start' }}
-              >
-                Customize appearance &amp; audio
-              </Button>
             </Stack>
           }
           contentRef={heroBoundsRef}
           image="assets/home.jpg"
           contentAlign="flex-end"
           contentSx={appStyles.homeHeroContentSx}
-          showShell={isHeroAnimationReady}
+          showShell
           shellSx={appStyles.homeHeroShellSx}
           shellWrapper={(shell) => (
-            <HeroMotionPath active={isHeroAnimationReady} onComplete={handleHeroMotionComplete}>
+            <HeroMotionPath active onComplete={handleHeroMotionComplete}>
               <motion.div
                 data-testid="home-hero-window"
                 data-session-key={String(ideSessionKey)}
@@ -190,38 +149,21 @@ export default function Home() {
             disabled={isHeroWindowDragging || isResizing || ideWindowState === 'expanded'}
             intensity={0.7}
           >
-            <AnimatedContentCard sx={cardResetSx} visible={isHeroAnimationReady}>
-              {isHeroAnimationReady ? (
-                <Box
-                  ref={setInlineIdeHost}
-                  sx={{
-                    display: 'inline-block',
-                    maxWidth: '100%',
-                    minWidth: 0,
-                  }}
-                />
-              ) : null}
+            <AnimatedContentCard sx={cardResetSx} visible>
+              <Box
+                ref={setInlineIdeHost}
+                sx={{
+                  display: 'inline-block',
+                  maxWidth: '100%',
+                  minWidth: 0,
+                }}
+              />
             </AnimatedContentCard>
           </MotionTiltCard>
         </BackgroundPaper>
       </motion.div>
 
-      {/* Outside the IDE shell so minimizing, closing, or expanding the IDE never unmounts it. */}
-      <FirstVisitWelcome
-        open={isWelcomeOpen}
-        focusOnOpen={focusWelcomeOnOpen}
-        returnFocusRef={preferencesTriggerRef}
-        onClose={handleDismiss}
-        onInteractionChange={setIsInteracting}
-        motionIntensity={motionIntensity}
-        onChangeMotionIntensity={setMotionIntensity}
-        isAudioPlaying={isAudioPlaying}
-        isAudioLoading={isAudioLoading}
-        audioError={error}
-        onToggleAudio={handleToggleAudio}
-      />
-
-      {ideWindowPortalContainer && isHeroAnimationReady && ideVisible
+      {ideWindowPortalContainer && ideVisible
         ? createPortal(
             <TerminalHeroContent
               key={ideSessionKey}

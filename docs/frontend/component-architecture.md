@@ -16,7 +16,7 @@ flowchart TB
     Layout["Layout primitives<br/>PageFrame · BackgroundPaper<br/>SectionCard · SectionPanel · SectionHeading"]
     Cards["Card surfaces<br/>ContentCard · AnimatedContentCard<br/>MotionTiltCard · MotionCard"]
     Lists["List orchestrators<br/>AnimatedSlideList · SkillsChipList<br/>AnimatedContentList"]
-    Text["Text primitives<br/>Text · TypewriterText · TypewriterLoopText<br/>UNSAFE_Typography"]
+    Text["Text primitives<br/>Text · TypewriterText<br/>UNSAFE_Typography"]
     Global["Global chrome<br/>Header · Footer · ScrollProgressBar<br/>GlobalCommandPalette · CommonLinkTooltip<br/>PageTransition · RouteRecoveryPanel"]
   end
 
@@ -25,7 +25,7 @@ flowchart TB
     Blog["blog/<br/>13 components<br/>hero · article · code · navigation"]
     Photo["photography/<br/>5 components<br/>album card · lightbox · share"]
     IDE["ide/<br/>14 files<br/>VS Code chrome for home hero"]
-    HeaderSub["header/<br/>7 files<br/>nav · dials · hints · scroll"]
+    HeaderSub["header/<br/>3 files<br/>nav · settings popover · scroll"]
   end
 
   subgraph Foundation["Foundation — src/motion/ · src/styles/ · src/theme/"]

@@ -15,27 +15,33 @@ async function activate(link: Locator, isMobile: boolean) {
   else await link.click();
 }
 
-async function resumeAction(page: Page, entry: string, isMobile: boolean) {
-  if (entry === 'header') {
-    return page.getByRole('link', { name: 'Download resume', exact: true });
-  }
+async function resumeAction(page: Page, isMobile: boolean) {
   const trigger = page.getByRole('button', { name: 'Open about actions' });
   if (isMobile) await trigger.tap();
   else await trigger.focus();
   await expect(trigger).toHaveAttribute('aria-expanded', 'true');
-  expect(await trigger.evaluate((button) => {
-    const rect = button.getBoundingClientRect();
-    return button.contains(document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2));
-  })).toBe(true);
+  expect(
+    await trigger.evaluate((button) => {
+      const rect = button.getBoundingClientRect();
+      return button.contains(
+        document.elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2)
+      );
+    })
+  ).toBe(true);
   return page.getByRole('menuitem', { name: 'Download Resume' });
 }
 
 async function expectDecoded(image: Locator, source: RegExp) {
   await image.scrollIntoViewIfNeeded();
   await expect(image).toBeVisible();
-  await expect.poll(() => image.evaluate((element: HTMLImageElement) =>
-    element.complete && element.naturalWidth > 0 && element.naturalHeight > 0
-  )).toBe(true);
+  await expect
+    .poll(() =>
+      image.evaluate(
+        (element: HTMLImageElement) =>
+          element.complete && element.naturalWidth > 0 && element.naturalHeight > 0
+      )
+    )
+    .toBe(true);
   expect(await image.evaluate((element: HTMLImageElement) => element.currentSrc)).toMatch(source);
 }
 
@@ -61,7 +67,8 @@ async function checkPhotography(page: Page, source: RegExp, everyTile = true) {
   const lightbox = page.getByRole('dialog', { name: /Immersive photo viewer/ });
   await expectDecoded(lightbox.locator('img'), source);
   await expect(lightbox.getByRole('link', { name: /^Download/ })).toHaveAttribute(
-    'href', new RegExp(`^${basePath}/assets/photography/.*\\.jpg$`)
+    'href',
+    new RegExp(`^${basePath}/assets/photography/.*\\.jpg$`)
   );
   await lightbox.getByRole('button', { name: 'Next photo' }).click();
   await expectDecoded(lightbox.locator('img'), source);
@@ -74,23 +81,69 @@ test.beforeEach(async ({ page }) => {
   await mockGitHubAPIFailure(page);
 });
 
-for (const entry of ['header', 'menu']) {
-  test(`${entry} resume action downloads real PDF bytes`, async ({ page, isMobile }, testInfo) => {
-    await page.goto(routePath('/cv'));
-    const link = await resumeAction(page, entry, isMobile);
-    await expect(link).toHaveAttribute('href', resumePdfUrl);
-    await expect(link).toHaveAttribute('download', resumeDownloadFilename);
-    const pendingDownload = page.waitForEvent('download');
-    await activate(link, isMobile);
-    const download = await pendingDownload;
-    const saved = testInfo.outputPath(`${entry}-resume.pdf`);
-    await download.saveAs(saved);
-    expect(await download.failure()).toBeNull();
-    expect((await readFile(saved)).subarray(0, 5).toString()).toBe('%PDF-');
-  });
-}
+test('Stack evidence links support touch, reload, and the configured base path', async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto(routePath('/cv'));
+  const chip = page.locator('#cv-stack-python');
+  await expect(chip).toHaveAttribute('href', routePath('/cv#cv-coding-typewriter'));
+  await activate(chip, isMobile);
+  await expect(page.locator('#cv-coding-typewriter-heading')).toBeFocused();
+  await page.reload();
+  await expect(page.locator('#cv-coding-typewriter-heading')).toBeFocused();
+  await expect(
+    page.locator('#cv-coding-typewriter').getByRole('tab', { name: 'Approach', exact: true })
+  ).toHaveAttribute('aria-selected', 'true');
+});
 
-test('certificate clicks request real PDFs rather than SPA documents', async ({ page, context, isMobile }) => {
+test('welcome audio plays the local MP3 only on request and pauses', async ({ page, isMobile }) => {
+  const audioRequests: string[] = [];
+  page.on('request', (request) => {
+    if (new URL(request.url()).pathname.endsWith('/assets/verse.mp3')) {
+      audioRequests.push(request.url());
+    }
+  });
+  await page.goto(routePath('/'));
+  const audio = page.getByTestId('welcome-audio');
+  await expect(audio).not.toHaveAttribute('src');
+  expect(audioRequests).toEqual([]);
+  await expect.poll(() => audio.evaluate((element: HTMLAudioElement) => element.paused)).toBe(true);
+
+  await activate(page.getByRole('button', { name: 'Open settings' }), isMobile);
+  await activate(page.getByRole('button', { name: 'Play welcome audio' }), isMobile);
+  await expect(page.getByRole('button', { name: 'Pause welcome audio' })).toBeVisible();
+  await expect(audio).toHaveAttribute('src', routePath('/assets/verse.mp3'));
+  await expect
+    .poll(() => audio.evaluate((element: HTMLAudioElement) => element.currentTime))
+    .toBeGreaterThan(0);
+  expect(audioRequests.length).toBeGreaterThan(0);
+
+  await activate(page.getByRole('button', { name: 'Pause welcome audio' }), isMobile);
+  await expect.poll(() => audio.evaluate((element: HTMLAudioElement) => element.paused)).toBe(true);
+  await expect(page.getByRole('button', { name: 'Play welcome audio' })).toBeVisible();
+});
+
+test('menu resume action downloads real PDF bytes', async ({ page, isMobile }, testInfo) => {
+  await page.goto(routePath('/cv'));
+  await expect(page.getByRole('link', { name: 'Download resume', exact: true })).toHaveCount(0);
+  const link = await resumeAction(page, isMobile);
+  await expect(link).toHaveAttribute('href', resumePdfUrl);
+  await expect(link).toHaveAttribute('download', resumeDownloadFilename);
+  const pendingDownload = page.waitForEvent('download');
+  await activate(link, isMobile);
+  const download = await pendingDownload;
+  const saved = testInfo.outputPath('menu-resume.pdf');
+  await download.saveAs(saved);
+  expect(await download.failure()).toBeNull();
+  expect((await readFile(saved)).subarray(0, 5).toString()).toBe('%PDF-');
+});
+
+test('certificate clicks request real PDFs rather than SPA documents', async ({
+  page,
+  context,
+  isMobile,
+}) => {
   test.setTimeout(60_000);
   await page.goto(routePath('/cv#cv-certificates'), { waitUntil: 'domcontentloaded' });
   await page.locator('#cv-certificates').scrollIntoViewIfNeeded();
@@ -142,14 +195,17 @@ test.describe('unavailable display images', () => {
   for (const status of [404, 200]) {
     test(`recovers originals when derivatives return ${status} HTML`, async ({ page }) => {
       test.setTimeout(90_000);
-      await page.route('**/assets/display/**', (route) => route.fulfill({
-        status,
-        contentType: 'text/html',
-        body: '<!doctype html><title>Misconfigured SPA rewrite</title>',
-      }));
+      await page.route('**/assets/display/**', (route) =>
+        route.fulfill({
+          status,
+          contentType: 'text/html',
+          body: '<!doctype html><title>Misconfigured SPA rewrite</title>',
+        })
+      );
       await checkPhotography(page, /\/assets\/photography\/.*\.jpg$/, false);
-      await expect(page.getByRole('list', { name: 'Landscape photo gallery' }).locator('img').first())
-        .not.toHaveAttribute('srcset');
+      await expect(
+        page.getByRole('list', { name: 'Landscape photo gallery' }).locator('img').first()
+      ).not.toHaveAttribute('srcset');
     });
   }
 });

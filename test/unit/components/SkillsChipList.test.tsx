@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { SkillsChipList } from '../../../src/components/SkillsChipList';
 
@@ -38,7 +39,9 @@ jest.mock('../../../src/components/AnimatedSlideList', () => ({
 
     return (
       <div data-testid="animated-slide-list" data-layout={props.layout ?? 'stack'}>
-        {props.in ? props.items.map(props.renderItem) : null}
+        {props.in
+          ? props.items.map((item, index) => <div key={item}>{props.renderItem(item, index)}</div>)
+          : null}
       </div>
     );
   },
@@ -133,4 +136,72 @@ describe('SkillsChipList', () => {
       expect.objectContaining({ in: true, layout: 'wrap', startDelayMs: 480 })
     );
   });
+
+  it.each(['zoom', 'slide'] as const)(
+    'renders optional real links in the %s branch',
+    (animation) => {
+      render(
+        <MemoryRouter basename="/portfolio" initialEntries={['/portfolio/cv']}>
+          <ThemeProvider>
+            <SkillsChipList
+              skills={['Python', 'Docker']}
+              animation={animation}
+              links={{
+                Python: {
+                  to: '/cv#cv-coding-typewriter',
+                  accessibleLabel: 'Python — view Typewriter CLI case study',
+                },
+              }}
+            />
+          </ThemeProvider>
+        </MemoryRouter>
+      );
+      const link = screen.getByRole('link', { name: 'Python — view Typewriter CLI case study' });
+      expect(link).toHaveAttribute('href', '/portfolio/cv#cv-coding-typewriter');
+      expect(link).toHaveAttribute('tabindex', '0');
+      expect(screen.getByText('Docker').closest('a')).toBeNull();
+      expect(screen.getAllByRole('link')).toHaveLength(1);
+    }
+  );
+
+  it.each([
+    [false, false],
+    [false, true],
+    [true, false],
+  ])(
+    'keeps hidden or exiting links out of the tab order (motion disabled: %s, entered: %s)',
+    (isMotionDisabled, isEntered) => {
+      mockUseControlledAnimatedList.mockReturnValue({
+        durationFactor: isMotionDisabled ? 0 : 1,
+        isMotionDisabled,
+        itemEntries: [
+          {
+            item: 'Python',
+            index: 0,
+            key: 'Python-0',
+            isEntered,
+            nodeRef: { current: null },
+          },
+        ],
+        resolvedContainerSx: {},
+      });
+      const { container } = render(
+        <MemoryRouter>
+          <ThemeProvider>
+            <SkillsChipList
+              skills={['Python']}
+              in={false}
+              links={{
+                Python: {
+                  to: '/cv#cv-coding-typewriter',
+                  accessibleLabel: 'Python — view Typewriter CLI case study',
+                },
+              }}
+            />
+          </ThemeProvider>
+        </MemoryRouter>
+      );
+      expect(container.querySelector('a')).toHaveAttribute('tabindex', '-1');
+    }
+  );
 });

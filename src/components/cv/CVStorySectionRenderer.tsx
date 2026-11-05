@@ -676,8 +676,7 @@ const CodingSection = ({
                 renderBulletList(
                   tab.items.map((item) =>
                     Array.isArray(item) ? renderExperienceSegments(item) : item
-                  ),
-                  3
+                  )
                 )
               )}
             </Box>

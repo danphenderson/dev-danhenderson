@@ -171,13 +171,12 @@ flowchart LR
     BG["Background/overlay<br/>getBackgroundImageSx · backgroundShellSx"]
     Header["Header styles<br/>toolbar · nav · avatar · icon buttons"]
     Page["Page containers<br/>pageFrameContainerSx · CV panels"]
-    Photo["Photography styles<br/>grid · card · overlay · quilted items"]
+    Photo["Photography styles<br/>hero · immersive card · overlay · quilted items"]
     Loading["Loading bars<br/>getLoadingBarSx · getLoadingBarToneColors"]
-    Hints["Hint popovers<br/>hintPopoverPaperSx"]
   end
 
   Theme --> CSM --> Cards & Text & Layouts & Timings & Helpers
-  Theme --> ASM --> BG & Header & Page & Photo & Loading & Hints
+  Theme --> ASM --> BG & Header & Page & Photo & Loading
 ```
 
 ### Consuming style builders
@@ -224,7 +223,6 @@ const styles = useComponentStyles();
 | `getBackgroundImageSx()` | Full-cover background with `::before` overlay |
 | `backgroundShellSx`      | Translucent shell panel on background         |
 | `headerToolbarSx`        | Responsive header padding and height          |
-| `photographyGridSx`      | Responsive 1/2/3 column grid                  |
 | `pageFrameContainerSx`   | Route container padding                       |
 | `backToTopFabSx`         | Fixed FAB with blur and shadow                |
 
@@ -250,7 +248,6 @@ The style builder also exports stagger timing constants, scaled by the current i
 | `backgroundSweep` | Gradient position slide for chips        |
 | `breathe`         | Gentle opacity + Y-translate oscillation |
 | `loadingPulse`    | Smooth opacity ramp (35% → 100%)         |
-| `pulseRing`       | Expanding ring with fade-out             |
 | `cursorBlink`     | Step-based on/off for terminal cursor    |
 
 These are conditionally applied based on `AppMotionTreatment` flags, which are disabled when `cssAnimations: false`.
@@ -267,7 +264,7 @@ SPRING_EASING_MOTION = [0.175, 0.885, 0.32, 1.275]
 This produces ease-out-back (slight overshoot and settle). It is used across:
 
 - MUI Zoom component easing
-- Framer Motion transition presets
+- Motion easing tokens
 - Route transition easing
 - `AnimatedContentCard` entrance
 

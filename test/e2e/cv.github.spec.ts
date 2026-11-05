@@ -107,7 +107,7 @@ test.describe('CV page – GitHub integration', () => {
   test('renders the CV page with core sections', async ({ page }) => {
     await page.goto('/cv');
     await expect(page.getByText('Daniel Henderson')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Download resume' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Contact me' })).toBeVisible();
     await ensureCvSectionVisible(page, 'cv-github');
     await expectGitHubDataStatusTooltip(page);
 

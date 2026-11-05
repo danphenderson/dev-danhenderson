@@ -109,11 +109,3 @@ export function register(config?: ServiceWorkerConfig): void {
 
   window.addEventListener('load', registerServiceWorker, { once: true });
 }
-
-export function unregister(): void {
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.ready
-      .then((registration) => registration.unregister())
-      .catch((error) => logServiceWorkerError('Error during service worker unregister:', error));
-  }
-}

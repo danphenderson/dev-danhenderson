@@ -4,11 +4,11 @@ This document covers the actual test organization, harness patterns, and coverag
 
 ## Test infrastructure
 
-| Layer              | Framework                         | Location     | Run command                            |
-| ------------------ | --------------------------------- | ------------ | -------------------------------------- |
-| Unit / component   | Jest + React Testing Library      | `test/unit/` | `CI=true npm test -- --watchAll=false` |
+| Layer              | Framework                             | Location     | Run command                            |
+| ------------------ | ------------------------------------- | ------------ | -------------------------------------- |
+| Unit / component   | Jest + React Testing Library          | `test/unit/` | `CI=true npm test -- --watchAll=false` |
 | End-to-end         | Playwright (Chromium + mobile WebKit) | `test/e2e/`  | `npm run test:e2e`                     |
-| Build verification | Vite production build             | —            | `npm run build`                        |
+| Build verification | Vite production build                 | —            | `npm run build`                        |
 
 ### Jest configuration
 
@@ -65,6 +65,11 @@ This document covers the actual test organization, harness patterns, and coverag
   network transfer. A 200 HTML rewrite is a failure, not an asset success.
 - `npm run build && npm run check:bundle` validates the complete eager JavaScript import graph (950 KB raw / 300 KB gzip), preventing chunk renaming from hiding growth.
 - `test/e2e/quality.spec.ts` covers font validity across all presets/modes, article contrast, narrow album layout and keyboard lightbox return, page landmarks, reveal actions, metadata navigation, and motion off/reduced behavior.
+- `test/e2e/cv-evidence.spec.ts` checks Stack evidence navigation with GitHub unavailable:
+  default/subtle/off motion, keyboard focus, direct links, reload, history, repeated and competing
+  destinations, story-mode precedence, and 320px/390px layouts. The entry-link case in
+  `asset-delivery.smoke.spec.ts` also runs against production desktop/mobile builds and the actual
+  `/portfolio` subpath deployment.
 
 ## Validation ownership
 
@@ -89,7 +94,7 @@ When another instruction file says to validate a change, it should point here ra
 | Route/navigation/not-found             | `npm run build` + direct-navigation check + relevant Playwright route coverage when present                                             |
 | Runtime-environment-sensitive behavior | `npm run build:e2e` + relevant Playwright or targeted validation                                                                        |
 | GitHub-backed CV/fallback data         | `npm run build` + mocked `/cv` success/failure coverage when present + browser validation                                               |
-| Asset-path or media-path change        | `npm run build` + `npm run test:e2e:assets` + `npm run test:e2e:assets:subpath`                                                            |
+| Asset-path or media-path change        | `npm run build` + `npm run test:e2e:assets` + `npm run test:e2e:assets:subpath`                                                         |
 
 ### Browser validation expectations
 
@@ -102,17 +107,22 @@ When another instruction file says to validate a change, it should point here ra
 - Prefer mocked `/cv` coverage over live GitHub API-dependent validation when that workflow is available.
 - If browser tooling is unavailable, run the narrowest fallback validation and report browser validation as deferred.
 - Close browser sessions when validation is finished.
-- Asset browser coverage checks actual `%PDF-` downloads from both resume controls,
+- Asset browser coverage checks actual `%PDF-` downloads from the CV actions menu,
   certificate click requests plus PDF response bodies, byte-range responses, and
   decoded album covers/tiles/lightbox images. It scrolls lazy images into view rather
   than confusing offscreen images with load failures, and uses reduced motion to
   isolate asset delivery from animation timing. Original-image recovery is exercised
   with both 404 and 200 HTML derivative responses; these UI-only fault tests block
   service workers so interception is deterministic.
+- Welcome-audio coverage checks that the local MP3 is not requested before Play,
+  advances its native playback clock, and pauses on desktop/mobile browsers at
+  root and subpath deployments. The welcome route suite also checks failed-load
+  retry, pause/resume across navigation, and paused entry after reload; provider
+  tests cover rejected/stalled playback and cancellation.
 - Production worker smoke tests separately verify real worker control, offline-cache
   behavior, and that missing PDFs stay errors instead of becoming HTML shells.
 - Mobile WebKit emulation does not reproduce the native iOS PDF viewer. Before a
-  release, also validate both PDF controls and photography on physical Safari,
+  release, also validate the resume menu, certificate links, and photography on physical Safari,
   including an existing worker-controlled session and a fresh session.
 
 ## Test organization
@@ -120,12 +130,12 @@ When another instruction file says to validate a change, it should point here ra
 ```mermaid
 flowchart TB
   subgraph Unit["test/unit/ (~125 files)"]
-    Providers["Root providers<br/>App · ThemeProvider<br/>CommandPalette · WelcomeAudio<br/>WelcomeOnboarding"]
+    Providers["Root providers<br/>App · ThemeProvider<br/>CommandPalette · WelcomeAudio"]
     Pages["Pages<br/>Home · CV · Climbing<br/>Photography · Blog · BlogPost · NotFound"]
     Components["Components<br/>AnimatedContentList · Header<br/>GlobalCommandPalette · PhotoAlbum<br/>+ cv/ blog/ ide/ header/ layout/ text/"]
     Hooks["Hooks<br/>data adapters · custom hooks"]
     Utils["Utilities<br/>date · sx · easing · assets · dom"]
-    Constants["Constants<br/>runtime env · routes · recovery"]
+    Constants["Constants<br/>routes · recovery"]
     Styles["Styles<br/>style builder outputs"]
     Data["Data modules<br/>schema validation"]
   end
@@ -203,18 +213,18 @@ Each route spec covers:
 
 ### Currently tested
 
-| Category                       | What's covered                                                                 | Test layer       |
-| ------------------------------ | ------------------------------------------------------------------------------ | ---------------- |
-| Provider state                 | Theme toggle, appearance, motion intensity, audio consent, palette state       | Unit             |
-| Route rendering                | All 6 routes render expected content                                           | Unit + E2E       |
-| Component APIs                 | Props, conditional rendering, data-driven content                              | Unit             |
-| Data hooks                     | Sorting, lookup, transformation, edge cases                                    | Unit             |
-| GitHub fallback                | Success and error API states, fallback rendering                               | E2E              |
-| Runtime environment resolution | `REACT_APP_RUNTIME_ENV` override and `NODE_ENV` fallback behavior              | Unit (constants) |
-| CV story mode                  | Story mode activation, scroll progress, active-section tracking, exit controls | Unit             |
-| Not-found recovery             | Recovery panel renders with contextual suggestions                             | Unit + E2E       |
-| Animation component contracts  | Delay props, tilt flag, visibility callbacks                                   | Unit             |
-| Style builder outputs          | Builder functions execute without error against theme                          | Unit             |
+| Category                      | What's covered                                                                 | Test layer   |
+| ----------------------------- | ------------------------------------------------------------------------------ | ------------ |
+| Provider state                | Theme toggle, appearance, motion intensity, audio consent, palette state       | Unit         |
+| Route rendering               | All 6 routes render expected content                                           | Unit + E2E   |
+| Component APIs                | Props, conditional rendering, data-driven content                              | Unit         |
+| Data hooks                    | Sorting, lookup, transformation, edge cases                                    | Unit         |
+| GitHub fallback               | Success and error API states, fallback rendering                               | E2E          |
+| Client environment reads      | `PUBLIC_URL`, `NODE_ENV`, GitHub development opt-in, and build metadata        | Unit (utils) |
+| CV story mode                 | Story mode activation, scroll progress, active-section tracking, exit controls | Unit         |
+| Not-found recovery            | Recovery panel renders with contextual suggestions                             | Unit + E2E   |
+| Animation component contracts | Delay props, tilt flag, visibility callbacks                                   | Unit         |
+| Style builder outputs         | Builder functions execute without error against theme                          | Unit         |
 
 ### Not currently tested (gaps)
 

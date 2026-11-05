@@ -32,6 +32,8 @@ import {
   resumeDownloadFilename,
   resumePdfUrl,
 } from '../data/cv';
+import { useCVEvidenceNavigation } from './cvEvidenceNavigation';
+import { resolveCVEntryTarget } from '../utils/cvEvidence';
 import { buildCVStoryItems } from '../data/cvStoryItems';
 import { siteRouteMap, cvStoryModeMetadata } from '../constants/siteRoutes';
 import type { CVMode } from '../constants/siteRoutes';
@@ -54,7 +56,8 @@ const nonAboutSectionIds = new Set<string>(
   cvSectionNavigationOrder.map((sectionKey) => cvSectionMetadata[sectionKey].id)
 );
 const shouldUnlockDeferredCVSections = (hash: string) =>
-  nonAboutSectionIds.has(hash.replace(/^#/, '').trim());
+  nonAboutSectionIds.has(hash.replace(/^#/, '').trim()) ||
+  Boolean(resolveCVEntryTarget(hash, codingExamples, experiences));
 
 export default function CV() {
   return <CVRouteContent />;
@@ -67,6 +70,7 @@ const CVRouteContent = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const cvMode = parseCVMode(searchParams.get('mode'));
   const isStoryMode = cvMode === 'story';
+  const evidenceNavigation = useCVEvidenceNavigation(isStoryMode);
 
   const documentMetadata = isStoryMode
     ? {
@@ -88,7 +92,7 @@ const CVRouteContent = () => {
   );
   const focusSectionsOnReveal = useRef(false);
   useEffect(() => {
-    if (!hasUnlockedDeferredSections) return;
+    if (!hasUnlockedDeferredSections || isStoryMode || evidenceNavigation.request) return;
     const hash = location.hash.replace(/^#/, '');
     const targetId = nonAboutSectionIds.has(hash)
       ? hash
@@ -112,7 +116,7 @@ const CVRouteContent = () => {
     };
     frameId = window.requestAnimationFrame(focusWhenVisible);
     return () => window.cancelAnimationFrame(frameId);
-  }, [hasUnlockedDeferredSections, location.hash]);
+  }, [hasUnlockedDeferredSections, location.hash, isStoryMode, evidenceNavigation.request]);
   const revealState = useCVRevealState({
     bio: aboutMe.bio,
     opportunities: aboutMe.opportunities ?? [],
@@ -124,10 +128,19 @@ const CVRouteContent = () => {
       return;
     }
 
-    if (scrolledPastHeaderCollapse || shouldUnlockDeferredCVSections(location.hash)) {
+    if (
+      evidenceNavigation.request ||
+      scrolledPastHeaderCollapse ||
+      shouldUnlockDeferredCVSections(location.hash)
+    ) {
       setHasUnlockedDeferredSections(true);
     }
-  }, [hasUnlockedDeferredSections, location.hash, scrolledPastHeaderCollapse]);
+  }, [
+    hasUnlockedDeferredSections,
+    location.hash,
+    scrolledPastHeaderCollapse,
+    evidenceNavigation.request,
+  ]);
 
   const handleToggleMode = useCallback(() => {
     setSearchParams(
@@ -202,15 +215,6 @@ const CVRouteContent = () => {
             Explore full CV
           </Button>
         )}
-        <Button
-          component="a"
-          href={resumePdfUrl}
-          download={resumeDownloadFilename}
-          startIcon={<DownloadIcon />}
-          variant="outlined"
-        >
-          Download resume
-        </Button>
         <Button component="a" href={`mailto:${aboutMe.email}`} startIcon={<EmailOutlinedIcon />}>
           Contact me
         </Button>
@@ -226,6 +230,8 @@ const CVRouteContent = () => {
     aboutActions: aboutSpeedDial,
     aboutFooterControls: aboutModeControls,
     currentWorkflowTools,
+    workflowSkillLinks: evidenceNavigation.skillLinks,
+    entryRequest: evidenceNavigation.request,
     experiences,
     education: educationInfo,
     volunteering,

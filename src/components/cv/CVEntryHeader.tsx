@@ -9,6 +9,7 @@ type CVEntryChip = {
 };
 
 type CVEntryHeaderProps = {
+  headingId?: string;
   title: string;
   organization: string;
   organizationUrl?: string;
@@ -20,6 +21,7 @@ type CVEntryHeaderProps = {
 };
 
 export const CVEntryHeader = ({
+  headingId,
   title,
   organization,
   organizationUrl,
@@ -44,7 +46,12 @@ export const CVEntryHeader = ({
   return (
     <Stack spacing={0.75} width="100%">
       <Box sx={cvEntryTitleRowSx}>
-        <Text role="cardTitle" sx={[cvEntryTitleTextSx, minWidthResetSx]}>
+        <Text
+          role="cardTitle"
+          id={headingId}
+          tabIndex={headingId ? -1 : undefined}
+          sx={[cvEntryTitleTextSx, minWidthResetSx]}
+        >
           {title}
         </Text>
         {dateRange && (

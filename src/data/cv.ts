@@ -1,6 +1,7 @@
 import type {
   AboutMe,
   CVStoryEndData,
+  CVStackEvidence,
   Certificate,
   CodingExample,
   EducationInfo,
@@ -34,9 +35,48 @@ export const currentWorkflowTools = [
   'Julia',
   'AWS',
   'React',
+  'Postgres',
   'Docker',
-  'GitHub Actions',
+  'Docker Compose',
+  'GitHub',
+  'Playwright',
+  'pre-commit',
 ];
+
+export const currentWorkflowEvidence: Partial<Record<string, CVStackEvidence>> = {
+  Python: {
+    target: { kind: 'coding', entryId: 'typewriter' },
+    accessibleLabel: 'Python — view Typewriter CLI case study',
+  },
+  TypeScript: {
+    target: { kind: 'coding', entryId: 'portfolio' },
+    accessibleLabel: 'TypeScript — view portfolio case study',
+  },
+  AWS: {
+    target: { kind: 'experience', entryId: 'lucerna-data-pipeline' },
+    accessibleLabel: 'AWS — view AWS work at Lucerna Health',
+  },
+  React: {
+    target: { kind: 'coding', entryId: 'portfolio' },
+    accessibleLabel: 'React — view portfolio case study',
+  },
+  Postgres: {
+    target: { kind: 'experience', entryId: 'lucerna-data-pipeline' },
+    accessibleLabel: 'Postgres — view PostgreSQL reconciliation work at Lucerna Health',
+  },
+  GitHub: {
+    target: { kind: 'coding', entryId: 'portfolio' },
+    accessibleLabel: 'GitHub — view portfolio case study',
+  },
+  Playwright: {
+    target: { kind: 'coding', entryId: 'portfolio' },
+    accessibleLabel: 'Playwright — view portfolio browser testing case study',
+  },
+  'pre-commit': {
+    target: { kind: 'coding', entryId: 'portfolio' },
+    accessibleLabel: 'pre-commit — view portfolio validation case study',
+  },
+};
 
 export const aboutMe: AboutMe = {
   name: 'Daniel Henderson',
@@ -59,40 +99,64 @@ Previously built ingestion, analytics, and ML solutions for a healthcare data pl
 
 export const codingExamples: CodingExample[] = [
   {
+    id: 'typewriter',
     title: 'typewriter CLI',
     description:
-      'Typewriter is a pip-installable CLI built on Typer and LibCST to normalize None-related type annotations while preserving formatting and comments.',
+      'A Python source-transformation tool for making None-related annotations consistent. I built a CLI around LibCST so developers can inspect a proposed diff before changing their files.',
     links: ['https://github.com/danphenderson/python-typewriter'],
     tabs: [
       {
-        value: 'purpose',
-        label: 'Purpose',
+        value: 'problem',
+        label: 'Problem',
         kind: 'list',
         items: [
-          'Normalize `Union[..., None]` and default-`None` annotations across Python source files.',
-          'Support dry-run auditing with unified diffs through `typewriter run ... --check`.',
-          'Handle file paths, directories, or in-memory snippets via `--code`.',
+          'A codebase can express the same optional value through Union, Optional, or a parameter with a None default. Updating those forms by hand creates repetitive work and makes a large change difficult to review.',
+          'The tool needs to distinguish Python syntax from surrounding comments and formatting, offer a preview, and make its supported transformations predictable. It is a focused codemod, not a general type-inference engine.',
         ],
       },
       {
-        value: 'rewrites',
-        label: 'Rewrites',
+        value: 'approach',
+        label: 'Approach',
         kind: 'list',
         items: [
-          'Rewrite `Union[T, None]` and related multi-type unions into `Optional[...]` forms.',
-          'Upgrade variable and parameter annotations to `Optional[...]` when the default value is `None`.',
-          'Add and deduplicate needed typing imports while preserving qualified references.',
+          'Use LibCST to operate on Python syntax with its concrete formatting representation, rather than applying text substitutions. The transformation also manages the typing imports needed by its output.',
+          'Expose file, directory, and in-memory input through Typer. A check mode prints unified diffs without writing; explicit application keeps the review and mutation steps separate.',
+          'Keep Optional-style output as the default and make Python 3.10+ union syntax an explicit target-version choice. Ignore patterns and gitignore support bound recursive runs to the intended source files.',
+        ],
+      },
+      {
+        value: 'results',
+        label: 'Results',
+        kind: 'list',
+        items: [
+          'Reproduced the committed CLI example: var: int = None becomes var: Optional[int] = None with the required import. The preview preserved the original file, application made the expected change, and a second check reported no further rewrite.',
+          'The CLI distinguishes a clean check, a proposed rewrite, and an error with separate exit codes. That makes the same review step usable locally and in automation.',
+          'These checks establish behavior for supported inputs, not semantic equivalence for arbitrary Python programs. Review the resulting diff before adopting a transformation across a codebase.',
+          [
+            { text: 'Inspect the ' },
+            {
+              text: 'CLI regression examples',
+              link: 'https://github.com/danphenderson/python-typewriter/blob/5d109085268e96af1acb1adbc441490d9ea07495/tests/test_cli.py',
+            },
+            { text: ' and ' },
+            {
+              text: 'transformation implementation',
+              link: 'https://github.com/danphenderson/python-typewriter/blob/5d109085268e96af1acb1adbc441490d9ea07495/typewriter/codemod.py',
+            },
+            { text: '.' },
+          ],
         ],
       },
       {
         value: 'stack',
         label: 'Stack',
         kind: 'skills',
-        skills: ['Python', 'Typer', 'LibCST', 'CLI tooling', 'Type annotations'],
+        skills: ['Python', 'LibCST', 'Typer', 'pytest', 'CLI tooling'],
       },
     ],
   },
   {
+    id: 'chromex',
     title: 'chromex Python Library',
     description:
       "An asynchronous interface for headless browser automation's that is built on bs4 and selenium.",
@@ -127,40 +191,77 @@ export const codingExamples: CodingExample[] = [
     ],
   },
   {
+    id: 'portfolio',
     title: 'Portfolio using React, TypeScript, and AWS',
     description:
-      'An interactive CV, climbing log, and photography galleries built with React + TypeScript + MUI and deployed on AWS using S3, CloudFront, and Route53.',
+      'A client-side portfolio that brings engineering work, an interactive CV, and photography into one static site. My work connects typed content, expressive motion, and dependable navigation through shared React components.',
     links: ['https://github.com/danphenderson/dev-danhenderson'],
     tabs: [
       {
-        value: 'product',
-        label: 'Product',
+        value: 'problem',
+        label: 'Problem',
         kind: 'list',
         items: [
-          'Power a static portfolio with home, CV, climbing, photography index, and album-detail routes.',
-          'Store portfolio content in local TypeScript data modules with GitHub-backed CV enrichment when available.',
-          'Include resume-style CV sections alongside climbing tick/todo data and photography collections.',
+          'The site needs to support both a quick scan of professional work and a more exploratory experience. Its CV, project details, and photography should remain usable across screen sizes and direct links.',
+          'Static hosting keeps the deployment simple, but the browser must handle routing, media paths, and optional remote data. Visual polish also has to respect motion preferences and keyboard navigation.',
         ],
       },
       {
-        value: 'architecture',
-        label: 'Architecture',
+        value: 'approach',
+        label: 'Approach',
         kind: 'list',
         items: [
-          'Use a React Router SPA with browser-handled routes and `PUBLIC_URL`-compatible asset handling.',
-          'Centralize CV animation behavior through shared wrappers and motion tokens instead of per-section timing.',
-          'Validate the app with Jest plus Playwright end-to-end tests against a production build.',
+          'Keep portfolio content in TypeScript data modules and compose pages from shared React components. That lets the standard CV and its story view present the same records without maintaining duplicate biographies.',
+          'Use shared motion primitives and theme style builders to coordinate reveals, tabs, and card interactions. The chosen motion stays part of the experience while off and reduced-motion preferences remain supported.',
+          'Resolve public assets relative to the deployment base path and retain bundled CV highlights when GitHub enrichment is unavailable. Those boundaries keep remote data and hosting details from becoming prerequisites for reading the page.',
+          'Use Playwright browser checks alongside unit tests, GitHub Actions workflows, and configured pre-commit checks. Browser checks exercise actual navigation and media delivery; unit tests isolate component and data behavior.',
         ],
       },
       {
-        value: 'cloud',
-        label: 'Cloud',
+        value: 'results',
+        label: 'Results',
+        kind: 'list',
+        items: [
+          'The same typed project content renders in the standard CV and story view. Visitors can use direct section links, download the resume, and browse photography while the site retains its client-side architecture.',
+          'Production asset checks exercise root and subpath deployments, PDF response bodies, and image recovery. These are reproducible validation results, not a claim that every physical device or network condition has been tested.',
+          [
+            { text: 'See the ' },
+            {
+              text: 'browser asset checks',
+              link: 'https://github.com/danphenderson/dev-danhenderson/blob/be7dddfd89bda3eae1db08e9483563403a19dd34/test/e2e/asset-delivery.smoke.spec.ts',
+            },
+            { text: ', ' },
+            {
+              text: 'CI workflow',
+              link: 'https://github.com/danphenderson/dev-danhenderson/blob/be7dddfd89bda3eae1db08e9483563403a19dd34/.github/workflows/build.yml',
+            },
+            { text: ', and ' },
+            {
+              text: 'pre-commit configuration',
+              link: 'https://github.com/danphenderson/dev-danhenderson/blob/be7dddfd89bda3eae1db08e9483563403a19dd34/.pre-commit-config.yaml',
+            },
+            { text: ' for concrete examples of that validation setup.' },
+          ],
+        ],
+      },
+      {
+        value: 'stack',
+        label: 'Stack',
         kind: 'skills',
-        skills: ['React', 'TypeScript', 'MUI', 'React Router', 'AWS S3', 'CloudFront', 'Route53'],
+        skills: [
+          'React',
+          'TypeScript',
+          'MUI',
+          'React Router',
+          'Playwright',
+          'GitHub Actions',
+          'pre-commit',
+        ],
       },
     ],
   },
   {
+    id: 'blockopt',
     title: 'BlockOpt.jl Julia Package',
     description:
       'An optim-style Julia package built with ForwardDiff.jl and TRS.jl that presents a novel scheme for an unconstrained Quasi-Newton minimization of a smooth objective function.',
@@ -201,6 +302,7 @@ export const codingExamples: CodingExample[] = [
     ],
   },
   {
+    id: 'uncnlprograms',
     title: 'UncNLPrograms.jl Julia Package',
     description:
       'A subset of high-dimensional, nonlinear, and unconstrained optimization problems from CUTEst in native Julia to test solvers using Automatic/Algorithmic Differentiation.',
@@ -249,6 +351,7 @@ export const codingExamples: CodingExample[] = [
     ],
   },
   {
+    id: 'masterplan',
     title: 'MasterPlan Java Application',
     description:
       'A Java application that allows users to create and manage a structure (directed acyclic graph) of tasks and corresponding subtasks.',
@@ -301,10 +404,18 @@ export const certificates: Certificate[] = [
 
 export const experiences: Experience[] = [
   {
+    company: 'Snorkel AI',
+    id: 'snorkel-expert-contributor',
+    title: 'Expert Contributor',
+    startDate: 'Jun 2026',
+    endDate: 'Present',
+  },
+  {
     company: 'Michigan Technological University',
     companyUrl: mtuGlobalCampusOrganizationUrl,
     companyTooltip: 'View Mathematical Sciences student directory page',
     industry: 'Higher Education',
+    id: 'mtu-graduate-research',
     title: 'Graduate Research Assistant',
     startDate: 'May 2025',
     endDate: 'Aug 2026 (1yr 4 mos)',
@@ -347,6 +458,7 @@ export const experiences: Experience[] = [
     companyUrl: mtuGlobalCampusOrganizationUrl,
     companyTooltip: 'View Mathematical Sciences student directory',
     industry: 'Higher Education',
+    id: 'mtu-instructor',
     title: 'Instructor',
     startDate: 'Jan 2025',
     endDate: 'May 2025 (5 mos)',
@@ -374,6 +486,7 @@ export const experiences: Experience[] = [
     companyUrl: mtuGlobalCampusOrganizationUrl,
     companyTooltip: 'View Mathematical Sciences student directory',
     industry: 'Higher Education',
+    id: 'mtu-teaching-assistant',
     title: 'Graduate Teaching Assistant',
     startDate: 'Aug 2024',
     endDate: 'Dec 2024 (5 mos)',
@@ -390,6 +503,7 @@ export const experiences: Experience[] = [
     companyUrl: 'https://getlucerna.com',
     companyTooltip: 'View company site',
     industry: 'HealthTech',
+    id: 'lucerna-data-pipeline',
     title: 'Data Pipeline Engineer',
     startDate: 'Apr 2022',
     endDate: 'Dec 2022 (9 mos)',
@@ -430,6 +544,7 @@ export const experiences: Experience[] = [
     companyUrl: 'https://getlucerna.com',
     companyTooltip: 'View company site',
     industry: 'HealthTech',
+    id: 'lucerna-data-scientist',
     title: 'Data Scientist | Contract',
     startDate: 'Nov 2021',
     endDate: 'Apr 2022 (6 mos)',
@@ -467,6 +582,7 @@ export const experiences: Experience[] = [
     companyUrl: mtuGlobalCampusOrganizationUrl,
     companyTooltip: 'View Mathematical Sciences student directory',
     industry: 'Higher Education',
+    id: 'mtu-research-assistant',
     title: 'Research Assistant | Full Time',
     startDate: 'May 2021',
     endDate: 'Nov 2021 (7 mos)',
@@ -520,6 +636,7 @@ export const experiences: Experience[] = [
     companyUrl: mtuGlobalCampusOrganizationUrl,
     companyTooltip: 'View Mathematical Sciences student directory',
     industry: 'Higher Education',
+    id: 'mtu-mathematics-tutor',
     title: 'Mathematics Tutor | Part Time',
     startDate: 'Sep 2015',
     endDate: 'May 2018 (2 yrs 9 mos)',
@@ -531,6 +648,7 @@ export const experiences: Experience[] = [
   {
     company: 'Various Locations',
     industry: 'Retail & Service',
+    id: 'bike-mechanic',
     title: 'Bike Mechanic & Service Technician',
     startDate: 'Various Periods Starting 2012',
     endDate: 'Aug 2024',

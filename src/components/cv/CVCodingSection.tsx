@@ -1,4 +1,4 @@
-import type { CodingExample } from '../../types/cv';
+import type { CodingExample, CVEntryRequest } from '../../types/cv';
 import type { AnimatedContentCardEntranceDirection } from '../../types/ui';
 import { cvSectionAnchorSx } from './cvSectionMetadata';
 import { CodingExamplesSection } from './CodingExamplesSection';
@@ -7,6 +7,7 @@ import { CVSectionCard } from './CVSectionCard';
 
 type CVCodingSectionProps = {
   examples: CodingExample[];
+  entryRequest?: CVEntryRequest;
   delayMs?: number;
   entranceDirection?: AnimatedContentCardEntranceDirection;
   triggerOnView?: boolean;
@@ -18,6 +19,7 @@ type CVCodingSectionProps = {
 
 export const CVCodingSection = ({
   examples,
+  entryRequest,
   delayMs = 0,
   entranceDirection,
   triggerOnView = true,
@@ -36,6 +38,10 @@ export const CVCodingSection = ({
     sx={cvSectionAnchorSx}
   >
     <SectionHeading overline="Coding Examples" />
-    <CodingExamplesSection examples={examples} startDelayMs={itemOffsetMs} />
+    <CodingExamplesSection
+      examples={examples}
+      entryRequest={entryRequest}
+      startDelayMs={itemOffsetMs}
+    />
   </CVSectionCard>
 );

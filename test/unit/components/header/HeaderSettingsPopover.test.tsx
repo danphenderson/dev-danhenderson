@@ -25,7 +25,6 @@ const renderSettingsPopover = (
         showAudioControl={false}
         isPlaying={false}
         onToggleAudio={jest.fn()}
-        highlightSettingsTrigger={false}
         {...props}
       />
     </ThemeProvider>
@@ -43,41 +42,29 @@ describe('HeaderSettingsPopover', () => {
     expect(screen.getByRole('button', { name: 'Open settings' })).toBeInTheDocument();
   });
 
-  it('marks the settings trigger as highlighted when the onboarding cue is active', () => {
-    renderSettingsPopover({ highlightSettingsTrigger: true });
+  it('announces loading and prevents duplicate playback requests', () => {
+    const onToggleAudio = jest.fn();
+    renderSettingsPopover({ showAudioControl: true, isAudioLoading: true, onToggleAudio });
+    fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
 
-    expect(screen.getByTestId('header-settings-trigger-halo')).toHaveAttribute(
-      'data-highlighted',
-      'true'
-    );
-    expect(screen.getByRole('button', { name: 'Open settings' })).toHaveAttribute(
-      'data-highlighted',
-      'true'
-    );
+    expect(screen.getByText('Loading audio…')).toHaveAttribute('aria-live', 'polite');
+    const play = screen.getByRole('button', { name: 'Play welcome audio' });
+    expect(play).toBeDisabled();
+    fireEvent.click(play);
+    expect(onToggleAudio).not.toHaveBeenCalled();
   });
 
-  it('keeps a static highlight ring visible when reduced motion is active', () => {
-    mockUseReducedMotion.mockReturnValue(true);
+  it('announces playback failure and leaves play available for retry', () => {
+    renderSettingsPopover({
+      showAudioControl: true,
+      audioError: 'Audio could not start. Please try again.',
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Open settings' }));
 
-    renderSettingsPopover({ highlightSettingsTrigger: true });
-
-    expect(screen.getByTestId('header-settings-trigger-highlight')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Open settings' })).toHaveAttribute(
-      'data-highlighted',
-      'true'
-    );
-  });
-
-  it('does not mark the settings trigger as highlighted by default', () => {
-    renderSettingsPopover();
-
-    expect(screen.getByTestId('header-settings-trigger-halo')).toHaveAttribute(
-      'data-highlighted',
-      'false'
-    );
-    expect(screen.getByRole('button', { name: 'Open settings' })).toHaveAttribute(
-      'data-highlighted',
-      'false'
+    expect(screen.getByRole('alert')).toHaveTextContent('Audio could not start. Please try again.');
+    expect(screen.getByRole('button', { name: 'Play welcome audio' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Play welcome audio' })).toHaveAccessibleDescription(
+      'Audio could not start. Please try again.'
     );
   });
 

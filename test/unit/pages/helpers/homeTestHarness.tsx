@@ -3,7 +3,6 @@ import { MemoryRouter } from 'react-router-dom';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { duration } from '../../../../src/motion/tokens';
 import { PREFERENCE_STORAGE_KEYS } from '../../../../src/theme/preferences';
-import { HEADER_SETTINGS_TRIGGER_ID } from '../../../../src/components/header/HeaderSettingsPopover';
 
 const AUTO_EXPAND_PULSE_DURATION_MS = Math.round(duration.slow * 1000);
 const mockScrollYProgress = { get: () => 0, on: () => () => {} };
@@ -108,41 +107,6 @@ jest.mock('motion/react', () => {
       }
 
       return { get: () => output[0], on: () => () => {} };
-    },
-  };
-});
-
-type MockWelcomeAudioState = {
-  play: () => Promise<void>;
-  pause: () => void;
-  isPlaying: boolean;
-  ready: boolean;
-  error?: string;
-  audioConsent: 'unknown' | 'granted' | 'declined';
-  grantAudioConsent: () => void;
-  declineAudioConsent: () => void;
-};
-
-const mockWelcomeAudioContext = React.createContext<MockWelcomeAudioState | null>(null);
-
-const MockWelcomeAudioProvider = ({
-  children,
-  value,
-}: {
-  children: React.ReactNode;
-  value: MockWelcomeAudioState;
-}) => <mockWelcomeAudioContext.Provider value={value}>{children}</mockWelcomeAudioContext.Provider>;
-
-jest.mock('../../../../src/WelcomeAudioProvider', () => {
-  const React = require('react');
-
-  return {
-    useWelcomeAudio: () => {
-      const value = React.useContext(mockWelcomeAudioContext);
-      if (!value) {
-        throw new Error('Missing mock welcome audio state.');
-      }
-      return value;
     },
   };
 });
@@ -317,85 +281,14 @@ jest.mock('../../../../src/components/BackgroundPaper', () => ({
 
 const ThemeProvider = require('../../../../src/ThemeProvider').default;
 const Home = require('../../../../src/pages/Home').default;
-const {
-  WelcomeOnboardingProvider,
-  useWelcomeOnboarding,
-  ONBOARDING_COMPLETED_STORAGE_KEY,
-} = require('../../../../src/WelcomeOnboardingProvider');
-
-const OnboardingStateProbe = () => {
-  const { onboardingCompleted, showCustomizeModal, showSettingsHint, completeOnboarding } =
-    useWelcomeOnboarding();
-
-  return (
-    <>
-      <button onClick={completeOnboarding} type="button">
-        Complete onboarding
-      </button>
-      <div data-testid="onboarding-completed">{String(onboardingCompleted)}</div>
-      <div data-testid="customize-modal-open">{String(showCustomizeModal)}</div>
-      <div data-testid="settings-hint-open">{String(showSettingsHint)}</div>
-    </>
+export const renderHomeRoute = () =>
+  render(
+    <MemoryRouter>
+      <ThemeProvider>
+        <Home />
+      </ThemeProvider>
+    </MemoryRouter>
   );
-};
-
-const HomeHarness = ({
-  initialAudioConsent = 'unknown',
-  error,
-}: {
-  initialAudioConsent?: MockWelcomeAudioState['audioConsent'];
-  error?: string;
-}) => {
-  const [audioConsent, setAudioConsent] =
-    React.useState<MockWelcomeAudioState['audioConsent']>(initialAudioConsent);
-  const [isPlaying, setIsPlaying] = React.useState(initialAudioConsent === 'granted');
-  const pause = React.useMemo(() => jest.fn(() => setIsPlaying(false)), []);
-  const grantAudioConsent = React.useMemo(() => jest.fn(), []);
-
-  const play = React.useCallback(async () => {
-    setAudioConsent('granted');
-    setIsPlaying(true);
-  }, []);
-
-  const declineAudioConsent = React.useCallback(() => {
-    setAudioConsent('declined');
-  }, []);
-
-  return (
-    <MockWelcomeAudioProvider
-      value={{
-        play,
-        pause,
-        isPlaying,
-        ready: true,
-        error,
-        audioConsent,
-        grantAudioConsent,
-        declineAudioConsent,
-      }}
-    >
-      <MemoryRouter>
-        <ThemeProvider>
-          <WelcomeOnboardingProvider>
-            <button id={HEADER_SETTINGS_TRIGGER_ID} type="button">
-              Header settings anchor
-            </button>
-            <Home />
-            <OnboardingStateProbe />
-          </WelcomeOnboardingProvider>
-        </ThemeProvider>
-      </MemoryRouter>
-    </MockWelcomeAudioProvider>
-  );
-};
-
-export const renderHomeRoute = ({
-  initialAudioConsent = 'unknown',
-  error,
-}: {
-  initialAudioConsent?: MockWelcomeAudioState['audioConsent'];
-  error?: string;
-} = {}) => render(<HomeHarness initialAudioConsent={initialAudioConsent} error={error} />);
 
 export const expectTerminalLinesStructure = (element: HTMLElement) => {
   const dataLines = element.getAttribute('data-lines') ?? '';
@@ -407,9 +300,8 @@ export const expectTerminalLinesStructure = (element: HTMLElement) => {
 };
 
 export const renderHomeWithHeroVisible = async () => {
-  window.localStorage.setItem(ONBOARDING_COMPLETED_STORAGE_KEY, 'true');
   window.localStorage.setItem('danhenderson-welcome-audio-consent', 'declined');
-  renderHomeRoute({ initialAudioConsent: 'declined' });
+  renderHomeRoute();
 
   await waitFor(() =>
     expect(screen.getByTestId('hero-card')).toHaveAttribute('data-visible', 'true')
@@ -523,9 +415,4 @@ export const resetHomeTestEnvironment = () => {
   window.localStorage.clear();
 };
 
-export {
-  AUTO_EXPAND_PULSE_DURATION_MS,
-  Home,
-  ONBOARDING_COMPLETED_STORAGE_KEY,
-  PREFERENCE_STORAGE_KEYS,
-};
+export { AUTO_EXPAND_PULSE_DURATION_MS, Home, PREFERENCE_STORAGE_KEYS };

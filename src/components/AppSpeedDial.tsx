@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useRef, useState } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import SpeedDial from '@mui/material/SpeedDial';
 import SpeedDialAction from '@mui/material/SpeedDialAction';
@@ -61,6 +61,7 @@ export const AppSpeedDial = ({
   sx,
 }: AppSpeedDialProps) => {
   const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
   const { duration: dFactor } = useMotionScale();
   const SPEED_DIAL_BASE_DURATION_MS = 200;
   const speedDialTransitionDuration =
@@ -70,7 +71,9 @@ export const AppSpeedDial = ({
     setOpen(true);
   };
 
-  const handleClose: NonNullable<SpeedDialProps['onClose']> = () => {
+  const handleClose: NonNullable<SpeedDialProps['onClose']> = (_event, reason) => {
+    // Keyboard focus and touch-generated hover must not dismiss an active menu.
+    if (reason === 'mouseLeave' && rootRef.current?.contains(document.activeElement)) return;
     setOpen(false);
   };
 
@@ -107,6 +110,7 @@ export const AppSpeedDial = ({
 
   return (
     <SpeedDial
+      ref={rootRef}
       ariaLabel={ariaLabel}
       direction={direction}
       open={open}

@@ -77,7 +77,7 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
   const shouldRenderWithoutEntranceDelay = skipEntranceAnimation || dFactor === 0;
 
   useEffect(() => {
-    if (skipEntranceAnimation) {
+    if (skipEntranceAnimation || dFactor === 0) {
       if (!hasTriggered) {
         setHasTriggered(true);
       }
@@ -114,6 +114,7 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
     observer.observe(node);
     return () => observer.disconnect();
   }, [
+    dFactor,
     hasTriggered,
     isVisibilityControlled,
     rootMargin,
@@ -161,7 +162,9 @@ const AnimatedCard = <RootComponent extends ElementType = 'div'>({
     visible,
   ]);
 
-  const isEligibleToShow = isVisibilityControlled ? Boolean(visible) : hasTriggered;
+  const isEligibleToShow = isVisibilityControlled
+    ? Boolean(visible)
+    : dFactor === 0 || hasTriggered;
   const isRenderedVisible = shouldRenderWithoutEntranceDelay ? isEligibleToShow : isVisible;
 
   useEffect(() => {

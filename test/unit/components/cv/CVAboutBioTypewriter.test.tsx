@@ -5,6 +5,13 @@ import { createAppTheme } from '../../../../src/theme/createAppTheme';
 import { CVAboutBioTypewriter } from '../../../../src/components/cv/CVAboutBioTypewriter';
 import type { AboutMe } from '../../../../src/types/cv';
 
+let mockReducedMotion = false;
+
+jest.mock('motion/react', () => ({
+  ...jest.requireActual('motion/react'),
+  useReducedMotion: () => mockReducedMotion,
+}));
+
 const defaultIntersectionObserver = window.IntersectionObserver;
 let handleIntersection: IntersectionObserverCallback | undefined;
 
@@ -104,6 +111,62 @@ describe('CVAboutBioTypewriter', () => {
     jest.clearAllTimers();
     jest.useRealTimers();
     jest.restoreAllMocks();
+    mockReducedMotion = false;
+  });
+
+  it.each([
+    ['off', false],
+    ['default', true],
+  ] as const)(
+    'skips observer and start delays for motion %s and reduced motion %s',
+    (level, reduced) => {
+      jest.useFakeTimers();
+      mockReducedMotion = reduced;
+      const onComplete = jest.fn();
+      const { container } = render(
+        <MuiThemeProvider theme={createAppTheme('light', 'evergreen', level)}>
+          <CVAboutBioTypewriter
+            about={aboutWithRichBio}
+            startDelayMs={500}
+            onComplete={onComplete}
+          />
+        </MuiThemeProvider>
+      );
+
+      expect(getLayer(container, 'animated').textContent).toBe(aboutWithRichBio.bio);
+      expect(window.IntersectionObserver).not.toHaveBeenCalled();
+      expect(onComplete).toHaveBeenCalledTimes(1);
+      expect(jest.getTimerCount()).toBe(0);
+    }
+  );
+
+  it('cancels the pending start delay when motion is disabled and does not replay when restored', () => {
+    jest.useFakeTimers();
+    const onComplete = jest.fn();
+    const content = (
+      <CVAboutBioTypewriter about={aboutWithRichBio} startDelayMs={500} onComplete={onComplete} />
+    );
+    const { container, rerender } = render(
+      <MuiThemeProvider theme={theme}>{content}</MuiThemeProvider>
+    );
+    triggerEnterView();
+    expect(getLayer(container, 'animated').textContent).toBe('');
+    expect(jest.getTimerCount()).toBe(1);
+
+    rerender(
+      <MuiThemeProvider theme={createAppTheme('light', 'evergreen', 'off')}>
+        {content}
+      </MuiThemeProvider>
+    );
+
+    expect(getLayer(container, 'animated').textContent).toBe(aboutWithRichBio.bio);
+    expect(jest.getTimerCount()).toBe(0);
+    expect(onComplete).toHaveBeenCalledTimes(1);
+
+    rerender(<MuiThemeProvider theme={theme}>{content}</MuiThemeProvider>);
+    expect(getLayer(container, 'animated').textContent).toBe(aboutWithRichBio.bio);
+    expect(jest.getTimerCount()).toBe(0);
+    expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
   it('stays empty before the bio enters view and keeps the reserve layer fully hidden', () => {
@@ -196,5 +259,4 @@ describe('CVAboutBioTypewriter', () => {
     expect(container.querySelector('[data-typewriter-layer="accessible"]')).toBeNull();
     expect(window.IntersectionObserver).not.toHaveBeenCalled();
   });
-
 });

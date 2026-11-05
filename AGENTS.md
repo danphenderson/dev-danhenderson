@@ -30,7 +30,7 @@ Prefer changes that preserve the current single-page-app architecture and static
 - `src/components/blog/AGENTS.md` — editorial blog subsystem rules and blog-specific validation
 - `src/data/AGENTS.md` — content source-of-truth modules, schema discipline, and protected datasets
 - `src/hooks/AGENTS.md` — adapter-layer boundaries, fallback behavior, and shared hook rules
-- `src/constants/AGENTS.md` — route metadata, runtime-environment helpers, command palette data, and recovery logic
+- `src/constants/AGENTS.md` — route metadata, command palette data, and recovery logic
 - `src/motion/AGENTS.md` — motion foundation, timing rules, and Motion-library boundaries
 - `src/styles/AGENTS.md` — style builders, keyframes, and CSS animation ownership
 - `src/theme/AGENTS.md` — appearance presets, theme assembly, and token ownership
@@ -133,7 +133,7 @@ Notes:
 - `src/motion/`: unified animation foundation — duration tokens, easing, variants, and animated primitives
 - `src/styles/`: theme-conditioned style maps, Emotion keyframes, and spring-easing constants
 - `src/theme/`: MUI theme assembly and appearance-preset system
-- `src/constants/`: build-time stable config — route definitions, runtime-environment helpers, command palette registry, recovery scoring
+- `src/constants/`: build-time stable config — route definitions, command palette registry, recovery scoring
 - `src/utils/`: pure, framework-agnostic helper functions
 - `test/e2e/`: Playwright end-to-end specs and helpers when the branch includes browser integration tests
 - `test/unit/`: Jest unit and component tests

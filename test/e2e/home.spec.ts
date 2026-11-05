@@ -125,22 +125,25 @@ const resetHomeScrollForScreenshot = async (page: Page, terminalHero: Locator) =
 };
 
 test.describe('Home page', () => {
-  test('keeps optional preferences open while a control has focus', async ({ page }) => {
-    await resetWelcomeState(page);
-    await page.clock.install({ time: HOME_SCREENSHOT_CLOCK_START });
-    await page.goto('/');
-    await expectImmediateHome(page);
-    await expect(page.getByRole('link', { name: 'Explore my CV' })).toBeVisible();
-    await page.getByRole('button', { name: 'Customize appearance & audio' }).click();
-    const preferences = page.getByRole('region', { name: 'Make yourself at home' });
-    await preferences.getByRole('button', { name: 'Off', exact: true }).focus();
-    await expect(page.getByRole('button', { name: 'Off', exact: true })).toBeFocused();
-    await expect(page.getByText('Take your time — this stays open while you choose.')).toBeVisible();
-    await page.clock.runFor(10_000);
-    await expect(preferences).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(preferences).toBeHidden();
-  });
+  for (const width of [1440, 390]) {
+    test(`shows only the CV intro action at ${width}px`, async ({ page }) => {
+      await page.setViewportSize({ width, height: 900 });
+      await resetWelcomeState(page);
+      await page.goto('/');
+      await expectImmediateHome(page);
+      await expect(page.getByRole('link', { name: 'View projects' })).toHaveCount(0);
+      await expect(page.getByRole('button', { name: 'Customize appearance & audio' })).toHaveCount(
+        0
+      );
+      const introAction = page.getByRole('link', { name: 'Explore my CV' });
+      const bounds = await getBounds(introAction);
+      expect(bounds.x).toBeGreaterThanOrEqual(0);
+      expect(bounds.x + bounds.width).toBeLessThanOrEqual(width);
+      await expect(
+        page.getByRole('heading', { name: 'Daniel Henderson', exact: true })
+      ).toBeVisible();
+    });
+  }
 
   test('renders hero content without a welcome sequence', async ({ page }) => {
     await resetWelcomeState(page);
@@ -172,7 +175,7 @@ test.describe('Home page', () => {
     await expect(getWindowedTerminalHero(page)).toHaveCount(0);
   });
 
-  test('renders the desktop AppBar navigation and keeps audio recovery available after onboarding', async ({
+  test('renders the desktop AppBar navigation and keeps audio recovery available', async ({
     page,
   }) => {
     await resetWelcomeState(page);
@@ -181,13 +184,7 @@ test.describe('Home page', () => {
     const siteNavigation = page.locator('#site-navigation');
     const settingsTrigger = page.getByTestId('header-settings-trigger');
 
-    await page.getByRole('button', { name: 'Customize appearance & audio' }).click();
-
-    const preferences = page.getByRole('region', { name: 'Make yourself at home' });
-    await expect(preferences).toBeVisible();
-    await preferences.getByRole('button', { name: 'Explore now' }).click();
-    await expect(preferences).toBeHidden();
-    await expect(settingsTrigger).toHaveAttribute('data-highlighted', 'false');
+    await expect(settingsTrigger).toBeVisible();
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
 
     await expect(siteNavigation).toBeVisible();
@@ -555,7 +552,9 @@ test.describe('Home page', () => {
     expect(Math.abs(resizedHeight - initialHeight)).toBeLessThanOrEqual(2);
   });
 
-  test('keeps the settled IDE mounted and stationary after motion preferences change', async ({ page }) => {
+  test('keeps the settled IDE mounted and stationary after motion preferences change', async ({
+    page,
+  }) => {
     await page.goto('/');
     const hero = getWindowedTerminalHero(page);
     await expect(hero).toHaveAttribute('data-playing', 'true');

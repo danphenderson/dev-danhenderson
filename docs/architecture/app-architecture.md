@@ -10,23 +10,23 @@ Providers are ordered from outermost (root) to innermost (content):
 flowchart TB
   Root["ReactDOM.createRoot(#root)"]
   TP["ThemeProvider<br/>mode · appearance · motionIntensity<br/>→ MuiThemeProvider + CssBaseline"]
-  WO["WelcomeOnboardingProvider<br/>first-visit hint dialogs"]
-  WA["WelcomeAudioProvider<br/>SoundCloud widget + consent model"]
+  WA["WelcomeAudioProvider<br/>local audio playback + errors"]
   App["App<br/>BrowserRouter + PUBLIC_URL basename"]
   CP["CommandPaletteProvider<br/>global Cmd+K palette state"]
   Shell["Layout shell"]
 
-  Root --> TP --> WO --> WA --> App --> CP --> Shell
+  Root --> TP --> WA --> App --> CP --> Shell
 ```
 
 ### Provider responsibilities
 
-| Provider                    | State                                                                                 | Persistence                           | Hook                     |
-| --------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------- | ------------------------ |
-| `ThemeProvider`             | Palette mode (light/dark), appearance preset (6 options), motion intensity (4 levels) | Three independent `localStorage` keys | `useAppTheme()`          |
-| `WelcomeOnboardingProvider` | Pause-motion hint, dark-mode hint                                                     | Session-scoped (no persistence)       | `useWelcomeOnboarding()` |
-| `WelcomeAudioProvider`      | Audio consent (unknown/granted/declined), playback state, widget lifecycle            | `localStorage` consent key            | `useWelcomeAudio()`      |
-| `CommandPaletteProvider`    | Open/close state, search query                                                        | None                                  | `useCommandPalette()`    |
+| Provider                 | State                                                                                 | Persistence                           | Hook                  |
+| ------------------------ | ------------------------------------------------------------------------------------- | ------------------------------------- | --------------------- |
+| `ThemeProvider`          | Palette mode (light/dark), appearance preset (6 options), motion intensity (4 levels) | Three independent `localStorage` keys | `useAppTheme()`       |
+| `WelcomeAudioProvider`   | Native audio lifecycle, playback state, playback errors                               | Explicit-play consent key             | `useWelcomeAudio()`   |
+| `CommandPaletteProvider` | Open/close state, search query                                                        | None                                  | `useCommandPalette()` |
+
+`useWelcomeAudio()` exposes `play`, `pause`, `isPlaying`, and `error`. A hidden native audio element loads `public/assets/verse.mp3` through `resolvePublicAssetPath()` only after explicit Play. Playback stays paused on every page load, including for stored consent. Explicit Play records consent for compatibility; Pause preserves position, and looping playback persists across client-side route changes. The provider confirms native playback, bounds stalled starts to eight seconds, and reports failures. Header settings owns pending-request feedback and displays recoverable errors.
 
 **Key constraint:** `ThemeProvider` must remain outermost because all downstream providers and components depend on MUI's `ThemeProvider` for `useTheme()` access. `CommandPaletteProvider` wraps only `AppContent`, not the root — it doesn't need theme context consumers above it.
 
@@ -151,16 +151,19 @@ Pages own orchestration state. Shared components are intentionally stateless or 
 | Tab/accordion expanded state  | Feature component (e.g., `ExperienceList`) | Page                                   |
 | Story mode navigation         | `CVStoryViewer`                            | `CV.tsx` (delegates)                   |
 | IDE window state              | `Home.tsx` (drag/resize/expand)            | `TerminalHeroContent` (receives props) |
-| Audio prompt flow             | `useHomeWelcomeSequence()` hook            | Page (consumes)                        |
+| Audio playback                | `WelcomeAudioProvider` (header controls)   | Route pages                            |
 | Search/filter state           | Page-local state                           | Data hooks (return full datasets)      |
 
-## Runtime environment helpers
+CV entry navigation is owned by `src/pages/cvEvidenceNavigation.ts`. Optional stable IDs in the
+CV data identify project and experience anchors; the explicit Stack evidence map selects supported
+destinations. Shared chip rendering accepts optional router-link metadata, leaving plain consumers
+unchanged. The route coordinates mounting, scrolling, visibility, focus, and history through the
+existing reveal signals. Entry requests select a detail once; subsequent tab interaction remains
+owned by the section. Explicit story mode takes precedence over entry hashes.
 
-`src/constants/runtimeEnvironment.ts` resolves the app runtime environment from `REACT_APP_RUNTIME_ENV` and `NODE_ENV`.
+## Runtime environment
 
-- `resolveAppRuntimeEnvironment()` returns `development`, `test`, or `production`
-- `appRuntimeEnvironment` exposes the resolved value for modules that need it
-- Current route exposure is public; the runtime helper is used for environment-sensitive client behavior such as development-only welcome-sequence reset logic
+The build toolchain retains `REACT_APP_RUNTIME_ENV` metadata for production/test build variants. Active client environment reads use `src/utils/appEnvironment.ts` for asset paths, Node environment, GitHub development opt-in, and build metadata. Route exposure is public, and audio stays paused on page load in every environment.
 
 ## Cross-cutting concerns
 
@@ -171,7 +174,7 @@ Pages own orchestration state. Shared components are intentionally stateless or 
 | Accessibility      | Skip links, keyboard-navigable tab panels, ARIA roles              | App shell + `TabPanel` + components               |
 | Error recovery     | `RouteRecoveryPanel` with contextual route suggestions             | NotFound page + blog/photography not-found states |
 | GitHub degradation | `useGithubProfile()` falls back to bundled data on API failure     | `src/hooks/useGithubProfile.ts`                   |
-| Static assets      | `PUBLIC_URL`-compatible paths via `src/utils/assets.ts`            | All image/PDF references                          |
+| Static assets      | `PUBLIC_URL`-compatible paths via `src/utils/assets.ts`            | Image, PDF, and local audio references            |
 
 ## Where new features should go
 

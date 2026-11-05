@@ -1,8 +1,15 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import ThemeProvider from '../../../../src/ThemeProvider';
+import ThemeProvider, { useAppTheme } from '../../../../src/ThemeProvider';
 import { CVAboutSection } from '../../../../src/components/cv/CVAboutSection';
 import { cvSectionMetadata } from '../../../../src/components/cv/cvSectionMetadata';
+
+let mockReducedMotion = false;
+
+jest.mock('motion/react', () => ({
+  ...jest.requireActual('motion/react'),
+  useReducedMotion: () => mockReducedMotion,
+}));
 
 jest.mock('../../../../src/motion', () => {
   const actual = jest.requireActual('../../../../src/motion');
@@ -55,12 +62,14 @@ jest.mock('../../../../src/components/cv/CVSectionCard', () => ({
 jest.mock('../../../../src/components/cv/ProfileCard', () => ({
   ProfileCard: ({
     actions,
+    bioRevealed,
     onBioAnimationComplete,
   }: {
     actions?: ReactNode;
+    bioRevealed?: boolean;
     onBioAnimationComplete?: () => void;
   }) => (
-    <div data-testid="profile-card">
+    <div data-testid="profile-card" data-bio-revealed={String(Boolean(bioRevealed))}>
       {actions}
       <button type="button" onClick={onBioAnimationComplete}>
         Complete bio animation
@@ -112,8 +121,18 @@ jest.mock('../../../../src/components/text', () => {
   };
 });
 
-const currentWorkflowTypewriterTestId = 'typewriter-Current workflow:';
+const currentWorkflowTypewriterTestId = 'typewriter-Stack:';
 const opportunitiesTypewriterTestId = 'typewriter-Open to opportunities:';
+
+const MotionControls = () => {
+  const { setMotionIntensity } = useAppTheme();
+  return (
+    <>
+      <button onClick={() => setMotionIntensity('off')}>Disable motion</button>
+      <button onClick={() => setMotionIntensity('default')}>Enable motion</button>
+    </>
+  );
+};
 
 const getSkillsChipListByText = (
   text: string,
@@ -131,6 +150,7 @@ const getSkillsChipListByText = (
 const renderAboutSection = (overrides?: Partial<Parameters<typeof CVAboutSection>[0]>) =>
   render(
     <ThemeProvider>
+      <MotionControls />
       <CVAboutSection
         about={{
           name: 'Dan',
@@ -155,6 +175,74 @@ const renderAboutSection = (overrides?: Partial<Parameters<typeof CVAboutSection
 describe('CVAboutSection', () => {
   afterEach(() => {
     jest.useRealTimers();
+    localStorage.clear();
+    mockReducedMotion = false;
+  });
+
+  it.each([
+    ['off', false],
+    ['default', true],
+  ] as const)(
+    'reveals all About content immediately for motion %s and reduced motion %s',
+    (level, reduced) => {
+      jest.useFakeTimers();
+      localStorage.setItem('danhenderson-motion', level);
+      mockReducedMotion = reduced;
+      const onRevealComplete = jest.fn();
+
+      renderAboutSection({ onRevealComplete });
+
+      expect(screen.getByTestId('profile-card')).toHaveAttribute('data-bio-revealed', 'true');
+      expect(screen.queryByTestId(opportunitiesTypewriterTestId)).not.toBeInTheDocument();
+      expect(screen.queryByTestId(currentWorkflowTypewriterTestId)).not.toBeInTheDocument();
+      expect(screen.getByTestId('opportunities-chip-list')).toHaveAttribute('data-in', 'true');
+      expect(screen.getByTestId('workflow-skills-chip-list')).toHaveAttribute('data-in', 'true');
+      expect(onRevealComplete).toHaveBeenCalledTimes(1);
+      expect(jest.getTimerCount()).toBe(0);
+    }
+  );
+
+  it('cancels a pending workflow reveal when motion is disabled and completes only once', () => {
+    jest.useFakeTimers();
+    const onRevealComplete = jest.fn();
+    renderAboutSection({ onRevealComplete });
+    fireEvent.click(screen.getByRole('button', { name: 'Complete bio animation' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Complete Open to opportunities:' }));
+    expect(jest.getTimerCount()).toBeGreaterThan(0);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Disable motion' }));
+
+    expect(screen.getByTestId('workflow-skills-chip-list')).toHaveAttribute('data-in', 'true');
+    expect(onRevealComplete).toHaveBeenCalledTimes(1);
+    expect(jest.getTimerCount()).toBe(0);
+    act(() => jest.runOnlyPendingTimers());
+    expect(onRevealComplete).toHaveBeenCalledTimes(1);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Enable motion' }));
+    expect(screen.getByTestId('profile-card')).toHaveAttribute('data-bio-revealed', 'true');
+    expect(screen.queryByTestId(opportunitiesTypewriterTestId)).not.toBeInTheDocument();
+    expect(screen.queryByTestId(currentWorkflowTypewriterTestId)).not.toBeInTheDocument();
+    expect(onRevealComplete).toHaveBeenCalledTimes(1);
+    expect(jest.getTimerCount()).toBe(0);
+  });
+
+  it('scales the workflow wait with subtle motion', () => {
+    jest.useFakeTimers();
+    localStorage.setItem('danhenderson-motion', 'subtle');
+    renderAboutSection();
+    fireEvent.click(screen.getByRole('button', { name: 'Complete bio animation' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Complete Open to opportunities:' }));
+
+    act(() => jest.advanceTimersByTime(179));
+    expect(screen.getByTestId(currentWorkflowTypewriterTestId)).toHaveAttribute(
+      'data-playing',
+      'false'
+    );
+    act(() => jest.advanceTimersByTime(1));
+    expect(screen.getByTestId(currentWorkflowTypewriterTestId)).toHaveAttribute(
+      'data-playing',
+      'true'
+    );
   });
 
   it('renders the About section inside a MotionTiltCard with the configured intensity', () => {
@@ -221,9 +309,9 @@ describe('CVAboutSection', () => {
       'data-playing',
       'true'
     );
-    expect(screen.getByText('Current workflow:')).toBeInTheDocument();
+    expect(screen.getByText('Stack:')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Complete Current workflow:' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Complete Stack:' }));
 
     expect(getSkillsChipListByText('Python, React', 'workflow-skills-chip-list')).toHaveAttribute(
       'data-in',
@@ -265,7 +353,7 @@ describe('CVAboutSection', () => {
       'true'
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Complete Current workflow:' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Complete Stack:' }));
 
     expect(getSkillsChipListByText('Python, React', 'workflow-skills-chip-list')).toHaveAttribute(
       'data-in',

@@ -37,8 +37,7 @@ If multiple documents overlap, prefer the canonical owner above and then the nea
 flowchart TB
   subgraph Providers["Root providers"]
     TP[ThemeProvider<br/>mode · appearance · motion intensity]
-    WO[WelcomeOnboardingProvider<br/>first-visit hints]
-    WA[WelcomeAudioProvider<br/>audio consent + playback]
+    WA[WelcomeAudioProvider<br/>local audio playback]
   end
 
   subgraph Shell["App shell"]

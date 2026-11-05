@@ -25,7 +25,7 @@ flowchart TB
 
 ## Home (`/`)
 
-Home presents identity and CV/projects links immediately, alongside a faux-VS Code IDE. The optional, nonmodal preferences panel opens from “Customize appearance & audio”, which acts as a disclosure toggle (`aria-expanded`/`aria-controls`). It dismisses after five idle seconds; hover or keyboard focus pauses the timer. Keyboard or assistive-technology activation moves focus into the panel; pointer activation leaves focus on the opener. Escape, click-away, or either dismiss button closes it; keyboard dismissal restores focus to its Customize opener, and header settings remain available. Audio starts only after explicit play. The IDE remains windowed until explicitly expanded; close, minimize, restore, drag, and resize remain available. Off/reduced motion settles the hero immediately and shows a stable terminal transcript.
+Home presents identity and the Explore my CV link immediately, alongside a faux-VS Code IDE. Appearance, motion, and audio controls are available in header settings. Audio starts only after explicit play. The IDE remains windowed until explicitly expanded; close, minimize, restore, drag, and resize remain available. Off/reduced motion settles the hero immediately and shows a stable terminal transcript.
 
 ### Assembly
 
@@ -38,7 +38,7 @@ flowchart TB
   ACC["AnimatedContentCard<br/>fade-in reveal"]
   THC["TerminalHeroContent<br/>VS Code shell:<br/>title bar · activity bar · explorer<br/>editor pane · terminal · status bar"]
   ScrollP["Scroll parallax<br/>heroScale (1→1.08)<br/>heroOpacity (1→0.6)"]
-  Intro["Identity + CV/projects links<br/>optional customization button"]
+  Intro["Identity + Explore my CV link"]
   Portal["Expanded IDE portal<br/>fixed fullscreen"]
 
   BG --> HMP --> DragDiv --> Tilt --> ACC --> THC
@@ -74,14 +74,13 @@ sequenceDiagram
 
 ### Page-owned state
 
-| State                  | Purpose                                                     |
-| ---------------------- | ----------------------------------------------------------- |
-| `ideWindowState`       | normal / minimized / expanded                               |
-| `ideWindowSize`        | width × height for resize                                   |
-| Drag constraints       | Bound to hero container via `heroBoundsRef`                 |
-| Typewriter playing     | Triggered by `HeroMotionPath` completion                    |
-| Scroll transforms      | `heroScale` and `heroOpacity` from scroll progress          |
-| Optional customization | `useHomeWelcomeSequence()`; opened by the user; five-second idle timer paused during interaction |
+| State              | Purpose                                            |
+| ------------------ | -------------------------------------------------- |
+| `ideWindowState`   | normal / minimized / expanded                      |
+| `ideWindowSize`    | width × height for resize                          |
+| Drag constraints   | Bound to hero container via `heroBoundsRef`        |
+| Typewriter playing | Triggered by `HeroMotionPath` completion           |
+| Scroll transforms  | `heroScale` and `heroOpacity` from scroll progress |
 
 ### IDE window interactions
 

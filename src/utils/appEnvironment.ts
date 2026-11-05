@@ -38,10 +38,6 @@ export const readNodeEnvironment = (
   env: AppEnvironmentSource = readDefaultEnvironmentSource()
 ): string => env.NODE_ENV ?? 'development';
 
-export const readRuntimeEnvironmentOverride = (
-  env: AppEnvironmentSource = readDefaultEnvironmentSource()
-): string | undefined => env.REACT_APP_RUNTIME_ENV;
-
 export const isGitHubApiEnabledInDevelopment = (
   env: AppEnvironmentSource = readDefaultEnvironmentSource()
 ): boolean => env.REACT_APP_ENABLE_GITHUB_API_IN_DEV === 'true';

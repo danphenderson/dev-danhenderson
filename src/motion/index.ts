@@ -14,7 +14,6 @@ export {
   cssDuration,
   easing,
   stagger,
-  transition,
   springOptions,
   scaleDuration,
   scaleStagger,

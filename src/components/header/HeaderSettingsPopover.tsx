@@ -9,7 +9,6 @@ import MotionPhotosAutoOutlinedIcon from '@mui/icons-material/MotionPhotosAutoOu
 import MotionPhotosOffOutlinedIcon from '@mui/icons-material/MotionPhotosOffOutlined';
 import SlowMotionVideoOutlinedIcon from '@mui/icons-material/SlowMotionVideoOutlined';
 import {
-  Badge,
   Box,
   Divider,
   IconButton,
@@ -31,7 +30,6 @@ import {
 } from '../../theme/appAppearance';
 import { cssDuration } from '../../motion/tokens';
 import { useMotionScale } from '../../motion';
-import { pulseRing } from '../../styles/animations';
 import { SPRING_EASING_CSS } from '../../styles/springEasing';
 import { Text } from '../text';
 
@@ -134,9 +132,9 @@ export type HeaderSettingsPopoverProps = {
   /* Audio */
   showAudioControl: boolean;
   isPlaying: boolean;
+  isAudioLoading?: boolean;
+  audioError?: string;
   onToggleAudio: () => void;
-  /* Home onboarding cue */
-  highlightSettingsTrigger?: boolean;
 };
 
 export const HeaderSettingsPopover = ({
@@ -150,15 +148,13 @@ export const HeaderSettingsPopover = ({
   onChangeMotionIntensity,
   showAudioControl,
   isPlaying,
+  isAudioLoading = false,
+  audioError,
   onToggleAudio,
-  highlightSettingsTrigger = false,
 }: HeaderSettingsPopoverProps) => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const open = Boolean(anchorEl);
-  const motionScale = useMotionScale();
-  const { duration: dFactor } = motionScale;
-  const showHighlightHalo = highlightSettingsTrigger;
-  const showHighlightAnimation = showHighlightHalo && motionScale.cssAnimations && dFactor > 0;
+  const { duration: dFactor } = useMotionScale();
 
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -214,89 +210,27 @@ export const HeaderSettingsPopover = ({
   return (
     <>
       <Tooltip title="Settings">
-        <Badge
-          overlap="circular"
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-          badgeContent={
-            showHighlightHalo ? (
-              <Box
-                component="span"
-                data-testid="header-settings-trigger-highlight"
-                aria-hidden
-                sx={{
-                  display: 'block',
-                  width: 38,
-                  height: 38,
-                  borderRadius: '50%',
-                  background: (theme) =>
-                    `radial-gradient(circle, ${alpha(
-                      theme.palette.primary.light,
-                      0.38
-                    )} 0%, ${alpha(theme.palette.primary.main, 0.28)} 46%, ${alpha(
-                      theme.palette.primary.main,
-                      0.08
-                    )} 72%, transparent 100%)`,
-                  border: (theme) => `1px solid ${alpha(theme.palette.primary.light, 0.55)}`,
-                  boxShadow: (theme) =>
-                    `0 0 0 6px ${alpha(theme.palette.primary.main, 0.18)}, 0 0 18px ${alpha(
-                      theme.palette.primary.main,
-                      0.24
-                    )}`,
-                  animation: showHighlightAnimation
-                    ? `${pulseRing} ${Math.max(
-                        1400,
-                        Math.round(1800 * dFactor)
-                      )}ms ease-out infinite`
-                    : 'none',
-                }}
-              />
-            ) : null
-          }
-          data-testid="header-settings-trigger-halo"
-          data-highlighted={highlightSettingsTrigger ? 'true' : 'false'}
-          slotProps={{
-            badge: {
-              'aria-hidden': true,
-              sx: {
-                minWidth: 'auto',
-                width: 'auto',
-                height: 'auto',
-                padding: 0,
-                borderRadius: '50%',
-                backgroundColor: 'transparent',
-                border: 'none',
-                top: '50%',
-                right: '50%',
-                transform: 'translate(50%, -50%)',
-                zIndex: 0,
-                pointerEvents: 'none',
-              },
+        <IconButton
+          id={HEADER_SETTINGS_TRIGGER_ID}
+          data-testid={HEADER_SETTINGS_TRIGGER_ID}
+          onClick={handleOpen}
+          aria-label="Open settings"
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          size="small"
+          sx={{
+            color: (theme) => alpha(theme.palette.common.white, 0.82),
+            transition: `color ${cssDuration.quick} ${SPRING_EASING_CSS}, background-color ${cssDuration.quick} ${SPRING_EASING_CSS}`,
+            position: 'relative',
+            zIndex: 1,
+            '&:hover': {
+              color: 'common.white',
+              backgroundColor: (theme) => alpha(theme.palette.common.white, 0.1),
             },
           }}
         >
-          <IconButton
-            id={HEADER_SETTINGS_TRIGGER_ID}
-            data-testid={HEADER_SETTINGS_TRIGGER_ID}
-            data-highlighted={highlightSettingsTrigger ? 'true' : 'false'}
-            onClick={handleOpen}
-            aria-label="Open settings"
-            aria-haspopup="true"
-            aria-expanded={open ? 'true' : undefined}
-            size="small"
-            sx={{
-              color: (theme) => alpha(theme.palette.common.white, 0.82),
-              transition: `color ${cssDuration.quick} ${SPRING_EASING_CSS}, background-color ${cssDuration.quick} ${SPRING_EASING_CSS}`,
-              position: 'relative',
-              zIndex: 1,
-              '&:hover': {
-                color: 'common.white',
-                backgroundColor: (theme) => alpha(theme.palette.common.white, 0.1),
-              },
-            }}
-          >
-            <SettingsOutlinedIcon sx={{ fontSize: 20 }} />
-          </IconButton>
-        </Badge>
+          <SettingsOutlinedIcon sx={{ fontSize: 20 }} />
+        </IconButton>
       </Tooltip>
 
       <Popover
@@ -484,23 +418,34 @@ export const HeaderSettingsPopover = ({
                   Welcome audio
                 </Text>
                 <Stack direction="row" alignItems="center" justifyContent="space-between">
-                  <Text role="body" component="span">
-                    {isPlaying ? 'Now playing' : 'Paused'}
+                  <Text role="body" component="span" aria-live="polite">
+                    {isAudioLoading ? 'Loading audio…' : isPlaying ? 'Now playing' : 'Paused'}
                   </Text>
                   <Tooltip title={isPlaying ? 'Pause welcome audio' : 'Play welcome audio'}>
-                    <IconButton
-                      size="small"
-                      onClick={onToggleAudio}
-                      aria-label={isPlaying ? 'Pause welcome audio' : 'Play welcome audio'}
-                    >
-                      {isPlaying ? (
-                        <PauseCircleOutlineIcon sx={{ fontSize: 18 }} />
-                      ) : (
-                        <PlayCircleOutlineIcon sx={{ fontSize: 18 }} />
-                      )}
-                    </IconButton>
+                    <span>
+                      <IconButton
+                        size="small"
+                        onClick={onToggleAudio}
+                        disabled={isAudioLoading}
+                        aria-label={isPlaying ? 'Pause welcome audio' : 'Play welcome audio'}
+                        aria-describedby={audioError ? 'welcome-audio-error' : undefined}
+                      >
+                        {isPlaying ? (
+                          <PauseCircleOutlineIcon sx={{ fontSize: 18 }} />
+                        ) : (
+                          <PlayCircleOutlineIcon sx={{ fontSize: 18 }} />
+                        )}
+                      </IconButton>
+                    </span>
                   </Tooltip>
                 </Stack>
+                {audioError && (
+                  <Box id="welcome-audio-error" role="alert">
+                    <Text role="caption" component="span">
+                      {audioError}
+                    </Text>
+                  </Box>
+                )}
               </Stack>
             </>
           )}

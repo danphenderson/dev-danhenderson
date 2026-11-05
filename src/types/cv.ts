@@ -49,6 +49,7 @@ export type AboutMe = {
 };
 
 export type CodingExample = {
+  id?: string;
   title: string;
   description: string;
   links: string[];
@@ -86,6 +87,7 @@ export type ExperienceDescription = string | ExperienceProjectSegment[];
 export type ExperienceProject = string | ExperienceProjectSegment | ExperienceProjectSegment[];
 
 export type Experience = {
+  id?: string;
   company: string;
   companyUrl?: string;
   companyTooltip?: string;
@@ -146,6 +148,17 @@ export type CVSectionKey =
   | 'github'
   | 'certificates'
   | 'coding';
+
+export type CVEvidenceTarget =
+  | { kind: 'coding'; entryId: string }
+  | { kind: 'experience'; entryId: string };
+
+export type CVEntryRequest = CVEvidenceTarget & { requestKey: string };
+
+export type CVStackEvidence = {
+  target: CVEvidenceTarget;
+  accessibleLabel: string;
+};
 
 export type CVStoryContactChannel = {
   label: string;

@@ -3,8 +3,6 @@ import {
   readBuildMetadata,
   readNodeEnvironment,
   readPublicUrl,
-  readRuntimeEnvironmentOverride,
-  type AppEnvironmentSource,
 } from '../../../src/utils/appEnvironment';
 
 describe('appEnvironment', () => {
@@ -16,13 +14,6 @@ describe('appEnvironment', () => {
   it('reads NODE_ENV and falls back to development', () => {
     expect(readNodeEnvironment({ NODE_ENV: 'test' })).toBe('test');
     expect(readNodeEnvironment({})).toBe('development');
-  });
-
-  it('reads the runtime environment override when present', () => {
-    const env: AppEnvironmentSource = { REACT_APP_RUNTIME_ENV: 'production' };
-
-    expect(readRuntimeEnvironmentOverride(env)).toBe('production');
-    expect(readRuntimeEnvironmentOverride({})).toBeUndefined();
   });
 
   it('detects whether live GitHub requests are enabled outside production', () => {

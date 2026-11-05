@@ -2,6 +2,7 @@ import { act, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import ThemeProvider from '../../../src/ThemeProvider';
 import { AnimatedContentCard } from '../../../src/components/AnimatedContentCard';
+import { PREFERENCE_STORAGE_KEYS } from '../../../src/theme/preferences';
 
 const mockUseReducedMotion = jest.fn().mockReturnValue(false);
 
@@ -38,15 +39,144 @@ jest.mock('@mui/material', () => {
 const defaultIntersectionObserver = window.IntersectionObserver;
 const getDirectionalWrapper = (testId: string = 'directional-card') =>
   screen.getByTestId(testId).parentElement as HTMLElement;
+const installNonIntersectingObserver = () => {
+  const observe = jest.fn();
+  window.IntersectionObserver = jest.fn(() => ({
+    observe,
+    unobserve: jest.fn(),
+    disconnect: jest.fn(),
+    takeRecords: jest.fn(() => []),
+  })) as unknown as typeof IntersectionObserver;
+  return observe;
+};
 
 describe('AnimatedContentCard', () => {
+  beforeEach(() => {
+    window.localStorage.clear();
+  });
+
   afterEach(() => {
     window.IntersectionObserver = defaultIntersectionObserver;
     mockUseReducedMotion.mockReset();
     mockUseReducedMotion.mockReturnValue(false);
     jest.useRealTimers();
     jest.clearAllMocks();
+    window.localStorage.clear();
   });
+
+  it.each(['off', 'reduced'])('reveals immediately without an observer with %s motion', (mode) => {
+    const observe = installNonIntersectingObserver();
+    const onVisible = jest.fn();
+    if (mode === 'off') {
+      window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.motionIntensity, 'off');
+    } else {
+      mockUseReducedMotion.mockReturnValue(true);
+    }
+
+    const { rerender } = render(
+      <ThemeProvider>
+        <AnimatedContentCard delayMs={500} onVisible={onVisible}>
+          Instant Card
+        </AnimatedContentCard>
+      </ThemeProvider>
+    );
+
+    expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'true');
+    expect(screen.getByTestId('zoom')).toHaveAttribute('data-appear', 'false');
+    expect(observe).not.toHaveBeenCalled();
+    expect(onVisible).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <ThemeProvider>
+        <AnimatedContentCard delayMs={500} onVisible={onVisible}>
+          Instant Card Updated
+        </AnimatedContentCard>
+      </ThemeProvider>
+    );
+
+    expect(onVisible).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps normal-motion cards gated until they intersect', () => {
+    jest.useFakeTimers();
+    const observe = installNonIntersectingObserver();
+    const onVisible = jest.fn();
+
+    render(
+      <ThemeProvider>
+        <AnimatedContentCard delayMs={150} onVisible={onVisible}>
+          Waiting Card
+        </AnimatedContentCard>
+      </ThemeProvider>
+    );
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+
+    expect(observe).toHaveBeenCalled();
+    expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'false');
+    expect(onVisible).not.toHaveBeenCalled();
+  });
+
+  it.each([false, true])(
+    'preserves controlled hidden content with motion off and skip %s',
+    (skip) => {
+      installNonIntersectingObserver();
+      window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.motionIntensity, 'off');
+      const onVisible = jest.fn();
+
+      render(
+        <ThemeProvider>
+          <AnimatedContentCard visible={false} skipEntranceAnimation={skip} onVisible={onVisible}>
+            Controlled Hidden Card
+          </AnimatedContentCard>
+        </ThemeProvider>
+      );
+
+      expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'false');
+      expect(onVisible).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each([true, false])(
+    'settles a pending reveal with triggerOnView %s when motion is disabled and stays visible when reenabled',
+    (triggerOnView) => {
+      jest.useFakeTimers();
+      installNonIntersectingObserver();
+      const onVisible = jest.fn();
+      const card = (
+        <ThemeProvider>
+          <AnimatedContentCard delayMs={500} triggerOnView={triggerOnView} onVisible={onVisible}>
+            Pending Card
+          </AnimatedContentCard>
+        </ThemeProvider>
+      );
+      const { rerender } = render(card);
+
+      expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'false');
+
+      mockUseReducedMotion.mockReturnValue(true);
+      rerender(
+        <ThemeProvider>
+          <AnimatedContentCard delayMs={500} triggerOnView={triggerOnView} onVisible={onVisible}>
+            Pending Card
+          </AnimatedContentCard>
+        </ThemeProvider>
+      );
+
+      expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'true');
+      expect(onVisible).toHaveBeenCalledTimes(1);
+
+      mockUseReducedMotion.mockReturnValue(false);
+      rerender(card);
+      act(() => {
+        jest.advanceTimersByTime(1000);
+      });
+
+      expect(screen.getByTestId('zoom')).toHaveAttribute('data-in', 'true');
+      expect(onVisible).toHaveBeenCalledTimes(1);
+    }
+  );
 
   it('uses the provided delay literally when animation is enabled', () => {
     jest.useFakeTimers();

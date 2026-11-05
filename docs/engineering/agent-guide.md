@@ -41,7 +41,7 @@ These are the non-negotiable rules. Breaking any of these produces a regression.
 ### 1. Provider nesting order
 
 ```
-ThemeProvider → WelcomeOnboardingProvider → WelcomeAudioProvider → BrowserRouter → CommandPaletteProvider → AppContent
+ThemeProvider → WelcomeAudioProvider → BrowserRouter → CommandPaletteProvider → AppContent
 ```
 
 Do not rearrange providers. Each depends on context from its parent.

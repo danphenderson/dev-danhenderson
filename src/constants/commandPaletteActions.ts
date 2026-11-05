@@ -93,8 +93,6 @@ const photographyAlbumActions: CommandPaletteAction[] = photographyCategories.ma
   };
 });
 
-export type CommandPaletteActionKindExtended = CommandPaletteActionKind | 'blog-post';
-
 const blogPostActions: CommandPaletteAction[] = blogPosts.map((post) => ({
   id: `blog-post-${post.slug}`,
   label: `Blog: ${post.title}`,

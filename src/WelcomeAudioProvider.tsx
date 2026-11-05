@@ -7,492 +7,182 @@ import {
   useRef,
   useState,
 } from 'react';
-import {
-  LEGACY_AUDIO_PROMPT_STORAGE_KEY,
-  PREFERENCE_STORAGE_KEYS,
-  isAudioConsent,
-} from './theme/preferences';
-import type { AudioConsent } from './types/ui';
-import { shouldResetWelcomeSequenceOnHomeLoad } from './welcomeSequenceEnvironment';
+import { LEGACY_AUDIO_PROMPT_STORAGE_KEY, PREFERENCE_STORAGE_KEYS } from './theme/preferences';
+import { resolvePublicAssetPath } from './utils/assets';
 
 export type { AudioConsent } from './types/ui';
-
-type SoundCloudWidget = {
-  play: () => void;
-  pause: () => void;
-  bind: (event: string, listener: () => void) => void;
-  unbind: (event?: string, listener?: () => void) => void;
-  isPaused: (callback: (paused: boolean) => void) => void;
-  setLoop: (loop: boolean) => void;
-};
 
 type WelcomeAudioContextValue = {
   play: () => Promise<void>;
   pause: () => void;
   isPlaying: boolean;
-  ready: boolean;
   error?: string;
-  audioConsent: AudioConsent;
-  grantAudioConsent: () => void;
-  declineAudioConsent: () => void;
 };
 
 const WelcomeAudioContext = createContext<WelcomeAudioContextValue>({
   play: async () => {},
   pause: () => {},
   isPlaying: false,
-  ready: false,
-  error: undefined,
-  audioConsent: 'unknown',
-  grantAudioConsent: () => {},
-  declineAudioConsent: () => {},
 });
 
-const WIDGET_SCRIPT_SRC = 'https://w.soundcloud.com/player/api.js';
-const TRACK_EMBED_URL =
-  'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/soundcloud%253Atracks%253A298021432&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true';
-const WIDGET_BOOT_TIMEOUT_MS = 8000;
-const hiddenAudioIframeStyle = {
-  position: 'absolute',
-  width: 0,
-  height: 0,
-  border: 0,
-  clipPath: 'inset(50%)',
-  clip: 'rect(0 0 0 0)',
-  overflow: 'hidden',
-} as const;
+const AUDIO_START_TIMEOUT_MS = 8000;
+const PLAYBACK_ERROR_MESSAGE = 'Audio could not start. Please try again.';
 
-let widgetScriptPromise: Promise<void> | null = null;
+const createAbortError = () => new DOMException('Audio playback cancelled.', 'AbortError');
 
-type SoundCloudNamespace = {
-  Widget: (iframe: HTMLIFrameElement) => SoundCloudWidget;
-};
-
-declare global {
-  interface Window {
-    SC?: SoundCloudNamespace;
-  }
-}
-
-const createAbortError = () => {
-  const error = new Error('Welcome audio setup aborted.');
-  error.name = 'AbortError';
-  return error;
-};
-
-const withTimeout = <T,>(
-  promise: Promise<T>,
-  message: string,
-  timeoutMs: number,
-  signal?: AbortSignal
-): Promise<T> =>
-  new Promise<T>((resolve, reject) => {
-    const timerId = window.setTimeout(() => {
+const waitForPlayback = (playback: Promise<void>, signal: AbortSignal): Promise<void> =>
+  new Promise<void>((resolve, reject) => {
+    const timer = window.setTimeout(() => {
       cleanup();
-      reject(new Error(message));
-    }, timeoutMs);
-
-    const handleAbort = () => {
+      reject(new Error(PLAYBACK_ERROR_MESSAGE));
+    }, AUDIO_START_TIMEOUT_MS);
+    const abort = () => {
       cleanup();
       reject(createAbortError());
     };
-
     const cleanup = () => {
-      window.clearTimeout(timerId);
-      signal?.removeEventListener('abort', handleAbort);
+      window.clearTimeout(timer);
+      signal.removeEventListener('abort', abort);
     };
-
-    signal?.addEventListener('abort', handleAbort, { once: true });
-
-    promise.then(
-      (value) => {
+    signal.addEventListener('abort', abort, { once: true });
+    playback.then(
+      () => {
         cleanup();
-        resolve(value);
+        resolve();
       },
       (error) => {
         cleanup();
         reject(error);
       }
     );
+    if (signal.aborted) abort();
   });
 
-const getStoredAudioConsent = (): AudioConsent => {
-  if (typeof window === 'undefined') return 'unknown';
-
+const persistExplicitPlay = () => {
   try {
-    const storedConsent = window.localStorage.getItem(PREFERENCE_STORAGE_KEYS.audioConsent);
-    if (isAudioConsent(storedConsent) && storedConsent !== 'unknown') {
-      return storedConsent;
-    }
-
-    if (window.localStorage.getItem(LEGACY_AUDIO_PROMPT_STORAGE_KEY) === 'dismissed') {
-      return 'declined';
-    }
-  } catch {
-    // localStorage may be unavailable in restricted browsing contexts
-  }
-
-  return 'unknown';
-};
-
-const getInitialAudioConsent = (): AudioConsent =>
-  shouldResetWelcomeSequenceOnHomeLoad() ? 'unknown' : getStoredAudioConsent();
-
-const persistAudioConsent = (consent: Exclude<AudioConsent, 'unknown'>) => {
-  if (typeof window === 'undefined') return;
-
-  try {
-    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.audioConsent, consent);
+    window.localStorage.setItem(PREFERENCE_STORAGE_KEYS.audioConsent, 'granted');
     window.localStorage.removeItem(LEGACY_AUDIO_PROMPT_STORAGE_KEY);
   } catch {
-    // localStorage may be unavailable in restricted browsing contexts
+    // Playback remains usable when storage is unavailable.
   }
 };
 
-const loadWidgetScript = (signal: AbortSignal): Promise<void> => {
-  if (typeof window === 'undefined') {
-    return Promise.reject(new Error('Window is not available.'));
-  }
-
-  if (window.SC?.Widget) {
-    return Promise.resolve();
-  }
-
-  if (widgetScriptPromise) {
-    return widgetScriptPromise;
-  }
-
-  if (signal.aborted) return Promise.reject(createAbortError());
-
-  widgetScriptPromise = new Promise<void>((resolve, reject) => {
-    const existingScript = document.querySelector<HTMLScriptElement>(
-      `script[src="${WIDGET_SCRIPT_SRC}"]`
-    );
-    const script = existingScript ?? document.createElement('script');
-    let settled = false;
-    const cleanup = () => {
-      script.removeEventListener('load', resolveWhenReady);
-      script.removeEventListener('error', rejectLoad);
-      signal.removeEventListener('abort', handleAbort);
-    };
-    const fail = (error: Error) => {
-      if (settled) return;
-      settled = true;
-      cleanup();
-      // Remove only the element this loader owns so a retry makes a new request.
-      if (!existingScript) script.remove();
-      widgetScriptPromise = null;
-      reject(error);
-    };
-    const resolveWhenReady = () => {
-      if (!window.SC?.Widget) {
-        fail(new Error('SoundCloud widget API unavailable.'));
-        return;
-      }
-      if (settled) return;
-      settled = true;
-      cleanup();
-      widgetScriptPromise = null;
-      resolve();
-    };
-    const rejectLoad = () => fail(new Error('Failed to load SoundCloud widget.'));
-    const handleAbort = () => fail(createAbortError());
-
-    script.addEventListener('load', resolveWhenReady);
-    script.addEventListener('error', rejectLoad);
-    signal.addEventListener('abort', handleAbort, { once: true });
-    if (!existingScript) {
-      script.src = WIDGET_SCRIPT_SRC;
-      script.async = true;
-      document.body.appendChild(script);
-    }
-  });
-
-  return widgetScriptPromise;
-};
-
-export const WelcomeAudioProvider = ({ children }: PropsWithChildren<{}>) => {
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const iframeWaitersRef = useRef<Array<(iframe: HTMLIFrameElement) => void>>([]);
-  const widgetRef = useRef<SoundCloudWidget | null>(null);
-  const setupPromiseRef = useRef<Promise<SoundCloudWidget> | null>(null);
-  const setupAbortControllerRef = useRef<AbortController | null>(null);
+export const WelcomeAudioProvider = ({ children }: PropsWithChildren) => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const pendingPlayRef = useRef<Promise<void> | null>(null);
+  const playControllerRef = useRef<AbortController | null>(null);
+  const playbackRequestedRef = useRef(false);
   const unmountedRef = useRef(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [ready, setReady] = useState(false);
-  const [error, setError] = useState<string | undefined>();
-  const [audioConsent, setAudioConsent] = useState<AudioConsent>(getInitialAudioConsent);
-
-  const bindIframeRef = useCallback((node: HTMLIFrameElement | null) => {
-    iframeRef.current = node;
-
-    if (!node) {
-      return;
-    }
-
-    const waiters = iframeWaitersRef.current.splice(0);
-    waiters.forEach((resolve) => resolve(node));
-  }, []);
-
-  const waitForIframe = useCallback((signal: AbortSignal) => {
-    if (iframeRef.current) {
-      return Promise.resolve(iframeRef.current);
-    }
-
-    if (typeof window === 'undefined') {
-      return Promise.reject(new Error('Window is not available.'));
-    }
-
-    const iframeMountPromise = new Promise<HTMLIFrameElement>((resolve, reject) => {
-      const handleAbort = () => {
-        iframeWaitersRef.current = iframeWaitersRef.current.filter((waiter) => waiter !== resolve);
-        signal.removeEventListener('abort', handleAbort);
-        reject(createAbortError());
-      };
-
-      iframeWaitersRef.current.push(resolve);
-      signal.addEventListener('abort', handleAbort, { once: true });
-    });
-
-    return withTimeout(
-      iframeMountPromise,
-      'Audio iframe did not mount in time.',
-      WIDGET_BOOT_TIMEOUT_MS,
-      signal
-    );
-  }, []);
+  const [error, setError] = useState<string>();
 
   useEffect(() => {
     unmountedRef.current = false;
-
+    const audio = audioRef.current;
     return () => {
       unmountedRef.current = true;
-      setupAbortControllerRef.current?.abort();
-      setupAbortControllerRef.current = null;
-      if (widgetRef.current) {
-        widgetRef.current.unbind('ready');
-        widgetRef.current.unbind('play');
-        widgetRef.current.unbind('pause');
-        widgetRef.current.unbind('finish');
-      }
+      playbackRequestedRef.current = false;
+      playControllerRef.current?.abort();
+      playControllerRef.current = null;
+      pendingPlayRef.current = null;
+      audio?.pause();
+      audio?.removeAttribute('src');
+      audio?.load();
     };
   }, []);
 
-  useEffect(() => {
-    if (audioConsent === 'granted') return;
-
-    setupAbortControllerRef.current?.abort();
-    setupAbortControllerRef.current = null;
-    if (widgetRef.current) {
-      widgetRef.current.pause();
-      widgetRef.current.unbind('ready');
-      widgetRef.current.unbind('play');
-      widgetRef.current.unbind('pause');
-      widgetRef.current.unbind('finish');
-      widgetRef.current = null;
-    }
-
-    setupPromiseRef.current = null;
-    iframeWaitersRef.current = [];
-    setIsPlaying(false);
-    setReady(false);
-  }, [audioConsent]);
-
-  const grantAudioConsent = useCallback(() => {
-    setAudioConsent((previousConsent) => {
-      if (previousConsent !== 'granted') {
-        persistAudioConsent('granted');
-      }
-      return 'granted';
-    });
+  const pause = useCallback(() => {
+    playbackRequestedRef.current = false;
+    playControllerRef.current?.abort();
+    playControllerRef.current = null;
+    pendingPlayRef.current = null;
+    audioRef.current?.pause();
+    if (!unmountedRef.current) setIsPlaying(false);
   }, []);
 
-  const declineAudioConsent = useCallback(() => {
-    persistAudioConsent('declined');
-    setAudioConsent('declined');
-  }, []);
-
-  const initializeWidget = useCallback(async (): Promise<SoundCloudWidget> => {
-    if (setupPromiseRef.current) {
-      return setupPromiseRef.current;
-    }
-
-    if (widgetRef.current && ready) {
-      return widgetRef.current;
-    }
+  const play = useCallback((): Promise<void> => {
+    if (pendingPlayRef.current) return pendingPlayRef.current;
+    const audio = audioRef.current;
+    if (!audio || unmountedRef.current) return Promise.reject(createAbortError());
 
     const controller = new AbortController();
-    setupAbortControllerRef.current = controller;
-    setupPromiseRef.current = (async () => {
-      await withTimeout(
-        loadWidgetScript(controller.signal),
-        'Timed out loading welcome audio widget script.',
-        WIDGET_BOOT_TIMEOUT_MS,
-        controller.signal
-      );
-      if (controller.signal.aborted) throw createAbortError();
-      const iframe = await waitForIframe(controller.signal);
-      const SC = window.SC;
+    playControllerRef.current = controller;
+    playbackRequestedRef.current = true;
+    setError(undefined);
+    persistExplicitPlay();
 
-      if (!SC?.Widget) {
-        throw new Error('SoundCloud widget API unavailable.');
-      }
+    // Assign the source and call play synchronously inside the user's gesture.
+    // Stored consent never starts a request or playback on mount.
+    if (!audio.getAttribute('src')) {
+      audio.src = resolvePublicAssetPath('/assets/verse.mp3');
+    } else if (audio.error) {
+      audio.load();
+    }
 
-      const widget: SoundCloudWidget = SC.Widget(iframe);
-      widgetRef.current = widget;
-
-      await new Promise<void>((resolve, reject) => {
-        let widgetReady = false;
-
-        const markReady = () => {
-          if (unmountedRef.current) return;
-
-          widgetReady = true;
-          window.clearTimeout(timeoutId);
-          controller.signal.removeEventListener('abort', handleAbort);
-          widget.unbind('ready', markReady);
-          setReady(true);
-          widget.isPaused((paused: boolean) => {
-            if (!unmountedRef.current) {
-              setIsPlaying(!paused);
-            }
-          });
-          resolve();
-        };
-
-        const handlePlay = () => {
-          if (!unmountedRef.current) {
-            setIsPlaying(true);
-          }
-        };
-
-        const handlePause = () => {
+    let playback: Promise<void>;
+    try {
+      playback = audio.play();
+    } catch (cause) {
+      playback = Promise.reject(cause);
+    }
+    const pending = waitForPlayback(playback, controller.signal)
+      .then(() => {
+        if (!controller.signal.aborted && !unmountedRef.current) {
+          setIsPlaying(!audio.paused);
+        }
+      })
+      .catch((cause: unknown) => {
+        if (playControllerRef.current === controller) {
+          playbackRequestedRef.current = false;
+          audio.pause();
           if (!unmountedRef.current) {
             setIsPlaying(false);
+            if (!(cause instanceof Error && cause.name === 'AbortError')) {
+              setError(PLAYBACK_ERROR_MESSAGE);
+            }
           }
-        };
-
-        const handleFinish = () => {
-          if (unmountedRef.current) return;
-
-          widget.play();
-          setIsPlaying(true);
-        };
-
-        const handleAbort = () => {
-          cleanup();
-          reject(createAbortError());
-        };
-
-        const timeoutId = window.setTimeout(() => {
-          cleanup();
-          reject(new Error('Timed out waiting for the welcome audio widget to become ready.'));
-        }, WIDGET_BOOT_TIMEOUT_MS);
-
-        const cleanup = () => {
-          window.clearTimeout(timeoutId);
-          controller.signal.removeEventListener('abort', handleAbort);
-          widget.unbind('ready', markReady);
-          if (!widgetReady) {
-            widget.unbind('play', handlePlay);
-            widget.unbind('pause', handlePause);
-            widget.unbind('finish', handleFinish);
-          }
-        };
-
-        widget.bind('ready', markReady);
-        widget.bind('play', handlePlay);
-        widget.bind('pause', handlePause);
-        widget.bind('finish', handleFinish);
-        controller.signal.addEventListener('abort', handleAbort, { once: true });
-      });
-
-      return widget;
-    })()
-      .catch((err) => {
-        // A timeout must also cancel the loader and remove its stalled script.
-        controller.abort();
-        if (setupAbortControllerRef.current === controller) {
-          setupPromiseRef.current = null;
-          widgetRef.current = null;
-          if (!unmountedRef.current) setReady(false);
         }
-
-        throw err;
+        throw cause;
       })
       .finally(() => {
-        if (setupAbortControllerRef.current === controller) {
-          setupAbortControllerRef.current = null;
+        if (playControllerRef.current === controller) {
+          playControllerRef.current = null;
+          pendingPlayRef.current = null;
         }
       });
-
-    return setupPromiseRef.current;
-  }, [ready, waitForIframe]);
-
-  useEffect(() => {
-    if (audioConsent !== 'granted') return;
-
-    initializeWidget().catch((err) => {
-      if ((err as Error).name === 'AbortError') {
-        return;
-      }
-      if (!unmountedRef.current) {
-        setError('Unable to load welcome audio.');
-      }
-      console.error('Welcome audio initialization failed:', err);
-    });
-  }, [audioConsent, initializeWidget]);
-
-  const play = useCallback(async () => {
-    try {
-      setError(undefined);
-
-      if (audioConsent !== 'granted') {
-        grantAudioConsent();
-      }
-
-      const widget = await initializeWidget();
-      widget.play();
-    } catch (err) {
-      if (!unmountedRef.current) {
-        setError('Unable to play welcome audio.');
-      }
-      throw err;
-    }
-  }, [audioConsent, grantAudioConsent, initializeWidget]);
-
-  const pause = useCallback(() => {
-    if (!widgetRef.current) return;
-    widgetRef.current.pause();
+    pendingPlayRef.current = pending;
+    return pending;
   }, []);
 
   return (
-    <>
-      <WelcomeAudioContext.Provider
-        value={{
-          play,
-          pause,
-          isPlaying,
-          ready,
-          error,
-          audioConsent,
-          grantAudioConsent,
-          declineAudioConsent,
+    <WelcomeAudioContext.Provider value={{ play, pause, isPlaying, error }}>
+      {children}
+      <audio
+        ref={audioRef}
+        data-testid="welcome-audio"
+        preload="none"
+        loop
+        hidden
+        aria-hidden="true"
+        onPlaying={() => {
+          if (unmountedRef.current) return;
+          if (!playbackRequestedRef.current) {
+            audioRef.current?.pause();
+            return;
+          }
+          setError(undefined);
+          setIsPlaying(true);
         }}
-      >
-        {children}
-      </WelcomeAudioContext.Provider>
-      {audioConsent === 'granted' && (
-        <iframe
-          ref={bindIframeRef}
-          title="Welcome audio"
-          src={TRACK_EMBED_URL}
-          allow="autoplay"
-          style={hiddenAudioIframeStyle}
-          aria-hidden={true}
-        />
-      )}
-    </>
+        onPause={() => {
+          if (!unmountedRef.current) setIsPlaying(false);
+        }}
+        onError={() => {
+          if (unmountedRef.current) return;
+          pause();
+          setError(PLAYBACK_ERROR_MESSAGE);
+        }}
+      />
+    </WelcomeAudioContext.Provider>
   );
 };
 

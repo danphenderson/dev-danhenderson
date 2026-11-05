@@ -1,4 +1,3 @@
-import type { Transition } from 'motion/react';
 import { SPRING_EASING_MOTION } from '../styles/springEasing';
 
 /* ------------------------------------------------------------------ */
@@ -86,23 +85,6 @@ export const DEFAULT_INTERSECTION_THRESHOLD = 0;
  * edge, creating a "slightly before it scrolls into view" entrance effect.
  */
 export const DEFAULT_INTERSECTION_ROOT_MARGIN = '0px 0px -10% 0px';
-
-/* ------------------------------------------------------------------ */
-/*  Composite transition presets                                      */
-/* ------------------------------------------------------------------ */
-
-export const transition: Record<string, Transition> = {
-  /** Physics-based spring for natural movement. */
-  spring: { type: 'spring', stiffness: 260, damping: 22 },
-  /** Smooth ease-out for general-purpose reveals. */
-  smooth: { duration: duration.normal, ease: easing.smooth },
-  /** Fast ease-out for micro-interactions. */
-  snappy: { duration: duration.fast, ease: easing.smooth },
-  /** Slow reveal for section entrances. */
-  reveal: { duration: duration.slow, ease: easing.decel },
-  /** Dramatic entrance with spring overshoot. */
-  dramatic: { duration: duration.dramatic, ease: easing.spring },
-} as const;
 
 /* ------------------------------------------------------------------ */
 /*  Spring physics options for pointer-follow effects                 */

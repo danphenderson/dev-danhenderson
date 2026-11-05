@@ -10,12 +10,13 @@ import { CVVolunteeringSection } from '../components/cv/CVVolunteeringSection';
 import { cvSectionMetadata } from '../components/cv/cvSectionMetadata';
 import { githubSectionLead } from '../data/cv';
 import { CVLayoutMode, CVSectionRegion, cvPageSectionLayout } from './cvPageLayout';
-import type { AnimatedContentCardEntranceDirection } from '../types/ui';
+import type { AnimatedContentCardEntranceDirection, SkillChipLink } from '../types/ui';
 import type {
   AboutMe,
   Certificate,
   CodingExample,
   CVSectionKey,
+  CVEntryRequest,
   EducationInfo,
   Experience,
   GitHubActivityItem,
@@ -78,6 +79,8 @@ type BuildCVSectionDescriptorsOptions = {
   aboutActions: ReactNode;
   aboutFooterControls: ReactNode;
   currentWorkflowTools: string[];
+  workflowSkillLinks?: Partial<Record<string, SkillChipLink>>;
+  entryRequest?: CVEntryRequest;
   experiences: Experience[];
   education: EducationInfo;
   volunteering: VolunteeringEntry[];
@@ -159,6 +162,8 @@ export const buildCVSectionDescriptors = ({
   aboutActions,
   aboutFooterControls,
   currentWorkflowTools,
+  workflowSkillLinks,
+  entryRequest,
   experiences,
   education,
   volunteering,
@@ -184,6 +189,7 @@ export const buildCVSectionDescriptors = ({
           actions={aboutActions}
           footerControls={aboutFooterControls}
           currentWorkflowTools={currentWorkflowTools}
+          workflowSkillLinks={workflowSkillLinks}
           delayMs={layout.delayMs}
           triggerOnView={layout.triggerOnView}
           revealed={revealState.isAboutRevealed}
@@ -197,6 +203,7 @@ export const buildCVSectionDescriptors = ({
       render: (layout) => (
         <CVExperienceSection
           experiences={experiences}
+          entryRequest={entryRequest?.kind === 'experience' ? entryRequest : undefined}
           delayMs={layout.delayMs}
           entranceDirection={layout.entranceDirection}
           triggerOnView={layout.triggerOnView}
@@ -279,6 +286,7 @@ export const buildCVSectionDescriptors = ({
       render: (layout) => (
         <CVCodingSection
           examples={codingExamples}
+          entryRequest={entryRequest?.kind === 'coding' ? entryRequest : undefined}
           delayMs={layout.delayMs}
           entranceDirection={layout.entranceDirection}
           triggerOnView={layout.triggerOnView}

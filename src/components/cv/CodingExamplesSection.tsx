@@ -1,5 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Box, Stack } from '@mui/material';
-import type { CodingExample, ExperienceProjectSegment } from '../../types/cv';
+import { getCVEntryAnchor } from '../../utils/cvEvidence';
+import { cvSectionAnchorSx } from './cvSectionMetadata';
+import type { CodingExample, CVEntryRequest, ExperienceProjectSegment } from '../../types/cv';
 import { AnimatedSlideList, getAnimatedSlideListCloseDelayMs } from '../AnimatedSlideList';
 import { SkillsChipList } from '../SkillsChipList';
 import { TabPanel } from '../TabPanel';
@@ -12,6 +15,7 @@ import { renderExperienceSegments } from './experienceContent';
 
 type CodingExamplesSectionProps = {
   examples: CodingExample[];
+  entryRequest?: CVEntryRequest;
   startDelayMs?: number;
   skipEntranceAnimation?: boolean;
 };
@@ -49,17 +53,34 @@ const CodingExampleDetailList = ({
 
 export const CodingExamplesSection = ({
   examples,
+  entryRequest,
   startDelayMs = 0,
   skipEntranceAnimation = false,
 }: CodingExamplesSectionProps) => {
   const { codingExampleLinkSx, contentListStackSpacing, detailBlockSx, motionTokens } =
     useComponentStyles();
 
+  const [visibleEntries, setVisibleEntries] = useState<Set<string>>(() => new Set());
+  const [activeTabs, setActiveTabs] = useState<Record<string, string | false>>({});
+  useEffect(() => {
+    if (entryRequest?.kind !== 'coding') return;
+    const example = examples.find((entry) => entry.id === entryRequest.entryId);
+    if (example?.tabs?.some((tab) => tab.value === 'approach')) {
+      setActiveTabs((previous) => ({ ...previous, [entryRequest.entryId]: 'approach' }));
+    }
+  }, [entryRequest, examples]);
+
   return (
     <AnimatedContentList
       items={examples}
-      getItemKey={(example, index) => `${example.title}-${index}`}
-      mountItemsOnView
+      getItemKey={(example, index) => example.id ?? `${example.title}-${index}`}
+      mountItemsOnView={!entryRequest}
+      onItemVisible={(example) => {
+        if (!example.id) return;
+        setVisibleEntries((previous) =>
+          previous.has(example.id!) ? previous : new Set(previous).add(example.id!)
+        );
+      }}
       startDelayMs={startDelayMs}
       skipEntranceAnimation={skipEntranceAnimation}
       stackSpacing={contentListStackSpacing}
@@ -67,6 +88,8 @@ export const CodingExamplesSection = ({
       tiltItems
       renderItem={(example, index) => {
         const primaryLink = example.links[0];
+        const entryKey = example.id ?? `${example.title}-${index}`;
+        const anchor = example.id ? getCVEntryAnchor('coding', example.id) : undefined;
         const exampleTabs = (example.tabs ?? []).reduce<TabPanelItem[]>((tabs, tab) => {
           if (tab.kind === 'list') {
             const items = tab.items.filter((item) =>
@@ -126,24 +149,33 @@ export const CodingExamplesSection = ({
         }, []);
 
         return (
-          <>
+          <Box
+            id={anchor}
+            data-cv-entry-visible={visibleEntries.has(example.id ?? '')}
+            sx={cvSectionAnchorSx}
+          >
             <Stack spacing={1.25}>
-              {primaryLink ? (
-                <CommonLink
-                  href={primaryLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  color="inherit"
-                  underline="hover"
-                  sx={{ textDecorationColor: 'currentColor' }}
-                >
-                  <Text role="cardTitle" component="span" sx={codingExampleLinkSx}>
+              <Text
+                role="cardTitle"
+                id={anchor ? `${anchor}-heading` : undefined}
+                tabIndex={anchor ? -1 : undefined}
+                sx={codingExampleLinkSx}
+              >
+                {primaryLink ? (
+                  <CommonLink
+                    href={primaryLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    color="inherit"
+                    underline="hover"
+                    sx={{ textDecorationColor: 'currentColor' }}
+                  >
                     {example.title}
-                  </Text>
-                </CommonLink>
-              ) : (
-                <Text role="cardTitle">{example.title}</Text>
-              )}
+                  </CommonLink>
+                ) : (
+                  example.title
+                )}
+              </Text>
               <Text role="body">{example.description}</Text>
             </Stack>
             {exampleTabs.length ? (
@@ -152,13 +184,17 @@ export const CodingExamplesSection = ({
                   id={`coding-example-details-${index}`}
                   ariaLabel={`${example.title} project details`}
                   items={exampleTabs}
+                  value={activeTabs[entryKey]}
+                  onChange={(value) =>
+                    setActiveTabs((previous) => ({ ...previous, [entryKey]: value }))
+                  }
                   dense
                   hideTabsWhenSingle
                   tabsVariant="fullWidth"
                 />
               </Box>
             ) : null}
-          </>
+          </Box>
         );
       }}
     />

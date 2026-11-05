@@ -3,7 +3,6 @@ import { cssDuration } from '../motion/tokens';
 import { SPRING_EASING_CSS } from './springEasing';
 
 type BackgroundContentAlign = 'flex-start' | 'center' | 'flex-end';
-type HeaderHighlightTone = 'primary' | 'secondary';
 type LoadingBarTone = 'primary' | 'secondary' | 'success';
 
 export const createAppStyleMap = (theme: Theme) => {
@@ -16,7 +15,6 @@ export const createAppStyleMap = (theme: Theme) => {
   const shellBackgroundColor = alpha(theme.palette.background.paper, surface.panelSurfaceAlpha);
   const shellBorder = `1px solid ${alpha(theme.palette.divider, surface.panelBorderAlpha * 0.5)}`;
 
-  const photoPlaceholderColor = alpha(theme.palette.text.primary, isLight ? 0.08 : 0.18);
   const photoDownloadShadow = alpha(theme.palette.common.black, isLight ? 0.18 : 0.42);
   const floatingActionBackgroundColor = alpha(
     theme.palette.background.paper,
@@ -64,34 +62,6 @@ export const createAppStyleMap = (theme: Theme) => {
     width: '100%',
     py: 6.25,
   });
-
-  const getHeaderHighlightSx = (tone: HeaderHighlightTone, animation: string): SxProps<Theme> => {
-    const palette = tone === 'primary' ? theme.palette.primary : theme.palette.secondary;
-    const ringColor = alpha(palette.light, tone === 'secondary' ? 0.95 : 0.9);
-    const glowColor = alpha(palette.main, 0.35);
-
-    return {
-      position: 'relative',
-      overflow: 'visible',
-      '&::after': {
-        content: '""',
-        position: 'absolute',
-        inset: -6,
-        borderRadius: '50%',
-        border: `2px solid ${ringColor}`,
-        animation,
-        pointerEvents: 'none',
-      },
-      '&::before': {
-        content: '""',
-        position: 'absolute',
-        inset: -2,
-        borderRadius: '50%',
-        boxShadow: `0 0 0 3px ${glowColor}`,
-        pointerEvents: 'none',
-      },
-    };
-  };
 
   const getLoadingBarSx = ({
     height,
@@ -150,38 +120,6 @@ export const createAppStyleMap = (theme: Theme) => {
 
   const headerIconSx: SxProps<Theme> = {
     fontSize: { xs: 22, md: 24 },
-  };
-
-  const headerSpeedDialSx = {
-    position: 'relative',
-    overflow: 'visible',
-    flexShrink: 0,
-  } satisfies SxProps<Theme>;
-
-  const photographyCardSx: SxProps<Theme> = {
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: 1.5,
-  };
-
-  const photographyGridSx: SxProps<Theme> = {
-    display: 'grid',
-    gap: 2.5,
-    gridTemplateColumns: {
-      xs: 'minmax(0, 1fr)',
-      sm: 'repeat(2, minmax(0, 1fr))',
-      md: 'repeat(3, minmax(0, 1fr))',
-    },
-    alignItems: 'stretch',
-  };
-
-  const photographyGridItemSx: SxProps<Theme> = {
-    minWidth: 0,
-  };
-
-  const photographyCardContentSx: SxProps<Theme> = {
-    flexGrow: 1,
   };
 
   /* ---- Immersive photography redesign tokens ---- */
@@ -301,11 +239,6 @@ export const createAppStyleMap = (theme: Theme) => {
     backgroundChildrenSx: { width: '100%' } satisfies SxProps<Theme>,
     pageFrameContainerSx,
     cvPageContainerSx,
-    resumeDownloadContainerSx: {
-      display: 'flex',
-      justifyContent: 'flex-end',
-      mb: { xs: 1.5, md: 2 },
-    } satisfies SxProps<Theme>,
     cvPagePaneSx: {
       height: '100%',
       p: { xs: 0, md: 1 },
@@ -344,14 +277,7 @@ export const createAppStyleMap = (theme: Theme) => {
       borderRadius: 1,
       overflow: 'hidden',
     } satisfies SxProps<Theme>,
-    homeHeroTitleSx: {
-      color: theme.palette.common.white,
-      fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem' },
-      lineHeight: 1.5,
-    } satisfies SxProps<Theme>,
     headerIconSx,
-    photographyGridSx,
-    photographyGridItemSx,
     headerToolbarSx: {
       px: { xs: 1.5, md: 3 },
       gap: { xs: 1.5, md: 2 },
@@ -366,24 +292,6 @@ export const createAppStyleMap = (theme: Theme) => {
       justifyContent: 'flex-end',
       flexShrink: 0,
       ml: 'auto',
-    } satisfies SxProps<Theme>,
-    headerAppearanceDialSx: {
-      ...headerSpeedDialSx,
-      '& .MuiSpeedDial-actions': {
-        position: 'absolute',
-        top: '100%',
-        right: 0,
-        marginTop: 0,
-        flexDirection: 'column',
-        [theme.breakpoints.down('md')]: {
-          // direction="down" on mobile: drop actions below the FAB
-          paddingTop: theme.spacing(1),
-        },
-        [theme.breakpoints.up('md')]: {
-          // direction="down" on desktop: keep actions stacked below the FAB
-          paddingTop: theme.spacing(1.5),
-        },
-      },
     } satisfies SxProps<Theme>,
     headerNavLeadSx: {
       display: 'flex',
@@ -446,10 +354,6 @@ export const createAppStyleMap = (theme: Theme) => {
         backgroundColor: alpha(theme.palette.common.white, 0.1),
       },
     } satisfies SxProps<Theme>,
-    headerAudioControlSx: {
-      mr: 0.625,
-    } satisfies SxProps<Theme>,
-    getHeaderHighlightSx,
     inlineStartSx: { alignSelf: 'flex-start' } satisfies SxProps<Theme>,
     compactSectionHeadingSx: { mb: 0 } satisfies SxProps<Theme>,
     sectionHeadingOffsetSx: { mt: 2 } satisfies SxProps<Theme>,
@@ -521,63 +425,13 @@ export const createAppStyleMap = (theme: Theme) => {
         )}`,
       },
     } satisfies SxProps<Theme>,
-    welcomePanelSx: {
-      position: 'fixed',
-      top: { xs: 76, sm: 88 },
-      right: { xs: 12, sm: 24 },
-      width: { xs: 'calc(100vw - 24px)', sm: 360 },
-      maxHeight: 'calc(100dvh - 100px)',
-      overflowY: 'auto',
-      p: { xs: 2, sm: 2.5 },
-      borderRadius: 2,
-      backgroundColor: theme.palette.background.paper,
-      border: shellBorder,
-      boxShadow: floatingActionShadow,
-      zIndex: theme.zIndex.appBar - 1,
-      '&:focus-visible': {
-        outline: `2px solid ${alpha(theme.palette.primary.light, 0.72)}`,
-        outlineOffset: 2,
-      },
-    } satisfies SxProps<Theme>,
-    hintPopoverPaperSx: {
-      p: 2,
-      maxWidth: 240,
-      borderRadius: 2,
-      boxShadow: 6,
-    } satisfies SxProps<Theme>,
-    hintPopoverTitleSx: {
-      fontWeight: 600,
-    } satisfies SxProps<Theme>,
-    hintPopoverBodySx: {
-      mt: 1,
-      mb: 2,
-    } satisfies SxProps<Theme>,
-    photographyCardSx,
-    photographyCardContentSx,
     photographyHeroSx,
     photographyImmersiveCardSx,
     photographyCardOverlaySx,
     photographyDetailCoverSx,
     readingSurfaceSx,
-    photographyMediaSx: {
-      position: 'relative',
-      borderRadius: 1.5,
-      overflow: 'hidden',
-      pt: '70%',
-      backgroundColor: photoPlaceholderColor,
-    } satisfies SxProps<Theme>,
-    photographyImageSx: {
-      position: 'absolute',
-      inset: 0,
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover',
-    } satisfies SxProps<Theme>,
     albumSectionSx: { p: { xs: 1.5, md: 2 } } satisfies SxProps<Theme>,
     climbingCardSx: { p: { xs: 2.5, md: 3.5 } } satisfies SxProps<Theme>,
-    errorAlertSx: { mb: 1 } satisfies SxProps<Theme>,
-    dataGridContainerSx: { width: '100%' } satisfies SxProps<Theme>,
-    loadingOverlaySx: { width: '100%', p: 2 } satisfies SxProps<Theme>,
     animatedCardContainerSx: { width: '100%' } satisfies SxProps<Theme>,
     getLoadingBarSx,
     getLoadingBarToneColors,

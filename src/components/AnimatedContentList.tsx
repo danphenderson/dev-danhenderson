@@ -18,6 +18,7 @@ type AnimatedContentListProps<Item> = {
   items: Item[];
   getItemKey: (item: Item, index: number) => string;
   renderItem: (item: Item, index: number) => ReactNode;
+  onItemVisible?: (item: Item, index: number) => void;
   layout?: AnimatedContentListLayout;
   startDelayMs?: number;
   itemStaggerMs?: number;
@@ -39,6 +40,7 @@ export const AnimatedContentList = <Item,>({
   items,
   getItemKey,
   renderItem,
+  onItemVisible,
   layout = 'stack',
   startDelayMs = 0,
   itemStaggerMs,
@@ -134,6 +136,7 @@ export const AnimatedContentList = <Item,>({
           key={getItemKey(item, index)}
           delayMs={getItemDelayMs(index, startDelayMs, resolvedItemStaggerMs)}
           skipEntranceAnimation={skipEntranceAnimation}
+          onVisible={onItemVisible ? () => onItemVisible(item, index) : undefined}
           sx={[...itemSurfaceSx, ...itemSxArray]}
           containerSx={[
             ...resolvedItemContainerSx,
